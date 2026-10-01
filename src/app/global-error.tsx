@@ -1,15 +1,22 @@
 'use client'
 
+import { useEffect } from 'react'
+import { reportError } from '@/lib/observability/report-error'
 import './globals.css'
 
 // Last resort when the root layout itself fails: no layout, no providers, no translations.
 // The only hardcoded text in the app (design.md §10), in English (the default locale).
 export default function GlobalError({
+  error,
   retry,
 }: {
   error: Error & { digest?: string }
   retry: () => void
 }) {
+  useEffect(() => {
+    reportError(error)
+  }, [error])
+
   return (
     <html lang="en">
       <body className="flex min-h-dvh items-center justify-center p-6 text-center">

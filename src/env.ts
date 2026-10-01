@@ -10,6 +10,7 @@ export const env = createEnv({
   shared: sharedEnvSchema,
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    NEXT_RUNTIME: process.env.NEXT_RUNTIME,
     APP_ENV: process.env.APP_ENV,
     API_BASE_URL: process.env.API_BASE_URL,
     API_MOCKS: process.env.API_MOCKS,

@@ -42,7 +42,7 @@ En este orden de preferencia:
 
 ## Variables de entorno
 
-- Definidas y validadas en `src/env.ts` con `@t3-oss/env-nextjs`. **Nunca `process.env` directo** fuera de ese archivo.
+- Definidas y validadas en `src/env.ts` con `@t3-oss/env-nextjs`. **Nunca `process.env` directo** fuera de ese archivo, con una sola excepción: `src/env.client.ts`, que lee las `NEXT_PUBLIC_*` que necesita código del navegador sin cargar zod en el bundle (ya las valida `env.ts` en el build).
 - Las variables del cliente llevan prefijo `NEXT_PUBLIC_` y **nunca** contienen secretos.
 - `.env.example` versionado con todas las variables y valores de ejemplo (ver `security.md`).
 

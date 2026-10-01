@@ -255,6 +255,8 @@ src/mocks/
 - `@sentry/nextjs` con `instrumentation.ts` y `instrumentation-client.ts`, siguiendo la guía de la versión instalada.
 - Se inicializa **solo si hay DSN**. `sendDefaultPii: false` y un `beforeSend` que elimina headers, cookies y query strings.
 - La subida de source maps queda preparada pero inactiva hasta tener proyecto y token en CI.
+- **En el navegador, Sentry se carga diferido y solo con DSN** (`instrumentation-client.ts` y `lib/observability/report-error.ts`, con `import()` dinámico). Sin DSN no suma JavaScript. Las variables públicas se leen de `env.client.ts`, sin zod. Medido en T-16: el SDK + zod sumaban ~148 KB gzip a la primera carga.
+- Solo errores: sin tracing, sin Session Replay (privacidad y presupuesto de JS).
 
 ## 10. Errores y SEO base (F-24, F-25)
 

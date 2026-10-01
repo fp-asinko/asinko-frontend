@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { StatusMessage } from '@/components/organisms/status-message'
 import { Button } from '@/components/ui/button'
+import { reportError } from '@/lib/observability/report-error'
 
 // F-25. Unexpected errors in a page: translated message + retry. Never shows error details.
 export default function ErrorPage({
@@ -16,8 +17,7 @@ export default function ErrorPage({
   const t = useTranslations('errors.unexpected')
 
   useEffect(() => {
-    // Replaced by Sentry reporting in T-16.
-    console.error(error)
+    reportError(error)
   }, [error])
 
   return (

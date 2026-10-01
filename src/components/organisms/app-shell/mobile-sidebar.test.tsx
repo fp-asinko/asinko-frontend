@@ -38,6 +38,20 @@ describe('MobileSidebar', () => {
 
     await user.keyboard('{Escape}')
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    // Focus goes back to the menu button.
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Open menu' })).toHaveFocus())
+  })
+
+  it('announces that it opens a dialog and its expanded state', async () => {
+    const user = userEvent.setup()
+    renderSidebar()
+    const trigger = screen.getByRole('button', { name: 'Open menu' })
+    expect(trigger).toHaveAttribute('aria-haspopup', 'dialog')
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+
+    await user.click(trigger)
+    await screen.findByRole('dialog')
+    expect(trigger).toHaveAttribute('aria-expanded', 'true')
   })
 
   it('closes with its translated close button', async () => {

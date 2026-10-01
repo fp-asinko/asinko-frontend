@@ -98,7 +98,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - `src/mocks/` (`design.md` §8), `src/lib/session.ts` (`getViewer()`), mock de ejemplo `GET /api/v1/profiles/{identifier}`.
   - **Tests:** `match.test.ts` (rutas con parámetros, método distinto no matchea); `client.test.ts` suma: con mocks una ruta registrada no llama a `fetch` y una no registrada sí; `fixtures.test.ts` parsea todas las fixtures con sus esquemas; `session.test.ts` (demo con mocks, `null` sin mocks).
 
-- [ ] **T-16 · Sentry opcional** · S · F-35
+- [x] **T-16 · Sentry opcional** · S · F-35
   - `instrumentation.ts`, `instrumentation-client.ts`, inicialización solo con DSN, `beforeSend` que limpia datos sensibles.
   - **Tests:** `sentry-scrub.test.ts` (el `beforeSend` elimina cookies, headers y query strings; sin DSN no se inicializa).
 

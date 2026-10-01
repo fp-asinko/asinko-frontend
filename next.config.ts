@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { withSentryConfig } from '@sentry/nextjs/config'
 import createNextIntlPlugin from 'next-intl/plugin'
 import { isIndexable } from './src/lib/seo/robots'
 
@@ -25,4 +26,10 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withNextIntl(nextConfig)
+// Sentry build integration. Source map upload stays off until the project and a CI token exist
+// (design.md §9): set org/project/authToken here and remove `disable`.
+export default withSentryConfig(withNextIntl(nextConfig), {
+  silent: true,
+  telemetry: false,
+  sourcemaps: { disable: true },
+})

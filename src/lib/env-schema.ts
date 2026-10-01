@@ -19,6 +19,8 @@ export const serverEnvSchema = {
 // Set by Next.js; shared by server and client.
 export const sharedEnvSchema = {
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  // Set by Next.js in instrumentation (nodejs | edge); absent elsewhere.
+  NEXT_RUNTIME: z.enum(['nodejs', 'edge']).optional(),
 }
 
 export const clientEnvSchema = {
