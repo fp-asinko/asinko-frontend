@@ -69,7 +69,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - Componentes base que usa el shell: `button`, `switch`, `sheet`, `skeleton`.
   - **Tests:** `tokens-contrast.test.ts` lee los tokens de `globals.css` y verifica cada par texto/fondo ≥ 4,5:1 y no-texto ≥ 3:1, en claro y oscuro (D-01). `package.json` sin dependencias `@radix-ui/*` (lo cubre también ESLint).
 
-- [ ] **T-10 · Tema claro/oscuro con toggle** · M · F-19, F-20, F-21
+- [x] **T-10 · Tema claro/oscuro con toggle** · M · F-19, F-20, F-21
   - Provider de `next-themes` (`defaultTheme="light"`, `enableSystem={false}`, `nonce`), `ThemeToggle` (molécula) con el `Switch`.
   - **Tests:** `theme-toggle.test.tsx`: tiene nombre accesible traducido, se opera con teclado (Espacio), refleja y cambia el estado.
 

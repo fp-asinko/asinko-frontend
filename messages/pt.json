@@ -6,5 +6,10 @@
   "home": {
     "title": "Início",
     "placeholder": "Seu feed vai aparecer aqui."
+  },
+  "common": {
+    "theme": {
+      "toggle": "Modo escuro"
+    }
   }
 }
