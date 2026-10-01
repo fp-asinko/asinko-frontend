@@ -52,7 +52,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - `src/env.ts` con el esquema de `design.md` §6, `.env.example`.
   - **Tests:** `env.test.ts` sobre el esquema: falla sin `API_BASE_URL`, con URL inválida, y con `APP_ENV=production` + `API_MOCKS=true`; pasa con una config válida de preview con mocks.
 
-- [ ] **T-07 · next-intl, mensajes y layout por idioma** · M · F-11, F-13, F-14, F-15, F-08
+- [x] **T-07 · next-intl, mensajes y layout por idioma** · M · F-11, F-13, F-14, F-15, F-08
   - `src/i18n/{routing,navigation,request}.ts`, `messages/{en,es,pt}.json` (namespaces `common`, `errors`, `api.errors`), `app/[locale]/layout.tsx` con `<html lang>`.
   - `src/test/render-with-intl.tsx`.
   - **Tests:** `messages.test.ts` (paridad de claves entre los tres idiomas, F-14) y `render-with-intl.test.tsx` (renderiza un texto traducido).

@@ -1,0 +1,10 @@
+{
+  "metadata": {
+    "title": "Asinko",
+    "description": "The finance social network where reputation is earned by being right."
+  },
+  "home": {
+    "title": "Home",
+    "placeholder": "Your feed will show up here."
+  }
+}
