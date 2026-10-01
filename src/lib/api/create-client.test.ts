@@ -157,3 +157,41 @@ describe('error translations', () => {
     expect(keys).toEqual(expect.arrayContaining([...KNOWN_ERROR_CODES, 'UNKNOWN']))
   })
 })
+
+describe('mocks (F-36)', () => {
+  const profileMock = {
+    method: 'GET',
+    path: '/api/v1/profiles/:identifier',
+    kind: 'contract',
+    schema: userSchema,
+    example: { params: { identifier: 'juan' }, query: {}, body: undefined },
+    handler: ({ params }: { params: Record<string, string> }) =>
+      params.identifier === 'juan'
+        ? { status: 200, body: { id: 'u1', username: 'juan' } }
+        : { status: 404, body: { error: { code: 'NOT_FOUND', message: 'mock' } } },
+  } as const
+
+  it('answers a registered route without touching the network', async () => {
+    const fetchMock = respond(500)
+    const api = createApiClient({ baseUrl: BASE_URL, fetch: fetchMock, mocks: [profileMock] })
+
+    expect(await api(getUser)).toEqual({ ok: true, data: { id: 'u1', username: 'juan' } })
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('sends unregistered routes to the real API', async () => {
+    const fetchMock = respond(200, { id: 'u2', username: 'ana' })
+    const api = createApiClient({ baseUrl: BASE_URL, fetch: fetchMock, mocks: [profileMock] })
+
+    await api({ method: 'GET', path: '/api/v1/users/u2', schema: userSchema })
+    expect(fetchMock).toHaveBeenCalledOnce()
+  })
+
+  it('applies the same error mapping to mocked errors', async () => {
+    const api = createApiClient({ baseUrl: BASE_URL, fetch: respond(500), mocks: [profileMock] })
+    expect(await api({ ...getUser, path: '/api/v1/profiles/nobody' })).toMatchObject({
+      ok: false,
+      errorKey: 'api.errors.NOT_FOUND',
+    })
+  })
+})

@@ -1,5 +1,7 @@
 import 'server-only'
 import type { z } from 'zod'
+import { findMock } from '@/mocks/match'
+import type { MockRoute } from '@/mocks/types'
 import { ApiUnexpectedError, isExpectedStatus, toApiFailure, type ApiFailure } from './errors'
 
 export type ApiResult<T> = { ok: true; data: T } | ApiFailure
@@ -19,6 +21,8 @@ export type ApiClientOptions = {
   baseUrl: string
   fetch?: typeof fetch
   timeoutMs?: number
+  /** Mocked routes (API_MOCKS). A registered route never reaches the network (F-36). */
+  mocks?: readonly MockRoute[]
 }
 
 const DEFAULT_TIMEOUT_MS = 10_000
@@ -34,13 +38,16 @@ async function readBody(response: Response): Promise<unknown> {
   }
 }
 
+type RawResponse = { status: number; body: unknown }
+
 /** HTTP client for asinko-app (design.md §7). Server-only: the browser never calls the API. */
 export function createApiClient({
   baseUrl,
   fetch: fetchImpl = fetch,
   timeoutMs = DEFAULT_TIMEOUT_MS,
+  mocks,
 }: ApiClientOptions) {
-  return async function apiRequest<T>(request: ApiRequest<T>): Promise<ApiResult<T>> {
+  async function callNetwork<T>(request: ApiRequest<T>): Promise<RawResponse> {
     const url = new URL(request.path, baseUrl)
     for (const [key, value] of Object.entries(request.query ?? {})) url.searchParams.set(key, value)
 
@@ -59,26 +66,34 @@ export function createApiClient({
     } catch (cause) {
       throw new ApiUnexpectedError(`${request.method} ${request.path} failed: ${String(cause)}`)
     }
+    return { status: response.status, body: await readBody(response) }
+  }
 
-    const body = await readBody(response)
+  return async function apiRequest<T>(request: ApiRequest<T>): Promise<ApiResult<T>> {
+    // Same handling below for mocked and real responses: a mock exercises validation and errors too.
+    const mock = mocks ? findMock(mocks, request.method, request.path) : null
+    const { status, body } = mock
+      ? await mock.route.handler({
+          params: mock.params,
+          query: request.query ?? {},
+          body: request.body,
+        })
+      : await callNetwork(request)
 
-    if (response.ok) {
+    if (status >= 200 && status < 300) {
       const parsed = request.schema.safeParse(body)
       if (!parsed.success) {
         throw new ApiUnexpectedError(
           `${request.method} ${request.path} returned an unexpected shape`,
-          response.status,
+          status,
         )
       }
       return { ok: true, data: parsed.data }
     }
 
-    if (isExpectedStatus(response.status)) return toApiFailure(response.status, body)
+    if (isExpectedStatus(status)) return toApiFailure(status, body)
 
-    throw new ApiUnexpectedError(
-      `${request.method} ${request.path} responded ${response.status}`,
-      response.status,
-    )
+    throw new ApiUnexpectedError(`${request.method} ${request.path} responded ${status}`, status)
   }
 }
 

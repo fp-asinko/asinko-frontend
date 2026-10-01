@@ -245,7 +245,7 @@ src/mocks/
 └── README.md         # Qué está mockeado y si es "contrato" o "propuesta"
 ```
 
-- Un handler recibe `{ params, query, body, viewer }` y devuelve `{ status, body }`: puede simular errores (`404`, `422`) y paginación.
+- Cada ruta mockeada se registra con su `schema` de respuesta y un `example` de request. Un handler recibe `{ params, query, body }` y devuelve `{ status, body }`: puede simular errores (`404`, `422`) y paginación. Si necesita al usuario, lo pide a `getViewer()` como el resto del código. El cliente aplica a la respuesta del mock **la misma** validación y mapeo de errores que a la real.
 - **Ejemplo incluido:** `GET /api/v1/profiles/{identifier}` (E01) con el perfil del usuario demo. Sirve para probar el mecanismo de punta a punta; los mocks de dominio los agrega cada vista.
 - Las fixtures se tipan e importan con los mismos esquemas zod que valida el cliente. Un test recorre todas las fixtures y las parsea (F-37).
 - Sin dependencias: matcher propio, menos de ~50 líneas (`libraries.md`).
