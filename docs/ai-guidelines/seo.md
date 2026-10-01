@@ -27,12 +27,12 @@
 
 Umbrales **bloqueantes**, no recomendaciones:
 
-| Métrica | Umbral | Medición |
-|---|---|---|
-| LCP | < 2.5s | Lighthouse en CI |
-| CLS | < 0.1 | Lighthouse en CI |
-| INP | < 200ms | Lighthouse en CI |
-| TTFB | < 800ms | Edge / CDN |
+| Métrica | Umbral  | Medición         |
+| ------- | ------- | ---------------- |
+| LCP     | < 2.5s  | Lighthouse en CI |
+| CLS     | < 0.1   | Lighthouse en CI |
+| INP     | < 200ms | Lighthouse en CI |
+| TTFB    | < 800ms | Edge / CDN       |
 
 Para sitios de contenido estático: Lighthouse score global > 90 obligatorio.
 
@@ -93,10 +93,10 @@ Para visibilidad en buscadores y LLMs:
 
 ## Herramientas
 
-| Herramienta | Uso |
-|---|---|
-| Crawler (ej. Screaming Frog) | Auditoría técnica completa |
-| Search Console / Webmaster tools | Monitoreo de indexación |
-| Lighthouse CI | Validación en pipeline |
-| Pa11y | Accesibilidad (impacta SEO) |
-| Ahrefs / Semrush | Backlinks y rankings |
+| Herramienta                      | Uso                         |
+| -------------------------------- | --------------------------- |
+| Crawler (ej. Screaming Frog)     | Auditoría técnica completa  |
+| Search Console / Webmaster tools | Monitoreo de indexación     |
+| Lighthouse CI                    | Validación en pipeline      |
+| Pa11y                            | Accesibilidad (impacta SEO) |
+| Ahrefs / Semrush                 | Backlinks y rankings        |

@@ -107,9 +107,9 @@ app/  →  features/  →  components/  →  lib/
 
 Con pnpm workspaces (ver `conventions.md`). Las apps dependen de los packages, **jamás al revés**; los packages base son hojas.
 
-| Package | Propósito |
-|---|---|
-| `ui` | `components/` compartidos (shadcn + moléculas + organismos) |
-| `api-client` | Cliente HTTP tipado (solo consumo) |
-| `config-eslint` | Config compartida de linter |
-| `config-typescript` | tsconfig base |
+| Package             | Propósito                                                   |
+| ------------------- | ----------------------------------------------------------- |
+| `ui`                | `components/` compartidos (shadcn + moléculas + organismos) |
+| `api-client`        | Cliente HTTP tipado (solo consumo)                          |
+| `config-eslint`     | Config compartida de linter                                 |
+| `config-typescript` | tsconfig base                                               |

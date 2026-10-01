@@ -32,7 +32,9 @@ shadcn define el tema con variables semánticas en `globals.css`:
   --radius: 0.625rem;
   /* ... */
 }
-.dark { /* mismas variables, valores de dark mode */ }
+.dark {
+  /* mismas variables, valores de dark mode */
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -56,14 +58,14 @@ shadcn define el tema con variables semánticas en `globals.css`:
 
 ## Atomic Design
 
-| Nivel | Qué es | Dónde vive | Ejemplos |
-|---|---|---|---|
-| **Átomos** | Primitivos indivisibles | `src/components/ui/` | `button`, `input`, `label`, `badge` (shadcn) |
-| **Moléculas** | Combinación simple de átomos, reutilizable | `src/components/molecules/` | `search-field`, `form-field`, `price-tag` |
-| **Organismos** | Secciones completas sin lógica de negocio | `src/components/organisms/` | `site-header`, `site-footer`, `empty-state` |
-| **Organismos de feature** | Secciones con lógica de negocio | `src/features/<feature>/components/` | `quote-form`, `product-grid` |
-| **Templates** | Esqueleto de página | `src/app/**/layout.tsx` | layout del sitio, layout del checkout |
-| **Pages** | Template + datos reales | `src/app/**/page.tsx` | `/`, `/products/[slug]` |
+| Nivel                     | Qué es                                     | Dónde vive                           | Ejemplos                                     |
+| ------------------------- | ------------------------------------------ | ------------------------------------ | -------------------------------------------- |
+| **Átomos**                | Primitivos indivisibles                    | `src/components/ui/`                 | `button`, `input`, `label`, `badge` (shadcn) |
+| **Moléculas**             | Combinación simple de átomos, reutilizable | `src/components/molecules/`          | `search-field`, `form-field`, `price-tag`    |
+| **Organismos**            | Secciones completas sin lógica de negocio  | `src/components/organisms/`          | `site-header`, `site-footer`, `empty-state`  |
+| **Organismos de feature** | Secciones con lógica de negocio            | `src/features/<feature>/components/` | `quote-form`, `product-grid`                 |
+| **Templates**             | Esqueleto de página                        | `src/app/**/layout.tsx`              | layout del sitio, layout del checkout        |
+| **Pages**                 | Template + datos reales                    | `src/app/**/page.tsx`                | `/`, `/products/[slug]`                      |
 
 ### Reglas
 

@@ -90,14 +90,15 @@ React escapa el texto por defecto. Las reglas son para no romper esa protección
   - El nonce obliga a renderizado dinámico. Para una red social con feeds personalizados es el caso normal. Las páginas que sí pueden ser estáticas (legales, landing) se evalúan por separado.
   - En desarrollo se agrega `'unsafe-eval'` (lo necesita React para debug). Nunca en producción.
   - Todo dominio nuevo en la política se justifica en el PR.
+
 - **Headers fijos** en `next.config.ts` (`headers()`):
 
-  | Header | Valor |
-  |---|---|
-  | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload` |
-  | `X-Content-Type-Options` | `nosniff` |
-  | `Referrer-Policy` | `strict-origin-when-cross-origin` |
-  | `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` (se habilita solo lo que un feature pida) |
+  | Header                      | Valor                                                                                |
+  | --------------------------- | ------------------------------------------------------------------------------------ |
+  | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload`                                       |
+  | `X-Content-Type-Options`    | `nosniff`                                                                            |
+  | `Referrer-Policy`           | `strict-origin-when-cross-origin`                                                    |
+  | `Permissions-Policy`        | `camera=(), microphone=(), geolocation=()` (se habilita solo lo que un feature pida) |
 
 ### 3. Sesión y tokens
 

@@ -90,7 +90,9 @@ Los features dependen de **abstracciones**, no de detalles de infraestructura.
 
 ```ts
 // features/quote/lib/quote-repository.ts
-export async function saveQuote(input: QuoteInput): Promise<Quote> { /* ORM / API acá */ }
+export async function saveQuote(input: QuoteInput): Promise<Quote> {
+  /* ORM / API acá */
+}
 
 // features/quote/actions/create-quote.action.ts
 export async function createQuote(raw: unknown) {
@@ -110,10 +112,10 @@ export async function createQuote(raw: unknown) {
 
 ### Errores esperables vs inesperados
 
-| Tipo | Ejemplos | Cómo se maneja |
-|---|---|---|
-| **Esperable** | Validación fallida, recurso no encontrado, regla de negocio | Se **devuelve** como resultado tipado |
-| **Inesperado** | Caída de la DB, bug, timeout de un servicio | Se **lanza** (`throw`), lo captura `error.tsx` y se reporta a Sentry |
+| Tipo           | Ejemplos                                                    | Cómo se maneja                                                       |
+| -------------- | ----------------------------------------------------------- | -------------------------------------------------------------------- |
+| **Esperable**  | Validación fallida, recurso no encontrado, regla de negocio | Se **devuelve** como resultado tipado                                |
+| **Inesperado** | Caída de la DB, bug, timeout de un servicio                 | Se **lanza** (`throw`), lo captura `error.tsx` y se reporta a Sentry |
 
 ### Server Actions
 
@@ -122,14 +124,17 @@ Las actions devuelven un resultado discriminado, nunca lanzan por errores espera
 ```ts
 // src/lib/result.ts
 export type ActionResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; error: string; fieldErrors?: Record<string, string[]> }
+  { ok: true; data: T } | { ok: false; error: string; fieldErrors?: Record<string, string[]> }
 
 // features/quote/actions/create-quote.action.ts
 export async function createQuote(raw: unknown): Promise<ActionResult<Quote>> {
   const parsed = quoteFormSchema.safeParse(raw)
   if (!parsed.success) {
-    return { ok: false, error: 'quote.errors.invalid', fieldErrors: z.flattenError(parsed.error).fieldErrors }
+    return {
+      ok: false,
+      error: 'quote.errors.invalid',
+      fieldErrors: z.flattenError(parsed.error).fieldErrors,
+    }
   }
   return { ok: true, data: await saveQuote(parsed.data) }
 }

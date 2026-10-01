@@ -4,12 +4,12 @@
 
 ## Jerarquía de fuentes de conocimiento
 
-| Fuente | Qué contiene | Manda sobre |
-|---|---|---|
-| **Specs** (`specs/`) | Qué se construye y cómo. Decisiones de diseño aprobadas. | Todo lo demás |
-| **Guías** (`docs/ai-guidelines/`) | Cómo trabajamos. Reglas del proyecto. | Engram |
-| **Engram** (`.engram/`) | Contexto de trabajo: descubrimientos, gotchas, bugs resueltos, estado entre sesiones. | Memoria personal |
-| **Memoria del asistente** (ej. auto-memory de Claude Code) | Solo preferencias personales de cada dev. | — |
+| Fuente                                                     | Qué contiene                                                                          | Manda sobre      |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------- | ---------------- |
+| **Specs** (`specs/`)                                       | Qué se construye y cómo. Decisiones de diseño aprobadas.                              | Todo lo demás    |
+| **Guías** (`docs/ai-guidelines/`)                          | Cómo trabajamos. Reglas del proyecto.                                                 | Engram           |
+| **Engram** (`.engram/`)                                    | Contexto de trabajo: descubrimientos, gotchas, bugs resueltos, estado entre sesiones. | Memoria personal |
+| **Memoria del asistente** (ej. auto-memory de Claude Code) | Solo preferencias personales de cada dev.                                             | —                |
 
 Si una memoria de Engram contradice un spec o una guía, **gana el spec/guía** y la memoria se corrige (`mem_update`). Si un descubrimiento cambia el diseño, se actualiza el spec: Engram no reemplaza a la documentación.
 

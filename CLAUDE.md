@@ -21,6 +21,7 @@ Qué es el producto (visión, menciones, tipos de contenido y roadmap):
 - @docs/product/overview.md
 
 Reglas rápidas:
+
 1. No escribas código de feature sin un spec aprobado.
 2. Si la spec es ambigua, pregunta. No completes con suposiciones.
 3. Sigue Conventional Commits.

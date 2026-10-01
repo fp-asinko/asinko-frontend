@@ -4,14 +4,14 @@
 
 ## Qué se testea con qué
 
-| Qué | Herramienta | Dónde |
-|---|---|---|
-| Componentes (client y Server Components síncronos) | Vitest + Testing Library | Al lado del archivo: `product-card.test.tsx` |
-| Hooks | Vitest (`renderHook`) | `use-product-search.test.ts` |
-| Esquemas de validación | Vitest | `quote-form.schema.test.ts` |
-| Server Actions y `lib/` | Vitest (dependencias mockeadas) | `create-quote.action.test.ts` |
-| Server Components `async` | Playwright | `e2e/` |
-| Flujos de usuario completos | Playwright | `e2e/<flujo>.spec.ts` |
+| Qué                                                | Herramienta                     | Dónde                                        |
+| -------------------------------------------------- | ------------------------------- | -------------------------------------------- |
+| Componentes (client y Server Components síncronos) | Vitest + Testing Library        | Al lado del archivo: `product-card.test.tsx` |
+| Hooks                                              | Vitest (`renderHook`)           | `use-product-search.test.ts`                 |
+| Esquemas de validación                             | Vitest                          | `quote-form.schema.test.ts`                  |
+| Server Actions y `lib/`                            | Vitest (dependencias mockeadas) | `create-quote.action.test.ts`                |
+| Server Components `async`                          | Playwright                      | `e2e/`                                       |
+| Flujos de usuario completos                        | Playwright                      | `e2e/<flujo>.spec.ts`                        |
 
 > Vitest no soporta Server Components `async` (limitación documentada por Next.js). Se cubren con e2e.
 
@@ -27,13 +27,13 @@
 
 El umbral es un **piso, no un objetivo**: la regla principal sigue siendo "cada componente y cada criterio de aceptación tiene su test". No se escriben tests triviales para subir el número.
 
-| Dónde | Líneas / funciones / statements | Branches |
-|---|---|---|
-| `features/**/{actions,schemas,lib,hooks}` | 80% | 75% |
-| `lib/`, `hooks/` | 80% | 75% |
-| Componentes | Sin umbral: cubiertos por la regla "un componente, un test" | — |
-| `app/` | Excluido: cubierto por e2e | — |
-| `components/ui/` (shadcn sin modificar) | Excluido | — |
+| Dónde                                     | Líneas / funciones / statements                             | Branches |
+| ----------------------------------------- | ----------------------------------------------------------- | -------- |
+| `features/**/{actions,schemas,lib,hooks}` | 80%                                                         | 75%      |
+| `lib/`, `hooks/`                          | 80%                                                         | 75%      |
+| Componentes                               | Sin umbral: cubiertos por la regla "un componente, un test" | —        |
+| `app/`                                    | Excluido: cubierto por e2e                                  | —        |
+| `components/ui/` (shadcn sin modificar)   | Excluido                                                    | —        |
 
 - `pnpm test:coverage` falla si algún umbral no se cumple. Es un **quality gate bloqueante** en CI.
 - Excluir un archivo de la cobertura requiere justificación en el PR.
@@ -58,21 +58,26 @@ export default defineConfig({
   plugins: [tsconfigPaths(), react()],
   test: {
     environment: 'jsdom',
-    setupFiles: ['./vitest.setup.ts'],   // import '@testing-library/jest-dom/vitest'
-    include: ['src/**/*.test.{ts,tsx}'],  // e2e/ queda fuera
+    setupFiles: ['./vitest.setup.ts'], // import '@testing-library/jest-dom/vitest'
+    include: ['src/**/*.test.{ts,tsx}'], // e2e/ queda fuera
     coverage: {
       provider: 'v8',
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
-        'src/components/ui/**',  // shadcn sin modificar
-        'src/app/**',            // pages y layouts: cubiertos por e2e
+        'src/components/ui/**', // shadcn sin modificar
+        'src/app/**', // pages y layouts: cubiertos por e2e
         'src/**/*.types.ts',
         'src/**/index.ts',
         'src/**/*.test.{ts,tsx}',
       ],
       thresholds: {
         // Umbral solo donde vive la lógica
-        'src/features/**/{actions,schemas,lib,hooks}/**': { lines: 80, functions: 80, statements: 80, branches: 75 },
+        'src/features/**/{actions,schemas,lib,hooks}/**': {
+          lines: 80,
+          functions: 80,
+          statements: 80,
+          branches: 75,
+        },
         'src/{lib,hooks}/**': { lines: 80, functions: 80, statements: 80, branches: 75 },
       },
     },
@@ -155,7 +160,11 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
   ],
-  webServer: { command: 'pnpm build && pnpm start', url: 'http://localhost:3000', reuseExistingServer: !process.env.CI },
+  webServer: {
+    command: 'pnpm build && pnpm start',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
 })
 ```
 

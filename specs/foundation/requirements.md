@@ -11,10 +11,10 @@ Este spec **no construye ninguna vista de producto**: cada una tiene su propio s
 
 ## Stakeholders
 
-| Rol | Quién |
-|---|---|
-| Product Owner y Tech Lead (aprueba) | Juan |
-| Backend (`asinko-app`) | eceraolo — informado; este spec no le pide cambios |
+| Rol                                 | Quién                                              |
+| ----------------------------------- | -------------------------------------------------- |
+| Product Owner y Tech Lead (aprueba) | Juan                                               |
+| Backend (`asinko-app`)              | eceraolo — informado; este spec no le pide cambios |
 
 ## User stories
 

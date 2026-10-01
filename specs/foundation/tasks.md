@@ -28,7 +28,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - Leer `node_modules/next/dist/docs/` para los cambios de Next 16 antes de seguir.
   - **Verificación:** `pnpm typecheck` y `pnpm build` pasan; no existe otro lockfile.
 
-- [ ] **T-02 · Prettier, EditorConfig y VS Code** · S · F-05
+- [x] **T-02 · Prettier, EditorConfig y VS Code** · S · F-05
   - Prettier + `prettier-plugin-tailwindcss` con la config de `tooling.md`. `.prettierignore`.
   - `.vscode/extensions.json` y `settings.json`.
   - **Verificación:** `pnpm format:check` pasa.
@@ -129,46 +129,46 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
 
 ## Mapeo de criterios a verificación
 
-| Criterio | Verificación | Tarea |
-|---|---|---|
-| F-01 | `pnpm build` + único lockfile | T-01 |
-| F-02 | `pnpm typecheck` (CI) | T-01 |
-| F-03 | `pnpm lint` (CI) + `eslint-rules.test.ts` | T-03 |
-| F-04 | `eslint-rules.test.ts` | T-03 |
-| F-05 | `pnpm format:check` (CI) | T-02 |
-| F-06 | `commitlint.test.ts` + hooks instalados | T-04 |
-| F-07 | Scripts presentes y usados por CI | T-01, T-18 |
-| F-08 | `render-with-intl.test.tsx` | T-05, T-07 |
-| F-09 | `pnpm test:coverage` (CI) | T-05 |
-| F-10 | `playwright.config.ts` + suite e2e | T-17 |
-| F-11 | `i18n.spec.ts` | T-07, T-17 |
-| F-12 | `i18n.spec.ts` | T-08, T-17 |
-| F-13 | `i18n.spec.ts` | T-07, T-17 |
-| F-14 | `messages.test.ts` | T-07 |
-| F-15 | `messages.test.ts` + revisión de `ui-reviewer` | T-07, T-20 |
-| F-16 | ESLint (`@radix-ui/*`) + `components.json` | T-09 |
-| F-17 | `tokens-contrast.test.ts` | T-09 |
-| F-18 | Revisión de `globals.css` (sin `next/font` ni fuentes externas) + CSP `font-src 'self'` | T-09 |
-| F-19 | `theme.spec.ts` | T-10, T-17 |
-| F-20 | `theme.spec.ts` | T-10, T-17 |
-| F-21 | `theme-toggle.test.tsx` + axe | T-10, T-17 |
-| F-22 | Revisión de `ui-reviewer` (`motion-safe`/`motion-reduce`) | T-11 |
-| F-23 | Tests de componentes del shell + `shell.spec.ts` | T-11, T-17 |
-| F-23b | `bottom-nav.test.tsx` | T-11 |
-| F-24 | `not-found.test.tsx` + `errors.spec.ts` | T-12, T-17 |
-| F-25 | `error.test.tsx` | T-12 |
-| F-26 | `shell.spec.ts` | T-11, T-17 |
-| F-27 | `csp.test.ts` + `security-headers.spec.ts` | T-08, T-17 |
-| F-28 | `csp.test.ts` + `security-headers.spec.ts` | T-08, T-17 |
-| F-29 | `env.test.ts` | T-06 |
-| F-30 | `env.test.ts` | T-06 |
-| F-31 | `robots.test.ts` + `security-headers.spec.ts` | T-13, T-17 |
-| F-32 | Test de compilación (Client Component que importa el cliente) | T-14, T-17 |
-| F-33 | `client.test.ts` | T-14 |
-| F-34 | `client.test.ts` | T-14 |
-| F-35 | `sentry-scrub.test.ts` | T-16 |
-| F-36 | `match.test.ts` + `client.test.ts` | T-15 |
-| F-37 | `fixtures.test.ts` | T-15 |
-| F-38 | `session.test.ts` | T-15 |
-| F-39 | `ci.yml` (`actionlint`) | T-18 |
-| F-40 | Revisión del PR | T-19 |
+| Criterio | Verificación                                                                            | Tarea      |
+| -------- | --------------------------------------------------------------------------------------- | ---------- |
+| F-01     | `pnpm build` + único lockfile                                                           | T-01       |
+| F-02     | `pnpm typecheck` (CI)                                                                   | T-01       |
+| F-03     | `pnpm lint` (CI) + `eslint-rules.test.ts`                                               | T-03       |
+| F-04     | `eslint-rules.test.ts`                                                                  | T-03       |
+| F-05     | `pnpm format:check` (CI)                                                                | T-02       |
+| F-06     | `commitlint.test.ts` + hooks instalados                                                 | T-04       |
+| F-07     | Scripts presentes y usados por CI                                                       | T-01, T-18 |
+| F-08     | `render-with-intl.test.tsx`                                                             | T-05, T-07 |
+| F-09     | `pnpm test:coverage` (CI)                                                               | T-05       |
+| F-10     | `playwright.config.ts` + suite e2e                                                      | T-17       |
+| F-11     | `i18n.spec.ts`                                                                          | T-07, T-17 |
+| F-12     | `i18n.spec.ts`                                                                          | T-08, T-17 |
+| F-13     | `i18n.spec.ts`                                                                          | T-07, T-17 |
+| F-14     | `messages.test.ts`                                                                      | T-07       |
+| F-15     | `messages.test.ts` + revisión de `ui-reviewer`                                          | T-07, T-20 |
+| F-16     | ESLint (`@radix-ui/*`) + `components.json`                                              | T-09       |
+| F-17     | `tokens-contrast.test.ts`                                                               | T-09       |
+| F-18     | Revisión de `globals.css` (sin `next/font` ni fuentes externas) + CSP `font-src 'self'` | T-09       |
+| F-19     | `theme.spec.ts`                                                                         | T-10, T-17 |
+| F-20     | `theme.spec.ts`                                                                         | T-10, T-17 |
+| F-21     | `theme-toggle.test.tsx` + axe                                                           | T-10, T-17 |
+| F-22     | Revisión de `ui-reviewer` (`motion-safe`/`motion-reduce`)                               | T-11       |
+| F-23     | Tests de componentes del shell + `shell.spec.ts`                                        | T-11, T-17 |
+| F-23b    | `bottom-nav.test.tsx`                                                                   | T-11       |
+| F-24     | `not-found.test.tsx` + `errors.spec.ts`                                                 | T-12, T-17 |
+| F-25     | `error.test.tsx`                                                                        | T-12       |
+| F-26     | `shell.spec.ts`                                                                         | T-11, T-17 |
+| F-27     | `csp.test.ts` + `security-headers.spec.ts`                                              | T-08, T-17 |
+| F-28     | `csp.test.ts` + `security-headers.spec.ts`                                              | T-08, T-17 |
+| F-29     | `env.test.ts`                                                                           | T-06       |
+| F-30     | `env.test.ts`                                                                           | T-06       |
+| F-31     | `robots.test.ts` + `security-headers.spec.ts`                                           | T-13, T-17 |
+| F-32     | Test de compilación (Client Component que importa el cliente)                           | T-14, T-17 |
+| F-33     | `client.test.ts`                                                                        | T-14       |
+| F-34     | `client.test.ts`                                                                        | T-14       |
+| F-35     | `sentry-scrub.test.ts`                                                                  | T-16       |
+| F-36     | `match.test.ts` + `client.test.ts`                                                      | T-15       |
+| F-37     | `fixtures.test.ts`                                                                      | T-15       |
+| F-38     | `session.test.ts`                                                                       | T-15       |
+| F-39     | `ci.yml` (`actionlint`)                                                                 | T-18       |
+| F-40     | Revisión del PR                                                                         | T-19       |

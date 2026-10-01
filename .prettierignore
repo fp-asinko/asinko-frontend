@@ -1,0 +1,15 @@
+# Generated / lockfiles
+pnpm-lock.yaml
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+next-env.d.ts
+
+# Vendored or third-party content: formatted by its authors
+.claude/skills/
+docs/references/
+
+# Next.js writes this block itself (see AGENTS.md)
+AGENTS.md

@@ -15,11 +15,11 @@ Navegador ──► asinko-web (Next.js)  ──HTTP──►  asinko-app /api/v
 
 ## Configuración
 
-| Variable | Dónde | Para qué |
-|---|---|---|
-| `API_BASE_URL` | Servidor | URL base de `asinko-app` por ambiente (sin `NEXT_PUBLIC_`) |
-| `NEXT_PUBLIC_SUPABASE_URL` | Cliente y servidor | Mismo proyecto Supabase que el backend |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Cliente y servidor | Key pública; la protección real son las políticas RLS |
+| Variable                        | Dónde              | Para qué                                                   |
+| ------------------------------- | ------------------ | ---------------------------------------------------------- |
+| `API_BASE_URL`                  | Servidor           | URL base de `asinko-app` por ambiente (sin `NEXT_PUBLIC_`) |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Cliente y servidor | Mismo proyecto Supabase que el backend                     |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Cliente y servidor | Key pública; la protección real son las políticas RLS      |
 
 Todas validadas en `src/env.ts` (ver `libraries.md`). **Nunca** usar la `service_role` key de Supabase en este repo.
 
@@ -33,21 +33,21 @@ Un único cliente en `src/lib/api/` (`import 'server-only'`) que todos los featu
 
 ### Formato del backend
 
-| Caso | Forma |
-|---|---|
-| Error | `{ "error": { "code": string, "message": string, ...extra } }` (ej. `retryAfter` en 429) |
-| Lista | `{ "items": T[], "nextCursor": string \| null }`, cursor opaco, 20 ítems por página |
-| Sin contenido | `204` sin body |
+| Caso          | Forma                                                                                    |
+| ------------- | ---------------------------------------------------------------------------------------- |
+| Error         | `{ "error": { "code": string, "message": string, ...extra } }` (ej. `retryAfter` en 429) |
+| Lista         | `{ "items": T[], "nextCursor": string \| null }`, cursor opaco, 20 ítems por página      |
+| Sin contenido | `204` sin body                                                                           |
 
 ### Errores
 
-| Status | Código típico | Cómo lo trata el front |
-|---|---|---|
-| `401` | `UNAUTHENTICATED` | Redirige al login (con `?next=` relativo, ver `security.md`) |
-| `403` | `USER_MISMATCH`, `ACCOUNT_DELETED`, … | Error esperable: clave de traducción por código |
-| `404` | `NOT_FOUND` | `notFound()` de Next. El backend devuelve 404 también cuando el recurso existe pero no es visible |
-| `409` / `422` / `429` | `USERNAME_TAKEN`, `SLUG_TAKEN`, … | Error esperable: `ActionResult` con clave de traducción (ver `engineering-principles.md`) |
-| `5xx` o red | — | Error inesperado: se lanza, lo captura `error.tsx` |
+| Status                | Código típico                         | Cómo lo trata el front                                                                            |
+| --------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `401`                 | `UNAUTHENTICATED`                     | Redirige al login (con `?next=` relativo, ver `security.md`)                                      |
+| `403`                 | `USER_MISMATCH`, `ACCOUNT_DELETED`, … | Error esperable: clave de traducción por código                                                   |
+| `404`                 | `NOT_FOUND`                           | `notFound()` de Next. El backend devuelve 404 también cuando el recurso existe pero no es visible |
+| `409` / `422` / `429` | `USERNAME_TAKEN`, `SLUG_TAKEN`, …     | Error esperable: `ActionResult` con clave de traducción (ver `engineering-principles.md`)         |
+| `5xx` o red           | —                                     | Error inesperado: se lanza, lo captura `error.tsx`                                                |
 
 - El `message` del backend **no se muestra** al usuario (viene en español y es para debug). Se muestra la traducción del `code`.
 - Un `code` desconocido cae en un mensaje genérico traducido.
@@ -93,9 +93,9 @@ src/mocks/
 - **Los mocks simulan también los errores** (`401`, `404`, `422`…) y la paginación con `nextCursor`, no solo el camino feliz.
 - Dos tipos de mock, y siempre se sabe cuál es cuál:
 
-  | Tipo | Qué es | Dónde se documenta |
-  |---|---|---|
-  | **Contrato** | El endpoint está en `docs/references/api/` pero no está implementado | Nada extra: el contrato ya lo describe |
+  | Tipo          | Qué es                                                                  | Dónde se documenta                                                  |
+  | ------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------- |
+  | **Contrato**  | El endpoint está en `docs/references/api/` pero no está implementado    | Nada extra: el contrato ya lo describe                              |
   | **Propuesta** | El front necesita algo que el contrato no tiene (un campo, un endpoint) | `docs/references/api/proposals.md`, con la forma exacta y el motivo |
 
 - `proposals.md` es lo que se le pasa al backend. Cuando el backend lo implementa, la propuesta pasa al snapshot del contrato y se apaga el mock.

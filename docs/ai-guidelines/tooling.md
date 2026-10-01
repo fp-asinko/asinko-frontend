@@ -10,11 +10,11 @@
 {
   "compilerOptions": {
     "strict": true,
-    "noUncheckedIndexedAccess": true,   // arr[i] es T | undefined
+    "noUncheckedIndexedAccess": true, // arr[i] es T | undefined
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true
-  }
+    "forceConsistentCasingInFileNames": true,
+  },
 }
 ```
 
@@ -26,25 +26,25 @@
 
 Flat config (`eslint.config.mjs`), ejecutado con el CLI de ESLint (`next lint` ya no existe en Next.js 16).
 
-| Plugin / config | Para qué |
-|---|---|
-| `eslint-config-next` (core-web-vitals + typescript) | Reglas de Next.js, React y hooks |
-| `eslint-plugin-jsx-a11y` | Errores de accesibilidad en JSX |
-| `eslint-plugin-boundaries` | Hace cumplir las reglas de dependencias de `structure.md` |
-| `eslint-config-prettier` | Desactiva reglas de formato (las maneja Prettier) |
+| Plugin / config                                     | Para qué                                                  |
+| --------------------------------------------------- | --------------------------------------------------------- |
+| `eslint-config-next` (core-web-vitals + typescript) | Reglas de Next.js, React y hooks                          |
+| `eslint-plugin-jsx-a11y`                            | Errores de accesibilidad en JSX                           |
+| `eslint-plugin-boundaries`                          | Hace cumplir las reglas de dependencias de `structure.md` |
+| `eslint-config-prettier`                            | Desactiva reglas de formato (las maneja Prettier)         |
 
 ### Boundaries
 
 Traduce el diagrama de dependencias de `structure.md` a errores de lint:
 
-| Elemento | Puede importar de |
-|---|---|
-| `app` | todo |
-| `feature` | `components`, `hooks`, `lib`, `i18n` (nunca otro `feature`) |
-| `organisms` | `molecules`, `ui`, `hooks`, `lib`, `i18n` |
-| `molecules` | `ui`, `hooks`, `lib`, `i18n` |
-| `ui` | `lib` |
-| `hooks`, `lib` | `lib` |
+| Elemento       | Puede importar de                                           |
+| -------------- | ----------------------------------------------------------- |
+| `app`          | todo                                                        |
+| `feature`      | `components`, `hooks`, `lib`, `i18n` (nunca otro `feature`) |
+| `organisms`    | `molecules`, `ui`, `hooks`, `lib`, `i18n`                   |
+| `molecules`    | `ui`, `hooks`, `lib`, `i18n`                                |
+| `ui`           | `lib`                                                       |
+| `hooks`, `lib` | `lib`                                                       |
 
 Además, entre features solo se importa desde su `index.ts`.
 
@@ -61,18 +61,26 @@ Además, entre features solo se importa desde su `index.ts`.
 - Config mínima; no se discute formato en los PRs.
 
 ```json
-{ "semi": false, "singleQuote": true, "printWidth": 100, "plugins": ["prettier-plugin-tailwindcss"] }
+{
+  "semi": false,
+  "singleQuote": true,
+  "printWidth": 100,
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "tailwindStylesheet": "./src/app/globals.css"
+}
 ```
+
+`tailwindStylesheet` es obligatorio con Tailwind 4: el plugin lee los tokens de ese archivo para ordenar las clases. El contenido de terceros (`.claude/skills/`, `docs/references/`) queda fuera de Prettier (`.prettierignore`).
 
 ## Git hooks
 
 Con **Lefthook** (un solo binario, más rápido que Husky y sin depender del shell):
 
-| Hook | Qué corre |
-|---|---|
-| `pre-commit` | ESLint + Prettier sobre los archivos staged |
+| Hook         | Qué corre                                                                                             |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| `pre-commit` | ESLint + Prettier sobre los archivos staged                                                           |
 | `commit-msg` | **commitlint** (`@commitlint/config-conventional`): rechaza commits que no sigan Conventional Commits |
-| `pre-push` | `pnpm typecheck` + `pnpm test` |
+| `pre-push`   | `pnpm typecheck` + `pnpm test`                                                                        |
 
 Los hooks son una ayuda local; **el CI es la fuente de verdad**. Saltearlos con `--no-verify` no evita que el PR falle.
 

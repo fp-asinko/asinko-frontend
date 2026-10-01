@@ -4,12 +4,12 @@
 
 ## SDD vs Vibe Coding
 
-| Característica | Vibe Coding (puro flow) | Spec Driven Development |
-|---|---|---|
-| **Definición** | Programar por intuición y lenguaje natural sin documentación previa. | El código es el resultado de una especificación técnica validada. |
-| **Velocidad** | Alta al inicio, genera deuda técnica exponencial. | Constante y sostenible. Menos retrabajo. |
-| **Mantenibilidad** | Baja ("black box" generado por IA). | Alta (existe una spec explicativa). |
-| **Seguridad** | Vulnerable a alucinaciones y prompt injection. | Seguridad por diseño definida en la spec. |
+| Característica     | Vibe Coding (puro flow)                                              | Spec Driven Development                                           |
+| ------------------ | -------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| **Definición**     | Programar por intuición y lenguaje natural sin documentación previa. | El código es el resultado de una especificación técnica validada. |
+| **Velocidad**      | Alta al inicio, genera deuda técnica exponencial.                    | Constante y sostenible. Menos retrabajo.                          |
+| **Mantenibilidad** | Baja ("black box" generado por IA).                                  | Alta (existe una spec explicativa).                               |
+| **Seguridad**      | Vulnerable a alucinaciones y prompt injection.                       | Seguridad por diseño definida en la spec.                         |
 
 **Trabajamos con SDD. El Vibe Coding no está permitido para features.**
 
@@ -31,6 +31,7 @@
 ### Fase 1: Requirements (qué)
 
 Define **qué** se va a construir:
+
 - User stories (formato `As a <user>, I want <goal>, so that <benefit>` o EARS)
 - Criterios de aceptación concretos y verificables (checklist)
 - Stakeholders involucrados
@@ -43,6 +44,7 @@ Define **qué** se va a construir:
 ### Fase 2: Design (cómo)
 
 Define **cómo** se va a construir:
+
 - Decisiones de arquitectura con trade-offs
 - Modelo de datos (tipos + validación de esquema)
 - Componentes / interfaces / contratos de API
@@ -55,6 +57,7 @@ Define **cómo** se va a construir:
 ### Fase 3: Tasks (en qué orden)
 
 Define **el orden** de implementación:
+
 - Checklist atómica
 - Cada tarea implementable y testeable de forma independiente, e incluye sus tests (ver `testing.md`)
 - Cada criterio de aceptación de `requirements.md` mapeado al test que lo verifica
@@ -74,15 +77,15 @@ Define **el orden** de implementación:
 
 ## Cuándo se permite saltarse el flujo
 
-| Caso | Spec requerido | Notas |
-|---|---|---|
-| Typo en copy | No | Commit directo a la integradora |
-| Bugfix < 30 min, sin cambio de comportamiento | No, pero el PR linkea el bug | Reportar en daily |
-| Spike técnico (rama no mergeable) | No | Rama `spike/*`, no mergea |
-| Hotfix de producción | Spec retroactivo en 24h | Se documenta después |
-| Feature nuevo | Sí, las 3 fases | Sin excepciones |
-| Refactor con cambio de comportamiento | Sí | Aunque sea "pequeño" |
-| Cambio de schema o API contract | Sí | Coordinar con consumidores |
+| Caso                                          | Spec requerido               | Notas                           |
+| --------------------------------------------- | ---------------------------- | ------------------------------- |
+| Typo en copy                                  | No                           | Commit directo a la integradora |
+| Bugfix < 30 min, sin cambio de comportamiento | No, pero el PR linkea el bug | Reportar en daily               |
+| Spike técnico (rama no mergeable)             | No                           | Rama `spike/*`, no mergea       |
+| Hotfix de producción                          | Spec retroactivo en 24h      | Se documenta después            |
+| Feature nuevo                                 | Sí, las 3 fases              | Sin excepciones                 |
+| Refactor con cambio de comportamiento         | Sí                           | Aunque sea "pequeño"            |
+| Cambio de schema o API contract               | Sí                           | Coordinar con consumidores      |
 
 ## Beneficios medibles
 

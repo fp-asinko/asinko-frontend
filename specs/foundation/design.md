@@ -7,15 +7,15 @@ Cómo se construye lo que pide `requirements.md`. Las referencias `F-NN` apuntan
 
 ## 1. Stack y versiones
 
-| Pieza | Versión | Nota |
-|---|---|---|
-| Node.js | 24 LTS | Igual que `asinko-app`. Fijada en `.nvmrc` y `engines` |
-| pnpm | 11 | `packageManager` en `package.json` (Corepack) |
-| Next.js | 16.x (App Router) | Versión exacta en `package.json` (ver `libraries.md`) |
-| React | 19.2 | Versión exacta |
-| TypeScript | 5.x | Estricto (F-02) |
-| Tailwind CSS | 4.x | Tokens con `@theme inline` |
-| shadcn/ui | CLI `latest` | Inicializado con Base UI, el default (F-16) |
+| Pieza        | Versión           | Nota                                                   |
+| ------------ | ----------------- | ------------------------------------------------------ |
+| Node.js      | 24 LTS            | Igual que `asinko-app`. Fijada en `.nvmrc` y `engines` |
+| pnpm         | 11                | `packageManager` en `package.json` (Corepack)          |
+| Next.js      | 16.x (App Router) | Versión exacta en `package.json` (ver `libraries.md`)  |
+| React        | 19.2              | Versión exacta                                         |
+| TypeScript   | 5.x               | Estricto (F-02)                                        |
+| Tailwind CSS | 4.x               | Tokens con `@theme inline`                             |
+| shadcn/ui    | CLI `latest`      | Inicializado con Base UI, el default (F-16)            |
 
 > Next.js 16 tiene cambios respecto de versiones anteriores (`proxy.ts`, sin `next lint`). Antes de escribir código de App Router se consulta la documentación de la versión instalada (`node_modules/next/dist/docs/`).
 
@@ -75,11 +75,11 @@ src/
 
 Estructura de Reddit y del prototipo, mobile first:
 
-| Ancho | Columnas | Izquierda (comunidades) | Derecha (widgets) | Navegación |
-|---|---|---|---|---|
-| < 768px (base) | 1 | Panel que abre el botón de menú (`Sheet` de shadcn) | Oculta | Barra inferior |
-| `md` ≥ 768px | 2 | Fija, 240px | Oculta | Barra superior |
-| `lg` ≥ 1024px | 3 | Fija, 240px | Fija, 320px | Barra superior |
+| Ancho          | Columnas | Izquierda (comunidades)                             | Derecha (widgets) | Navegación     |
+| -------------- | -------- | --------------------------------------------------- | ----------------- | -------------- |
+| < 768px (base) | 1        | Panel que abre el botón de menú (`Sheet` de shadcn) | Oculta            | Barra inferior |
+| `md` ≥ 768px   | 2        | Fija, 240px                                         | Oculta            | Barra superior |
+| `lg` ≥ 1024px  | 3        | Fija, 240px                                         | Fija, 320px       | Barra superior |
 
 - La columna central tiene un máximo de 680px y se centra, como en el prototipo.
 - **El layout de `[locale]` arma lo global** (barra superior, columna izquierda, barra inferior). **Cada página decide su columna derecha** con el organismo `PageColumns`:
@@ -89,6 +89,7 @@ Estructura de Reddit y del prototipo, mobile first:
   ```
 
   Sin `aside`, la columna central ocupa el espacio. Así la columna derecha cambia por vista sin parallel routes (KISS).
+
 - Las columnas laterales son `sticky` bajo la barra superior y scrollean por separado.
 - **Barras superior e inferior translúcidas** (skill `apple-design` §12): fondo semitransparente + `backdrop-filter: blur()`, con un borde superior sutil en vez de un divisor fuerte. Con `prefers-reduced-transparency: reduce` pasan a fondo sólido.
 - La barra inferior respeta el área segura del iPhone (`env(safe-area-inset-bottom)`) y el layout usa `100dvh`, no `100vh` (skill `mobile-native`).
@@ -100,32 +101,32 @@ Estructura de Reddit y del prototipo, mobile first:
 
 Los colores de sistema de iOS en modo claro **no cumplen WCAG AA para texto** (4,5:1), que es obligatorio en `design-system.md`. Medido:
 
-| Color iOS (claro) | Contraste sobre blanco | ¿Texto AA? |
-|---|---|---|
-| systemBlue `#007AFF` | 4,02 | ❌ |
-| secondaryLabel | 3,44 | ❌ |
-| systemGreen `#34C759` | 2,22 | ❌ |
-| systemRed `#FF3B30` | 3,55 | ❌ |
+| Color iOS (claro)     | Contraste sobre blanco | ¿Texto AA? |
+| --------------------- | ---------------------- | ---------- |
+| systemBlue `#007AFF`  | 4,02                   | ❌         |
+| secondaryLabel        | 3,44                   | ❌         |
+| systemGreen `#34C759` | 2,22                   | ❌         |
+| systemRed `#FF3B30`   | 3,55                   | ❌         |
 
 Apple resuelve esto con las variantes de **alto contraste** de sus propios colores (las que usa iOS con "Aumentar contraste"). Propuesta:
 
 - **Para texto y para el fondo de botones con texto encima: variante de alto contraste.**
 - **Para íconos, bordes de foco y elementos no textuales: el color base de iOS**, que pide 3:1 y lo cumple (`#007AFF` sobre blanco: 4,02).
 
-| Token | Uso | Claro | Oscuro |
-|---|---|---|---|
-| `--background` | Fondo de la app | `#F2F2F7` (systemGroupedBackground) | `#000000` |
-| `--card` | Tarjetas, columnas | `#FFFFFF` | `#1C1C1E` |
-| `--foreground` | Texto principal (label) | `#000000` | `#FFFFFF` |
-| `--muted-foreground` | Texto secundario | `rgb(60 60 67 / 0.76)` (alto contraste) | `rgb(235 235 245 / 0.6)` |
-| `--primary` | Botón principal, links | `#0040DD` (azul alto contraste) | `#0A84FF` |
-| `--primary-foreground` | Texto sobre `--primary` | `#FFFFFF` | `#000000` |
-| `--ring` / `--tint` | Foco, íconos activos | `#007AFF` | `#0A84FF` |
-| `--destructive` | Errores, borrar | `#D70015` | `#FF453A` |
-| `--success` / `--bullish` | Correcto, alcista | Verde alto contraste ajustado a ≥ 4,5:1 (`#248A3D` da 4,40) | `#30D158` |
-| `--bearish` | Bajista | `#D70015` | `#FF453A` |
-| `--warning` | Avisos | `#C93400` | `#FF9F0A` |
-| `--border` | Separadores | `rgb(60 60 67 / 0.29)` | `rgb(84 84 88 / 0.65)` |
+| Token                     | Uso                     | Claro                                                       | Oscuro                   |
+| ------------------------- | ----------------------- | ----------------------------------------------------------- | ------------------------ |
+| `--background`            | Fondo de la app         | `#F2F2F7` (systemGroupedBackground)                         | `#000000`                |
+| `--card`                  | Tarjetas, columnas      | `#FFFFFF`                                                   | `#1C1C1E`                |
+| `--foreground`            | Texto principal (label) | `#000000`                                                   | `#FFFFFF`                |
+| `--muted-foreground`      | Texto secundario        | `rgb(60 60 67 / 0.76)` (alto contraste)                     | `rgb(235 235 245 / 0.6)` |
+| `--primary`               | Botón principal, links  | `#0040DD` (azul alto contraste)                             | `#0A84FF`                |
+| `--primary-foreground`    | Texto sobre `--primary` | `#FFFFFF`                                                   | `#000000`                |
+| `--ring` / `--tint`       | Foco, íconos activos    | `#007AFF`                                                   | `#0A84FF`                |
+| `--destructive`           | Errores, borrar         | `#D70015`                                                   | `#FF453A`                |
+| `--success` / `--bullish` | Correcto, alcista       | Verde alto contraste ajustado a ≥ 4,5:1 (`#248A3D` da 4,40) | `#30D158`                |
+| `--bearish`               | Bajista                 | `#D70015`                                                   | `#FF453A`                |
+| `--warning`               | Avisos                  | `#C93400`                                                   | `#FF9F0A`                |
+| `--border`                | Separadores             | `rgb(60 60 67 / 0.29)`                                      | `rgb(84 84 88 / 0.65)`   |
 
 - Los valores exactos se cargan en `:root` y `.dark` y se exponen en `@theme inline` (`design-system.md`).
 - **Un test unitario verifica el contraste de cada par texto/fondo** de esta tabla: un token que baje de 4,5:1 (texto) o 3:1 (no texto) rompe el build.
@@ -170,19 +171,19 @@ El wordmark de Asinko del prototipo pasa a `components/ui/asinko-logo.tsx` como 
 
 **Consecuencia: todas las páginas se renderizan en el servidor en cada request** (Next solo inyecta el nonce en render dinámico). Es esperable para una red social con feed personalizado, pero **contradice la sugerencia de `i18n.md` de `generateStaticParams` para rendering estático**. Se actualiza `i18n.md` en este PR: con CSP por nonce no se usa render estático; la excepción (páginas legales, landing) se evalúa en su spec.
 
-> ⚠️ **Riesgo técnico:** la documentación de next-intl muestra cómo alterar la *respuesta*, pero no cómo hacer llegar el nonce al render en el mismo request cuando su middleware ya generó la respuesta. Se resuelve en implementación, consultando la doc de las versiones instaladas, y lo garantiza `security-headers.spec.ts`: verifica que la CSP tenga nonce **y** que los `<script>` de la página lo lleven. Si no hay forma limpia, el plan B es hash-based CSP con SRI (experimental en Next) y se vuelve a consultar antes de aplicarlo.
+> ⚠️ **Riesgo técnico:** la documentación de next-intl muestra cómo alterar la _respuesta_, pero no cómo hacer llegar el nonce al render en el mismo request cuando su middleware ya generó la respuesta. Se resuelve en implementación, consultando la doc de las versiones instaladas, y lo garantiza `security-headers.spec.ts`: verifica que la CSP tenga nonce **y** que los `<script>` de la página lo lleven. Si no hay forma limpia, el plan B es hash-based CSP con SRI (experimental en Next) y se vuelve a consultar antes de aplicarlo.
 
 ## 6. Variables de entorno (F-29, F-30, F-31)
 
 `src/env.ts` con `@t3-oss/env-nextjs`. `.env.example` versionado con placeholders.
 
-| Variable | Tipo | Requerida | Para qué |
-|---|---|---|---|
-| `APP_ENV` | `development` \| `preview` \| `production` | Sí | Indexación (F-31) y bloqueo de mocks (F-30) |
-| `NEXT_PUBLIC_SITE_URL` | URL | Sí | `metadataBase`, canonical, sitemap |
-| `API_BASE_URL` | URL | Sí | Base de `asinko-app` |
-| `API_MOCKS` | `true` \| `false` (default `false`) | No | Activa los mocks (sección 8) |
-| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | URL | No | Sin valor, Sentry queda apagado (F-35) |
+| Variable                                | Tipo                                       | Requerida | Para qué                                    |
+| --------------------------------------- | ------------------------------------------ | --------- | ------------------------------------------- |
+| `APP_ENV`                               | `development` \| `preview` \| `production` | Sí        | Indexación (F-31) y bloqueo de mocks (F-30) |
+| `NEXT_PUBLIC_SITE_URL`                  | URL                                        | Sí        | `metadataBase`, canonical, sitemap          |
+| `API_BASE_URL`                          | URL                                        | Sí        | Base de `asinko-app`                        |
+| `API_MOCKS`                             | `true` \| `false` (default `false`)        | No        | Activa los mocks (sección 8)                |
+| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | URL                                        | No        | Sin valor, Sentry queda apagado (F-35)      |
 
 - Una regla del esquema hace fallar el build si `APP_ENV=production` y `API_MOCKS=true` (F-30).
 - Se usa `APP_ENV` y no `NODE_ENV`, porque un deploy de preview también corre con `NODE_ENV=production` y no debe indexarse.
@@ -218,13 +219,13 @@ apiRequest<T>(options: {
 - **Sesión:** `src/lib/session.ts` expone `getViewer()`. Con mocks devuelve el usuario demo (F-38); sin mocks y sin login, `null`. El cliente no inventa `userId`: las funciones de cada feature lo piden a `getViewer()` (ver `api-integration.md § userId explícito`). Cuando llegue el login, solo cambia `getViewer()`.
 - **Errores (F-34)**, según la tabla de `api-integration.md`:
 
-  | Respuesta | Resultado |
-  |---|---|
-  | `2xx` | Se valida con `schema`. Si no cumple → **lanza** (inesperado, va a Sentry) |
-  | `401` | `{ ok: false, code: 'UNAUTHENTICATED' }`. Sin login, la UI muestra "Se requiere una cuenta" |
-  | `404` | `{ ok: false, code: 'NOT_FOUND' }`. Las páginas llaman a `notFound()` |
+  | Respuesta                  | Resultado                                                                                                |
+  | -------------------------- | -------------------------------------------------------------------------------------------------------- |
+  | `2xx`                      | Se valida con `schema`. Si no cumple → **lanza** (inesperado, va a Sentry)                               |
+  | `401`                      | `{ ok: false, code: 'UNAUTHENTICATED' }`. Sin login, la UI muestra "Se requiere una cuenta"              |
+  | `404`                      | `{ ok: false, code: 'NOT_FOUND' }`. Las páginas llaman a `notFound()`                                    |
   | `403`, `409`, `422`, `429` | `{ ok: false, code }`. La clave de traducción es `api.errors.<CODE>`; si no existe, `api.errors.UNKNOWN` |
-  | `5xx`, timeout, red | **Lanza** → `error.tsx` + Sentry |
+  | `5xx`, timeout, red        | **Lanza** → `error.tsx` + Sentry                                                                         |
 
 - El `message` del backend nunca llega a la UI.
 
@@ -267,15 +268,15 @@ src/mocks/
 
 ## 12. Tooling (F-01 a F-07)
 
-| Pieza | Config |
-|---|---|
+| Pieza         | Config                                                                                                                                                                                                                                                                                                                                        |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ESLint (flat) | `eslint-config-next` (core-web-vitals + typescript) · `jsx-a11y` · `eslint-plugin-boundaries` con la tabla de `tooling.md` · `react/no-danger` · `no-restricted-imports` (`next/link`, `next/navigation` fuera de `src/i18n/`; `@radix-ui/*` en todo el proyecto) · `no-console` (permite `warn`/`error`) · `eslint-config-prettier` al final |
-| Prettier | La config de `tooling.md` |
-| Lefthook | `pre-commit`: ESLint + Prettier sobre staged · `commit-msg`: commitlint · `pre-push`: `typecheck` + `test` |
-| commitlint | `@commitlint/config-conventional` con los tipos de `conventions.md` |
-| Vitest | La config de `testing.md`, con `src/test/setup.ts` |
-| Playwright | Proyectos `mobile` (Pixel 7) y `desktop`, `webServer: pnpm build && pnpm start`, `@axe-core/playwright` |
-| VS Code | `.vscode/extensions.json` y `settings.json` de `tooling.md` |
+| Prettier      | La config de `tooling.md`                                                                                                                                                                                                                                                                                                                     |
+| Lefthook      | `pre-commit`: ESLint + Prettier sobre staged · `commit-msg`: commitlint · `pre-push`: `typecheck` + `test`                                                                                                                                                                                                                                    |
+| commitlint    | `@commitlint/config-conventional` con los tipos de `conventions.md`                                                                                                                                                                                                                                                                           |
+| Vitest        | La config de `testing.md`, con `src/test/setup.ts`                                                                                                                                                                                                                                                                                            |
+| Playwright    | Proyectos `mobile` (Pixel 7) y `desktop`, `webServer: pnpm build && pnpm start`, `@axe-core/playwright`                                                                                                                                                                                                                                       |
+| VS Code       | `.vscode/extensions.json` y `settings.json` de `tooling.md`                                                                                                                                                                                                                                                                                   |
 
 **F-04** se verifica con un test de lint: archivos de ejemplo que violan las reglas de capas (en `src/test/fixtures/boundaries/`, excluidos del build) y un test que corre ESLint sobre ellos y espera errores.
 
@@ -294,11 +295,11 @@ El build de CI corre con `APP_ENV=preview`, `API_MOCKS=true` y URLs de placehold
 
 Todas están en `libraries.md`, `testing.md` o `tooling.md`, salvo:
 
-| Nueva | Para qué | Estado |
-|---|---|---|
-| `next-themes` | Tema sin parpadeo (sección 4) | **D-02** |
-| `@axe-core/playwright` | Mencionada en `testing.md` pero no en la tabla de librerías | Se agrega a `libraries.md` |
-| gitleaks (GitHub Action) | Escaneo de secretos que pide `security.md` | Se agrega a `libraries.md` |
+| Nueva                    | Para qué                                                    | Estado                     |
+| ------------------------ | ----------------------------------------------------------- | -------------------------- |
+| `next-themes`            | Tema sin parpadeo (sección 4)                               | **D-02**                   |
+| `@axe-core/playwright`   | Mencionada en `testing.md` pero no en la tabla de librerías | Se agrega a `libraries.md` |
+| gitleaks (GitHub Action) | Escaneo de secretos que pide `security.md`                  | Se agrega a `libraries.md` |
 
 Animaciones: este spec no necesita springs ni gestos (el panel usa la transición de shadcn, con `motion-safe:`/`motion-reduce:`, F-22). `motion` se evalúa cuando una vista lo justifique.
 

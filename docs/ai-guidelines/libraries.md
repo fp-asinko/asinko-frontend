@@ -4,31 +4,31 @@
 
 ## Base
 
-| Necesidad | Librería | Notas |
-|---|---|---|
-| Framework | `next` (App Router) | |
-| UI | `shadcn/ui` (Base UI + Tailwind CSS) | Primitivos de [Base UI](https://base-ui.com), el default de shadcn desde julio 2026. No mezclar con Radix. Ver `design-system.md` |
-| Variantes de componentes | `class-variance-authority` + `tailwind-merge` + `clsx` | Vienen con shadcn (`cn()`) |
-| Íconos | `lucide-react` | Default de shadcn. No mezclar sets de íconos |
-| Internacionalización | `next-intl` | Ver `i18n.md` |
-| Validación | `zod` | Todo input externo: formularios, actions, API, env, params |
-| Formularios | `react-hook-form` + `@hookform/resolvers` | Con el componente `Form` de shadcn |
-| Variables de entorno | `@t3-oss/env-nextjs` | Validadas con zod en build |
-| Estado en la URL | `nuqs` | Filtros, paginación, tabs, búsqueda |
-| Fechas | `date-fns` | Para cálculos. El formato visible al usuario, con `next-intl` |
-| Toasts | `sonner` | El de shadcn |
-| Errores en producción | `@sentry/nextjs` | Ver `engineering-principles.md` |
-| Código solo de servidor | `server-only` | En los módulos de acceso a datos. Rompe el build si se importan desde el cliente (ver `security.md`) |
+| Necesidad                | Librería                                               | Notas                                                                                                                             |
+| ------------------------ | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- |
+| Framework                | `next` (App Router)                                    |                                                                                                                                   |
+| UI                       | `shadcn/ui` (Base UI + Tailwind CSS)                   | Primitivos de [Base UI](https://base-ui.com), el default de shadcn desde julio 2026. No mezclar con Radix. Ver `design-system.md` |
+| Variantes de componentes | `class-variance-authority` + `tailwind-merge` + `clsx` | Vienen con shadcn (`cn()`)                                                                                                        |
+| Íconos                   | `lucide-react`                                         | Default de shadcn. No mezclar sets de íconos                                                                                      |
+| Internacionalización     | `next-intl`                                            | Ver `i18n.md`                                                                                                                     |
+| Validación               | `zod`                                                  | Todo input externo: formularios, actions, API, env, params                                                                        |
+| Formularios              | `react-hook-form` + `@hookform/resolvers`              | Con el componente `Form` de shadcn                                                                                                |
+| Variables de entorno     | `@t3-oss/env-nextjs`                                   | Validadas con zod en build                                                                                                        |
+| Estado en la URL         | `nuqs`                                                 | Filtros, paginación, tabs, búsqueda                                                                                               |
+| Fechas                   | `date-fns`                                             | Para cálculos. El formato visible al usuario, con `next-intl`                                                                     |
+| Toasts                   | `sonner`                                               | El de shadcn                                                                                                                      |
+| Errores en producción    | `@sentry/nextjs`                                       | Ver `engineering-principles.md`                                                                                                   |
+| Código solo de servidor  | `server-only`                                          | En los módulos de acceso a datos. Rompe el build si se importan desde el cliente (ver `security.md`)                              |
 
 Testing y tooling: ver `testing.md` y `tooling.md`.
 
 ## Solo si hace falta
 
-| Necesidad | Librería | Cuándo |
-|---|---|---|
-| Estado global de cliente | `zustand` | Solo si el estado no puede vivir en el servidor, la URL ni un componente padre |
+| Necesidad                 | Librería                | Cuándo                                                                                                                       |
+| ------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Estado global de cliente  | `zustand`               | Solo si el estado no puede vivir en el servidor, la URL ni un componente padre                                               |
 | Fetching desde el cliente | `@tanstack/react-query` | Solo para datos que cambian en el cliente (polling, infinite scroll). Por defecto los datos se obtienen en Server Components |
-| Animaciones complejas | `motion` | Las simples, con Tailwind. Siempre respetando `prefers-reduced-motion` |
+| Animaciones complejas     | `motion`                | Las simples, con Tailwind. Siempre respetando `prefers-reduced-motion`                                                       |
 
 ## Dónde vive el estado
 
