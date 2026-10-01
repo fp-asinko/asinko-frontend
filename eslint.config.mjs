@@ -79,6 +79,10 @@ export default defineConfig([
   {
     rules: {
       'react/no-danger': 'error',
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { ignoreRestSiblings: true, argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
       'no-console': ['error', { allow: ['warn', 'error'] }],
       'no-restricted-imports': [
         'error',

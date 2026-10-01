@@ -48,7 +48,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
 
 ### Configuración e i18n
 
-- [ ] **T-06 · Variables de entorno** · S · F-29, F-30
+- [x] **T-06 · Variables de entorno** · S · F-29, F-30
   - `src/env.ts` con el esquema de `design.md` §6, `.env.example`.
   - **Tests:** `env.test.ts` sobre el esquema: falla sin `API_BASE_URL`, con URL inválida, y con `APP_ENV=production` + `API_MOCKS=true`; pasa con una config válida de preview con mocks.
 
