@@ -171,19 +171,22 @@ El wordmark de Asinko del prototipo pasa a `components/ui/asinko-logo.tsx` como 
 
 **Consecuencia: todas las páginas se renderizan en el servidor en cada request** (Next solo inyecta el nonce en render dinámico). Es esperable para una red social con feed personalizado, pero **contradice la sugerencia de `i18n.md` de `generateStaticParams` para rendering estático**. Se actualiza `i18n.md` en este PR: con CSP por nonce no se usa render estático; la excepción (páginas legales, landing) se evalúa en su spec.
 
-> ⚠️ **Riesgo técnico:** la documentación de next-intl muestra cómo alterar la _respuesta_, pero no cómo hacer llegar el nonce al render en el mismo request cuando su middleware ya generó la respuesta. Se resuelve en implementación, consultando la doc de las versiones instaladas, y lo garantiza `security-headers.spec.ts`: verifica que la CSP tenga nonce **y** que los `<script>` de la página lo lleven. Si no hay forma limpia, el plan B es hash-based CSP con SRI (experimental en Next) y se vuelve a consultar antes de aplicarlo.
+> ✅ **Riesgo técnico resuelto (T-08):** el middleware de next-intl copia los headers del request que recibe y los reenvía al render (`NextResponse.next/rewrite({ request: { headers } })`). El proxy arma un `NextRequest` nuevo con la CSP y `x-nonce`, se lo pasa a next-intl y repite la CSP en la respuesta. Verificado contra el build de producción: todos los `<script>` llevan el nonce de la CSP y cada request genera uno nuevo. No hizo falta el plan B.
+
+**Estilos — decisión de implementación:** la CSP separa `style-src-elem 'self' 'nonce-…'` (hojas y `<style>`, con nonce) de `style-src-attr 'unsafe-inline'`. Con un `style-src` único por nonce, el navegador ignora los atributos `style=""` del HTML del servidor, y Base UI los usa para posicionar paneles y popovers. Un atributo `style` no ejecuta código, así que el riesgo es bajo; los `<style>` siguen protegidos. `upgrade-insecure-requests` solo se envía si `NEXT_PUBLIC_SITE_URL` es https (en `http://localhost` rompería los e2e).
 
 ## 6. Variables de entorno (F-29, F-30, F-31)
 
 `src/env.ts` con `@t3-oss/env-nextjs`. `.env.example` versionado con placeholders.
 
-| Variable                                | Tipo                                       | Requerida | Para qué                                    |
-| --------------------------------------- | ------------------------------------------ | --------- | ------------------------------------------- |
-| `APP_ENV`                               | `development` \| `preview` \| `production` | Sí        | Indexación (F-31) y bloqueo de mocks (F-30) |
-| `NEXT_PUBLIC_SITE_URL`                  | URL                                        | Sí        | `metadataBase`, canonical, sitemap          |
-| `API_BASE_URL`                          | URL                                        | Sí        | Base de `asinko-app`                        |
-| `API_MOCKS`                             | `true` \| `false` (default `false`)        | No        | Activa los mocks (sección 8)                |
-| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | URL                                        | No        | Sin valor, Sentry queda apagado (F-35)      |
+| Variable                                | Tipo                                       | Requerida    | Para qué                                    |
+| --------------------------------------- | ------------------------------------------ | ------------ | ------------------------------------------- |
+| `APP_ENV`                               | `development` \| `preview` \| `production` | Sí           | Indexación (F-31) y bloqueo de mocks (F-30) |
+| `NEXT_PUBLIC_SITE_URL`                  | URL                                        | Sí           | `metadataBase`, canonical, sitemap          |
+| `API_BASE_URL`                          | URL                                        | Sí           | Base de `asinko-app`                        |
+| `API_MOCKS`                             | `true` \| `false` (default `false`)        | No           | Activa los mocks (sección 8)                |
+| `NODE_ENV`                              | `development`                              | `production` | `test`                                      | Lo setea Next | Compartida; el proxy la usa para `'unsafe-eval'` solo en desarrollo |
+| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | URL                                        | No           | Sin valor, Sentry queda apagado (F-35)      |
 
 - Una regla del esquema hace fallar el build si `APP_ENV=production` y `API_MOCKS=true` (F-30).
 - Se usa `APP_ENV` y no `NODE_ENV`, porque un deploy de preview también corre con `NODE_ENV=production` y no debe indexarse.

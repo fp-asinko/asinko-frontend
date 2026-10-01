@@ -16,6 +16,11 @@ export const serverEnvSchema = {
   SENTRY_DSN: z.url().optional(),
 }
 
+// Set by Next.js; shared by server and client.
+export const sharedEnvSchema = {
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+}
+
 export const clientEnvSchema = {
   NEXT_PUBLIC_SITE_URL: z.url(),
   NEXT_PUBLIC_SENTRY_DSN: z.url().optional(),
@@ -34,4 +39,6 @@ export function refineEnv(
 }
 
 /** Full schema used by tests and by src/env.ts on the server. */
-export const envSchema = z.object({ ...serverEnvSchema, ...clientEnvSchema }).superRefine(refineEnv)
+export const envSchema = z
+  .object({ ...serverEnvSchema, ...sharedEnvSchema, ...clientEnvSchema })
+  .superRefine(refineEnv)

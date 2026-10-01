@@ -57,7 +57,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - `src/test/render-with-intl.tsx`.
   - **Tests:** `messages.test.ts` (paridad de claves entre los tres idiomas, F-14) y `render-with-intl.test.tsx` (renderiza un texto traducido).
 
-- [ ] **T-08 · Proxy: locale + CSP con nonce, headers de seguridad** · **L** · F-12, F-27, F-28
+- [x] **T-08 · Proxy: locale + CSP con nonce, headers de seguridad** · **L** · F-12, F-27, F-28
   - `src/proxy.ts` según `design.md` §5; headers fijos en `next.config.ts`.
   - **Riesgo:** propagar el nonce al render con next-intl. Si no hay forma limpia, **parar y consultar** el plan B (CSP por hash + SRI) antes de aplicarlo.
   - **Tests:** `csp.test.ts` (unitario sobre la función que arma la política: con nonce, sin `unsafe-eval`/`unsafe-inline` en `script-src` cuando no es desarrollo, Sentry en `connect-src` solo con DSN). La parte de punta a punta queda en T-17.
