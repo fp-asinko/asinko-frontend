@@ -10,6 +10,19 @@
   "common": {
     "theme": {
       "toggle": "Dark mode"
+    },
+    "nav": {
+      "main": "Main navigation",
+      "home": "Home",
+      "skipToContent": "Skip to content",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "menu": "Menu"
+    },
+    "logo": "Asinko, go to home",
+    "communities": {
+      "title": "Communities",
+      "empty": "Your communities will appear here."
     }
   }
 }

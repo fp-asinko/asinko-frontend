@@ -3,6 +3,8 @@
 @import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
+/* Translucent bars become solid when the user asks for less transparency (apple-design §12). */
+@custom-variant reduced-transparency (@media (prefers-reduced-transparency: reduce));
 
 /*
  * Design tokens: iOS system colors (specs/foundation/design.md §4, decision D-01).
@@ -50,6 +52,10 @@
   --sidebar-ring: var(--ring);
 }
 
+/*
+ * .dark only ever goes on <html> (next-themes), so aliases defined with var() in :root
+ * (--bullish, --bearish, --ring, --sidebar-*) resolve to the dark values.
+ */
 .dark {
   --background: #000000; /* systemBackground */
   --foreground: #ffffff;

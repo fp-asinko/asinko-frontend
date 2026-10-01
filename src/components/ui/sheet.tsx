@@ -41,11 +41,15 @@ function SheetContent({
   children,
   side = 'right',
   showCloseButton = true,
+  closeLabel,
   ...props
 }: SheetPrimitive.Popup.Props & {
   side?: 'top' | 'right' | 'bottom' | 'left'
-  showCloseButton?: boolean
-}) {
+} &
+  // asinko: the close button needs a translated accessible name (i18n.md, WCAG 4.1.2).
+  (
+    { showCloseButton?: true; closeLabel: string } | { showCloseButton: false; closeLabel?: never }
+  )) {
   return (
     <SheetPortal>
       <SheetOverlay />
@@ -65,7 +69,7 @@ function SheetContent({
             render={<Button variant="ghost" className="absolute top-3 right-3" size="icon-sm" />}
           >
             <XIcon />
-            <span className="sr-only">Close</span>
+            <span className="sr-only">{closeLabel}</span>
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Popup>

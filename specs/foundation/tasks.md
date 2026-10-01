@@ -73,11 +73,11 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - Provider de `next-themes` (`defaultTheme="light"`, `enableSystem={false}`, `nonce`), `ThemeToggle` (molécula) con el `Switch`.
   - **Tests:** `theme-toggle.test.tsx`: tiene nombre accesible traducido, se opera con teclado (Espacio), refleja y cambia el estado.
 
-- [ ] **T-11 · Shell de 3 columnas** · **L** · F-22, F-23, F-23b, F-26
-  - `asinko-logo` (átomo), organismos `site-header`, `sidebar-left` (fija en `md+`, `Sheet` en mobile), `bottom-nav`, `app-shell` y `PageColumns` (`design.md` §3). Barras translúcidas con fallback para `prefers-reduced-transparency`; transiciones con `motion-safe:`/`motion-reduce:`; link "Saltar al contenido"; landmarks.
+- [x] **T-11 · Shell de 3 columnas** · **L** · F-22, F-23, F-23b, F-26
+  - `asinko-logo` (átomo), organismos en `app-shell/`: `site-header`, `sidebar-content` (columna fija en `md+`) + `mobile-sidebar` (`Sheet` en mobile), `bottom-nav`, `app-shell` y `page-columns`; molécula `nav-link` (ítem con `aria-current`, variantes con `cva`) (`design.md` §3). Barras translúcidas con fallback para `prefers-reduced-transparency`; transiciones con `motion-safe:`/`motion-reduce:`; link "Saltar al contenido"; landmarks.
   - Configuración de navegación con un solo ítem: Home.
   - `app/[locale]/page.tsx`: Home de relleno (título traducido), usando `PageColumns` sin `aside`.
-  - **Tests:** uno por componente — `asinko-logo.test.tsx` (nombre accesible), `site-header.test.tsx` (logo lleva al Home, incluye el toggle), `bottom-nav.test.tsx` (solo ítems registrados, `aria-current` en el activo), `sidebar-left.test.tsx` (el botón de menú abre y cierra el panel, con teclado y Escape), `page-columns.test.tsx` (con y sin `aside`).
+  - **Tests:** uno por componente — `asinko-logo.test.tsx` (nombre accesible), `site-header.test.tsx` (logo lleva al Home, incluye el toggle), `bottom-nav.test.tsx` (solo ítems registrados, `aria-current` en el activo), `mobile-sidebar.test.tsx` (el botón de menú abre y cierra el panel, con teclado y Escape), `sidebar-content.test.tsx`, `app-shell.test.tsx` (skip link, `main`, landmarks), `nav-link.test.tsx`, `page-columns.test.tsx` (con y sin `aside`).
   - Correr el subagente `ui-reviewer` y las skills `apple-design` / `mobile-native` sobre el shell; aplicar lo que corresponda.
 
 - [ ] **T-12 · Páginas de error y carga** · S · F-24, F-25
