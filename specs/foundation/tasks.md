@@ -64,7 +64,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
 
 ### Design system y layout
 
-- [ ] **T-09 · shadcn con Base UI, tokens iOS y tipografía** · M · F-16, F-17, F-18
+- [x] **T-09 · shadcn con Base UI, tokens iOS y tipografía** · M · F-16, F-17, F-18
   - `shadcn init` (Base UI, default), tokens de `design.md` §4 en `:root`/`.dark`/`@theme inline`, fuente del sistema, utilidades de tipografía, `--radius`.
   - Componentes base que usa el shell: `button`, `switch`, `sheet`, `skeleton`.
   - **Tests:** `tokens-contrast.test.ts` lee los tokens de `globals.css` y verifica cada par texto/fondo ≥ 4,5:1 y no-texto ≥ 3:1, en claro y oscuro (D-01). `package.json` sin dependencias `@radix-ui/*` (lo cubre también ESLint).

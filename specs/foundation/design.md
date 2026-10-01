@@ -113,21 +113,22 @@ Apple resuelve esto con las variantes de **alto contraste** de sus propios color
 - **Para texto y para el fondo de botones con texto encima: variante de alto contraste.**
 - **Para íconos, bordes de foco y elementos no textuales: el color base de iOS**, que pide 3:1 y lo cumple (`#007AFF` sobre blanco: 4,02).
 
-| Token                     | Uso                     | Claro                                                       | Oscuro                   |
-| ------------------------- | ----------------------- | ----------------------------------------------------------- | ------------------------ |
-| `--background`            | Fondo de la app         | `#F2F2F7` (systemGroupedBackground)                         | `#000000`                |
-| `--card`                  | Tarjetas, columnas      | `#FFFFFF`                                                   | `#1C1C1E`                |
-| `--foreground`            | Texto principal (label) | `#000000`                                                   | `#FFFFFF`                |
-| `--muted-foreground`      | Texto secundario        | `rgb(60 60 67 / 0.76)` (alto contraste)                     | `rgb(235 235 245 / 0.6)` |
-| `--primary`               | Botón principal, links  | `#0040DD` (azul alto contraste)                             | `#0A84FF`                |
-| `--primary-foreground`    | Texto sobre `--primary` | `#FFFFFF`                                                   | `#000000`                |
-| `--ring` / `--tint`       | Foco, íconos activos    | `#007AFF`                                                   | `#0A84FF`                |
-| `--destructive`           | Errores, borrar         | `#D70015`                                                   | `#FF453A`                |
-| `--success` / `--bullish` | Correcto, alcista       | Verde alto contraste ajustado a ≥ 4,5:1 (`#248A3D` da 4,40) | `#30D158`                |
-| `--bearish`               | Bajista                 | `#D70015`                                                   | `#FF453A`                |
-| `--warning`               | Avisos                  | `#C93400`                                                   | `#FF9F0A`                |
-| `--border`                | Separadores             | `rgb(60 60 67 / 0.29)`                                      | `rgb(84 84 88 / 0.65)`   |
+| Token                     | Uso                     | Claro                                                     | Oscuro                     |
+| ------------------------- | ----------------------- | --------------------------------------------------------- | -------------------------- |
+| `--background`            | Fondo de la app         | `#F2F2F7` (systemGroupedBackground)                       | `#000000`                  |
+| `--card`                  | Tarjetas, columnas      | `#FFFFFF`                                                 | `#1C1C1E`                  |
+| `--foreground`            | Texto principal (label) | `#000000`                                                 | `#FFFFFF`                  |
+| `--muted-foreground`      | Texto secundario        | `rgb(60 60 67 / 0.76)` (alto contraste)                   | `rgb(235 235 245 / 0.6)`   |
+| `--primary`               | Botón principal, links  | `#0040DD` (azul alto contraste)                           | `#409CFF` (alto contraste) |
+| `--primary-foreground`    | Texto sobre `--primary` | `#FFFFFF`                                                 | `#000000`                  |
+| `--ring` / `--tint`       | Foco, íconos activos    | `#007AFF`                                                 | `#0A84FF`                  |
+| `--destructive`           | Errores, borrar         | `#D70015`                                                 | `#FF6961` (alto contraste) |
+| `--success` / `--bullish` | Correcto, alcista       | `#1E7E34` (`#248A3D` de Apple da 4,40; oscurecido a 5,14) | `#30D158`                  |
+| `--bearish`               | Bajista                 | `#D70015`                                                 | `#FF6961` (alto contraste) |
+| `--warning`               | Avisos                  | `#C93400`                                                 | `#FF9F0A`                  |
+| `--border`                | Separadores             | `rgb(60 60 67 / 0.29)`                                    | `rgb(84 84 88 / 0.65)`     |
 
+- **Ajuste en T-09:** en oscuro, `#0A84FF` y `#FF453A` no llegan a 4,5:1 sobre fondos elevados (`#2C2C2E`: 3,82 y 4,09), así que el texto usa también las variantes de alto contraste (`#409CFF`, `#FF6961`); `#0A84FF` queda para foco e íconos (`--tint`).
 - Los valores exactos se cargan en `:root` y `.dark` y se exponen en `@theme inline` (`design-system.md`).
 - **Un test unitario verifica el contraste de cada par texto/fondo** de esta tabla: un token que baje de 4,5:1 (texto) o 3:1 (no texto) rompe el build.
 
