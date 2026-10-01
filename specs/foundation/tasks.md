@@ -33,7 +33,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - `.vscode/extensions.json` y `settings.json`.
   - **Verificación:** `pnpm format:check` pasa.
 
-- [ ] **T-03 · ESLint con reglas del proyecto** · M · F-03, F-04
+- [x] **T-03 · ESLint con reglas del proyecto** · M · F-03, F-04
   - Flat config: `eslint-config-next`, `jsx-a11y`, `boundaries` (tabla de `tooling.md`), `react/no-danger`, `no-restricted-imports` (`next/link`/`next/navigation` fuera de `src/i18n/`, `@radix-ui/*`), `no-console`, `eslint-config-prettier`.
   - Fixtures de violaciones en `src/test/fixtures/boundaries/` (excluidas de build y cobertura).
   - **Tests:** `eslint-rules.test.ts` corre ESLint (API de Node) sobre las fixtures y espera un error por regla: feature → feature, `components` → `features`, átomo → molécula, `next/link` fuera de `i18n/`, `dangerouslySetInnerHTML`, import de Radix.
@@ -42,7 +42,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - Lefthook (`pre-commit`, `commit-msg`, `pre-push`) y `@commitlint/config-conventional` con los tipos de `conventions.md`.
   - **Tests:** `commitlint.test.ts` valida mensajes de ejemplo con la API de commitlint: acepta `feat(home): add feed`, rechaza `agregué cosas` y tipos fuera de la lista.
 
-- [ ] **T-05 · Vitest y Testing Library** · S · F-08, F-09
+- [x] **T-05 · Vitest y Testing Library** · S · F-08, F-09
   - `vitest.config.mts` de `testing.md` (umbrales por carpeta), `src/test/setup.ts`.
   - **Verificación:** `pnpm test:coverage` corre y aplica umbrales (se prueba bajando uno temporalmente en local; no se commitea).
 

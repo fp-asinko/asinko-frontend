@@ -44,7 +44,7 @@ El umbral es un **piso, no un objetivo**: la regla principal sigue siendo "cada 
 ### Stack
 
 ```bash
-pnpm add -D vitest @vitest/coverage-v8 @vitejs/plugin-react vite-tsconfig-paths jsdom \
+pnpm add -D vitest @vitest/coverage-v8 @vitejs/plugin-react jsdom \
   @testing-library/react @testing-library/dom @testing-library/user-event @testing-library/jest-dom
 ```
 
@@ -52,13 +52,13 @@ pnpm add -D vitest @vitest/coverage-v8 @vitejs/plugin-react vite-tsconfig-paths 
 // vitest.config.mts
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
-import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
-  plugins: [tsconfigPaths(), react()],
+  plugins: [react()],
+  resolve: { tsconfigPaths: true }, // native in Vite: no plugin needed
   test: {
     environment: 'jsdom',
-    setupFiles: ['./vitest.setup.ts'], // import '@testing-library/jest-dom/vitest'
+    setupFiles: ['./src/test/setup.ts'], // import '@testing-library/jest-dom/vitest'
     include: ['src/**/*.test.{ts,tsx}'], // e2e/ queda fuera
     coverage: {
       provider: 'v8',

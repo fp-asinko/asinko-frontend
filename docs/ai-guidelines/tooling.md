@@ -26,6 +26,8 @@
 
 Flat config (`eslint.config.mjs`), ejecutado con el CLI de ESLint (`next lint` ya no existe en Next.js 16).
 
+> **ESLint 9, no 10.** `eslint-plugin-react`, `eslint-plugin-import` (ambos dentro de `eslint-config-next`) y `eslint-plugin-jsx-a11y` todavía no soportan ESLint 10, que eliminó APIs que usan. Se migra cuando los tres lo declaren en sus `peerDependencies` (`pnpm peers check` sin errores). ESLint corre solo en desarrollo y CI: no llega al sitio.
+
 | Plugin / config                                     | Para qué                                                  |
 | --------------------------------------------------- | --------------------------------------------------------- |
 | `eslint-config-next` (core-web-vitals + typescript) | Reglas de Next.js, React y hooks                          |
