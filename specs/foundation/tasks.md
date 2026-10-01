@@ -38,7 +38,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - Fixtures de violaciones en `src/test/fixtures/boundaries/` (excluidas de build y cobertura).
   - **Tests:** `eslint-rules.test.ts` corre ESLint (API de Node) sobre las fixtures y espera un error por regla: feature → feature, `components` → `features`, átomo → molécula, `next/link` fuera de `i18n/`, `dangerouslySetInnerHTML`, import de Radix.
 
-- [ ] **T-04 · Git hooks y commitlint** · S · F-06
+- [x] **T-04 · Git hooks y commitlint** · S · F-06
   - Lefthook (`pre-commit`, `commit-msg`, `pre-push`) y `@commitlint/config-conventional` con los tipos de `conventions.md`.
   - **Tests:** `commitlint.test.ts` valida mensajes de ejemplo con la API de commitlint: acepta `feat(home): add feed`, rechaza `agregué cosas` y tipos fuera de la lista.
 
