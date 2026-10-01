@@ -11,6 +11,11 @@ Asinko es una red social de finanzas. La inspiración es Reddit: comunidades, po
 
 La interfaz sigue el lenguaje visual y de interacción de **iOS** (Apple Human Interface Guidelines), adaptado a la web según la skill `apple-design`: tipografía del sistema, movimiento físico e interrumpible, materiales translúcidos y profundidad con moderación. Se implementa con los tokens de `design-system.md`, no con valores sueltos.
 
+- **Reddit es la referencia de estructura**: el Home (y en general las vistas de contenido) usa **3 columnas** en desktop — comunidades a la izquierda, contenido al centro, widgets a la derecha. Mobile first: a 360px es una sola columna, con las comunidades en un panel lateral y navegación inferior. Breakpoints como el prototipo: 1 columna en mobile, 2 en tablet (sin la derecha), 3 desde desktop.
+- **Tema claro por defecto**, sin importar la preferencia del sistema operativo.
+- **Modo oscuro opcional** con un toggle; la elección del usuario se recuerda.
+- **Colores de sistema de iOS** en ambos modos, con sus variantes claras y oscuras. El color principal es el azul de sistema (`#007AFF` claro, `#0A84FF` oscuro).
+
 ## Para quién
 
 - Inversores minoristas que quieren discutir activos con contexto, no ruido.
@@ -91,7 +96,7 @@ Solo las comunidades son grupos. La página de un activo y el perfil de un usuar
 
 | Fase | Alcance |
 |---|---|
-| **1. MVP social** | Cuatro vistas: **Home** (feed), **Crear post**, **Detalle de post** y **Comunidades**. Incluye posts (Text, Image, Poll), menciones `$ # @`, comentarios anidados y votos. El front consume el backend y la base de datos existentes. **Sin login**: llega en una fase posterior |
+| **1. MVP social** | Foco en el **Home** (feed). Después **Detalle de post** y **Comunidades**. **Crear post queda postergado** (decisión del 2026-10-01). Orden de specs: `foundation` → `home` → `post-detail` → `communities`. Incluye posts (Text, Image, Poll), menciones `$ # @`, comentarios anidados y votos. El front consume el backend y la base de datos existentes. **Sin login**: llega en una fase posterior; mientras tanto, las escrituras (crear post, votar, comentar, unirse) funcionan contra mocks con un usuario demo y no llegan a la base real |
 | **2. Tesis y reputación** | Tesis con resolución automática, accuracy, racha, rating, perfil con track record, página de activo, búsqueda, formatos Thought y Portfolio |
 | **3. Tiempo real** | Lives, alertas de mercado, notificaciones |
 | **4. Economía** | Tokens, stakes en tesis, Finance Duel, propinas, avatar, monetización de creadores. **Requiere validación legal antes del spec** |
@@ -107,6 +112,7 @@ Solo las comunidades son grupos. La página de un activo y el perfil de un usuar
 
 - [ ] Proveedor de precios de cripto para resolver tesis.
 - [ ] Mercado inicial.
+- [ ] Cuándo llegan el login y las escrituras reales (a definir con backend).
 - [ ] En el MVP no hay página de activo ni perfil: ¿a dónde lleva hacer clic en una mención `$` o `@`?
 - [ ] Encuadre legal de la economía de tokens (juego/predicción, asesoramiento financiero).
 - [ ] Reglas de moderación y proceso de disputa de tesis.
