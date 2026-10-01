@@ -84,7 +84,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - `not-found.tsx`, `[...rest]/page.tsx`, `error.tsx`, `global-error.tsx`, `loading.tsx` (`design.md` §10).
   - **Tests:** `not-found.test.tsx` (texto traducido y link al Home), `error.test.tsx` (mensaje traducido sin detalles del error, "Reintentar" llama a `retry`); organismo `status-message` con su test.
 
-- [ ] **T-13 · Metadata y SEO base** · S · F-31
+- [x] **T-13 · Metadata y SEO base** · S · F-31
   - `generateMetadata` con `metadataBase`, `alternates.languages` + `x-default`, canonical por idioma. `robots.ts` y `sitemap.ts`.
   - **Tests:** `robots.test.ts` (`Disallow: /` salvo `APP_ENV=production`).
 

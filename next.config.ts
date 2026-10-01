@@ -1,8 +1,9 @@
 import type { NextConfig } from 'next'
 import createNextIntlPlugin from 'next-intl/plugin'
+import { isIndexable } from './src/lib/seo/robots'
 
 // Validates environment variables at build time (F-29, F-30).
-import './src/env'
+import { env } from './src/env'
 
 const withNextIntl = createNextIntlPlugin()
 
@@ -13,6 +14,8 @@ const SECURITY_HEADERS = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+  // Non-production environments are invisible to crawlers (security.md, F-31): header + meta + robots.
+  ...(isIndexable(env.APP_ENV) ? [] : [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]),
 ]
 
 const nextConfig: NextConfig = {
