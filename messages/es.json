@@ -24,5 +24,17 @@
       "title": "Comunidades",
       "empty": "Aquí aparecerán tus comunidades."
     }
+  },
+  "errors": {
+    "notFound": {
+      "title": "Página no encontrada",
+      "description": "La página que buscas no existe o se movió.",
+      "backHome": "Volver al inicio"
+    },
+    "unexpected": {
+      "title": "Algo salió mal",
+      "description": "Ocurrió un error inesperado. Intenta de nuevo.",
+      "retry": "Reintentar"
+    }
   }
 }

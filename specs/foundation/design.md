@@ -259,9 +259,10 @@ src/mocks/
 ## 10. Errores y SEO base (F-24, F-25)
 
 - `[locale]/not-found.tsx`: traducido, con link al Home. `[...rest]/page.tsx` llama a `notFound()` para que las URLs inexistentes dentro de un locale lleguen ahí.
-- `[locale]/error.tsx` (Client Component): mensaje traducido + botón "Reintentar" (`reset()`), reporta a Sentry.
+- `[locale]/error.tsx` (Client Component): mensaje traducido + botón "Reintentar" (`retry()`, la API recomendada desde Next 16.2: vuelve a pedir los datos y re-renderiza), reporta a Sentry.
 - `global-error.tsx`: último recurso, sin depender de traducciones (texto mínimo en inglés, es el único texto fijo permitido porque el layout raíz falló).
-- `loading.tsx`: skeleton de las 3 columnas con `Skeleton` de shadcn, mismas medidas que el layout final (sin CLS).
+- `loading.tsx`: skeleton de la columna central con `Skeleton` de shadcn, mismas medidas que el layout final (sin CLS). **Vive en el grupo `[locale]/(main)/`, no en `[locale]/`**: un `loading` encima de `[...rest]` hace que la respuesta empiece a enviarse como 200 antes de `notFound()` (soft 404). Las vistas nuevas van dentro de `(main)`.
+- **Limitación conocida (T-12):** el 404 responde con status 404 y `noindex`, y en el navegador se ve completo (shell + página traducida), pero **el HTML inicial es el documento de error de Next (`<html id="__next_error__">`) y el contenido se dibuja en el cliente**. Next lo advierte para layouts raíz con segmentos dinámicos (`[locale]`). Descartado: `not-found` en el segmento de `[...rest]`, `global-not-found` (experimental) y evitar `notFound()` en `i18n/request.ts`. Un proyecto recién creado con layout raíz estático sí renderiza el 404 en el servidor. Impacto bajo (página de error, sin efecto en SEO); se revisa si se reestructura el layout raíz o al actualizar Next/next-intl.
 - Metadata en `[locale]/layout.tsx` con `generateMetadata`: `metadataBase`, título y descripción traducidos, `alternates.languages` con `x-default` → `en`, canonical por idioma (`seo.md`).
 
 ## 11. i18n (F-11 a F-15)

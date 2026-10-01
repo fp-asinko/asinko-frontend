@@ -24,5 +24,17 @@
       "title": "Communities",
       "empty": "Your communities will appear here."
     }
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page not found",
+      "description": "The page you're looking for doesn't exist or was moved.",
+      "backHome": "Back to home"
+    },
+    "unexpected": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred. Please try again.",
+      "retry": "Try again"
+    }
   }
 }

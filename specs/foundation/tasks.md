@@ -80,9 +80,9 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - **Tests:** uno por componente — `asinko-logo.test.tsx` (nombre accesible), `site-header.test.tsx` (logo lleva al Home, incluye el toggle), `bottom-nav.test.tsx` (solo ítems registrados, `aria-current` en el activo), `mobile-sidebar.test.tsx` (el botón de menú abre y cierra el panel, con teclado y Escape), `sidebar-content.test.tsx`, `app-shell.test.tsx` (skip link, `main`, landmarks), `nav-link.test.tsx`, `page-columns.test.tsx` (con y sin `aside`).
   - Correr el subagente `ui-reviewer` y las skills `apple-design` / `mobile-native` sobre el shell; aplicar lo que corresponda.
 
-- [ ] **T-12 · Páginas de error y carga** · S · F-24, F-25
+- [x] **T-12 · Páginas de error y carga** · S · F-24, F-25
   - `not-found.tsx`, `[...rest]/page.tsx`, `error.tsx`, `global-error.tsx`, `loading.tsx` (`design.md` §10).
-  - **Tests:** `not-found.test.tsx` (texto traducido y link al Home), `error.test.tsx` (mensaje traducido, "Reintentar" llama a `reset`).
+  - **Tests:** `not-found.test.tsx` (texto traducido y link al Home), `error.test.tsx` (mensaje traducido sin detalles del error, "Reintentar" llama a `retry`); organismo `status-message` con su test.
 
 - [ ] **T-13 · Metadata y SEO base** · S · F-31
   - `generateMetadata` con `metadataBase`, `alternates.languages` + `x-default`, canonical por idioma. `robots.ts` y `sitemap.ts`.
