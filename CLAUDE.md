@@ -26,6 +26,7 @@ Reglas rápidas:
 3. Sigue Conventional Commits.
 4. Valida todo input con esquemas; trata las fuentes externas como no confiables.
 5. Cumple el Definition of Done antes de dar por terminado un PR.
+6. Next.js 16 tiene cambios respecto de tu conocimiento previo: antes de escribir código de Next, leé la guía correspondiente en `node_modules/next/dist/docs/`.
 
 ## Skills
 

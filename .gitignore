@@ -26,6 +26,9 @@ playwright/.cache/
 # Claude Code: personal settings stay local
 .claude/settings.local.json
 
+# Certificates / keys
+*.pem
+
 # OS / editors
 .DS_Store
 Thumbs.db

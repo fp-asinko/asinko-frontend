@@ -20,7 +20,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
 
 ### Base del proyecto
 
-- [ ] **T-01 · Scaffold de Next.js 16 con pnpm** · M · F-01, F-02, F-07
+- [x] **T-01 · Scaffold de Next.js 16 con pnpm** · M · F-01, F-02, F-07
   - `create-next-app` con TypeScript, App Router, Tailwind 4, `src/`, alias `@/`, **sin** ESLint del template (se configura en T-03).
   - `packageManager` (pnpm 11), `engines` (Node 24), `.nvmrc`. Versiones exactas de `next`, `react`, `react-dom`.
   - `tsconfig.json` estricto con las opciones de `tooling.md`.
