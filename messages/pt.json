@@ -36,5 +36,17 @@
       "description": "Ocorreu um erro inesperado. Tente novamente.",
       "retry": "Tentar novamente"
     }
+  },
+  "api": {
+    "errors": {
+      "UNAUTHENTICATED": "Você precisa de uma conta para fazer isso.",
+      "NOT_FOUND": "Não encontramos o que você procurava.",
+      "USER_MISMATCH": "Você não pode fazer isso em nome de outro usuário.",
+      "ACCOUNT_DELETED": "Esta conta foi excluída.",
+      "CONFLICT": "Isso já existe. Tente algo diferente.",
+      "INVALID": "Alguns dados não são válidos. Revise e tente novamente.",
+      "RATE_LIMITED": "Muitas tentativas. Aguarde um momento e tente novamente.",
+      "UNKNOWN": "Algo deu errado. Tente novamente."
+    }
   }
 }

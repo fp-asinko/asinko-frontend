@@ -36,5 +36,17 @@
       "description": "An unexpected error occurred. Please try again.",
       "retry": "Try again"
     }
+  },
+  "api": {
+    "errors": {
+      "UNAUTHENTICATED": "You need an account to do this.",
+      "NOT_FOUND": "We couldn't find what you were looking for.",
+      "USER_MISMATCH": "You can't do this on behalf of another user.",
+      "ACCOUNT_DELETED": "This account was deleted.",
+      "CONFLICT": "That already exists. Try something different.",
+      "INVALID": "Some data isn't valid. Check it and try again.",
+      "RATE_LIMITED": "Too many attempts. Wait a moment and try again.",
+      "UNKNOWN": "Something went wrong. Please try again."
+    }
   }
 }

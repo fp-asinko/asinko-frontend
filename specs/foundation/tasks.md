@@ -90,7 +90,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
 
 ### API, mocks y observabilidad
 
-- [ ] **T-14 · Cliente HTTP** · M · F-32, F-33, F-34
+- [x] **T-14 · Cliente HTTP** · M · F-32, F-33, F-34
   - `src/lib/api/` y `src/lib/result.ts` (`design.md` §7).
   - **Tests:** `client.test.ts` con `fetch` mockeado: respuesta válida → `ok`; respuesta que no cumple el esquema → lanza; cada fila de la tabla de errores (`401`, `404`, `403/409/422/429` con su clave, código desconocido → `UNKNOWN`, `5xx` y timeout → lanzan); el `message` del backend nunca aparece en el resultado. F-32 se verifica en T-17 (build).
 
