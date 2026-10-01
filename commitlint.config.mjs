@@ -14,7 +14,7 @@ export const COMMIT_TYPES = [
 const config = {
   extends: ['@commitlint/config-conventional'],
   rules: {
-    'type-enum': [2, 'always', COMMIT_TYPES],
+    'type-enum': /** @type {const} */ ([2, 'always', COMMIT_TYPES]),
   },
 }
 
