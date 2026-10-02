@@ -61,6 +61,10 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - **Tests:** cada componente (post normal, imagen, link, editado, borrado, sistema; encuesta visible, oculta, cerrada, votada), pestañas y filtros con `aria-current`.
   - Revisión visual contra el prototipo (capturas a 360 y 1440 px, claro y oscuro).
 
+- [ ] **T-08b · Vista previa de comentarios** · M · H-28 — ⏳ espera la aprobación de H-28 y D-H2
+  - `load-comments-preview.action.ts` (zod, `ActionResult`), `comments-toggle` (client), `comments-preview` (server); P-006 en `proposals.md`.
+  - **Tests:** action (3 primeros, sin borrados, contenido inexistente), toggle (`aria-expanded`, carga una sola vez, error), preview (Markdown seguro).
+
 - [ ] **T-09 · Votar** · M · H-15, H-23
   - Actions `vote-post` y `vote-poll` (zod, `getViewer`, `ActionResult`); `vote-control` y `poll-voting` con `useOptimistic`.
   - **Tests:** actions con el cliente mockeado (éxito, sin viewer, error), componentes (aria-pressed, optimista, revertir).
@@ -101,6 +105,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
 | H-20             | Test de `getFeed` con ítem inválido                  | T-06             |
 | H-21             | Test de mosaico con precio desactualizado            | T-05             |
 | H-27             | `locale-switcher.test.tsx` + `i18n.spec.ts`          | T-05b            |
+| H-28             | Tests de la action y del toggle + `home.spec.ts`     | T-08b, T-12      |
 | H-22             | Paridad de claves + formato                          | T-11             |
 | H-23             | Tests de componentes + axe                           | T-08, T-09, T-12 |
 | H-24             | `performance.spec.ts`                                | T-12             |

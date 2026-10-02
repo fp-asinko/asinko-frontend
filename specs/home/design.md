@@ -198,6 +198,19 @@ Cuerpo (type-post-body, Markdown seguro, recortado a 6 líneas + "Ver más")
 - Sin viewer (sin mocks y sin login): `UNAUTHENTICATED` → "Necesitas una cuenta para votar".
 - **Mocks**: se agregan `PUT`/`DELETE /posts/:id/vote` y `PUT /polls/:id/vote`. No persisten (cada recarga vuelve al estado de las fixtures), lo cual se documenta.
 
+### Vista previa de comentarios (H-28) — D-H2 ⏳
+
+Medidas del prototipo: caja con fondo `--surface`, borde superior, radio inferior de 12 px, padding 10 × 14 px y 14 px entre comentarios; avatar de 20 px, usuario 12/700 en `--muted-foreground`, tiempo 12 px y texto 13 px; "Ver todos los comentarios →" 12/600.
+
+- Se muestran los **3 primeros comentarios de primer nivel** que devuelve `GET /posts/:id/comments` (o `/polls/:id/comments`), sin respuestas anidadas y sin los borrados. Texto en Markdown seguro (`PostMarkdown`); los comentarios no traen `entities`, así que sus menciones se ven como texto.
+- El botón 💬 tiene `aria-expanded` y `aria-controls`; el resto de la tarjeta no cambia.
+- **Encuestas**: el contrato de `Poll` no trae `commentCount`. El botón se muestra sin número y se propone **P-006** (`commentCount` en `Poll`).
+
+> **D-H2 — ⏳ a aprobar: cuándo se cargan los comentarios.**
+>
+> - **A (recomendada): al abrir.** El botón 💬 es una hoja cliente (`CommentsToggle`, ~1 KB) que la primera vez llama a la Server Action `loadCommentsPreview(kind, id)`; esta devuelve los comentarios **ya renderizados en el servidor** (Markdown incluido, sin sumar `react-markdown` al navegador). El feed no hace pedidos de más. Riesgo: es el mismo mecanismo que T-10 (Server Action que devuelve JSX), así que se verifica acá primero; si no funciona, se consulta antes de cambiar de plan.
+> - **B: precargados.** Se piden los comentarios de los 20 ítems al renderizar el feed y se muestran con un `<details>` (cero JavaScript). Costo: 20 pedidos extra a la API por cada página del feed, aunque nadie abra los comentarios.
+
 ### Paginación (H-16)
 
 - La primera página (20 ítems) viene del servidor.
@@ -286,5 +299,5 @@ Cambios en `src/mocks/`:
 - `design-system.md` y `overview.md § Estilo`: el sistema visual pasa a ser el del prototipo (monocromático, Figtree, sin sombras). De la skill `apple-design` queda el criterio de movimiento e interacción, no la paleta.
 - `specs/foundation/design.md`: D-01 y la tipografía del sistema (F-17, F-18) quedan reemplazadas por este spec; se anota ahí.
 - `libraries.md`: `react-markdown` (si se aprueba D-H1).
-- `proposals.md`: P-004 y P-005.
+- `proposals.md`: P-004, P-005 y P-006 (`commentCount` en `Poll`, H-28).
 - `specs/foundation/requirements.md`: F-12 (redirección por idioma del navegador) queda reemplazado por H-27; `i18n.md § URLs` se actualiza.
