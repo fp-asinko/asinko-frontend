@@ -18,7 +18,17 @@ Probado el 2026-10-02 con `dev` corriendo en local contra la Supabase de dev: **
 20260922152554_community_favorites
 ```
 
-Las aplica el backend (el front no corre migraciones). Alternativa del propio handoff: Postgres local con el seed.
+**Causa verificada: es el esquema, no los permisos.** En `information_schema` no existen `communities.slugChangedAt` ni `polls.resultsVisibility`, y el log del backend lo confirma (`The column communities.slugChangedAt does not exist in the current database`). El rol de solo lectura del front (`juan_readonly`) lee las tablas sin problema (12 comunidades, 12 posts, 2 encuestas); un problema de permisos daría `permission denied for table`.
+
+**Pedido:**
+
+- [ ] Aplicar las 6 migraciones en la Supabase de dev (`npx prisma migrate deploy`, `HANDOFF-frontend.md` § 3). Las aplica el backend: el front no corre migraciones.
+- [ ] Decidir si se corre el seed después. **Ojo:** borra todo el contenido antes de reinsertar.
+- [ ] Avisar cuando esté, para que el front repita la prueba (`pnpm api:smoke`).
+
+**No hacen falta credenciales nuevas para el front.** Con las migraciones aplicadas, `juan_readonly` alcanza para todo lo que lee el Home sin login (feed, comunidades, perfiles). Las escrituras (votar, comentar) piden sesión de usuario, y el backend las hace con su propia conexión.
+
+Alternativa del propio handoff: Postgres local con el seed.
 
 ## Formato
 
