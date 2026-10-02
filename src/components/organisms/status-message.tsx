@@ -12,7 +12,7 @@ export function StatusMessage({
 }) {
   return (
     <div className="mx-auto flex max-w-md flex-col items-center gap-3 py-16 text-center">
-      <h1 className="text-title-2">{title}</h1>
+      <h1 className="text-page-title">{title}</h1>
       <p className="text-muted-foreground">{description}</p>
       {action && <div className="mt-3">{action}</div>}
     </div>

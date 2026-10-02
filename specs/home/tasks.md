@@ -16,7 +16,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
 
 ## Tareas
 
-- [ ] **T-01 · Sistema visual del prototipo** · M · H-01, H-02, H-03, H-04
+- [x] **T-01 · Sistema visual del prototipo** · M · H-01, H-02, H-03, H-04
   - Tokens de `design.md` §2 en `globals.css` (claro y oscuro), sin sombras, radios, utilidades de tipografía.
   - Figtree con `next/font/google` en el layout.
   - **Tests:** `tokens-contrast.test.ts` con los pares nuevos (`--faint` e `--interesting` como no-texto).

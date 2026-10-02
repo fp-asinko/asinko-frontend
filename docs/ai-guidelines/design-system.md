@@ -47,33 +47,28 @@ shadcn define el tema con variables semánticas en `globals.css`:
 - Se usan nombres **semánticos** (`primary`, `destructive`, `muted`), no de color (`blue-500`).
 - Tokens nuevos (ej. `--success`) se agregan en `:root` **y** `.dark`, y se exponen en `@theme inline`. Un alias con `var()` definido solo en `:root` funciona porque `.dark` va únicamente en `<html>` (lo pone next-themes).
 
-### Tokens de Asinko (estilo iOS)
+### Tokens de Asinko (sistema del prototipo)
 
-Colores de sistema de iOS, claro por defecto y oscuro opcional (`docs/product/overview.md § Estilo`). Valores y motivos en `specs/foundation/design.md § 4`.
+El sistema visual sale del prototipo (`docs/references/prototype.html`), medido en el navegador. Valores y motivos en `specs/home/design.md § 2`.
 
-- **Texto y botones usan las variantes de alto contraste de Apple** (`--primary` `#0040DD` en claro, `#409CFF` en oscuro): los colores base de iOS no llegan a 4,5:1 sobre blanco.
-- **`--tint` / `--ring` (`#007AFF` / `#0A84FF`) son solo para íconos, foco y estados no textuales** (3:1). Nunca para texto: un label activo va en `text-primary` con el ícono en `text-tint`.
-- Semánticos de negocio: `--success`/`--bullish`, `--bearish`, `--warning`. El color nunca es la única señal: van con ícono o texto.
-- `src/test/tokens-contrast.test.ts` mide cada par texto/fondo en los dos temas: un token que baja del mínimo rompe el build.
+- **Monocromático**: `--primary` es casi negro (`#17181A`) en claro y casi blanco en oscuro. El único azul es el punto del logo (`--brand-dot`).
+- **Grises cálidos**: `--surface` (`#F7F6F4`) para buscador, caja para publicar y hovers; `--muted` (`#F1F0ED`) para chips; `--border` (`#ECEBE7`).
+- **Texto secundario**: `--muted-foreground` (`#5C5D60`). **`--faint` (`#8A8B8E`) no es para texto chico** (3,4:1): solo íconos, separadores y texto de 18 px o más.
+- **Verde en texto** (`--success`/`--bullish`) sobre fondos blancos, no sobre `--surface`. El color nunca es la única señal: siempre con flecha, ícono o texto.
+- **Sin sombras**: las capas se separan con borde. Radios de 4 / 8 / 12 / 16 px y `rounded-full` para píldoras.
+- **Bordes de campos activos** con `--input` (3:1); el borde suave del prototipo solo en elementos deshabilitados o decorativos.
+- `src/test/tokens-contrast.test.ts` mide cada par en los dos temas: un token que baja del mínimo rompe el build.
 
 ### Tipografía
 
-- Fuente del sistema (SF Pro en Apple), sin descargas. Escala de iOS en `rem` como utilidades: `text-large-title`, `text-title-1`…`3`, `text-headline`, `text-body` (17px, base del `body`), `text-callout`, `text-subhead`, `text-footnote`, `text-caption`.
-- Cada utilidad trae su tracking y leading: no se ajustan sueltos en los componentes.
+- **Figtree** con `next/font/google`: se descarga en el build y se sirve desde el sitio, sin requests a Google.
+- Escala del prototipo como utilidades: `text-page-title`, `text-post-title` (17 px, 700), `text-post-body` (15 px), `text-ui` (14 px, base del `body`), `text-action` (13 px, 600), `text-meta` (12 px), `text-section` (11 px, mayúsculas).
 
 ### Materiales
 
-- Barras de navegación translúcidas: `bg-card/90 backdrop-blur-xl`, con `reduced-transparency:` para pasar a fondo sólido (`prefers-reduced-transparency`).
-- Áreas seguras del iPhone con `env(safe-area-inset-*)` (el layout declara `viewport-fit=cover`); alturas de pantalla con `dvh`, nunca `vh`.
-
-```tsx
-// ✅ Correcto: tokens semánticos vía utilidades
-<div className="bg-primary text-primary-foreground p-4 rounded-lg">
-
-// ❌ Incorrecto: valores hardcoded o colores crudos
-<div style={{ backgroundColor: '#FF0000', padding: '16px' }}>
-<div className="bg-[#FF0000] text-blue-500">
-```
+- Barra superior translúcida: `bg-header/92` con `backdrop-blur` y `reduced-transparency:` para pasar a sólido.
+- Áreas seguras del iPhone con `env(safe-area-inset-*)` (`viewport-fit=cover`); alturas de pantalla con `dvh`, nunca `vh`.
+- Del estilo de Apple (skill `apple-design`) se toma el criterio de **movimiento e interacción**, no la paleta.
 
 ## Atomic Design
 

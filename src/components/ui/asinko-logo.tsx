@@ -107,7 +107,7 @@ export function AsinkoLogo({ label, className }: { label: string; className?: st
                       <g clipPath={`url(#${prefix}-3)`}>
                         <g clipPath={`url(#${prefix}-4)`}>
                           <path
-                            className="fill-success"
+                            className="fill-brand-dot"
                             d="M 0.101562 0.214844 L 17.117188 0.214844 L 17.117188 17.230469 L 0.101562 17.230469 Z M 0.101562 0.214844 "
                             fillOpacity="1"
                             fillRule="nonzero"

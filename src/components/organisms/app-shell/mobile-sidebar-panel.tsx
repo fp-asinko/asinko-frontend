@@ -32,7 +32,7 @@ export function MobileSidebarPanel({
         className="px-3 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-6 data-[side=left]:w-72 motion-reduce:transition-none"
       >
         <div className="flex items-center justify-between">
-          <SheetTitle className="px-3 text-headline">{t('menu')}</SheetTitle>
+          <SheetTitle className="px-3 text-ui font-semibold">{t('menu')}</SheetTitle>
           <SheetClose
             render={
               <Button variant="ghost" size="icon" className="size-11" aria-label={t('closeMenu')} />

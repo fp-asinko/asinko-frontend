@@ -1,5 +1,6 @@
 import { HouseIcon } from 'lucide-react'
 import type { Metadata, Viewport } from 'next'
+import { Figtree } from 'next/font/google'
 import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
@@ -11,6 +12,14 @@ import { routing } from '@/i18n/routing'
 import { isIndexable } from '@/lib/seo/robots'
 import { Providers } from './providers'
 import '../globals.css'
+
+// The prototype's typeface (specs/home/design.md §2). next/font downloads it at build time and
+// serves it from this site: the browser never contacts Google (CSP font-src 'self').
+const figtree = Figtree({
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--font-figtree',
+})
 
 // Root layout: [locale] is the top segment so next/root-params can read it anywhere on the server.
 // Defaults for every page (seo.md). Each page adds its canonical and hreflang (alternates).
@@ -51,7 +60,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
 
   return (
     // next-themes sets the theme class on <html> before hydration.
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} className={figtree.variable} suppressHydrationWarning>
       <body>
         <NextIntlClientProvider>
           <Providers nonce={nonce}>

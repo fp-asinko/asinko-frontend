@@ -7,43 +7,51 @@
 @custom-variant reduced-transparency (@media (prefers-reduced-transparency: reduce));
 
 /*
- * Design tokens: iOS system colors (specs/foundation/design.md §4, decision D-01).
- * - Text and buttons use Apple's high-contrast variants: WCAG AA (4.5:1) is mandatory.
- * - Focus rings and icons use the base iOS tint (non-text, 3:1).
+ * Design tokens: the prototype's visual system (specs/home/design.md §2), measured in the browser.
+ * Monochrome, warm grays, no shadows. Replaces the iOS tokens of the foundation spec (D-01).
+ * - --muted-foreground (#5C5D60) is the secondary TEXT color. --faint (#8A8B8E) is 3.4:1: only for
+ *   icons, separators and text >= 18px, never small text.
+ * - Green text (--success) goes on white surfaces (4.7:1), not on --surface (4.4:1).
  * src/test/tokens-contrast.test.ts fails the build if any pair drops below its minimum.
  */
 :root {
-  --background: #f2f2f7; /* systemGroupedBackground */
-  --foreground: #000000; /* label */
+  --background: #ffffff;
+  --foreground: #17181a;
   --card: #ffffff;
-  --card-foreground: #000000;
+  --card-foreground: #17181a;
   --popover: #ffffff;
-  --popover-foreground: #000000;
-  --primary: #0040dd; /* systemBlue, high contrast */
+  --popover-foreground: #17181a;
+  --primary: #17181a; /* monochrome */
   --primary-foreground: #ffffff;
-  --secondary: #e5e5ea; /* systemGray5 */
-  --secondary-foreground: #000000;
-  --muted: #e5e5ea;
-  --muted-foreground: rgb(60 60 67 / 0.76); /* secondaryLabel, high contrast */
-  --accent: #e5e5ea;
-  --accent-foreground: #000000;
-  --destructive: #d70015; /* systemRed, high contrast */
-  --success: #1e7e34; /* systemGreen, darkened to reach 4.5:1 */
+  --primary-hover: #000000;
+  --secondary: #f1f0ed;
+  --secondary-foreground: #17181a;
+  --surface: #f7f6f4; /* search, composer, hover */
+  --muted: #f1f0ed;
+  --muted-foreground: #5c5d60;
+  --faint: #8a8b8e;
+  --accent: #f1f0ed;
+  --accent-foreground: #17181a;
+  --destructive: #ce2c31;
+  --success: #17853b;
   --bullish: var(--success);
   --bearish: var(--destructive);
-  --warning: #c93400; /* systemOrange, high contrast */
-  --tint: #007aff; /* systemBlue: icons and active states (non-text) */
-  --border: rgb(60 60 67 / 0.29); /* separator */
-  --input: rgb(60 60 67 / 0.6);
-  --ring: var(--tint);
-  --chart-1: #007aff;
-  --chart-2: #34c759;
-  --chart-3: #ff9500;
-  --chart-4: #af52de;
-  --chart-5: #30b0c7;
+  --interesting: #8b5cf6;
+  --brand-dot: #155de9; /* only the logo dot */
+  --border: #ecebe7;
+  --border-strong: #d9d8d4;
+  /* Border of ACTIVE inputs: 3:1 against the background (WCAG 1.4.11). */
+  --input: #8a8b8e;
+  --ring: #17181a;
+  --header: #fcfcfb;
+  --chart-1: #17181a;
+  --chart-2: #17853b;
+  --chart-3: #ce2c31;
+  --chart-4: #8b5cf6;
+  --chart-5: #8a8b8e;
   --radius: 0.75rem;
   --sidebar: #ffffff;
-  --sidebar-foreground: #000000;
+  --sidebar-foreground: #17181a;
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: var(--accent);
@@ -53,43 +61,50 @@
 }
 
 /*
- * .dark only ever goes on <html> (next-themes), so aliases defined with var() in :root
- * (--bullish, --bearish, --ring, --sidebar-*) resolve to the dark values.
+ * The prototype's dark palette used cold grays from an older version: adjusted here to neutral
+ * grays with the same hierarchy. .dark only ever goes on <html> (next-themes), so aliases defined
+ * with var() in :root (--bullish, --bearish, --sidebar-*) resolve to the dark values.
  */
 .dark {
-  --background: #000000; /* systemBackground */
-  --foreground: #ffffff;
-  --card: #1c1c1e; /* secondarySystemBackground */
-  --card-foreground: #ffffff;
-  --popover: #2c2c2e; /* tertiarySystemBackground */
-  --popover-foreground: #ffffff;
-  --primary: #409cff; /* systemBlue, high contrast */
-  --primary-foreground: #000000;
-  --secondary: #2c2c2e;
-  --secondary-foreground: #ffffff;
-  --muted: #2c2c2e;
-  --muted-foreground: rgb(235 235 245 / 0.6); /* secondaryLabel */
-  --accent: #2c2c2e;
-  --accent-foreground: #ffffff;
-  --destructive: #ff6961; /* systemRed, high contrast */
-  --success: #30d158;
-  --warning: #ff9f0a;
-  --tint: #0a84ff;
-  --border: rgb(84 84 88 / 0.65);
-  --input: rgb(235 235 245 / 0.45);
-  --chart-1: #0a84ff;
-  --chart-2: #30d158;
-  --chart-3: #ff9f0a;
-  --chart-4: #bf5af2;
-  --chart-5: #40c8e0;
-  --sidebar: #1c1c1e;
-  --sidebar-foreground: #ffffff;
+  --background: #111214;
+  --foreground: #f4f4f2;
+  --card: #111214;
+  --card-foreground: #f4f4f2;
+  --popover: #1a1b1e;
+  --popover-foreground: #f4f4f2;
+  --primary: #f4f4f2;
+  --primary-foreground: #111214;
+  --primary-hover: #ffffff;
+  --secondary: #26272b;
+  --secondary-foreground: #f4f4f2;
+  --surface: #1a1b1e;
+  --muted: #26272b;
+  --muted-foreground: #a6a7aa;
+  --faint: #77787b;
+  --accent: #26272b;
+  --accent-foreground: #f4f4f2;
+  --destructive: #ff6b6b;
+  --success: #3dbe6a;
+  --interesting: #a78bfa;
+  --brand-dot: #4c8dff;
+  --border: #2e2f33;
+  --border-strong: #3d3e43;
+  --input: #77787b;
+  --ring: #f4f4f2;
+  --header: #111214;
+  --chart-1: #f4f4f2;
+  --chart-2: #3dbe6a;
+  --chart-3: #ff6b6b;
+  --chart-4: #a78bfa;
+  --chart-5: #77787b;
+  --sidebar: #111214;
+  --sidebar-foreground: #f4f4f2;
 }
 
 @theme inline {
-  /* System font: SF Pro on Apple platforms. No font downloads (F-18). */
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  /* Figtree, self-hosted by next/font (set as --font-figtree on <html>). No requests to Google. */
+  --font-sans: var(--font-figtree), -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
   --font-heading: var(--font-sans);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -99,21 +114,26 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-surface: var(--surface);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
+  --color-faint: var(--faint);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-success: var(--success);
   --color-bullish: var(--bullish);
   --color-bearish: var(--bearish);
-  --color-warning: var(--warning);
-  --color-tint: var(--tint);
+  --color-interesting: var(--interesting);
+  --color-brand-dot: var(--brand-dot);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-header: var(--header);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -127,73 +147,58 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  /* Prototype radii: 4 / 8 / 12 / 16 px, plus rounded-full for pills. */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1rem;
+  --radius-4xl: 1rem;
+  /* No shadows in the prototype: layers are separated by borders. */
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+  --shadow-2xl: none;
 }
 
-/*
- * iOS type scale in rem, so it follows the user's text size (skill apple-design §15).
- * Tracking: negative on large text, slightly positive on small text.
- */
-@utility text-large-title {
-  font-size: 2.125rem;
-  line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: -0.022em;
-}
-@utility text-title-1 {
-  font-size: 1.75rem;
-  line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-@utility text-title-2 {
+/* The prototype's type scale (specs/home/design.md §2). */
+@utility text-page-title {
   font-size: 1.375rem;
-  line-height: 1.27;
+  line-height: 1.3;
   font-weight: 700;
-  letter-spacing: -0.016em;
 }
-@utility text-title-3 {
-  font-size: 1.25rem;
-  line-height: 1.25;
-  font-weight: 600;
-  letter-spacing: -0.012em;
-}
-@utility text-headline {
+@utility text-post-title {
   font-size: 1.0625rem;
   line-height: 1.3;
-  font-weight: 600;
-  letter-spacing: -0.008em;
+  font-weight: 700;
 }
-@utility text-body {
-  font-size: 1.0625rem;
-  line-height: 1.47;
-  letter-spacing: -0.008em;
-}
-@utility text-callout {
-  font-size: 1rem;
-  line-height: 1.4;
-  letter-spacing: -0.006em;
-}
-@utility text-subhead {
+@utility text-post-body {
   font-size: 0.9375rem;
-  line-height: 1.33;
-  letter-spacing: -0.004em;
+  line-height: 1.55;
 }
-@utility text-footnote {
+@utility text-ui {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+@utility text-action {
   font-size: 0.8125rem;
-  line-height: 1.38;
-  letter-spacing: 0.002em;
+  line-height: 1.5;
+  font-weight: 600;
 }
-@utility text-caption {
+@utility text-meta {
   font-size: 0.75rem;
-  line-height: 1.33;
-  letter-spacing: 0.008em;
+  line-height: 1.5;
+}
+@utility text-section {
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 @layer base {
@@ -205,6 +210,6 @@
     -webkit-text-size-adjust: 100%;
   }
   body {
-    @apply bg-background text-body text-foreground antialiased;
+    @apply bg-background text-ui text-foreground antialiased;
   }
 }

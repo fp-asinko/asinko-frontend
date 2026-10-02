@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 
-// F-17 / D-01: every text/background pair of the theme meets WCAG AA (4.5:1 text, 3:1 non-text),
+// H-04 (home spec): every text/background pair of the theme meets WCAG AA (4.5:1 text, 3:1 non-text),
 // in light and dark. Reads the real tokens from globals.css.
 const css = readFileSync(path.resolve(import.meta.dirname, '../app/globals.css'), 'utf8')
 
@@ -65,28 +65,30 @@ const TEXT_PAIRS: Array<[string, string]> = [
   ['foreground', 'background'],
   ['card-foreground', 'card'],
   ['popover-foreground', 'popover'],
+  ['foreground', 'surface'],
   ['muted-foreground', 'background'],
-  ['muted-foreground', 'card'],
+  ['muted-foreground', 'surface'],
   ['muted-foreground', 'muted'],
   ['primary', 'background'],
-  ['primary', 'card'],
-  ['primary', 'popover'],
   ['primary-foreground', 'primary'],
   ['secondary-foreground', 'secondary'],
   ['accent-foreground', 'accent'],
   ['destructive', 'card'],
   ['destructive', 'popover'],
-  ['success', 'background'],
+  // Green text goes on white surfaces (cards, tiles), not on --surface.
   ['success', 'card'],
   ['bearish', 'card'],
-  ['warning', 'card'],
   ['sidebar-foreground', 'sidebar'],
 ]
 
+// Non-text: icons, separators, focus rings and borders of active inputs (3:1).
 const NON_TEXT_PAIRS: Array<[string, string]> = [
   ['ring', 'background'],
-  ['ring', 'card'],
-  ['tint', 'card'],
+  ['faint', 'background'],
+  ['faint', 'surface'],
+  ['interesting', 'card'],
+  ['bullish', 'card'],
+  ['brand-dot', 'background'],
   ['input', 'card'],
 ]
 

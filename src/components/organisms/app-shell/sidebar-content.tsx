@@ -19,10 +19,10 @@ export function SidebarContent({ navItems }: { navItems: NavItem[] }) {
         </ul>
       </nav>
       <section aria-label={t('communities.title')} className="flex flex-col gap-2 px-3">
-        <p aria-hidden className="text-footnote font-semibold text-muted-foreground uppercase">
+        <p aria-hidden className="text-section font-semibold text-muted-foreground uppercase">
           {t('communities.title')}
         </p>
-        <p className="text-subhead text-muted-foreground">{t('communities.empty')}</p>
+        <p className="text-meta text-muted-foreground">{t('communities.empty')}</p>
       </section>
     </div>
   )

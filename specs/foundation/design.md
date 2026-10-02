@@ -99,6 +99,8 @@ Estructura de Reddit y del prototipo, mobile first:
 
 ### Tokens de color (F-17) — D-01
 
+> **Reemplazado por `specs/home/design.md § 2` (2026-10-02):** el sistema visual pasó a ser el del prototipo (monocromático, grises cálidos, Figtree). Los tokens iOS de esta sección y la fuente del sistema (F-18) ya no aplican. Se mantienen las reglas de contraste y el test.
+
 Los colores de sistema de iOS en modo claro **no cumplen WCAG AA para texto** (4,5:1), que es obligatorio en `design-system.md`. Medido:
 
 | Color iOS (claro)     | Contraste sobre blanco | ¿Texto AA? |

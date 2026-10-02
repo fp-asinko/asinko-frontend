@@ -18,7 +18,7 @@ export function AppShell({ navItems, children }: { navItems: NavItem[]; children
     <>
       <a
         href="#content"
-        className="sr-only z-50 rounded-lg bg-card px-4 py-3 text-headline focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:ring-3 focus:ring-ring/50"
+        className="sr-only z-50 rounded-lg bg-card px-4 py-3 text-ui font-semibold focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:ring-3 focus:ring-ring/50"
       >
         {t('nav.skipToContent')}
       </a>
