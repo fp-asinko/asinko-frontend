@@ -34,3 +34,6 @@ playwright/.cache/
 Thumbs.db
 *.log
 .vercel
+
+# Local duplicate of docs/references/prototype.html
+/FinanceShowOff_Prototype.html
