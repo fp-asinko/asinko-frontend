@@ -43,7 +43,7 @@ Incluye **reemplazar el estilo iOS de `foundation` por el sistema visual del pro
 
 - [ ] **H-05** **Barra superior** de 60 px, translúcida (`#FCFCFB` al 92%) con borde inferior: logo a la izquierda; buscador centrado (680×40, redondeado) en desktop; ícono de búsqueda en mobile; acciones a la derecha (saldo de tokens, campana y perfil), **deshabilitadas** (Q1).
 - [ ] **H-06** **Tres columnas** en desktop: izquierda 260 px, centro 780 px, derecha 300 px, como el prototipo. Mobile first: 1 columna en mobile, columna izquierda en panel lateral y barra inferior de 5 ítems.
-- [ ] **H-07** **Columna izquierda "Tus intereses"**, con secciones plegables:
+- [ ] **H-07** **Columna izquierda "Tus intereses"**, con secciones plegables. Cada entidad se muestra con su **símbolo de mención** (`$BTC`, `@usuario`, `#comunidad`), igual que se la menciona:
   - **Activos**: grilla de 3 columnas con símbolo y variación del día en verde o rojo; el borde inferior de cada mosaico toma el color de la variación.
   - **Personas**: usuarios que sigo, con avatar o iniciales y su precisión.
   - **Grupos**: comunidades donde soy miembro, con avatar, nombre, su último post como subtítulo y etiqueta `MOD` si modero.

@@ -3,7 +3,14 @@ import { apiRequest, paginatedSchema } from '@/lib/api'
 import { assetPageSchema, communitySchema, userSummarySchema } from '@/lib/api/contract'
 import type { Viewer } from '@/lib/session'
 import type { Interests, SectionResult } from '../interests.types'
-import { memberAssetCommunities, toAssetTile, toGroups, toPerson, toSuggestions } from './mappers'
+import {
+  assetSymbol,
+  memberAssetCommunities,
+  toAssetTile,
+  toGroups,
+  toPerson,
+  toSuggestions,
+} from './mappers'
 
 const failed = { ok: false } as const
 
@@ -45,7 +52,7 @@ export async function getInterests(viewer: Viewer | null): Promise<Interests> {
       apiRequest({
         method: 'GET',
         path: '/api/v1/assets/:symbol',
-        params: { symbol: community.slug.toUpperCase() },
+        params: { symbol: assetSymbol(community.slug) },
         schema: assetPageSchema,
       }),
     ),

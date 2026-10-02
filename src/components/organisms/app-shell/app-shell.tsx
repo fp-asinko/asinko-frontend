@@ -26,13 +26,13 @@ export function AppShell({
     <>
       <a
         href="#content"
-        className="sr-only z-50 rounded-lg bg-background px-4 py-3 text-ui font-semibold focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:ring-3 focus:ring-ring/50"
+        className="sr-only z-50 rounded-lg bg-background px-4 py-3 type-ui font-semibold focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:ring-3 focus:ring-ring/50"
       >
         {t('nav.skipToContent')}
       </a>
       <SiteHeader menu={<MobileSidebar>{sidebar}</MobileSidebar>} />
       <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)] lg:grid-cols-[16.25rem_minmax(0,1fr)_18.75rem]">
-        <div className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-3 py-4 md:block">
+        <div className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-2 py-2.5 md:block">
           {sidebar}
         </div>
         {/* outline-none: focused only by the skip link (tabIndex -1), never reachable with Tab. */}

@@ -12,6 +12,7 @@ const interests: Interests = {
     ok: true,
     data: [
       {
+        handle: '$BTC',
         symbol: 'BTC',
         name: 'Bitcoin',
         changePct: 2.4,
@@ -20,6 +21,7 @@ const interests: Interests = {
         communitySlug: 'btc',
       },
       {
+        handle: '$AVAX',
         symbol: 'AVAX',
         name: 'Avalanche',
         changePct: -1.2,
@@ -29,11 +31,15 @@ const interests: Interests = {
       },
     ],
   },
-  people: { ok: true, data: [{ id: '1', username: 'maria', avatarUrl: null, accuracyRate: 0.74 }] },
+  people: {
+    ok: true,
+    data: [{ handle: '@maria', id: '1', username: 'maria', avatarUrl: null, accuracyRate: 0.74 }],
+  },
   groups: {
     ok: true,
     data: [
       {
+        handle: '#trading',
         slug: 'trading',
         name: 'Trading',
         description: 'On-chain',
@@ -44,7 +50,7 @@ const interests: Interests = {
   },
   suggested: {
     ok: true,
-    data: [{ slug: 'nft', name: 'NFT', memberCount: 1200, avatarUrl: null }],
+    data: [{ handle: '#nft', slug: 'nft', name: 'NFT', memberCount: 1200, avatarUrl: null }],
   },
 }
 
@@ -62,14 +68,22 @@ describe('InterestsSections', () => {
   it('links assets and groups to the Home filtered by their community', () => {
     renderWithIntl(<InterestsSections interests={interests} />)
 
-    expect(screen.getByRole('link', { name: 'Bitcoin (BTC)' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Bitcoin ($BTC)' })).toHaveAttribute(
       'href',
       '/?comunidad=btc',
     )
-    expect(screen.getByRole('link', { name: /Trading/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: '#trading · Trading' })).toHaveAttribute(
       'href',
       '/?comunidad=trading',
     )
+  })
+
+  it('shows every entity with its mention symbol (H-07)', () => {
+    renderWithIntl(<InterestsSections interests={interests} />)
+
+    for (const handle of ['$BTC', '$AVAX', '@maria', '#trading', '#nft']) {
+      expect(screen.getByText(handle)).toBeInTheDocument()
+    }
   })
 
   it('announces the change direction, stale prices and accuracy', () => {
@@ -81,10 +95,18 @@ describe('InterestsSections', () => {
     expect(screen.getByText('1,200 members')).toBeInTheDocument()
   })
 
+  it('shows a coming-soon "more" for assets, people and groups (H-26)', () => {
+    renderWithIntl(<InterestsSections interests={interests} />)
+
+    for (const name of ['More assets', 'More people', 'More groups']) {
+      expect(screen.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
+    }
+  })
+
   it('shows join and create group as coming soon', async () => {
     renderWithIntl(<InterestsSections interests={interests} />)
 
-    const join = screen.getByRole('button', { name: 'Join NFT' })
+    const join = screen.getByRole('button', { name: 'Join #nft' })
     expect(join).toHaveAttribute('aria-disabled', 'true')
     expect(screen.getByRole('button', { name: 'Create group' })).toHaveAttribute(
       'aria-disabled',
@@ -98,7 +120,7 @@ describe('InterestsSections', () => {
     renderWithIntl(<InterestsSections interests={{ ...interests, people: { ok: false } }} />)
 
     expect(screen.getAllByText('Could not load this section.')).toHaveLength(1)
-    expect(screen.getByRole('link', { name: 'Bitcoin (BTC)' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Bitcoin ($BTC)' })).toBeInTheDocument()
   })
 
   it('shows the empty message of each section', () => {

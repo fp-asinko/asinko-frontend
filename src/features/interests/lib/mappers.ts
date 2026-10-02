@@ -3,6 +3,18 @@ import type { AssetTile, Group, Person, Suggestion } from '../interests.types'
 
 const SUGGESTION_COUNT = 3
 
+/** An asset community slug is its symbol in lower case (btc → BTC). */
+export function assetSymbol(slug: string) {
+  return slug.toUpperCase()
+}
+
+/** The mention handle of a community: $ for an asset, # for a group (overview.md § Menciones). */
+function communityHandle(community: RawCommunity) {
+  return community.type === 'SYSTEM_ASSET'
+    ? `$${assetSymbol(community.slug)}`
+    : `#${community.slug}`
+}
+
 /** Asset communities the viewer belongs to (one tile each). */
 export function memberAssetCommunities(communities: readonly RawCommunity[]) {
   return communities.filter((c) => c.type === 'SYSTEM_ASSET' && c.viewerMembership && c.assetId)
@@ -10,6 +22,7 @@ export function memberAssetCommunities(communities: readonly RawCommunity[]) {
 
 export function toAssetTile(asset: RawAsset, communitySlug: string): AssetTile {
   return {
+    handle: `$${asset.symbol}`,
     symbol: asset.symbol,
     name: asset.name,
     changePct: asset.priceChangePct,
@@ -21,6 +34,7 @@ export function toAssetTile(asset: RawAsset, communitySlug: string): AssetTile {
 
 export function toPerson(user: RawUserSummary): Person {
   return {
+    handle: `@${user.username}`,
     id: user.id,
     username: user.username,
     avatarUrl: user.avatarUrl,
@@ -33,6 +47,7 @@ export function toGroups(communities: readonly RawCommunity[]): Group[] {
   return communities
     .filter((c) => c.viewerMembership && c.type !== 'SYSTEM_ASSET' && c.type !== 'PERSONAL_CHANNEL')
     .map((c) => ({
+      handle: communityHandle(c),
       slug: c.slug,
       name: c.name,
       description: c.description,
@@ -50,6 +65,7 @@ export function toSuggestions(communities: readonly RawCommunity[]): Suggestion[
     .sort((a, b) => b.memberCount - a.memberCount)
     .slice(0, SUGGESTION_COUNT)
     .map((c) => ({
+      handle: communityHandle(c),
       slug: c.slug,
       name: c.name,
       memberCount: c.memberCount,

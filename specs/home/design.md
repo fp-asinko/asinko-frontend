@@ -48,12 +48,12 @@ Reemplaza los tokens iOS de `foundation` (su D-01 queda sin efecto). Mapeo de la
 
 | Utilidad          | Uso                                  | Medida                                  |
 | ----------------- | ------------------------------------ | --------------------------------------- |
-| `text-post-title` | Título de post, pregunta de encuesta | 17 px / 1.3, 700                        |
-| `text-post-body`  | Cuerpo de post                       | 15 px / 1.55                            |
-| `text-ui`         | Texto base de la interfaz            | 14 px / 1.5                             |
-| `text-action`     | Pestañas, acciones, votos            | 13 px / 1.5, 600                        |
-| `text-meta`       | Autor, tiempo, metadatos             | 12 px / 1.5                             |
-| `text-section`    | Rótulos de sección ("TUS INTERESES") | 11 px, 700, mayúsculas, tracking 0.08em |
+| `type-post-title` | Título de post, pregunta de encuesta | 17 px / 1.3, 700                        |
+| `type-post-body`  | Cuerpo de post                       | 15 px / 1.55                            |
+| `type-ui`         | Texto base de la interfaz            | 14 px / 1.5                             |
+| `type-action`     | Pestañas, acciones, votos            | 13 px / 1.5, 600                        |
+| `type-meta`       | Autor, tiempo, metadatos             | 12 px / 1.5                             |
+| `type-section`    | Rótulos de sección ("TUS INTERESES") | 11 px, 700, mayúsculas, tracking 0.08em |
 
 ## 3. Estructura (H-05 a H-08, H-26)
 
@@ -98,6 +98,8 @@ Feature **`interests`**, Server Component. Cada sección es un `<details>` nativ
 | **Grupos**    | Comunidades no-activo donde soy miembro: avatar, nombre, descripción como subtítulo (el contrato no trae el último post) y `MOD` si modero | `GET /communities` (filtrando `viewerMembership`)                                                   |
 | **Sugeridas** | Comunidades donde no soy miembro, las 3 más grandes, con "Unirse" deshabilitado (unirse llega con el spec `communities`)                   | `GET /communities`                                                                                  |
 
+- **Símbolos de mención** (H-07): el mapper arma el `handle` de cada entidad: `$` + símbolo para activos (y comunidades de activo en Sugeridas), `@` + usuario para personas, `#` + slug para grupos. Es lo que se escribe para mencionarlos.
+- **Medidas del prototipo** (medidas en el navegador): columna con padding de 10 × 8 px, sin divisores entre secciones; rótulo de sección de 10 px; mosaicos de 78 px con 5 px de separación (símbolo 13 px/700, variación 10 px/600); filas de personas de 36 px con avatar de 28 px y nombre de 13 px/600; grupos con avatar de 24 px, nombre de 13 px/600 y descripción de 11 px debajo; **Sugeridas fija al pie de la columna**, con borde superior, avatar de 32 px y nombre de 12 px/700.
 - **Mosaico de activo**: grilla de 3 columnas, borde inferior de 3 px con el color de la variación, flecha ▲/▼ además del color (el color nunca es la única señal).
 - **Limitación del contrato**: `GET /communities` no filtra por membresía, así que se filtra la primera página. Se propone **P-004** (`?member=true`) al backend.
 - "Crear grupo" y los "ver más" de cada sección: deshabilitados (H-26).
@@ -138,8 +140,8 @@ La página lee y valida con zod sus `searchParams`:
 
 ```
 [avatar 20px] usuario · precisión · #comunidad · hace 1 h            [tag]
-Título (text-post-title)
-Cuerpo (text-post-body, Markdown seguro, recortado a 6 líneas + "Ver más")
+Título (type-post-title)
+Cuerpo (type-post-body, Markdown seguro, recortado a 6 líneas + "Ver más")
 [imagen 16:9, radio 8] | [link: dominio ↗]
 [💬 412]  [▲ 2.104 ▼]                                          [↗ Compartir]
 ```
@@ -167,7 +169,7 @@ Cuerpo (text-post-body, Markdown seguro, recortado a 6 líneas + "Ver más")
 ### `PollCard` (H-13)
 
 ```
-[avatar] pregunta (text-post-title)                         [▮ ENCUESTA]
+[avatar] pregunta (type-post-title)                         [▮ ENCUESTA]
 [ opción 1 ················ 23% ]   ← barra de fondo proporcional al voto
 [ opción 2 ················ 50% ] ✓ tu voto
 1.787 votos · cierra en 4 días         [💬 45]

@@ -2,6 +2,8 @@
 // never the raw contract shapes.
 
 export type AssetTile = {
+  /** How it is mentioned: $BTC */
+  handle: string
   symbol: string
   name: string
   changePct: number | null
@@ -12,6 +14,8 @@ export type AssetTile = {
 }
 
 export type Person = {
+  /** How it is mentioned: @maria */
+  handle: string
   id: string
   username: string
   avatarUrl: string | null
@@ -19,6 +23,8 @@ export type Person = {
 }
 
 export type Group = {
+  /** How it is mentioned: #defi */
+  handle: string
   slug: string
   name: string
   description: string | null
@@ -27,6 +33,8 @@ export type Group = {
 }
 
 export type Suggestion = {
+  /** $BTC for an asset community, #slug for a group */
+  handle: string
   slug: string
   name: string
   memberCount: number

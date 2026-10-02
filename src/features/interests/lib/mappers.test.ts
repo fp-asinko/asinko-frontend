@@ -24,9 +24,9 @@ describe('interests mappers', () => {
       community({ slug: 'c', type: 'USER_PUBLIC', viewerMembership: null }),
       community({ slug: 'd', type: 'SYSTEM_ASSET', viewerMembership: 'MEMBER' }),
     ]
-    expect(toGroups(list).map((g) => [g.slug, g.isModerator])).toEqual([
-      ['b', true],
-      ['a', false],
+    expect(toGroups(list).map((g) => [g.handle, g.isModerator])).toEqual([
+      ['#b', true],
+      ['#a', false],
     ])
   })
 
@@ -38,9 +38,17 @@ describe('interests mappers', () => {
     expect(toSuggestions(list).map((s) => s.slug)).toEqual(['c1', 'c3', 'c2'])
   })
 
+  it('marks suggested asset communities with $ and groups with #', () => {
+    const list = [
+      community({ slug: 'eth', type: 'SYSTEM_ASSET', viewerMembership: null, memberCount: 2 }),
+      community({ slug: 'macro', type: 'USER_PUBLIC', viewerMembership: null, memberCount: 1 }),
+    ]
+    expect(toSuggestions(list).map((s) => s.handle)).toEqual(['$ETH', '#macro'])
+  })
+
   it('defaults a missing accuracy to null', () => {
     expect(
       toPerson({ id: 'x', username: 'ana', avatarUrl: null } as Parameters<typeof toPerson>[0]),
-    ).toMatchObject({ accuracyRate: null })
+    ).toMatchObject({ handle: '@ana', accuracyRate: null })
   })
 })
