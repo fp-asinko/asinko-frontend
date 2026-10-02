@@ -30,11 +30,11 @@ src/
 ├── components/           # UI compartida, organizada con Atomic Design
 │   ├── ui/               # Átomos: shadcn (lo escribe el CLI) + átomos de marca (asinko-logo)
 │   ├── molecules/
-│   └── organisms/        # app-shell/ (layout de 3 columnas), status-message, …
-├── features/             # Un directorio por dominio de negocio
+│   └── organisms/        # app-shell/ (layout de 3 columnas), status-message, empty-state, …
+├── features/             # Un directorio por dominio de negocio (hoy: feed, interests)
 │   └── <feature>/
 ├── hooks/                # Hooks transversales (use-mobile.ts, etc.)
-├── i18n/                 # routing, navigation, request (next-intl) y alternates (SEO)
+├── i18n/                 # routing, navigation, request (next-intl), alternates (SEO) y client-messages
 ├── lib/                  # Utilidades transversales
 │   ├── api/              # Cliente HTTP del backend, server-only (ver api-integration.md)
 │   ├── observability/    # Sentry: opciones y reportError

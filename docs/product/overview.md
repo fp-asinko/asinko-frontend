@@ -112,6 +112,6 @@ Solo las comunidades son grupos. La página de un activo y el perfil de un usuar
 - [ ] Proveedor de precios de cripto para resolver tesis.
 - [ ] Mercado inicial.
 - [ ] Cuándo llegan el login y las escrituras reales (a definir con backend).
-- [ ] En el MVP no hay página de activo ni perfil: ¿a dónde lleva hacer clic en una mención `$` o `@`?
+- [x] En el MVP no hay página de activo ni perfil: ¿a dónde lleva hacer clic en una mención `$` o `@`? **Decidido en `specs/home` (Q4):** `$` y `#` llevan al Home filtrado por la comunidad; `@` se destaca sin link hasta que exista el perfil.
 - [ ] Encuadre legal de la economía de tokens (juego/predicción, asesoramiento financiero).
 - [ ] Reglas de moderación y proceso de disputa de tesis.

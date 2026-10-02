@@ -125,7 +125,10 @@ describe('SearchField', () => {
 - La navegación localizada (`@/i18n/navigation`) se mockea con el helper compartido: `vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))` y `setPathname('/')` para fijar la ruta activa.
 - El cliente de la API se testea con su fábrica (`createApiClient({ baseUrl, fetch, mocks })`), pasando un `fetch` falso: nunca se importa la instancia de `@/lib/api`, que depende de las variables de entorno.
 - Código que lee `@/env` se testea con `vi.mock('@/env', () => ({ env }))` y un objeto `env` de `vi.hoisted`.
-- Los componentes con textos se renderizan con `renderWithIntl` (`src/test/render-with-intl.tsx`), que los envuelve en `NextIntlClientProvider` con los mensajes del idioma por defecto (ver `i18n.md`).
+- Los componentes con textos se renderizan con `renderWithIntl` (`src/test/render-with-intl.tsx`), que los envuelve en `NextIntlClientProvider` con los mensajes del idioma por defecto (ver `i18n.md`). Para probar formatos en otro idioma: `renderWithIntl(ui, { locale: 'es' })`.
+- **Server Actions**: se testean llamándolas directo, con sus dependencias mockeadas en el borde (`@/lib/session`, las funciones de `lib/` del feature, `next-intl/server`). Verifican input inválido, falta de sesión y que el `userId` sale de la sesión.
+- Un componente que importa una Server Action (directa o indirectamente) arrastra el cliente de la API y `@/env`: en sus tests se mockea la action (`vi.mock('../actions/<nombre>.action', () => ({ … }))`).
+- APIs del navegador que jsdom no trae (`IntersectionObserver`): un doble con `vi.stubGlobal` que deje disparar el evento desde el test (ver `load-more.test.tsx`).
 - Nada de llamadas reales a red ni a servicios externos en tests unitarios.
 
 ## Tests end to end (Playwright)
@@ -184,6 +187,7 @@ export default defineConfig({
 - **Qué cubrir**: los flujos críticos de negocio y los criterios de aceptación de cada spec que involucran más de una pantalla o datos del servidor.
 - **Locators por rol**, igual que en unitarios (`page.getByRole(...)`). Nada de selectores CSS ni XPath.
 - **Sin `waitForTimeout`**: usar las esperas automáticas de Playwright y `expect(...).toBeVisible()`.
+- **Elementos "Próximamente"** (`aria-disabled`, H-26): Playwright no los cliquea porque los considera deshabilitados. Se usa `click({ force: true })` y se verifica el aviso; el `aria-disabled` se chequea aparte.
 - **Tests independientes**: cada test prepara sus propios datos y no depende del orden de ejecución.
 - **Accesibilidad**: los flujos críticos incluyen un chequeo con `@axe-core/playwright`.
 

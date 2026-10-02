@@ -30,62 +30,62 @@ Incluye **reemplazar el estilo iOS de `foundation` por el sistema visual del pro
 
 ### Sistema visual (reemplaza al estilo iOS)
 
-- [ ] **H-01** Los tokens de `globals.css` son los valores efectivos del prototipo:
+- [x] **H-01** Los tokens de `globals.css` son los valores efectivos del prototipo:
   - Color principal monocromático `#17181A` (hover `#000000`, sutil `#F1F0ED`).
   - Fondos `#FFFFFF` / `#F7F6F4` / `#F1F0ED`; bordes `#ECEBE7` / `#D9D8D4`.
   - Texto `#17181A` / `#5C5D60` / `#8A8B8E`.
   - Alcista `#17853B`, bajista `#CE2C31`, interesante `#8B5CF6`. Radios 4 / 8 / 12 / 16 px y totalmente redondeado. **Sin sombras.**
-- [ ] **H-02** La tipografía es **Figtree** (300–900), autoalojada con `next/font`: sin requests a Google en el navegador. Texto base de 14 px.
-- [ ] **H-03** Modo oscuro con la paleta oscura del prototipo, ajustada a la versión monocromática. El toggle se mantiene, con claro por defecto.
-- [ ] **H-04** Todo par texto/fondo cumple WCAG AA. El gris `#8A8B8E` (3,4:1) **solo** se usa en elementos no textuales o texto de 18 px o más; para texto secundario va `#5C5D60` (6,6:1). Lo verifica el test de contraste.
+- [x] **H-02** La tipografía es **Figtree** (300–900), autoalojada con `next/font`: sin requests a Google en el navegador. Texto base de 14 px.
+- [x] **H-03** Modo oscuro con la paleta oscura del prototipo, ajustada a la versión monocromática. El toggle se mantiene, con claro por defecto.
+- [x] **H-04** Todo par texto/fondo cumple WCAG AA. El gris `#8A8B8E` (3,4:1) **solo** se usa en elementos no textuales o texto de 18 px o más; para texto secundario va `#5C5D60` (6,6:1). Lo verifica el test de contraste.
 
 ### Estructura (shell)
 
-- [ ] **H-05** **Barra superior** de 60 px, translúcida (`#FCFCFB` al 92%) con borde inferior: logo a la izquierda; buscador centrado (680×40, redondeado) en desktop; ícono de búsqueda en mobile; acciones a la derecha (saldo de tokens, campana y perfil), **deshabilitadas** (Q1).
-- [ ] **H-06** **Tres columnas** en desktop: izquierda 260 px, centro 780 px, derecha 300 px, como el prototipo. Mobile first: 1 columna en mobile, columna izquierda en panel lateral y barra inferior de 5 ítems.
-- [ ] **H-07** **Columna izquierda "Tus intereses"**, con secciones plegables. Cada entidad se muestra con su **símbolo de mención** (`$BTC`, `@usuario`, `#comunidad`), igual que se la menciona:
+- [x] **H-05** **Barra superior** de 60 px, translúcida (`#FCFCFB` al 92%) con borde inferior: logo a la izquierda; buscador centrado (680×40, redondeado) en desktop; ícono de búsqueda en mobile; acciones a la derecha (saldo de tokens, campana y perfil), **deshabilitadas** (Q1).
+- [x] **H-06** **Tres columnas** en desktop: izquierda 260 px, centro 780 px, derecha 300 px, como el prototipo. Mobile first: 1 columna en mobile, columna izquierda en panel lateral y barra inferior de 5 ítems.
+- [x] **H-07** **Columna izquierda "Tus intereses"**, con secciones plegables. Cada entidad se muestra con su **símbolo de mención** (`$BTC`, `@usuario`, `#comunidad`), igual que se la menciona: _Los activos siguen con mocks hasta E14 (P-003)._
   - **Activos**: grilla de 3 columnas con símbolo y variación del día en verde o rojo; el borde inferior de cada mosaico toma el color de la variación.
   - **Personas**: usuarios que sigo, con avatar o iniciales y su precisión.
   - **Grupos**: comunidades donde soy miembro, con avatar, nombre, su último post como subtítulo y etiqueta `MOD` si modero.
   - **Sugeridas**: comunidades para unirme.
-- [ ] **H-08** **Columna derecha**: existe en desktop (300 px) para respetar la estructura, **vacía** en el MVP (Q2). Su contenido se define más adelante.
+- [x] **H-08** **Columna derecha**: existe en desktop (300 px) para respetar la estructura, **vacía** en el MVP (Q2). Su contenido se define más adelante.
 
 ### Feed
 
-- [ ] **H-09** Arriba del feed, la **caja para publicar** del prototipo (avatar + "¿Qué estás pensando?" + Post / Thesis / Live), **deshabilitada** (Q1): crear post está postergado.
-- [ ] **H-10** **Pestañas** _Para ti_ (Explorar: todas las comunidades) y _Siguiendo_ (comunidades donde soy miembro), con el estilo del prototipo (subrayado del activo). La pestaña _Live_ (fase 3) se muestra **deshabilitada** (Q1).
-- [ ] **H-11** **Filtros** _New_ (orden por fecha, el del contrato) y _Polls_ (solo encuestas) (Q3). _Hot_ y _Top_ llegan cuando el backend soporte ordenar el feed.
-- [ ] **H-12** **Tarjeta de post** como el prototipo:
+- [x] **H-09** Arriba del feed, la **caja para publicar** del prototipo (avatar + "¿Qué estás pensando?" + Post / Thesis / Live), **deshabilitada** (Q1): crear post está postergado.
+- [x] **H-10** **Pestañas** _Para ti_ (Explorar: todas las comunidades) y _Siguiendo_ (comunidades donde soy miembro), con el estilo del prototipo (subrayado del activo). La pestaña _Live_ (fase 3) se muestra **deshabilitada** (Q1).
+- [x] **H-11** **Filtros** _New_ (orden por fecha, el del contrato) y _Polls_ (solo encuestas) (Q3). _Hot_ y _Top_ llegan cuando el backend soporte ordenar el feed.
+- [x] **H-12** **Tarjeta de post** como el prototipo:
   - Autor (avatar o iniciales, usuario y precisión), comunidad y tiempo relativo.
   - Título y cuerpo (Markdown seguro, sin HTML crudo; los cuerpos largos se recortan con "ver más").
   - Imagen (con `next/image`) o link con su dominio visible.
   - Etiqueta (`tag`).
   - Píldora de votos (▲ puntaje ▼) y cantidad de comentarios.
   - Post editado ("editado"), borrado ("[contenido eliminado]", sin acciones) y post del sistema (sin autor).
-- [ ] **H-13** **Tarjeta de encuesta**: pregunta, opciones con barra de resultados y porcentaje, total de votos y tiempo restante. Resultados ocultos hasta votar cuando así lo indica (`ON_VOTE`); cerrada sin votar; voto propio marcado.
-- [ ] **H-14** **Menciones** `$ # @` del cuerpo, renderizadas desde `entities` (P-001) como links, nunca armando HTML (Q4):
+- [x] **H-13** **Tarjeta de encuesta**: pregunta, opciones con barra de resultados y porcentaje, total de votos y tiempo restante. Resultados ocultos hasta votar cuando así lo indica (`ON_VOTE`); cerrada sin votar; voto propio marcado.
+- [x] **H-14** **Menciones** `$ # @` del cuerpo, renderizadas desde `entities` (P-001) como links, nunca armando HTML (Q4): _Con datos reales espera P-001: hoy el backend no resuelve las menciones y se ven como texto._
   - `$BTC` y `#defi` llevan al **Home filtrado por esa comunidad** (un activo usa su comunidad de activo). Un activo sin comunidad se muestra destacado, sin link.
   - `@usuario` se muestra destacado, **sin link** hasta que exista el perfil (fase 2).
-- [ ] **H-15** **Votar** posts (▲/▼, quitar el voto) y encuestas, con actualización optimista. Con mocks, el voto es del usuario demo y no llega a la base real (`overview.md`).
-- [ ] **H-27** **Inglés primero y selector de idioma** (pedido el 2026-10-02): entrar a `/` lleva siempre a `/en`, sin mirar el idioma del navegador (reemplaza a F-12). La barra superior tiene un **selector de idioma** (English, Español, Português) que cambia a la misma página en el otro idioma, conservando los filtros de la URL. Los **parámetros de la URL también van en inglés** (`?feed=following&filter=polls&community=btc`).
-- [ ] **H-28** _Aprobado el 2026-10-02._ **Vista previa de comentarios en la tarjeta**, como el prototipo: el botón 💬 despliega debajo de la tarjeta los **primeros 3 comentarios** (avatar, usuario, tiempo y texto) sobre fondo `--surface`, y un "Ver todos los comentarios →" que queda **deshabilitado** (H-26) hasta que exista el detalle de post. Vale para posts y encuestas.
-- [ ] **H-26** Elementos **deshabilitados** (Q1): se ven como en el prototipo con aspecto atenuado, **se pueden enfocar** con teclado, se anuncian como no disponibles (`aria-disabled`, no `disabled`) y al activarlos (tap, clic o teclado) muestran "Próximamente".
-- [ ] **H-16** **Paginación**: al llegar al final se cargan más ítems con `nextCursor` (scroll infinito con botón "Cargar más" como respaldo accesible).
+- [x] **H-15** **Votar** posts (▲/▼, quitar el voto) y encuestas, con actualización optimista. Con mocks, el voto es del usuario demo y no llega a la base real (`overview.md`).
+- [x] **H-27** **Inglés primero y selector de idioma** (pedido el 2026-10-02): entrar a `/` lleva siempre a `/en`, sin mirar el idioma del navegador (reemplaza a F-12). La barra superior tiene un **selector de idioma** (English, Español, Português) que cambia a la misma página en el otro idioma, conservando los filtros de la URL. Los **parámetros de la URL también van en inglés** (`?feed=following&filter=polls&community=btc`).
+- [x] **H-28** _Aprobado el 2026-10-02._ **Vista previa de comentarios en la tarjeta**, como el prototipo: el botón 💬 despliega debajo de la tarjeta los **primeros 3 comentarios** (avatar, usuario, tiempo y texto) sobre fondo `--surface`, y un "Ver todos los comentarios →" que queda **deshabilitado** (H-26) hasta que exista el detalle de post. Vale para posts y encuestas.
+- [x] **H-26** Elementos **deshabilitados** (Q1): se ven como en el prototipo con aspecto atenuado, **se pueden enfocar** con teclado, se anuncian como no disponibles (`aria-disabled`, no `disabled`) y al activarlos (tap, clic o teclado) muestran "Próximamente".
+- [x] **H-16** **Paginación**: al llegar al final se cargan más ítems con `nextCursor` (scroll infinito con botón "Cargar más" como respaldo accesible).
 
 ### Estados y errores
 
-- [ ] **H-17** Carga con skeletons con la forma de las tarjetas (sin CLS).
-- [ ] **H-18** _Siguiendo_ sin comunidades muestra un estado vacío que invita a unirse a comunidades.
-- [ ] **H-19** Si falla el feed (contenido principal) se muestra la página de error con "Reintentar". Si falla una columna lateral, solo esa sección muestra un error y el resto sigue (`engineering-principles.md`).
-- [ ] **H-20** Un ítem del feed mal formado se descarta y se reporta, sin romper el feed (`keepValidItems`).
-- [ ] **H-21** Un precio desactualizado (`priceStale`) se marca como tal.
+- [x] **H-17** Carga con skeletons con la forma de las tarjetas (sin CLS).
+- [x] **H-18** _Siguiendo_ sin comunidades muestra un estado vacío que invita a unirse a comunidades.
+- [x] **H-19** Si falla el feed (contenido principal) se muestra la página de error con "Reintentar". Si falla una columna lateral, solo esa sección muestra un error y el resto sigue (`engineering-principles.md`).
+- [x] **H-20** Un ítem del feed mal formado se descarta y se reporta, sin romper el feed (`keepValidItems`).
+- [x] **H-21** Un precio desactualizado (`priceStale`) se marca como tal.
 
 ### Transversales
 
-- [ ] **H-22** Textos de la UI en `en`, `es`, `pt`. Fechas relativas y números compactos (12,4 K) con el formatter de next-intl según el idioma.
-- [ ] **H-23** Accesibilidad: cada ítem del feed es un `article` con título; los votos son botones con `aria-pressed` y nombre accesible; las pestañas y filtros se operan con teclado; axe sin violaciones.
-- [ ] **H-24** JavaScript de primera carga del Home ≤ 230 KB gzip (`seo.md`).
-- [ ] **H-25** Datos solo desde el servidor (`api-integration.md`): esquema crudo del contrato + mapper a tipos de dominio del feature.
+- [x] **H-22** Textos de la UI en `en`, `es`, `pt`. Fechas relativas y números compactos (12,4 K) con el formatter de next-intl según el idioma.
+- [x] **H-23** Accesibilidad: cada ítem del feed es un `article` con título; los votos son botones con `aria-pressed` y nombre accesible; las pestañas y filtros se operan con teclado; axe sin violaciones.
+- [x] **H-24** JavaScript de primera carga del Home ≤ 230 KB gzip (`seo.md`).
+- [x] **H-25** Datos solo desde el servidor (`api-integration.md`): esquema crudo del contrato + mapper a tipos de dominio del feature.
 
 ## Fuera de alcance
 

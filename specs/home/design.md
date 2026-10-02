@@ -284,18 +284,26 @@ src/components/
 
 ## 10. Mocks y propuestas al backend
 
-| #                 | Qué                                                                                 | Por qué                                                                                  |
-| ----------------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| P-001             | `entities` en la lectura de posts                                                   | Menciones (ya existía)                                                                   |
-| P-003             | Forma de la respuesta del catálogo de activos                                       | Ya existía                                                                               |
-| **P-004** (nueva) | `GET /communities?member=true` y comunidad resumida (`slug`, `name`) en cada `Post` | Columna "Tus intereses" y la línea de autor de cada post sin pedir todas las comunidades |
-| **P-005** (nueva) | `GET /feed/*?kind=POLL` y orden `sort=hot\|new\|top`                                | Filtro _Polls_ y, más adelante, _Hot_ / _Top_                                            |
+Estado al 2026-10-02, revisado contra la rama `dev` de `asinko-app`. El detalle y la forma exacta de cada una están en `docs/references/api/proposals.md`.
+
+| #     | Qué                                         | Estado                                                   | Lo usa                                     |
+| ----- | ------------------------------------------- | -------------------------------------------------------- | ------------------------------------------ |
+| P-001 | `entities` en la lectura de posts           | Propuesta. La detección está postergada en el backend    | Menciones (H-14): hoy solo con mocks       |
+| P-002 | Autenticación con Bearer en `/api/v1`       | Propuesta                                                | Login (fase siguiente)                     |
+| P-003 | Catálogo de activos (E14)                   | Propuesta. E14 postergado en el backend                  | Mosaicos de activos (H-07, H-21)           |
+| P-004 | Comunidad resumida en cada contenido        | Propuesta. `?mine=true` (la otra mitad) ya está en `dev` | Línea de autor y chip de comunidad         |
+| P-005 | Filtro por tipo en el feed (`?kind=`)       | **Implementada** en `dev`. Falta `sort=hot               | new                                        | top` | Filtro _Polls_ (H-11); _Hot_ y _Top_ |
+| P-006 | `commentCount` en `Poll`                    | Propuesta                                                | Botón de comentarios de la encuesta (H-28) |
+| P-007 | `?limit=3&replies=false` en los comentarios | Propuesta                                                | Vista previa de comentarios (H-28)         |
+| P-008 | Sin textos en español en las respuestas     | Propuesta (baja prioridad)                               | Posts y comentarios borrados               |
 
 Cambios en `src/mocks/`:
 
-- `GET /users/:userId/following` (E01) para "Personas".
-- `PUT`/`DELETE /posts/:id/vote` y `PUT /polls/:id/vote` (E03/E05).
-- El usuario demo pasa a ser miembro también de `eth` y `sol` (más mosaicos de activos) y **moderador** de `trading-on-chain` (para ver el `MOD`).
+- Los handlers siguen a `dev`: `?kind=` en los feeds, `?mine=true` en comunidades y página vacía para una comunidad inexistente.
+- Cada ruta declara `implemented`; con `API_MOCKS=missing` solo se mockean los activos.
+- `GET /users/:userId/following` (E01), votos (`PUT`/`DELETE /posts/:id/vote`, `PUT /polls/:id/vote`) y comentarios.
+- El usuario demo es miembro de seis comunidades de activo, de `defi` y `latam`, y **moderador** de `trading-on-chain` (para ver el `MOD`).
+- Fixtures en inglés, con un post de 200 caracteres sin espacios para el caso de desborde.
 
 ## 11. Cambios en otras guías y specs
 
