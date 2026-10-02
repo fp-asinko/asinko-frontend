@@ -199,6 +199,8 @@ Cuerpo (text-post-body, Markdown seguro, recortado a 6 líneas + "Ver más")
 
 ## 6. Feature y archivos
 
+> Ajuste en T-03: el avatar es una molécula propia renderizada en el servidor () en lugar del de shadcn, que es un Client Component: no suma JavaScript.
+
 ```
 src/features/feed/
 ├── components/   composer-placeholder, feed-tabs, feed-filters, community-filter-chip,
@@ -218,8 +220,7 @@ src/features/interests/
 └── index.ts
 
 src/components/
-├── ui/           avatar (shadcn) + iniciales como fallback
-├── molecules/    coming-soon, delta (variación con flecha y color), user-chip
+├── molecules/    user-avatar (servidor: imagen o iniciales), coming-soon, delta (variación con flecha y color)
 └── organisms/app-shell/   site-header (rehecho), bottom-nav (5 ítems), app-shell (3 columnas)
 ```
 

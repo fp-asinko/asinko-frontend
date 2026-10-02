@@ -24,7 +24,13 @@
       "title": "Comunidades",
       "empty": "Aquí aparecerán tus comunidades."
     },
-    "loading": "Cargando…"
+    "loading": "Cargando…",
+    "comingSoon": "Próximamente",
+    "delta": {
+      "up": "sube {value}",
+      "down": "baja {value}",
+      "flat": "sin cambios"
+    }
   },
   "errors": {
     "notFound": {

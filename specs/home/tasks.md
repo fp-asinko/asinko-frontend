@@ -27,7 +27,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - Usuario demo: miembro también de `eth` y `sol`; moderador de `trading-on-chain`.
   - **Tests:** handlers nuevos en `handlers.test.ts`; el test de fixtures los valida contra el contrato.
 
-- [ ] **T-03 · Átomos y moléculas compartidas** · S · H-26, H-21
+- [x] **T-03 · Átomos y moléculas compartidas** · S · H-26, H-21
   - `avatar` (shadcn) con iniciales; molécula `coming-soon` (`aria-disabled`, burbuja "Próximamente" con `role="status"`); molécula `delta` (variación con flecha y color).
   - **Tests:** uno por componente.
 
