@@ -88,7 +88,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - `performance.spec.ts`: Home con y sin filtros ≤ 230 KB.
   - `home-feed` (Server Component async, sin test unitario): `?community=` inexistente → "Page not found" con `noindex` (status 200 por streaming, ver design § 5); un título o handle de 200 caracteres sin espacios no genera scroll horizontal a 360 px (revisión de UI del 2026-10-02).
 
-- [ ] **T-13 · Propuestas, guías y Definition of Done** · S
+- [x] **T-13 · Propuestas, guías y Definition of Done** · S
   - `proposals.md`: P-004 y P-005.
   - Todos los gates; `ui-reviewer` sin bloqueantes; revisión visual final contra el prototipo.
 

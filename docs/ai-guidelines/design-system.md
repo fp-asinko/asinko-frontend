@@ -62,7 +62,7 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
 ### Tipografía
 
 - **Figtree** con `next/font/google`: se descarga en el build y se sirve desde el sitio, sin requests a Google.
-- Escala del prototipo como utilidades: `type-page-title`, `type-post-title` (17 px, 700), `type-post-body` (15 px), `type-ui` (14 px, base del `body`), `type-action` (13 px, 600), `type-meta` (12 px), `type-section` (11 px, mayúsculas).
+- Escala del prototipo como utilidades: `type-page-title`, `type-post-title` (17 px, 700), `type-post-body` (15 px), `type-ui` (14 px, base del `body`), `type-action` (13 px, 600), `type-small` (13 px, regular: comentarios y nombres de la columna izquierda), `type-meta` (12 px), `type-section` (11 px, mayúsculas).
 - **Prefijo `type-`, no `text-`**: `cn` trata cualquier `text-<algo>` desconocido como un color y lo descarta al combinarlo con `text-muted-foreground`. Con `type-` no hay conflicto y no hace falta configurar `cn` (configurarlo sumaba ~20 KB al bundle). Como `cn` no las combina, no se ponen junto a otra clase que pise lo mismo (`text-[…]`, `font-*`): en ese caso se escriben las clases sueltas.
 
 ### Materiales
@@ -121,6 +121,9 @@ El diseño y el código arrancan por la pantalla más chica y **se agregan** est
 - **No usar variantes `max-*:`** salvo un caso justificado y comentado.
 - **Viewport de referencia: 360px.** Todo tiene que funcionar ahí sin scroll horizontal.
 - **Áreas táctiles**: mínimo 24×24px (WCAG 2.2 AA, criterio 2.5.8); recomendado 44×44px para acciones principales.
+- **Foco no tapado** (WCAG 2.4.11): `html` tiene `scroll-padding` del alto de la barra superior y, en mobile, de la inferior. Un elemento fijo nuevo que tape contenido suma su alto ahí.
+- **Links con varias partes** (handle, etiqueta, descripción): el nombre accesible sale del contenido, sin `aria-label` que lo tape, y con un espacio (`{' '}`) entre `<span>` para que no se lea todo junto.
+- **Globo "Próximamente"**: `ComingSoon` tiene `placement` (`below`, `below-end`, `above`, `above-end`). Contra el borde derecho se usa `-end`; en la barra inferior, `above`.
 - **Nada solo con hover**: toda interacción debe funcionar con tap y teclado.
 - **Inputs con `text-base` (16px) o más**: evita el zoom automático de iOS al enfocar.
 - **Imágenes** con `next/image` y `sizes` definido según el layout mobile.

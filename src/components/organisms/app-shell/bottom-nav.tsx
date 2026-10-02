@@ -31,9 +31,14 @@ export function BottomNav({ items }: { items: NavItem[] }) {
             <NavLink {...item} variant="bar" />
           </li>
         ))}
-        {soon.map((item) => (
+        {soon.map((item, index) => (
           <li key={item.label}>
-            <ComingSoon label={item.label} className={SOON_ITEM}>
+            {/* At the bottom of the screen the bubble opens upwards; the last one aligns right. */}
+            <ComingSoon
+              label={item.label}
+              className={SOON_ITEM}
+              placement={index === soon.length - 1 ? 'above-end' : 'above'}
+            >
               <span aria-hidden className="[&_svg]:size-6">
                 {item.icon}
               </span>

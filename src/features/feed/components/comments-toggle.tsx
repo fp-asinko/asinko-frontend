@@ -58,6 +58,10 @@ export function CommentsToggle({
           )}
         />
       </button>
+      {/* Always mounted: a live region inserted with its text already in it is often not read. */}
+      <span role="status" className="sr-only">
+        {open && pending ? t('loading') : ''}
+      </span>
       {open && (
         <div
           id={panelId}
@@ -65,9 +69,7 @@ export function CommentsToggle({
           className="order-last -mx-4 mt-1 -mb-4.5 basis-[calc(100%+2rem)] border-t bg-surface px-3.5 pt-2.5 pb-1.5 md:-mx-6 md:-mb-5.5 md:basis-[calc(100%+3rem)]"
         >
           {pending ? (
-            <p role="status" className="py-1 type-meta text-muted-foreground">
-              {t('loading')}
-            </p>
+            <p className="py-1 type-meta text-muted-foreground">{t('loading')}</p>
           ) : failed ? (
             <p role="alert" className="py-1 type-meta text-muted-foreground">
               {t('error')}

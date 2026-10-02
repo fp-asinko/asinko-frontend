@@ -1,10 +1,30 @@
 'use client'
 
+import { cva, type VariantProps } from 'class-variance-authority'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 const VISIBLE_MS = 2000
+
+/**
+ * Where the "Coming soon" bubble opens. Centered by default; -end aligns it to the button's right
+ * edge (buttons at the right of a card or the screen), above for the bottom bar.
+ */
+const bubble = cva(
+  'pointer-events-none absolute z-50 rounded-md bg-primary px-2 py-1 type-meta whitespace-nowrap text-primary-foreground transition-opacity motion-reduce:transition-none',
+  {
+    variants: {
+      placement: {
+        below: 'top-full left-1/2 mt-1.5 -translate-x-1/2',
+        'below-end': 'top-full right-0 mt-1.5',
+        above: 'bottom-full left-1/2 mb-1.5 -translate-x-1/2',
+        'above-end': 'right-0 bottom-full mb-1.5',
+      },
+    },
+    defaultVariants: { placement: 'below' },
+  },
+)
 
 /**
  * A feature that exists in the prototype but not yet in the product (H-26). Looks dimmed, can be
@@ -15,7 +35,8 @@ export function ComingSoon({
   label,
   children,
   className,
-}: {
+  placement,
+}: VariantProps<typeof bubble> & {
   /** Accessible name of the unavailable action, e.g. "Search". */
   label: string
   children: ReactNode
@@ -49,10 +70,7 @@ export function ComingSoon({
       </button>
       <span
         role="status"
-        className={cn(
-          'pointer-events-none absolute top-full left-1/2 z-50 mt-1.5 -translate-x-1/2 rounded-md bg-primary px-2 py-1 type-meta whitespace-nowrap text-primary-foreground transition-opacity motion-reduce:transition-none',
-          visible ? 'opacity-100' : 'opacity-0',
-        )}
+        className={cn(bubble({ placement }), visible ? 'opacity-100' : 'opacity-0')}
       >
         {visible ? t('comingSoon') : ''}
       </span>

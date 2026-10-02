@@ -83,6 +83,7 @@
     "morePeople": "Mais pessoas",
     "moreGroups": "Mais grupos",
     "join": "Entrar",
+    "joinLabel": "Entrar em {handle}",
     "mod": "MOD",
     "stale": "Preço desatualizado",
     "accuracy": "{value} de acertos",
@@ -156,7 +157,8 @@
       "up": "Votar a favor",
       "down": "Votar contra",
       "error": "Não foi possível salvar seu voto. Tente de novo.",
-      "needAccount": "Você precisa de uma conta para votar."
+      "needAccount": "Você precisa de uma conta para votar.",
+      "saved": "Voto salvo"
     },
     "loadMore": {
       "button": "Carregar mais",

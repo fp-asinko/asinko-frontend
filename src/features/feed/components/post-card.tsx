@@ -111,6 +111,7 @@ export function PostCard({ post }: { post: PostItem }) {
           <span className="ml-auto">
             <ComingSoon
               label={t('share')}
+              placement="below-end"
               className="inline-flex h-7 min-w-7 items-center justify-center gap-1.5 rounded-sm px-1 type-meta text-muted-foreground"
             >
               <Share2Icon aria-hidden className="size-3.5" />

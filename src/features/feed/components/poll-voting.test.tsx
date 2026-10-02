@@ -86,4 +86,22 @@ describe('PollVoting (H-13, H-15)', () => {
     renderPoll()
     expect(screen.getByRole('button', { name: 'Comments' })).toBeInTheDocument()
   })
+
+  it('keeps the focused option a button once the vote locks, and announces it (WCAG 2.4.3)', async () => {
+    action.votePoll.mockResolvedValue({
+      ok: true,
+      data: { ...hidden, viewerOptionId: 'a', resultsVisible: true, totalVotes: 1 },
+    })
+    renderPoll({ ...hidden, allowVoteChange: false })
+
+    const yes = screen.getByRole('button', { name: 'Yes' })
+    await userEvent.click(yes)
+    expect(await screen.findByRole('status')).toHaveTextContent('Vote saved')
+    expect(yes).toBeInTheDocument()
+    expect(yes).toHaveFocus()
+    expect(yes).toHaveAttribute('aria-disabled', 'true')
+
+    await userEvent.click(screen.getByRole('button', { name: 'No' }))
+    expect(action.votePoll).toHaveBeenCalledTimes(1)
+  })
 })

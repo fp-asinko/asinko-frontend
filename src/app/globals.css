@@ -189,6 +189,11 @@
   line-height: 1.5;
   font-weight: 600;
 }
+/* 13px regular: comments, sidebar names and asset symbols (weight added where needed). */
+@utility type-small {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
 @utility type-meta {
   font-size: 0.75rem;
   line-height: 1.5;
@@ -208,6 +213,13 @@
   html {
     @apply font-sans;
     -webkit-text-size-adjust: 100%;
+    /* Focus not obscured (WCAG 2.4.11): scrolling to a focused element leaves room for the
+       sticky top bar (60px) and, on phones, the fixed bottom bar. */
+    scroll-padding-top: calc(3.75rem + env(safe-area-inset-top));
+    scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    @variant md {
+      scroll-padding-bottom: 0;
+    }
   }
   body {
     @apply bg-background type-ui text-foreground antialiased;

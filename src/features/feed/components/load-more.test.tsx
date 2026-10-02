@@ -89,4 +89,42 @@ describe('LoadMore (H-16)', () => {
     await userEvent.keyboard('{Enter}')
     expect(await screen.findByText('Card 21')).toBeInTheDocument()
   })
+
+  it('moves focus to the first new card after a load asked by hand (WCAG 2.4.3)', async () => {
+    action.loadMoreFeed.mockResolvedValue({
+      ok: true,
+      data: {
+        items: (
+          <li>
+            <article aria-label="Card 21">Card 21</article>
+          </li>
+        ),
+        count: 1,
+        nextCursor: null,
+      },
+    })
+    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" />)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
+    expect(await screen.findByRole('article', { name: 'Card 21' })).toHaveFocus()
+  })
+
+  it('does not steal the focus after a load triggered by scrolling', async () => {
+    action.loadMoreFeed.mockResolvedValue({
+      ok: true,
+      data: {
+        items: (
+          <li>
+            <article aria-label="Card 21">Card 21</article>
+          </li>
+        ),
+        count: 1,
+        nextCursor: 'c2',
+      },
+    })
+    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" />)
+
+    await act(async () => observers.at(-1)!([{ isIntersecting: true }]))
+    expect(await screen.findByRole('article', { name: 'Card 21' })).not.toHaveFocus()
+  })
 })

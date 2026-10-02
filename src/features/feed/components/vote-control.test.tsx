@@ -29,6 +29,22 @@ describe('VoteControl (H-15)', () => {
     expect(screen.getByText('1,284 points, you upvoted')).toBeInTheDocument()
   })
 
+  it('keeps the focus on the arrow while saving and ignores a second press', async () => {
+    const answer = deferred<unknown>()
+    action.votePost.mockReturnValue(answer.promise)
+    renderWithIntl(<VoteControl postId={ID} score={10} viewerVote={null} />)
+    const up = screen.getByRole('button', { name: 'Upvote' })
+
+    await userEvent.click(up)
+    expect(up).toHaveFocus()
+    expect(up).toHaveAttribute('aria-disabled', 'true')
+    await userEvent.click(up)
+    expect(action.votePost).toHaveBeenCalledTimes(1)
+
+    answer.resolve({ ok: true, data: { score: 11, viewerVote: 1 } })
+    expect(await screen.findByText('11 points, you upvoted')).toBeInTheDocument()
+  })
+
   it('shows the vote at once and keeps the server score', async () => {
     const answer = deferred<unknown>()
     action.votePost.mockReturnValue(answer.promise)

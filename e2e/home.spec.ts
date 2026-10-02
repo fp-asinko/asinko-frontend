@@ -7,6 +7,15 @@ import { collectConsoleErrors, expectNoA11yViolations } from './fixtures/axe'
 const articles = (page: Page) => page.getByRole('article')
 const card = (page: Page, text: string) => articles(page).filter({ hasText: text })
 
+/**
+ * Clicks a coming-soon button (aria-disabled, so Playwright needs force) after centering it: on a
+ * phone the fixed bottom bar covers the lower edge, and a forced click there would hit the bar.
+ */
+async function pressComingSoon(button: ReturnType<Page['getByRole']>) {
+  await button.evaluate((element) => element.scrollIntoView({ block: 'center' }))
+  await button.click({ force: true })
+}
+
 test.describe('Home feed', () => {
   test('shows the first page with posts and polls (H-12, H-13)', async ({ page }) => {
     await page.goto('/en')
@@ -114,9 +123,44 @@ test.describe('Home feed', () => {
     await page.goto('/en')
     const share = articles(page).first().getByRole('button', { name: 'Share' })
     await expect(share).toHaveAttribute('aria-disabled', 'true')
-    // aria-disabled (not disabled) keeps it focusable; Playwright needs force to click it.
-    await share.click({ force: true })
-    await expect(articles(page).first().getByRole('status')).toHaveText('Coming soon')
+    await pressComingSoon(share)
+    await expect(
+      articles(page).first().getByRole('status').filter({ hasText: 'Coming soon' }),
+    ).toBeVisible()
+  })
+
+  test('"Coming soon" bubbles stay on screen at 360px, at the edges too (H-26)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 800 })
+    await page.goto('/en')
+    const inside = async (
+      trigger: ReturnType<Page['getByRole']>,
+      scope: ReturnType<Page['getByRole']>,
+    ) => {
+      await pressComingSoon(trigger)
+      const bubble = scope.getByRole('status').filter({ hasText: 'Coming soon' })
+      await expect(bubble).toBeVisible()
+      const box = (await bubble.boundingBox())!
+      expect(box.x).toBeGreaterThanOrEqual(0)
+      expect(box.x + box.width).toBeLessThanOrEqual(360)
+      expect(box.y + box.height).toBeLessThanOrEqual(800)
+    }
+    const post = articles(page).first()
+    await inside(post.getByRole('button', { name: 'Share' }), post)
+    const bar = page.getByRole('navigation', { name: 'Main navigation' })
+    await inside(bar.getByRole('button', { name: 'Profile' }), bar)
+  })
+
+  test('a focused control is not hidden under the bottom bar (WCAG 2.4.11)', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 })
+    await page.goto('/en')
+    // The first card's Share button starts under the fixed bottom bar at this size.
+    const share = articles(page).first().getByRole('button', { name: 'Share' })
+    await share.focus()
+    const bar = (await page.getByRole('navigation', { name: 'Main navigation' }).boundingBox())!
+    const box = (await share.boundingBox())!
+    expect(box.y + box.height).toBeLessThanOrEqual(bar.y)
   })
 
   test('long words from users wrap instead of overflowing at 360px', async ({ page }) => {

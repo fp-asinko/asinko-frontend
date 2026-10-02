@@ -10,7 +10,7 @@ import { countFormat } from '../lib/count-format'
 type Vote = { score: number; viewerVote: 1 | -1 | null }
 
 const BUTTON =
-  'inline-flex size-8 items-center justify-center rounded-full outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-60'
+  'inline-flex size-8 items-center justify-center rounded-full outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-60'
 
 /**
  * The prototype's vote pill (H-15): ▲ score ▼, 136×38 with 32px buttons. Pressing the active
@@ -27,6 +27,8 @@ export function VoteControl({ postId, score, viewerVote }: { postId: string } & 
   const [pending, startTransition] = useTransition()
 
   function vote(direction: 1 | -1) {
+    // aria-disabled, not disabled, while saving: the focused button keeps the focus (WCAG 2.4.3).
+    if (pending) return
     const next = shown.viewerVote === direction ? null : direction
     const nextScore = shown.score - (shown.viewerVote ?? 0) + (next ?? 0)
     setError(null)
@@ -51,7 +53,7 @@ export function VoteControl({ postId, score, viewerVote }: { postId: string } & 
           type="button"
           aria-label={t('up')}
           aria-pressed={shown.viewerVote === 1}
-          disabled={pending}
+          aria-disabled={pending || undefined}
           onClick={() => vote(1)}
           className={BUTTON}
         >
@@ -71,7 +73,7 @@ export function VoteControl({ postId, score, viewerVote }: { postId: string } & 
           type="button"
           aria-label={t('down')}
           aria-pressed={shown.viewerVote === -1}
-          disabled={pending}
+          aria-disabled={pending || undefined}
           onClick={() => vote(-1)}
           className={BUTTON}
         >

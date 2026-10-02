@@ -36,7 +36,7 @@ export function CommentsPreview({ comments }: { comments: CommentPreview[] }) {
                     {format.relativeTime(new Date(comment.createdAt), now)}
                   </time>
                 </p>
-                <div className="text-[0.8125rem] leading-normal">
+                <div className="type-small">
                   <PostMarkdown>{comment.body}</PostMarkdown>
                 </div>
               </div>

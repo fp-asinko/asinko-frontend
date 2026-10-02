@@ -38,7 +38,8 @@ export function LocaleSwitcher() {
         className="absolute inset-0 cursor-pointer appearance-none rounded-full text-base opacity-0"
       >
         {routing.locales.map((each) => (
-          <option key={each} value={each}>
+          // lang: each name is read in its own language (WCAG 3.1.2).
+          <option key={each} value={each} lang={each}>
             {t(`names.${each}`)}
           </option>
         ))}

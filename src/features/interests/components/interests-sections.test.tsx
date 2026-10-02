@@ -61,18 +61,18 @@ describe('InterestsSections', () => {
 
     for (const name of ['Assets', 'People', 'Groups', 'Suggested']) {
       const heading = within(region).getByRole('heading', { name })
-      expect(heading.closest('details')).toHaveAttribute('open')
+      expect(heading.closest('section')!.querySelector('details')).toHaveAttribute('open')
     }
   })
 
   it('links assets and groups to the Home filtered by their community', () => {
     renderWithIntl(<InterestsSections interests={interests} />)
 
-    expect(screen.getByRole('link', { name: 'Bitcoin ($BTC)' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^Bitcoin \$BTC/ })).toHaveAttribute(
       'href',
       '/?community=btc',
     )
-    expect(screen.getByRole('link', { name: '#trading · Trading' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^#trading MOD On-chain/ })).toHaveAttribute(
       'href',
       '/?community=trading',
     )
@@ -120,7 +120,7 @@ describe('InterestsSections', () => {
     renderWithIntl(<InterestsSections interests={{ ...interests, people: { ok: false } }} />)
 
     expect(screen.getAllByText('Could not load this section.')).toHaveLength(1)
-    expect(screen.getByRole('link', { name: 'Bitcoin ($BTC)' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /^Bitcoin \$BTC/ })).toBeInTheDocument()
   })
 
   it('shows the empty message of each section', () => {

@@ -31,7 +31,7 @@ export function SiteHeader({ menu }: { menu: ReactNode }) {
         <div className="hidden flex-1 justify-center md:flex">
           <ComingSoon
             label={t('nav.search')}
-            className="flex h-10 w-full max-w-[42.5rem] items-center gap-2.5 rounded-full border bg-surface px-4 text-left type-ui text-muted-foreground"
+            className="flex h-10 w-full max-w-170 items-center gap-2.5 rounded-full border bg-surface px-4 text-left type-ui text-muted-foreground"
           >
             <SearchIcon aria-hidden className="size-4 shrink-0" />
             <span className="truncate">{t('header.search')}</span>

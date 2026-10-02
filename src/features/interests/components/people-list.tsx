@@ -12,9 +12,7 @@ export function PeopleList({ people }: { people: Person[] }) {
       {people.map((person) => (
         <li key={person.id} className="flex min-h-9 items-center gap-2 rounded-md p-1">
           <UserAvatar name={person.username} imageUrl={person.avatarUrl} size="sm" />
-          <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold">
-            {person.handle}
-          </span>
+          <span className="min-w-0 flex-1 truncate type-small font-semibold">{person.handle}</span>
           {person.accuracyRate !== null && (
             <span className="rounded-sm bg-muted px-1.5 py-0.5 text-[0.625rem] font-bold tabular-nums">
               <span aria-hidden>{format.number(person.accuracyRate, { style: 'percent' })}</span>

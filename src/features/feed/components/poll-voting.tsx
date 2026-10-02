@@ -27,6 +27,8 @@ type Props = Pick<
  * Options and footer of a poll (H-13, H-15). While the viewer can vote, each option is a button
  * (aria-pressed on the chosen one); the choice shows at once and the results arrive with the
  * server's answer. A closed poll, or one that does not allow changing a cast vote, is read-only.
+ * Options that started as buttons stay buttons (aria-disabled once locked), so the focused option
+ * is never unmounted (WCAG 2.4.3); the saved vote is announced in a live region.
  */
 export function PollVoting({
   id,
@@ -43,16 +45,24 @@ export function PollVoting({
   const [shown, setShown] = useOptimistic(results)
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
+  const [saved, setSaved] = useState(false)
 
   const canVote = !isClosed && (results.viewerOptionId === null || allowVoteChange)
+  // Decided once: a poll that loads votable keeps its buttons for the whole visit.
+  const [asButtons] = useState(canVote)
 
   function vote(optionId: string) {
+    if (pending || !canVote) return
     setError(null)
+    setSaved(false)
     startTransition(async () => {
       setShown({ ...results, viewerOptionId: optionId })
       const result = await votePoll({ pollId: id, optionId })
-      if (result.ok) setResults(result.data)
-      else setError(result.error === 'api.errors.UNAUTHENTICATED' ? tv('needAccount') : tv('error'))
+      if (result.ok) {
+        setResults(result.data)
+        setSaved(true)
+      } else
+        setError(result.error === 'api.errors.UNAUTHENTICATED' ? tv('needAccount') : tv('error'))
     })
   }
 
@@ -84,7 +94,7 @@ export function PollVoting({
                 <span className="flex min-w-0 items-center gap-1.5">
                   {mine && <CheckIcon aria-hidden className="size-4 shrink-0" />}
                   <span className="min-w-0">{option.label}</span>
-                  {mine && !canVote && <span className="sr-only">({t('yourVote')})</span>}
+                  {mine && !asButtons && <span className="sr-only">({t('yourVote')})</span>}
                 </span>
                 {percent && <span className="shrink-0 font-bold tabular-nums">{percent}</span>}
               </span>
@@ -96,15 +106,17 @@ export function PollVoting({
           )
           return (
             <li key={option.id}>
-              {canVote ? (
+              {asButtons ? (
                 <button
                   type="button"
                   aria-pressed={mine}
-                  disabled={pending}
+                  aria-disabled={pending || !canVote || undefined}
                   onClick={() => vote(option.id)}
                   className={cn(
                     box,
-                    'outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-wait',
+                    'outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+                    canVote && 'hover:bg-surface',
+                    pending && 'cursor-wait',
                   )}
                 >
                   {content}
@@ -116,6 +128,9 @@ export function PollVoting({
           )
         })}
       </ul>
+      <p role="status" className="sr-only">
+        {saved ? tv('saved') : ''}
+      </p>
       {error && (
         <p role="alert" className="mt-2 type-meta text-destructive">
           {error}
