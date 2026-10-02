@@ -49,10 +49,10 @@ export function FeedFilters({
         <Link
           href={feedHref({ ...params, comunidad: undefined })}
           aria-label={t('chip.remove', { handle: community?.handle ?? `#${params.comunidad}` })}
-          className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-full border px-3 type-action font-semibold outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="ml-auto inline-flex h-8 max-w-full min-w-0 items-center gap-1.5 rounded-full border px-3 type-action font-semibold outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
         >
-          {community?.handle ?? `#${params.comunidad}`}
-          <XIcon aria-hidden className="size-3.5" />
+          <span className="truncate">{community?.handle ?? `#${params.comunidad}`}</span>
+          <XIcon aria-hidden className="size-3.5 shrink-0" />
         </Link>
       )}
     </div>

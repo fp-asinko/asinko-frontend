@@ -1,10 +1,10 @@
 import { useTranslations } from 'next-intl'
+import { EmptyState } from '@/components/organisms/empty-state'
 import { Link } from '@/i18n/navigation'
 import type { FeedItem } from '../feed.types'
 import { feedHref } from '../lib/feed-href'
 import type { FeedParams } from '../schemas/feed-params.schema'
 import { ComposerPlaceholder } from './composer-placeholder'
-import { FeedEmpty } from './feed-empty'
 import { FeedFilters } from './feed-filters'
 import { FeedTabs } from './feed-tabs'
 import { PollCard } from './poll-card'
@@ -39,7 +39,7 @@ export function FeedView({
       </div>
       <div className="overflow-hidden border-y bg-card sm:rounded-2xl sm:border">
         {state.status === 'needs-account' ? (
-          <FeedEmpty message={t('needAccount')} />
+          <EmptyState message={t('needAccount')} />
         ) : items.length === 0 ? (
           <EmptyFeed params={params} />
         ) : (
@@ -59,10 +59,10 @@ export function FeedView({
 function EmptyFeed({ params }: { params: FeedParams }) {
   const t = useTranslations('feed.empty')
 
-  if (params.filtro === 'polls') return <FeedEmpty message={t('polls')} />
+  if (params.filtro === 'polls') return <EmptyState message={t('polls')} />
   if (params.feed === 'siguiendo') {
     return (
-      <FeedEmpty
+      <EmptyState
         message={t('following')}
         action={
           <Link
@@ -75,5 +75,8 @@ function EmptyFeed({ params }: { params: FeedParams }) {
       />
     )
   }
-  return <FeedEmpty message={t('community', { handle: `#${params.comunidad ?? ''}` })} />
+  if (params.comunidad) {
+    return <EmptyState message={t('community', { handle: `#${params.comunidad}` })} />
+  }
+  return <EmptyState message={t('forYou')} />
 }

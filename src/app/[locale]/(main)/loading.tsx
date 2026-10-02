@@ -15,12 +15,17 @@ export default async function Loading() {
         {t('loading')}
       </p>
       <div aria-hidden>
-        <div className="border-b px-4 py-3.5">
+        {/* Same boxes as ComposerPlaceholder, so the feed does not move when it arrives. */}
+        <div className="border-b bg-card px-4 py-3.5">
           <div className="flex items-center gap-3">
             <Skeleton className="size-10 rounded-full" />
             <Skeleton className="h-10.75 flex-1 rounded-full" />
           </div>
-          <Skeleton className="mt-6 h-6 w-full" />
+          <div className="mt-3 grid grid-cols-3 gap-1 border-t pt-3">
+            {[0, 1, 2].map((action) => (
+              <Skeleton key={action} className="h-9 rounded-lg" />
+            ))}
+          </div>
         </div>
         <div className="px-2 pt-4 sm:px-0">
           <div className="mb-4 flex gap-6 border-b px-4 py-3">

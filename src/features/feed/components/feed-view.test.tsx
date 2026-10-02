@@ -73,6 +73,13 @@ describe('FeedView', () => {
     expect(screen.getByText('Nothing posted in #defi yet.')).toBeInTheDocument()
   })
 
+  it('says when the general feed is empty', () => {
+    renderWithIntl(
+      <FeedView params={params()} state={{ status: 'ok', items: [] }} viewerName={null} />,
+    )
+    expect(screen.getByText('Nothing posted yet.')).toBeInTheDocument()
+  })
+
   it('asks for an account when Following needs one', () => {
     renderWithIntl(
       <FeedView

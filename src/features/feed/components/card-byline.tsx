@@ -26,7 +26,7 @@ export function CardByline({
   return (
     <div className="flex min-w-0 flex-wrap items-center gap-x-1.25 gap-y-0.5 type-meta text-muted-foreground">
       <UserAvatar name={author?.username ?? t('system')} imageUrl={author?.avatarUrl} size="xs" />
-      <span className="font-bold">{author ? author.handle : t('system')}</span>
+      <span className="min-w-0 font-bold break-all">{author ? author.handle : t('system')}</span>
       {author?.accuracyRate != null && (
         <span className="rounded-sm bg-muted px-1 text-[0.625rem] font-bold text-foreground tabular-nums">
           <span aria-hidden>{format.number(author.accuracyRate, { style: 'percent' })}</span>
@@ -40,7 +40,7 @@ export function CardByline({
           <span aria-hidden>·</span>
           <Link
             href={{ pathname: '/', query: { comunidad: community.slug } }}
-            className="font-semibold text-foreground hover:underline"
+            className="inline-flex min-h-6 min-w-0 items-center font-semibold break-all text-foreground hover:underline"
           >
             {community.handle}
           </Link>

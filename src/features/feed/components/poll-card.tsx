@@ -12,9 +12,21 @@ export function PollCard({ poll }: { poll: PollItem }) {
   const t = useTranslations('feed.poll')
   const format = useFormatter()
   const now = useNow()
+  const footer = [
+    !poll.resultsVisible && !poll.isClosed ? t('hidden') : null,
+    poll.totalVotes !== null ? t('votes', { count: poll.totalVotes }) : null,
+    poll.isClosed
+      ? t('closed')
+      : poll.closesAt
+        ? t('closes', { time: format.relativeTime(new Date(poll.closesAt), now) })
+        : null,
+  ].filter((part): part is string => part !== null)
 
   return (
-    <article className="px-4 py-4.5 md:px-6 md:py-5.5" aria-labelledby={`poll-${poll.id}`}>
+    <article
+      className="px-4 py-4.5 wrap-anywhere md:px-6 md:py-5.5"
+      aria-labelledby={`poll-${poll.id}`}
+    >
       <div className="mb-2 flex items-start justify-between gap-3">
         <CardByline
           author={poll.author}
@@ -66,13 +78,14 @@ export function PollCard({ poll }: { poll: PollItem }) {
         })}
       </ul>
 
-      <p className="mt-3 type-action font-medium text-muted-foreground">
-        {!poll.resultsVisible && !poll.isClosed && <>{t('hidden')} · </>}
-        {poll.totalVotes !== null && <>{t('votes', { count: poll.totalVotes })} · </>}
-        {poll.isClosed
-          ? t('closed')
-          : poll.closesAt &&
-            t('closes', { time: format.relativeTime(new Date(poll.closesAt), now) })}
+      {/* Each part is a whole message (no string concatenation); the dots are decorative. */}
+      <p className="mt-3 flex flex-wrap gap-x-1.5 type-action font-medium text-muted-foreground">
+        {footer.map((part, index) => (
+          <span key={part} className="flex gap-x-1.5">
+            {index > 0 && <span aria-hidden>·</span>}
+            {part}
+          </span>
+        ))}
       </p>
     </article>
   )

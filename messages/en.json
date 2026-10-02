@@ -108,7 +108,7 @@
       "live": "Live"
     },
     "filters": {
-      "label": "Sort",
+      "label": "Filters",
       "new": "New",
       "polls": "Polls"
     },
@@ -123,18 +123,22 @@
       "seeMore": "See more",
       "seeLess": "See less",
       "comments": "{count, plural, one {# comment} other {# comments}}",
-      "score": "{score, plural, one {# point} other {# points}}",
-      "share": "Share"
+      "score": "{score, plural, one {# point} other {# points}}{vote, select, up {, you upvoted} down {, you downvoted} other {}}",
+      "share": "Share",
+      "image": "Image attached to the post",
+      "newTab": "(opens in a new tab)",
+      "linkDomain": "({domain})"
     },
     "poll": {
       "badge": "Poll",
       "votes": "{count, plural, one {# vote} other {# votes}}",
-      "closes": "closes {time}",
+      "closes": "Closes {time}",
       "closed": "Closed",
       "hidden": "Vote to see the results",
       "yourVote": "Your vote"
     },
     "empty": {
+      "forYou": "Nothing posted yet.",
       "following": "You do not follow any communities yet.",
       "goForYou": "See For you",
       "polls": "No polls in what is loaded so far.",

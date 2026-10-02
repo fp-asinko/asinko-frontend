@@ -19,7 +19,12 @@ export function ScorePill({ score, viewerVote }: { score: number; viewerVote: 1 
       </span>
       <span className="min-w-6 px-1 text-center font-bold text-foreground tabular-nums">
         <span aria-hidden>{format.number(score)}</span>
-        <span className="sr-only">{t('score', { score })}</span>
+        <span className="sr-only">
+          {t('score', {
+            score,
+            vote: viewerVote === 1 ? 'up' : viewerVote === -1 ? 'down' : 'none',
+          })}
+        </span>
       </span>
       <span className="inline-flex size-8 items-center justify-center" aria-hidden>
         <ArrowBigDownIcon

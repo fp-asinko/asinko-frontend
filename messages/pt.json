@@ -108,7 +108,7 @@
       "live": "Live"
     },
     "filters": {
-      "label": "Ordem",
+      "label": "Filtros",
       "new": "Novos",
       "polls": "Enquetes"
     },
@@ -123,18 +123,22 @@
       "seeMore": "Ver mais",
       "seeLess": "Ver menos",
       "comments": "{count, plural, one {# comentário} other {# comentários}}",
-      "score": "{score, plural, one {# ponto} other {# pontos}}",
-      "share": "Compartilhar"
+      "score": "{score, plural, one {# ponto} other {# pontos}}{vote, select, up {, você votou a favor} down {, você votou contra} other {}}",
+      "share": "Compartilhar",
+      "image": "Imagem anexada ao post",
+      "newTab": "(abre em uma nova aba)",
+      "linkDomain": "({domain})"
     },
     "poll": {
       "badge": "Enquete",
       "votes": "{count, plural, one {# voto} other {# votos}}",
-      "closes": "fecha {time}",
+      "closes": "Fecha {time}",
       "closed": "Encerrada",
       "hidden": "Vote para ver os resultados",
       "yourVote": "Seu voto"
     },
     "empty": {
+      "forYou": "Ainda não há publicações.",
       "following": "Você ainda não segue nenhuma comunidade.",
       "goForYou": "Ver Para você",
       "polls": "Nenhuma enquete no que foi carregado até agora.",

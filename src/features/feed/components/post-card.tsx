@@ -24,7 +24,11 @@ export function PostCard({ post }: { post: PostItem }) {
   const format = useFormatter()
 
   return (
-    <article className="px-4 py-4.5 md:px-6 md:py-5.5" aria-labelledby={`post-${post.id}`}>
+    // wrap-anywhere: a long word or URL from a user wraps instead of being cut off at 360px.
+    <article
+      className="px-4 py-4.5 wrap-anywhere md:px-6 md:py-5.5"
+      aria-labelledby={`post-${post.id}`}
+    >
       <div className="mb-2 flex items-start justify-between gap-3">
         <CardByline
           author={post.author}
@@ -54,7 +58,7 @@ export function PostCard({ post }: { post: PostItem }) {
                 <PostMarkdown>{post.body}</PostMarkdown>
               </div>
               <details className="group/more mt-1">
-                <summary className="w-fit cursor-pointer list-none rounded-sm type-action text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
+                <summary className="inline-flex min-h-6 w-fit cursor-pointer list-none items-center rounded-sm type-action text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
                   <span className="group-open/more:hidden">{t('seeMore')}</span>
                   <span className="hidden group-open/more:inline">{t('seeLess')}</span>
                 </summary>
@@ -70,7 +74,7 @@ export function PostCard({ post }: { post: PostItem }) {
         <div className="relative mt-3 aspect-video overflow-hidden rounded-lg border bg-surface">
           <Image
             src={post.media.url}
-            alt=""
+            alt={t('image')}
             fill
             sizes="(min-width: 1024px) 732px, (min-width: 768px) calc(100vw - 300px), 100vw"
             className="object-cover"
@@ -88,6 +92,7 @@ export function PostCard({ post }: { post: PostItem }) {
         >
           <span className="truncate">{post.media.domain}</span>
           <ArrowUpRightIcon aria-hidden className="size-3.5 shrink-0" />
+          <span className="sr-only">{t('newTab')}</span>
         </a>
       )}
 
@@ -102,7 +107,7 @@ export function PostCard({ post }: { post: PostItem }) {
           <span className="ml-auto">
             <ComingSoon
               label={t('share')}
-              className="inline-flex h-7 items-center gap-1.5 rounded-sm type-meta text-muted-foreground"
+              className="inline-flex h-7 min-w-7 items-center justify-center gap-1.5 rounded-sm px-1 type-meta text-muted-foreground"
             >
               <Share2Icon aria-hidden className="size-3.5" />
               <span className="hidden sm:inline">{t('share')}</span>

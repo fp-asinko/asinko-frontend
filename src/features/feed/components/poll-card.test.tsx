@@ -14,7 +14,7 @@ describe('PollCard (H-13)', () => {
     expect(screen.getByText('Poll')).toBeInTheDocument()
     expect(screen.getByText('25%')).toBeInTheDocument()
     expect(screen.getByText('75%')).toBeInTheDocument()
-    expect(screen.getByText(/100 votes · closes in 4 days/)).toBeInTheDocument()
+    expect(screen.getByText('Closes in 4 days')).toBeInTheDocument()
   })
 
   it('hides the results until voting (ON_VOTE)', () => {
@@ -28,12 +28,14 @@ describe('PollCard (H-13)', () => {
     })
     renderWithIntl(<PollCard poll={hidden} />)
     expect(screen.queryByText(/%/)).toBeNull()
-    expect(screen.getByText(/Vote to see the results/)).toBeInTheDocument()
+    expect(screen.getByText('Vote to see the results')).toBeInTheDocument()
+    expect(screen.queryByText(/votes/)).toBeNull()
   })
 
   it('shows a closed poll with its final results', () => {
     renderWithIntl(<PollCard poll={pollItem({ isClosed: true })} />)
-    expect(screen.getByText(/100 votes · Closed/)).toBeInTheDocument()
+    expect(screen.getByText('100 votes')).toBeInTheDocument()
+    expect(screen.getByText('Closed')).toBeInTheDocument()
     expect(screen.getByText('75%')).toBeInTheDocument()
   })
 

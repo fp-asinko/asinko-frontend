@@ -1,4 +1,5 @@
 import 'server-only'
+import { useTranslations } from 'next-intl'
 import type { ComponentProps, ReactNode } from 'react'
 import Markdown, { type Components } from 'react-markdown'
 import { Link } from '@/i18n/navigation'
@@ -35,6 +36,7 @@ function domainOf(href: string) {
 const mentionClass = 'font-extrabold text-foreground'
 
 function Anchor({ href, children }: ComponentProps<'a'>) {
+  const t = useTranslations('feed.card')
   const mention = parseMention(href)
   if (mention?.type === 'community') {
     return (
@@ -59,7 +61,8 @@ function Anchor({ href, children }: ComponentProps<'a'>) {
       className="underline underline-offset-2"
     >
       {children}
-      <span className="text-muted-foreground"> ({domain})</span>
+      <span className="text-muted-foreground"> {t('linkDomain', { domain })}</span>
+      <span className="sr-only">{t('newTab')}</span>
     </a>
   )
 }
@@ -84,7 +87,7 @@ const components: Components = {
     </blockquote>
   ),
   code: ({ children }) => (
-    <code className="rounded-sm bg-muted px-1 py-0.5 font-mono text-[0.9em]">{children}</code>
+    <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">{children}</code>
   ),
 }
 

@@ -36,7 +36,10 @@ describe('PostCard (H-12)', () => {
     renderWithIntl(
       <PostCard post={postItem({ media: { type: 'image', url: '/mocks/chart.svg' } })} />,
     )
-    expect(screen.getByRole('presentation')).toHaveAttribute('src', '/mocks/chart.svg')
+    expect(screen.getByRole('img', { name: 'Image attached to the post' })).toHaveAttribute(
+      'src',
+      '/mocks/chart.svg',
+    )
   })
 
   it('shows a link post with its real domain, opened safely', () => {
@@ -50,6 +53,7 @@ describe('PostCard (H-12)', () => {
     const link = screen.getByRole('link', { name: /example\.com/ })
     expect(link).toHaveAttribute('href', 'https://www.example.com/a')
     expect(link).toHaveAttribute('rel', 'noopener noreferrer nofollow ugc')
+    expect(link).toHaveTextContent('(opens in a new tab)')
   })
 
   it('marks an edited post', () => {

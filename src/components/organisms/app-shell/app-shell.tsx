@@ -42,7 +42,7 @@ export function AppShell({
           <main
             id="content"
             tabIndex={-1}
-            className="min-w-0 pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none sm:px-4 sm:pt-6 md:pb-8 lg:max-w-[48.75rem] lg:flex-1"
+            className="min-w-0 pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none sm:px-4 sm:pt-6 md:pb-8 lg:max-w-195 lg:flex-1"
           >
             {children}
           </main>

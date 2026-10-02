@@ -46,6 +46,7 @@ describe('PostMarkdown', () => {
     expect(link).toHaveAttribute('rel', 'noopener noreferrer nofollow ugc')
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveTextContent('(example.com)')
+    expect(link).toHaveTextContent('(opens in a new tab)')
   })
 
   it('turns headings into bold text and drops images', () => {
