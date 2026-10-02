@@ -12,6 +12,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     kind: 'contract',
     schema: profileSchema,
     example: { params: { identifier: 'demo' }, query: {}, body: undefined },
+    // Seed user of the dev database (asinko-app packages/db/scripts/seed.mjs).
+    liveExample: { params: { identifier: 'maria' }, query: {}, body: undefined },
     handler: ({ params }) => {
       const profile = PROFILES.find(
         (each) => each.id === params.identifier || each.username === params.identifier,

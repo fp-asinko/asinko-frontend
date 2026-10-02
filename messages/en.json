@@ -47,6 +47,7 @@
       "CONFLICT": "That already exists. Try something different.",
       "INVALID": "Some data isn't valid. Check it and try again.",
       "RATE_LIMITED": "Too many attempts. Wait a moment and try again.",
+      "UNAVAILABLE": "The service isn't available right now. Try again in a moment.",
       "UNKNOWN": "Something went wrong. Please try again."
     }
   }

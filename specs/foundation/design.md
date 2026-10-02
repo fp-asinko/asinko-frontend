@@ -195,57 +195,36 @@ El wordmark de Asinko del prototipo pasa a `components/ui/asinko-logo.tsx` como 
 
 ## 7. Cliente de la API (F-32, F-33, F-34)
 
+> **Revisado después de T-16** (2026-10-01) al adoptar buenas prácticas de consumo de APIs. El detalle vigente está en `docs/ai-guidelines/api-integration.md § Cliente HTTP`; acá queda el resumen.
+
 ```
 src/lib/api/
-├── client.ts        # apiRequest(): fetch + sesión + validación + errores
-├── errors.ts        # Esquema del error del backend y mapeo a resultados
-├── schemas.ts       # Esquemas comunes: error, lista paginada
-└── index.ts
+├── create-client.ts   # createApiClient(): fetch o mock, timeout, validación, clasificación de fallos
+├── path.ts            # Patrones del contrato con :params, codificados (buildPath)
+├── errors.ts          # ApiFailure (expected | unexpected), códigos, invalidInput, ApiRequestError
+├── helpers.ts         # getOrThrow (contenido principal), keepValidItems (listas)
+├── schemas.ts         # Envelope de error, lista paginada, 204
+└── index.ts           # Instancia de la app: env, mocks y reporte a Sentry
 ```
 
-```ts
-// Firma (contrato interno, no implementación final)
-type ApiResult<T> =
-  | { ok: true; data: T }
-  | { ok: false; status: number; code: string } // errores esperables
-
-apiRequest<T>(options: {
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-  path: `/api/v1/${string}`
-  schema: z.ZodType<T>        // obligatorio: no hay respuestas sin validar (F-33)
-  body?: unknown
-  query?: Record<string, string>
-}): Promise<ApiResult<T>>
-```
-
-- Primera línea de cada archivo: `import 'server-only'` (F-32).
-- Si `API_MOCKS=true` y la ruta está registrada en `src/mocks/`, responde el mock; si no, `fetch` a `API_BASE_URL` con `cache: 'no-store'` y timeout de 10 s.
-- **Sesión:** `src/lib/session.ts` expone `getViewer()`. Con mocks devuelve el usuario demo (F-38); sin mocks y sin login, `null`. El cliente no inventa `userId`: las funciones de cada feature lo piden a `getViewer()` (ver `api-integration.md § userId explícito`). Cuando llegue el login, solo cambia `getViewer()`.
-- **Errores (F-34)**, según la tabla de `api-integration.md`:
-
-  | Respuesta                  | Resultado                                                                                                |
-  | -------------------------- | -------------------------------------------------------------------------------------------------------- |
-  | `2xx`                      | Se valida con `schema`. Si no cumple → **lanza** (inesperado, va a Sentry)                               |
-  | `401`                      | `{ ok: false, code: 'UNAUTHENTICATED' }`. Sin login, la UI muestra "Se requiere una cuenta"              |
-  | `404`                      | `{ ok: false, code: 'NOT_FOUND' }`. Las páginas llaman a `notFound()`                                    |
-  | `403`, `409`, `422`, `429` | `{ ok: false, code }`. La clave de traducción es `api.errors.<CODE>`; si no existe, `api.errors.UNKNOWN` |
-  | `5xx`, timeout, red        | **Lanza** → `error.tsx` + Sentry                                                                         |
-
-- El `message` del backend nunca llega a la UI.
+- `import 'server-only'` (F-32). Cada respuesta se valida con zod (F-33).
+- **El cliente nunca lanza por un request**: devuelve `ApiResult`. Los fallos inesperados (`NETWORK`, `TIMEOUT`, `HTTP` 5xx, `VALIDATION`) vuelven con `errorKey: api.errors.UNAVAILABLE` y se reportan a Sentry desde el propio cliente (F-34, F-35). Cada pantalla decide: `getOrThrow` para el contenido principal, error local para secciones secundarias.
+- Rutas declaradas como patrones (`/api/v1/profiles/:identifier`) con `params` codificados; el endpoint se identifica por el patrón en errores y reportes, nunca por la URL concreta.
+- **Sesión:** `src/lib/session.ts` expone `getViewer()`. Con mocks devuelve el usuario demo (F-38); sin mocks y sin login, `null`. Cuando llegue el login, solo cambia `getViewer()`.
+- **Smoke tests** (`pnpm api:smoke`): validan el backend de desarrollo real contra los esquemas del contrato.
 
 ## 8. Mocks (F-36, F-37, F-38)
 
 ```
 src/mocks/
 ├── handlers.ts       # registry: Map<'GET /api/v1/profiles/:identifier', handler>
-├── match.ts          # Compara método + ruta con parámetros (:id)
 ├── demo-user.ts      # Usuario demo fijo (F-38)
 ├── fixtures/
 │   └── profiles.ts   # Ejemplo: perfil del usuario demo
 └── README.md         # Qué está mockeado y si es "contrato" o "propuesta"
 ```
 
-- Cada ruta mockeada se registra con su `schema` de respuesta y un `example` de request. Un handler recibe `{ params, query, body }` y devuelve `{ status, body }`: puede simular errores (`404`, `422`) y paginación. Si necesita al usuario, lo pide a `getViewer()` como el resto del código. El cliente aplica a la respuesta del mock **la misma** validación y mapeo de errores que a la real.
+- Cada ruta mockeada se registra con el mismo patrón de ruta que usa el cliente (no hace falta un matcher), su `schema` de respuesta, un `example` de request y, si el endpoint ya existe en el backend, un `liveExample` para los smoke tests. Un handler recibe `{ params, query, body }` y devuelve `{ status, body }`: puede simular errores (`404`, `422`) y paginación. Si necesita al usuario, lo pide a `getViewer()` como el resto del código. El cliente aplica a la respuesta del mock **la misma** validación y mapeo de errores que a la real.
 - **Ejemplo incluido:** `GET /api/v1/profiles/{identifier}` (E01) con el perfil del usuario demo. Sirve para probar el mecanismo de punta a punta; los mocks de dominio los agrega cada vista.
 - Las fixtures se tipan e importan con los mismos esquemas zod que valida el cliente. Un test recorre todas las fixtures y las parsea (F-37).
 - Sin dependencias: matcher propio, menos de ~50 líneas (`libraries.md`).

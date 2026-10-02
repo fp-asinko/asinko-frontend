@@ -1,8 +1,8 @@
 import { apiErrorSchema } from './schemas'
 
 /**
- * Backend error codes with a translation under `api.errors.<CODE>` (api-integration.md § Errores).
- * A code outside this list falls back to `api.errors.UNKNOWN`. Add codes here and in messages/ together.
+ * Expected backend error codes with a translation under `api.errors.<CODE>`
+ * (api-integration.md § Errores). Add codes here and in messages/ together.
  */
 export const KNOWN_ERROR_CODES = [
   'UNAUTHENTICATED',
@@ -16,26 +16,31 @@ export const KNOWN_ERROR_CODES = [
 
 export type KnownErrorCode = (typeof KNOWN_ERROR_CODES)[number]
 
-/** Expected error: returned, never thrown. Never carries the backend's message. */
-export type ApiFailure = {
+/** Why an unexpected failure happened. All of them show `api.errors.UNAVAILABLE`. */
+export type UnexpectedCode = 'NETWORK' | 'TIMEOUT' | 'HTTP' | 'VALIDATION'
+
+export type ErrorKey = `api.errors.${KnownErrorCode | 'UNKNOWN' | 'UNAVAILABLE'}`
+
+type FailureBase = {
   ok: false
-  status: number
+  /** Contract pattern of the endpoint, never the concrete URL (it can carry personal data). */
+  endpoint: string
+  /** Translation key for the UI. The backend message never reaches the UI. */
+  errorKey: ErrorKey
+  status?: number
+}
+
+/** A business outcome the UI handles (not found, conflict, invalid input…). Not reported. */
+export type ExpectedFailure = FailureBase & {
+  kind: 'expected'
   code: string
-  /** Translation key for the UI. */
-  errorKey: `api.errors.${KnownErrorCode | 'UNKNOWN'}`
   retryAfter?: string
 }
 
-/** Unexpected failure (5xx, network, timeout, contract mismatch): thrown, caught by error.tsx. */
-export class ApiUnexpectedError extends Error {
-  constructor(
-    message: string,
-    readonly status?: number,
-  ) {
-    super(message)
-    this.name = 'ApiUnexpectedError'
-  }
-}
+/** The backend or the network failed, or the contract changed. Reported to Sentry. */
+export type UnexpectedFailure = FailureBase & { kind: 'unexpected'; code: UnexpectedCode }
+
+export type ApiFailure = ExpectedFailure | UnexpectedFailure
 
 const EXPECTED_STATUSES = new Set([401, 403, 404, 409, 422, 429])
 
@@ -57,16 +62,50 @@ function isKnownCode(code: string): code is KnownErrorCode {
 }
 
 /** Maps an expected error response (4xx in the table) to a typed failure. */
-export function toApiFailure(status: number, body: unknown): ApiFailure {
+export function toExpectedFailure(
+  endpoint: string,
+  status: number,
+  body: unknown,
+): ExpectedFailure {
   const envelope = apiErrorSchema.safeParse(body)
   const code = envelope.success ? envelope.data.error.code : (CODE_BY_STATUS[status] ?? 'UNKNOWN')
   const retryAfter = envelope.success ? envelope.data.error.retryAfter : undefined
 
   return {
     ok: false,
+    kind: 'expected',
+    endpoint,
     status,
     code,
     errorKey: `api.errors.${isKnownCode(code) ? code : 'UNKNOWN'}`,
     ...(retryAfter ? { retryAfter } : {}),
+  }
+}
+
+export function unexpectedFailure(
+  endpoint: string,
+  code: UnexpectedCode,
+  status?: number,
+): UnexpectedFailure {
+  return {
+    ok: false,
+    kind: 'unexpected',
+    endpoint,
+    code,
+    errorKey: 'api.errors.UNAVAILABLE',
+    ...(status === undefined ? {} : { status }),
+  }
+}
+
+/** Input rejected locally, before any request (api-integration.md § Validar antes de la red). */
+export function invalidInput(endpoint: string): ExpectedFailure {
+  return { ok: false, kind: 'expected', endpoint, code: 'INVALID', errorKey: 'api.errors.INVALID' }
+}
+
+/** Thrown by getOrThrow() for data a page cannot render without; caught by error.tsx. */
+export class ApiRequestError extends Error {
+  constructor(readonly failure: ApiFailure) {
+    super(`${failure.endpoint} failed: ${failure.kind} ${failure.code}`)
+    this.name = 'ApiRequestError'
   }
 }

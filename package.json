@@ -16,7 +16,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "api:smoke": "vitest run --config vitest.smoke.config.mts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

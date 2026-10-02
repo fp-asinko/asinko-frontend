@@ -47,6 +47,7 @@
       "CONFLICT": "Isso já existe. Tente algo diferente.",
       "INVALID": "Alguns dados não são válidos. Revise e tente novamente.",
       "RATE_LIMITED": "Muitas tentativas. Aguarde um momento e tente novamente.",
+      "UNAVAILABLE": "O serviço não está disponível no momento. Tente novamente em instantes.",
       "UNKNOWN": "Algo deu errado. Tente novamente."
     }
   }

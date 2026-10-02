@@ -25,32 +25,72 @@ Todas validadas en `src/env.ts` (ver `libraries.md`). **Nunca** usar la `service
 
 ## Cliente HTTP
 
-Un único cliente en `src/lib/api/` (`import 'server-only'`) que todos los features usan desde su `lib/`:
+Un único cliente en `src/lib/api/` (`import 'server-only'`) que todos los features usan desde su `lib/`. Principio: **el front no confía en el backend**. Toda respuesta se valida, todo fallo vuelve como resultado tipado y ningún secreto ni dato personal cruza al navegador o a los logs.
 
-- Arma la URL con `API_BASE_URL` y reenvía la sesión (ver abajo).
-- **Valida cada respuesta con zod.** Si la respuesta no matchea el esquema, es un error inesperado: se lanza y lo reporta Sentry.
-- Traduce los errores del backend a resultados tipados (ver tabla).
+```ts
+const result = await apiRequest({
+  method: 'GET',
+  path: '/api/v1/profiles/:identifier', // patrón del contrato
+  params: { identifier: username }, // el cliente los codifica
+  schema: rawProfileSchema, // forma cruda del backend, obligatoria
+})
+```
+
+- **Rutas como patrones del contrato con parámetros con nombre.** El cliente codifica cada valor (`encodeURIComponent`): un `../`, `?` o `#` en un username o slug nunca cambia la ruta. TypeScript exige exactamente los parámetros que pide el patrón. Nunca se arma un path concatenando strings.
+- **Validación de cada respuesta con zod** (obligatoria). Si no cumple el esquema es un fallo `VALIDATION` (cambió el contrato): se reportan los campos que fallaron, nunca sus valores.
+- **Timeout de 10 s** en cada request.
+- **Nunca lanza por el resultado de un request**: siempre devuelve `ApiResult` (ver Errores). Solo lanza ante un bug propio, como un parámetro de ruta faltante.
+- **El endpoint se identifica por su patrón** (`GET /api/v1/profiles/:identifier`) en errores y reportes, nunca por la URL concreta: puede llevar un username, un email o un id.
+
+### Por feature: esquema crudo + mapper
+
+Cada feature define en su `lib/`:
+
+1. El **esquema crudo**: la forma real que devuelve el backend.
+2. Un **mapper** a un **tipo de dominio** propio, con los nombres y la forma que necesita la UI.
+
+La UI solo conoce tipos de dominio. Si el backend renombra un campo o cambia un formato, se ajusta el mapper y nada más. De paso, el mapper deja solo los campos que la UI usa: a los Client Components nunca les llega la respuesta completa (`security.md`).
+
+### Validar antes de la red
+
+Los parámetros con formato conocido (ids, slugs, cursores) se validan con zod en la función del feature **antes** de llamar a la API. Si no cumplen, se devuelve `invalidInput(endpoint)` sin gastar un request.
+
+### Listas: degradación elegante
+
+En listados (feed, comunidades), un ítem mal formado no tira abajo la lista: el esquema de la lista acepta ítems desconocidos y `keepValidItems(items, itemSchema, endpoint)` se queda con los válidos y **reporta a Sentry cuántos descartó y qué campos fallaron**. Descartar en silencio ocultaría que cambió el contrato.
 
 ### Formato del backend
 
 | Caso          | Forma                                                                                    |
 | ------------- | ---------------------------------------------------------------------------------------- |
 | Error         | `{ "error": { "code": string, "message": string, ...extra } }` (ej. `retryAfter` en 429) |
-| Lista         | `{ "items": T[], "nextCursor": string \| null }`, cursor opaco, 20 ítems por página      |
+| Lista         | `{ "items": T[], "nextCursor": string                                                    | null }`, cursor opaco, 20 ítems por página |
 | Sin contenido | `204` sin body                                                                           |
 
 ### Errores
 
-| Status                | Código típico                         | Cómo lo trata el front                                                                            |
-| --------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `401`                 | `UNAUTHENTICATED`                     | Redirige al login (con `?next=` relativo, ver `security.md`)                                      |
-| `403`                 | `USER_MISMATCH`, `ACCOUNT_DELETED`, … | Error esperable: clave de traducción por código                                                   |
-| `404`                 | `NOT_FOUND`                           | `notFound()` de Next. El backend devuelve 404 también cuando el recurso existe pero no es visible |
-| `409` / `422` / `429` | `USERNAME_TAKEN`, `SLUG_TAKEN`, …     | Error esperable: `ActionResult` con clave de traducción (ver `engineering-principles.md`)         |
-| `5xx` o red           | —                                     | Error inesperado: se lanza, lo captura `error.tsx`                                                |
+Todo fallo vuelve como `{ ok: false, kind, code, errorKey, endpoint, status? }`. `errorKey` es la clave de traducción que muestra la UI.
 
-- El `message` del backend **no se muestra** al usuario (viene en español y es para debug). Se muestra la traducción del `code`.
-- Un `code` desconocido cae en un mensaje genérico traducido.
+| `kind`       | Status / causa                           | `code`                                                               | `errorKey`                                           | ¿Se reporta?        |
+| ------------ | ---------------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------- | ------------------- |
+| `expected`   | `401`, `403`, `404`, `409`, `422`, `429` | El del backend (`NOT_FOUND`, `USER_MISMATCH`…) o derivado del status | `api.errors.<CODE>` (o `UNKNOWN` si no lo conocemos) | No                  |
+| `unexpected` | `5xx`                                    | `HTTP`                                                               | `api.errors.UNAVAILABLE`                             | Sí, automáticamente |
+| `unexpected` | Sin conexión                             | `NETWORK`                                                            | `api.errors.UNAVAILABLE`                             | Sí                  |
+| `unexpected` | Más de 10 s                              | `TIMEOUT`                                                            | `api.errors.UNAVAILABLE`                             | Sí                  |
+| `unexpected` | 2xx que no cumple el esquema             | `VALIDATION`                                                         | `api.errors.UNAVAILABLE`                             | Sí, con los campos  |
+
+Qué hace cada pantalla (`engineering-principles.md § Manejo de errores`):
+
+- **Contenido principal**: `getOrThrow(result)` → `error.tsx`. Un `NOT_FOUND` → `notFound()`.
+- **Secciones secundarias**: estado de error local; el resto de la página sigue.
+- **Server Actions**: devuelven `ActionResult` con el `errorKey`.
+- `401`: sin login todavía, la UI muestra que la acción requiere una cuenta. Cuando exista, redirige al login con `?next=` relativo (`security.md`).
+
+El `message` del backend **nunca llega a la UI** (viene en español y es para debug).
+
+### Smoke tests contra el backend real
+
+`pnpm api:smoke` llama al backend de desarrollo (`API_SMOKE_BASE_URL`, por defecto `asinko-app` en `http://localhost:3001`) con el `liveExample` de cada mock de tipo "contrato" y valida la respuesta con **el mismo esquema** que usa el mock. Detecta cuándo el backend y nuestro contrato se separaron. Solo en desarrollo: nunca en el CI normal ni contra producción.
 
 ## Sesión
 

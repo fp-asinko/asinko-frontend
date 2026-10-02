@@ -112,10 +112,18 @@ export async function createQuote(raw: unknown) {
 
 ### Errores esperables vs inesperados
 
-| Tipo           | Ejemplos                                                    | Cómo se maneja                                                       |
-| -------------- | ----------------------------------------------------------- | -------------------------------------------------------------------- |
-| **Esperable**  | Validación fallida, recurso no encontrado, regla de negocio | Se **devuelve** como resultado tipado                                |
-| **Inesperado** | Caída de la DB, bug, timeout de un servicio                 | Se **lanza** (`throw`), lo captura `error.tsx` y se reporta a Sentry |
+| Tipo           | Ejemplos                                                         | Cómo se maneja                                                                                                  |
+| -------------- | ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Esperable**  | Validación fallida, recurso no encontrado, regla de negocio      | Se **devuelve** como resultado tipado y la UI lo muestra                                                        |
+| **Inesperado** | Backend caído, timeout, red, respuesta que no cumple el contrato | También se **devuelve** (con su categoría) y **se reporta a Sentry automáticamente** desde el cliente de la API |
+| **Bug propio** | Un error de programación (ej. falta un parámetro de ruta)        | Se **lanza**: lo captura `error.tsx` y lo reporta Sentry                                                        |
+
+**Cada pantalla decide qué hacer con un fallo de datos**, porque el cliente de la API nunca lanza:
+
+- **Contenido principal** (sin él la página no tiene sentido, ej. el feed): `getOrThrow(result)` lanza y se muestra `error.tsx`. Un `NOT_FOUND` se convierte en `notFound()`.
+- **Secciones secundarias** (widgets, columna derecha): muestran un estado de error local y el resto de la página sigue funcionando.
+
+Ver `api-integration.md § Errores`.
 
 ### Server Actions
 
