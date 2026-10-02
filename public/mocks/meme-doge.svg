@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Meme: sold DOGE at 0.07">
+<rect width="800" height="450" fill="#FEF3C7"/>
+<circle cx="400" cy="210" r="120" fill="#F59E0B"/><circle cx="360" cy="180" r="14" fill="#0F172A"/><circle cx="440" cy="180" r="14" fill="#0F172A"/>
+<path d="M350 260 Q400 230 450 260" fill="none" stroke="#0F172A" stroke-width="8" stroke-linecap="round"/>
+<path d="M352 196 Q346 230 340 250" fill="none" stroke="#3B82F6" stroke-width="6" stroke-linecap="round"/>
+<text x="400" y="400" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-size="34" font-weight="800" fill="#0F172A">SOLD AT 0.07 · NOW 0.21</text>
+</svg>

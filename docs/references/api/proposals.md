@@ -30,3 +30,10 @@
 **Endpoint:** todos los de `/api/v1`
 **Motivo:** el front corre en otro dominio y reenvía la cookie de Supabase. El `proxy.ts` del backend puede refrescar la sesión con esa cookie y consumir el refresh token, dejando al usuario deslogueado (ver "Riesgo conocido" en `api-integration.md`).
 **Cambio:** aceptar `Authorization: Bearer <access_token>` (validado con `supabase.auth.getUser(token)`) y excluir `/api/v1` del refresh de sesión del `proxy.ts`. Las cookies pueden seguir funcionando para la UI propia del backend.
+
+### P-003 — Forma de respuesta del catálogo de activos
+
+**Estado:** propuesta
+**Endpoint:** `GET /api/v1/assets?q=`
+**Motivo:** el autocompletado de `$` y el mock del front necesitan la forma exacta. E14 describe el endpoint pero no su respuesta.
+**Cambio:** confirmar que responde la lista estándar del contrato, `{ "items": Asset[], "nextCursor": string | null }`, con el recurso `Asset` de E14. El mock del front ya asume esa forma.

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Whale holdings (>1,000 BTC)">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#155DE9" stop-opacity="0.25"/><stop offset="1" stop-color="#155DE9" stop-opacity="0"/></linearGradient></defs>
+<rect width="800" height="450" fill="#FFFFFF"/><line x1="40" x2="760" y1="80" y2="80" stroke="#E2E8F0" stroke-width="1"/><line x1="40" x2="760" y1="190" y2="190" stroke="#E2E8F0" stroke-width="1"/><line x1="40" x2="760" y1="300" y2="300" stroke="#E2E8F0" stroke-width="1"/><line x1="40" x2="760" y1="410" y2="410" stroke="#E2E8F0" stroke-width="1"/>
+<path d="M40.0,392.6 L85.0,410.0 L130.0,397.0 L175.0,383.9 L220.0,388.3 L265.0,357.9 L310.0,336.2 L355.0,344.9 L400.0,310.1 L445.0,279.7 L490.0,253.7 L535.0,223.3 L580.0,205.9 L625.0,171.2 L670.0,140.8 L715.0,114.7 L760.0,80.0 L760,410 L40,410 Z" fill="url(#g)"/><path d="M40.0,392.6 L85.0,410.0 L130.0,397.0 L175.0,383.9 L220.0,388.3 L265.0,357.9 L310.0,336.2 L355.0,344.9 L400.0,310.1 L445.0,279.7 L490.0,253.7 L535.0,223.3 L580.0,205.9 L625.0,171.2 L670.0,140.8 L715.0,114.7 L760.0,80.0" fill="none" stroke="#155DE9" stroke-width="3" stroke-linejoin="round"/>
+<text x="40" y="48" font-family="Helvetica Neue, Arial, sans-serif" font-size="22" font-weight="700" fill="#0F172A">Whale holdings (>1,000 BTC)</text>
+<text x="760" y="48" text-anchor="end" font-family="Helvetica Neue, Arial, sans-serif" font-size="18" fill="#475569">+48K BTC · 14d</text>
+</svg>

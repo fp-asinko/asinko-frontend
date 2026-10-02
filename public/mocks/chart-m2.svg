@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Global M2 (USD trillions)">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#17853B" stop-opacity="0.25"/><stop offset="1" stop-color="#17853B" stop-opacity="0"/></linearGradient></defs>
+<rect width="800" height="450" fill="#FFFFFF"/><line x1="40" x2="760" y1="80" y2="80" stroke="#E2E8F0" stroke-width="1"/><line x1="40" x2="760" y1="190" y2="190" stroke="#E2E8F0" stroke-width="1"/><line x1="40" x2="760" y1="300" y2="300" stroke="#E2E8F0" stroke-width="1"/><line x1="40" x2="760" y1="410" y2="410" stroke="#E2E8F0" stroke-width="1"/>
+<path d="M40.0,90.6 L105.5,175.8 L170.9,250.3 L236.4,314.2 L301.8,367.4 L367.3,399.4 L432.7,410.0 L498.2,378.1 L563.6,314.2 L629.1,239.7 L694.5,154.5 L760.0,80.0 L760,410 L40,410 Z" fill="url(#g)"/><path d="M40.0,90.6 L105.5,175.8 L170.9,250.3 L236.4,314.2 L301.8,367.4 L367.3,399.4 L432.7,410.0 L498.2,378.1 L563.6,314.2 L629.1,239.7 L694.5,154.5 L760.0,80.0" fill="none" stroke="#17853B" stroke-width="3" stroke-linejoin="round"/>
+<text x="40" y="48" font-family="Helvetica Neue, Arial, sans-serif" font-size="22" font-weight="700" fill="#0F172A">Global M2 (USD trillions)</text>
+<text x="760" y="48" text-anchor="end" font-family="Helvetica Neue, Arial, sans-serif" font-size="18" fill="#475569">trough: Aug</text>
+</svg>

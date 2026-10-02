@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="SOL: buy after -10% day, hold 7d">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8B5CF6" stop-opacity="0.25"/><stop offset="1" stop-color="#8B5CF6" stop-opacity="0"/></linearGradient></defs>
+<rect width="800" height="450" fill="#FFFFFF"/><line x1="40" x2="760" y1="80" y2="80" stroke="#E2E8F0" stroke-width="1"/><line x1="40" x2="760" y1="190" y2="190" stroke="#E2E8F0" stroke-width="1"/><line x1="40" x2="760" y1="300" y2="300" stroke="#E2E8F0" stroke-width="1"/><line x1="40" x2="760" y1="410" y2="410" stroke="#E2E8F0" stroke-width="1"/>
+<path d="M40.0,235.3 L85.0,177.1 L130.0,274.1 L175.0,138.2 L220.0,215.9 L265.0,351.8 L310.0,157.6 L355.0,80.0 L400.0,196.5 L445.0,410.0 L490.0,177.1 L535.0,118.8 L580.0,312.9 L625.0,99.4 L670.0,196.5 L715.0,138.2 L760.0,175.1 L760,410 L40,410 Z" fill="url(#g)"/><path d="M40.0,235.3 L85.0,177.1 L130.0,274.1 L175.0,138.2 L220.0,215.9 L265.0,351.8 L310.0,157.6 L355.0,80.0 L400.0,196.5 L445.0,410.0 L490.0,177.1 L535.0,118.8 L580.0,312.9 L625.0,99.4 L670.0,196.5 L715.0,138.2 L760.0,175.1" fill="none" stroke="#8B5CF6" stroke-width="3" stroke-linejoin="round"/>
+<text x="40" y="48" font-family="Helvetica Neue, Arial, sans-serif" font-size="22" font-weight="700" fill="#0F172A">SOL: buy after -10% day, hold 7d</text>
+<text x="760" y="48" text-anchor="end" font-family="Helvetica Neue, Arial, sans-serif" font-size="18" fill="#475569">avg +3.1%</text>
+</svg>
