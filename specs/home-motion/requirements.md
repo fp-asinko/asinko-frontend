@@ -1,5 +1,6 @@
 # Home con movimiento — Requirements
 
+> **Estado:** requisitos aprobados el 2026-10-02.
 > Spec de diseño sobre el Home terminado (`specs/home`). Pedido el 2026-10-02: "más vida" en el feed y más interacciones en la columna izquierda.
 > **Fuente de verdad:** las transiciones del prototipo (`docs/references/prototype.html`): hovers de 120–150 ms, barras que crecen en 600 ms con `cubic-bezier(0.4, 0, 0.2, 1)`, chevrons de ~200 ms, aparición con fade de 200 ms, punto de "Live" que late. Criterio de las skills `emil-design-eng` y `review-animations`.
 
@@ -55,13 +56,13 @@ Que el Home responda a lo que hace la persona: cada acción tiene un feedback in
 - Celebraciones (confeti, etc.) y animaciones continuas fuera del punto de _Live_.
 - Datos en tiempo real (precios que se actualizan solos).
 
-## Preguntas abiertas
+## Decisiones (aprobadas el 2026-10-02)
 
-| #   | Pregunta                                                                                                                                            | Propuesta                                                   |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| Q1  | **S-04** (marcar la comunidad activa) es una interacción nueva, no solo animación: la columna tiene que saber qué comunidad filtra el feed. ¿Entra? | Sí: ayuda a orientarse y es barato                          |
-| Q2  | **M-01**: ¿el "pop" de la flecha también al quitar el voto?                                                                                         | No: solo al votar; quitar el voto es neutro                 |
-| Q3  | **M-05**: ¿escalonar también la primera página al cargar el Home?                                                                                   | No: la primera página aparece de una (sin demora para leer) |
+| #   | Pregunta                                                    | Decisión                                                       |
+| --- | ----------------------------------------------------------- | -------------------------------------------------------------- |
+| Q1  | ¿Entra **S-04** (marcar la comunidad activa en la columna)? | **Sí**                                                         |
+| Q2  | **M-01**: ¿"pop" de la flecha también al quitar el voto?    | **No**: solo al votar                                          |
+| Q3  | **M-05**: ¿escalonar también la primera página del Home?    | **No**: la primera página aparece de una, sin demora para leer |
 
 ## Dependencias
 
