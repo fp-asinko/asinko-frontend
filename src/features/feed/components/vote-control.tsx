@@ -5,6 +5,7 @@ import { useFormatter, useTranslations } from 'next-intl'
 import { useOptimistic, useState, useTransition } from 'react'
 import { cn } from '@/lib/utils'
 import { votePost } from '../actions/vote-post.action'
+import { countFormat } from '../lib/count-format'
 
 type Vote = { score: number; viewerVote: 1 | -1 | null }
 
@@ -63,7 +64,7 @@ export function VoteControl({ postId, score, viewerVote }: { postId: string } & 
           aria-live="polite"
           className="min-w-6 px-1 text-center font-bold text-foreground tabular-nums"
         >
-          <span aria-hidden>{format.number(shown.score)}</span>
+          <span aria-hidden>{format.number(shown.score, countFormat(shown.score))}</span>
           <span className="sr-only">{tc('score', { score: shown.score, vote: voteName })}</span>
         </span>
         <button

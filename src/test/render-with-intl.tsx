@@ -1,13 +1,21 @@
 import { render, type RenderOptions } from '@testing-library/react'
 import { NextIntlClientProvider } from 'next-intl'
 import type { ReactElement } from 'react'
-import messages from '../../messages/en.json'
+import type { Locale } from '@/i18n/routing'
+import en from '../../messages/en.json'
+import es from '../../messages/es.json'
+import pt from '../../messages/pt.json'
 
-// Renders with the default locale's messages (docs/ai-guidelines/testing.md).
-export function renderWithIntl(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
+const MESSAGES = { en, es, pt }
+
+// Renders with the messages of a locale, the default one unless told otherwise (testing.md).
+export function renderWithIntl(
+  ui: ReactElement,
+  { locale = 'en', ...options }: Omit<RenderOptions, 'wrapper'> & { locale?: Locale } = {},
+) {
   return render(ui, {
     wrapper: ({ children }) => (
-      <NextIntlClientProvider locale="en" messages={messages} timeZone="UTC">
+      <NextIntlClientProvider locale={locale} messages={MESSAGES[locale]} timeZone="UTC">
         {children}
       </NextIntlClientProvider>
     ),

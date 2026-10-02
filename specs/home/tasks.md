@@ -79,7 +79,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - `load-more-feed.action.ts` + `load-more` (IntersectionObserver + botón).
   - **Tests:** action (siguiente página, fin de páginas), componente (agrega ítems, desaparece al final, teclado).
 
-- [ ] **T-11 · i18n completo** · S · H-22
+- [x] **T-11 · i18n completo** · S · H-22
   - Namespaces `feed` e `interests` en `en`, `es`, `pt`; tiempo relativo y números compactos.
   - **Tests:** paridad de claves (existente), formato de números y fechas en los tres idiomas.
 

@@ -75,4 +75,17 @@ describe('VoteControl (H-15)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('You need an account to vote.')
   })
+
+  it.each([
+    ['en', '12.4K'],
+    ['es', /12,4\smil/],
+    ['pt', /12,4\smil/],
+  ] as const)(
+    'shows big scores compact in %s, the full number for screen readers',
+    (locale, shown) => {
+      renderWithIntl(<VoteControl postId={ID} score={12_400} viewerVote={null} />, { locale })
+      expect(screen.getByText(shown)).toBeInTheDocument()
+      expect(screen.getByText(/12[.,\s]?400/)).toHaveClass('sr-only')
+    },
+  )
 })

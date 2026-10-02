@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { useFormatter, useTranslations } from 'next-intl'
 import { ComingSoon } from '@/components/molecules/coming-soon'
 import type { PostItem } from '../feed.types'
+import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
 import { CommentsToggle } from './comments-toggle'
 import { PostMarkdown } from './post-markdown'
@@ -101,7 +102,9 @@ export function PostCard({ post }: { post: PostItem }) {
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <CommentsToggle kind="post" id={post.id}>
             <MessageSquareIcon aria-hidden className="size-4" />
-            <span aria-hidden>{format.number(post.commentCount)}</span>
+            <span aria-hidden>
+              {format.number(post.commentCount, countFormat(post.commentCount))}
+            </span>
             <span className="sr-only">{t('comments', { count: post.commentCount })}</span>
           </CommentsToggle>
           <VoteControl postId={post.id} score={post.score} viewerVote={post.viewerVote} />

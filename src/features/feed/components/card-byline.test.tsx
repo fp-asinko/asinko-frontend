@@ -29,4 +29,15 @@ describe('CardByline', () => {
     expect(screen.getByText('edited')).toBeInTheDocument()
     expect(screen.queryByRole('link')).toBeNull()
   })
+
+  it.each([
+    ['es', /hace 1 hora/, /74\s%\sde precisión/],
+    ['pt', /há 1 hora/, /74%\sde precisão/],
+  ] as const)('formats time and accuracy in %s (H-22)', (locale, time, accuracy) => {
+    renderWithIntl(<CardByline author={MARIA} community={null} publishedAt={hourAgo()} />, {
+      locale,
+    })
+    expect(screen.getByText(time).tagName).toBe('TIME')
+    expect(screen.getByText(accuracy)).toBeInTheDocument()
+  })
 })

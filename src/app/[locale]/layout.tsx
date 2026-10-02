@@ -4,11 +4,12 @@ import { Figtree } from 'next/font/google'
 import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
-import { getTranslations } from 'next-intl/server'
+import { getMessages, getTranslations } from 'next-intl/server'
 import { AppShell, type NavItem } from '@/components/organisms/app-shell'
 import { env } from '@/env'
 import { InterestsSidebar } from '@/features/interests'
 import { OG_LOCALES } from '@/i18n/alternates'
+import { pickClientMessages } from '@/i18n/client-messages'
 import { routing } from '@/i18n/routing'
 import { isIndexable } from '@/lib/seo/robots'
 import { Providers } from './providers'
@@ -55,6 +56,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   // Set by src/proxy.ts. Reading headers also keeps every page dynamic, which the nonce requires.
   const nonce = (await headers()).get('x-nonce') ?? undefined
   const t = await getTranslations('common.nav')
+  // The browser gets only the namespaces its Client Components use (i18n.md).
+  const clientMessages = pickClientMessages(await getMessages())
 
   // Only views that exist (F-23b): each view's spec registers its own item.
   const navItems: NavItem[] = [{ href: '/', label: t('home'), icon: <HouseIcon /> }]
@@ -63,7 +66,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
     // next-themes sets the theme class on <html> before hydration.
     <html lang={locale} className={figtree.variable} suppressHydrationWarning>
       <body>
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={clientMessages}>
           <Providers nonce={nonce}>
             <AppShell navItems={navItems} sidebar={<InterestsSidebar />}>
               {children}
