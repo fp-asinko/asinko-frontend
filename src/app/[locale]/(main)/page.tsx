@@ -17,7 +17,7 @@ export default async function HomePage() {
 
   return (
     <PageColumns>
-      <h1 className="text-page-title">{t('title')}</h1>
+      <h1 className="type-page-title">{t('title')}</h1>
       <p className="mt-2 text-muted-foreground">{t('placeholder')}</p>
     </PageColumns>
   )

@@ -50,7 +50,7 @@ export function ComingSoon({
       <span
         role="status"
         className={cn(
-          'pointer-events-none absolute top-full left-1/2 z-50 mt-1.5 -translate-x-1/2 rounded-md bg-primary px-2 py-1 text-meta whitespace-nowrap text-primary-foreground transition-opacity motion-reduce:transition-none',
+          'pointer-events-none absolute top-full left-1/2 z-50 mt-1.5 -translate-x-1/2 rounded-md bg-primary px-2 py-1 type-meta whitespace-nowrap text-primary-foreground transition-opacity motion-reduce:transition-none',
           visible ? 'opacity-100' : 'opacity-0',
         )}
       >

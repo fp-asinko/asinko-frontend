@@ -62,7 +62,8 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
 ### Tipografía
 
 - **Figtree** con `next/font/google`: se descarga en el build y se sirve desde el sitio, sin requests a Google.
-- Escala del prototipo como utilidades: `text-page-title`, `text-post-title` (17 px, 700), `text-post-body` (15 px), `text-ui` (14 px, base del `body`), `text-action` (13 px, 600), `text-meta` (12 px), `text-section` (11 px, mayúsculas).
+- Escala del prototipo como utilidades: `type-page-title`, `type-post-title` (17 px, 700), `type-post-body` (15 px), `type-ui` (14 px, base del `body`), `type-action` (13 px, 600), `type-meta` (12 px), `type-section` (11 px, mayúsculas).
+- **Prefijo `type-`, no `text-`**: `cn` trata cualquier `text-<algo>` desconocido como un color y lo descarta al combinarlo con `text-muted-foreground`. Con `type-` no hay conflicto y no hace falta configurar `cn` (configurarlo sumaba ~20 KB al bundle). Como `cn` no las combina, no se ponen junto a otra clase que pise lo mismo (`text-[…]`, `font-*`): en ese caso se escriben las clases sueltas.
 
 ### Materiales
 

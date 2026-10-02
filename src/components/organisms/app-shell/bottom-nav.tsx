@@ -5,7 +5,7 @@ import { NavLink } from '@/components/molecules/nav-link'
 import type { NavItem } from './nav-item.types'
 
 const SOON_ITEM =
-  'flex min-h-12 min-w-14 flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-meta text-muted-foreground'
+  'flex min-h-12 min-w-14 flex-col items-center justify-center gap-0.5 rounded-lg px-2 type-meta text-muted-foreground'
 
 /*
  * Mobile only (< md), five items as in the prototype (Home · Search · Create · Notif · Profile).

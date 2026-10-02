@@ -11,8 +11,8 @@ const navLinkVariants = cva(
     variants: {
       /** `bar`: icon over label (mobile bottom bar). `list`: icon beside label (sidebar). */
       variant: {
-        bar: 'min-h-12 min-w-16 flex-col justify-center gap-0.5 px-3 text-meta',
-        list: 'min-h-11 gap-3 px-3 text-ui hover:bg-accent',
+        bar: 'min-h-12 min-w-16 flex-col justify-center gap-0.5 px-3 type-meta',
+        list: 'min-h-11 gap-3 px-3 type-ui hover:bg-accent',
       },
       // Active: monochrome primary on icon and label, as the prototype.
       active: {
