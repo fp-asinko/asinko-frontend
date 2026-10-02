@@ -6,6 +6,8 @@ import { PollCard } from './poll-card'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 vi.mock('../actions/load-comments-preview.action', () => ({ loadCommentsPreview: vi.fn() }))
+vi.mock('../actions/vote-post.action', () => ({ votePost: vi.fn() }))
+vi.mock('../actions/vote-poll.action', () => ({ votePoll: vi.fn() }))
 
 describe('PollCard (H-13)', () => {
   it('shows the question, options with their share and the totals', () => {
@@ -40,9 +42,17 @@ describe('PollCard (H-13)', () => {
     expect(screen.getByText('75%')).toBeInTheDocument()
   })
 
-  it('marks the viewer vote', () => {
+  it('marks the viewer vote as pressed while it can still change', () => {
     renderWithIntl(<PollCard poll={pollItem({ viewerOptionId: 'b' })} />)
-    expect(screen.getByText('(Your vote)')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Below 150K/ })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  })
+
+  it('marks the viewer vote as text when the poll is read-only', () => {
+    renderWithIntl(<PollCard poll={pollItem({ viewerOptionId: 'b', isClosed: true })} />)
+    expect(screen.queryByRole('button', { name: /Below 150K/ })).toBeNull()
     expect(screen.getByText('(Your vote)').closest('li')).toHaveTextContent('Below 150K')
   })
 })

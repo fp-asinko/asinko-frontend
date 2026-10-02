@@ -5,7 +5,15 @@ import type {
   RawPost,
   RawUserSummary,
 } from '@/lib/api/contract'
-import type { Author, CommunityRef, FeedItem, PollItem, PostItem, PostMedia } from '../feed.types'
+import type {
+  Author,
+  CommunityRef,
+  FeedItem,
+  PollItem,
+  PollResults,
+  PostItem,
+  PostMedia,
+} from '../feed.types'
 import { markMentions, type MentionLookup } from './mentions'
 
 /** Communities by id, plus the lookups mentions need. Built once per feed page. */
@@ -122,6 +130,7 @@ export function toPollItem(poll: RawPoll, communities: CommunityIndex): PollItem
       })),
     totalVotes: total,
     viewerOptionId: poll.viewerOptionId,
+    allowVoteChange: poll.allowVoteChange,
     resultsVisible,
     isClosed: poll.isClosed,
     closesAt: poll.closesAt,
@@ -129,6 +138,15 @@ export function toPollItem(poll: RawPoll, communities: CommunityIndex): PollItem
     community: communities.byId(poll.communityId),
     publishedAt: poll.publishedAt,
   }
+}
+
+/** The part of a poll a vote changes (the vote endpoint answers the whole poll). */
+export function toPollResults(poll: RawPoll): PollResults {
+  const { options, totalVotes, viewerOptionId, resultsVisible } = toPollItem(
+    poll,
+    indexCommunities([]),
+  )
+  return { options, totalVotes, viewerOptionId, resultsVisible }
 }
 
 export function toFeedItem(item: RawFeedItem, communities: CommunityIndex): FeedItem {

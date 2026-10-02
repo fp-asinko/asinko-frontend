@@ -40,6 +40,7 @@ export function pollItem(overrides: Partial<PollItem> = {}): PollItem {
     ],
     totalVotes: 100,
     viewerOptionId: null,
+    allowVoteChange: true,
     resultsVisible: true,
     isClosed: false,
     closesAt: new Date(Date.now() + 4 * 86400_000).toISOString(),

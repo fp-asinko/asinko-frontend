@@ -42,7 +42,10 @@ export function votePoll(pollId: string, body: unknown): MockResponse {
   const { userId, optionId } = (body ?? {}) as { userId?: unknown; optionId?: unknown }
   if (!isViewer(userId)) return error(403, 'USER_MISMATCH')
   if (poll.isClosed) return error(409, 'POLL_CLOSED')
-  if (!poll.allowVoteChange && poll.viewerOptionId) return error(409, 'VOTE_LOCKED')
+  // Revoting the same option is not a change: 200, as the backend dev branch does.
+  if (!poll.allowVoteChange && poll.viewerOptionId && poll.viewerOptionId !== optionId) {
+    return error(409, 'VOTE_LOCKED')
+  }
   if (!poll.options.some((option) => option.id === optionId)) return error(422, 'INVALID')
 
   const hidden = HIDDEN_RESULTS[poll.id]

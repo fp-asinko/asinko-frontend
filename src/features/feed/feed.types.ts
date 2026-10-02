@@ -57,6 +57,8 @@ export type PollItem = {
   options: PollOption[]
   totalVotes: number | null
   viewerOptionId: string | null
+  /** Whether the viewer can change a vote already cast. */
+  allowVoteChange: boolean
   /** False when the results stay hidden until voting (ON_VOTE) or closing (ON_CLOSE). */
   resultsVisible: boolean
   isClosed: boolean
@@ -65,6 +67,12 @@ export type PollItem = {
   community: CommunityRef | null
   publishedAt: string
 }
+
+/** What changes in a poll after voting. */
+export type PollResults = Pick<
+  PollItem,
+  'options' | 'totalVotes' | 'viewerOptionId' | 'resultsVisible'
+>
 
 export type FeedItem = PostItem | PollItem
 

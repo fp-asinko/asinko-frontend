@@ -151,6 +151,12 @@
       "error": "No se pudieron cargar los comentarios. Ciérralos y ábrelos para reintentar.",
       "empty": "Todavía no hay comentarios.",
       "seeAll": "Ver todos los comentarios"
+    },
+    "vote": {
+      "up": "Votar a favor",
+      "down": "Votar en contra",
+      "error": "No se pudo guardar tu voto. Inténtalo de nuevo.",
+      "needAccount": "Necesitas una cuenta para votar."
     }
   }
 }

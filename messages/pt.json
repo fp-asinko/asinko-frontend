@@ -151,6 +151,12 @@
       "error": "Não foi possível carregar os comentários. Feche e abra para tentar de novo.",
       "empty": "Ainda não há comentários.",
       "seeAll": "Ver todos os comentários"
+    },
+    "vote": {
+      "up": "Votar a favor",
+      "down": "Votar contra",
+      "error": "Não foi possível salvar seu voto. Tente de novo.",
+      "needAccount": "Você precisa de uma conta para votar."
     }
   }
 }

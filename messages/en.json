@@ -151,6 +151,12 @@
       "error": "Could not load the comments. Close and open them to retry.",
       "empty": "No comments yet.",
       "seeAll": "See all comments"
+    },
+    "vote": {
+      "up": "Upvote",
+      "down": "Downvote",
+      "error": "Could not save your vote. Try again.",
+      "needAccount": "You need an account to vote."
     }
   }
 }

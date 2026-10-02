@@ -6,7 +6,7 @@ import type { PostItem } from '../feed.types'
 import { CardByline } from './card-byline'
 import { CommentsToggle } from './comments-toggle'
 import { PostMarkdown } from './post-markdown'
-import { ScorePill } from './score-pill'
+import { VoteControl } from './vote-control'
 
 /** Bodies longer than this get "See more" (6 lines at 15px in the 748px column, roughly). */
 const LONG_BODY = 420
@@ -104,7 +104,7 @@ export function PostCard({ post }: { post: PostItem }) {
             <span aria-hidden>{format.number(post.commentCount)}</span>
             <span className="sr-only">{t('comments', { count: post.commentCount })}</span>
           </CommentsToggle>
-          <ScorePill score={post.score} viewerVote={post.viewerVote} />
+          <VoteControl postId={post.id} score={post.score} viewerVote={post.viewerVote} />
           <span className="ml-auto">
             <ComingSoon
               label={t('share')}

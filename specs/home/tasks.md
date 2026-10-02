@@ -70,7 +70,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - `load-comments-preview.action.ts` (zod, `ActionResult`), `comments-toggle` (client), `comments-preview` (server); P-006 en `proposals.md`.
   - **Tests:** action (3 primeros, sin borrados, contenido inexistente), toggle (`aria-expanded`, carga una sola vez, error), preview (Markdown seguro).
 
-- [ ] **T-09 · Votar** · M · H-15, H-23
+- [x] **T-09 · Votar** · M · H-15, H-23
   - Actions `vote-post` y `vote-poll` (zod, `getViewer`, `ActionResult`); `vote-control` y `poll-voting` con `useOptimistic`.
   - **Tests:** actions con el cliente mockeado (éxito, sin viewer, error), componentes (aria-pressed, optimista, revertir).
 
