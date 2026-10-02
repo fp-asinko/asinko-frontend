@@ -50,7 +50,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - `feed-params.schema.ts` (`feed`, `filtro`, `comunidad`), `feed-api.ts` (`getFeed` con `keepValidItems`), `mappers.ts` (post, encuesta, comunidad resuelta), `mentions.ts` (marcado de `entities`).
   - **Tests:** esquema de parámetros (valores inválidos → default), mappers, menciones (offsets, activo sin comunidad, `@` sin link), filtro _Polls_.
 
-- [ ] **T-07 · Markdown seguro** · S · H-12, H-14
+- [x] **T-07 · Markdown seguro** · S · H-12, H-14
   - `react-markdown` (server) con lista blanca, sin HTML crudo, links solo http/https con `rel="noopener noreferrer nofollow ugc"`, menciones `asinko:`.
   - `libraries.md` actualizado (D-H1).
   - **Tests:** HTML crudo escapado, `javascript:` bloqueado, títulos bajados a negrita, menciones renderizadas.

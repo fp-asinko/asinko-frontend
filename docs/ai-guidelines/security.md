@@ -67,7 +67,11 @@ React escapa el texto por defecto. Las reglas son para no romper esa protección
   - Solo se aceptan esquemas `http:` y `https:`. `javascript:`, `data:` y cualquier otro se muestran como texto plano.
   - Siempre con `rel="noopener noreferrer nofollow ugc"`. Si abren en otra pestaña, `target="_blank"`.
   - Se muestra el dominio real del destino, para que un texto no pueda disfrazar a dónde lleva.
-- Si en el futuro se suma Markdown, se usa un renderer que **no permita HTML crudo** y con lista blanca de elementos. Requiere actualizar esta guía.
+- **Markdown** (el `body` de posts y comentarios) con `react-markdown`, solo en el servidor (`features/feed/components/post-markdown.tsx`):
+  - Sin HTML crudo: no se usa `rehype-raw` y `skipHtml` descarta las etiquetas.
+  - Lista blanca de elementos (párrafos, negrita, itálica, listas, links, código en línea, citas); el resto se reduce a su texto. Imágenes de Markdown no se muestran.
+  - Links: solo `http:`/`https:` y las menciones propias `asinko:`; cualquier otro esquema queda como texto.
+  - Las menciones llegan como `entities` con posiciones; antes de usarlas se verifica que el texto en esa posición sea la mención (`lib/mentions.ts`).
 
 ### 2. Headers de seguridad y CSP
 
