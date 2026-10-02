@@ -34,44 +34,61 @@ function assetCommunity(n: number, symbol: string, memberCount: number, descript
   })
 }
 
-// The demo user is a member of btc, eth, sol, defi and latam, and moderates trading-on-chain
+// The demo user is a member of btc, eth, sol, link, avax, xrp, defi and latam, and moderates trading-on-chain
 // (drives the Following feed and the "Your interests" column).
 export const COMMUNITIES: RawCommunity[] = [
   {
-    ...assetCommunity(1, 'BTC', 48210, 'Todo sobre Bitcoin: on-chain, ciclos, ETFs y halving.'),
+    ...assetCommunity(
+      1,
+      'BTC',
+      48210,
+      'All things Bitcoin: on-chain, cycles, ETFs and the halving.',
+    ),
     viewerMembership: 'MEMBER',
     mainUrl: 'https://bitcoin.org',
   },
   {
-    ...assetCommunity(2, 'ETH', 31540, 'Ethereum, L2s, staking y el roadmap.'),
+    ...assetCommunity(2, 'ETH', 31540, 'Ethereum, L2s, staking and the roadmap.'),
     viewerMembership: 'MEMBER',
   },
   {
-    ...assetCommunity(3, 'SOL', 15320, 'Solana: memecoins, DePIN y velocidad.'),
+    ...assetCommunity(3, 'SOL', 15320, 'Solana: memecoins, DePIN and speed.'),
+    viewerMembership: 'MEMBER',
+  },
+  {
+    ...assetCommunity(9, 'LINK', 6420, 'Chainlink: oracles, CCIP and staking.'),
+    viewerMembership: 'MEMBER',
+  },
+  {
+    ...assetCommunity(10, 'AVAX', 5180, 'Avalanche: subnets and institutional RWAs.'),
+    viewerMembership: 'MEMBER',
+  },
+  {
+    ...assetCommunity(11, 'XRP', 8930, 'XRP: payments, the ledger and the ETF race.'),
     viewerMembership: 'MEMBER',
   },
   {
     ...community(4, {
       slug: 'defi',
       name: 'DeFi',
-      description: 'Protocolos, rendimientos y riesgos de las finanzas descentralizadas.',
+      description: 'Protocols, yields and risks of decentralized finance.',
       type: 'SYSTEM_CATEGORY',
       memberCount: 12880,
-      rules: '1. Sin shilling de tokens propios.\n2. Citá la fuente de los datos on-chain.',
+      rules: '1. No shilling your own tokens.\n2. Cite the source of on-chain data.',
     }),
     viewerMembership: 'MEMBER',
   },
   community(5, {
     slug: 'macro',
     name: 'Macro',
-    description: 'Tasas, liquidez global y cómo mueven al mercado cripto.',
+    description: 'Rates, global liquidity and how they move crypto.',
     type: 'SYSTEM_CATEGORY',
     memberCount: 9640,
   }),
   community(6, {
     slug: 'memecoins',
     name: 'Memecoins',
-    description: 'DOGE, ranas y perros con gorro. Entrá bajo tu propio riesgo.',
+    description: 'DOGE, frogs and dogs with hats. Enter at your own risk.',
     type: 'SYSTEM_CATEGORY',
     memberCount: 22150,
   }),
@@ -79,7 +96,7 @@ export const COMMUNITIES: RawCommunity[] = [
     ...community(7, {
       slug: 'latam',
       name: 'LATAM',
-      description: 'Cripto en Latinoamérica: regulación, adopción y exchanges locales.',
+      description: 'Crypto in Latin America: regulation, adoption and local exchanges.',
       type: 'SYSTEM_GEO',
       memberCount: 7310,
     }),
@@ -88,11 +105,11 @@ export const COMMUNITIES: RawCommunity[] = [
   community(8, {
     slug: 'trading-on-chain',
     name: 'Trading on-chain',
-    description: 'Análisis de flujos de wallets, exchanges y ballenas.',
+    description: 'Flows of wallets, exchanges and whales.',
     type: 'USER_PUBLIC',
     memberCount: 1204,
     createdByProfileId: userByUsername('maria')?.id ?? null,
-    rules: 'Datos o no pasó. Sin señales pagas.',
+    rules: 'Data or it did not happen. No paid signals.',
     // The demo user moderates it (shows the MOD label).
     viewerMembership: 'MODERATOR',
   }),

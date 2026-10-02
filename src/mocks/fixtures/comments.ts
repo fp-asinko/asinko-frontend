@@ -53,14 +53,14 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
         comment(
           {
             author: 'maria',
-            body: 'Sí, las excluyo con los labels de Arkham. Quedan solo wallets no custodiales.',
+            body: 'Yes, I exclude them with Arkham labels. Only non-custodial wallets are left.',
             ago: minutesAgo(26),
             score: 54,
           },
           [
             comment({
               author: 'quantsimula',
-              body: 'Igual hay un margen de error de 5–8% en esos labels. Ojo.',
+              body: 'Those labels still have a 5–8% error margin. Careful.',
               ago: minutesAgo(20),
               score: 12,
             }),
@@ -70,7 +70,7 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
     ),
     comment({
       author: 'diamondgrandma',
-      body: 'Yo también acumulé. 0,01 BTC pero cuenta 😂',
+      body: 'I accumulated too. 0.01 BTC but it counts 😂',
       ago: minutesAgo(18),
       score: 41,
       viewerVote: 1,
@@ -78,14 +78,14 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
     comment(
       {
         author: 'capitalprudente',
-        body: '[comentario eliminado]',
+        body: '[deleted]',
         ago: minutesAgo(15),
         deleted: true,
       },
       [
         comment({
           author: 'federico',
-          body: 'Respondía a algo que ya no está, pero el punto sigue: las ballenas también se equivocan.',
+          body: 'Replying to something that is gone, but the point stands: whales get it wrong too.',
           ago: minutesAgo(10),
           score: 7,
         }),
@@ -96,14 +96,14 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
     comment(
       {
         author: 'federico',
-        body: 'El dot plot muestra dos recortes más en 2027. Eso es lo que movió al mercado.',
+        body: 'The dot plot shows two more cuts in 2027. That is what moved the market.',
         ago: hoursAgo(1.5),
         score: 63,
       },
       [
         comment({
           author: 'macropilar',
-          body: 'Exacto. Y el tono de Powell fue más dovish de lo esperado.',
+          body: 'Exactly. And Powell sounded more dovish than expected.',
           ago: hoursAgo(1.2),
           score: 22,
           editedAt: hoursAgo(1),
@@ -112,7 +112,7 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
     ),
     comment({
       author: 'esmev',
-      body: 'No Brasil o efeito foi o contrário: o real se valorizou.',
+      body: 'In Brazil it was the opposite: the real got stronger.',
       ago: hoursAgo(1),
       score: 9,
     }),
@@ -121,7 +121,7 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
     comment(
       {
         author: 'federico',
-        body: 'Te respondí en un post aparte, no entraba acá.',
+        body: 'I replied in a separate post, it did not fit here.',
         ago: hoursAgo(2.5),
         score: 15,
       },
@@ -139,7 +139,7 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
     comment({ author: 'jeppe', body: 'Pain. Pure pain.', ago: hoursAgo(3.5), score: 120 }),
     comment({
       author: 'quantsimula',
-      body: 'Y si hubieras holdeado desde 2021, -70%.',
+      body: 'And if you had held since 2021, -70%.',
       ago: hoursAgo(3),
       score: 64,
     }),
@@ -147,13 +147,13 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
   [stableYields!.id]: thread(
     comment({
       author: 'maria',
-      body: 'Morpho tiene mejor relación riesgo/rendimiento hoy.',
+      body: 'Morpho has the better risk/return today.',
       ago: hoursAgo(4),
       score: 18,
     }),
     comment({
       author: 'macropilar',
-      body: 'Con 4% en T-bills, DeFi no compensa el riesgo.',
+      body: 'With 4% in T-bills, DeFi is not worth the risk.',
       ago: hoursAgo(3.8),
       score: 25,
     }),
@@ -161,7 +161,7 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
   [cnv!.id]: thread(
     comment({
       author: 'capitalprudente',
-      body: '¿Esto aplica a exchanges extranjeros también?',
+      body: 'Does this apply to foreign exchanges too?',
       ago: hoursAgo(6),
       score: 3,
     }),

@@ -32,7 +32,7 @@ export const PROFILES: RawProfile[] = [
   {
     ...profile(0, {
       username: DEMO_USER.username,
-      bio: 'Cuenta demo mientras no hay login.',
+      bio: 'Demo account until login exists.',
       accuracyRate: null,
       points: 0,
       badgeStatus: 'NONE',
@@ -42,7 +42,7 @@ export const PROFILES: RawProfile[] = [
   },
   profile(1, {
     username: 'maria',
-    bio: 'On-chain analyst. Si no está en la blockchain, no pasó.',
+    bio: "On-chain analyst. If it's not on the blockchain, it didn't happen.",
     accuracyRate: 0.74,
     points: 12400,
     badgeStatus: 'IDENTITY_VERIFIED',
@@ -58,7 +58,7 @@ export const PROFILES: RawProfile[] = [
   }),
   profile(2, {
     username: 'federico',
-    bio: 'Macro + cripto. Escribo largo, me equivoco en público.',
+    bio: 'Macro + crypto. I write long and I am wrong in public.',
     accuracyRate: 0.68,
     points: 3200,
     badgeStatus: 'NONE',
@@ -85,7 +85,7 @@ export const PROFILES: RawProfile[] = [
   }),
   profile(4, {
     username: 'quantsimula',
-    bio: 'Modelos cuantitativos, cero vibes.',
+    bio: 'Quant models, zero vibes.',
     accuracyRate: 0.71,
     points: 5100,
     badgeStatus: 'IDENTITY_VERIFIED',
@@ -96,7 +96,7 @@ export const PROFILES: RawProfile[] = [
   }),
   profile(5, {
     username: 'macropilar',
-    bio: 'Tasas, liquidez y ciclos. La Fed mueve todo, incluso tu shitcoin.',
+    bio: 'Rates, liquidity and cycles. The Fed moves everything, even your shitcoin.',
     accuracyRate: 0.63,
     points: 2840,
     badgeStatus: 'NONE',
@@ -107,7 +107,7 @@ export const PROFILES: RawProfile[] = [
   }),
   profile(6, {
     username: 'esmev',
-    bio: 'DeFi desde 2020. Análise de protocolos em português e espanhol.',
+    bio: 'DeFi since 2020. Protocol deep dives.',
     accuracyRate: 0.7,
     points: 1830,
     badgeStatus: 'NONE',
@@ -121,7 +121,7 @@ export const PROFILES: RawProfile[] = [
   }),
   profile(7, {
     username: 'diamondgrandma',
-    bio: 'HODL desde 2017. No vendo, ni aunque me lo pidan mis nietos 💎',
+    bio: 'HODLing since 2017. Not selling, not even if my grandkids ask 💎',
     accuracyRate: 0.41,
     points: 612,
     badgeStatus: 'NONE',
