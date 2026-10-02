@@ -5,6 +5,7 @@ import { pollItem } from '../feed-items.fixture'
 import { PollCard } from './poll-card'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
+vi.mock('../actions/load-comments-preview.action', () => ({ loadCommentsPreview: vi.fn() }))
 
 describe('PollCard (H-13)', () => {
   it('shows the question, options with their share and the totals', () => {

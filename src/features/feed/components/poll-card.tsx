@@ -1,8 +1,9 @@
-import { ChartBarIcon, CheckIcon } from 'lucide-react'
+import { ChartBarIcon, CheckIcon, MessageSquareIcon } from 'lucide-react'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import type { PollItem } from '../feed.types'
 import { CardByline } from './card-byline'
+import { CommentsToggle } from './comments-toggle'
 
 /**
  * Poll card of the prototype (H-13): question, options as 8px-radius rows and, when the results
@@ -10,6 +11,7 @@ import { CardByline } from './card-byline'
  */
 export function PollCard({ poll }: { poll: PollItem }) {
   const t = useTranslations('feed.poll')
+  const tc = useTranslations('feed.comments')
   const format = useFormatter()
   const now = useNow()
   const footer = [
@@ -78,15 +80,22 @@ export function PollCard({ poll }: { poll: PollItem }) {
         })}
       </ul>
 
-      {/* Each part is a whole message (no string concatenation); the dots are decorative. */}
-      <p className="mt-3 flex flex-wrap gap-x-1.5 type-action font-medium text-muted-foreground">
-        {footer.map((part, index) => (
-          <span key={part} className="flex gap-x-1.5">
-            {index > 0 && <span aria-hidden>·</span>}
-            {part}
-          </span>
-        ))}
-      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+        {/* The contract's Poll has no commentCount (proposal P-006): the button shows a label. */}
+        <CommentsToggle kind="poll" id={poll.id}>
+          <MessageSquareIcon aria-hidden className="size-4" />
+          {tc('label')}
+        </CommentsToggle>
+        {/* Each part is a whole message (no string concatenation); the dots are decorative. */}
+        <p className="ml-auto flex flex-wrap gap-x-1.5 type-action font-medium text-muted-foreground">
+          {footer.map((part, index) => (
+            <span key={part} className="flex gap-x-1.5">
+              {index > 0 && <span aria-hidden>·</span>}
+              {part}
+            </span>
+          ))}
+        </p>
+      </div>
     </article>
   )
 }

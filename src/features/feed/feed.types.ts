@@ -68,6 +68,15 @@ export type PollItem = {
 
 export type FeedItem = PostItem | PollItem
 
+/** A comment of the card's preview (H-28): top level only, never deleted. */
+export type CommentPreview = {
+  id: string
+  author: Author
+  /** Markdown. Comments carry no entities, so mentions show as plain text. */
+  body: string
+  createdAt: string
+}
+
 export type FeedPage = {
   items: FeedItem[]
   nextCursor: string | null

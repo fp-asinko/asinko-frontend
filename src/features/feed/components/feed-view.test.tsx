@@ -6,6 +6,7 @@ import { parseFeedParams } from '../schemas/feed-params.schema'
 import { FeedView } from './feed-view'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
+vi.mock('../actions/load-comments-preview.action', () => ({ loadCommentsPreview: vi.fn() }))
 
 const params = (raw: Record<string, string> = {}) => parseFeedParams(raw)
 

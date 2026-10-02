@@ -66,7 +66,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - Mocks con el comportamiento de `dev` (Explore vacío con comunidad inexistente, `kind`, `mine`) y `API_MOCKS=missing`: solo se mockea lo que el backend no tiene.
   - **Tests:** esquema de parámetros, `getFeed` (kind, comunidad inexistente), `getInterests` (mine, sin viewer), modos de `API_MOCKS`.
 
-- [ ] **T-08b · Vista previa de comentarios** · M · H-28 (D-H2: opción A)
+- [x] **T-08b · Vista previa de comentarios** · M · H-28 (D-H2: opción A)
   - `load-comments-preview.action.ts` (zod, `ActionResult`), `comments-toggle` (client), `comments-preview` (server); P-006 en `proposals.md`.
   - **Tests:** action (3 primeros, sin borrados, contenido inexistente), toggle (`aria-expanded`, carga una sola vez, error), preview (Markdown seguro).
 

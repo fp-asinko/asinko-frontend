@@ -6,6 +6,7 @@ import { postItem } from '../feed-items.fixture'
 import { PostCard } from './post-card'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
+vi.mock('../actions/load-comments-preview.action', () => ({ loadCommentsPreview: vi.fn() }))
 
 describe('PostCard (H-12)', () => {
   it('shows byline, title, Markdown body with mentions, tag and actions', () => {

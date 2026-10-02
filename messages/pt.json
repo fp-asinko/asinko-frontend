@@ -144,6 +144,13 @@
       "polls": "Nenhuma enquete no que foi carregado até agora.",
       "community": "Ainda não há publicações em {handle}.",
       "needAccount": "Você precisa de uma conta para ver as comunidades que segue."
+    },
+    "comments": {
+      "label": "Comentários",
+      "loading": "Carregando comentários…",
+      "error": "Não foi possível carregar os comentários. Feche e abra para tentar de novo.",
+      "empty": "Ainda não há comentários.",
+      "seeAll": "Ver todos os comentários"
     }
   }
 }
