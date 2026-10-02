@@ -13,19 +13,19 @@ T-01 ─┬─ T-02 ─ T-03 ─ T-04 ─ T-05 ─ T-06
   - Tokens de movimiento, `@keyframes`, utilidades `tap` y `stagger` en `globals.css`; regla global de reducir movimiento.
   - **Tests:** `e2e/home-motion.spec.ts` arranca con el caso de reducir movimiento.
 
-- [ ] **T-02 · Feedback general del feed** · S · M-06, M-07, M-08, M-10
+- [x] **T-02 · Feedback general del feed** · S · M-06, M-07, M-08, M-10
   - `tap` en botones de tarjeta, opciones, píldoras, pestañas y composer; globo "Próximamente" con desplazamiento; punto de _Live_ que late.
   - **Tests:** los existentes siguen en verde (no cambia el comportamiento).
 
-- [ ] **T-03 · Votar con movimiento** · S · M-01
+- [x] **T-03 · Votar con movimiento** · S · M-01
   - `lastVote`, `popKey` y el número con `key` en `vote-control.tsx`.
   - **Tests:** `data-animate` según la dirección; nada al cargar ni al quitar el voto.
 
-- [ ] **T-04 · Barras de encuesta** · S · M-02
+- [x] **T-04 · Barras de encuesta** · S · M-02
   - Estado `revealed`, `animate-bar-grow`, transición de ancho al cambiar de opción.
   - **Tests:** unitario de `revealed`; e2e de la barra creciendo.
 
-- [ ] **T-05 · Comentarios que se despliegan** · S · M-03
+- [x] **T-05 · Comentarios que se despliegan** · S · M-03
   - Panel montado después de la primera apertura, `grid-template-rows`, `inert` y `aria-hidden` cerrado.
   - **Tests:** unitario del panel cerrado; los e2e de comentarios siguen en verde.
 

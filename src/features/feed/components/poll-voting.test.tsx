@@ -104,4 +104,31 @@ describe('PollVoting (H-13, H-15)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'No' }))
     expect(action.votePoll).toHaveBeenCalledTimes(1)
   })
+
+  describe('motion (home-motion M-02)', () => {
+    it('does not animate results that were already visible on load', () => {
+      const { container } = renderPoll(pollItem())
+      expect(container.querySelector('ul')).not.toHaveAttribute('data-revealed')
+    })
+
+    it('grows the bars from 0 when a vote reveals the results', async () => {
+      action.votePoll.mockResolvedValue({
+        ok: true,
+        data: {
+          options: [
+            { id: 'a', label: 'Yes', votes: 1, share: 1 },
+            { id: 'b', label: 'No', votes: 0, share: 0 },
+          ],
+          totalVotes: 1,
+          viewerOptionId: 'a',
+          resultsVisible: true,
+        },
+      })
+      const { container } = renderPoll()
+      await userEvent.click(screen.getByRole('button', { name: 'Yes' }))
+      expect(await screen.findByText('100%')).toHaveClass('animate-fade-in')
+      expect(container.querySelector('ul')).toHaveAttribute('data-revealed', 'true')
+      expect(container.querySelector('ul [aria-hidden].animate-bar-grow')).not.toBeNull()
+    })
+  })
 })

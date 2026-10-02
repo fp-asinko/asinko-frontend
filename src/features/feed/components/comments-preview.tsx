@@ -46,7 +46,7 @@ export function CommentsPreview({ comments }: { comments: CommentPreview[] }) {
       )}
       <ComingSoon
         label={t('seeAll')}
-        className="inline-flex min-h-6 items-center gap-1 type-meta font-semibold"
+        className="inline-flex min-h-6 tap items-center gap-1 type-meta font-semibold"
       >
         {t('seeAll')}
         <ArrowRightIcon aria-hidden className="size-3.5" />

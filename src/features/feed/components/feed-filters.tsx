@@ -34,7 +34,7 @@ export function FeedFilters({
               href={feedHref({ ...params, filter: filter.filter })}
               aria-current={active ? 'page' : undefined}
               className={cn(
-                'inline-flex h-8 items-center rounded-full px-3.5 type-action font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+                'inline-flex h-8 tap items-center rounded-full px-3.5 type-action font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
                 active
                   ? 'bg-muted text-foreground'
                   : 'text-muted-foreground hover:bg-surface hover:text-foreground',
@@ -49,7 +49,7 @@ export function FeedFilters({
         <Link
           href={feedHref({ ...params, community: undefined })}
           aria-label={t('chip.remove', { handle: community?.handle ?? `#${params.community}` })}
-          className="ml-auto inline-flex h-8 max-w-full min-w-0 items-center gap-1.5 rounded-full border px-3 type-action font-semibold outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="ml-auto inline-flex h-8 max-w-full min-w-0 tap items-center gap-1.5 rounded-full border px-3 type-action font-semibold outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           <span className="truncate">{community?.handle ?? `#${params.community}`}</span>
           <XIcon aria-hidden className="size-3.5 shrink-0" />

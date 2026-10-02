@@ -104,4 +104,35 @@ describe('VoteControl (H-15)', () => {
       expect(screen.getByText(/12[.,\s]?400/)).toHaveClass('sr-only')
     },
   )
+
+  describe('motion (home-motion M-01)', () => {
+    const pill = () => screen.getByRole('button', { name: 'Upvote' }).parentElement!
+
+    it('does not animate on load', () => {
+      renderWithIntl(<VoteControl postId={ID} score={10} viewerVote={1} />)
+      expect(pill()).not.toHaveAttribute('data-animate')
+    })
+
+    it('pops the arrow in the direction of the vote', async () => {
+      action.votePost.mockResolvedValue({ ok: true, data: { score: 9, viewerVote: -1 } })
+      renderWithIntl(<VoteControl postId={ID} score={10} viewerVote={null} />)
+
+      await userEvent.click(screen.getByRole('button', { name: 'Downvote' }))
+      expect(pill()).toHaveAttribute('data-animate', 'down')
+      expect(screen.getByRole('button', { name: 'Downvote' }).querySelector('svg')).toHaveClass(
+        'animate-vote-pop',
+      )
+    })
+
+    it('does not pop when removing the vote (Q2), but the number still rolls', async () => {
+      action.votePost.mockResolvedValue({ ok: true, data: { score: null, viewerVote: null } })
+      renderWithIntl(<VoteControl postId={ID} score={11} viewerVote={1} />)
+
+      await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
+      expect(pill()).not.toHaveAttribute('data-animate')
+      expect(await screen.findByText('10', { selector: '[aria-hidden]' })).toHaveClass(
+        'animate-count-down',
+      )
+    })
+  })
 })

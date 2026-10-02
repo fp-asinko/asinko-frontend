@@ -69,7 +69,7 @@ function EmptyFeed({ params }: { params: FeedParams }) {
         action={
           <Link
             href={feedHref({ ...params, feed: 'for-you' })}
-            className="rounded-full bg-primary px-4 py-2 type-action text-primary-foreground hover:bg-primary-hover"
+            className="tap rounded-full bg-primary px-4 py-2 type-action text-primary-foreground hover:bg-primary-hover"
           >
             {t('goForYou')}
           </Link>

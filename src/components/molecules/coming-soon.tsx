@@ -12,7 +12,7 @@ const VISIBLE_MS = 2000
  * edge (buttons at the right of a card or the screen), above for the bottom bar.
  */
 const bubble = cva(
-  'pointer-events-none absolute z-50 rounded-md bg-primary px-2 py-1 type-meta whitespace-nowrap text-primary-foreground transition-opacity motion-reduce:transition-none',
+  'pointer-events-none absolute z-50 rounded-md bg-primary px-2 py-1 type-meta whitespace-nowrap text-primary-foreground transition-[opacity,translate] duration-150 ease-out',
   {
     variants: {
       placement: {
@@ -25,6 +25,13 @@ const bubble = cva(
     defaultVariants: { placement: 'below' },
   },
 )
+
+/** Hidden, the bubble sits 2px toward the button, so it slides out of it when shown. */
+function hiddenOffset(placement: VariantProps<typeof bubble>['placement']) {
+  return placement === 'above' || placement === 'above-end'
+    ? 'translate-y-0.5 opacity-0'
+    : '-translate-y-0.5 opacity-0'
+}
 
 /**
  * A feature that exists in the prototype but not yet in the product (H-26). Looks dimmed, can be
@@ -70,7 +77,10 @@ export function ComingSoon({
       </button>
       <span
         role="status"
-        className={cn(bubble({ placement }), visible ? 'opacity-100' : 'opacity-0')}
+        className={cn(
+          bubble({ placement }),
+          visible ? 'translate-y-0 opacity-100' : hiddenOffset(placement),
+        )}
       >
         {visible ? t('comingSoon') : ''}
       </span>

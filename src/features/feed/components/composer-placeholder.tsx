@@ -23,7 +23,7 @@ export function ComposerPlaceholder({ viewerName }: { viewerName: string | null 
         <div className="flex min-w-0 flex-1 flex-col">
           <ComingSoon
             label={t('placeholder')}
-            className="flex h-10.75 w-full items-center rounded-full border bg-surface px-4 text-left type-ui text-muted-foreground"
+            className="flex h-10.75 w-full tap items-center rounded-full border bg-surface px-4 text-left type-ui text-muted-foreground"
           >
             <span className="truncate">{t('placeholder')}</span>
           </ComingSoon>
@@ -34,7 +34,7 @@ export function ComposerPlaceholder({ viewerName }: { viewerName: string | null 
           <div key={key} className="flex flex-col">
             <ComingSoon
               label={t(key)}
-              className="flex h-9 w-full items-center justify-center gap-2 rounded-lg type-action text-muted-foreground"
+              className="flex h-9 w-full tap items-center justify-center gap-2 rounded-lg type-action text-muted-foreground"
             >
               <Icon aria-hidden className="size-4" />
               {t(key)}

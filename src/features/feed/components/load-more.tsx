@@ -90,7 +90,7 @@ export function LoadMore({ params, cursor }: { params: FeedParams; cursor: strin
             type="button"
             onClick={() => load(true)}
             aria-disabled={pending || undefined}
-            className="inline-flex h-11 items-center rounded-full border px-5 type-action text-muted-foreground outline-none hover:bg-surface hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:cursor-wait"
+            className="inline-flex h-11 tap items-center rounded-full border px-5 type-action text-muted-foreground outline-none hover:bg-surface hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:cursor-wait"
           >
             {pending ? t('loading') : t('button')}
           </button>

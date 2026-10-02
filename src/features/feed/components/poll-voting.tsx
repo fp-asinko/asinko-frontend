@@ -46,6 +46,8 @@ export function PollVoting({
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   const [saved, setSaved] = useState(false)
+  // M-02: true once a vote reveals results that were hidden; then the bars grow from 0.
+  const [revealed, setRevealed] = useState(false)
 
   const canVote = !isClosed && (results.viewerOptionId === null || allowVoteChange)
   // Decided once: a poll that loads votable keeps its buttons for the whole visit.
@@ -59,6 +61,7 @@ export function PollVoting({
       setShown({ ...results, viewerOptionId: optionId })
       const result = await votePoll({ pollId: id, optionId })
       if (result.ok) {
+        if (!results.resultsVisible && result.data.resultsVisible) setRevealed(true)
         setResults(result.data)
         setSaved(true)
       } else
@@ -74,7 +77,7 @@ export function PollVoting({
 
   return (
     <>
-      <ul className="mt-3.5 flex flex-col gap-2">
+      <ul data-revealed={revealed || undefined} className="mt-3.5 flex flex-col gap-2">
         {shown.options.map((option) => {
           const mine = option.id === shown.viewerOptionId
           const percent =
@@ -86,7 +89,11 @@ export function PollVoting({
               {option.share !== null && (
                 <span
                   aria-hidden
-                  className="absolute inset-y-0 left-0 bg-muted"
+                  // Grows from 0 when revealed; a later change of option transitions the width.
+                  className={cn(
+                    'absolute inset-y-0 left-0 origin-left bg-muted transition-[width] duration-600 ease-bars',
+                    revealed && 'animate-bar-grow',
+                  )}
                   style={{ width: `${option.share * 100}%` }}
                 />
               )}
@@ -96,12 +103,18 @@ export function PollVoting({
                   <span className="min-w-0">{option.label}</span>
                   {mine && !asButtons && <span className="sr-only">({t('yourVote')})</span>}
                 </span>
-                {percent && <span className="shrink-0 font-bold tabular-nums">{percent}</span>}
+                {percent && (
+                  <span
+                    className={cn('shrink-0 font-bold tabular-nums', revealed && 'animate-fade-in')}
+                  >
+                    {percent}
+                  </span>
+                )}
               </span>
             </>
           )
           const box = cn(
-            'relative block w-full overflow-hidden rounded-lg border px-3.5 py-2.5 text-left type-ui font-medium',
+            'tap relative block w-full overflow-hidden rounded-lg border px-3.5 py-2.5 text-left type-ui font-medium',
             mine && 'border-foreground',
           )
           return (

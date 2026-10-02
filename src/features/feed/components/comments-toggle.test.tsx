@@ -30,22 +30,27 @@ describe('CommentsToggle (H-28)', () => {
     expect(button).toHaveAttribute('aria-expanded', 'true')
     expect(await screen.findByText('First comment')).toBeInTheDocument()
     expect(action.loadCommentsPreview).toHaveBeenCalledWith({ kind: 'post', id: ID, locale: 'en' })
-    expect(button.getAttribute('aria-controls')).toBe(
-      screen.getByText('First comment').parentElement!.id,
-    )
+    const panel = document.getElementById(button.getAttribute('aria-controls')!)!
+    expect(panel).toContainElement(screen.getByText('First comment'))
   })
 
-  it('reuses the preview when toggled again', async () => {
+  it('reuses the preview when toggled again; closed, it stays mounted but inert (M-03)', async () => {
     action.loadCommentsPreview.mockResolvedValue({ ok: true, data: <p>First comment</p> })
     renderToggle()
     const button = screen.getByRole('button', { name: /6 comments/ })
 
     await userEvent.click(button)
     await screen.findByText('First comment')
+    const panel = document.getElementById(button.getAttribute('aria-controls')!)!
+
     await userEvent.click(button)
-    expect(screen.queryByText('First comment')).toBeNull()
+    // Kept for the closing animation, but out of the focus order and of screen readers.
+    expect(panel).toHaveAttribute('inert')
+    expect(panel).toHaveAttribute('aria-hidden', 'true')
+
     await userEvent.click(button)
-    expect(screen.getByText('First comment')).toBeInTheDocument()
+    expect(panel).not.toHaveAttribute('inert')
+    expect(screen.getByText('First comment')).toBeVisible()
     expect(action.loadCommentsPreview).toHaveBeenCalledTimes(1)
   })
 

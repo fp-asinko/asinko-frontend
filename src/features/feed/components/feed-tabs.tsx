@@ -26,10 +26,10 @@ export function FeedTabs({ params }: { params: FeedParams }) {
             href={feedHref({ ...params, feed: tab.feed })}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              '-mb-px border-b-2 px-4 py-3 type-ui font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+              'relative px-4 py-3 type-ui font-semibold transition-colors duration-150 ease-out outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
               active
-                ? 'border-foreground text-foreground'
-                : 'border-transparent text-muted-foreground hover:text-foreground',
+                ? "text-foreground after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:animate-underline-in after:bg-foreground after:content-['']"
+                : 'text-muted-foreground hover:text-foreground',
             )}
           >
             {tab.label}
@@ -40,7 +40,10 @@ export function FeedTabs({ params }: { params: FeedParams }) {
         label={t('live')}
         className="inline-flex items-center gap-1.5 px-4 py-3 type-ui font-semibold text-muted-foreground"
       >
-        <span aria-hidden className="size-1.5 rounded-full bg-bearish" />
+        <span aria-hidden className="relative size-1.5">
+          <span className="absolute inset-0 animate-live-pulse rounded-full bg-bearish" />
+          <span className="relative block size-1.5 rounded-full bg-bearish" />
+        </span>
         {t('live')}
       </ComingSoon>
     </nav>
