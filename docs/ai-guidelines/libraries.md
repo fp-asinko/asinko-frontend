@@ -17,7 +17,8 @@
 | Estado en la URL         | `nuqs`                                    | Filtros, paginación, tabs, búsqueda                                                                                               |
 | Fechas                   | `date-fns`                                | Para cálculos. El formato visible al usuario, con `next-intl`                                                                     |
 | Toasts                   | `sonner`                                  | El de shadcn                                                                                                                      |
-| Errores en producción    | `@sentry/nextjs`                          | Ver `engineering-principles.md`                                                                                                   |
+| Tema claro/oscuro        | `next-themes`                             | Sin parpadeo al cargar, acepta el nonce de la CSP. Claro por defecto (D-02 en `specs/foundation`)                                 |
+| Errores en producción    | `@sentry/nextjs`                          | Ver `engineering-principles.md`. En el navegador se carga diferido y solo con DSN (JS budget, `seo.md`)                           |
 | Código solo de servidor  | `server-only`                             | En los módulos de acceso a datos. Rompe el build si se importan desde el cliente (ver `security.md`)                              |
 
 Testing y tooling: ver `testing.md` y `tooling.md`.

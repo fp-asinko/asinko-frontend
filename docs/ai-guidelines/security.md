@@ -21,7 +21,7 @@
 
 El pipeline debe incluir:
 
-- **Scan de secretos** en cada PR (TruffleHog, GitGuardian o equivalente).
+- **Scan de secretos** en cada PR: gitleaks sobre todo el historial (`.github/workflows/ci.yml`).
 - **Scan de dependencias** por vulnerabilidades conocidas.
 - **Rechazo de commits** que contengan archivos con patrones sensibles (configurable en una lista de patrones).
 
@@ -71,21 +71,25 @@ React escapa el texto por defecto. Las reglas son para no romper esa protección
 
 ### 2. Headers de seguridad y CSP
 
-- **CSP con nonce**, generado en `src/proxy.ts` en cada request, en el mismo proxy que resuelve el locale de next-intl. Base de la política:
+- **CSP con nonce**, generado en `src/proxy.ts` en cada request, en el mismo proxy que resuelve el locale de next-intl. La política se arma en `src/lib/security/csp.ts` (con tests):
 
   ```
   default-src 'self';
   script-src 'self' 'nonce-{nonce}' 'strict-dynamic';
-  style-src 'self' 'nonce-{nonce}';
-  img-src 'self' blob: data: <dominio de imágenes del backend>;
-  connect-src 'self' <dominio de la API>;
+  style-src-elem 'self' 'nonce-{nonce}';
+  style-src-attr 'unsafe-inline';
+  img-src 'self' blob: data: <dominio de imágenes del backend, cuando haga falta>;
+  connect-src 'self' <origen de Sentry, si hay DSN>;
   font-src 'self';
   object-src 'none';
   base-uri 'self';
   form-action 'self';
   frame-ancestors 'none';
-  upgrade-insecure-requests;
+  upgrade-insecure-requests;   # solo si el sitio se sirve por https
   ```
+
+  - **Estilos**: las hojas y los `<style>` llevan nonce (`style-src-elem`); los atributos `style=""` se permiten (`style-src-attr`) porque Base UI los usa para posicionar en el HTML del servidor y no ejecutan código.
+  - El navegador **no** llama a la API (ver `api-integration.md`), así que su dominio no va en `connect-src`.
 
   - El nonce obliga a renderizado dinámico. Para una red social con feeds personalizados es el caso normal. Las páginas que sí pueden ser estáticas (legales, landing) se evalúan por separado.
   - En desarrollo se agrega `'unsafe-eval'` (lo necesita React para debug). Nunca en producción.

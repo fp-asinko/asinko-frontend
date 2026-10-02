@@ -119,7 +119,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
   - `.github/workflows/ci.yml` (`design.md` §13) con gitleaks y `pnpm audit`.
   - **Verificación:** el workflow pasa `actionlint`; se prueba de verdad cuando exista el repositorio remoto.
 
-- [ ] **T-19 · Guías actualizadas** · S · F-40
+- [x] **T-19 · Guías actualizadas** · S · F-40
   - `i18n.md` (render dinámico por CSP), `libraries.md` (`next-themes`, `@axe-core/playwright`, gitleaks), `design-system.md` (tokens iOS con regla de alto contraste, átomos de marca en `ui/`).
 
 - [ ] **T-20 · Definition of Done** · S

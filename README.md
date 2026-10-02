@@ -10,10 +10,27 @@ Visión completa de producto: [`docs/product/overview.md`](docs/product/overview
 - [pnpm](https://pnpm.io/) — único gestor de paquetes del proyecto
 - [Engram](https://github.com/Gentleman-Programming/engram) — memoria persistente para asistentes de IA (ver [`memory.md`](docs/ai-guidelines/memory.md))
 
+## Primeros pasos
+
+```bash
+pnpm install                 # también registra los git hooks (Lefthook)
+cp .env.example .env.local   # valores de desarrollo; nunca secretos reales en el repo
+pnpm dev                     # http://localhost:3000
+```
+
+Con `API_MOCKS=true` (el default de `.env.example`) la app funciona sin el backend: los endpoints que faltan se responden desde `src/mocks/`.
+
+| Comando                            | Qué hace                                                     |
+| ---------------------------------- | ------------------------------------------------------------ |
+| `pnpm lint` / `pnpm format`        | ESLint sin warnings / Prettier                               |
+| `pnpm typecheck`                   | TypeScript estricto                                          |
+| `pnpm test` / `pnpm test:coverage` | Vitest (con umbrales de cobertura)                           |
+| `pnpm test:e2e`                    | Playwright en mobile y desktop contra el build de producción |
+
 ## Stack
 
 - Next.js (App Router)
-- shadcn/ui + Tailwind CSS
+- shadcn/ui (Base UI) + Tailwind CSS 4, estilo iOS
 - TypeScript (estricto)
 - next-intl (multi-idioma)
 - Vitest + Testing Library (unitarios) · Playwright (e2e)

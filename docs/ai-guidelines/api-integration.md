@@ -78,18 +78,21 @@ En el **cliente HTTP**, no en los features. Con `API_MOCKS=true`, el cliente res
 - Todo el resto del camino corre igual que con datos reales: validación zod, mapeo de errores, `ActionResult`. Pasar a datos reales es **apagar el mock de esa ruta**, sin tocar el feature.
 - **Mock por endpoint**, no todo o nada. Lo que el backend ya tiene (hoy, E01) va siempre contra la API real.
 - `src/env.ts` **rechaza `API_MOCKS=true` en producción**: el build falla.
-- Sin librería de mocking: es un mapa `método + ruta → handler` dentro del cliente (menos de ~50 líneas, ver criterio en `libraries.md`).
+- Sin librería de mocking: un registro de rutas (`src/mocks/handlers.ts`) que el cliente consulta antes de ir a la red (menos de ~50 líneas, ver criterio en `libraries.md`).
+- **El cliente aplica a la respuesta del mock la misma validación y el mismo mapeo de errores** que a la real: un mock también prueba ese camino.
 
 ```
 src/mocks/
-├── handlers.ts          # Mapa método + ruta → handler, y qué rutas están mockeadas
+├── handlers.ts          # MOCK_ROUTES: método, ruta con :params, kind, schema, example y handler
+├── match.ts             # Compara método + ruta y extrae los params
+├── demo-user.ts         # Usuario demo (sesión mientras no hay login)
 ├── fixtures/            # Datos de ejemplo, uno por recurso (posts.ts, communities.ts…)
 └── README.md            # Qué está mockeado y por qué (contrato sin implementar o propuesta)
 ```
 
 ### Reglas
 
-- **Los mocks respetan el contrato.** Las fixtures se validan con los mismos esquemas zod que las respuestas reales: un mock que no pasa el esquema rompe los tests.
+- **Los mocks respetan el contrato.** Cada ruta declara el `schema` de su respuesta y un `example` de request; `src/mocks/fixtures.test.ts` ejecuta cada handler con su ejemplo y valida la respuesta. Un mock que no pasa el esquema rompe los tests.
 - **Los mocks simulan también los errores** (`401`, `404`, `422`…) y la paginación con `nextCursor`, no solo el camino feliz.
 - Dos tipos de mock, y siempre se sabe cuál es cuál:
 

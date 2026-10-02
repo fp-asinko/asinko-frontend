@@ -9,33 +9,47 @@
 ## Árbol general
 
 ```
+.github/workflows/ci.yml  # Quality gates (ver tooling.md)
 e2e/                      # Tests end to end (Playwright), ver testing.md
 messages/                 # Traducciones: en.json (default), es.json, pt.json (ver i18n.md)
 specs/                    # Specs SDD: specs/<feature>/{requirements,design,tasks}.md
 src/
 ├── app/                  # Rutas (App Router): layouts = templates, pages = pages
-│   ├── [locale]/         # Todas las rutas cuelgan del idioma
-│   │   ├── layout.tsx
-│   │   ├── page.tsx
+│   ├── [locale]/         # Layout raíz: todas las rutas cuelgan del idioma (ver i18n.md)
+│   │   ├── layout.tsx    # <html lang>, providers, shell
+│   │   ├── (main)/       # Vistas de la app con su loading.tsx (ver i18n.md § 404)
+│   │   │   ├── page.tsx
+│   │   │   └── loading.tsx
+│   │   ├── [...rest]/    # Catch-all: notFound() para URLs inexistentes
 │   │   ├── error.tsx
-│   │   ├── loading.tsx
 │   │   └── not-found.tsx
 │   ├── globals.css       # Tokens del tema (ver design-system.md)
 │   ├── global-error.tsx
 │   ├── robots.ts
 │   └── sitemap.ts
 ├── components/           # UI compartida, organizada con Atomic Design
-│   ├── ui/               # Átomos — shadcn (lo escribe el CLI)
+│   ├── ui/               # Átomos: shadcn (lo escribe el CLI) + átomos de marca (asinko-logo)
 │   ├── molecules/
-│   └── organisms/
+│   └── organisms/        # app-shell/ (layout de 3 columnas), status-message, …
 ├── features/             # Un directorio por dominio de negocio
 │   └── <feature>/
 ├── hooks/                # Hooks transversales (use-mobile.ts, etc.)
-├── i18n/                 # routing.ts, navigation.ts, request.ts (next-intl)
-├── lib/                  # Utilidades transversales (utils.ts con cn(), result.ts, etc.)
-├── test/                 # Helpers de tests unitarios (renderWithIntl, setup)
+├── i18n/                 # routing, navigation, request (next-intl) y alternates (SEO)
+├── lib/                  # Utilidades transversales
+│   ├── api/              # Cliente HTTP del backend, server-only (ver api-integration.md)
+│   ├── observability/    # Sentry: opciones y reportError
+│   ├── security/         # CSP
+│   ├── seo/              # robots
+│   ├── session.ts        # getViewer(): usuario actual
+│   ├── result.ts         # ActionResult
+│   └── utils.ts          # cn()
+├── mocks/                # Mocks de la API por endpoint (ver api-integration.md § Mocks)
+├── test/                 # Helpers de tests unitarios (renderWithIntl, navigation-mock, setup)
 ├── env.ts                # Variables de entorno validadas (ver libraries.md)
-└── proxy.ts              # Locale (next-intl). Antes middleware.ts
+├── env.client.ts         # NEXT_PUBLIC_* para el navegador sin zod (única otra lectura de process.env)
+├── instrumentation.ts    # Sentry en el servidor
+├── instrumentation-client.ts  # Sentry en el navegador (diferido, solo con DSN)
+└── proxy.ts              # Locale (next-intl) + CSP con nonce. Antes middleware.ts
 ```
 
 ## Estructura por feature

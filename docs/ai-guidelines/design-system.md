@@ -45,7 +45,26 @@ shadcn define el tema con variables semánticas en `globals.css`:
 
 - Los colores del diseño se cargan **en estas variables**, no como valores sueltos en componentes.
 - Se usan nombres **semánticos** (`primary`, `destructive`, `muted`), no de color (`blue-500`).
-- Tokens nuevos (ej. `--success`) se agregan en `:root` **y** `.dark`, y se exponen en `@theme inline`.
+- Tokens nuevos (ej. `--success`) se agregan en `:root` **y** `.dark`, y se exponen en `@theme inline`. Un alias con `var()` definido solo en `:root` funciona porque `.dark` va únicamente en `<html>` (lo pone next-themes).
+
+### Tokens de Asinko (estilo iOS)
+
+Colores de sistema de iOS, claro por defecto y oscuro opcional (`docs/product/overview.md § Estilo`). Valores y motivos en `specs/foundation/design.md § 4`.
+
+- **Texto y botones usan las variantes de alto contraste de Apple** (`--primary` `#0040DD` en claro, `#409CFF` en oscuro): los colores base de iOS no llegan a 4,5:1 sobre blanco.
+- **`--tint` / `--ring` (`#007AFF` / `#0A84FF`) son solo para íconos, foco y estados no textuales** (3:1). Nunca para texto: un label activo va en `text-primary` con el ícono en `text-tint`.
+- Semánticos de negocio: `--success`/`--bullish`, `--bearish`, `--warning`. El color nunca es la única señal: van con ícono o texto.
+- `src/test/tokens-contrast.test.ts` mide cada par texto/fondo en los dos temas: un token que baja del mínimo rompe el build.
+
+### Tipografía
+
+- Fuente del sistema (SF Pro en Apple), sin descargas. Escala de iOS en `rem` como utilidades: `text-large-title`, `text-title-1`…`3`, `text-headline`, `text-body` (17px, base del `body`), `text-callout`, `text-subhead`, `text-footnote`, `text-caption`.
+- Cada utilidad trae su tracking y leading: no se ajustan sueltos en los componentes.
+
+### Materiales
+
+- Barras de navegación translúcidas: `bg-card/90 backdrop-blur-xl`, con `reduced-transparency:` para pasar a fondo sólido (`prefers-reduced-transparency`).
+- Áreas seguras del iPhone con `env(safe-area-inset-*)` (el layout declara `viewport-fit=cover`); alturas de pantalla con `dvh`, nunca `vh`.
 
 ```tsx
 // ✅ Correcto: tokens semánticos vía utilidades
@@ -70,7 +89,9 @@ shadcn define el tema con variables semánticas en `globals.css`:
 ### Reglas
 
 - **Las dependencias van solo hacia abajo**: un átomo no importa moléculas; una molécula no importa organismos.
-- **`components/ui/` es de shadcn**: lo escribe el CLI. Se puede modificar (el código es nuestro), pero con cambios mínimos y sin romper la API original.
+- **`components/ui/` es de shadcn**: lo escribe el CLI. Se puede modificar (el código es nuestro), pero con cambios mínimos y sin romper la API original. Cada cambio lleva un comentario `asinko:` que lo explica (ej. `closeLabel` obligatorio en `sheet.tsx`: el original traía "Close" fijo en inglés).
+- `components/ui/` también aloja **átomos de marca** que no son de shadcn (`asinko-logo.tsx`), con su test.
+- Componentes pesados que no se ven al cargar (paneles, diálogos) se cargan con `next/dynamic` al primer uso (presupuesto de JS, `seo.md`). Ejemplo: `mobile-sidebar.tsx`.
 - **Un feature nunca crea átomos ni moléculas propias.** Si necesita uno nuevo, se agrega a `components/` para que lo usen todos.
 - **Los organismos de `components/organisms/` no conocen el negocio**: reciben datos por props, no hacen fetching ni llaman actions.
 - **`page.tsx` solo compone**: obtiene datos y arma la página con organismos. Sin markup extenso ni lógica.

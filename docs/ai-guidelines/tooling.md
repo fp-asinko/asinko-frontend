@@ -109,7 +109,14 @@ Los hooks son una ayuda local; **el CI es la fuente de verdad**. Saltearlos con 
 
 ## Quality gates en CI
 
-Cada PR corre, en este orden: `format:check` → `lint` → `typecheck` → `test:coverage` → `build` → `test:e2e`. Todos bloqueantes.
+`.github/workflows/ci.yml`, en cada push y PR a `develop`, `staging` y `main`. Todos bloqueantes:
+
+1. `format:check` → `lint` → `typecheck` → `test:coverage` → `build` → `test:e2e` (sube el reporte de Playwright si falla).
+2. En paralelo: **gitleaks** (secretos en todo el historial) y `pnpm audit --audit-level high`.
+
+El CI compila con `APP_ENV=preview` y `API_MOCKS=true`: no necesita secretos ni el backend.
+
+> **pnpm 11 bloquea los scripts de instalación** de las dependencias. Los permitidos o negados se declaran en `pnpm-workspace.yaml` (`allowBuilds`). Por defecto se niegan; Lefthook registra sus hooks con el script `prepare`.
 
 ## VS Code
 

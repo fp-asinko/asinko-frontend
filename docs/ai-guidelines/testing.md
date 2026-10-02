@@ -122,7 +122,9 @@ describe('SearchField', () => {
 ### Mocks
 
 - Se mockea en el **borde**: las funciones de `lib/` del feature, no `fetch` ni el ORM desde el componente (ver Dependency Inversion en `engineering-principles.md`).
-- La navegación localizada (`@/i18n/navigation`) se mockea con `vi.mock`.
+- La navegación localizada (`@/i18n/navigation`) se mockea con el helper compartido: `vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))` y `setPathname('/')` para fijar la ruta activa.
+- El cliente de la API se testea con su fábrica (`createApiClient({ baseUrl, fetch, mocks })`), pasando un `fetch` falso: nunca se importa la instancia de `@/lib/api`, que depende de las variables de entorno.
+- Código que lee `@/env` se testea con `vi.mock('@/env', () => ({ env }))` y un objeto `env` de `vi.hoisted`.
 - Los componentes con textos se renderizan con `renderWithIntl` (`src/test/render-with-intl.tsx`), que los envuelve en `NextIntlClientProvider` con los mensajes del idioma por defecto (ver `i18n.md`).
 - Nada de llamadas reales a red ni a servicios externos en tests unitarios.
 
@@ -145,6 +147,15 @@ playwright.config.ts
 ```
 
 ### Configuración
+
+Ajustes del proyecto que ya están en `vitest.config.mts` y `src/test/setup.ts`:
+
+- `server-only` apunta a un módulo vacío (`src/test/stubs/server-only.ts`): fuera de Next ese paquete lanza un error a propósito.
+- `next-intl` se procesa con Vite (`server.deps.inline`): importa `next/navigation` sin extensión.
+- El setup desmonta los componentes entre tests (`cleanup`, porque no usamos globals de Vitest) y agrega un `matchMedia` falso para jsdom.
+- Tests que no necesitan DOM (lint, ESLint, esquemas puros) declaran `// @vitest-environment node`.
+
+Playwright:
 
 - **Mobile first también en e2e**: cada test corre en un proyecto mobile y uno desktop.
 - Contra el **build de producción** (`pnpm build && pnpm start`), no contra `next dev`.
@@ -201,6 +212,13 @@ test('user can request a quote', async ({ page }) => {
   }
 }
 ```
+
+### Specs de la base (`specs/foundation`)
+
+- Corren en el puerto 3100 (el 3000 queda para `pnpm dev`) contra el build de producción con `APP_ENV=preview` y mocks.
+- `e2e/fixtures/axe.ts` tiene `expectNoA11yViolations(page)` (WCAG 2.2 AA) y `collectConsoleErrors(page)` (violaciones de CSP, errores de hidratación).
+- `e2e/performance.spec.ts` verifica el presupuesto de JavaScript (`seo.md`). Toda ruta nueva se suma a su lista.
+- Los chequeos que no dependen del dispositivo (headers, peso de JS) corren solo en el proyecto desktop.
 
 ## En el pipeline
 
