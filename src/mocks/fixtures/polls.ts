@@ -92,6 +92,11 @@ export const POLLS: RawPoll[] = [
   },
 ]
 
+/** Real counts of polls whose results are hidden until voting (revealed by PUT /polls/:id/vote). */
+export const HIDDEN_RESULTS: Record<string, number[]> = {
+  [mockId(5, 2)]: [210, 540, 260, 90],
+}
+
 export function pollById(id: string) {
   return POLLS.find((each) => each.id === id)
 }

@@ -38,6 +38,12 @@ export const postSchema = z.object({
   entities: z.array(entitySchema).optional(),
 })
 
+/** PUT /{posts|theses|comments}/{id}/vote (E05). */
+export const voteResultSchema = z.object({
+  score: z.number().int(),
+  viewerVote: z.union([z.literal(1), z.literal(-1)]),
+})
+
 export const pollSchema = z.object({
   id: z.uuid(),
   communityId: z.uuid(),

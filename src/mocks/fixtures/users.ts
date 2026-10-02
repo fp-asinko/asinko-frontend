@@ -80,6 +80,7 @@ export const PROFILES: RawProfile[] = [
     incorrectCount: 43,
     followerCount: 18900,
     followingCount: 95,
+    isFollowedByViewer: true,
     language: 'en',
   }),
   profile(4, {

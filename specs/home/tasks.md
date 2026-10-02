@@ -22,7 +22,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - **Tests:** `tokens-contrast.test.ts` con los pares nuevos (`--faint` e `--interesting` como no-texto).
   - Docs: `design-system.md`, `overview.md § Estilo`, nota en `specs/foundation/design.md` (D-01 y F-17/F-18 reemplazadas).
 
-- [ ] **T-02 · Mocks que faltan** · S · H-07, H-15
+- [x] **T-02 · Mocks que faltan** · S · H-07, H-15
   - `GET /users/:userId/following`, `PUT`/`DELETE /posts/:id/vote`, `PUT /polls/:id/vote`.
   - Usuario demo: miembro también de `eth` y `sol`; moderador de `trading-on-chain`.
   - **Tests:** handlers nuevos en `handlers.test.ts`; el test de fixtures los valida contra el contrato.

@@ -34,15 +34,22 @@ function assetCommunity(n: number, symbol: string, memberCount: number, descript
   })
 }
 
-// The demo user is a member of btc, defi and latam (drives the Following feed).
+// The demo user is a member of btc, eth, sol, defi and latam, and moderates trading-on-chain
+// (drives the Following feed and the "Your interests" column).
 export const COMMUNITIES: RawCommunity[] = [
   {
     ...assetCommunity(1, 'BTC', 48210, 'Todo sobre Bitcoin: on-chain, ciclos, ETFs y halving.'),
     viewerMembership: 'MEMBER',
     mainUrl: 'https://bitcoin.org',
   },
-  assetCommunity(2, 'ETH', 31540, 'Ethereum, L2s, staking y el roadmap.'),
-  assetCommunity(3, 'SOL', 15320, 'Solana: memecoins, DePIN y velocidad.'),
+  {
+    ...assetCommunity(2, 'ETH', 31540, 'Ethereum, L2s, staking y el roadmap.'),
+    viewerMembership: 'MEMBER',
+  },
+  {
+    ...assetCommunity(3, 'SOL', 15320, 'Solana: memecoins, DePIN y velocidad.'),
+    viewerMembership: 'MEMBER',
+  },
   {
     ...community(4, {
       slug: 'defi',
@@ -86,6 +93,8 @@ export const COMMUNITIES: RawCommunity[] = [
     memberCount: 1204,
     createdByProfileId: userByUsername('maria')?.id ?? null,
     rules: 'Datos o no pasó. Sin señales pagas.',
+    // The demo user moderates it (shows the MOD label).
+    viewerMembership: 'MODERATOR',
   }),
 ]
 

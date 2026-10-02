@@ -7,9 +7,12 @@ import {
   pollSchema,
   postSchema,
   profileSchema,
+  userSummarySchema,
+  voteResultSchema,
   type RawFeedItem,
 } from '@/lib/api/contract'
-import { paginatedSchema } from '@/lib/api/schemas'
+import { noContentSchema, paginatedSchema } from '@/lib/api/schemas'
+import { DEMO_USER } from './demo-user'
 import { ASSETS, assetBySymbol } from './fixtures/assets'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { COMMUNITIES, communityBySlug } from './fixtures/communities'
@@ -18,6 +21,7 @@ import { POSTS, postById } from './fixtures/posts'
 import { PROFILES } from './fixtures/users'
 import { paginate } from './paginate'
 import type { MockContext, MockRoute } from './types'
+import { removePostVote, votePoll, votePost } from './votes'
 
 const notFound = { status: 404, body: { error: { code: 'NOT_FOUND', message: 'mock' } } }
 
@@ -52,6 +56,27 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       return profile && (profile.isPublic || profile.username === 'demo')
         ? { status: 200, body: profile }
         : notFound
+    },
+  },
+
+  {
+    method: 'GET',
+    path: '/api/v1/users/:userId/following',
+    kind: 'contract',
+    schema: paginatedSchema(userSummarySchema),
+    example: { ...noRequest, params: { userId: DEMO_USER.id } },
+    handler: ({ params, query }) => {
+      if (!PROFILES.some((each) => each.id === params.userId)) return notFound
+      // Only the demo viewer's follows are modeled (isFollowedByViewer).
+      const followed =
+        params.userId === DEMO_USER.id ? PROFILES.filter((p) => p.isFollowedByViewer) : []
+      const items = followed.map(({ id, username, avatarUrl, accuracyRate }) => ({
+        id,
+        username,
+        avatarUrl,
+        accuracyRate,
+      }))
+      return { status: 200, body: paginate(items, query.cursor) }
     },
   },
 
@@ -138,7 +163,41 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     },
   },
 
-  // E05
+  // E05: votes (stateless, see votes.ts)
+  {
+    method: 'PUT',
+    path: '/api/v1/posts/:id/vote',
+    kind: 'contract',
+    schema: voteResultSchema,
+    example: {
+      ...noRequest,
+      params: { id: POSTS[1]!.id },
+      body: { userId: DEMO_USER.id, value: 1 },
+    },
+    handler: ({ params, body }) => votePost(params.id ?? '', body),
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/posts/:id/vote',
+    kind: 'contract',
+    schema: noContentSchema,
+    example: { ...noRequest, params: { id: POSTS[0]!.id }, query: { userId: DEMO_USER.id } },
+    handler: ({ params, query }) => removePostVote(params.id ?? '', query.userId),
+  },
+  {
+    method: 'PUT',
+    path: '/api/v1/polls/:id/vote',
+    kind: 'contract',
+    schema: pollSchema,
+    example: {
+      ...noRequest,
+      params: { id: POLLS[1]!.id },
+      body: { userId: DEMO_USER.id, optionId: POLLS[1]!.options[1]!.id },
+    },
+    handler: ({ params, body }) => votePoll(params.id ?? '', body),
+  },
+
+  // E05: comments
   {
     method: 'GET',
     path: '/api/v1/posts/:id/comments',

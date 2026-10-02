@@ -83,3 +83,52 @@ describe('mock handlers behave like the contract', () => {
     expect(page.linkedCommunity?.slug).toBe('btc')
   })
 })
+
+describe('mock writes (stateless, demo viewer)', () => {
+  const demo = '00000000-0000-4000-8000-000000000001'
+
+  it('lists the users the demo viewer follows', async () => {
+    const page = (
+      await call('GET', '/api/v1/users/:userId/following', { params: { userId: demo } })
+    ).body as { items: Array<{ username: string }> }
+    expect(page.items.map((each) => each.username).sort()).toEqual(['federico', 'jeppe', 'maria'])
+  })
+
+  it('votes a post adjusting for the previous vote', async () => {
+    // POSTS[0] fixture: score 1284 with viewerVote 1 → voting -1 gives 1282.
+    const result = await call('PUT', '/api/v1/posts/:id/vote', {
+      params: { id: POSTS[0]!.id },
+      body: { userId: demo, value: -1 },
+    })
+    expect(result).toEqual({ status: 200, body: { score: 1282, viewerVote: -1 } })
+  })
+
+  it('rejects voting on behalf of another user', async () => {
+    const result = await call('PUT', '/api/v1/posts/:id/vote', {
+      params: { id: POSTS[0]!.id },
+      body: { userId: 'someone-else', value: 1 },
+    })
+    expect(result.status).toBe(403)
+  })
+
+  it('reveals hidden poll results when voting and blocks closed polls', async () => {
+    const { POLLS } = await import('./fixtures/polls')
+    const hidden = POLLS[1]!
+    const voted = (
+      await call('PUT', '/api/v1/polls/:id/vote', {
+        params: { id: hidden.id },
+        body: { userId: demo, optionId: hidden.options[1]!.id },
+      })
+    ).body as { totalVotes: number; viewerOptionId: string; options: Array<{ voteCount: number }> }
+    expect(voted.viewerOptionId).toBe(hidden.options[1]!.id)
+    expect(voted.options.every((option) => typeof option.voteCount === 'number')).toBe(true)
+    expect(voted.totalVotes).toBe(1101)
+
+    const closed = POLLS[2]!
+    const result = await call('PUT', '/api/v1/polls/:id/vote', {
+      params: { id: closed.id },
+      body: { userId: demo, optionId: closed.options[0]!.id },
+    })
+    expect(result.status).toBe(409)
+  })
+})
