@@ -25,6 +25,12 @@ describe('buildCsp', () => {
     expect(directive(buildCsp({ ...base, isDev: true }), 'script-src')).toContain("'unsafe-eval'")
   })
 
+  it('allows inline style elements in development without a nonce (dev tools)', () => {
+    // A nonce makes browsers ignore 'unsafe-inline', which would block Next's dev overlay.
+    const styles = directive(buildCsp({ ...base, isDev: true }), 'style-src-elem')
+    expect(styles).toEqual(["'self'", "'unsafe-inline'"])
+  })
+
   it('protects style elements with the nonce and allows style attributes', () => {
     const csp = buildCsp(base)
     expect(directive(csp, 'style-src-elem')).toEqual(["'self'", "'nonce-abc123'"])

@@ -93,6 +93,7 @@ React escapa el texto por defecto. Las reglas son para no romper esa protección
 
   - El nonce obliga a renderizado dinámico. Para una red social con feeds personalizados es el caso normal. Las páginas que sí pueden ser estáticas (legales, landing) se evalúan por separado.
   - En desarrollo se agrega `'unsafe-eval'` (lo necesita React para debug). Nunca en producción.
+  - En desarrollo los estilos usan `'unsafe-inline'` **sin nonce**: las herramientas de Next inyectan `<style>` sin nonce, y si la directiva tiene un nonce el navegador ignora `'unsafe-inline'`. En producción, solo nonce.
   - Todo dominio nuevo en la política se justifica en el PR.
 
 - **Headers fijos** en `next.config.ts` (`headers()`):

@@ -31,7 +31,9 @@ export function buildCsp({ nonce, isDev, siteUrl, sentryDsn }: CspOptions): stri
     ],
     // <style> and <link> need the nonce; style attributes are allowed because SSR markup from
     // Base UI (positioning) uses them and they cannot execute code.
-    'style-src-elem': ["'self'", `'nonce-${nonce}'`, ...(isDev ? ["'unsafe-inline'"] : [])],
+    // Development: Next's dev tools inject <style> tags without a nonce, and browsers ignore
+    // 'unsafe-inline' whenever a nonce is present, so dev uses 'unsafe-inline' alone.
+    'style-src-elem': isDev ? ["'self'", "'unsafe-inline'"] : ["'self'", `'nonce-${nonce}'`],
     'style-src-attr': ["'unsafe-inline'"],
     'img-src': ["'self'", 'blob:', 'data:'],
     'font-src': ["'self'"],
