@@ -1,6 +1,6 @@
 # Home con movimiento — Tasks
 
-> **Estado:** a aprobar junto con `design.md`.
+> **Estado:** aprobado el 2026-10-02.
 
 ```
 T-01 ─┬─ T-02 ─ T-03 ─ T-04 ─ T-05 ─ T-06
@@ -34,7 +34,7 @@ T-01 ─┬─ T-02 ─ T-03 ─ T-04 ─ T-05 ─ T-06
   - **Tests:** unitario de `FadeImage`; e2e de CLS al cargar más.
 
 - [ ] **T-07 · Columna: secciones, mosaicos y filas** · M · S-01, S-02, S-03, S-05, S-06
-  - `::details-content` animado, elevación de mosaicos, hover de filas y avatares, `tap` en los botones, duración del panel lateral.
+  - Secciones con `Collapsible` de shadcn (alto animado en todos los navegadores), elevación de mosaicos, hover de filas y avatares, `tap` en los botones, duración del panel lateral.
   - **Tests:** los existentes siguen en verde; revisión visual a 360 y 1440 px.
 
 - [ ] **T-08 · Comunidad activa** · S · S-04
