@@ -14,9 +14,9 @@ test.describe('locale routing', () => {
   }
 
   test('the header selector switches language and keeps the filters (H-27)', async ({ page }) => {
-    await page.goto('/en?comunidad=btc')
+    await page.goto('/en?community=btc')
     await page.getByRole('combobox', { name: 'Language' }).selectOption('es')
-    await expect(page).toHaveURL(/\/es\?comunidad=btc$/)
+    await expect(page).toHaveURL(/\/es\?community=btc$/)
     await expect(page.locator('html')).toHaveAttribute('lang', 'es')
     await expect(page.getByRole('combobox', { name: 'Idioma' })).toHaveValue('es')
   })

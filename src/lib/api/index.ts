@@ -2,15 +2,23 @@ import 'server-only'
 import * as Sentry from '@sentry/nextjs'
 import type { z } from 'zod'
 import { env } from '@/env'
+import type { MocksMode } from '@/lib/env-schema'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import { createApiClient } from './create-client'
 import { keepValidItems as keepValid } from './helpers'
 
+/** Routes answered by the mocks for each API_MOCKS mode (api-integration.md § Mocks). */
+function mockedRoutes(mode: MocksMode) {
+  if (mode === 'all') return MOCK_ROUTES
+  if (mode === 'missing') return MOCK_ROUTES.filter((route) => !route.implemented)
+  return undefined
+}
+
 /** The app's API client. Features use it from their lib/ (api-integration.md). */
 export const apiRequest = createApiClient({
   baseUrl: env.API_BASE_URL,
-  // Never in production: src/env.ts rejects API_MOCKS=true there (F-30).
-  mocks: env.API_MOCKS ? MOCK_ROUTES : undefined,
+  // Never in production: src/env.ts rejects any API_MOCKS but false there (F-30).
+  mocks: mockedRoutes(env.API_MOCKS),
   // A no-op when Sentry has no DSN. Tags carry the endpoint pattern, never URLs or values.
   onUnexpected: (failure, cause) => {
     Sentry.captureException(new Error(`API ${failure.code} on ${failure.endpoint}`), {

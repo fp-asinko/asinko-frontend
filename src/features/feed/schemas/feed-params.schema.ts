@@ -11,9 +11,9 @@ const first = (value: unknown) => (Array.isArray(value) ? value[0] : value)
  * falls back to the default instead of breaking the page.
  */
 export const feedParamsSchema = z.object({
-  feed: z.preprocess(first, z.enum(['para-ti', 'siguiendo']).catch('para-ti')),
-  filtro: z.preprocess(first, z.enum(['new', 'polls']).catch('new')),
-  comunidad: z.preprocess(first, z.string().regex(SLUG_PATTERN).optional().catch(undefined)),
+  feed: z.preprocess(first, z.enum(['for-you', 'following']).catch('for-you')),
+  filter: z.preprocess(first, z.enum(['new', 'polls']).catch('new')),
+  community: z.preprocess(first, z.string().regex(SLUG_PATTERN).optional().catch(undefined)),
 })
 
 export type FeedParams = z.infer<typeof feedParamsSchema>

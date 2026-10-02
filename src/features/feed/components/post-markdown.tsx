@@ -41,7 +41,7 @@ function Anchor({ href, children }: ComponentProps<'a'>) {
   if (mention?.type === 'community') {
     return (
       <Link
-        href={{ pathname: '/', query: { comunidad: mention.slug } }}
+        href={{ pathname: '/', query: { community: mention.slug } }}
         className={`${mentionClass} underline underline-offset-2 hover:decoration-2`}
       >
         {children}

@@ -47,25 +47,44 @@ describe('getFeed', () => {
     expect(result.data.items.every((item) => item.community !== null)).toBe(true)
   })
 
-  it('filters For you by community', async () => {
-    const result = await getFeed(parseFeedParams({ comunidad: 'btc' }))
+  it('filters For you by community and returns that community for the chip', async () => {
+    const result = await getFeed(parseFeedParams({ community: 'btc' }))
     if (!result.ok) throw new Error('expected ok')
     expect(result.data.items.length).toBeGreaterThan(0)
     expect(result.data.items.every((item) => item.community?.slug === 'btc')).toBe(true)
+    expect(result.data.community).toEqual({ slug: 'btc', name: 'Bitcoin', handle: '$BTC' })
   })
 
-  it('returns NOT_FOUND for an unknown community', async () => {
-    const result = await getFeed(parseFeedParams({ comunidad: 'nope' }))
+  it('names the filtered community even when the communities list fails', async () => {
+    state.routes = MOCK_ROUTES.filter((route) => route.path !== '/api/v1/communities')
+    const result = await getFeed(parseFeedParams({ community: 'btc' }))
+    if (!result.ok) throw new Error('expected ok')
+    expect(result.data.items.every((item) => item.community?.slug === 'btc')).toBe(true)
+  })
+
+  it('returns NOT_FOUND for an unknown community, although Explore answers an empty page', async () => {
+    const result = await getFeed(parseFeedParams({ community: 'nope' }))
     expect(result).toMatchObject({ ok: false, code: 'NOT_FOUND' })
   })
 
   it('reads the Following feed', async () => {
-    const result = await getFeed(parseFeedParams({ feed: 'siguiendo' }))
+    const result = await getFeed(parseFeedParams({ feed: 'following' }))
     expect(result.ok).toBe(true)
   })
 
-  it('keeps only polls with the Polls filter (P-005)', async () => {
-    const result = await getFeed(parseFeedParams({ filtro: 'polls' }))
+  it('asks only for posts and polls: theses arrive in phase 2', async () => {
+    const queries: Record<string, string>[] = []
+    state.routes = MOCK_ROUTES.map((route) =>
+      route.path === '/api/v1/feed/explore'
+        ? { ...route, handler: (context) => (queries.push(context.query), route.handler(context)) }
+        : route,
+    )
+    await getFeed(parseFeedParams({}))
+    expect(queries[0]).toMatchObject({ kind: 'POST,POLL' })
+  })
+
+  it('asks the backend for polls only with the Polls filter (P-005)', async () => {
+    const result = await getFeed(parseFeedParams({ filter: 'polls' }))
     if (!result.ok) throw new Error('expected ok')
     expect(result.data.items.length).toBeGreaterThan(0)
     expect(result.data.items.every((item) => item.kind === 'poll')).toBe(true)
@@ -80,7 +99,7 @@ describe('getFeed', () => {
       nextCursor: null,
     })
     const result = await getFeed(parseFeedParams({}))
-    expect(result).toEqual({ ok: true, data: { items: [], nextCursor: null } })
+    expect(result).toEqual({ ok: true, data: { items: [], nextCursor: null, community: null } })
     expect(state.dropped).toEqual([2])
   })
 

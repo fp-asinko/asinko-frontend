@@ -39,7 +39,7 @@ export function CardByline({
         <>
           <span aria-hidden>·</span>
           <Link
-            href={{ pathname: '/', query: { comunidad: community.slug } }}
+            href={{ pathname: '/', query: { community: community.slug } }}
             className="inline-flex min-h-6 min-w-0 items-center font-semibold break-all text-foreground hover:underline"
           >
             {community.handle}

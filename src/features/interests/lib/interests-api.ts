@@ -18,20 +18,28 @@ function section<T>(data: T): SectionResult<T> {
   return { ok: true, data }
 }
 
+const emptyPage = { ok: true as const, data: { items: [], nextCursor: null } }
+
 /**
  * Data of the "Your interests" column. Each section degrades on its own (H-19): a failed request
  * empties only that section. Unexpected failures are already reported by the API client.
  *
- * Contract limitation: GET /communities does not filter by membership, so the first page is
- * filtered here (proposal P-004 asks for ?member=true).
+ * - Assets and Groups: GET /communities?mine=true (backend dev; needs a session, so without a
+ *   viewer those sections stay empty).
+ * - Suggested: the biggest communities from GET /communities that are not mine.
  */
 export async function getInterests(viewer: Viewer | null): Promise<Interests> {
-  const [communities, following] = await Promise.all([
-    apiRequest({
-      method: 'GET',
-      path: '/api/v1/communities',
-      schema: paginatedSchema(communitySchema),
-    }),
+  const communitiesPage = paginatedSchema(communitySchema)
+  const [mine, all, following] = await Promise.all([
+    viewer
+      ? apiRequest({
+          method: 'GET',
+          path: '/api/v1/communities',
+          query: { mine: 'true' },
+          schema: communitiesPage,
+        })
+      : Promise.resolve(emptyPage),
+    apiRequest({ method: 'GET', path: '/api/v1/communities', schema: communitiesPage }),
     viewer
       ? apiRequest({
           method: 'GET',
@@ -39,14 +47,14 @@ export async function getInterests(viewer: Viewer | null): Promise<Interests> {
           params: { userId: viewer.id },
           schema: paginatedSchema(userSummarySchema),
         })
-      : Promise.resolve({ ok: true as const, data: { items: [], nextCursor: null } }),
+      : Promise.resolve(emptyPage),
   ])
 
   const people = following.ok ? section(following.data.items.map(toPerson)) : failed
-  if (!communities.ok) return { assets: failed, people, groups: failed, suggested: failed }
+  const suggested = all.ok ? section(toSuggestions(all.data.items)) : failed
+  if (!mine.ok) return { assets: failed, people, groups: failed, suggested }
 
-  const items = communities.data.items
-  const assetCommunities = memberAssetCommunities(items)
+  const assetCommunities = memberAssetCommunities(mine.data.items)
   const assetPages = await Promise.all(
     assetCommunities.map((community) =>
       apiRequest({
@@ -64,10 +72,5 @@ export async function getInterests(viewer: Viewer | null): Promise<Interests> {
   )
   const assets = tiles.length === 0 && assetPages.length > 0 ? failed : section(tiles)
 
-  return {
-    assets,
-    people,
-    groups: section(toGroups(items)),
-    suggested: section(toSuggestions(items)),
-  }
+  return { assets, people, groups: section(toGroups(mine.data.items)), suggested }
 }

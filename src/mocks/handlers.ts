@@ -33,17 +33,30 @@ const FEED: RawFeedItem[] = [
   ...POLLS.map((content) => ({ kind: 'POLL' as const, content })),
 ].sort((a, b) => b.content.publishedAt.localeCompare(a.content.publishedAt))
 
+const FEED_KINDS = ['POST', 'THESIS', 'POLL']
+
+/** ?kind=POST or ?kind=POST,POLL narrows the feed; unknown values are ignored (backend dev). */
+function byKind(items: RawFeedItem[], raw: string | undefined) {
+  const kinds = (raw ?? '')
+    .split(',')
+    .map((each) => each.trim().toUpperCase())
+    .filter((each) => FEED_KINDS.includes(each))
+  return kinds.length ? items.filter((item) => kinds.includes(item.kind)) : items
+}
+
 /** Communities the demo viewer belongs to (drives the Following feed). */
 const MEMBER_OF = new Set(COMMUNITIES.filter((c) => c.viewerMembership).map((c) => c.id))
 
-// Registry of mocked endpoints (api-integration.md § Mocks). Only routes listed here are mocked;
-// the rest go to the real API. Remove a route here when the backend implements it.
+// Registry of mocked endpoints (api-integration.md § Mocks). Handlers follow what the backend does
+// on its dev branch (asinko-app 0cdf243), not only the written contract. API_MOCKS=missing mocks only
+// the routes with implemented: false.
 export const MOCK_ROUTES: readonly MockRoute[] = [
   // E01: implemented in the backend; mocked for development without it.
   {
     method: 'GET',
     path: '/api/v1/profiles/:identifier',
     kind: 'contract',
+    implemented: true,
     schema: profileSchema,
     example: { ...noRequest, params: { identifier: 'maria' } },
     // Seed user of the dev database (asinko-app packages/db/scripts/seed.mjs).
@@ -63,6 +76,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'GET',
     path: '/api/v1/users/:userId/following',
     kind: 'contract',
+    implemented: true,
     schema: paginatedSchema(userSummarySchema),
     example: { ...noRequest, params: { userId: DEMO_USER.id } },
     handler: ({ params, query }) => {
@@ -85,13 +99,17 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'GET',
     path: '/api/v1/communities',
     kind: 'contract',
+    implemented: true,
     schema: paginatedSchema(communitySchema),
     example: { ...noRequest, query: { search: 'de' } },
     handler: ({ query }) => {
       const search = query.search?.toLowerCase()
+      // ?mine=true: only the viewer's communities (requires a session; with mocks, the demo user).
+      const mine = query.mine === 'true'
       const filtered = COMMUNITIES.filter(
         (each) =>
           each.type !== 'PERSONAL_CHANNEL' &&
+          (!mine || each.viewerMembership !== null) &&
           (!query.type || each.type === query.type) &&
           (!search || each.name.toLowerCase().includes(search) || each.slug.includes(search)),
       ).sort((a, b) => b.memberCount - a.memberCount)
@@ -102,6 +120,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'GET',
     path: '/api/v1/communities/:slug',
     kind: 'contract',
+    implemented: true,
     schema: communitySchema,
     example: { ...noRequest, params: { slug: 'btc' } },
     handler: ({ params }) => {
@@ -115,27 +134,32 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'GET',
     path: '/api/v1/feed/explore',
     kind: 'contract',
+    implemented: true,
     schema: paginatedSchema(feedItemSchema),
     example: noRequest,
     handler: ({ query }) => {
+      // Backend dev: an unknown community answers an empty page, not a 404.
+      if (query.community && !communityBySlug(query.community)) {
+        return { status: 200, body: { items: [], nextCursor: null } }
+      }
       const community = query.community ? communityBySlug(query.community) : undefined
-      if (query.community && !community) return notFound
       const items = community
         ? FEED.filter((item) => item.content.communityId === community.id)
         : FEED
-      return { status: 200, body: paginate(items, query.cursor) }
+      return { status: 200, body: paginate(byKind(items, query.kind), query.cursor) }
     },
   },
   {
     method: 'GET',
     path: '/api/v1/feed/following',
     kind: 'contract',
+    implemented: true,
     schema: paginatedSchema(feedItemSchema),
     example: noRequest,
     // With mocks the viewer is always the demo user (src/lib/session.ts).
     handler: ({ query }) => {
       const items = FEED.filter((item) => MEMBER_OF.has(item.content.communityId))
-      return { status: 200, body: paginate(items, query.cursor) }
+      return { status: 200, body: paginate(byKind(items, query.kind), query.cursor) }
     },
   },
 
@@ -144,6 +168,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'GET',
     path: '/api/v1/posts/:id',
     kind: 'contract',
+    implemented: true,
     schema: postSchema,
     example: { ...noRequest, params: { id: POSTS[0]!.id } },
     handler: ({ params }) => {
@@ -155,6 +180,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'GET',
     path: '/api/v1/polls/:id',
     kind: 'contract',
+    implemented: true,
     schema: pollSchema,
     example: { ...noRequest, params: { id: POLLS[0]!.id } },
     handler: ({ params }) => {
@@ -168,6 +194,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'PUT',
     path: '/api/v1/posts/:id/vote',
     kind: 'contract',
+    implemented: true,
     schema: voteResultSchema,
     example: {
       ...noRequest,
@@ -180,6 +207,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'DELETE',
     path: '/api/v1/posts/:id/vote',
     kind: 'contract',
+    implemented: true,
     schema: noContentSchema,
     example: { ...noRequest, params: { id: POSTS[0]!.id }, query: { userId: DEMO_USER.id } },
     handler: ({ params, query }) => removePostVote(params.id ?? '', query.userId),
@@ -188,6 +216,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'PUT',
     path: '/api/v1/polls/:id/vote',
     kind: 'contract',
+    implemented: true,
     schema: pollSchema,
     example: {
       ...noRequest,
@@ -202,6 +231,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'GET',
     path: '/api/v1/posts/:id/comments',
     kind: 'contract',
+    implemented: true,
     schema: commentListSchema,
     example: { ...noRequest, params: { id: POSTS[0]!.id } },
     handler: ({ params }) =>
@@ -213,6 +243,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'GET',
     path: '/api/v1/polls/:id/comments',
     kind: 'contract',
+    implemented: true,
     schema: commentListSchema,
     example: { ...noRequest, params: { id: POLLS[0]!.id } },
     handler: ({ params }) =>
@@ -226,6 +257,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'GET',
     path: '/api/v1/assets',
     kind: 'contract',
+    // E14 is postponed in the backend: the asset tiles stay on mocks.
+    implemented: false,
     schema: paginatedSchema(assetSchema),
     example: { ...noRequest, query: { q: 'b' } },
     handler: ({ query }) => {
@@ -240,6 +273,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'GET',
     path: '/api/v1/assets/:symbol',
     kind: 'contract',
+    // E14 is postponed in the backend: the asset tiles stay on mocks.
+    implemented: false,
     schema: assetPageSchema,
     example: { ...noRequest, params: { symbol: 'BTC' } },
     handler: ({ params }) => {

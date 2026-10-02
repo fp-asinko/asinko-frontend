@@ -27,11 +27,11 @@ describe('LocaleSwitcher', () => {
   })
 
   it('switches to the same page in the chosen locale, keeping the URL filters (H-27)', async () => {
-    window.history.replaceState(null, '', '/en?comunidad=btc')
+    window.history.replaceState(null, '', '/en?community=btc')
     renderWithIntl(<LocaleSwitcher />)
 
     await userEvent.selectOptions(screen.getByRole('combobox', { name: 'Language' }), 'es')
 
-    expect(router.replace).toHaveBeenCalledWith('/?comunidad=btc', { locale: 'es' })
+    expect(router.replace).toHaveBeenCalledWith('/?community=btc', { locale: 'es' })
   })
 })

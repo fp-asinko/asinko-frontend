@@ -17,12 +17,12 @@ describe('envSchema', () => {
   it('accepts a valid preview config with mocks', () => {
     const result = envSchema.safeParse(validPreview)
     expect(result.success).toBe(true)
-    expect(result.data?.API_MOCKS).toBe(true)
+    expect(result.data?.API_MOCKS).toBe('all')
   })
 
   it('defaults API_MOCKS to false', () => {
     const { API_MOCKS: _omitted, ...withoutMocks } = validPreview
-    expect(envSchema.parse(withoutMocks).API_MOCKS).toBe(false)
+    expect(envSchema.parse(withoutMocks).API_MOCKS).toBe('off')
   })
 
   it('rejects a missing API_BASE_URL', () => {
@@ -42,6 +42,15 @@ describe('envSchema', () => {
 
   it('rejects mocks in production (F-30)', () => {
     const issues = issuesOf({ ...validPreview, APP_ENV: 'production', API_MOCKS: 'true' })
+    expect(issues.map((issue) => issue.message)).toContain(MOCKS_IN_PRODUCTION_ERROR)
+  })
+
+  it('reads missing as mocking only the routes the backend lacks', () => {
+    expect(envSchema.parse({ ...validPreview, API_MOCKS: 'missing' }).API_MOCKS).toBe('missing')
+  })
+
+  it('rejects partial mocks in production too', () => {
+    const issues = issuesOf({ ...validPreview, APP_ENV: 'production', API_MOCKS: 'missing' })
     expect(issues.map((issue) => issue.message)).toContain(MOCKS_IN_PRODUCTION_ERROR)
   })
 

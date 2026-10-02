@@ -75,8 +75,28 @@ describe('getInterests', () => {
     expect(interests.groups.ok).toBe(true)
   })
 
-  it('has no people without a viewer', async () => {
+  it('without a viewer, shows only suggestions: mine=true needs a session', async () => {
     const interests = await getInterests(null)
     expect(interests.people).toEqual({ ok: true, data: [] })
+    expect(interests.assets).toEqual({ ok: true, data: [] })
+    expect(interests.groups).toEqual({ ok: true, data: [] })
+    expect(interests.suggested.ok && interests.suggested.data.length).toBeGreaterThan(0)
+  })
+
+  it('keeps the suggestions when only the viewer communities fail', async () => {
+    state.routes = MOCK_ROUTES.map((route) =>
+      route.path === '/api/v1/communities'
+        ? {
+            ...route,
+            handler: (context) =>
+              context.query.mine === 'true'
+                ? { status: 401, body: { error: { code: 'UNAUTHENTICATED' } } }
+                : route.handler(context),
+          }
+        : route,
+    )
+    const interests = await getInterests(viewer)
+    expect(interests.groups).toEqual({ ok: false })
+    expect(interests.suggested.ok).toBe(true)
   })
 })

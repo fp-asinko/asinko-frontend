@@ -14,7 +14,7 @@ describe('FeedView', () => {
     renderWithIntl(
       <FeedView
         params={params()}
-        state={{ status: 'ok', items: [postItem(), pollItem()] }}
+        state={{ status: 'ok', items: [postItem(), pollItem()], community: null }}
         viewerName="demo"
       />,
     )
@@ -27,11 +27,15 @@ describe('FeedView', () => {
     expect(within(cards[1]!).getByText('Poll')).toBeInTheDocument()
   })
 
-  it('shows the community chip with ?comunidad, linking back to the unfiltered feed', () => {
+  it('shows the community chip with ?community, linking back to the unfiltered feed', () => {
     renderWithIntl(
       <FeedView
-        params={params({ comunidad: 'btc' })}
-        state={{ status: 'ok', items: [postItem()] }}
+        params={params({ community: 'btc' })}
+        state={{
+          status: 'ok',
+          items: [postItem()],
+          community: { slug: 'btc', name: 'Bitcoin', handle: '$BTC' },
+        }}
         viewerName="demo"
       />,
     )
@@ -44,8 +48,8 @@ describe('FeedView', () => {
   it('invites to For you when Following is empty (H-17)', () => {
     renderWithIntl(
       <FeedView
-        params={params({ feed: 'siguiendo' })}
-        state={{ status: 'ok', items: [] }}
+        params={params({ feed: 'following' })}
+        state={{ status: 'ok', items: [], community: null }}
         viewerName="demo"
       />,
     )
@@ -56,8 +60,8 @@ describe('FeedView', () => {
   it('explains an empty Polls page and an empty community', () => {
     const { unmount } = renderWithIntl(
       <FeedView
-        params={params({ filtro: 'polls' })}
-        state={{ status: 'ok', items: [] }}
+        params={params({ filter: 'polls' })}
+        state={{ status: 'ok', items: [], community: null }}
         viewerName={null}
       />,
     )
@@ -65,8 +69,8 @@ describe('FeedView', () => {
     unmount()
     renderWithIntl(
       <FeedView
-        params={params({ comunidad: 'defi' })}
-        state={{ status: 'ok', items: [] }}
+        params={params({ community: 'defi' })}
+        state={{ status: 'ok', items: [], community: null }}
         viewerName={null}
       />,
     )
@@ -75,7 +79,11 @@ describe('FeedView', () => {
 
   it('says when the general feed is empty', () => {
     renderWithIntl(
-      <FeedView params={params()} state={{ status: 'ok', items: [] }} viewerName={null} />,
+      <FeedView
+        params={params()}
+        state={{ status: 'ok', items: [], community: null }}
+        viewerName={null}
+      />,
     )
     expect(screen.getByText('Nothing posted yet.')).toBeInTheDocument()
   })
@@ -83,7 +91,7 @@ describe('FeedView', () => {
   it('asks for an account when Following needs one', () => {
     renderWithIntl(
       <FeedView
-        params={params({ feed: 'siguiendo' })}
+        params={params({ feed: 'following' })}
         state={{ status: 'needs-account' }}
         viewerName={null}
       />,

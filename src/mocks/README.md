@@ -1,6 +1,6 @@
 # Mocks
 
-Endpoints answered locally when `API_MOCKS=true` (never in production). See `docs/ai-guidelines/api-integration.md § Mocks`.
+Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of them with the demo user; `API_MOCKS=missing` only the ones the backend does not have yet (`implemented: false`: today the assets, E14). Handlers follow the backend's `dev` branch (`asinko-app` `0cdf243`): `?kind=` on the feeds, `?mine=true` on communities, an empty page for an unknown community. See `docs/ai-guidelines/api-integration.md § Mocks`.
 
 | Method | Path                              | Kind     | Notes                                                                |
 | ------ | --------------------------------- | -------- | -------------------------------------------------------------------- |
@@ -20,7 +20,7 @@ Endpoints answered locally when `API_MOCKS=true` (never in production). See `doc
 | GET    | `/api/v1/assets`                  | contract | E14. Response shape assumed (proposal P-003). `q`, `cursor`          |
 | GET    | `/api/v1/assets/:symbol`          | contract | E14. `openTheses` empty until phase 2                                |
 
-- **contract**: in `docs/references/api/` but not implemented in the backend yet (or mocked to work without it).
+- **contract**: in `docs/references/api/`. Every route but the assets is already implemented on the backend's `dev` branch; they stay here to work without the backend (CI, `API_MOCKS=true`).
 - **proposal**: the frontend needs it and it is not in the contract; described in `docs/references/api/proposals.md`.
 
 ## Mock world

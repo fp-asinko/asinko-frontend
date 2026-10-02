@@ -19,7 +19,7 @@ export function AssetTiles({ tiles }: { tiles: AssetTile[] }) {
           return (
             <li key={tile.symbol}>
               <Link
-                href={{ pathname: '/', query: { comunidad: tile.communitySlug } }}
+                href={{ pathname: '/', query: { community: tile.communitySlug } }}
                 aria-label={`${tile.name} (${tile.handle})`}
                 className={cn(
                   'flex min-h-19.5 flex-col items-center justify-center gap-0.5 rounded-md border border-b-[3px] bg-card p-1 text-center outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50',

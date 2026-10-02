@@ -15,12 +15,12 @@ export async function HomeFeed({ searchParams }: { searchParams: Promise<unknown
   const [viewer, result] = await Promise.all([getViewer(), getFeed(params)])
 
   if (!result.ok) {
-    if (result.code === 'NOT_FOUND' && params.comunidad) notFound()
+    if (result.code === 'NOT_FOUND' && params.community) notFound()
     // Any other failure but a missing account throws: the feed is the main content.
     if (result.code !== 'UNAUTHENTICATED') getOrThrow(result)
   }
   const state: FeedState = result.ok
-    ? { status: 'ok', items: result.data.items }
+    ? { status: 'ok', items: result.data.items, community: result.data.community }
     : { status: 'needs-account' }
 
   return <FeedView params={params} state={state} viewerName={viewer?.username ?? null} />

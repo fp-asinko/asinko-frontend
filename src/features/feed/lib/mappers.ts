@@ -12,7 +12,7 @@ import { markMentions, type MentionLookup } from './mentions'
 export type CommunityIndex = MentionLookup & { byId: (id: string) => CommunityRef | null }
 
 /** The mention handle of a community: $ for an asset, # for a group (overview.md § Menciones). */
-function toCommunityRef(community: RawCommunity): CommunityRef {
+export function toCommunityRef(community: RawCommunity): CommunityRef {
   return {
     slug: community.slug,
     name: community.name,

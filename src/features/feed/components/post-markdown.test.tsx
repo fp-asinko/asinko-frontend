@@ -66,8 +66,8 @@ describe('PostMarkdown', () => {
         }
       </PostMarkdown>,
     )
-    expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/?comunidad=btc')
-    expect(screen.getByRole('link', { name: '#defi' })).toHaveAttribute('href', '/?comunidad=defi')
+    expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/?community=btc')
+    expect(screen.getByRole('link', { name: '#defi' })).toHaveAttribute('href', '/?community=defi')
     expect(screen.queryByRole('link', { name: '@maria' })).toBeNull()
     expect(screen.getByText('@maria').tagName).toBe('STRONG')
     expect(screen.getByText('$XYZ').tagName).toBe('STRONG')

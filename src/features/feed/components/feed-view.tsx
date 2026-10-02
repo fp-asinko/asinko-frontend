@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl'
 import { EmptyState } from '@/components/organisms/empty-state'
 import { Link } from '@/i18n/navigation'
-import type { FeedItem } from '../feed.types'
+import type { CommunityRef, FeedItem } from '../feed.types'
 import { feedHref } from '../lib/feed-href'
 import type { FeedParams } from '../schemas/feed-params.schema'
 import { ComposerPlaceholder } from './composer-placeholder'
@@ -10,7 +10,8 @@ import { FeedTabs } from './feed-tabs'
 import { PollCard } from './poll-card'
 import { PostCard } from './post-card'
 
-export type FeedState = { status: 'ok'; items: FeedItem[] } | { status: 'needs-account' }
+export type FeedState =
+  { status: 'ok'; items: FeedItem[]; community: CommunityRef | null } | { status: 'needs-account' }
 
 /**
  * The center column as in the prototype (specs/home/design.md § 5): composer, tabs, filters and
@@ -27,8 +28,7 @@ export function FeedView({
 }) {
   const t = useTranslations('feed.empty')
   const items = state.status === 'ok' ? state.items : []
-  const community =
-    items.find((item) => item.community?.slug === params.comunidad)?.community ?? null
+  const community = state.status === 'ok' ? state.community : null
 
   return (
     <>
@@ -59,14 +59,14 @@ export function FeedView({
 function EmptyFeed({ params }: { params: FeedParams }) {
   const t = useTranslations('feed.empty')
 
-  if (params.filtro === 'polls') return <EmptyState message={t('polls')} />
-  if (params.feed === 'siguiendo') {
+  if (params.filter === 'polls') return <EmptyState message={t('polls')} />
+  if (params.feed === 'following') {
     return (
       <EmptyState
         message={t('following')}
         action={
           <Link
-            href={feedHref({ ...params, feed: 'para-ti' })}
+            href={feedHref({ ...params, feed: 'for-you' })}
             className="rounded-full bg-primary px-4 py-2 type-action text-primary-foreground hover:bg-primary-hover"
           >
             {t('goForYou')}
@@ -75,8 +75,8 @@ function EmptyFeed({ params }: { params: FeedParams }) {
       />
     )
   }
-  if (params.comunidad) {
-    return <EmptyState message={t('community', { handle: `#${params.comunidad}` })} />
+  if (params.community) {
+    return <EmptyState message={t('community', { handle: `#${params.community}` })} />
   }
   return <EmptyState message={t('forYou')} />
 }

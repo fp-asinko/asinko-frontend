@@ -12,7 +12,7 @@ export function GroupList({ groups }: { groups: Group[] }) {
       {groups.map((group) => (
         <li key={group.slug}>
           <Link
-            href={{ pathname: '/', query: { comunidad: group.slug } }}
+            href={{ pathname: '/', query: { community: group.slug } }}
             aria-label={`${group.handle} · ${group.name}`}
             className="flex flex-col gap-1 rounded-md px-1 py-1.5 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
           >

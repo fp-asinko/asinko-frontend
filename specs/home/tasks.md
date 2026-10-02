@@ -61,7 +61,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - **Tests:** cada componente (post normal, imagen, link, editado, borrado, sistema; encuesta visible, oculta, cerrada, votada), pestañas y filtros con `aria-current`.
   - Revisión visual contra el prototipo (capturas a 360 y 1440 px, claro y oscuro).
 
-- [ ] **T-06b · Adaptar al backend `dev` y URL en inglés** · S · H-10, H-11, H-27
+- [x] **T-06b · Adaptar al backend `dev` y URL en inglés** · S · H-10, H-11, H-27
   - Parámetros `feed=for-you|following`, `filter`, `community`; `?kind=` en el feed; `GET /communities/{slug}` para la comunidad filtrada; `?mine=true` en "Tus intereses".
   - Mocks con el comportamiento de `dev` (Explore vacío con comunidad inexistente, `kind`, `mine`) y `API_MOCKS=missing`: solo se mockea lo que el backend no tiene.
   - **Tests:** esquema de parámetros, `getFeed` (kind, comunidad inexistente), `getInterests` (mine, sin viewer), modos de `API_MOCKS`.
@@ -86,7 +86,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
 - [ ] **T-12 · E2E del Home** · M · H-06, H-10, H-11, H-14, H-15, H-16, H-23, H-24, H-26
   - `e2e/home.spec.ts`: el feed muestra los mocks; _Siguiendo_; filtro _Polls_; mención `$BTC` filtra por comunidad; votar; cargar más; elemento deshabilitado avisa "Próximamente"; axe; sin scroll horizontal a 360 / 800 / 1440.
   - `performance.spec.ts`: Home con y sin filtros ≤ 230 KB.
-  - `home-feed` (Server Component async, sin test unitario): `?comunidad=` inexistente → 404; un título o handle de 200 caracteres sin espacios no genera scroll horizontal a 360 px (revisión de UI del 2026-10-02).
+  - `home-feed` (Server Component async, sin test unitario): `?community=` inexistente → "Page not found" con `noindex` (status 200 por streaming, ver design § 5); un título o handle de 200 caracteres sin espacios no genera scroll horizontal a 360 px (revisión de UI del 2026-10-02).
 
 - [ ] **T-13 · Propuestas, guías y Definition of Done** · S
   - `proposals.md`: P-004 y P-005.

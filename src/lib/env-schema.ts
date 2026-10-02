@@ -3,16 +3,15 @@ import { z } from 'zod'
 // Environment variable schema (specs/foundation/design.md §6). Pure: no access to process.env,
 // so it can be tested in isolation. src/env.ts applies it.
 
-const booleanString = z
-  .enum(['true', 'false'])
-  .default('false')
-  .transform((value) => value === 'true')
-
 export const serverEnvSchema = {
   // APP_ENV (not NODE_ENV): preview deploys also run with NODE_ENV=production.
   APP_ENV: z.enum(['development', 'preview', 'production']),
   API_BASE_URL: z.url(),
-  API_MOCKS: booleanString,
+  // false: no mocks · missing: only routes the backend lacks · true: every route (CI, no backend).
+  API_MOCKS: z
+    .enum(['true', 'false', 'missing'])
+    .default('false')
+    .transform((value) => (({ true: 'all', false: 'off', missing: 'missing' }) as const)[value]),
   SENTRY_DSN: z.url().optional(),
 }
 
@@ -30,12 +29,14 @@ export const clientEnvSchema = {
 
 export const MOCKS_IN_PRODUCTION_ERROR = 'API_MOCKS must be false when APP_ENV is production'
 
+export type MocksMode = 'off' | 'missing' | 'all'
+
 /** Cross-variable rules. On the client only client variables exist, so they are skipped. */
 export function refineEnv(
-  env: { APP_ENV?: string; API_MOCKS?: boolean },
+  env: { APP_ENV?: string; API_MOCKS?: MocksMode },
   ctx: z.RefinementCtx,
 ): void {
-  if (env.APP_ENV === 'production' && env.API_MOCKS === true) {
+  if (env.APP_ENV === 'production' && env.API_MOCKS !== undefined && env.API_MOCKS !== 'off') {
     ctx.addIssue({ code: 'custom', path: ['API_MOCKS'], message: MOCKS_IN_PRODUCTION_ERROR })
   }
 }

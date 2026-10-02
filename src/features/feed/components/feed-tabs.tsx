@@ -12,8 +12,8 @@ import type { FeedParams } from '../schemas/feed-params.schema'
 export function FeedTabs({ params }: { params: FeedParams }) {
   const t = useTranslations('feed.tabs')
   const tabs = [
-    { feed: 'para-ti', label: t('forYou') },
-    { feed: 'siguiendo', label: t('following') },
+    { feed: 'for-you', label: t('forYou') },
+    { feed: 'following', label: t('following') },
   ] as const
 
   return (

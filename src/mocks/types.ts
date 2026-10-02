@@ -20,6 +20,11 @@ export type MockRoute = {
   path: EndpointPattern
   /** `contract`: in docs/references/api but not implemented. `proposal`: in proposals.md. */
   kind: 'contract' | 'proposal'
+  /**
+   * The backend already serves it (asinko-app, branch dev). With API_MOCKS=missing only the routes
+   * with `implemented: false` are mocked.
+   */
+  implemented: boolean
   schema: z.ZodType
   /** Sample request the fixtures test runs against the handler. */
   example: MockContext

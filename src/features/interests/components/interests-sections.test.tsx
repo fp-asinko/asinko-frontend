@@ -70,11 +70,11 @@ describe('InterestsSections', () => {
 
     expect(screen.getByRole('link', { name: 'Bitcoin ($BTC)' })).toHaveAttribute(
       'href',
-      '/?comunidad=btc',
+      '/?community=btc',
     )
     expect(screen.getByRole('link', { name: '#trading · Trading' })).toHaveAttribute(
       'href',
-      '/?comunidad=trading',
+      '/?community=trading',
     )
   })
 

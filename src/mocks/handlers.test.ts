@@ -36,10 +36,35 @@ describe('mock handlers behave like the contract', () => {
     for (const item of page.items) expect(item.content?.communityId).toBe(btc.id)
   })
 
-  it('returns 404 for an unknown community filter', async () => {
-    expect(
-      (await call('GET', '/api/v1/feed/explore', { query: { community: 'nope' } })).status,
-    ).toBe(404)
+  it('answers an empty page for an unknown community, like the backend dev branch', async () => {
+    const response = await call('GET', '/api/v1/feed/explore', { query: { community: 'nope' } })
+    expect(response).toEqual({ status: 200, body: { items: [], nextCursor: null } })
+  })
+
+  it('narrows both feeds by kind, ignoring unknown kinds', async () => {
+    const polls = (await call('GET', '/api/v1/feed/explore', { query: { kind: 'POLL' } }))
+      .body as Page
+    expect(polls.items.length).toBeGreaterThan(0)
+    expect(polls.items.every((item) => item.kind === 'POLL')).toBe(true)
+    const following = (await call('GET', '/api/v1/feed/following', { query: { kind: 'POLL' } }))
+      .body as Page
+    expect(following.items.every((item) => item.kind === 'POLL')).toBe(true)
+    const unknown = (await call('GET', '/api/v1/feed/explore', { query: { kind: 'NOPE' } }))
+      .body as Page
+    expect(unknown.items).toHaveLength(20)
+  })
+
+  it('lists only the viewer communities with mine=true', async () => {
+    const page = (await call('GET', '/api/v1/communities', { query: { mine: 'true' } })).body as {
+      items: Array<{ viewerMembership: string | null }>
+    }
+    expect(page.items.length).toBeGreaterThan(0)
+    expect(page.items.every((each) => each.viewerMembership !== null)).toBe(true)
+  })
+
+  it('marks as missing only the routes the backend does not have (assets, E14)', () => {
+    const missing = MOCK_ROUTES.filter((route) => !route.implemented).map((route) => route.path)
+    expect(missing).toEqual(['/api/v1/assets', '/api/v1/assets/:symbol'])
   })
 
   it('builds the following feed from the communities the viewer belongs to', async () => {

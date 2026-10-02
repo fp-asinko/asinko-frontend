@@ -68,4 +68,9 @@ export type PollItem = {
 
 export type FeedItem = PostItem | PollItem
 
-export type FeedPage = { items: FeedItem[]; nextCursor: string | null }
+export type FeedPage = {
+  items: FeedItem[]
+  nextCursor: string | null
+  /** The filtered community (?community=), when there is one. */
+  community: CommunityRef | null
+}

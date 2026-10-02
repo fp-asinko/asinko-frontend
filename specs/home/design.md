@@ -130,7 +130,7 @@ La página lee y valida con zod sus `searchParams`:
 - **Pestañas y filtros son links** (`<Link>` con `aria-current`), no un widget de pestañas ARIA: navegan y se pueden compartir. Sin JavaScript extra.
 - Con `community`, arriba del feed aparece un chip "#btc ✕" para quitar el filtro.
 - **Tipos de contenido** (P-005, ya en `dev`): el feed se pide con `?kind=POST,POLL` (las tesis llegan en la fase 2) y el filtro _Polls_ con `?kind=POLL`. Así la página siempre trae 20 ítems de lo que se muestra.
-- **Comunidad inexistente**: Explore responde `200` con `items: []`. Con `community`, el front pide en paralelo `GET /communities/{slug}`: si da `NOT_FOUND`, la página es un 404; si existe, da el nombre para el chip.
+- **Comunidad inexistente**: Explore responde `200` con `items: []`. Con `community`, el front pide en paralelo `GET /communities/{slug}`: si da `NOT_FOUND`, la página es un 404; si existe, da el nombre para el chip. Como el Home tiene `loading.tsx` (streaming), la respuesta ya salió con `200` cuando la página llama a `notFound()`: se ve "Page not found" con `noindex` (comportamiento documentado de Next). Es suficiente para buscadores; sacar el skeleton solo para tener el status no compensa.
 
 ### Composición
 

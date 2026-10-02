@@ -19,7 +19,7 @@ describe('CardByline', () => {
     )
     expect(screen.getByText('@maria')).toBeInTheDocument()
     expect(screen.getByText('74% accuracy')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: '#defi' })).toHaveAttribute('href', '/?comunidad=defi')
+    expect(screen.getByRole('link', { name: '#defi' })).toHaveAttribute('href', '/?community=defi')
     expect(screen.getByText('1 hour ago').tagName).toBe('TIME')
   })
 

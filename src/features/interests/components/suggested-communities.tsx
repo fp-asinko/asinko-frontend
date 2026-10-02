@@ -13,7 +13,7 @@ export function SuggestedCommunities({ suggestions }: { suggestions: Suggestion[
       {suggestions.map((suggestion) => (
         <li key={suggestion.slug} className="flex items-center gap-2 rounded-md px-0.5 py-1.5">
           <Link
-            href={{ pathname: '/', query: { comunidad: suggestion.slug } }}
+            href={{ pathname: '/', query: { community: suggestion.slug } }}
             aria-label={`${suggestion.handle} · ${suggestion.name}`}
             className="flex min-w-0 flex-1 items-center gap-2 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
           >

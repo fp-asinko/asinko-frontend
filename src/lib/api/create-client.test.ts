@@ -205,6 +205,7 @@ describe('mocks (F-36)', () => {
     method: 'GET',
     path: '/api/v1/profiles/:identifier',
     kind: 'contract',
+    implemented: true,
     schema: userSchema,
     example: { params: { identifier: 'juan' }, query: {}, body: undefined },
     handler: ({ params }) =>

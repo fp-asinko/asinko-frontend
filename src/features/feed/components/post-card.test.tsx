@@ -20,7 +20,7 @@ describe('PostCard (H-12)', () => {
     expect(screen.getByText('On-chain')).toBeInTheDocument()
     // The byline community and the body mention both link to the filtered Home.
     for (const link of screen.getAllByRole('link', { name: '$BTC' })) {
-      expect(link).toHaveAttribute('href', '/?comunidad=btc')
+      expect(link).toHaveAttribute('href', '/?community=btc')
     }
     expect(screen.getByText('6 comments')).toBeInTheDocument()
     expect(screen.getByText('1,284 points')).toBeInTheDocument()
@@ -29,7 +29,7 @@ describe('PostCard (H-12)', () => {
 
   it('links the community in the byline', () => {
     renderWithIntl(<PostCard post={postItem({ body: 'No mentions here.' })} />)
-    expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/?comunidad=btc')
+    expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/?community=btc')
   })
 
   it('shows an image post with next/image', () => {
