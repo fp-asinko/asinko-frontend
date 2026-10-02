@@ -72,7 +72,11 @@ Las reglas que sostienen los Core Web Vitals:
 - **JavaScript del cliente al mínimo**: Server Components por defecto, `'use client'` solo en hojas (ver `structure.md`).
 - **Carga diferida** con `next/dynamic` para componentes pesados que no se ven al cargar (modales, carruseles, mapas, editores).
 - **Scripts de terceros** (analytics, chat, pixels) con `next/script` y `strategy="lazyOnload"` o `afterInteractive`, nunca bloqueantes.
-- **Presupuesto de JS**: máximo **150 KB** (gzip) de JavaScript de primera carga por ruta. Se revisa con `@next/bundle-analyzer`; superarlo requiere justificación en el PR.
+- **Presupuesto de JS**: máximo **230 KB** (gzip) de JavaScript de primera carga por ruta.
+  - **Cómo se mide**: suma de todos los `<script src>` del HTML inicial de la ruta, comprimidos con gzip, contra el build de producción. Lo verifica un test e2e (`e2e/performance.spec.ts`) en cada PR.
+  - **Por qué 230**: Next.js 16 + React 19 vacíos ya pesan ~175 KB medidos así (Turbopack y webpack por igual, medido en 2026-10). El margen es para el código propio.
+  - Superarlo requiere justificación en el PR. Para encontrar qué pesa, `@next/bundle-analyzer`.
+  - Lo que no hace falta al cargar (modales, paneles, SDKs opcionales) se carga diferido con `next/dynamic` o `import()`.
 
 ## Estático vs dinámico
 

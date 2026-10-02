@@ -97,6 +97,7 @@ Cada criterio tiene un ID para mapearlo al test que lo verifica en `tasks.md`.
 
 - [ ] **F-39** Un workflow de CI corre, en orden y como bloqueantes: `format:check` → `lint` → `typecheck` → `test:coverage` → `build` → `test:e2e`, más el escaneo de secretos y `pnpm audit`. Queda listo para cuando exista el repositorio remoto.
 - [ ] **F-40** Las dependencias nuevas que no estén en `libraries.md` se agregan a la guía con su justificación en el mismo PR.
+- [ ] **F-41** El JavaScript de primera carga de cada ruta no supera **230 KB gzip** (`seo.md`, presupuesto actualizado el 2026-10-01: Next.js 16 vacío ya pesa ~175 KB). Lo verifica un test e2e.
 
 ## Fuera de alcance
 
@@ -117,3 +118,4 @@ Cada criterio tiene un ID para mapearlo al test que lo verifica en `tasks.md`.
 - **Prototipo como fuente de verdad visual** para el layout y la navegación; se itera después.
 - **Reddit como referencia de estructura**: layout de 3 columnas en desktop.
 - **Sentry** queda configurado sin DSN hasta que exista el proyecto (ver F-35).
+- **Presupuesto de JS** (en implementación, T-16): 150 KB era menor que el piso de Next.js 16 (~175 KB). Se fija en 230 KB gzip por ruta y se agrega F-41.
