@@ -2,6 +2,7 @@ import { BellIcon, CoinsIcon, SearchIcon, UserIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ComingSoon } from '@/components/molecules/coming-soon'
+import { LocaleSwitcher } from '@/components/molecules/locale-switcher'
 import { ThemeToggle } from '@/components/molecules/theme-toggle'
 import { AsinkoLogo } from '@/components/ui/asinko-logo'
 import { Link } from '@/i18n/navigation'
@@ -49,7 +50,8 @@ export function SiteHeader({ menu }: { menu: ReactNode }) {
               className="inline-flex h-8 items-center gap-1.5 rounded-full bg-surface px-3 type-action"
             >
               <CoinsIcon aria-hidden className="size-4" />
-              {t('header.tokens')}
+              {/* Icon only on tablets: the label does not fit next to the search (800px). */}
+              <span className="hidden lg:inline">{t('header.tokens')}</span>
             </ComingSoon>
             <ComingSoon label={t('header.notifications')} className={ICON_BUTTON}>
               <BellIcon aria-hidden className="size-5" />
@@ -58,6 +60,7 @@ export function SiteHeader({ menu }: { menu: ReactNode }) {
               <UserIcon aria-hidden className="size-5" />
             </ComingSoon>
           </span>
+          <LocaleSwitcher />
           <span className="px-2">
             <ThemeToggle />
           </span>

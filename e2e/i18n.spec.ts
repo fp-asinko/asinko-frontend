@@ -1,21 +1,25 @@
 import { expect, test } from '@playwright/test'
 
-// F-11, F-12, F-13
+// F-11, F-13 and H-27 (English first: replaces F-12's browser-language redirect)
 test.describe('locale routing', () => {
-  for (const [browserLocale, expected] of [
-    ['es-AR', '/es'],
-    ['pt-BR', '/pt'],
-    ['fr-FR', '/en'],
-  ] as const) {
+  for (const browserLocale of ['es-AR', 'pt-BR', 'en-US']) {
     test.describe(`browser in ${browserLocale}`, () => {
       test.use({ locale: browserLocale })
 
-      test(`/ redirects to ${expected}`, async ({ page }) => {
+      test('/ redirects to /en', async ({ page }) => {
         await page.goto('/')
-        await expect(page).toHaveURL(new RegExp(`${expected}$`))
+        await expect(page).toHaveURL(/\/en$/)
       })
     })
   }
+
+  test('the header selector switches language and keeps the filters (H-27)', async ({ page }) => {
+    await page.goto('/en?comunidad=btc')
+    await page.getByRole('combobox', { name: 'Language' }).selectOption('es')
+    await expect(page).toHaveURL(/\/es\?comunidad=btc$/)
+    await expect(page.locator('html')).toHaveAttribute('lang', 'es')
+    await expect(page.getByRole('combobox', { name: 'Idioma' })).toHaveValue('es')
+  })
 
   for (const [locale, heading] of [
     ['en', 'Home'],

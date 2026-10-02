@@ -1,4 +1,5 @@
 import type { AnchorHTMLAttributes } from 'react'
+import { vi } from 'vitest'
 
 // Stand-in for @/i18n/navigation in unit tests (testing.md § Mocks). Usage:
 //   vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
@@ -11,6 +12,13 @@ export function setPathname(next: string) {
 
 export function usePathname() {
   return pathname
+}
+
+/** Spies of the localized router: assert on them, reset with vi.clearAllMocks(). */
+export const router = { push: vi.fn(), replace: vi.fn() }
+
+export function useRouter() {
+  return router
 }
 
 type Href = string | { pathname: string; query?: Record<string, string> }

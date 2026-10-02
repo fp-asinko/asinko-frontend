@@ -67,6 +67,7 @@ Incluye **reemplazar el estilo iOS de `foundation` por el sistema visual del pro
   - `$BTC` y `#defi` llevan al **Home filtrado por esa comunidad** (un activo usa su comunidad de activo). Un activo sin comunidad se muestra destacado, sin link.
   - `@usuario` se muestra destacado, **sin link** hasta que exista el perfil (fase 2).
 - [ ] **H-15** **Votar** posts (▲/▼, quitar el voto) y encuestas, con actualización optimista. Con mocks, el voto es del usuario demo y no llega a la base real (`overview.md`).
+- [ ] **H-27** **Inglés primero y selector de idioma** (pedido el 2026-10-02): entrar a `/` lleva siempre a `/en`, sin mirar el idioma del navegador (reemplaza a F-12). La barra superior tiene un **selector de idioma** (English, Español, Português) que cambia a la misma página en el otro idioma, conservando los filtros de la URL.
 - [ ] **H-26** Elementos **deshabilitados** (Q1): se ven como en el prototipo con aspecto atenuado, **se pueden enfocar** con teclado, se anuncian como no disponibles (`aria-disabled`, no `disabled`) y al activarlos (tap, clic o teclado) muestran "Próximamente".
 - [ ] **H-16** **Paginación**: al llegar al final se cargan más ítems con `nextCursor` (scroll infinito con botón "Cargar más" como respaldo accesible).
 

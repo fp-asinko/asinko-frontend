@@ -42,6 +42,10 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - Inyectada en el layout (desktop y panel mobile).
   - **Tests:** mappers (cobertura de `lib/`), componentes de cada sección, sección con error.
 
+- [ ] **T-05b · Inglés primero y selector de idioma** · S · H-27
+  - `localeDetection: false` en `routing.ts`; molécula `LocaleSwitcher` en la barra superior.
+  - **Tests:** `locale-switcher.test.tsx` (opciones, cambio conservando la query); `i18n.spec.ts` (`/` → `/en` con navegador en español; el selector lleva a `/es` con los filtros).
+
 - [ ] **T-06 · Datos del feed** · M · H-10, H-11, H-14, H-20, H-25
   - `feed-params.schema.ts` (`feed`, `filtro`, `comunidad`), `feed-api.ts` (`getFeed` con `keepValidItems`), `mappers.ts` (post, encuesta, comunidad resuelta), `mentions.ts` (marcado de `entities`).
   - **Tests:** esquema de parámetros (valores inválidos → default), mappers, menciones (offsets, activo sin comunidad, `@` sin link), filtro _Polls_.
@@ -96,6 +100,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
 | H-19             | Test de sección con error + `error.tsx` (existente)  | T-05, T-06       |
 | H-20             | Test de `getFeed` con ítem inválido                  | T-06             |
 | H-21             | Test de mosaico con precio desactualizado            | T-05             |
+| H-27             | `locale-switcher.test.tsx` + `i18n.spec.ts`          | T-05b            |
 | H-22             | Paridad de claves + formato                          | T-11             |
 | H-23             | Tests de componentes + axe                           | T-08, T-09, T-12 |
 | H-24             | `performance.spec.ts`                                | T-12             |

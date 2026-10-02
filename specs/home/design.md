@@ -70,10 +70,17 @@ Reemplaza los tokens iOS de `foundation` (su D-01 queda sin efecto). Mapeo de la
 
 ### Barra superior (H-05)
 
-`[menú (mobile)] [logo] ······ [buscador 680×40 (md+) | 🔍 (mobile)] ······ [tokens] [🔔] [perfil] [tema]`
+`[menú (mobile)] [logo] ······ [buscador 680×40 (md+) | 🔍 (mobile)] ······ [tokens] [🔔] [perfil] [idioma] [tema]`
 
 - Buscador, tokens, campana y perfil: **deshabilitados** (H-26).
 - El toggle de tema se mantiene al final (no está en el prototipo, pero H-03 lo pide).
+
+### Idioma (H-27)
+
+- `routing.ts` con `localeDetection: false`: `/` → `/en` siempre. next-intl tampoco usa la cookie `NEXT_LOCALE` en la raíz; el idioma elegido vive en la URL.
+- Molécula **`LocaleSwitcher`** (Client Component, sin dependencias): un `<select>` nativo transparente encima de un rótulo visible (🌐 + `EN`). El `<select>` da teclado, lector de pantalla y la lista nativa del sistema en mobile sin sumar JavaScript; las opciones muestran el nombre de cada idioma en su propio idioma.
+- Al cambiar: `router.replace(pathname + search, { locale })` de `@/i18n/navigation`, así se conservan `?feed`, `?filtro` y `?comunidad`.
+- Visible también en mobile (es la única forma de cambiar de idioma).
 
 ### Barra inferior (mobile)
 
@@ -280,3 +287,4 @@ Cambios en `src/mocks/`:
 - `specs/foundation/design.md`: D-01 y la tipografía del sistema (F-17, F-18) quedan reemplazadas por este spec; se anota ahí.
 - `libraries.md`: `react-markdown` (si se aprueba D-H1).
 - `proposals.md`: P-004 y P-005.
+- `specs/foundation/requirements.md`: F-12 (redirección por idioma del navegador) queda reemplazado por H-27; `i18n.md § URLs` se actualiza.

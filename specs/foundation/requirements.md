@@ -48,7 +48,7 @@ Cada criterio tiene un ID para mapearlo al test que lo verifica en `tasks.md`.
 ### Multi-idioma (`i18n.md`)
 
 - [x] **F-11** Los idiomas son `en` (por defecto), `es` y `pt`. Todas las URLs llevan prefijo de idioma.
-- [x] **F-12** Entrar a `/` redirige al idioma del navegador si está soportado; si no, a `/en`.
+- [x] **F-12** ~~Entrar a `/` redirige al idioma del navegador si está soportado; si no, a `/en`.~~ Reemplazado por H-27 (`specs/home`): `/` lleva siempre a `/en` y el idioma se elige con el selector.
 - [x] **F-13** `<html lang>` coincide con el idioma de la página.
 - [x] **F-14** Un test falla si `messages/en.json`, `es.json` y `pt.json` no tienen exactamente las mismas claves.
 - [x] **F-15** Ningún texto visible del esqueleto de la app está hardcodeado: todo sale de `messages/`.

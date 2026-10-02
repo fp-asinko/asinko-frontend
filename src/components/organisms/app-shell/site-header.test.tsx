@@ -32,9 +32,10 @@ describe('SiteHeader (H-05)', () => {
     expect(screen.getByText('Search tickers, theses, creators…')).toBeInTheDocument()
   })
 
-  it('keeps the theme toggle and the menu slot', () => {
+  it('keeps the theme toggle, the language selector (H-27) and the menu slot', () => {
     renderHeader()
     expect(screen.getByRole('switch', { name: 'Dark mode' })).toBeInTheDocument()
+    expect(screen.getByRole('combobox', { name: 'Language' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'menu' })).toBeInTheDocument()
   })
 })

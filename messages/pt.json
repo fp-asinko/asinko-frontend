@@ -11,6 +11,14 @@
     "theme": {
       "toggle": "Modo escuro"
     },
+    "locale": {
+      "label": "Idioma",
+      "names": {
+        "en": "English",
+        "es": "Español",
+        "pt": "Português"
+      }
+    },
     "nav": {
       "main": "Navegação principal",
       "home": "Início",
