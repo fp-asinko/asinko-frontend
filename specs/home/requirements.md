@@ -1,6 +1,6 @@
 # Home — Requirements
 
-> **Spec:** `home` · **Rama:** `feature/home-feed` · **Estado:** listo para aprobar
+> **Spec:** `home` · **Rama:** `feature/home-feed` · **Estado:** ✅ aprobado (2026-10-02)
 > **Fase:** 1 de 3 (requirements → design → tasks)
 > **Fuente de verdad visual y de estructura:** `docs/references/prototype.html` (medido en el navegador el 2026-10-02).
 
