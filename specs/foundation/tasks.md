@@ -115,7 +115,7 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
     - `security-headers.spec.ts`: CSP con nonce y **los `<script>` llevan ese nonce**; headers fijos presentes; `robots.txt` con `Disallow: /` en preview.
   - F-32 queda como verificación manual (hecha en T-14): un test automático necesita un build de producción extra en cada corrida.
 
-- [ ] **T-18 · CI** · S · F-39
+- [x] **T-18 · CI** · S · F-39
   - `.github/workflows/ci.yml` (`design.md` §13) con gitleaks y `pnpm audit`.
   - **Verificación:** el workflow pasa `actionlint`; se prueba de verdad cuando exista el repositorio remoto.
 

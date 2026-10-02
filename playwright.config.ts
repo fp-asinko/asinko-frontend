@@ -16,7 +16,8 @@ export default defineConfig({
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
   ],
   webServer: {
-    command: `pnpm build && pnpm start -p ${PORT}`,
+    // CI builds in its own step (same env), so it only starts the server here.
+    command: process.env.CI ? `pnpm start -p ${PORT}` : `pnpm build && pnpm start -p ${PORT}`,
     url: `${BASE_URL}/en`,
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
