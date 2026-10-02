@@ -3,7 +3,22 @@
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla.
 > Cuando el backend la implementa, se mueve al snapshot del contrato y se marca como resuelta acá.
 
-**Revisado contra `asinko-app` rama `dev` (`0cdf243`, 2026-10-01).** En `main` solo está E01; en `dev` ya están E02, E03, E04, E05 y tesis. E14 (activos) no está en ninguna rama.
+**Revisado contra `asinko-app` rama `dev` (`0cdf243`, 2026-10-01)** y sus notas `HANDOFF-frontend.md` y `API-IMPLEMENTATION-NOTES.md`. En `main` solo está E01; en `dev` están 33 de los 43 paths: E01 a E05, búsqueda y tesis. E07 (notificaciones) y E14 (activos) no están. El contrato vigente vive en `financeshowoff-design-docs/api/` (con `openapi.yaml`) y en el artefacto _ASINKO Endpoint Spec_.
+
+## Bloqueo para usar datos reales
+
+Probado el 2026-10-02 con `dev` corriendo en local contra la Supabase de dev: **todas las lecturas públicas responden `500`** (`/communities`, `/communities/{slug}`, `/feed/explore`, `/profiles/{id}`). A la base le faltan **6 migraciones** de `dev` (`HANDOFF-frontend.md` § 3 habla de 3; faltan también las 3 de agosto):
+
+```
+20260817161500_remove_min_points_to_join
+20260817161600_slug_mutability            → communities.slugChangedAt
+20260817161700_personal_channels_replace_follow
+20260921115338_poll_results_visibility    → polls.resultsVisibility
+20260922152054_vote_thesis
+20260922152554_community_favorites
+```
+
+Las aplica el backend (el front no corre migraciones). Alternativa del propio handoff: Postgres local con el seed.
 
 ## Formato
 
@@ -19,7 +34,7 @@
 
 ### P-001 — Menciones resueltas en la lectura de posts
 
-**Estado:** propuesta. En `dev`, `serializePost` todavía no incluye `entities`.
+**Estado:** propuesta. La detección de menciones se **postergó** en el backend (decisión del 21/09): `POST /posts` devuelve `entities: []` y las lecturas no traen el campo. Pedido: priorizarla, porque las menciones son centrales en el Home.
 **Endpoint:** `GET /api/v1/posts/{id}`, `GET /api/v1/feed/following`, `GET /api/v1/feed/explore` (y los comentarios, si van a tener menciones)
 **Motivo:** el Home y el Detalle de post renderizan menciones `$ # @` como links. Hoy `entities` solo viene en la respuesta de `POST /posts`; sin eso, el front tendría que reparsear el texto y adivinar a qué entidad apunta cada mención.
 **Cambio:** el recurso `Post` incluye siempre el mismo campo que ya devuelve `POST /posts`:
@@ -37,7 +52,7 @@
 
 ### P-003 — Catálogo de activos (E14)
 
-**Estado:** propuesta. E14 no está implementado en ninguna rama.
+**Estado:** propuesta. E14 está **postergado** en el backend (falta proveedor de precios). Pedido: al menos `GET /assets/{symbol}` con precio y variación, o confirmar que la columna de activos sigue con datos de prueba.
 **Endpoint:** `GET /api/v1/assets?q=`, `GET /api/v1/assets/{symbol}`
 **Motivo:** la columna "Tus intereses" muestra precio y variación de los activos (hoy mockeado) y el autocompletado de `$` necesita el catálogo.
 **Cambio:** implementar E14. Para `GET /assets?q=`, confirmar que responde la lista estándar, `{ "items": Asset[], "nextCursor": string | null }`, con el recurso `Asset` de E14. El mock del front ya asume esa forma.
@@ -84,4 +99,6 @@
 - **Explore con comunidad inexistente**: `GET /feed/explore?community=nope` responde `200` con `items: []`. El front prefería `404` para mostrar "no existe" en lugar de "no hay posts". ¿Se cambia, o el front consulta `GET /communities/{slug}` aparte?
 - **Tesis en el feed**: el feed ya devuelve `kind: "THESIS"`. El front las muestra en la fase 2; mientras tanto pide `?kind=POST,POLL`. ¿OK?
 - **`Poll.totalVotes`**: el contrato lo tipa `number | null`; en `dev` siempre es un número, aun con los resultados ocultos. El front acepta las dos cosas; conviene alinear el contrato.
-- **Documentos del contrato**: el código cita `api/entities.md` y `api/CONSIDERATIONS.md`, que no están en el repo. El snapshot del front (`docs/references/api/`) quedó desactualizado: ¿dónde está la versión vigente?
+- **Documentos del contrato**: viven en `financeshowoff-design-docs/api/` (ese repo tiene cambios sin commitear según el handoff). Pedido: acceso al repo o el `openapi.yaml` actualizado, para refrescar `docs/references/api/`.
+- **Imágenes**: van al bucket público `post-images` de Supabase Storage (`HANDOFF-frontend.md` § 8). El front agrega ese dominio a `remotePatterns` y a `img-src` de la CSP cuando se active.
+- **Usuarios del seed**: no son cuentas de Supabase Auth, no se puede entrar con ellos. Para probar Following y votos con login hace falta crear cuentas reales.
