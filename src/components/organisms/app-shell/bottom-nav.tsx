@@ -1,20 +1,44 @@
+import { BellIcon, CirclePlusIcon, SearchIcon, UserIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { ComingSoon } from '@/components/molecules/coming-soon'
 import { NavLink } from '@/components/molecules/nav-link'
 import type { NavItem } from './nav-item.types'
 
-// Mobile only (< md). Translucent, above the iPhone home indicator (safe area).
+const SOON_ITEM =
+  'flex min-h-12 min-w-14 flex-col items-center justify-center gap-0.5 rounded-lg px-2 text-meta text-muted-foreground'
+
+/*
+ * Mobile only (< md), five items as in the prototype (Home · Search · Create · Notif · Profile).
+ * Only the registered destinations work; the rest are shown disabled (H-26).
+ */
 export function BottomNav({ items }: { items: NavItem[] }) {
   const t = useTranslations('common.nav')
+  const soon = [
+    { label: t('search'), icon: <SearchIcon /> },
+    { label: t('create'), icon: <CirclePlusIcon /> },
+    { label: t('notificationsShort'), icon: <BellIcon /> },
+    { label: t('profile'), icon: <UserIcon /> },
+  ]
 
   return (
     <nav
       aria-label={t('main')}
-      className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl backdrop-saturate-150 md:hidden reduced-transparency:bg-card reduced-transparency:backdrop-blur-none"
+      className="fixed inset-x-0 bottom-0 z-40 border-t bg-header/92 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden reduced-transparency:bg-header reduced-transparency:backdrop-blur-none"
     >
-      <ul className="flex items-center justify-around px-2 py-1">
+      <ul className="flex items-center justify-around px-1 py-1">
         {items.map((item) => (
           <li key={item.href}>
             <NavLink {...item} variant="bar" />
+          </li>
+        ))}
+        {soon.map((item) => (
+          <li key={item.label}>
+            <ComingSoon label={item.label} className={SOON_ITEM}>
+              <span aria-hidden className="[&_svg]:size-6">
+                {item.icon}
+              </span>
+              <span aria-hidden>{item.label}</span>
+            </ComingSoon>
           </li>
         ))}
       </ul>

@@ -64,7 +64,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
       <body>
         <NextIntlClientProvider>
           <Providers nonce={nonce}>
-            <AppShell navItems={navItems}>{children}</AppShell>
+            <AppShell navItems={navItems} sidebar={null}>
+              {children}
+            </AppShell>
           </Providers>
         </NextIntlClientProvider>
       </body>

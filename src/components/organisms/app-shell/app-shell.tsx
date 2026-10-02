@@ -3,44 +3,48 @@ import type { ReactNode } from 'react'
 import { BottomNav } from './bottom-nav'
 import { MobileSidebar } from './mobile-sidebar'
 import type { NavItem } from './nav-item.types'
-import { SidebarContent } from './sidebar-content'
 import { SiteHeader } from './site-header'
 
 /*
- * Reddit-style layout, mobile first (design.md §3):
- * < md: 1 column, communities in a panel, bottom bar · md: + fixed left column (15rem)
- * The right column belongs to each page (PageColumns, lg+).
+ * Layout of the prototype (specs/home/design.md §3), mobile first:
+ * < md: 1 column, left column in the menu panel, bottom bar
+ * md: left 260px + center · lg: left 260px + center (max 780px) + right 300px
+ * The left column's content comes from the layout (organisms do not know the business).
  */
-export function AppShell({ navItems, children }: { navItems: NavItem[]; children: ReactNode }) {
+export function AppShell({
+  navItems,
+  sidebar,
+  children,
+}: {
+  navItems: NavItem[]
+  sidebar: ReactNode
+  children: ReactNode
+}) {
   const t = useTranslations('common')
 
   return (
     <>
       <a
         href="#content"
-        className="sr-only z-50 rounded-lg bg-card px-4 py-3 text-ui font-semibold focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:ring-3 focus:ring-ring/50"
+        className="sr-only z-50 rounded-lg bg-background px-4 py-3 text-ui font-semibold focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:ring-3 focus:ring-ring/50"
       >
         {t('nav.skipToContent')}
       </a>
-      <SiteHeader
-        menu={
-          <MobileSidebar>
-            <SidebarContent navItems={navItems} />
-          </MobileSidebar>
-        }
-      />
-      <div className="md:grid md:grid-cols-[15rem_minmax(0,1fr)]">
-        <div className="sticky top-14 hidden h-[calc(100dvh-3.5rem)] overflow-y-auto border-r bg-card px-3 py-4 md:block">
-          <SidebarContent navItems={navItems} />
+      <SiteHeader menu={<MobileSidebar>{sidebar}</MobileSidebar>} />
+      <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)] lg:grid-cols-[16.25rem_minmax(0,1fr)_18.75rem]">
+        <div className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-3 py-4 md:block">
+          {sidebar}
         </div>
         {/* outline-none: focused only by the skip link (tabIndex -1), never reachable with Tab. */}
         <main
           id="content"
           tabIndex={-1}
-          className="min-w-0 px-4 pt-4 pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none md:px-6 md:pb-8"
+          className="min-w-0 pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none sm:px-4 sm:pt-4 md:pb-8"
         >
           {children}
         </main>
+        {/* Right column: empty in the MVP (Q2). A div, not an aside: no empty landmark. */}
+        <div className="hidden border-l lg:block" />
       </div>
       <BottomNav items={navItems} />
     </>

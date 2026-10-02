@@ -3,14 +3,15 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { MobileSidebar } from './mobile-sidebar'
-import { SidebarContent } from './sidebar-content'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 function renderSidebar() {
   return renderWithIntl(
     <MobileSidebar>
-      <SidebarContent navItems={[{ href: '/', label: 'Home', icon: <svg /> }]} />
+      <section aria-label="Your interests">
+        <a href="#bitcoin">Bitcoin</a>
+      </section>
     </MobileSidebar>,
   )
 }
@@ -26,8 +27,8 @@ describe('MobileSidebar', () => {
 
     const panel = await screen.findByRole('dialog', { name: 'Menu' })
     expect(panel).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument()
-    expect(screen.getByRole('region', { name: 'Communities' })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Your interests' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Bitcoin' })).toBeInTheDocument()
   })
 
   it('closes with Escape', async () => {

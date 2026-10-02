@@ -17,19 +17,25 @@
       "skipToContent": "Saltar al contenido",
       "openMenu": "Abrir menú",
       "closeMenu": "Cerrar menú",
-      "menu": "Menú"
+      "menu": "Menú",
+      "search": "Buscar",
+      "create": "Crear",
+      "notificationsShort": "Notif",
+      "profile": "Perfil"
     },
     "logo": "Asinko, ir al inicio",
-    "communities": {
-      "title": "Comunidades",
-      "empty": "Aquí aparecerán tus comunidades."
-    },
     "loading": "Cargando…",
     "comingSoon": "Próximamente",
     "delta": {
       "up": "sube {value}",
       "down": "baja {value}",
       "flat": "sin cambios"
+    },
+    "header": {
+      "search": "Buscar tickers, tesis, creadores…",
+      "tokens": "Tokens",
+      "notifications": "Notificaciones",
+      "profile": "Perfil"
     }
   },
   "errors": {

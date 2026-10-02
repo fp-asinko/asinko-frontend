@@ -14,19 +14,25 @@ function renderHeader() {
   )
 }
 
-describe('SiteHeader', () => {
-  it('is the banner landmark', () => {
+describe('SiteHeader (H-05)', () => {
+  it('is the banner landmark with the logo linking home', () => {
     renderHeader()
     expect(screen.getByRole('banner')).toBeInTheDocument()
-  })
-
-  it('links the logo to the home page', () => {
-    renderHeader()
     const logo = screen.getByRole('img', { name: 'Asinko, go to home' })
     expect(logo.closest('a')).toHaveAttribute('href', '/')
   })
 
-  it('includes the theme toggle and the menu slot', () => {
+  it('shows search, tokens, notifications and profile as unavailable (H-26)', () => {
+    renderHeader()
+    for (const name of ['Search', 'Tokens', 'Notifications', 'Profile']) {
+      for (const button of screen.getAllByRole('button', { name })) {
+        expect(button).toHaveAttribute('aria-disabled', 'true')
+      }
+    }
+    expect(screen.getByText('Search tickers, theses, creators…')).toBeInTheDocument()
+  })
+
+  it('keeps the theme toggle and the menu slot', () => {
     renderHeader()
     expect(screen.getByRole('switch', { name: 'Dark mode' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'menu' })).toBeInTheDocument()

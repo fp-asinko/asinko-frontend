@@ -31,7 +31,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - `avatar` (shadcn) con iniciales; molécula `coming-soon` (`aria-disabled`, burbuja "Próximamente" con `role="status"`); molécula `delta` (variación con flecha y color).
   - **Tests:** uno por componente.
 
-- [ ] **T-04 · Shell como el prototipo** · M · H-05, H-06, H-08, H-26
+- [x] **T-04 · Shell como el prototipo** · M · H-05, H-06, H-08, H-26
   - `AppShell` de 3 columnas con slot izquierdo; columna derecha vacía (`div`).
   - `SiteHeader`: buscador centrado (desktop) e ícono (mobile), tokens, campana y perfil deshabilitados, toggle de tema.
   - `BottomNav` de 5 ítems (solo Home activo).

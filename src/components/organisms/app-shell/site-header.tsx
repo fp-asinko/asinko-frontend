@@ -1,25 +1,66 @@
+import { BellIcon, CoinsIcon, SearchIcon, UserIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
+import { ComingSoon } from '@/components/molecules/coming-soon'
 import { ThemeToggle } from '@/components/molecules/theme-toggle'
 import { AsinkoLogo } from '@/components/ui/asinko-logo'
 import { Link } from '@/i18n/navigation'
 
-// Translucent top bar (apple-design §12): blur over the content, solid with reduced transparency.
+const ICON_BUTTON =
+  'inline-flex size-10 items-center justify-center rounded-full text-muted-foreground hover:bg-surface'
+
+/*
+ * Top bar from the prototype (H-05): 60px, translucent, logo · centered search · actions.
+ * Search, tokens, notifications and profile are not in the MVP: shown disabled (H-26).
+ */
 export function SiteHeader({ menu }: { menu: ReactNode }) {
   const t = useTranslations('common')
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-card/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl backdrop-saturate-150 reduced-transparency:bg-card reduced-transparency:backdrop-blur-none">
-      <div className="flex h-14 items-center gap-1 px-2 md:px-4">
+    <header className="sticky top-0 z-40 border-b bg-header/92 pt-[env(safe-area-inset-top)] backdrop-blur-xl reduced-transparency:bg-header reduced-transparency:backdrop-blur-none">
+      <div className="flex h-15 items-center gap-2 px-2 md:px-4">
         {menu}
         <Link
           href="/"
-          className="flex min-h-11 items-center rounded-lg px-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="flex min-h-11 shrink-0 items-center rounded-lg px-2 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:w-60"
         >
           <AsinkoLogo label={t('logo')} />
         </Link>
-        <div className="ml-auto flex items-center px-2">
-          <ThemeToggle />
+
+        <div className="hidden flex-1 justify-center md:flex">
+          <ComingSoon
+            label={t('nav.search')}
+            className="flex h-10 w-full max-w-[42.5rem] items-center gap-2.5 rounded-full border bg-surface px-4 text-left text-ui text-muted-foreground"
+          >
+            <SearchIcon aria-hidden className="size-4 shrink-0" />
+            <span className="truncate">{t('header.search')}</span>
+          </ComingSoon>
+        </div>
+
+        <div className="ml-auto flex items-center gap-1 md:ml-0">
+          <span className="md:hidden">
+            <ComingSoon label={t('nav.search')} className={ICON_BUTTON}>
+              <SearchIcon aria-hidden className="size-5" />
+            </ComingSoon>
+          </span>
+          <span className="hidden items-center gap-1 md:flex">
+            <ComingSoon
+              label={t('header.tokens')}
+              className="inline-flex h-8 items-center gap-1.5 rounded-full bg-surface px-3 text-action"
+            >
+              <CoinsIcon aria-hidden className="size-4" />
+              {t('header.tokens')}
+            </ComingSoon>
+            <ComingSoon label={t('header.notifications')} className={ICON_BUTTON}>
+              <BellIcon aria-hidden className="size-5" />
+            </ComingSoon>
+            <ComingSoon label={t('header.profile')} className={ICON_BUTTON}>
+              <UserIcon aria-hidden className="size-5" />
+            </ComingSoon>
+          </span>
+          <span className="px-2">
+            <ThemeToggle />
+          </span>
         </div>
       </div>
     </header>

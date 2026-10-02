@@ -10,7 +10,10 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 function renderShell() {
   return renderWithIntl(
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <AppShell navItems={[{ href: '/', label: 'Home', icon: <svg /> }]}>
+      <AppShell
+        navItems={[{ href: '/', label: 'Home', icon: <svg /> }]}
+        sidebar={<p>Your interests</p>}
+      >
         <h1>Page</h1>
       </AppShell>
     </ThemeProvider>,
@@ -21,7 +24,6 @@ describe('AppShell', () => {
   it('starts with a skip link to the main content (F-26)', async () => {
     const user = userEvent.setup()
     renderShell()
-
     await user.tab()
     const skip = screen.getByRole('link', { name: 'Skip to content' })
     expect(skip).toHaveFocus()
@@ -35,11 +37,15 @@ describe('AppShell', () => {
     expect(main).toContainElement(screen.getByRole('heading', { name: 'Page' }))
   })
 
-  it('has the banner and the navigation landmarks (F-23)', () => {
+  it('renders the sidebar content in the left column (H-06)', () => {
+    renderShell()
+    expect(screen.getByText('Your interests')).toBeInTheDocument()
+  })
+
+  it('has the banner, the bottom navigation and the menu button', () => {
     renderShell()
     expect(screen.getByRole('banner')).toBeInTheDocument()
-    // Sidebar navigation and mobile bottom bar (CSS decides which one is visible).
-    expect(screen.getAllByRole('navigation', { name: 'Main navigation' })).toHaveLength(2)
+    expect(screen.getByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument()
   })
 })
