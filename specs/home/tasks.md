@@ -42,7 +42,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - Inyectada en el layout (desktop y panel mobile).
   - **Tests:** mappers (cobertura de `lib/`), componentes de cada sección, sección con error.
 
-- [ ] **T-05b · Inglés primero y selector de idioma** · S · H-27
+- [x] **T-05b · Inglés primero y selector de idioma** · S · H-27
   - `localeDetection: false` en `routing.ts`; molécula `LocaleSwitcher` en la barra superior.
   - **Tests:** `locale-switcher.test.tsx` (opciones, cambio conservando la query); `i18n.spec.ts` (`/` → `/en` con navegador en español; el selector lleva a `/es` con los filtros).
 
