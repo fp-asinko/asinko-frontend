@@ -15,5 +15,8 @@ export default getRequestConfig(async ({ locale }) => {
   return {
     locale: resolved,
     messages: (await import(`../../messages/${resolved}.json`)).default,
+    // Same zone on server and client, so formatted dates never mismatch on hydration. The UI shows
+    // relative times ("2 hours ago"), which do not depend on it.
+    timeZone: 'UTC',
   }
 })

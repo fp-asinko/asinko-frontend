@@ -7,7 +7,7 @@ import messages from '../../messages/en.json'
 export function renderWithIntl(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
   return render(ui, {
     wrapper: ({ children }) => (
-      <NextIntlClientProvider locale="en" messages={messages}>
+      <NextIntlClientProvider locale="en" messages={messages} timeZone="UTC">
         {children}
       </NextIntlClientProvider>
     ),

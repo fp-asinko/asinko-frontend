@@ -4,8 +4,7 @@
     "description": "The finance social network where reputation is earned by being right."
   },
   "home": {
-    "title": "Inicio",
-    "placeholder": "Aquí verás tu feed."
+    "title": "Inicio"
   },
   "common": {
     "theme": {
@@ -93,6 +92,54 @@
       "assets": "Únete a la comunidad de un activo para verlo aquí.",
       "people": "Todavía no sigues a nadie.",
       "groups": "Todavía no estás en ningún grupo."
+    }
+  },
+  "feed": {
+    "composer": {
+      "placeholder": "¿Qué estás pensando?",
+      "post": "Post",
+      "thesis": "Tesis",
+      "live": "Live"
+    },
+    "tabs": {
+      "label": "Feed",
+      "forYou": "Para ti",
+      "following": "Siguiendo",
+      "live": "Live"
+    },
+    "filters": {
+      "label": "Orden",
+      "new": "Nuevos",
+      "polls": "Encuestas"
+    },
+    "chip": {
+      "remove": "Quitar el filtro {handle}"
+    },
+    "card": {
+      "system": "Asinko",
+      "edited": "editado",
+      "deleted": "[eliminado]",
+      "accuracy": "{value} de precisión",
+      "seeMore": "Ver más",
+      "seeLess": "Ver menos",
+      "comments": "{count, plural, one {# comentario} other {# comentarios}}",
+      "score": "{score, plural, one {# punto} other {# puntos}}",
+      "share": "Compartir"
+    },
+    "poll": {
+      "badge": "Encuesta",
+      "votes": "{count, plural, one {# voto} other {# votos}}",
+      "closes": "cierra {time}",
+      "closed": "Cerrada",
+      "hidden": "Vota para ver los resultados",
+      "yourVote": "Tu voto"
+    },
+    "empty": {
+      "following": "Todavía no sigues comunidades.",
+      "goForYou": "Ver Para ti",
+      "polls": "No hay encuestas en lo cargado hasta ahora.",
+      "community": "Todavía no hay publicaciones en {handle}.",
+      "needAccount": "Necesitas una cuenta para ver las comunidades que sigues."
     }
   }
 }

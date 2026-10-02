@@ -4,8 +4,7 @@
     "description": "The finance social network where reputation is earned by being right."
   },
   "home": {
-    "title": "Home",
-    "placeholder": "Your feed will show up here."
+    "title": "Home"
   },
   "common": {
     "theme": {
@@ -93,6 +92,54 @@
       "assets": "Join an asset community to see it here.",
       "people": "You do not follow anyone yet.",
       "groups": "You are not in any group yet."
+    }
+  },
+  "feed": {
+    "composer": {
+      "placeholder": "What are you thinking?",
+      "post": "Post",
+      "thesis": "Thesis",
+      "live": "Live"
+    },
+    "tabs": {
+      "label": "Feed",
+      "forYou": "For you",
+      "following": "Following",
+      "live": "Live"
+    },
+    "filters": {
+      "label": "Sort",
+      "new": "New",
+      "polls": "Polls"
+    },
+    "chip": {
+      "remove": "Remove the {handle} filter"
+    },
+    "card": {
+      "system": "Asinko",
+      "edited": "edited",
+      "deleted": "[deleted]",
+      "accuracy": "{value} accuracy",
+      "seeMore": "See more",
+      "seeLess": "See less",
+      "comments": "{count, plural, one {# comment} other {# comments}}",
+      "score": "{score, plural, one {# point} other {# points}}",
+      "share": "Share"
+    },
+    "poll": {
+      "badge": "Poll",
+      "votes": "{count, plural, one {# vote} other {# votes}}",
+      "closes": "closes {time}",
+      "closed": "Closed",
+      "hidden": "Vote to see the results",
+      "yourVote": "Your vote"
+    },
+    "empty": {
+      "following": "You do not follow any communities yet.",
+      "goForYou": "See For you",
+      "polls": "No polls in what is loaded so far.",
+      "community": "Nothing posted in {handle} yet.",
+      "needAccount": "You need an account to see the communities you follow."
     }
   }
 }

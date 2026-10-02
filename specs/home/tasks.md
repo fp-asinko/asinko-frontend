@@ -55,7 +55,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - `libraries.md` actualizado (D-H1).
   - **Tests:** HTML crudo escapado, `javascript:` bloqueado, títulos bajados a negrita, menciones renderizadas.
 
-- [ ] **T-08 · Feed visible** · L · H-09, H-10, H-11, H-12, H-13, H-14, H-17, H-18
+- [x] **T-08 · Feed visible** · L · H-09, H-10, H-11, H-12, H-13, H-14, H-17, H-18
   - `composer-placeholder`, `feed-tabs`, `feed-filters`, `community-filter-chip`, `feed-list`, `post-card`, `poll-card` (sin votar todavía), `feed-empty`.
   - Página `(main)/page.tsx` con los `searchParams` validados; `loading.tsx` con skeletons de tarjetas.
   - **Tests:** cada componente (post normal, imagen, link, editado, borrado, sistema; encuesta visible, oculta, cerrada, votada), pestañas y filtros con `aria-current`.
