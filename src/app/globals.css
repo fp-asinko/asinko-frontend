@@ -165,6 +165,105 @@
   --shadow-2xl: none;
 }
 
+/*
+ * Motion (specs/home-motion/design.md § 2). Durations and the bars curve come from the prototype;
+ * --ease-out is the strong exit curve of the emil-design-eng skill. Transitions for states (they
+ * can be interrupted), keyframes only for one-time entries. Never ease-in.
+ */
+@theme {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-bars: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --animate-vote-pop: vote-pop 200ms var(--ease-out);
+  --animate-count-up: count-up 180ms var(--ease-out);
+  --animate-count-down: count-down 180ms var(--ease-out);
+  --animate-bar-grow: bar-grow 600ms var(--ease-bars);
+  --animate-fade-up: fade-up 200ms var(--ease-out) backwards;
+  --animate-fade-in: fade-in 200ms var(--ease-out);
+  --animate-underline-in: underline-in 200ms var(--ease-out);
+  --animate-live-pulse: live-pulse 2s var(--ease-out) infinite;
+
+  @keyframes vote-pop {
+    50% {
+      transform: scale(1.25);
+    }
+  }
+  @keyframes count-up {
+    from {
+      opacity: 0;
+      transform: translateY(60%);
+    }
+  }
+  @keyframes count-down {
+    from {
+      opacity: 0;
+      transform: translateY(-60%);
+    }
+  }
+  @keyframes bar-grow {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes underline-in {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  @keyframes live-pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
+    }
+    70%,
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+}
+
+/* Hover and press feedback for everything interactive (M-06, M-07): colors in 150ms like the
+   prototype's hovers, a 0.97 press in 120ms. */
+@utility tap {
+  transition-property: color, background-color, border-color, transform;
+  transition-duration: 150ms, 150ms, 150ms, 120ms;
+  transition-timing-function: var(--ease-out);
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+/* The first five children enter one after another (M-05). */
+@utility stagger {
+  & > * {
+    animation: var(--animate-fade-up);
+  }
+  & > :nth-child(2) {
+    animation-delay: 40ms;
+  }
+  & > :nth-child(3) {
+    animation-delay: 80ms;
+  }
+  & > :nth-child(4) {
+    animation-delay: 120ms;
+  }
+  & > :nth-child(n + 5) {
+    animation-delay: 160ms;
+  }
+}
+
 /* The prototype's type scale (specs/home/design.md §2). */
 @utility type-page-title {
   font-size: 1.375rem;
@@ -207,6 +306,19 @@
 }
 
 @layer base {
+  /* Reduced motion (G-01): everything ends at once in its final state, including third-party
+     components. motion-safe: / motion-reduce: variants keep working on top of this. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+      transition-delay: 0ms !important;
+    }
+  }
   * {
     @apply border-border outline-ring/50;
   }

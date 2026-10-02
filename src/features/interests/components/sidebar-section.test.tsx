@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
@@ -19,17 +19,23 @@ describe('SidebarSection', () => {
     const region = screen.getByRole('region', { name: 'Assets' })
     const heading = screen.getByRole('heading', { name: 'Assets', level: 2 })
     expect(region).toContainElement(heading)
-    expect(heading.closest('summary')).toBeNull()
+    expect(heading.closest('button')).toBeNull()
   })
 
-  it('is a native <details>, open by default, that collapses without JavaScript', async () => {
+  it('starts open and collapses from its toggle, announcing the state (S-01)', async () => {
     renderSection({ ok: true, data: ['BTC', 'ETH'] })
-    const details = screen.getByRole('region', { name: 'Assets' }).querySelector('details')!
-    expect(details).toHaveAttribute('open')
-    expect(screen.getByText('BTC, ETH')).toBeInTheDocument()
+    const toggle = screen.getByRole('button', { name: 'Assets' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    expect(screen.getByText('BTC, ETH')).toBeVisible()
 
-    await userEvent.click(details.querySelector('summary')!)
-    expect(details).not.toHaveAttribute('open')
+    await userEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    // Closed, the panel leaves the page once its height animation ends.
+    await waitFor(() => expect(screen.queryByText('BTC, ETH')).toBeNull())
+
+    await userEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    expect(await screen.findByText('BTC, ETH')).toBeVisible()
   })
 
   it('shows its own error without breaking the column (H-19)', () => {

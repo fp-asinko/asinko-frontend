@@ -9,7 +9,7 @@ T-01 ─┬─ T-02 ─ T-03 ─ T-04 ─ T-05 ─ T-06
 
 ## Tareas
 
-- [ ] **T-01 · Tokens y red de seguridad** · S · G-01, G-02, G-03
+- [x] **T-01 · Tokens y red de seguridad** · S · G-01, G-02, G-03
   - Tokens de movimiento, `@keyframes`, utilidades `tap` y `stagger` en `globals.css`; regla global de reducir movimiento.
   - **Tests:** `e2e/home-motion.spec.ts` arranca con el caso de reducir movimiento.
 

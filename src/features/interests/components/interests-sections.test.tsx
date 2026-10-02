@@ -61,7 +61,10 @@ describe('InterestsSections', () => {
 
     for (const name of ['Assets', 'People', 'Groups', 'Suggested']) {
       const heading = within(region).getByRole('heading', { name })
-      expect(heading.closest('section')!.querySelector('details')).toHaveAttribute('open')
+      expect(within(heading.closest('section')!).getByRole('button', { name })).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      )
     }
   })
 
