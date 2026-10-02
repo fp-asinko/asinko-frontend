@@ -199,7 +199,7 @@ Cuerpo (text-post-body, Markdown seguro, recortado a 6 líneas + "Ver más")
 
 ## 6. Feature y archivos
 
-> Ajuste en T-03: el avatar es una molécula propia renderizada en el servidor () en lugar del de shadcn, que es un Client Component: no suma JavaScript.
+> Ajuste en T-03: el avatar es una molécula propia renderizada en el servidor (`user-avatar`) en lugar del `avatar` de shadcn, que es un Client Component: no suma JavaScript.
 
 ```
 src/features/feed/
