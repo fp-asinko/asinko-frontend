@@ -7,6 +7,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getTranslations } from 'next-intl/server'
 import { AppShell, type NavItem } from '@/components/organisms/app-shell'
 import { env } from '@/env'
+import { InterestsSidebar } from '@/features/interests'
 import { OG_LOCALES } from '@/i18n/alternates'
 import { routing } from '@/i18n/routing'
 import { isIndexable } from '@/lib/seo/robots'
@@ -64,7 +65,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
       <body>
         <NextIntlClientProvider>
           <Providers nonce={nonce}>
-            <AppShell navItems={navItems} sidebar={null}>
+            <AppShell navItems={navItems} sidebar={<InterestsSidebar />}>
               {children}
             </AppShell>
           </Providers>

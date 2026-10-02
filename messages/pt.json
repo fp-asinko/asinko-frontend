@@ -62,5 +62,25 @@
       "UNAVAILABLE": "O serviço não está disponível no momento. Tente novamente em instantes.",
       "UNKNOWN": "Algo deu errado. Tente novamente."
     }
+  },
+  "interests": {
+    "title": "Seus interesses",
+    "assets": "Ativos",
+    "people": "Pessoas",
+    "groups": "Grupos",
+    "suggested": "Sugeridas",
+    "createGroup": "Criar grupo",
+    "more": "ver mais",
+    "join": "Entrar",
+    "mod": "MOD",
+    "stale": "Preço desatualizado",
+    "accuracy": "{value} de acertos",
+    "members": "{count, plural, one {# membro} other {# membros}}",
+    "error": "Não foi possível carregar esta seção.",
+    "empty": {
+      "assets": "Entre na comunidade de um ativo para vê-lo aqui.",
+      "people": "Você ainda não segue ninguém.",
+      "groups": "Você ainda não está em nenhum grupo."
+    }
   }
 }

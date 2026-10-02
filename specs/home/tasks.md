@@ -37,7 +37,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - `BottomNav` de 5 ítems (solo Home activo).
   - **Tests:** actualizados (header, bottom nav, app shell, panel mobile).
 
-- [ ] **T-05 · Columna "Tus intereses"** · M · H-07, H-19, H-21
+- [x] **T-05 · Columna "Tus intereses"** · M · H-07, H-19, H-21
   - Feature `interests`: `interests-api.ts` + mappers + `interests-sidebar` (Activos, Personas, Grupos, Sugeridas) en `<details>`; errores por sección.
   - Inyectada en el layout (desktop y panel mobile).
   - **Tests:** mappers (cobertura de `lib/`), componentes de cada sección, sección con error.
