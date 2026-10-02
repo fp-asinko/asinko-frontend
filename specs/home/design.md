@@ -1,6 +1,6 @@
 # Home — Design
 
-> **Spec:** `home` · **Rama:** `feature/home-feed` · **Estado:** en revisión
+> **Spec:** `home` · **Rama:** `feature/home-feed` · **Estado:** ✅ aprobado (2026-10-02) — D-H1 aprobada
 > **Fase:** 2 de 3 · Requirements: [requirements.md](requirements.md) ✅
 > Valores medidos en el prototipo con el navegador (2026-10-02). Las decisiones que necesitan aprobación están marcadas **D-H**.
 
@@ -162,7 +162,7 @@ Cuerpo (text-post-body, Markdown seguro, recortado a 6 líneas + "Ver más")
   - `@maria`: destacado (negrita), sin link.
 - Estilo de mención del prototipo: negrita 800 y subrayado (`.post-inline-ticker`).
 
-> **D-H1 — a aprobar:** sumar **`react-markdown`** a `libraries.md`. Motivo: el `body` del contrato es Markdown y parsearlo bien a mano supera largamente las ~50 líneas del criterio. Al usarse solo en Server Components **no suma JavaScript al navegador**. Alternativa descartada: un parser propio (riesgo de casos borde y de seguridad).
+> **D-H1 — ✅ aprobada:** sumar **`react-markdown`** a `libraries.md`. Motivo: el `body` del contrato es Markdown y parsearlo bien a mano supera largamente las ~50 líneas del criterio. Al usarse solo en Server Components **no suma JavaScript al navegador**. Alternativa descartada: un parser propio (riesgo de casos borde y de seguridad).
 
 ### `PollCard` (H-13)
 
