@@ -122,11 +122,21 @@ T-17 (después de T-11 y T-08) ── T-18 ── T-19 ── T-20
 - [x] **T-19 · Guías actualizadas** · S · F-40
   - `i18n.md` (render dinámico por CSP), `libraries.md` (`next-themes`, `@axe-core/playwright`, gitleaks), `design-system.md` (tokens iOS con regla de alto contraste, átomos de marca en `ui/`).
 
-- [ ] **T-20 · Definition of Done** · S
+- [x] **T-20 · Definition of Done** · S
   - Todos los gates locales en orden: `format:check` → `lint` → `typecheck` → `test:coverage` → `build` → `test:e2e`.
   - `ui-reviewer` sobre todo `src/` sin bloqueantes.
   - Probado a mano en 360px y desktop, con teclado, en claro y oscuro.
   - Specs actualizados si algo cambió; estado de `tasks.md` al día.
+
+## Pendientes para el PR
+
+Lo que no se puede cerrar desde el código y va en la descripción del PR:
+
+- [ ] **TODO(i18n)**: `metadata.description` en `es` y `pt` usa el texto en inglés. Es copy de marketing: se espera la traducción aprobada (i18n.md § Reglas 2).
+- [ ] **Prueba manual con lector de pantalla** (NVDA o VoiceOver) del shell, el panel mobile y las páginas de error (design-system.md § Accesibilidad). Axe no la reemplaza.
+- [ ] **Prueba en dispositivos reales** (iPhone con notch, Android): áreas seguras y barras translúcidas (skill `mobile-native`).
+- [ ] **Primera corrida del CI** cuando exista el repositorio remoto.
+- [ ] F-32 verificado a mano en T-14 (ver mapeo).
 
 ## Mapeo de criterios a verificación
 

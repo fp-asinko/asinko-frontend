@@ -23,7 +23,8 @@
     "communities": {
       "title": "Comunidades",
       "empty": "Suas comunidades vão aparecer aqui."
-    }
+    },
+    "loading": "Carregando…"
   },
   "errors": {
     "notFound": {
