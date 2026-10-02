@@ -7,11 +7,12 @@ import type { FeedParams } from '../schemas/feed-params.schema'
 import { ComposerPlaceholder } from './composer-placeholder'
 import { FeedFilters } from './feed-filters'
 import { FeedTabs } from './feed-tabs'
-import { PollCard } from './poll-card'
-import { PostCard } from './post-card'
+import { FeedItems } from './feed-items'
+import { LoadMore } from './load-more'
 
 export type FeedState =
-  { status: 'ok'; items: FeedItem[]; community: CommunityRef | null } | { status: 'needs-account' }
+  | { status: 'ok'; items: FeedItem[]; nextCursor: string | null; community: CommunityRef | null }
+  | { status: 'needs-account' }
 
 /**
  * The center column as in the prototype (specs/home/design.md § 5): composer, tabs, filters and
@@ -43,13 +44,14 @@ export function FeedView({
         ) : items.length === 0 ? (
           <EmptyFeed params={params} />
         ) : (
-          <ul className="divide-y">
-            {items.map((item) => (
-              <li key={`${item.kind}-${item.id}`}>
-                {item.kind === 'post' ? <PostCard post={item} /> : <PollCard poll={item} />}
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul className="divide-y">
+              <FeedItems items={items} />
+            </ul>
+            {state.status === 'ok' && state.nextCursor && (
+              <LoadMore params={params} cursor={state.nextCursor} />
+            )}
+          </>
         )}
       </div>
     </>

@@ -157,6 +157,12 @@
       "down": "Votar contra",
       "error": "Não foi possível salvar seu voto. Tente de novo.",
       "needAccount": "Você precisa de uma conta para votar."
+    },
+    "loadMore": {
+      "button": "Carregar mais",
+      "loading": "Carregando…",
+      "loaded": "{count, plural, one {# item a mais carregado} other {# itens a mais carregados}}",
+      "error": "Não foi possível carregar mais. Tente de novo."
     }
   }
 }

@@ -20,7 +20,12 @@ export async function HomeFeed({ searchParams }: { searchParams: Promise<unknown
     if (result.code !== 'UNAUTHENTICATED') getOrThrow(result)
   }
   const state: FeedState = result.ok
-    ? { status: 'ok', items: result.data.items, community: result.data.community }
+    ? {
+        status: 'ok',
+        items: result.data.items,
+        nextCursor: result.data.nextCursor,
+        community: result.data.community,
+      }
     : { status: 'needs-account' }
 
   return <FeedView params={params} state={state} viewerName={viewer?.username ?? null} />

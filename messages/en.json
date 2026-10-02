@@ -157,6 +157,12 @@
       "down": "Downvote",
       "error": "Could not save your vote. Try again.",
       "needAccount": "You need an account to vote."
+    },
+    "loadMore": {
+      "button": "Load more",
+      "loading": "Loading…",
+      "loaded": "{count, plural, one {# more item loaded} other {# more items loaded}}",
+      "error": "Could not load more. Try again."
     }
   }
 }

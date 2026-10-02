@@ -74,7 +74,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - Actions `vote-post` y `vote-poll` (zod, `getViewer`, `ActionResult`); `vote-control` y `poll-voting` con `useOptimistic`.
   - **Tests:** actions con el cliente mockeado (éxito, sin viewer, error), componentes (aria-pressed, optimista, revertir).
 
-- [ ] **T-10 · Cargar más** · L · H-16
+- [x] **T-10 · Cargar más** · L · H-16
   - **Riesgo:** Server Action que devuelve JSX. Si no funciona, **parar y consultar** el plan B (paginación por URL).
   - `load-more-feed.action.ts` + `load-more` (IntersectionObserver + botón).
   - **Tests:** action (siguiente página, fin de páginas), componente (agrega ítems, desaparece al final, teclado).

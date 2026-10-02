@@ -9,6 +9,7 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 vi.mock('../actions/load-comments-preview.action', () => ({ loadCommentsPreview: vi.fn() }))
 vi.mock('../actions/vote-post.action', () => ({ votePost: vi.fn() }))
 vi.mock('../actions/vote-poll.action', () => ({ votePoll: vi.fn() }))
+vi.mock('../actions/load-more-feed.action', () => ({ loadMoreFeed: vi.fn() }))
 
 const params = (raw: Record<string, string> = {}) => parseFeedParams(raw)
 
@@ -17,7 +18,7 @@ describe('FeedView', () => {
     renderWithIntl(
       <FeedView
         params={params()}
-        state={{ status: 'ok', items: [postItem(), pollItem()], community: null }}
+        state={{ status: 'ok', items: [postItem(), pollItem()], nextCursor: null, community: null }}
         viewerName="demo"
       />,
     )
@@ -30,6 +31,26 @@ describe('FeedView', () => {
     expect(within(cards[1]!).getByText('Poll')).toBeInTheDocument()
   })
 
+  it('offers to load more only when there is a next page (H-16)', () => {
+    const { unmount } = renderWithIntl(
+      <FeedView
+        params={params()}
+        state={{ status: 'ok', items: [postItem()], nextCursor: 'next', community: null }}
+        viewerName="demo"
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Load more' })).toBeInTheDocument()
+    unmount()
+    renderWithIntl(
+      <FeedView
+        params={params()}
+        state={{ status: 'ok', items: [postItem()], nextCursor: null, community: null }}
+        viewerName="demo"
+      />,
+    )
+    expect(screen.queryByRole('button', { name: 'Load more' })).toBeNull()
+  })
+
   it('shows the community chip with ?community, linking back to the unfiltered feed', () => {
     renderWithIntl(
       <FeedView
@@ -37,6 +58,7 @@ describe('FeedView', () => {
         state={{
           status: 'ok',
           items: [postItem()],
+          nextCursor: null,
           community: { slug: 'btc', name: 'Bitcoin', handle: '$BTC' },
         }}
         viewerName="demo"
@@ -52,7 +74,7 @@ describe('FeedView', () => {
     renderWithIntl(
       <FeedView
         params={params({ feed: 'following' })}
-        state={{ status: 'ok', items: [], community: null }}
+        state={{ status: 'ok', items: [], nextCursor: null, community: null }}
         viewerName="demo"
       />,
     )
@@ -64,7 +86,7 @@ describe('FeedView', () => {
     const { unmount } = renderWithIntl(
       <FeedView
         params={params({ filter: 'polls' })}
-        state={{ status: 'ok', items: [], community: null }}
+        state={{ status: 'ok', items: [], nextCursor: null, community: null }}
         viewerName={null}
       />,
     )
@@ -73,7 +95,7 @@ describe('FeedView', () => {
     renderWithIntl(
       <FeedView
         params={params({ community: 'defi' })}
-        state={{ status: 'ok', items: [], community: null }}
+        state={{ status: 'ok', items: [], nextCursor: null, community: null }}
         viewerName={null}
       />,
     )
@@ -84,7 +106,7 @@ describe('FeedView', () => {
     renderWithIntl(
       <FeedView
         params={params()}
-        state={{ status: 'ok', items: [], community: null }}
+        state={{ status: 'ok', items: [], nextCursor: null, community: null }}
         viewerName={null}
       />,
     )

@@ -220,7 +220,7 @@ Medidas del prototipo: caja con fondo `--surface`, borde superior, radio inferio
 - `LoadMore` (client): cuando el botón "Cargar más" entra en pantalla (`IntersectionObserver`) o se presiona, llama a la Server Action `loadMoreFeed({ feed, filtro, comunidad, cursor })`, que devuelve **las tarjetas ya renderizadas** (RSC) y el `nextCursor` siguiente. Sin más páginas, el botón desaparece.
 - El botón queda siempre visible y usable con teclado (respaldo accesible del scroll infinito).
 
-> ⚠️ **Riesgo a verificar en la primera tarea del feed:** que una Server Action devuelva elementos JSX ya renderizados. La serialización de los valores de retorno lo permite (`use-cache.md` de Next: "you can return JSX elements"), pero hay que probarlo con Next 16.3. **Plan B:** paginación por URL (`?cursor=`), donde "Cargar más" navega a la página siguiente renderizada en el servidor. Pierde el scroll infinito pero no suma JavaScript. Si hace falta el plan B, se consulta antes.
+> ✅ **Riesgo verificado (2026-10-02):** una Server Action devuelve los elementos ya renderizados (cards con sus hojas cliente incluidas) en el build de producción de Next 16.3, en `en` y `es`. Lo usan `loadCommentsPreview` (H-28) y `loadMoreFeed` (H-16). Como `next/root-params` no corre en Server Actions, el idioma viaja en el input validado y se fija con `setRequestLocale`. El plan B (paginación por URL) no hizo falta.
 
 ## 6. Feature y archivos
 
