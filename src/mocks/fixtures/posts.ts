@@ -259,6 +259,16 @@ export const POSTS: RawPost[] = [
     commentCount: 0,
     publishedAt: hoursAgo(80),
   }),
+  // A pasted URL with no spaces: must wrap instead of overflowing at 360px (UI review, T-12).
+  post(23, {
+    community: 'latam',
+    author: 'capitalprudente',
+    title: `https://exchange.example/${'very-long-path-without-spaces-'.repeat(6)}end`,
+    body: `Source: https://exchange.example/${'another-very-long-path-'.repeat(8)}end`,
+    score: 1,
+    commentCount: 0,
+    publishedAt: hoursAgo(81),
+  }),
 ]
 
 export function postById(id: string) {

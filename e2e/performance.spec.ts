@@ -8,7 +8,7 @@ const BUDGET_KB = 230
 test.describe('JavaScript budget', () => {
   test.skip(({ isMobile }) => isMobile, 'Same bundle on every device')
 
-  for (const path of ['/en', '/en/does-not-exist']) {
+  for (const path of ['/en', '/en?filter=polls', '/en?community=btc', '/en/does-not-exist']) {
     test(`${path} stays under ${BUDGET_KB} KB gzip`, async ({ request }) => {
       const html = await (await request.get(path)).text()
       const sources = [

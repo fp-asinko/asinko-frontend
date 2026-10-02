@@ -83,7 +83,7 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - Namespaces `feed` e `interests` en `en`, `es`, `pt`; tiempo relativo y números compactos.
   - **Tests:** paridad de claves (existente), formato de números y fechas en los tres idiomas.
 
-- [ ] **T-12 · E2E del Home** · M · H-06, H-10, H-11, H-14, H-15, H-16, H-23, H-24, H-26
+- [x] **T-12 · E2E del Home** · M · H-06, H-10, H-11, H-14, H-15, H-16, H-23, H-24, H-26
   - `e2e/home.spec.ts`: el feed muestra los mocks; _Siguiendo_; filtro _Polls_; mención `$BTC` filtra por comunidad; votar; cargar más; elemento deshabilitado avisa "Próximamente"; axe; sin scroll horizontal a 360 / 800 / 1440.
   - `performance.spec.ts`: Home con y sin filtros ≤ 230 KB.
   - `home-feed` (Server Component async, sin test unitario): `?community=` inexistente → "Page not found" con `noindex` (status 200 por streaming, ver design § 5); un título o handle de 200 caracteres sin espacios no genera scroll horizontal a 360 px (revisión de UI del 2026-10-02).

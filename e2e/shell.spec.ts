@@ -24,16 +24,28 @@ test.describe('app shell', () => {
     await expect(page.getByRole('main')).toBeFocused()
   })
 
-  test('only shows destinations that exist (F-23b)', async ({ page, isMobile }) => {
+  // T-04 rebuilt the shell after the prototype: the bottom bar (mobile) is the main navigation,
+  // and the destinations that do not exist yet are coming soon (H-26).
+  test('only links destinations that exist (F-23b, H-26)', async ({ page, isMobile }) => {
     await page.goto('/en')
-    if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click()
-    const nav = page.getByRole('navigation', { name: 'Main navigation' }).filter({ visible: true })
-    await expect(nav.first().getByRole('link')).toHaveText(['Home'])
+    if (isMobile) {
+      const nav = page.getByRole('navigation', { name: 'Main navigation' })
+      await expect(nav.getByRole('link')).toHaveText(['Home'])
+      for (const name of ['Search', 'Create', 'Notif', 'Profile']) {
+        await expect(nav.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
+      }
+    } else {
+      await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeHidden()
+      await expect(page.getByRole('banner').getByRole('link').first()).toHaveAttribute(
+        'href',
+        '/en',
+      )
+    }
   })
 })
 
 test.describe('layout by width (F-23, F-26)', () => {
-  for (const width of [360, 800, 1280]) {
+  for (const width of [360, 800, 1280, 1440]) {
     test(`${width}px has no horizontal scroll`, async ({ page }) => {
       await page.setViewportSize({ width, height: 800 })
       await page.goto('/es')
@@ -48,11 +60,11 @@ test.describe('layout by width (F-23, F-26)', () => {
     await page.setViewportSize({ width: 360, height: 800 })
     await page.goto('/en')
     await expect(page.getByRole('button', { name: 'Open menu' })).toBeVisible()
-    await expect(page.getByRole('region', { name: 'Communities' })).toBeHidden()
+    await expect(page.getByRole('region', { name: 'Your interests' })).toBeHidden()
 
     await page.getByRole('button', { name: 'Open menu' }).click()
     const panel = page.getByRole('dialog', { name: 'Menu' })
-    await expect(panel.getByRole('region', { name: 'Communities' })).toBeVisible()
+    await expect(panel.getByRole('region', { name: 'Your interests' })).toBeVisible()
     await page.keyboard.press('Escape')
     await expect(panel).toBeHidden()
     await expect(page.getByRole('button', { name: 'Open menu' })).toBeFocused()
@@ -61,7 +73,7 @@ test.describe('layout by width (F-23, F-26)', () => {
   test('desktop: fixed left column, no menu button or bottom bar', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/en')
-    await expect(page.getByRole('region', { name: 'Communities' })).toBeVisible()
+    await expect(page.getByRole('region', { name: 'Your interests' })).toBeVisible()
     await expect(page.getByRole('button', { name: 'Open menu' })).toBeHidden()
   })
 })
