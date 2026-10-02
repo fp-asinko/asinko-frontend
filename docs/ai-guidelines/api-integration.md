@@ -113,11 +113,21 @@ El front no espera al backend: lo que falta se mockea **acá**, con la forma que
 
 ### Dónde se mockea
 
-En el **cliente HTTP**, no en los features. Con `API_MOCKS=true`, el cliente responde ciertas rutas desde `src/mocks/` en vez de llamar a la red:
+En el **cliente HTTP**, no en los features. `API_MOCKS` tiene tres valores:
+
+| Valor     | Qué se mockea                                                         | Para qué                                           |
+| --------- | --------------------------------------------------------------------- | -------------------------------------------------- |
+| `false`   | Nada: todo va al backend                                              | Producción y desarrollo contra el backend completo |
+| `missing` | Solo las rutas que el backend todavía no tiene (`implemented: false`) | Desarrollo con el backend real (hoy: activos, E14) |
+| `true`    | Todas las rutas registradas, con el usuario demo como sesión          | CI y desarrollo sin backend                        |
+
+Cuando una ruta se mockea, el cliente la responde desde `src/mocks/` en vez de llamar a la red:
 
 - Todo el resto del camino corre igual que con datos reales: validación zod, mapeo de errores, `ActionResult`. Pasar a datos reales es **apagar el mock de esa ruta**, sin tocar el feature.
 - **Mock por endpoint**, no todo o nada. Lo que el backend ya tiene (hoy, E01) va siempre contra la API real.
-- `src/env.ts` **rechaza `API_MOCKS=true` en producción**: el build falla.
+- `src/env.ts` **rechaza `API_MOCKS` distinto de `false` en producción**: el build falla.
+- Cada ruta declara `implemented`: si el backend ya la tiene (rama `dev` de `asinko-app`). Al implementarse una ruta en el backend, se marca `implemented: true` y deja de mockearse con `missing`.
+- El usuario demo (`getViewer`) existe solo con `true`: con el backend real, las escrituras piden login.
 - Sin librería de mocking: un registro de rutas (`src/mocks/handlers.ts`) que el cliente consulta antes de ir a la red (menos de ~50 líneas, ver criterio en `libraries.md`).
 - **El cliente aplica a la respuesta del mock la misma validación y el mismo mapeo de errores** que a la real: un mock también prueba ese camino.
 

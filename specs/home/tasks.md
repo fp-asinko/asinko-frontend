@@ -61,7 +61,12 @@ T-01 ─ T-02 ─ T-03 ─ T-04 ─ T-05
   - **Tests:** cada componente (post normal, imagen, link, editado, borrado, sistema; encuesta visible, oculta, cerrada, votada), pestañas y filtros con `aria-current`.
   - Revisión visual contra el prototipo (capturas a 360 y 1440 px, claro y oscuro).
 
-- [ ] **T-08b · Vista previa de comentarios** · M · H-28 — ⏳ espera la aprobación de H-28 y D-H2
+- [ ] **T-06b · Adaptar al backend `dev` y URL en inglés** · S · H-10, H-11, H-27
+  - Parámetros `feed=for-you|following`, `filter`, `community`; `?kind=` en el feed; `GET /communities/{slug}` para la comunidad filtrada; `?mine=true` en "Tus intereses".
+  - Mocks con el comportamiento de `dev` (Explore vacío con comunidad inexistente, `kind`, `mine`) y `API_MOCKS=missing`: solo se mockea lo que el backend no tiene.
+  - **Tests:** esquema de parámetros, `getFeed` (kind, comunidad inexistente), `getInterests` (mine, sin viewer), modos de `API_MOCKS`.
+
+- [ ] **T-08b · Vista previa de comentarios** · M · H-28 (D-H2: opción A)
   - `load-comments-preview.action.ts` (zod, `ActionResult`), `comments-toggle` (client), `comments-preview` (server); P-006 en `proposals.md`.
   - **Tests:** action (3 primeros, sin borrados, contenido inexistente), toggle (`aria-expanded`, carga una sola vez, error), preview (Markdown seguro).
 

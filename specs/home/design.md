@@ -108,7 +108,7 @@ Feature **`interests`**, Server Component. Cada sección es un `<details>` nativ
 - **Símbolos de mención** (H-07): el mapper arma el `handle` de cada entidad: `$` + símbolo para activos (y comunidades de activo en Sugeridas), `@` + usuario para personas, `#` + slug para grupos. Es lo que se escribe para mencionarlos.
 - **Medidas del prototipo** (medidas en el navegador): columna con padding de 10 × 8 px, sin divisores entre secciones; rótulo de sección de 10 px; mosaicos de 78 px con 5 px de separación (símbolo 13 px/700, variación 10 px/600); filas de personas de 36 px con avatar de 28 px y nombre de 13 px/600; grupos con avatar de 24 px, nombre de 13 px/600 y descripción de 11 px debajo; **Sugeridas fija al pie de la columna**, con borde superior, avatar de 32 px y nombre de 12 px/700.
 - **Mosaico de activo**: grilla de 3 columnas, borde inferior de 3 px con el color de la variación, flecha ▲/▼ además del color (el color nunca es la única señal).
-- **Limitación del contrato**: `GET /communities` no filtra por membresía, así que se filtra la primera página. Se propone **P-004** (`?member=true`) al backend.
+- **Membresía** (backend `dev`, 2026-10-02): Activos y Grupos salen de `GET /communities?mine=true` (requiere sesión; sin viewer, esas secciones quedan vacías). Sugeridas sale de `GET /communities`, quitando las que ya son mías.
 - "Crear grupo" y los "ver más" de cada sección: deshabilitados (H-26).
 - **Errores**: si falla una sección, solo esa muestra "No se pudo cargar" y el resto sigue (H-19).
 
@@ -118,16 +118,19 @@ Feature **`interests`**, Server Component. Cada sección es un `<details>` nativ
 
 La página lee y valida con zod sus `searchParams`:
 
+> Parámetros en inglés (H-27, 2026-10-02), como el `?community=` del backend.
+
 | Parámetro   | Valores                  | Default   | Efecto                                          |
 | ----------- | ------------------------ | --------- | ----------------------------------------------- |
-| `feed`      | `para-ti` \| `siguiendo` | `para-ti` | `GET /feed/explore` o `GET /feed/following`     |
-| `filtro`    | `new` \| `polls`         | `new`     | `polls` muestra solo encuestas                  |
-| `comunidad` | slug                     | —         | Filtra Explorar por comunidad (H-14, menciones) |
+| `feed`      | `for-you` \| `following` | `for-you` | `GET /feed/explore` o `GET /feed/following`     |
+| `filter`    | `new` \| `polls`         | `new`     | `polls` muestra solo encuestas                  |
+| `community` | slug                     | —         | Filtra Explorar por comunidad (H-14, menciones) |
 
 - Valores inválidos caen al default (nunca rompen la página).
 - **Pestañas y filtros son links** (`<Link>` con `aria-current`), no un widget de pestañas ARIA: navegan y se pueden compartir. Sin JavaScript extra.
-- Con `comunidad`, arriba del feed aparece un chip "#btc ✕" para quitar el filtro.
-- **Filtro _Polls_**: el contrato no tiene filtro por tipo, así que se filtra la página recibida. Se propone **P-005** (`?kind=POLL`) al backend.
+- Con `community`, arriba del feed aparece un chip "#btc ✕" para quitar el filtro.
+- **Tipos de contenido** (P-005, ya en `dev`): el feed se pide con `?kind=POST,POLL` (las tesis llegan en la fase 2) y el filtro _Polls_ con `?kind=POLL`. Así la página siempre trae 20 ítems de lo que se muestra.
+- **Comunidad inexistente**: Explore responde `200` con `items: []`. Con `community`, el front pide en paralelo `GET /communities/{slug}`: si da `NOT_FOUND`, la página es un 404; si existe, da el nombre para el chip.
 
 ### Composición
 
@@ -198,7 +201,7 @@ Cuerpo (type-post-body, Markdown seguro, recortado a 6 líneas + "Ver más")
 - Sin viewer (sin mocks y sin login): `UNAUTHENTICATED` → "Necesitas una cuenta para votar".
 - **Mocks**: se agregan `PUT`/`DELETE /posts/:id/vote` y `PUT /polls/:id/vote`. No persisten (cada recarga vuelve al estado de las fixtures), lo cual se documenta.
 
-### Vista previa de comentarios (H-28) — D-H2 ⏳
+### Vista previa de comentarios (H-28) — D-H2
 
 Medidas del prototipo: caja con fondo `--surface`, borde superior, radio inferior de 12 px, padding 10 × 14 px y 14 px entre comentarios; avatar de 20 px, usuario 12/700 en `--muted-foreground`, tiempo 12 px y texto 13 px; "Ver todos los comentarios →" 12/600.
 
@@ -206,7 +209,7 @@ Medidas del prototipo: caja con fondo `--surface`, borde superior, radio inferio
 - El botón 💬 tiene `aria-expanded` y `aria-controls`; el resto de la tarjeta no cambia.
 - **Encuestas**: el contrato de `Poll` no trae `commentCount`. El botón se muestra sin número y se propone **P-006** (`commentCount` en `Poll`).
 
-> **D-H2 — ⏳ a aprobar: cuándo se cargan los comentarios.**
+> **D-H2 — ✅ aprobada la opción A (2026-10-02): cuándo se cargan los comentarios.**
 >
 > - **A (recomendada): al abrir.** El botón 💬 es una hoja cliente (`CommentsToggle`, ~1 KB) que la primera vez llama a la Server Action `loadCommentsPreview(kind, id)`; esta devuelve los comentarios **ya renderizados en el servidor** (Markdown incluido, sin sumar `react-markdown` al navegador). El feed no hace pedidos de más. Riesgo: es el mismo mecanismo que T-10 (Server Action que devuelve JSX), así que se verifica acá primero; si no funciona, se consulta antes de cambiar de plan.
 > - **B: precargados.** Se piden los comentarios de los 20 ítems al renderizar el feed y se muestran con un `<details>` (cero JavaScript). Costo: 20 pedidos extra a la API por cada página del feed, aunque nadie abra los comentarios.
@@ -247,7 +250,7 @@ src/components/
 ```
 
 - **Mappers** (`api-integration.md`): esquema crudo del contrato (`@/lib/api/contract`) → tipos de dominio. Ejemplo: `PostItem` lleva `author`, `community` (slug y nombre, resueltos con la lista de comunidades), `publishedAt`, `body` ya con las menciones marcadas, `score`, `viewerVote`, `media`.
-- El feed resuelve el slug y nombre de cada comunidad con `GET /communities` (el `Post` del contrato solo trae `communityId`). Limitación anotada para el backend como parte de P-004.
+- El feed resuelve el slug y nombre de cada comunidad con `GET /communities` (el `Post` del contrato solo trae `communityId`). Limitación anotada para el backend como P-004.
 - Ítems inválidos del feed: `keepValidItems` (H-20).
 - `features/feed` y `features/interests` no se importan entre sí (`structure.md`); lo común (tipos de usuario o de comunidad) vive en `@/lib/api/contract`.
 
