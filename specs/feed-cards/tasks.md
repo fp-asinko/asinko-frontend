@@ -14,7 +14,7 @@ T-01 ─┬─ T-02 ─ T-03
   - Tokens de § 2 en `:root`, `.dark` y `@theme inline`.
   - **Tests:** pares nuevos en `tokens-contrast.test.ts`, en los dos temas (se verifica que fallan con un valor más claro). También un test que confirma que ningún token de avatar o encuesta es igual a `--bullish` o `--bearish`.
 
-- [ ] **T-02 · Avatares de color** · S · FC-01
+- [x] **T-02 · Avatares de color** · S · FC-01
   - `identityIndex` en `src/lib/identity-color.ts`. `AVATAR_CLASSES` y el tamaño `xl` en `UserAvatar`.
   - **Tests:**
     - Unitario del hash: estable, ignora prefijo y mayúsculas, siempre en 0–7, y reparte una muestra de handles en al menos 6 tonos.

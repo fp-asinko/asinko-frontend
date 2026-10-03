@@ -18,7 +18,12 @@ export function ComposerPlaceholder({ viewerName }: { viewerName: string | null 
   return (
     <div className="border-b bg-card px-4 py-3.5">
       <div className="flex items-center gap-3">
-        <UserAvatar name={viewerName ?? '?'} size="md" className="size-10" />
+        <UserAvatar
+          name={viewerName ?? '?'}
+          tone={viewerName ? 'identity' : 'neutral'}
+          size="md"
+          className="size-10"
+        />
         {/* Column flex: stretches the coming-soon wrapper (and its button) to the full width. */}
         <div className="flex min-w-0 flex-1 flex-col">
           <ComingSoon

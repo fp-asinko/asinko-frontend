@@ -10,4 +10,12 @@ describe('ComposerPlaceholder (H-09)', () => {
       expect(screen.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
     }
   })
+
+  it('colors the viewer avatar and keeps the guest placeholder neutral (FC-01)', () => {
+    const { unmount } = renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
+    expect(screen.getByTestId('user-avatar')).toHaveAttribute('data-color')
+    unmount()
+    renderWithIntl(<ComposerPlaceholder viewerName={null} />)
+    expect(screen.getByTestId('user-avatar')).not.toHaveAttribute('data-color')
+  })
 })
