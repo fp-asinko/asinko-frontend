@@ -1,6 +1,6 @@
 # Tarjetas del feed con color y vida — Design
 
-> **Estado:** para aprobar. Requisitos en `requirements.md` (FC-01 a FC-14). Este diseño asume las respuestas propuestas a Q1–Q3 (tramos 70/50, consenso desde 10 votos, color calculado del usuario); si cambian, se ajustan § 4, § 5.3 y § 3.
+> **Estado:** aprobado el 2026-10-03, con Q1–Q3 y D-C1 a D-C3 como se proponen. D-C2 se corrigió al implementar: en este proyecto `rounded-lg` es 12 px (escala sm 4 / md 8 / lg 12 / xl 16), así que el recuadro va en `rounded-xl` (16 px), concéntrico con las opciones (12 px + 6 px de padding). Requisitos en `requirements.md` (FC-01 a FC-14).
 > Paleta y razones de contraste medidas por un agente de color con la fórmula de `src/test/tokens-contrast.test.ts`; movimiento revisado por un agente con las skills `find-animation-opportunities` y `emil-design-eng`. Las decisiones que necesitan aprobación están marcadas **D-C**.
 
 ## 1. Principios
@@ -127,7 +127,7 @@ export function identityIndex(key: string): number {
 La geometría es **la misma antes y después de votar**. Los resultados pueden llegar varios segundos después del toque (el backend tarda hoy ~1–13 s), así que nada se mueve cuando llegan: cambian el color y el contenido.
 
 ```
-┌ ul: rounded-lg border p-1.5 ─────────────────────────────┐   antes: border-transparent
+┌ ul: rounded-xl border p-1.5 ─────────────────────────────┐   antes: border-transparent
 │ ┌ opción (button) ─────────────────────────────────────┐ │   después: border-border,
 │ │ [■] Label de la opción                         64 %  │ │   bg-linear-to-b from-surface
 │ │ ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔ (barra 6px, absoluta abajo)  │ │   to-card (el recuadro, FC-04)
@@ -146,7 +146,7 @@ La geometría es **la misma antes y después de votar**. Los resultados pueden l
   - La votada: etiqueta y porcentaje en `font-bold text-foreground`. Las demás quedan en `font-medium`.
   - "(your vote)" sigue en sr-only.
 - **Antes de votar (FC-06):** al pasar el mouse o enfocar, el borde de la opción y el del marcador pasan a `poll-N`. La utilidad `tap` ya transiciona el borde. No se agrega desplazamiento. El anillo de foco se mantiene.
-- **Radio:** `rounded-lg` (8 px) para el recuadro, en vez de los 10 px del prototipo, para quedarse en la escala 4/8/12/16 (**D-C2**).
+- **Radio:** `rounded-xl` (16 px) para el recuadro, en vez de los 10 px del prototipo: se queda en la escala 4/8/12/16 y es concéntrico con las opciones, que siguen en `rounded-lg` (12 px) con 6 px de padding (**D-C2**).
 
 ### 5.3 Consenso (FC-05)
 
@@ -228,8 +228,8 @@ Se traducen a es y pt en el mismo cambio, porque es copy de interfaz y no de mar
 
 ## 10. Decisiones para aprobar
 
-| #    | Decisión                                                                                                       | Propuesta                                               |
-| ---- | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| D-C1 | Marcador cuadrado siempre visible (radio antes de votar, leyenda después) en lugar del ✓ que corre la etiqueta | Sí: sin saltos y con un acento de color para FC-06      |
-| D-C2 | Radio del recuadro de resultados                                                                               | `rounded-lg` (8 px, escala del sistema) en vez de 10 px |
-| D-C3 | El consenso empuja el pie al aparecer                                                                          | Aceptarlo; no reservar espacio en encuestas sin votar   |
+| #    | Decisión                                                                                                       | Propuesta                                                             |
+| ---- | -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| D-C1 | Marcador cuadrado siempre visible (radio antes de votar, leyenda después) en lugar del ✓ que corre la etiqueta | Sí: sin saltos y con un acento de color para FC-06                    |
+| D-C2 | Radio del recuadro de resultados                                                                               | `rounded-xl` (16 px, escala del sistema, concéntrico) en vez de 10 px |
+| D-C3 | El consenso empuja el pie al aparecer                                                                          | Aceptarlo; no reservar espacio en encuestas sin votar                 |

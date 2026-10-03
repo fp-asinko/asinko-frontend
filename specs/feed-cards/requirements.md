@@ -1,6 +1,6 @@
 # Tarjetas del feed con color y vida — Requirements
 
-> **Estado:** requisitos para aprobar. Pedido el 2026-10-03 después de una revisión contra el prototipo: el feed tiene la estructura correcta pero se ve apagado. Indicación del Product Owner: "no escatimar en colores", con animaciones.
+> **Estado:** aprobado el 2026-10-03, con Q1–Q3 como se proponen. Pedido el 2026-10-03 después de una revisión contra el prototipo: el feed tiene la estructura correcta pero se ve apagado. Indicación del Product Owner: "no escatimar en colores", con animaciones.
 > **Fuente de verdad:** `docs/references/prototype.html` (colores medidos en el navegador: resultados de encuesta, badges de rating, panel de comentarios) y el sistema de movimiento de `specs/home-motion`.
 
 ## Objetivo

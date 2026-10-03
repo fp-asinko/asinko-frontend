@@ -1,6 +1,6 @@
 # Tarjetas del feed con color y vida — Tasks
 
-> **Estado:** para aprobar junto con `design.md`.
+> **Estado:** aprobado el 2026-10-03.
 
 ```
 T-01 ─┬─ T-02 ─ T-03
@@ -10,7 +10,7 @@ T-01 ─┬─ T-02 ─ T-03
 
 ## Tareas
 
-- [ ] **T-01 · Tokens y test de contraste** · S · FC-12, FC-13
+- [x] **T-01 · Tokens y test de contraste** · S · FC-12, FC-13
   - Tokens de § 2 en `:root`, `.dark` y `@theme inline`.
   - **Tests:** pares nuevos en `tokens-contrast.test.ts`, en los dos temas (se verifica que fallan con un valor más claro). También un test que confirma que ningún token de avatar o encuesta es igual a `--bullish` o `--bearish`.
 

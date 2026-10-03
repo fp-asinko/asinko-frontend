@@ -58,6 +58,59 @@
   --sidebar-accent-foreground: var(--accent-foreground);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
+
+  /*
+   * Feed cards color (specs/feed-cards/design.md § 2). Hex, not oklch: the contrast test reads hex.
+   * Identity: 8 hues for avatars (135deg gradient, initials measured against the lighter stop).
+   * No green 145 nor red 25: those mean price up/down (--bullish, --bearish).
+   */
+  --avatar-foreground: #ffffff;
+  --avatar-0: #2378c2; /* blue 250 */
+  --avatar-0-to: #0059a2;
+  --avatar-0-foreground: var(--avatar-foreground);
+  --avatar-1: #5d69cb; /* indigo 275 */
+  --avatar-1-to: #434baa;
+  --avatar-1-foreground: var(--avatar-foreground);
+  --avatar-2: #835cbe; /* violet 300 */
+  --avatar-2-to: #663e9e;
+  --avatar-2-foreground: var(--avatar-foreground);
+  --avatar-3: #ab4b90; /* magenta 340 */
+  --avatar-3-to: #8b2d72;
+  --avatar-3-foreground: var(--avatar-foreground);
+  --avatar-4: #af5a21; /* orange 50 */
+  --avatar-4-to: #8e3c00;
+  --avatar-4-foreground: var(--avatar-foreground);
+  --avatar-5: #9d6300; /* amber 70 */
+  --avatar-5-to: #7e4600;
+  --avatar-5-foreground: var(--avatar-foreground);
+  --avatar-6: #007b76; /* teal 190 */
+  --avatar-6-to: #005d59;
+  --avatar-6-foreground: var(--avatar-foreground);
+  --avatar-7: #007694; /* cyan 220 */
+  --avatar-7-to: #005976;
+  --avatar-7-foreground: var(--avatar-foreground);
+  /* Poll options: 3:1 against the track (--muted) and the results box (--surface). */
+  --poll-1: #026fd7;
+  --poll-2: #8747d7;
+  --poll-3: #c46016;
+  --poll-4: #038586;
+  --poll-5: #c62685;
+  --poll-6: #a97416;
+  --poll-track: var(--muted);
+  /* Consensus after voting: teal (far from the up green) and the violet of --interesting. */
+  --consensus-majority: #e6f7f3;
+  --consensus-majority-foreground: #0f5f55;
+  --consensus-majority-border: #99e6d6;
+  --consensus-minority: #f1edfe;
+  --consensus-minority-foreground: #5b32c2;
+  --consensus-minority-border: #d9ccfb;
+  /* Accuracy tiers: tinted chip with dark text of the same hue (white on gold was 3.16:1). */
+  --accuracy-high: #e4f4e8;
+  --accuracy-high-foreground: #146b32;
+  --accuracy-mid: #faf0d2;
+  --accuracy-mid-foreground: #7a5800;
+  --accuracy-low: #fce6e6;
+  --accuracy-low-foreground: #a8262c;
 }
 
 /*
@@ -99,6 +152,50 @@
   --chart-5: #77787b;
   --sidebar: #111214;
   --sidebar-foreground: #f4f4f2;
+
+  /* Feed cards color: own values per theme, never an inversion of the light ones. */
+  --avatar-0: #004f8b;
+  --avatar-0-to: #003872;
+  --avatar-0-foreground: #e0f1ff;
+  --avatar-1: #3b4391;
+  --avatar-1-to: #282c78;
+  --avatar-1-foreground: #e8edff;
+  --avatar-2: #593887;
+  --avatar-2-to: #43216e;
+  --avatar-2-foreground: #f1eaff;
+  --avatar-3: #782b62;
+  --avatar-3-to: #5f114c;
+  --avatar-3-foreground: #fde7f5;
+  --avatar-4: #7b3701;
+  --avatar-4-to: #622000;
+  --avatar-4-foreground: #ffe9dd;
+  --avatar-5: #6f4100;
+  --avatar-5-to: #582b00;
+  --avatar-5-foreground: #fcecd9;
+  --avatar-6: #005b57;
+  --avatar-6-to: #004542;
+  --avatar-6-foreground: #d9f5f3;
+  --avatar-7: #005870;
+  --avatar-7-to: #004159;
+  --avatar-7-foreground: #d9f4fd;
+  --poll-1: #5da6ff;
+  --poll-2: #b786ff;
+  --poll-3: #fd965a;
+  --poll-4: #56baba;
+  --poll-5: #f772b7;
+  --poll-6: #e0a957;
+  --consensus-majority: #10302b;
+  --consensus-majority-foreground: #7ee0cc;
+  --consensus-majority-border: #1e5249;
+  --consensus-minority: #231c3d;
+  --consensus-minority-foreground: #c4b2ff;
+  --consensus-minority-border: #3c2f6b;
+  --accuracy-high: #173424;
+  --accuracy-high-foreground: #7fd99b;
+  --accuracy-mid: #3a2f12;
+  --accuracy-mid-foreground: #f0c960;
+  --accuracy-low: #3d1a1b;
+  --accuracy-low-foreground: #ff9c9c;
 }
 
 @theme inline {
@@ -147,6 +244,49 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-avatar-0: var(--avatar-0);
+  --color-avatar-0-to: var(--avatar-0-to);
+  --color-avatar-0-foreground: var(--avatar-0-foreground);
+  --color-avatar-1: var(--avatar-1);
+  --color-avatar-1-to: var(--avatar-1-to);
+  --color-avatar-1-foreground: var(--avatar-1-foreground);
+  --color-avatar-2: var(--avatar-2);
+  --color-avatar-2-to: var(--avatar-2-to);
+  --color-avatar-2-foreground: var(--avatar-2-foreground);
+  --color-avatar-3: var(--avatar-3);
+  --color-avatar-3-to: var(--avatar-3-to);
+  --color-avatar-3-foreground: var(--avatar-3-foreground);
+  --color-avatar-4: var(--avatar-4);
+  --color-avatar-4-to: var(--avatar-4-to);
+  --color-avatar-4-foreground: var(--avatar-4-foreground);
+  --color-avatar-5: var(--avatar-5);
+  --color-avatar-5-to: var(--avatar-5-to);
+  --color-avatar-5-foreground: var(--avatar-5-foreground);
+  --color-avatar-6: var(--avatar-6);
+  --color-avatar-6-to: var(--avatar-6-to);
+  --color-avatar-6-foreground: var(--avatar-6-foreground);
+  --color-avatar-7: var(--avatar-7);
+  --color-avatar-7-to: var(--avatar-7-to);
+  --color-avatar-7-foreground: var(--avatar-7-foreground);
+  --color-poll-1: var(--poll-1);
+  --color-poll-2: var(--poll-2);
+  --color-poll-3: var(--poll-3);
+  --color-poll-4: var(--poll-4);
+  --color-poll-5: var(--poll-5);
+  --color-poll-6: var(--poll-6);
+  --color-poll-track: var(--poll-track);
+  --color-consensus-majority: var(--consensus-majority);
+  --color-consensus-majority-foreground: var(--consensus-majority-foreground);
+  --color-consensus-majority-border: var(--consensus-majority-border);
+  --color-consensus-minority: var(--consensus-minority);
+  --color-consensus-minority-foreground: var(--consensus-minority-foreground);
+  --color-consensus-minority-border: var(--consensus-minority-border);
+  --color-accuracy-high: var(--accuracy-high);
+  --color-accuracy-high-foreground: var(--accuracy-high-foreground);
+  --color-accuracy-mid: var(--accuracy-mid);
+  --color-accuracy-mid-foreground: var(--accuracy-mid-foreground);
+  --color-accuracy-low: var(--accuracy-low);
+  --color-accuracy-low-foreground: var(--accuracy-low-foreground);
   /* Prototype radii: 4 / 8 / 12 / 16 px, plus rounded-full for pills. */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;

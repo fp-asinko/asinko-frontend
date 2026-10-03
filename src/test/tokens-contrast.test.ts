@@ -61,6 +61,9 @@ function contrast(theme: Record<string, string>, fg: string, bg: string): number
   return ((light as number) + 0.05) / ((dark as number) + 0.05)
 }
 
+const AVATARS = [0, 1, 2, 3, 4, 5, 6, 7]
+const POLLS = [1, 2, 3, 4, 5, 6]
+
 const TEXT_PAIRS: Array<[string, string]> = [
   ['foreground', 'background'],
   ['card-foreground', 'card'],
@@ -79,6 +82,14 @@ const TEXT_PAIRS: Array<[string, string]> = [
   ['success', 'card'],
   ['bearish', 'card'],
   ['sidebar-foreground', 'sidebar'],
+  // Feed cards (FC-12): initials on the lighter stop of each avatar gradient, consensus and accuracy.
+  ...AVATARS.map((n): [string, string] => [`avatar-${n}-foreground`, `avatar-${n}`]),
+  ...AVATARS.map((n): [string, string] => [`avatar-${n}-foreground`, `avatar-${n}-to`]),
+  ['consensus-majority-foreground', 'consensus-majority'],
+  ['consensus-minority-foreground', 'consensus-minority'],
+  ['accuracy-high-foreground', 'accuracy-high'],
+  ['accuracy-mid-foreground', 'accuracy-mid'],
+  ['accuracy-low-foreground', 'accuracy-low'],
 ]
 
 // Non-text: icons, separators, focus rings and borders of active inputs (3:1).
@@ -90,11 +101,26 @@ const NON_TEXT_PAIRS: Array<[string, string]> = [
   ['bullish', 'card'],
   ['brand-dot', 'background'],
   ['input', 'card'],
+  // Poll legend squares and bars against their track and the results box (FC-04).
+  ...POLLS.map((n): [string, string] => [`poll-${n}`, 'poll-track']),
+  ...POLLS.map((n): [string, string] => [`poll-${n}`, 'surface']),
 ]
 
 describe.each(Object.entries(THEMES))('%s theme tokens', (_name, theme) => {
   it.each(TEXT_PAIRS)('text --%s on --%s reaches 4.5:1', (fg, bg) => {
     expect(contrast(theme, fg, bg)).toBeGreaterThanOrEqual(4.5)
+  })
+
+  // FC-13: identity and poll colors never reuse the price up/down colors.
+  it('keeps avatar and poll colors apart from --bullish and --bearish', () => {
+    const meaning = [resolve(theme, 'bullish'), resolve(theme, 'bearish')].map((c) =>
+      c.toLowerCase(),
+    )
+    const colors = [
+      ...AVATARS.flatMap((n) => [`avatar-${n}`, `avatar-${n}-to`]),
+      ...POLLS.map((n) => `poll-${n}`),
+    ].map((token) => resolve(theme, token).toLowerCase())
+    for (const color of colors) expect(meaning).not.toContain(color)
   })
 
   it.each(NON_TEXT_PAIRS)('UI --%s on --%s reaches 3:1', (fg, bg) => {
