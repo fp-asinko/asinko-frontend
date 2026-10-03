@@ -1,6 +1,8 @@
 # Home con movimiento — Tasks
 
-> **Estado:** aprobado el 2026-10-02.
+> **Estado:** aprobado el 2026-10-02; cerrado el 2026-10-03.
+>
+> **Cierre:** 398 tests unitarios y 96 e2e en verde (los de movimiento, estables en tres repeticiones); revisión con `review-animations` (barras a `scaleX`, cierre más rápido que la apertura) y con `ui-reviewer` (sin bloqueantes; indicador de comunidad activa con contraste, `FadeImage` en `components/ui`, test de D-M1). JS del Home: 226,9 KB de 230.
 
 ```
 T-01 ─┬─ T-02 ─ T-03 ─ T-04 ─ T-05 ─ T-06
@@ -41,7 +43,7 @@ T-01 ─┬─ T-02 ─ T-03 ─ T-04 ─ T-05 ─ T-06
   - `CommunityLink` (D-M2) en mosaicos, grupos y sugeridas.
   - **Tests:** `community-link.test.tsx`; e2e con `?community=btc`.
 
-- [ ] **T-09 · Revisión y cierre** · S · G-04, G-05, G-06
+- [x] **T-09 · Revisión y cierre** · S · G-04, G-05, G-06
   - Skill `review-animations`, `ui-reviewer`, presupuesto de JS, axe, CLS; `design-system.md` actualizado.
 
 ## Trazabilidad

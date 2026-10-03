@@ -1,6 +1,6 @@
 # Home con movimiento — Requirements
 
-> **Estado:** requisitos aprobados el 2026-10-02.
+> **Estado:** implementado y cerrado el 2026-10-03. Requisitos aprobados el 2026-10-02.
 > Spec de diseño sobre el Home terminado (`specs/home`). Pedido el 2026-10-02: "más vida" en el feed y más interacciones en la columna izquierda.
 > **Fuente de verdad:** las transiciones del prototipo (`docs/references/prototype.html`): hovers de 120–150 ms, barras que crecen en 600 ms con `cubic-bezier(0.4, 0, 0.2, 1)`, chevrons de ~200 ms, aparición con fade de 200 ms, punto de "Live" que late. Criterio de las skills `emil-design-eng` y `review-animations`.
 
@@ -20,34 +20,34 @@ Que el Home responda a lo que hace la persona: cada acción tiene un feedback in
 
 ### Feed
 
-- [ ] **M-01** **Votar**: al votar, la flecha hace un "pop" corto (crece y vuelve, sin partir de 0) y el puntaje cambia con un desplazamiento vertical en la dirección del voto (sube al votar a favor, baja en contra).
-- [ ] **M-02** **Encuesta**: al revelarse los resultados (después de votar), las barras crecen desde 0 hasta su porcentaje con la curva del prototipo, y los porcentajes aparecen con un fade. Al cargar la página con resultados ya visibles, las barras no se animan.
-- [ ] **M-03** **Comentarios**: el panel se despliega y se pliega animando la altura; el chevron rota.
-- [ ] **M-04** **Pestañas y filtros**: el subrayado de la pestaña activa aparece creciendo desde el centro; las píldoras de filtro cambian de fondo con transición.
-- [ ] **M-05** **Cargar más**: las tarjetas nuevas aparecen con un fade y un leve desplazamiento hacia arriba, escalonadas (las primeras 5).
-- [ ] **M-06** **Feedback al presionar**: votos, opciones de encuesta, píldoras, pestañas, acciones del composer y botones de la tarjeta se achican levemente al presionarlos.
-- [ ] **M-07** **Hovers** con transición de fondo y color (120–150 ms, como el prototipo) en todo lo interactivo del feed.
-- [ ] **M-08** **"Próximamente"**: el globo aparece con fade y un leve desplazamiento desde el botón.
-- [ ] **M-09** **Imágenes de posts**: aparecen con un fade al terminar de cargar, sin salto (el espacio ya está reservado).
-- [ ] **M-10** **Live**: el punto rojo de la pestaña _Live_ late, como en el prototipo.
+- [x] **M-01** **Votar**: al votar, la flecha hace un "pop" corto (crece y vuelve, sin partir de 0) y el puntaje cambia con un desplazamiento vertical en la dirección del voto (sube al votar a favor, baja en contra).
+- [x] **M-02** **Encuesta**: al revelarse los resultados (después de votar), las barras crecen desde 0 hasta su porcentaje con la curva del prototipo, y los porcentajes aparecen con un fade. Al cargar la página con resultados ya visibles, las barras no se animan.
+- [x] **M-03** **Comentarios**: el panel se despliega y se pliega animando la altura; el chevron rota.
+- [x] **M-04** **Pestañas y filtros**: el subrayado de la pestaña activa aparece creciendo desde el centro; las píldoras de filtro cambian de fondo con transición.
+- [x] **M-05** **Cargar más**: las tarjetas nuevas aparecen con un fade y un leve desplazamiento hacia arriba, escalonadas (las primeras 5).
+- [x] **M-06** **Feedback al presionar**: votos, opciones de encuesta, píldoras, pestañas, acciones del composer y botones de la tarjeta se achican levemente al presionarlos.
+- [x] **M-07** **Hovers** con transición de fondo y color (120–150 ms, como el prototipo) en todo lo interactivo del feed.
+- [x] **M-08** **"Próximamente"**: el globo aparece con fade y un leve desplazamiento desde el botón.
+- [x] **M-09** **Imágenes de posts**: aparecen con un fade al terminar de cargar, sin salto (el espacio ya está reservado).
+- [x] **M-10** **Live**: el punto rojo de la pestaña _Live_ late, como en el prototipo.
 
 ### Columna "Tus intereses"
 
-- [ ] **S-01** **Secciones**: plegar y desplegar anima la altura (además del chevron que ya rota). En navegadores que no lo soportan, se pliega sin animación (mejora progresiva).
-- [ ] **S-02** **Mosaicos de activos**: al pasar el mouse o enfocar, el mosaico se eleva levemente y su borde inferior gana intensidad; al presionar, se hunde.
-- [ ] **S-03** **Personas, grupos y sugeridas**: filas con hover de fondo y feedback al presionar; el avatar crece levemente al hacer hover.
-- [ ] **S-04** **Comunidad activa**: cuando el feed está filtrado por una comunidad (`?community=`), su mosaico o su grupo en la columna se marca como seleccionado (`aria-current`) y el cambio se anima.
-- [ ] **S-05** **Botones de la columna** ("more", "Create group", "+ Join"): hover y feedback al presionar.
-- [ ] **S-06** **Panel lateral en mobile**: abre y cierra deslizándose (ya lo hace) con la duración y curva de este spec.
+- [x] **S-01** **Secciones**: plegar y desplegar anima la altura (además del chevron que ya rota). En navegadores que no lo soportan, se pliega sin animación (mejora progresiva).
+- [x] **S-02** **Mosaicos de activos**: al pasar el mouse o enfocar, el mosaico se eleva levemente y su borde inferior gana intensidad; al presionar, se hunde.
+- [x] **S-03** **Personas, grupos y sugeridas**: filas con hover de fondo y feedback al presionar; el avatar crece levemente al hacer hover.
+- [x] **S-04** **Comunidad activa**: cuando el feed está filtrado por una comunidad (`?community=`), su mosaico o su grupo en la columna se marca como seleccionado (`aria-current`) y el cambio se anima.
+- [x] **S-05** **Botones de la columna** ("more", "Create group", "+ Join"): hover y feedback al presionar.
+- [x] **S-06** **Panel lateral en mobile**: abre y cierra deslizándose (ya lo hace) con la duración y curva de este spec.
 
 ### Generales
 
-- [ ] **G-01** **Reducir movimiento**: con `prefers-reduced-motion: reduce` no hay desplazamientos, escalas ni latidos; a lo sumo, cambios de opacidad instantáneos o muy cortos.
-- [ ] **G-02** **Rápido**: ninguna animación de interfaz supera 300 ms, salvo las barras de encuesta (600 ms, del prototipo). Curvas de salida (`ease-out`), nunca `ease-in`.
-- [ ] **G-03** **Sin peso**: las animaciones son CSS; el JavaScript de primera carga del Home sigue ≤ 230 KB (hoy 221,6 KB). Sin librerías nuevas.
-- [ ] **G-04** **Sin saltos de layout**: las animaciones usan `transform` y `opacity` (o altura en los desplegables); el CLS no sube.
-- [ ] **G-05** **Interrumpibles**: si la persona vuelve a tocar en medio de una animación (abrir y cerrar rápido), la animación se revierte desde donde está, sin saltar.
-- [ ] **G-06** **Accesibilidad intacta**: el foco, los nombres accesibles y los anuncios no cambian; axe sigue sin violaciones.
+- [x] **G-01** **Reducir movimiento**: con `prefers-reduced-motion: reduce` no hay desplazamientos, escalas ni latidos; a lo sumo, cambios de opacidad instantáneos o muy cortos.
+- [x] **G-02** **Rápido**: ninguna animación de interfaz supera 300 ms, salvo las barras de encuesta (600 ms, del prototipo). Curvas de salida (`ease-out`), nunca `ease-in`.
+- [x] **G-03** **Sin peso**: las animaciones son CSS; el JavaScript de primera carga del Home sigue ≤ 230 KB (hoy 221,6 KB). Sin librerías nuevas.
+- [x] **G-04** **Sin saltos de layout**: las animaciones usan `transform` y `opacity` (o altura en los desplegables); el CLS no sube.
+- [x] **G-05** **Interrumpibles**: si la persona vuelve a tocar en medio de una animación (abrir y cerrar rápido), la animación se revierte desde donde está, sin saltar.
+- [x] **G-06** **Accesibilidad intacta**: el foco, los nombres accesibles y los anuncios no cambian; axe sigue sin violaciones.
 
 ## Fuera de alcance
 
