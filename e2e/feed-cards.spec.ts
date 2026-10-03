@@ -18,7 +18,9 @@ test.describe('Feed cards', () => {
 
     await poll.getByRole('button', { name: '1–10%' }).click()
 
-    const consensus = poll.getByText(/You voted with the majority: \d+% chose the same/)
+    const consensus = poll
+      .locator('[data-consensus]')
+      .filter({ hasText: /You voted with the majority: \d+% chose the same/ })
     await expect(consensus).toBeVisible()
     expect(await consensus.evaluate((el) => getComputedStyle(el).animationDelay)).toBe('0.4s')
     await expect(poll.locator('[data-bar]')).toHaveCount(4)
@@ -28,9 +30,30 @@ test.describe('Feed cards', () => {
 
   test('a vote cast earlier shows its consensus at once', async ({ page }) => {
     await page.goto('/en?filter=polls')
-    const consensus = card(page, 'Next Fed move?').getByText(/chose the same/)
+    const consensus = card(page, 'Next Fed move?')
+      .locator('[data-consensus]')
+      .filter({ hasText: /chose the same/ })
     await expect(consensus).toBeVisible()
     expect(await consensus.evaluate((el) => getComputedStyle(el).animationName)).toBe('none')
+  })
+
+  test('comments enter one after another and avatars answer the hover (FC-10)', async ({
+    page,
+    isMobile,
+  }) => {
+    await page.goto('/en')
+    const whales = card(page, 'Whales accumulated 48,000 $BTC')
+    await whales.getByRole('button', { name: /6 comments/ }).click()
+    const rows = whales.locator('.stagger > li')
+    await expect(rows.nth(1)).toBeVisible()
+    expect(await rows.nth(0).evaluate((el) => getComputedStyle(el).animationName)).toBe('fade-up')
+    expect(await rows.nth(1).evaluate((el) => getComputedStyle(el).animationDelay)).toBe('0.04s')
+
+    // Hover exists only with a pointer that hovers (Tailwind 4 hover: variant).
+    test.skip(isMobile, 'no hover on touch devices')
+    const avatar = whales.getByTestId('user-avatar').first()
+    await avatar.hover()
+    await expect.poll(() => avatar.evaluate((el) => getComputedStyle(el).scale)).toBe('1.05')
   })
 
   for (const theme of ['light', 'dark'] as const) {
@@ -46,7 +69,9 @@ test.describe('Feed cards', () => {
       await expect(whales.getByRole('button', { name: 'See all comments' })).toBeVisible()
       const poll = card(page, DEFI)
       await poll.getByRole('button', { name: '1–10%' }).click()
-      await expect(poll.getByText(/chose the same/)).toBeVisible()
+      await expect(
+        poll.locator('[data-consensus]').filter({ hasText: /chose the same/ }),
+      ).toBeVisible()
 
       await expectNoA11yViolations(page)
     })
@@ -60,7 +85,7 @@ test.describe('Feed cards with reduced motion (FC-11)', () => {
     await page.goto('/en?filter=polls')
     const poll = card(page, DEFI)
     await poll.getByRole('button', { name: '1–10%' }).click()
-    const consensus = poll.getByText(/chose the same/)
+    const consensus = poll.locator('[data-consensus]').filter({ hasText: /chose the same/ })
     await expect(consensus).toBeVisible()
     expect(
       await consensus.evaluate((el) => parseFloat(getComputedStyle(el).animationDuration)),

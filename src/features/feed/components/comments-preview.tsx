@@ -28,7 +28,7 @@ export function CommentsPreview({ comments }: { comments: CommentPreview[] }) {
                 name={comment.author.username}
                 imageUrl={comment.author.avatarUrl}
                 size="xs"
-                className="transition-[scale] duration-150 ease-out group-hover:scale-110"
+                className="transition-[scale] duration-150 ease-out motion-safe:group-hover:scale-105"
               />
               <div className="min-w-0 flex-1 wrap-anywhere">
                 <p className="mb-0.75 flex gap-1.25 type-meta text-muted-foreground">

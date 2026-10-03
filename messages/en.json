@@ -164,7 +164,7 @@
       "down": "Downvote",
       "error": "Could not save your vote. Try again.",
       "needAccount": "You need an account to vote.",
-      "saved": "Vote saved"
+      "saved": "Vote saved."
     },
     "loadMore": {
       "button": "Load more",

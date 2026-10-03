@@ -104,6 +104,8 @@ const NON_TEXT_PAIRS: Array<[string, string]> = [
   // Poll legend squares and bars against their track and the results box (FC-04).
   ...POLLS.map((n): [string, string] => [`poll-${n}`, 'poll-track']),
   ...POLLS.map((n): [string, string] => [`poll-${n}`, 'surface']),
+  // The check of the voted option sits on its legend color (FC-04).
+  ...POLLS.map((n): [string, string] => ['card', `poll-${n}`]),
 ]
 
 describe.each(Object.entries(THEMES))('%s theme tokens', (_name, theme) => {

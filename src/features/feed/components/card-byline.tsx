@@ -46,14 +46,14 @@ export function CardByline({
         name={author?.username ?? t('system')}
         imageUrl={author?.avatarUrl}
         size="xs"
-        className="transition-[scale] duration-150 ease-out group-hover/byline:scale-110"
+        className="transition-[scale] duration-150 ease-out motion-safe:group-hover/byline:scale-105"
       />
       <span className="min-w-0 font-bold break-all">{author ? author.handle : t('system')}</span>
       {accuracy && (
         <span
           data-tier={accuracy.tier}
           className={cn(
-            'rounded-sm px-1 text-[0.625rem] font-bold tabular-nums ring-current/0 transition-shadow duration-150 ease-out group-hover/byline:ring-1 group-hover/byline:ring-current/40',
+            'rounded-sm px-1 text-[0.625rem] font-bold tabular-nums ring-1 ring-current/0 transition-shadow duration-150 ease-out group-hover/byline:ring-current/40',
             TIER_CLASSES[accuracy.tier],
           )}
         >

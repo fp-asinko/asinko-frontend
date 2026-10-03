@@ -233,3 +233,23 @@ Se traducen a es y pt en el mismo cambio, porque es copy de interfaz y no de mar
 | D-C1 | Marcador cuadrado siempre visible (radio antes de votar, leyenda después) en lugar del ✓ que corre la etiqueta | Sí: sin saltos y con un acento de color para FC-06                    |
 | D-C2 | Radio del recuadro de resultados                                                                               | `rounded-xl` (16 px, escala del sistema, concéntrico) en vez de 10 px |
 | D-C3 | El consenso empuja el pie al aparecer                                                                          | Aceptarlo; no reservar espacio en encuestas sin votar                 |
+
+## 11. Ajustes de la implementación
+
+Surgieron al implementar o en las revisiones de cierre (`ui-reviewer` y una revisión de movimiento contra `design-system.md § Movimiento`; la skill `review-animations` solo se activa a mano):
+
+- **Radios (D-C2):** acá `rounded-lg` es 12 px. El recuadro va en `rounded-xl` (16 px) y es concéntrico con las opciones (12 px + 6 px de padding). El panel de comentarios usa `rounded-lg`.
+- **Color de las comunidades:** `UserAvatar` recibe `colorKey`. Una comunidad usa siempre su slug, porque la columna mostraba el nombre ("On-chain") y el feed el handle ("#onchain"), y así una misma comunidad podía tener dos colores. El composer sin sesión usa `tone="neutral"`, porque todavía no es nadie.
+- **Logo de la encuesta (FC-02):** las iniciales salen del handle, así que una comunidad de activo muestra su símbolo (`$BTC` → "BT").
+- **Consenso (§ 5.3, § 5.4):**
+  - Se calcula siempre con los resultados del servidor. Mientras viaja un voto nuevo se atenúa (`opacity-60`) en lugar de desmontarse: desmontarlo hacía saltar la tarjeta y repetía la entrada en cada voto.
+  - Entra después de las barras (`delay-after-bars`, una utilidad de `globals.css`) la primera vez que aparece en la visita. Si un cambio de voto cambia el tramo, entra sin retardo. Si el voto era de antes, aparece sin animación.
+  - Lectores de pantalla: la región viva dice "Vote saved." junto con el consenso, como dos oraciones completas (WCAG 4.1.3). El texto insertado no se anunciaba solo.
+- **El ✓** late al tocar, con el estado optimista, y no cuando responde el servidor: la respuesta es inmediata. El marcador votado no hace fade al revelar: ya estaba visible y cambia de color.
+- **Opciones bloqueadas:** no se hunden al tocarlas (`aria-disabled:active:scale-100`).
+- **Hover de avatares:** `scale-105` solo con `motion-safe`. Con reducir movimiento no hay escala, y en la byline queda el anillo del chip, que solo cambia de color: el ancho es fijo y la opacidad va de 0 a 40 %.
+- **Chevron de comentarios:** 200 ms al abrir y 150 ms al cerrar, igual que el panel.
+- **Copy:** "You are in the minority" y "It is a tie", sin contracciones. Se suma un punto a "Vote saved.", en los tres idiomas, para que las dos oraciones se lean separadas.
+- **Mientras carga:** un esqueleto de dos comentarios, como pedía el diseño.
+- **axe en e2e:** `expectNoA11yViolations` espera a que terminen las animaciones finitas antes de medir. Midiendo en pleno fade-up, axe veía bajo contraste en el texto que entraba.
+- **Queda como está (menor):** el degradado del recuadro aparece de golpe, porque un `background-image` no se interpola. Coincide con el inicio de las barras y no se nota.

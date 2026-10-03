@@ -385,6 +385,11 @@
   }
 }
 
+/* The poll consensus enters once the 600ms bars are mostly grown (specs/feed-cards § 5.4). */
+@utility delay-after-bars {
+  animation-delay: 400ms;
+}
+
 /* The first five children enter one after another (M-05). */
 @utility stagger {
   & > * {

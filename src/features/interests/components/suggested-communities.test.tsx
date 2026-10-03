@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { identityIndex } from '@/lib/identity-color'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { SuggestedCommunities } from './suggested-communities'
 
@@ -27,5 +28,15 @@ describe('SuggestedCommunities (H-07)', () => {
   it('builds the join label as a whole message in each locale', () => {
     renderWithIntl(<SuggestedCommunities suggestions={[nft]} />, { locale: 'es' })
     expect(screen.getByRole('button', { name: 'Unirse a #nft' })).toBeInTheDocument()
+  })
+
+  it('colors the avatar by the slug, like the feed does (FC-01)', () => {
+    renderWithIntl(
+      <SuggestedCommunities suggestions={[{ ...nft, name: 'On-chain', slug: 'onchain' }]} />,
+    )
+    expect(screen.getByTestId('user-avatar')).toHaveAttribute(
+      'data-color',
+      String(identityIndex('onchain')),
+    )
   })
 })

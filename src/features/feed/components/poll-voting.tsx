@@ -94,8 +94,12 @@ export function PollVoting({
   const [saved, setSaved] = useState(false)
   // M-02: true once a vote reveals results that were hidden; then the bars grow from 0.
   const [revealed, setRevealed] = useState(false)
-  // FC-09: the option voted in this visit; its check pops and the consensus fades in after the bars.
+  // FC-09: the option voted in this visit; its check pops (with the optimistic choice, at the tap).
   const [lastVotedId, setLastVotedId] = useState<string | null>(null)
+  // How the consensus enters: after the bars the first time it appears in this visit, at once
+  // when a changed vote changes its tier, and without animation for a vote cast earlier.
+  const [consensusSeen, setConsensusSeen] = useState(() => pollConsensus(initial) !== null)
+  const [consensusEntry, setConsensusEntry] = useState<'after-bars' | 'now' | null>(null)
 
   const canVote = !isClosed && (results.viewerOptionId === null || allowVoteChange)
   // Decided once: a poll that loads votable keeps its buttons for the whole visit.
@@ -113,13 +117,22 @@ export function PollVoting({
         if (!results.resultsVisible && result.data.resultsVisible) setRevealed(true)
         setResults(result.data)
         setSaved(true)
+        if (pollConsensus(result.data)) {
+          setConsensusEntry(consensusSeen ? 'now' : 'after-bars')
+          setConsensusSeen(true)
+        }
       } else
         setError(result.error === 'api.errors.UNAUTHENTICATED' ? tv('needAccount') : tv('error'))
     })
   }
 
-  // From the server results only (never the optimistic choice), hidden while a new vote travels.
-  const consensus = pending ? null : pollConsensus(results)
+  // From the server results only (never the optimistic choice); dimmed while a new vote travels.
+  const consensus = pollConsensus(results)
+  const consensusText = consensus
+    ? t(`consensus.${consensus.tier}`, {
+        percent: format.number(consensus.share, { style: 'percent', maximumFractionDigits: 0 }),
+      })
+    : null
   const hasResults = shown.options.some((option) => option.share !== null)
 
   const footer = [
@@ -160,12 +173,12 @@ export function PollVoting({
                           : mine
                             ? 'border-foreground bg-foreground text-background'
                             : cn('border-input', canVote && color.marker),
-                        revealed && option.share !== null && 'animate-fade-in',
+                        // The voted marker was already there: it changes color, it does not blink.
+                        revealed && option.share !== null && !mine && 'animate-fade-in',
                       )}
                     >
                       {mine && (
                         <CheckIcon
-                          key={lastVotedId ?? 'loaded'}
                           strokeWidth={3}
                           className={cn('size-3', lastVotedId === option.id && 'animate-vote-pop')}
                         />
@@ -209,7 +222,8 @@ export function PollVoting({
               </>
             )
             const box = cn(
-              'group tap relative block w-full rounded-lg border px-3.5 pt-2.5 pb-4.5 text-left type-ui font-medium',
+              // A locked option does not press in: nothing happens when tapped.
+              'group tap relative block w-full rounded-lg border px-3.5 pt-2.5 pb-4.5 text-left type-ui font-medium aria-disabled:active:scale-100',
               hasResults ? 'border-transparent' : mine && 'border-foreground',
             )
             return (
@@ -240,27 +254,32 @@ export function PollVoting({
         </ul>
         {consensus && (
           <p
-            // Replays when a changed vote changes the tier; delayed after the bars only when the
-            // vote happened in this visit (a vote cast earlier shows at once).
+            // Remounts (and enters again) only when a changed vote changes the tier. Inserted text is
+            // not announced: the live region below says it together with the saved vote.
             key={consensus.tier}
+            data-consensus={consensus.tier}
             className={cn(
               'mt-1.5 flex items-center gap-2 rounded-md border px-3 py-2 type-action',
               CONSENSUS_CLASSES[consensus.tier],
-              lastVotedId !== null && 'animate-fade-up [animation-delay:400ms]',
+              'transition-opacity duration-150 ease-out',
+              pending && 'opacity-60',
+              consensusEntry === 'after-bars' && 'animate-fade-up delay-after-bars',
+              consensusEntry === 'now' && 'animate-fade-up',
             )}
           >
             <UsersIcon aria-hidden className="size-4 shrink-0" />
-            {t(`consensus.${consensus.tier}`, {
-              percent: format.number(consensus.share, {
-                style: 'percent',
-                maximumFractionDigits: 0,
-              }),
-            })}
+            {consensusText}
           </p>
         )}
       </div>
+      {/* Two whole sentences, never fragments of one: "Vote saved." and the consensus (WCAG 4.1.3). */}
       <p role="status" className="sr-only">
-        {saved ? tv('saved') : ''}
+        {saved && (
+          <>
+            <span>{tv('saved')}</span>
+            {consensusText && <span> {consensusText}</span>}
+          </>
+        )}
       </p>
       {error && (
         <p role="alert" className="mt-2 type-meta text-destructive">

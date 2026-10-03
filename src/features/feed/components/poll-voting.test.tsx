@@ -168,8 +168,40 @@ describe('PollVoting (H-13, H-15)', () => {
       expect(screen.queryByText(/minority/)).toBeNull()
 
       answer(results('b'))
-      const message = await screen.findByText('You are in the minority: 20% chose the same')
-      expect(message).toHaveClass('animate-fade-up')
+      const message = await screen.findByText('You are in the minority: 20% chose the same', {
+        selector: 'p',
+      })
+      expect(message).toHaveClass('animate-fade-up', 'delay-after-bars')
+      // Inserted text is not read: the live region says it with the saved vote (WCAG 4.1.3).
+      expect(screen.getByRole('status')).toHaveTextContent(
+        'Vote saved. You are in the minority: 20% chose the same',
+      )
+    })
+
+    it('enters again at once when a changed vote changes the tier', async () => {
+      action.votePoll.mockResolvedValueOnce(results('b')).mockResolvedValueOnce(results('a'))
+      renderPoll()
+
+      await userEvent.click(screen.getByRole('button', { name: 'No' }))
+      await screen.findByText(/minority/, { selector: 'p' })
+      await userEvent.click(screen.getByRole('button', { name: /Yes/ }))
+      const majority = await screen.findByText('You voted with the majority: 80% chose the same', {
+        selector: 'p',
+      })
+      expect(majority).toHaveClass('animate-fade-up')
+      expect(majority).not.toHaveClass('delay-after-bars')
+    })
+
+    it('accents a votable option with its color on hover and focus, not a locked one (FC-06)', async () => {
+      action.votePoll.mockResolvedValue(results('a'))
+      renderPoll({ ...hidden, allowVoteChange: false })
+      const yes = screen.getByRole('button', { name: 'Yes' })
+      expect(yes.className).toMatch(/focus-visible:border-poll-1/)
+
+      await userEvent.click(yes)
+      await screen.findByText(/majority/, { selector: 'p' })
+      expect(yes).toHaveAttribute('aria-disabled', 'true')
+      expect(yes.className).not.toMatch(/border-poll/)
     })
 
     it('shows the consensus of a vote cast earlier at once, without animation', () => {

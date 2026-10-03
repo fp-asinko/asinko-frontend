@@ -1,6 +1,8 @@
 # Tarjetas del feed con color y vida — Tasks
 
-> **Estado:** aprobado el 2026-10-03.
+> **Estado:** aprobado y cerrado el 2026-10-03.
+>
+> **Cierre:** 512 tests unitarios y los e2e del feed en verde dos veces seguidas (mobile y desktop, claro y oscuro con axe). JS del Home: 227,9 KB de 230 (+1,0 KB). Revisiones de UI y de movimiento aplicadas; los detalles, en `design.md § 11`.
 
 ```
 T-01 ─┬─ T-02 ─ T-03
@@ -47,7 +49,7 @@ T-01 ─┬─ T-02 ─ T-03
     - `comments-preview.test.tsx`: autor y "See all" presentes, con lista y vacío.
     - `comments-toggle.test.tsx`: mientras carga se anuncia el estado y el esqueleto queda oculto para lectores de pantalla.
 
-- [ ] **T-08 · Cierre** · S · FC-12, FC-14
+- [x] **T-08 · Cierre** · S · FC-12, FC-14
   - e2e de axe en el Home, en claro y en oscuro, después de votar una encuesta y abrir comentarios. Presupuesto de JS en `performance.spec.ts`.
   - Revisión con `review-animations` y `ui-reviewer`. Spec actualizado si algo cambió.
 
@@ -62,6 +64,6 @@ T-01 ─┬─ T-02 ─ T-03
 | FC-05       | `poll-consensus.test.ts`, `poll-voting.test.tsx`        |
 | FC-06       | `poll-voting.test.tsx` (borde de color en foco)         |
 | FC-07/08    | `comments-preview.test.tsx`, `comments-toggle.test.tsx` |
-| FC-09/10/11 | `e2e/home-motion.spec.ts`                               |
+| FC-09/10/11 | `e2e/feed-cards.spec.ts`, `poll-voting.test.tsx`        |
 | FC-12/13    | `tokens-contrast.test.ts`, axe en claro y oscuro        |
 | FC-14       | `e2e/performance.spec.ts`                               |

@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { identityIndex } from '@/lib/identity-color'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { GroupList } from './group-list'
 
@@ -25,5 +26,13 @@ describe('GroupList (H-07)', () => {
   it('labels the groups the viewer moderates, also in the link name', () => {
     renderWithIntl(<GroupList groups={[{ ...group, isModerator: true }]} />)
     expect(screen.getByRole('link')).toHaveAccessibleName('#trading MOD On-chain flows')
+  })
+
+  it('colors the avatar by the slug, like the feed does (FC-01)', () => {
+    renderWithIntl(<GroupList groups={[{ ...group, name: 'On-chain', slug: 'onchain' }]} />)
+    expect(screen.getByTestId('user-avatar')).toHaveAttribute(
+      'data-color',
+      String(identityIndex('onchain')),
+    )
   })
 })

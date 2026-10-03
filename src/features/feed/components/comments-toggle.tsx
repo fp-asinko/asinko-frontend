@@ -57,8 +57,8 @@ export function CommentsToggle({
         <ChevronDownIcon
           aria-hidden
           className={cn(
-            'size-3.5 transition-transform duration-200 ease-out',
-            open && 'rotate-180',
+            'size-3.5 transition-transform ease-out',
+            open ? 'rotate-180 duration-200' : 'duration-150',
           )}
         />
       </button>

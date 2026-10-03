@@ -59,6 +59,14 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
 - **Bordes de campos activos** con `--input` (3:1); el borde suave del prototipo solo en elementos deshabilitados o decorativos.
 - `src/test/tokens-contrast.test.ts` mide cada par en los dos temas: un token que baja del mínimo rompe el build.
 
+### Color de las tarjetas (`specs/feed-cards`)
+
+- **Identidad**: 8 tonos (`--avatar-0…7`, gradiente a `-to` y texto `-foreground`). `UserAvatar` elige el tono con `identityIndex` (`src/lib/identity-color.ts`) sobre una clave estable: el username de una persona y el **slug** de una comunidad (`colorKey`), nunca el nombre visible.
+- **Encuestas**: `--poll-1…6` para leyenda y barra, sobre `--poll-track`.
+- **Consenso** (`--consensus-majority`, `--consensus-minority`) y **precisión por tramos** (`--accuracy-high|mid|low`): fondo tintado con texto del mismo tono.
+- **Sin verde ni rojo de sube/baja** en avatares ni encuestas: lo verifica el test de contraste.
+- Las clases por tono van escritas completas en un array (`IDENTITY_CLASSES[i]`), nunca interpoladas: Tailwind solo genera las clases que encuentra escritas.
+
 ### Tipografía
 
 - **Figtree** con `next/font/google`: se descarga en el build y se sirve desde el sitio, sin requests a Google.
@@ -76,7 +84,8 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
 Definido en `specs/home-motion`. Los valores salen del prototipo y el criterio, de las skills `emil-design-eng` y `review-animations`.
 
 - **Tokens** en `globals.css`: `--ease-out` (`cubic-bezier(0.23, 1, 0.32, 1)`, salidas e interacciones) y `--ease-bars` (`cubic-bezier(0.4, 0, 0.2, 1)`, las barras del prototipo); animaciones `animate-vote-pop`, `animate-count-up/down`, `animate-bar-grow`, `animate-fade-up`, `animate-fade-in`, `animate-underline-in` y `animate-live-pulse`. Un valor nuevo se agrega ahí, no suelto en un componente.
-- **Utilidades**: `tap` (hover de color en 150 ms y presión a `scale(0.97)` en 120 ms) para todo lo interactivo, y `stagger` (entrada escalonada de los primeros 5 hijos).
+- **Utilidades**: `tap` (hover de color en 150 ms y presión a `scale(0.97)` en 120 ms) para todo lo interactivo, `stagger` (entrada escalonada de los primeros 5 hijos) y `delay-after-bars` (400 ms: lo que entra después de las barras de encuesta). Un control bloqueado (`aria-disabled`) no se hunde al tocarlo: `aria-disabled:active:scale-100`.
+- **Escalas al hover** con `motion-safe:`: la red de seguridad acorta duraciones pero no quita la escala, que saltaría al instante.
 - **Reglas**:
   - Transiciones para cambios de estado (se pueden interrumpir); `@keyframes` solo para entradas de una vez.
   - Todo ≤ 300 ms con salidas `ease-out`; nunca `ease-in`. Excepción: barras de encuesta (600 ms, del prototipo).

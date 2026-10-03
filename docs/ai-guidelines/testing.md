@@ -220,7 +220,7 @@ test('user can request a quote', async ({ page }) => {
 ### Specs de la base (`specs/foundation`)
 
 - Corren en el puerto 3100 (el 3000 queda para `pnpm dev`) contra el build de producción con `APP_ENV=preview` y mocks.
-- `e2e/fixtures/axe.ts` tiene `expectNoA11yViolations(page)` (WCAG 2.2 AA) y `collectConsoleErrors(page)` (violaciones de CSP, errores de hidratación).
+- `e2e/fixtures/axe.ts` tiene `expectNoA11yViolations(page)` (WCAG 2.2 AA) y `collectConsoleErrors(page)` (violaciones de CSP, errores de hidratación). Antes de medir, espera a que terminen las animaciones finitas: en pleno fade-in, axe ve bajo contraste en el texto que está entrando.
 - `e2e/performance.spec.ts` verifica el presupuesto de JavaScript (`seo.md`). Toda ruta nueva se suma a su lista.
 - Los chequeos que no dependen del dispositivo (headers, peso de JS) corren solo en el proyecto desktop.
 
