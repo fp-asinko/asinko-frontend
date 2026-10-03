@@ -20,7 +20,7 @@ T-01 ─┬─ T-02 ─ T-03
     - Unitario del hash: estable, ignora prefijo y mayúsculas, siempre en 0–7, y reparte una muestra de handles en al menos 6 tonos.
     - `user-avatar.test.tsx`: la misma clave da la misma clase, y con imagen no hay gradiente.
 
-- [ ] **T-03 · Precisión por tramos y hover de la byline** · S · FC-03, FC-10
+- [x] **T-03 · Precisión por tramos y hover de la byline** · S · FC-03, FC-10
   - `accuracyTier` con los límites de Q1. El chip usa un mapa de clases y `group/byline`.
   - **Tests:** tramos en 0,4999 / 0,5 / 0,6999 / 0,7. `card-byline.test.tsx` verifica el nombre accesible con el tramo en los tres casos.
 

@@ -121,7 +121,7 @@
       "system": "Asinko",
       "edited": "editado",
       "deleted": "[excluído]",
-      "accuracy": "{value} de precisão",
+      "accuracy": "{value} de precisão, {tier, select, high {alta} mid {média} other {baixa}}",
       "seeMore": "Ver mais",
       "seeLess": "Ver menos",
       "comments": "{count, plural, one {# comentário} other {# comentários}}",

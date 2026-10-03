@@ -18,7 +18,7 @@ describe('CardByline', () => {
       />,
     )
     expect(screen.getByText('@maria')).toBeInTheDocument()
-    expect(screen.getByText('74% accuracy')).toBeInTheDocument()
+    expect(screen.getByText('74% accuracy, high')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '#defi' })).toHaveAttribute('href', '/?community=defi')
     expect(screen.getByText('1 hour ago').tagName).toBe('TIME')
   })
@@ -31,13 +31,24 @@ describe('CardByline', () => {
   })
 
   it.each([
-    ['es', /hace 1 hora/, /74\s%\sde precisión/],
-    ['pt', /há 1 hora/, /74%\sde precisão/],
+    ['es', /hace 1 hora/, /74\s%\sde precisión, alta/],
+    ['pt', /há 1 hora/, /74%\sde precisão, alta/],
   ] as const)('formats time and accuracy in %s (H-22)', (locale, time, accuracy) => {
     renderWithIntl(<CardByline author={MARIA} community={null} publishedAt={hourAgo()} />, {
       locale,
     })
     expect(screen.getByText(time).tagName).toBe('TIME')
     expect(screen.getByText(accuracy)).toBeInTheDocument()
+  })
+
+  it.each([
+    [0.74, 'high'],
+    [0.55, 'medium'],
+    [0.31, 'low'],
+  ] as const)('names the accuracy tier of %s for screen readers (FC-03)', (accuracyRate, tier) => {
+    renderWithIntl(
+      <CardByline author={{ ...MARIA, accuracyRate }} community={null} publishedAt={hourAgo()} />,
+    )
+    expect(screen.getByText(new RegExp(`accuracy, ${tier}$`))).toBeInTheDocument()
   })
 })

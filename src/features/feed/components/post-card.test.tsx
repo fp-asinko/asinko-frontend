@@ -18,7 +18,7 @@ describe('PostCard (H-12)', () => {
       screen.getByRole('article', { name: 'Whales accumulated 48,000 $BTC' }),
     ).toBeInTheDocument()
     expect(screen.getByText('@maria')).toBeInTheDocument()
-    expect(screen.getByText('74% accuracy')).toBeInTheDocument()
+    expect(screen.getByText('74% accuracy, high')).toBeInTheDocument()
     expect(screen.getByText('2 hours ago')).toBeInTheDocument()
     expect(screen.getByText('On-chain')).toBeInTheDocument()
     // The byline community and the body mention both link to the filtered Home.
