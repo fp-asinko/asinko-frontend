@@ -16,7 +16,7 @@ export function GroupList({ groups }: { groups: Group[] }) {
         <li key={group.slug}>
           <CommunityLink
             slug={group.slug}
-            className="group flex tap flex-col gap-1 rounded-md px-1 py-1.5 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted"
+            className="group flex tap flex-col gap-1 rounded-md px-1 py-1.5 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted aria-[current=page]:ring-1 aria-[current=page]:ring-foreground"
           >
             <span className="flex items-center gap-2">
               <UserAvatar

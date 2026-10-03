@@ -5,8 +5,8 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 
 /**
- * A post image that fades in once loaded (M-09). Only for cards that arrive with "Load more"
- * (D-M1): an image hidden while it loads does not count for LCP, so the first page shows its
+ * An image that fades in once loaded (home-motion M-09). A brand atom, not shadcn. Used only for
+ * images that arrive after the first paint, like the cards from "Load more" (D-M1): an image hidden while it loads does not count for LCP, so the first page shows its
  * images at once. Same props and contract as next/image.
  */
 export function FadeImage({ className, onLoad, alt, ...props }: ImageProps) {

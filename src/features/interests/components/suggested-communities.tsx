@@ -18,7 +18,7 @@ export function SuggestedCommunities({ suggestions }: { suggestions: Suggestion[
         <li key={suggestion.slug} className="flex items-center gap-2 rounded-md px-0.5 py-1.5">
           <CommunityLink
             slug={suggestion.slug}
-            className="group flex min-w-0 flex-1 tap items-center gap-2 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted"
+            className="group flex min-w-0 flex-1 tap items-center gap-2 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted aria-[current=page]:ring-1 aria-[current=page]:ring-foreground"
           >
             <UserAvatar
               name={suggestion.name}

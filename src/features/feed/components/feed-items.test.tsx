@@ -23,4 +23,24 @@ describe('FeedItems', () => {
     ).toBeInTheDocument()
     expect(screen.getByRole('article', { name: 'Where does $BTC close 2026?' })).toBeInTheDocument()
   })
+
+  it('shows first-page images at once and fades in the ones loaded later (D-M1)', () => {
+    const withImage = postItem({ media: { type: 'image', url: '/mocks/chart.svg' } })
+    const { unmount } = renderWithIntl(
+      <ul>
+        <FeedItems items={[withImage]} />
+      </ul>,
+    )
+    expect(screen.getByRole('img', { name: 'Image attached to the post' })).not.toHaveClass(
+      'opacity-0',
+    )
+    unmount()
+
+    renderWithIntl(
+      <ul>
+        <FeedItems items={[withImage]} later />
+      </ul>,
+    )
+    expect(screen.getByRole('img', { name: 'Image attached to the post' })).toHaveClass('opacity-0')
+  })
 })

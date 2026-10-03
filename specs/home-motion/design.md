@@ -108,6 +108,8 @@ Cubre también lo que no escribimos nosotros (el panel lateral de shadcn/Base UI
 - **M-02**: la barra no anima `width` sino `transform: scaleX(share)` sobre un ancho completo, para que vaya por la GPU (revisión con `review-animations`). `bar-grow` arranca en `scaleX(0)` y termina en el valor de la barra.
 - **M-03 y S-01**: cerrar dura 150 ms y abrir 200 ms (entrada y salida asimétricas).
 - **S-02**: el mosaico no cambia de fondo ni en hover ni activo: el verde de la variación sobre `surface` o `muted` no llega a 4,5:1 (lo marcó axe). Se eleva en hover y el activo se marca con el borde. El refuerzo del borde inferior quedó afuera: la elevación ya da la señal y el borde extra movía el contenido.
+- **S-04**: en grupos y sugeridas, el activo lleva además `ring-1 ring-foreground` (un fondo `muted` solo no llega a 3:1, WCAG 1.4.11), y transiciona en 150 ms con `tap` en lugar de 200 ms.
+- **M-09**: `FadeImage` es un átomo genérico y vive en `components/ui/fade-image.tsx`.
 - **D-M2**: `useSearchParams` se reexporta desde `@/i18n/navigation` para que código y tests usen un solo módulo (y un solo mock).
 - **Presupuesto**: 226,9 KB de 230 al cerrar (el `Collapsible` sumó 4,4 KB).
 
