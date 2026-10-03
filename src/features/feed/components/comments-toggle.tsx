@@ -3,6 +3,7 @@
 import { ChevronDownIcon } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useId, useState, useTransition, type ReactNode } from 'react'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { loadCommentsPreview } from '../actions/load-comments-preview.action'
 
@@ -71,21 +72,30 @@ export function CommentsToggle({
           // Closed: no focus, not read (WCAG), while the height animates to 0.
           inert={!open}
           aria-hidden={!open || undefined}
-          // On phones it bleeds to the card edges (negative margins plus the same extra width); from md the
-          // cards have no side padding (design decision of 2026-10-03), so it spans their width. It
+          // The full width of the card content, as a rounded box inside the card (FC-07). It
           // animates its height with grid rows: 0fr closed, 1fr open (M-03).
           className={cn(
             // Opening (what the person wants to see) takes 200ms; closing snaps in 150ms.
-            'order-last -mx-4 grid basis-[calc(100%+2rem)] transition-[grid-template-rows,margin] ease-out md:mx-0 md:basis-full',
-            open
-              ? 'mt-1 -mb-4.5 grid-rows-[1fr] duration-200 md:-mb-5.5'
-              : 'mt-0 mb-0 grid-rows-[0fr] duration-150',
+            'order-last grid basis-full transition-[grid-template-rows,margin] ease-out',
+            open ? 'mt-1.5 grid-rows-[1fr] duration-200' : 'mt-0 grid-rows-[0fr] duration-150',
           )}
         >
           <div className="min-h-0 overflow-hidden">
-            <div className="border-t bg-surface px-3.5 pt-2.5 pb-1.5">
+            <div className="rounded-lg border bg-surface px-3.5 py-3">
               {pending ? (
-                <p className="py-1 type-meta text-muted-foreground">{t('loading')}</p>
+                // Two comments tall, like a typical preview: the box barely moves when they arrive.
+                // Decorative: the status above announces the loading.
+                <div aria-hidden data-testid="comments-skeleton" className="flex flex-col gap-3.5">
+                  {[0, 1].map((row) => (
+                    <div key={row} className="flex gap-2.5">
+                      <Skeleton className="size-5 shrink-0 rounded-full" />
+                      <div className="flex flex-1 flex-col gap-1.5">
+                        <Skeleton className="h-3 w-32" />
+                        <Skeleton className="h-3.5 w-full" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : failed ? (
                 <p role="alert" className="py-1 type-meta text-muted-foreground">
                   {t('error')}

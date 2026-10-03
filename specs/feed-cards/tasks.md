@@ -41,7 +41,7 @@ T-01 ─┬─ T-02 ─ T-03
   - El pop del ✓ con `key` y el retardo del consenso.
   - **Tests:** en `e2e/home-motion.spec.ts`, el consenso aparece después de las barras. Con reducir movimiento, el estado final llega de inmediato y con color.
 
-- [ ] **T-07 · Panel de comentarios** · S · FC-07, FC-08, FC-10
+- [x] **T-07 · Panel de comentarios** · S · FC-07, FC-08, FC-10
   - Recuadro con margen, autor en negrita, texto principal, `stagger`, hover del avatar, "See all" en negrita con la flecha, y el esqueleto de carga.
   - **Tests:**
     - `comments-preview.test.tsx`: autor y "See all" presentes, con lista y vacío.

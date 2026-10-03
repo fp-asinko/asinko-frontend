@@ -3,6 +3,16 @@ import { expect, type Page } from '@playwright/test'
 
 /** WCAG 2.2 AA automated check (design-system.md § Accesibilidad). Manual testing still applies. */
 export async function expectNoA11yViolations(page: Page) {
+  // Entrances fade in (stagger, consensus): measured mid-fade, text looks low-contrast. Wait for
+  // every finite animation to end; infinite ones (the Live pulse) never would.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((animation) => animation.effect?.getComputedTiming().iterations !== Infinity)
+        .map((animation) => animation.finished.catch(() => undefined)),
+    ),
+  )
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
     .analyze()

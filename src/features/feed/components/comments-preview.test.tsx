@@ -26,6 +26,15 @@ describe('CommentsPreview (H-28)', () => {
     expect(document.querySelector('script')).toBeNull()
   })
 
+  it('gives each author their identity color (FC-07)', () => {
+    renderWithIntl(
+      <CommentsPreview
+        comments={[{ id: 'c1', author: MARIA, body: 'First', createdAt: new Date().toISOString() }]}
+      />,
+    )
+    expect(screen.getByTestId('user-avatar')).toHaveAttribute('data-color')
+  })
+
   it('says when there are no comments yet', () => {
     renderWithIntl(<CommentsPreview comments={[]} />)
     expect(screen.getByText('No comments yet.')).toBeInTheDocument()

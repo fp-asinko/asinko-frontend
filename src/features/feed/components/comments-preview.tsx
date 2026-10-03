@@ -8,7 +8,8 @@ import { PostMarkdown } from './post-markdown'
 /**
  * The first comments under a card (H-28), rendered on the server: the Markdown never reaches the
  * browser. Prototype sizes: 20px avatar, name 12/700, time 12px, text 13px, 14px between comments.
- * "See all comments" waits for the post detail spec (H-26).
+ * "See all comments" waits for the post detail spec (H-26). Color and motion (FC-07, FC-08, FC-10):
+ * identity avatars, bold authors in the main color, rows that fade up one after the other.
  */
 export function CommentsPreview({ comments }: { comments: CommentPreview[] }) {
   const t = useTranslations('feed.comments')
@@ -20,23 +21,24 @@ export function CommentsPreview({ comments }: { comments: CommentPreview[] }) {
       {comments.length === 0 ? (
         <p className="type-meta text-muted-foreground">{t('empty')}</p>
       ) : (
-        <ul className="flex flex-col gap-3.5">
+        <ul className="flex stagger flex-col gap-3.5">
           {comments.map((comment) => (
-            <li key={comment.id} className="flex gap-2.5">
+            <li key={comment.id} className="group flex gap-2.5">
               <UserAvatar
                 name={comment.author.username}
                 imageUrl={comment.author.avatarUrl}
                 size="xs"
+                className="transition-[scale] duration-150 ease-out group-hover:scale-110"
               />
               <div className="min-w-0 flex-1 wrap-anywhere">
                 <p className="mb-0.75 flex gap-1.25 type-meta text-muted-foreground">
-                  <span className="font-bold">{comment.author.handle}</span>
+                  <span className="font-bold text-foreground">{comment.author.handle}</span>
                   <span aria-hidden>·</span>
                   <time dateTime={comment.createdAt}>
                     {format.relativeTime(new Date(comment.createdAt), now)}
                   </time>
                 </p>
-                <div className="type-small">
+                <div className="type-small text-foreground">
                   <PostMarkdown>{comment.body}</PostMarkdown>
                 </div>
               </div>
@@ -46,10 +48,13 @@ export function CommentsPreview({ comments }: { comments: CommentPreview[] }) {
       )}
       <ComingSoon
         label={t('seeAll')}
-        className="inline-flex min-h-6 tap items-center gap-1 type-meta font-semibold"
+        className="group inline-flex min-h-6 tap items-center gap-1 type-meta font-bold text-foreground"
       >
         {t('seeAll')}
-        <ArrowRightIcon aria-hidden className="size-3.5" />
+        <ArrowRightIcon
+          aria-hidden
+          className="size-3.5 transition-[translate] duration-150 ease-out group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5"
+        />
       </ComingSoon>
     </div>
   )

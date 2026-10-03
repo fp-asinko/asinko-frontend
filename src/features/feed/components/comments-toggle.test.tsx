@@ -34,6 +34,20 @@ describe('CommentsToggle (H-28)', () => {
     expect(panel).toContainElement(screen.getByText('First comment'))
   })
 
+  it('announces the loading and shows a decorative skeleton meanwhile (FC-07)', async () => {
+    let answer: (value: unknown) => void = () => {}
+    action.loadCommentsPreview.mockReturnValue(new Promise((resolve) => (answer = resolve)))
+    renderToggle()
+
+    await userEvent.click(screen.getByRole('button', { name: /6 comments/ }))
+    expect(screen.getByRole('status')).toHaveTextContent('Loading comments…')
+    expect(screen.getByTestId('comments-skeleton')).toHaveAttribute('aria-hidden', 'true')
+
+    answer({ ok: true, data: <p>First comment</p> })
+    expect(await screen.findByText('First comment')).toBeInTheDocument()
+    expect(screen.queryByTestId('comments-skeleton')).toBeNull()
+  })
+
   it('reuses the preview when toggled again; closed, it stays mounted but inert (M-03)', async () => {
     action.loadCommentsPreview.mockResolvedValue({ ok: true, data: <p>First comment</p> })
     renderToggle()
