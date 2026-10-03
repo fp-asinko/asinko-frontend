@@ -1,7 +1,7 @@
 import { useTranslations } from 'next-intl'
 import { UserAvatar } from '@/components/molecules/user-avatar'
-import { Link } from '@/i18n/navigation'
 import type { Group } from '../interests.types'
+import { CommunityLink } from './community-link'
 
 /**
  * Groups I belong to: #handle, MOD label if I moderate, description below (prototype sizes). The
@@ -14,16 +14,16 @@ export function GroupList({ groups }: { groups: Group[] }) {
     <ul className="flex flex-col gap-0.5">
       {groups.map((group) => (
         <li key={group.slug}>
-          <Link
-            href={{ pathname: '/', query: { community: group.slug } }}
-            className="flex flex-col gap-1 rounded-md px-1 py-1.5 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
+          <CommunityLink
+            slug={group.slug}
+            className="group flex tap flex-col gap-1 rounded-md px-1 py-1.5 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted"
           >
             <span className="flex items-center gap-2">
               <UserAvatar
                 name={group.name}
                 imageUrl={group.avatarUrl}
                 size="xs"
-                className="size-6 rounded-sm"
+                className="size-6 rounded-sm transition-[scale] duration-200 ease-out group-hover:scale-105"
               />
               <span className="truncate type-small font-semibold">{group.handle}</span>{' '}
               {group.isModerator && (
@@ -37,7 +37,7 @@ export function GroupList({ groups }: { groups: Group[] }) {
                 {group.description}
               </span>
             )}
-          </Link>
+          </CommunityLink>
         </li>
       ))}
     </ul>

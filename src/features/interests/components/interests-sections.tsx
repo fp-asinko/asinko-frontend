@@ -49,7 +49,7 @@ export function InterestsSections({ interests }: { interests: Interests }) {
       <div className="mt-1 flex flex-col">
         <ComingSoon
           label={t('createGroup')}
-          className="flex h-7.5 w-full items-center gap-1.75 rounded-md border border-dashed px-1.5 type-meta font-semibold text-muted-foreground"
+          className="flex h-7.5 w-full tap items-center gap-1.75 rounded-md border border-dashed px-1.5 type-meta font-semibold text-muted-foreground hover:bg-surface"
         >
           <PlusCircleIcon aria-hidden className="size-3" />
           {t('createGroup')}

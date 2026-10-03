@@ -38,7 +38,7 @@ export function FeedView({
         <FeedTabs params={params} />
         <FeedFilters params={params} community={community} />
       </div>
-      <div className="overflow-hidden border-y bg-card sm:rounded-2xl sm:border">
+      <div className="overflow-hidden bg-card">
         {state.status === 'needs-account' ? (
           <EmptyState message={t('needAccount')} />
         ) : items.length === 0 ? (

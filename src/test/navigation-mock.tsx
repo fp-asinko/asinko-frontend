@@ -14,6 +14,17 @@ export function usePathname() {
   return pathname
 }
 
+let search = new URLSearchParams()
+
+/** Sets the query string read by useSearchParams, e.g. setSearch('community=btc'). */
+export function setSearch(query: string) {
+  search = new URLSearchParams(query)
+}
+
+export function useSearchParams() {
+  return search
+}
+
 /** Spies of the localized router: assert on them, reset with vi.clearAllMocks(). */
 export const router = { push: vi.fn(), replace: vi.fn() }
 

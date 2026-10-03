@@ -5,6 +5,7 @@ import { ComingSoon } from '@/components/molecules/coming-soon'
 import type { PostItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
+import { FadeImage } from './fade-image'
 import { CommentsToggle } from './comments-toggle'
 import { PostMarkdown } from './post-markdown'
 import { VoteControl } from './vote-control'
@@ -21,14 +22,22 @@ function isLong(body: string) {
  * Markdown), image or link, and the actions row. A long body is clamped with CSS and expands with a
  * native <details>: no JavaScript.
  */
-export function PostCard({ post }: { post: PostItem }) {
+export function PostCard({
+  post,
+  fadeImage = false,
+}: {
+  post: PostItem
+  /** Fade the image in once loaded: only cards loaded later (D-M1, protects LCP). */
+  fadeImage?: boolean
+}) {
+  const PostImage = fadeImage ? FadeImage : Image
   const t = useTranslations('feed.card')
   const format = useFormatter()
 
   return (
     // wrap-anywhere: a long word or URL from a user wraps instead of being cut off at 360px.
     <article
-      className="px-4 py-4.5 wrap-anywhere md:px-6 md:py-5.5"
+      className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
       aria-labelledby={`post-${post.id}`}
     >
       <div className="mb-2 flex items-start justify-between gap-3">
@@ -74,7 +83,7 @@ export function PostCard({ post }: { post: PostItem }) {
 
       {post.media?.type === 'image' && (
         <div className="relative mt-3 aspect-video overflow-hidden rounded-lg border bg-surface">
-          <Image
+          <PostImage
             src={post.media.url}
             alt={t('image')}
             fill

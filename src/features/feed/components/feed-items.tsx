@@ -3,10 +3,17 @@ import { PollCard } from './poll-card'
 import { PostCard } from './post-card'
 
 /** The cards of one feed page, as list items. Shared by the first page and the ones loaded later. */
-export function FeedItems({ items }: { items: FeedItem[] }) {
+export function FeedItems({
+  items,
+  later = false,
+}: {
+  items: FeedItem[]
+  /** A page loaded with "Load more": its images fade in (D-M1). */
+  later?: boolean
+}) {
   return items.map((item) => (
     <li key={`${item.kind}-${item.id}`}>
-      {item.kind === 'post' ? <PostCard post={item} /> : <PollCard poll={item} />}
+      {item.kind === 'post' ? <PostCard post={item} fadeImage={later} /> : <PollCard poll={item} />}
     </li>
   ))
 }

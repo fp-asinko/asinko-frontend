@@ -70,7 +70,7 @@ export function LoadMore({ params, cursor }: { params: FeedParams; cursor: strin
         <ul
           key={index}
           ref={index === pages.length - 1 ? lastPage : undefined}
-          className="divide-y border-t [&_article]:outline-none [&_article:focus-visible]:ring-3 [&_article:focus-visible]:ring-ring/50 [&_article:focus-visible]:ring-inset"
+          className="stagger divide-y border-t [&_article]:outline-none [&_article:focus-visible]:ring-3 [&_article:focus-visible]:ring-ring/50 [&_article:focus-visible]:ring-inset"
         >
           {page}
         </ul>

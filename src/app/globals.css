@@ -237,11 +237,11 @@
 /* Hover and press feedback for everything interactive (M-06, M-07): colors in 150ms like the
    prototype's hovers, a 0.97 press in 120ms. */
 @utility tap {
-  transition-property: color, background-color, border-color, transform;
-  transition-duration: 150ms, 150ms, 150ms, 120ms;
+  transition-property: color, background-color, border-color, translate, scale;
+  transition-duration: 150ms, 150ms, 150ms, 200ms, 120ms;
   transition-timing-function: var(--ease-out);
   &:active {
-    transform: scale(0.97);
+    scale: 0.97;
   }
 }
 

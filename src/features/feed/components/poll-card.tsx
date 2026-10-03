@@ -22,7 +22,7 @@ export function PollCard({ poll }: { poll: PollItem }) {
 
   return (
     <article
-      className="px-4 py-4.5 wrap-anywhere md:px-6 md:py-5.5"
+      className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
       aria-labelledby={`poll-${poll.id}`}
     >
       <div className="mb-2 flex items-start justify-between gap-3">

@@ -74,8 +74,11 @@ export function CommentsToggle({
           // Bleeds to the card edges (negative margins plus the same extra width, 2rem / 3rem) and
           // animates its height with grid rows: 0fr closed, 1fr open (M-03).
           className={cn(
-            'order-last -mx-4 grid basis-[calc(100%+2rem)] transition-[grid-template-rows,margin] duration-200 ease-out md:-mx-6 md:basis-[calc(100%+3rem)]',
-            open ? 'mt-1 -mb-4.5 grid-rows-[1fr] md:-mb-5.5' : 'mt-0 mb-0 grid-rows-[0fr]',
+            // Opening (what the person wants to see) takes 200ms; closing snaps in 150ms.
+            'order-last -mx-4 grid basis-[calc(100%+2rem)] transition-[grid-template-rows,margin] ease-out md:-mx-6 md:basis-[calc(100%+3rem)]',
+            open
+              ? 'mt-1 -mb-4.5 grid-rows-[1fr] duration-200 md:-mb-5.5'
+              : 'mt-0 mb-0 grid-rows-[0fr] duration-150',
           )}
         >
           <div className="min-h-0 overflow-hidden">

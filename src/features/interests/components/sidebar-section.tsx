@@ -49,7 +49,7 @@ export function SidebarSection<T>({
           />
         </CollapsibleTrigger>
         {/* Height from Base UI's --collapsible-panel-height: animates in every browser (S-01). */}
-        <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-[height] duration-200 ease-out data-ending-style:h-0 data-starting-style:h-0">
+        <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-[height] duration-200 ease-out data-ending-style:h-0 data-ending-style:duration-150 data-starting-style:h-0">
           <div className="py-1">
             {!result.ok ? (
               <p className="px-1 type-meta text-muted-foreground">{t('error')}</p>
@@ -63,7 +63,7 @@ export function SidebarSection<T>({
                     <ComingSoon
                       label={moreLabel}
                       placement="below-end"
-                      className="h-6 rounded-sm px-1.5 text-[0.625rem] font-medium text-muted-foreground"
+                      className="h-6 tap rounded-sm px-1.5 text-[0.625rem] font-medium text-muted-foreground hover:text-foreground"
                     >
                       {t('more')}
                     </ComingSoon>

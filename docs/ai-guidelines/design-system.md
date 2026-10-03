@@ -71,6 +71,22 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
 - Áreas seguras del iPhone con `env(safe-area-inset-*)` (`viewport-fit=cover`); alturas de pantalla con `dvh`, nunca `vh`.
 - Del estilo de Apple (skill `apple-design`) se toma el criterio de **movimiento e interacción**, no la paleta.
 
+## Movimiento
+
+Definido en `specs/home-motion`. Los valores salen del prototipo y el criterio, de las skills `emil-design-eng` y `review-animations`.
+
+- **Tokens** en `globals.css`: `--ease-out` (`cubic-bezier(0.23, 1, 0.32, 1)`, salidas e interacciones) y `--ease-bars` (`cubic-bezier(0.4, 0, 0.2, 1)`, las barras del prototipo); animaciones `animate-vote-pop`, `animate-count-up/down`, `animate-bar-grow`, `animate-fade-up`, `animate-fade-in`, `animate-underline-in` y `animate-live-pulse`. Un valor nuevo se agrega ahí, no suelto en un componente.
+- **Utilidades**: `tap` (hover de color en 150 ms y presión a `scale(0.97)` en 120 ms) para todo lo interactivo, y `stagger` (entrada escalonada de los primeros 5 hijos).
+- **Reglas**:
+  - Transiciones para cambios de estado (se pueden interrumpir); `@keyframes` solo para entradas de una vez.
+  - Todo ≤ 300 ms con salidas `ease-out`; nunca `ease-in`. Excepción: barras de encuesta (600 ms, del prototipo).
+  - Solo `transform` y `opacity`; la altura se anima únicamente en los desplegables. Nada desde `scale(0)`.
+  - Abrir es más lento que cerrar (200 / 150 ms): lo que la persona pidió ver se muestra con calma; la respuesta del sistema es inmediata.
+  - Lo que solo se mueve con hover usa la variante `hover:` (Tailwind 4 la limita a dispositivos con hover).
+  - Un estado con fondo nuevo (hover, activo) respeta el contraste: el verde de las variaciones va sobre blanco (por eso un mosaico de activo no cambia de fondo).
+- **Reducir movimiento**: una regla global en `globals.css` termina al instante toda animación y transición con `prefers-reduced-motion: reduce`, incluidas las de terceros.
+- **Desplegables**: `Collapsible` de shadcn (alto animado en todos los navegadores; el `<details>` nativo solo se anima en Chrome y Edge).
+
 ## Atomic Design
 
 | Nivel                     | Qué es                                     | Dónde vive                           | Ejemplos                                     |

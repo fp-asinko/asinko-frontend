@@ -10,8 +10,16 @@ export function PeopleList({ people }: { people: Person[] }) {
   return (
     <ul className="flex flex-col gap-0.5">
       {people.map((person) => (
-        <li key={person.id} className="flex min-h-9 items-center gap-2 rounded-md p-1">
-          <UserAvatar name={person.username} imageUrl={person.avatarUrl} size="sm" />
+        <li
+          key={person.id}
+          className="group flex min-h-9 items-center gap-2 rounded-md p-1 transition-colors duration-150 ease-out hover:bg-surface"
+        >
+          <UserAvatar
+            name={person.username}
+            imageUrl={person.avatarUrl}
+            size="sm"
+            className="transition-[scale] duration-200 ease-out group-hover:scale-105"
+          />
           <span className="min-w-0 flex-1 truncate type-small font-semibold">{person.handle}</span>
           {person.accuracyRate !== null && (
             <span className="rounded-sm bg-muted px-1.5 py-0.5 text-[0.625rem] font-bold tabular-nums">

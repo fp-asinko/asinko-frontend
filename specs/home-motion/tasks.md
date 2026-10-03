@@ -29,15 +29,15 @@ T-01 ─┬─ T-02 ─ T-03 ─ T-04 ─ T-05 ─ T-06
   - Panel montado después de la primera apertura, `grid-template-rows`, `inert` y `aria-hidden` cerrado.
   - **Tests:** unitario del panel cerrado; los e2e de comentarios siguen en verde.
 
-- [ ] **T-06 · Pestañas, cargar más e imágenes** · S · M-04, M-05, M-09
+- [x] **T-06 · Pestañas, cargar más e imágenes** · S · M-04, M-05, M-09
   - Subrayado `::after`, `stagger` en las páginas nuevas, `FadeImage` solo en esas páginas (D-M1).
   - **Tests:** unitario de `FadeImage`; e2e de CLS al cargar más.
 
-- [ ] **T-07 · Columna: secciones, mosaicos y filas** · M · S-01, S-02, S-03, S-05, S-06
+- [x] **T-07 · Columna: secciones, mosaicos y filas** · M · S-01, S-02, S-03, S-05, S-06
   - Secciones con `Collapsible` de shadcn (alto animado en todos los navegadores), elevación de mosaicos, hover de filas y avatares, `tap` en los botones, duración del panel lateral.
   - **Tests:** los existentes siguen en verde; revisión visual a 360 y 1440 px.
 
-- [ ] **T-08 · Comunidad activa** · S · S-04
+- [x] **T-08 · Comunidad activa** · S · S-04
   - `CommunityLink` (D-M2) en mosaicos, grupos y sugeridas.
   - **Tests:** `community-link.test.tsx`; e2e con `?community=btc`.
 

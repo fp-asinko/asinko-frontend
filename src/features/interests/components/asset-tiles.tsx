@@ -1,14 +1,16 @@
 import { ClockAlertIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { Delta } from '@/components/molecules/delta'
-import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 import type { AssetTile } from '../interests.types'
+import { CommunityLink } from './community-link'
 
 /**
  * Prototype tiles: 3-column grid, $handle, daily change, bottom border in the change's color.
  * The link's name comes from its content (asset name for screen readers, change, price and the
  * stale warning), so nothing shown only by color or icon is lost (WCAG 1.3.1).
+ * Motion (S-02): lifts on hover and focus, presses on tap; the community the feed shows is
+ * marked as current (S-04).
  */
 export function AssetTiles({ tiles }: { tiles: AssetTile[] }) {
   const t = useTranslations('interests')
@@ -22,10 +24,11 @@ export function AssetTiles({ tiles }: { tiles: AssetTile[] }) {
           const change = tile.changePct ?? 0
           return (
             <li key={tile.symbol}>
-              <Link
-                href={{ pathname: '/', query: { community: tile.communitySlug } }}
+              <CommunityLink
+                slug={tile.communitySlug}
                 className={cn(
-                  'flex min-h-19.5 flex-col items-center justify-center gap-0.5 rounded-md border border-b-3 bg-card p-1 text-center outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50',
+                  'flex min-h-19.5 tap flex-col items-center justify-center gap-0.5 rounded-md border border-b-3 bg-card p-1 text-center outline-none hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-0',
+                  'aria-[current=page]:border-x-foreground aria-[current=page]:border-t-foreground',
                   change > 0 && 'border-b-bullish',
                   change < 0 && 'border-b-bearish',
                 )}
@@ -51,7 +54,7 @@ export function AssetTiles({ tiles }: { tiles: AssetTile[] }) {
                     <span className="sr-only">{t('stale')}</span>
                   </span>
                 )}
-              </Link>
+              </CommunityLink>
             </li>
           )
         })}

@@ -103,6 +103,14 @@ Cubre también lo que no escribimos nosotros (el panel lateral de shadcn/Base UI
   - El presupuesto de JS y axe siguen pasando (G-03, G-06).
 - **Revisión**: la skill `review-animations` sobre los componentes tocados, y el `ui-reviewer` antes del PR.
 
-## 7. Cambios en guías
+## 7. Ajustes de la implementación (2026-10-03)
+
+- **M-02**: la barra no anima `width` sino `transform: scaleX(share)` sobre un ancho completo, para que vaya por la GPU (revisión con `review-animations`). `bar-grow` arranca en `scaleX(0)` y termina en el valor de la barra.
+- **M-03 y S-01**: cerrar dura 150 ms y abrir 200 ms (entrada y salida asimétricas).
+- **S-02**: el mosaico no cambia de fondo ni en hover ni activo: el verde de la variación sobre `surface` o `muted` no llega a 4,5:1 (lo marcó axe). Se eleva en hover y el activo se marca con el borde. El refuerzo del borde inferior quedó afuera: la elevación ya da la señal y el borde extra movía el contenido.
+- **D-M2**: `useSearchParams` se reexporta desde `@/i18n/navigation` para que código y tests usen un solo módulo (y un solo mock).
+- **Presupuesto**: 226,9 KB de 230 al cerrar (el `Collapsible` sumó 4,4 KB).
+
+## 8. Cambios en guías
 
 - `design-system.md`: tokens de movimiento, utilidades `tap` y `stagger`, la red de seguridad de reducir movimiento y la regla "transiciones para estados, keyframes para entradas".

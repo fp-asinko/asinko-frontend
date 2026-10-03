@@ -89,12 +89,13 @@ export function PollVoting({
               {option.share !== null && (
                 <span
                   aria-hidden
-                  // Grows from 0 when revealed; a later change of option transitions the width.
+                  // Full width, scaled to its share: transform runs on the GPU (no layout per frame).
+                  // Grows from 0 when revealed; a later change of option transitions the scale.
                   className={cn(
-                    'absolute inset-y-0 left-0 origin-left bg-muted transition-[width] duration-600 ease-bars',
+                    'absolute inset-0 origin-left bg-muted transition-transform duration-600 ease-bars',
                     revealed && 'animate-bar-grow',
                   )}
-                  style={{ width: `${option.share * 100}%` }}
+                  style={{ transform: `scaleX(${option.share})` }}
                 />
               )}
               <span className="relative flex items-center justify-between gap-3">
