@@ -14,6 +14,7 @@ export const env = createEnv({
     APP_ENV: process.env.APP_ENV,
     API_BASE_URL: process.env.API_BASE_URL,
     API_MOCKS: process.env.API_MOCKS,
+    API_TIMEOUT_MS: process.env.API_TIMEOUT_MS,
     SENTRY_DSN: process.env.SENTRY_DSN,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,

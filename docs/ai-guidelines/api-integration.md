@@ -38,7 +38,7 @@ const result = await apiRequest({
 
 - **Rutas como patrones del contrato con parámetros con nombre.** El cliente codifica cada valor (`encodeURIComponent`): un `../`, `?` o `#` en un username o slug nunca cambia la ruta. TypeScript exige exactamente los parámetros que pide el patrón. Nunca se arma un path concatenando strings.
 - **Validación de cada respuesta con zod** (obligatoria). Si no cumple el esquema es un fallo `VALIDATION` (cambió el contrato): se reportan los campos que fallaron, nunca sus valores.
-- **Timeout de 10 s** en cada request.
+- **Timeout de 10 s** en cada request (`API_TIMEOUT_MS`, de 1 a 60 s). Subirlo solo en desarrollo contra un backend lento (por ejemplo, el backend local contra una base en otro continente); nunca para esconder una API lenta en producción.
 - **Nunca lanza por el resultado de un request**: siempre devuelve `ApiResult` (ver Errores). Solo lanza ante un bug propio, como un parámetro de ruta faltante.
 - **El endpoint se identifica por su patrón** (`GET /api/v1/profiles/:identifier`) en errores y reportes, nunca por la URL concreta: puede llevar un username, un email o un id.
 

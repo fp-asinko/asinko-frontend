@@ -54,6 +54,14 @@ describe('envSchema', () => {
     expect(issues.map((issue) => issue.message)).toContain(MOCKS_IN_PRODUCTION_ERROR)
   })
 
+  it('waits 10 s for the API by default and accepts a longer timeout for development', () => {
+    expect(envSchema.parse(validPreview).API_TIMEOUT_MS).toBe(10_000)
+    expect(envSchema.parse({ ...validPreview, API_TIMEOUT_MS: '30000' }).API_TIMEOUT_MS).toBe(
+      30_000,
+    )
+    expect(envSchema.safeParse({ ...validPreview, API_TIMEOUT_MS: '500' }).success).toBe(false)
+  })
+
   it('accepts production without mocks', () => {
     const result = envSchema.safeParse({
       ...validPreview,

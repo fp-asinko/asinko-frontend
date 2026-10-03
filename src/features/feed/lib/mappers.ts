@@ -1,3 +1,4 @@
+import { allowedImageUrl } from '@/lib/images'
 import type {
   RawCommunity,
   RawFeedItem,
@@ -56,17 +57,6 @@ function toAuthor(user: RawAuthor | null): Author | null {
   }
 }
 
-/** Only same-site paths and https images; anything else is dropped. */
-function safeImageUrl(url: string | null): string | null {
-  if (!url) return null
-  if (url.startsWith('/') && !url.startsWith('//')) return url
-  try {
-    return new URL(url).protocol === 'https:' ? url : null
-  } catch {
-    return null
-  }
-}
-
 /** Only http(s) links, with the real domain to show (security.md § 1). */
 function safeLink(url: string | null): Extract<PostMedia, { type: 'link' }> | null {
   if (!url) return null
@@ -82,7 +72,7 @@ function safeLink(url: string | null): Extract<PostMedia, { type: 'link' }> | nu
 function toMedia(post: RawPost): PostMedia | null {
   if (post.deleted) return null
   if (post.type === 'IMAGE') {
-    const url = safeImageUrl(post.imageUrl)
+    const url = allowedImageUrl(post.imageUrl)
     return url ? { type: 'image', url } : null
   }
   if (post.type === 'LINK') return safeLink(post.url)

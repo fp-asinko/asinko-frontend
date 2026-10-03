@@ -19,6 +19,7 @@ export const apiRequest = createApiClient({
   baseUrl: env.API_BASE_URL,
   // Never in production: src/env.ts rejects any API_MOCKS but false there (F-30).
   mocks: mockedRoutes(env.API_MOCKS),
+  timeoutMs: env.API_TIMEOUT_MS,
   // A no-op when Sentry has no DSN. Tags carry the endpoint pattern, never URLs or values.
   onUnexpected: (failure, cause) => {
     Sentry.captureException(new Error(`API ${failure.code} on ${failure.endpoint}`), {

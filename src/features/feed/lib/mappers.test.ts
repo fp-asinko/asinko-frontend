@@ -31,10 +31,13 @@ describe('toPostItem', () => {
     const base = post(6)
     const js: RawPost = { ...base, url: 'javascript:alert(1)' }
     const image: RawPost = { ...post(1), imageUrl: 'http://evil.example/x.png' }
+    // A host outside the allowlist (the seed's placeholders) would make next/image throw.
+    const unknownHost: RawPost = { ...post(1), imageUrl: 'https://placehold.co/800x450' }
     const protocolRelative: RawPost = { ...post(1), imageUrl: '//evil.example/x.png' }
     expect(toPostItem(js, communities).media).toBeNull()
     expect(toPostItem(image, communities).media).toBeNull()
     expect(toPostItem(protocolRelative, communities).media).toBeNull()
+    expect(toPostItem(unknownHost, communities).media).toBeNull()
   })
 
   it('handles system, edited and deleted posts', () => {

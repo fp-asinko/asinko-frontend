@@ -12,6 +12,12 @@ export const serverEnvSchema = {
     .enum(['true', 'false', 'missing'])
     .default('false')
     .transform((value) => (({ true: 'all', false: 'off', missing: 'missing' }) as const)[value]),
+  /**
+   * How long the API client waits for a request, in ms. 10 s by default (api-integration.md);
+   * raise it only in development against a slow backend (a far database), never to hide a slow
+   * production API.
+   */
+  API_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60_000).default(10_000),
   SENTRY_DSN: z.url().optional(),
 }
 
