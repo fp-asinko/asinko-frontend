@@ -146,6 +146,8 @@ La página lee y valida con zod sus `searchParams`:
 </PageColumns>
 ```
 
+> **Cambio de diseño (2026-10-03, decidido por el Product Owner):** la caja del feed no lleva borde ni radio, y desde `md` las tarjetas no tienen padding horizontal: el contenido se alinea con las pestañas y el composer. Se aparta del prototipo (que tenía la caja con borde de 16 px). Los separadores entre tarjetas se mantienen.
+
 ### `PostCard` (H-12), Server Component
 
 ```

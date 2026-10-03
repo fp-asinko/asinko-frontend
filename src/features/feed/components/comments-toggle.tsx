@@ -71,11 +71,12 @@ export function CommentsToggle({
           // Closed: no focus, not read (WCAG), while the height animates to 0.
           inert={!open}
           aria-hidden={!open || undefined}
-          // Bleeds to the card edges (negative margins plus the same extra width, 2rem / 3rem) and
+          // On phones it bleeds to the card edges (negative margins plus the same extra width); from md the
+          // cards have no side padding (design decision of 2026-10-03), so it spans their width. It
           // animates its height with grid rows: 0fr closed, 1fr open (M-03).
           className={cn(
             // Opening (what the person wants to see) takes 200ms; closing snaps in 150ms.
-            'order-last -mx-4 grid basis-[calc(100%+2rem)] transition-[grid-template-rows,margin] ease-out md:-mx-6 md:basis-[calc(100%+3rem)]',
+            'order-last -mx-4 grid basis-[calc(100%+2rem)] transition-[grid-template-rows,margin] ease-out md:mx-0 md:basis-full',
             open
               ? 'mt-1 -mb-4.5 grid-rows-[1fr] duration-200 md:-mb-5.5'
               : 'mt-0 mb-0 grid-rows-[0fr] duration-150',

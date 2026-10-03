@@ -37,9 +37,9 @@ export default async function Loading() {
             <Skeleton className="h-8 w-14 rounded-full" />
           </div>
         </div>
-        <div className="divide-y overflow-hidden border-y sm:rounded-2xl sm:border">
+        <div className="divide-y overflow-hidden">
           {[0, 1, 2].map((item) => (
-            <div key={item} className="flex flex-col gap-2.5 px-4 py-4.5 md:px-6 md:py-5.5">
+            <div key={item} className="flex flex-col gap-2.5 px-4 py-4.5 md:px-0 md:py-5.5">
               <Skeleton className="h-4 w-56" />
               <Skeleton className="h-5 w-3/4" />
               <Skeleton className="h-4 w-full" />
