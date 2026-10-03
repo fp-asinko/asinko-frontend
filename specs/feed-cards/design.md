@@ -253,3 +253,46 @@ Surgieron al implementar o en las revisiones de cierre (`ui-reviewer` y una revi
 - **Mientras carga:** un esqueleto de dos comentarios, como pedía el diseño.
 - **axe en e2e:** `expectNoA11yViolations` espera a que terminen las animaciones finitas antes de medir. Midiendo en pleno fade-up, axe veía bajo contraste en el texto que entraba.
 - **Queda como está (menor):** el degradado del recuadro aparece de golpe, porque un `background-image` no se interpola. Coincide con el inicio de las barras y no se nota.
+
+## 12. Revisión 1 — Encuestas como el prototipo (2026-10-03)
+
+> **Estado:** para aprobar junto con la Revisión 1 de los requisitos (FC-15 a FC-19). Reemplaza § 5.2, mueve el consenso de § 5.3 y deja sin efecto D-C1 y D-C2.
+
+### 12.1 Medidas del prototipo
+
+| Pieza            | Prototipo                                                                                                 | Implementación                                                                                                                                                  |
+| ---------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Recuadro         | Degradado `#F7F6F4` → blanco, borde 1 px `#ECEBE7`, radio 10 px, padding 14 px, separación 12 px          | `bg-linear-to-b from-surface to-card border rounded-lg p-3.5 gap-3` (12 px: el radio más cercano de la escala)                                                  |
+| Línea de colores | Degradado de colores en el borde superior                                                                 | `::before` de 2 px con los colores de las opciones (`from-poll-1 via-poll-2 to-poll-3`), decorativo                                                             |
+| Fila             | Grilla `10px 140px 1fr 36px`, separación 8 px, alto 20 px, 6 px entre filas, 13 px/500                    | `grid grid-cols-[0.625rem_minmax(0,8.75rem)_1fr_2.25rem] gap-2 type-action`. A 360 px la columna de la etiqueta se achica y la etiqueta puede ocupar dos líneas |
+| Cuadrado         | 10 × 10, radio 2 px                                                                                       | `size-2.5 rounded-xs bg-poll-N`                                                                                                                                 |
+| Barra            | Pista 8 px `--muted`, radio 6 px; relleno del color                                                       | Pista `h-2 rounded-full bg-poll-track`; relleno `bg-poll-N` con `scaleX` (sin cambios de movimiento)                                                            |
+| No votada        | Cuadrado y relleno al 45 %, texto `#8A8B8E` 500                                                           | `opacity-45` en cuadrado y relleno; texto `text-muted-foreground` (`--faint` no alcanza AA en 13 px)                                                            |
+| Tuya             | Color pleno, texto principal 600                                                                          | Opacidad 1, `font-semibold text-foreground`, "(your vote)" en sr-only                                                                                           |
+| Banner           | `#F0FDFA`, borde `#99F6E4`, radio 10 px, padding 14/16/12; título 16 px/700; subtítulo 12 px itálica gris | Tokens de consenso de § 2.3, `rounded-lg px-4 pt-3.5 pb-3`; título `text-base font-bold`; subtítulo `type-meta italic text-muted-foreground`                    |
+| Botón previo     | A lo ancho, borde 1 px, radio ~10 px, alto ~42 px, 8 px entre botones                                     | `rounded-lg border px-3.5 py-2.5 type-ui font-medium`, `hover:bg-surface`, anillo de foco                                                                       |
+| Logo             | 48 × 48, radio 8 px                                                                                       | `UserAvatar size="xl"` con `rounded-md`                                                                                                                         |
+
+### 12.2 Estados
+
+| Estado                               | Qué se ve                                                                                                                                  |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Resultados ocultos, se puede votar   | Botones limpios (FC-18)                                                                                                                    |
+| Resultados visibles, sin voto propio | Filas suaves. Si se puede votar, cada fila es un `button` (`hover:bg-surface`, `rounded-md`, alto mínimo 24 px)                            |
+| Con voto propio                      | Banner de consenso (si hay al menos 5 votos), tu fila plena y el resto suave. Si se puede cambiar el voto, las filas siguen siendo botones |
+| Cerrada                              | Filas, sin botones                                                                                                                         |
+
+- **Foco (WCAG 2.4.3):** si una opción con foco pasa de botón limpio a fila, el foco pasa a la fila de la misma opción. Las dos son `button` con la misma `key`, así que React conserva el elemento.
+- **Salto de alto (D-C4):** al votar en una encuesta con resultados ocultos, los botones (unos 42 px cada uno) pasan a filas (20 px) más el banner. Es un cambio pedido por la persona, igual que en el prototipo, y se acepta. Reemplaza a D-C1.
+- **El color nunca es la única señal:** la tuya se distingue por negrita y "(your vote)" en sr-only; cada opción, por su etiqueta y su porcentaje. Las barras suaves son decorativas, porque el número lleva el dato.
+
+### 12.3 Consenso
+
+- Arriba del recuadro, antes de las filas. Mínimo de 5 votos (R1-Q1).
+- `consensus.title`: "{percent} of the community thinks like you". `consensus.{majority|minority|tie}`: los subtítulos de R1-Q2. Las claves `consensus.*` de § 8 se reemplazan.
+- **Movimiento:** igual que hasta ahora. Entra después de las barras la primera vez, sin retardo si cambia el tramo, sin animación si el voto era de antes, atenuado mientras viaja un voto nuevo.
+- **Lector de pantalla:** igual que hasta ahora, "Vote saved." más el consenso (título y subtítulo) en la región viva.
+
+### 12.4 Qué se va
+
+El marcador de radio y leyenda (D-C1), el acento de color en hover (FC-06), el ✓ y su "pop", y las barras bajo la etiqueta. El "pop" pasa al cuadrado de tu opción.
