@@ -34,6 +34,7 @@ describe('getInterests', () => {
   it('builds every section from the mocked API', async () => {
     const interests = await getInterests(viewer)
 
+    expect(interests.signedIn).toBe(true)
     expect(interests.assets).toMatchObject({ ok: true })
     expect(interests.assets.ok && interests.assets.data.map((tile) => tile.symbol)).toEqual(
       expect.arrayContaining(['BTC', 'ETH', 'SOL']),
@@ -80,7 +81,10 @@ describe('getInterests', () => {
     expect(interests.people).toEqual({ ok: true, data: [] })
     expect(interests.assets).toEqual({ ok: true, data: [] })
     expect(interests.groups).toEqual({ ok: true, data: [] })
-    expect(interests.suggested.ok && interests.suggested.data.length).toBeGreaterThan(0)
+    expect(interests.signedIn).toBe(false)
+    // The mocks mark the demo user's memberships, so only the two others remain here; the
+    // guest limit of 8 is tested in mappers.test.ts.
+    expect(interests.suggested.ok && interests.suggested.data.length).toBe(2)
   })
 
   it('keeps the suggestions when only the viewer communities fail', async () => {

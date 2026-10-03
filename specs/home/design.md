@@ -110,6 +110,7 @@ Feature **`interests`**, Server Component. Cada sección es un `<details>` nativ
 - **Mosaico de activo**: grilla de 3 columnas, borde inferior de 3 px con el color de la variación, flecha ▲/▼ además del color (el color nunca es la única señal).
 - **Membresía** (backend `dev`, 2026-10-02): Activos y Grupos salen de `GET /communities?mine=true` (requiere sesión; sin viewer, esas secciones quedan vacías). Sugeridas sale de `GET /communities`, quitando las que ya son mías.
 - "Crear grupo" y los "ver más" de cada sección: deshabilitados (H-26).
+- **Sin sesión** (2026-10-03): `getInterests(null)` devuelve `signedIn: false` y hasta 8 sugeridas (`SUGGESTION_COUNT.guest`); `InterestsSections` muestra solo esa lista con el título "Comunidades". Con mocks (`API_MOCKS=true`) siempre hay usuario demo, así que el caso se ve con datos reales o en los tests.
 - **Errores**: si falla una sección, solo esa muestra "No se pudo cargar" y el resto sigue (H-19).
 
 ## 5. Feed (H-09 a H-16)

@@ -5,6 +5,7 @@ import type { Viewer } from '@/lib/session'
 import type { Interests, SectionResult } from '../interests.types'
 import {
   assetSymbol,
+  SUGGESTION_COUNT,
   memberAssetCommunities,
   toAssetTile,
   toGroups,
@@ -51,8 +52,10 @@ export async function getInterests(viewer: Viewer | null): Promise<Interests> {
   ])
 
   const people = following.ok ? section(following.data.items.map(toPerson)) : failed
-  const suggested = all.ok ? section(toSuggestions(all.data.items)) : failed
-  if (!mine.ok) return { assets: failed, people, groups: failed, suggested }
+  const signedIn = viewer !== null
+  const count = signedIn ? SUGGESTION_COUNT.signedIn : SUGGESTION_COUNT.guest
+  const suggested = all.ok ? section(toSuggestions(all.data.items, count)) : failed
+  if (!mine.ok) return { signedIn, assets: failed, people, groups: failed, suggested }
 
   const assetCommunities = memberAssetCommunities(mine.data.items)
   const assetPages = await Promise.all(
@@ -72,5 +75,5 @@ export async function getInterests(viewer: Viewer | null): Promise<Interests> {
   )
   const assets = tiles.length === 0 && assetPages.length > 0 ? failed : section(tiles)
 
-  return { assets, people, groups: section(toGroups(mine.data.items)), suggested }
+  return { signedIn, assets, people, groups: section(toGroups(mine.data.items)), suggested }
 }

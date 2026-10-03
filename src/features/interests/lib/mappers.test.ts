@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import type { RawCommunity } from '@/lib/api/contract'
 import { COMMUNITIES } from '@/mocks/fixtures/communities'
-import { memberAssetCommunities, toGroups, toPerson, toSuggestions } from './mappers'
+import {
+  memberAssetCommunities,
+  SUGGESTION_COUNT,
+  toGroups,
+  toPerson,
+  toSuggestions,
+} from './mappers'
 
 function community(overrides: Partial<RawCommunity>): RawCommunity {
   return { ...COMMUNITIES[0]!, ...overrides }
@@ -44,6 +50,19 @@ describe('interests mappers', () => {
       community({ slug: 'macro', type: 'USER_PUBLIC', viewerMembership: null, memberCount: 1 }),
     ]
     expect(toSuggestions(list).map((s) => s.handle)).toEqual(['$ETH', '#macro'])
+  })
+
+  it('suggests up to 8 communities without a session', () => {
+    const list = Array.from({ length: 12 }, (_, index) =>
+      community({
+        slug: `c${index}`,
+        type: 'USER_PUBLIC',
+        viewerMembership: null,
+        memberCount: index,
+      }),
+    )
+    expect(toSuggestions(list, SUGGESTION_COUNT.guest)).toHaveLength(8)
+    expect(toSuggestions(list)).toHaveLength(3)
   })
 
   it('defaults a missing accuracy to null', () => {

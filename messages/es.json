@@ -72,6 +72,7 @@
   },
   "interests": {
     "title": "Tus intereses",
+    "guestTitle": "Comunidades",
     "assets": "Activos",
     "people": "Personas",
     "groups": "Grupos",

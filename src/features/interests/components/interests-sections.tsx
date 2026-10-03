@@ -8,16 +8,35 @@ import { PeopleList } from './people-list'
 import { SidebarSection } from './sidebar-section'
 import { SuggestedCommunities } from './suggested-communities'
 
-/** The "Your interests" column as in the prototype (H-07). Pure render: data comes in. */
+const COLUMN_TITLE =
+  'px-1 pt-1 pb-2 text-[0.6875rem] leading-[1.4] font-extrabold tracking-[0.08em] text-muted-foreground uppercase'
+
+/**
+ * The "Your interests" column as in the prototype (H-07). Pure render: data comes in. Without a
+ * session the viewer sections would always be empty, so the column is only the biggest
+ * communities (decided 2026-10-03).
+ */
 export function InterestsSections({ interests }: { interests: Interests }) {
   const t = useTranslations('interests')
 
+  if (!interests.signedIn) {
+    return (
+      <section aria-label={t('guestTitle')} className="flex flex-col">
+        <p aria-hidden className={COLUMN_TITLE}>
+          {t('guestTitle')}
+        </p>
+        {interests.suggested.ok ? (
+          <SuggestedCommunities suggestions={interests.suggested.data} />
+        ) : (
+          <p className="px-1 type-meta text-muted-foreground">{t('error')}</p>
+        )}
+      </section>
+    )
+  }
+
   return (
     <section aria-label={t('title')} className="flex min-h-full flex-col">
-      <p
-        aria-hidden
-        className="px-1 pt-1 pb-2 text-[0.6875rem] leading-[1.4] font-extrabold tracking-[0.08em] text-muted-foreground uppercase"
-      >
+      <p aria-hidden className={COLUMN_TITLE}>
         {t('title')}
       </p>
       <SidebarSection

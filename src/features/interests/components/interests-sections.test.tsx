@@ -8,6 +8,7 @@ import { InterestsSections } from './interests-sections'
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 const interests: Interests = {
+  signedIn: true,
   assets: {
     ok: true,
     data: [
@@ -130,6 +131,7 @@ describe('InterestsSections', () => {
     renderWithIntl(
       <InterestsSections
         interests={{
+          signedIn: true,
           assets: { ok: true, data: [] },
           people: { ok: true, data: [] },
           groups: { ok: true, data: [] },
@@ -141,5 +143,24 @@ describe('InterestsSections', () => {
     expect(screen.getByText('Join an asset community to see it here.')).toBeInTheDocument()
     expect(screen.getByText('You do not follow anyone yet.')).toBeInTheDocument()
     expect(screen.getByText('You are not in any group yet.')).toBeInTheDocument()
+  })
+
+  describe('without a session (decided 2026-10-03)', () => {
+    const guest: Interests = { ...interests, signedIn: false }
+
+    it('shows only communities: no assets, people, groups or create group', () => {
+      renderWithIntl(<InterestsSections interests={guest} />)
+      expect(screen.getByRole('region', { name: 'Communities' })).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: /#nft/ })).toBeInTheDocument()
+      for (const name of ['Assets', 'People', 'Groups']) {
+        expect(screen.queryByRole('heading', { name })).toBeNull()
+      }
+      expect(screen.queryByRole('button', { name: 'Create group' })).toBeNull()
+    })
+
+    it('says when the communities could not be loaded', () => {
+      renderWithIntl(<InterestsSections interests={{ ...guest, suggested: { ok: false } }} />)
+      expect(screen.getByText('Could not load this section.')).toBeInTheDocument()
+    })
   })
 })

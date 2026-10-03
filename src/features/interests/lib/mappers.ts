@@ -1,7 +1,8 @@
 import type { RawAsset, RawCommunity, RawUserSummary } from '@/lib/api/contract'
 import type { AssetTile, Group, Person, Suggestion } from '../interests.types'
 
-const SUGGESTION_COUNT = 3
+/** Suggestions under the viewer sections; without a session the list is all the column shows. */
+export const SUGGESTION_COUNT = { signedIn: 3, guest: 8 } as const
 
 /** An asset community slug is its symbol in lower case (btc → BTC). */
 export function assetSymbol(slug: string) {
@@ -59,11 +60,14 @@ export function toGroups(communities: readonly RawCommunity[]): Group[] {
 }
 
 /** The biggest communities the viewer is not in yet. */
-export function toSuggestions(communities: readonly RawCommunity[]): Suggestion[] {
+export function toSuggestions(
+  communities: readonly RawCommunity[],
+  count: number = SUGGESTION_COUNT.signedIn,
+): Suggestion[] {
   return communities
     .filter((c) => !c.viewerMembership && c.type !== 'PERSONAL_CHANNEL')
     .sort((a, b) => b.memberCount - a.memberCount)
-    .slice(0, SUGGESTION_COUNT)
+    .slice(0, count)
     .map((c) => ({
       handle: communityHandle(c),
       slug: c.slug,

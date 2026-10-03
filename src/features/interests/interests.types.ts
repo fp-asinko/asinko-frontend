@@ -45,6 +45,8 @@ export type Suggestion = {
 export type SectionResult<T> = { ok: true; data: T } | { ok: false }
 
 export type Interests = {
+  /** Without a session the column shows only communities (H-07, decided 2026-10-03). */
+  signedIn: boolean
   assets: SectionResult<AssetTile[]>
   people: SectionResult<Person[]>
   groups: SectionResult<Group[]>
