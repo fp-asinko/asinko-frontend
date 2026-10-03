@@ -22,6 +22,7 @@ export function SuggestedCommunities({ suggestions }: { suggestions: Suggestion[
           >
             <UserAvatar
               name={suggestion.name}
+              colorKey={suggestion.slug}
               imageUrl={suggestion.avatarUrl}
               size="md"
               className="size-8 rounded-md transition-[scale] duration-200 ease-out group-hover:scale-105"

@@ -137,7 +137,12 @@
       "closes": "Closes {time}",
       "closed": "Closed",
       "hidden": "Vote to see the results",
-      "yourVote": "Your vote"
+      "yourVote": "Your vote",
+      "consensus": {
+        "majority": "You voted with the majority: {percent} chose the same",
+        "minority": "You are in the minority: {percent} chose the same",
+        "tie": "It is a tie: {percent} chose the same"
+      }
     },
     "empty": {
       "forYou": "Nothing posted yet.",

@@ -55,4 +55,12 @@ describe('PollCard (H-13)', () => {
     expect(screen.queryByRole('button', { name: /Below 150K/ })).toBeNull()
     expect(screen.getByText('(Your vote)').closest('li')).toHaveTextContent('Below 150K')
   })
+
+  it('shows the community logo next to the question, or none without a community (FC-02)', () => {
+    const { unmount } = renderWithIntl(<PollCard poll={pollItem()} />)
+    expect(screen.getAllByTestId('user-avatar').at(-1)).toHaveTextContent('BT')
+    unmount()
+    renderWithIntl(<PollCard poll={pollItem({ community: null })} />)
+    expect(screen.getAllByTestId('user-avatar')).toHaveLength(1)
+  })
 })

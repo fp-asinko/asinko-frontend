@@ -137,7 +137,12 @@
       "closes": "Cierra {time}",
       "closed": "Cerrada",
       "hidden": "Vota para ver los resultados",
-      "yourVote": "Tu voto"
+      "yourVote": "Tu voto",
+      "consensus": {
+        "majority": "Votaste con la mayoría: {percent} eligió lo mismo",
+        "minority": "Estás en la minoría: {percent} eligió lo mismo",
+        "tie": "Hay empate: {percent} eligió lo mismo"
+      }
     },
     "empty": {
       "forYou": "Todavía no hay publicaciones.",

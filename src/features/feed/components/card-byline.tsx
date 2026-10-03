@@ -46,7 +46,7 @@ export function CardByline({
         name={author?.username ?? t('system')}
         imageUrl={author?.avatarUrl}
         size="xs"
-        className="transition-transform duration-150 ease-out group-hover/byline:scale-110"
+        className="transition-[scale] duration-150 ease-out group-hover/byline:scale-110"
       />
       <span className="min-w-0 font-bold break-all">{author ? author.handle : t('system')}</span>
       {accuracy && (

@@ -39,4 +39,12 @@ describe('UserAvatar', () => {
     render(<UserAvatar name="?" tone="neutral" />)
     expect(screen.getByTestId('user-avatar')).not.toHaveAttribute('data-color')
   })
+
+  it('keys the color on colorKey when the visible name is a display name', () => {
+    render(<UserAvatar name="On-chain" colorKey="onchain" />)
+    expect(screen.getByTestId('user-avatar')).toHaveAttribute(
+      'data-color',
+      String(identityIndex('onchain')),
+    )
+  })
 })

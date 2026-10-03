@@ -25,24 +25,27 @@ const IDENTITY_CLASSES = [
 /**
  * Avatar of a user or community. Server-rendered (no client JS): the image when there is one,
  * otherwise the initials on the person's identity color (FC-01), stable across screens. `neutral`
- * is for a placeholder that is nobody yet (the composer without a session). Decorative: the name
- * is always next to it.
+ * is for a placeholder that is nobody yet (the composer without a session). `colorKey` is the stable
+ * key of the color when the visible name is not (a community: its slug, never its display name).
+ * Decorative: the name is always next to it.
  */
 export function UserAvatar({
   name,
   imageUrl,
   size = 'sm',
   tone = 'identity',
+  colorKey = name,
   className,
 }: {
   name: string
+  colorKey?: string
   imageUrl?: string | null
   size?: keyof typeof SIZES
   tone?: 'identity' | 'neutral'
   className?: string
 }) {
   const { box, px } = SIZES[size]
-  const color = tone === 'identity' ? identityIndex(name) : null
+  const color = tone === 'identity' ? identityIndex(colorKey) : null
   const initials = name
     .replace(/^[@#$]/, '')
     .slice(0, 2)

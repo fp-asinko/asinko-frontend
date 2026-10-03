@@ -24,20 +24,20 @@ T-01 ─┬─ T-02 ─ T-03
   - `accuracyTier` con los límites de Q1. El chip usa un mapa de clases y `group/byline`.
   - **Tests:** tramos en 0,4999 / 0,5 / 0,6999 / 0,7. `card-byline.test.tsx` verifica el nombre accesible con el tramo en los tres casos.
 
-- [ ] **T-04 · Opciones con marcador y barra fina** · M · FC-04, FC-06, FC-09
+- [x] **T-04 · Opciones con marcador y barra fina** · M · FC-04, FC-06, FC-09
   - Recuadro de geometría fija, marcador (radio → leyenda), barra fina con `bar-grow`, negrita de la votada, acento de color en hover y foco. Logo de comunidad en `PollCard` (FC-02).
   - **Tests:**
     - `poll-voting.test.tsx`: la votada lleva ✓ y "(your vote)" accesible, y cada opción tiene un color distinto.
     - `poll-card.test.tsx`: logo con comunidad y sin logo cuando no hay comunidad.
     - e2e: la caja de la encuesta mide lo mismo antes y después de votar (sin saltos).
 
-- [ ] **T-05 · Consenso** · S · FC-05, FC-09
+- [x] **T-05 · Consenso** · S · FC-05, FC-09
   - `pollConsensus` en `features/feed/lib/`, el mensaje en `PollVoting`, `lastVotedId` y la secuencia de § 5.4, y los mensajes en en/es/pt.
   - **Tests:**
     - Unitario de `pollConsensus`: mayoría, minoría, empate, menos de 10 votos, sin voto y resultados ocultos.
     - `poll-voting.test.tsx`: no aparece con el estado optimista; aparece con la respuesta del servidor; aparece sin animación si ya había votado.
 
-- [ ] **T-06 · Movimiento de la encuesta** · S · FC-09, FC-11
+- [x] **T-06 · Movimiento de la encuesta** · S · FC-09, FC-11
   - El pop del ✓ con `key` y el retardo del consenso.
   - **Tests:** en `e2e/home-motion.spec.ts`, el consenso aparece después de las barras. Con reducir movimiento, el estado final llega de inmediato y con color.
 

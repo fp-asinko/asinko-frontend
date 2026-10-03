@@ -21,6 +21,7 @@ export function GroupList({ groups }: { groups: Group[] }) {
             <span className="flex items-center gap-2">
               <UserAvatar
                 name={group.name}
+                colorKey={group.slug}
                 imageUrl={group.avatarUrl}
                 size="xs"
                 className="size-6 rounded-sm transition-[scale] duration-200 ease-out group-hover:scale-105"

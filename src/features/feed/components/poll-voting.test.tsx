@@ -128,7 +128,69 @@ describe('PollVoting (H-13, H-15)', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Yes' }))
       expect(await screen.findByText('100%')).toHaveClass('animate-fade-in')
       expect(container.querySelector('ul')).toHaveAttribute('data-revealed', 'true')
-      expect(container.querySelector('ul [aria-hidden].animate-bar-grow')).not.toBeNull()
+      expect(container.querySelector('[data-bar] .animate-bar-grow')).not.toBeNull()
+    })
+  })
+
+  describe('color and consensus (feed-cards)', () => {
+    const results = (viewerOptionId: string) => ({
+      ok: true,
+      data: {
+        options: [
+          { id: 'a', label: 'Yes', votes: 8, share: 0.8 },
+          { id: 'b', label: 'No', votes: 2, share: 0.2 },
+        ],
+        totalVotes: 10,
+        viewerOptionId,
+        resultsVisible: true,
+      },
+    })
+
+    it('gives each option its own color and a bar (FC-04)', () => {
+      const { container } = renderPoll(pollItem())
+      const markers = [...container.querySelectorAll('[data-marker]')].map((m) => m.className)
+      expect(new Set(markers).size).toBe(2)
+      expect(container.querySelectorAll('[data-bar]')).toHaveLength(2)
+    })
+
+    it('marks the voted option and keeps the box geometry: no bars before results', () => {
+      const { container } = renderPoll()
+      expect(container.querySelectorAll('[data-marker]')).toHaveLength(2)
+      expect(container.querySelector('[data-bar]')).toBeNull()
+    })
+
+    it('says where the vote stands only once the server answers (FC-05)', async () => {
+      let answer: (value: unknown) => void = () => {}
+      action.votePoll.mockReturnValue(new Promise((resolve) => (answer = resolve)))
+      renderPoll()
+
+      await userEvent.click(screen.getByRole('button', { name: 'No' }))
+      expect(screen.queryByText(/minority/)).toBeNull()
+
+      answer(results('b'))
+      const message = await screen.findByText('You are in the minority: 20% chose the same')
+      expect(message).toHaveClass('animate-fade-up')
+    })
+
+    it('shows the consensus of a vote cast earlier at once, without animation', () => {
+      renderPoll(pollItem({ viewerOptionId: 'b' }))
+      expect(screen.getByText('You voted with the majority: 75% chose the same')).not.toHaveClass(
+        'animate-fade-up',
+      )
+    })
+
+    it('stays quiet below 10 votes (Q2)', () => {
+      renderPoll(
+        pollItem({
+          viewerOptionId: 'a',
+          totalVotes: 4,
+          options: [
+            { id: 'a', label: 'Yes', votes: 3, share: 0.75 },
+            { id: 'b', label: 'No', votes: 1, share: 0.25 },
+          ],
+        }),
+      )
+      expect(screen.queryByText(/majority/)).toBeNull()
     })
   })
 })
