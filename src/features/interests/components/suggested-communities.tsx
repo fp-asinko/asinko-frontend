@@ -1,6 +1,6 @@
 import { PlusIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { ComingSoon } from '@/components/molecules/coming-soon'
+import { GatedComingSoon } from '@/components/organisms/auth-gate'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import type { Suggestion } from '../interests.types'
 import { CommunityLink } from './community-link'
@@ -34,14 +34,15 @@ export function SuggestedCommunities({ suggestions }: { suggestions: Suggestion[
               </span>
             </span>
           </CommunityLink>
-          <ComingSoon
+          <GatedComingSoon
+            action="join"
             label={t('joinLabel', { handle: suggestion.handle })}
             placement="below-end"
             className="inline-flex h-6 tap items-center gap-0.5 rounded-full border px-2 text-[0.625rem] hover:bg-surface"
           >
             <PlusIcon aria-hidden className="size-2.5" />
             {t('join')}
-          </ComingSoon>
+          </GatedComingSoon>
         </li>
       ))}
     </ul>

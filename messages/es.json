@@ -158,7 +158,6 @@
       "up": "Votar a favor",
       "down": "Votar en contra",
       "error": "No se pudo guardar tu voto. Inténtalo de nuevo.",
-      "needAccount": "Necesitas una cuenta para votar.",
       "saved": "Voto guardado."
     },
     "loadMore": {

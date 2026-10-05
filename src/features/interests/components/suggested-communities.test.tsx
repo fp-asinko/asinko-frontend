@@ -1,6 +1,8 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { identityIndex } from '@/lib/identity-color'
+import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { SuggestedCommunities } from './suggested-communities'
 
@@ -38,5 +40,17 @@ describe('SuggestedCommunities (H-07)', () => {
       'data-color',
       String(identityIndex('onchain')),
     )
+  })
+
+  it('opens the account modal to join without a session (G-04)', async () => {
+    renderWithIntl(
+      <AuthGateProvider signedIn={false}>
+        <SuggestedCommunities suggestions={[nft]} />
+      </AuthGateProvider>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Join #nft' }))
+    expect(
+      await screen.findByRole('dialog', { name: 'Join Asinko to join communities' }),
+    ).toBeInTheDocument()
   })
 })

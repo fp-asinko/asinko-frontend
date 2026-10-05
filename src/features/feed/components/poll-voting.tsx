@@ -3,6 +3,7 @@
 import { CheckIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { useOptimistic, useState, useTransition, type ReactNode } from 'react'
+import { useAuthGate } from '@/components/organisms/auth-gate'
 import { cn } from '@/lib/utils'
 import { votePoll } from '../actions/vote-poll.action'
 import type { PollItem, PollResults } from '../feed.types'
@@ -63,9 +64,11 @@ export function PollVoting({
   const canVote = !isClosed && (results.viewerOptionId === null || allowVoteChange)
   // Decided once: a poll that loads votable keeps its buttons for the whole visit.
   const [asButtons] = useState(canVote)
+  const { requireAccount, openGate } = useAuthGate()
 
   function vote(optionId: string) {
-    if (pending || !canVote) return
+    // Without a session nothing is marked: the account modal opens (specs/guest-experience G-04).
+    if (pending || !canVote || !requireAccount('vote-poll')) return
     setError(null)
     setSaved(false)
     setLastVotedId(optionId)
@@ -80,8 +83,10 @@ export function PollVoting({
           setConsensusEntry(consensusSeen ? 'now' : 'after-bars')
           setConsensusSeen(true)
         }
-      } else
-        setError(result.error === 'api.errors.UNAUTHENTICATED' ? tv('needAccount') : tv('error'))
+      } else if (result.error === 'api.errors.UNAUTHENTICATED') {
+        // The session ended meanwhile (the action checks it too, security.md § 5).
+        openGate('vote-poll')
+      } else setError(tv('error'))
     })
   }
 

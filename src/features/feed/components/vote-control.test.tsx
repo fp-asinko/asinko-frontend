@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { VoteControl } from './vote-control'
 
@@ -84,12 +85,37 @@ describe('VoteControl (H-15)', () => {
     expect(screen.getByText('10 points')).toBeInTheDocument()
   })
 
-  it('asks for an account without a session', async () => {
-    action.votePost.mockResolvedValue({ ok: false, error: 'api.errors.UNAUTHENTICATED' })
-    renderWithIntl(<VoteControl postId={ID} score={10} viewerVote={null} />)
+  it('opens the account modal without a session, marking and sending nothing (G-04)', async () => {
+    renderWithIntl(
+      <AuthGateProvider signedIn={false}>
+        <VoteControl postId={ID} score={10} viewerVote={null} />
+      </AuthGateProvider>,
+    )
+    const upvote = screen.getByRole('button', { name: 'Upvote' })
+    await userEvent.click(upvote)
 
-    await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('You need an account to vote.')
+    expect(
+      await screen.findByRole('dialog', { name: 'Vote to make your take count' }),
+    ).toBeInTheDocument()
+    expect(action.votePost).not.toHaveBeenCalled()
+    expect(upvote).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.getByText('10')).toBeInTheDocument()
+  })
+
+  it('opens the account modal when the session ended meanwhile, and goes back', async () => {
+    action.votePost.mockResolvedValue({ ok: false, error: 'api.errors.UNAUTHENTICATED' })
+    renderWithIntl(
+      <AuthGateProvider signedIn>
+        <VoteControl postId={ID} score={10} viewerVote={null} />
+      </AuthGateProvider>,
+    )
+    // With the modal open the page behind it is hidden from the accessibility tree.
+    const upvote = screen.getByRole('button', { name: 'Upvote' })
+    await userEvent.click(upvote)
+
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).toBeNull()
+    await vi.waitFor(() => expect(upvote).toHaveAttribute('aria-pressed', 'false'))
   })
 
   it.each([

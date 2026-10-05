@@ -18,7 +18,7 @@ T-01 ─┬─ T-02 ─┬─ T-04 ─ T-06
 - [x] **T-03 · Llamados permanentes** · S · G-02, G-03
   - Botones en `SiteHeader`, `JoinCard` en la columna derecha y botones en el estado vacío de "Following".
   - **Tests:** con y sin sesión.
-- [ ] **T-04 · Acciones con modal** · M · G-04, G-06
+- [x] **T-04 · Acciones con modal** · M · G-04, G-06
   - Votos de post y de encuesta, composer y Join. Se borran los `needAccount`.
   - **Tests:** sin sesión, nada se marca ni se envía.
 - [ ] **T-05 · e2e sin sesión** · S · G-01, G-04 a G-08

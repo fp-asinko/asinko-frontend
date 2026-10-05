@@ -3,6 +3,7 @@
 import { ArrowBigDownIcon, ArrowBigUpIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { useOptimistic, useState, useTransition } from 'react'
+import { useAuthGate } from '@/components/organisms/auth-gate'
 import { cn } from '@/lib/utils'
 import { votePost } from '../actions/vote-post.action'
 import { countFormat } from '../lib/count-format'
@@ -22,7 +23,8 @@ const BUTTON =
 /**
  * The prototype's vote pill (H-15): ▲ score ▼, 136×38 with 32px buttons. Pressing the active
  * arrow removes the vote. The change shows at once (useOptimistic); if the Server Action fails,
- * React drops the optimistic value, the score goes back and the pill says why.
+ * React drops the optimistic value, the score goes back and the pill says why. Without a session
+ * nothing is marked: the account modal opens instead (specs/guest-experience G-04).
  */
 export function VoteControl({ postId, score, viewerVote }: { postId: string } & Vote) {
   const t = useTranslations('feed.vote')
@@ -33,10 +35,11 @@ export function VoteControl({ postId, score, viewerVote }: { postId: string } & 
   const [error, setError] = useState<string | null>(null)
   const [pending, startTransition] = useTransition()
   const [motion, setMotion] = useState<Motion>({ pop: null, roll: null, key: 0 })
+  const { requireAccount, openGate } = useAuthGate()
 
   function vote(direction: 1 | -1) {
     // aria-disabled, not disabled, while saving: the focused button keeps the focus (WCAG 2.4.3).
-    if (pending) return
+    if (pending || !requireAccount('vote-post')) return
     const next = shown.viewerVote === direction ? null : direction
     const nextScore = shown.score - (shown.viewerVote ?? 0) + (next ?? 0)
     setError(null)
@@ -51,8 +54,11 @@ export function VoteControl({ postId, score, viewerVote }: { postId: string } & 
       if (result.ok) {
         // Removing answers 204 without a score: the computed one stands.
         setConfirmed({ score: result.data.score ?? nextScore, viewerVote: result.data.viewerVote })
+      } else if (result.error === 'api.errors.UNAUTHENTICATED') {
+        // The session ended meanwhile (the action checks it too, security.md § 5).
+        openGate('vote-post')
       } else {
-        setError(result.error === 'api.errors.UNAUTHENTICATED' ? t('needAccount') : t('error'))
+        setError(t('error'))
       }
     })
   }

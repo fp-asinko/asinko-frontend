@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { pollItem } from '../feed-items.fixture'
 import type { PollItem } from '../feed.types'
@@ -62,12 +63,41 @@ describe('PollVoting (H-13, H-15)', () => {
   })
 
   it('goes back and says why when the vote fails', async () => {
-    action.votePoll.mockResolvedValue({ ok: false, error: 'api.errors.UNAUTHENTICATED' })
+    action.votePoll.mockResolvedValue({ ok: false, error: 'api.errors.UNAVAILABLE' })
     renderPoll()
 
     await userEvent.click(screen.getByRole('button', { name: 'No' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('You need an account to vote.')
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Could not save your vote. Try again.',
+    )
     expect(screen.getByRole('button', { name: 'No' })).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('opens the account modal without a session, marking and sending nothing (G-04)', async () => {
+    renderWithIntl(
+      <AuthGateProvider signedIn={false}>
+        <PollVoting
+          id={hidden.id}
+          options={hidden.options}
+          totalVotes={hidden.totalVotes}
+          viewerOptionId={null}
+          resultsVisible={false}
+          isClosed={false}
+          allowVoteChange
+          closing={null}
+          comments={null}
+        />
+      </AuthGateProvider>,
+    )
+    // With the modal open the page behind it is hidden from the accessibility tree.
+    const no = screen.getByRole('button', { name: 'No' })
+    await userEvent.click(no)
+
+    expect(
+      await screen.findByRole('dialog', { name: 'Vote to see where you stand' }),
+    ).toBeInTheDocument()
+    expect(action.votePoll).not.toHaveBeenCalled()
+    expect(no).toHaveAttribute('aria-pressed', 'false')
   })
 
   it('is read-only when closed', () => {
