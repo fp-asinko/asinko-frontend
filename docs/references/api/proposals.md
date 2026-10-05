@@ -3,7 +3,33 @@
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla.
 > Cuando el backend la implementa, se mueve al snapshot del contrato y se marca como resuelta acá.
 
-**Revisado contra `asinko-app` rama `dev` (`0bb6325`, 2026-10-04)**. Antes, contra `0cdf243` (2026-10-01) y sus notas `HANDOFF-frontend.md` y `API-IMPLEMENTATION-NOTES.md`. En `main` solo está E01; en `dev` están 33 de los 43 paths: E01 a E05, búsqueda y tesis. E07 (notificaciones) y E14 (activos) no están. El contrato vigente vive en `financeshowoff-design-docs/api/` (con `openapi.yaml`) y en el artefacto _ASINKO Endpoint Spec_.
+**Revisado contra `asinko-app` rama `dev` (`c669972`, 2026-10-05)**, con su `API-IMPLEMENTATION-NOTES.md` y el `openapi.yaml` del 2026-10-02. Antes, contra `0bb6325` (2026-10-04) y `0cdf243` (2026-10-01).
+
+`dev` ya tiene:
+- E01 a E05, búsqueda, tesis (sin `resolution-vote`) y E12.
+- **E14** (activos y sentiment, `6e2d05b`).
+- **E07** (notificaciones, `cb6ee2b`).
+- Alertas de precio (`c56d7ba`).
+- Seed con imágenes en Storage.
+
+El contrato vigente vive en `financeshowoff-design-docs/api/` (con `openapi.yaml`) y en el artefacto _ASINKO Endpoint Spec_.
+
+## Pedido urgente: una migración sin aplicar en la base de dev (2026-10-05)
+
+Con `dev` en `c669972`, la base de dev tiene aplicadas 4 de las 5 migraciones nuevas. **Falta `20261005130156_asset_logo`** (`4ff913a`):
+
+```sql
+ALTER TABLE "assets" ADD COLUMN "logoUrl" TEXT;
+```
+
+**Efecto:** todo lo que lee activos responde `500 INTERNAL`. Lo verificamos con `GET /assets/BTC` y `GET /assets?q=b`, y el log del backend dice `P2022: The column assets.logoUrl does not exist in the current database`. Eso alcanza a E14, a la columna de activos del front y a las tesis.
+
+**Pedido:**
+
+- [ ] Aplicar la migración en la Supabase de dev (`npx prisma migrate deploy`). Es una sola columna nullable, sin riesgo para los datos.
+- [ ] Avisar cuando esté, para que el front pase los activos de mocks a datos reales (P-003).
+
+Comprobado con el rol de solo lectura del front, leyendo `_prisma_migrations`. El front no corre migraciones.
 
 ## Bloqueo para usar datos reales — resuelto
 
@@ -41,7 +67,7 @@ Las 6 migraciones que faltaban en la Supabase de dev se aplicaron el 2026-10-03,
 
 ### P-003 — Catálogo de activos (E14)
 
-**Estado:** propuesta. E14 está **postergado** en el backend (falta proveedor de precios). Pedido: al menos `GET /assets/{symbol}` con precio y variación, o confirmar que la columna de activos sigue con datos de prueba.
+**Estado:** implementada en `dev` (`6e2d05b`, 2026-10-04), **bloqueada** por la migración `asset_logo` sin aplicar (ver el pedido urgente). Cuando responda, el front saca los activos de los mocks.
 **Endpoint:** `GET /api/v1/assets?q=`, `GET /api/v1/assets/{symbol}`
 **Motivo:** la columna "Tus intereses" muestra precio y variación de los activos (hoy mockeado) y el autocompletado de `$` necesita el catálogo.
 **Cambio:** implementar E14. Para `GET /assets?q=`, confirmar que responde la lista estándar, `{ "items": Asset[], "nextCursor": string | null }`, con el recurso `Asset` de E14. El mock del front ya asume esa forma.
@@ -85,7 +111,7 @@ Las 6 migraciones que faltaban en la Supabase de dev se aplicaron el 2026-10-03,
 
 ### P-009 — Feed en pocas consultas, y backend en la región de la base
 
-**Estado:** propuesta (2026-10-05). Es lo que más afecta a la experiencia hoy.
+**Estado:** propuesta (2026-10-05). Es lo que más afecta a la experiencia hoy. `API-IMPLEMENTATION-NOTES.md` lo anota como hueco conocido ("~3 queries por contenido. Alcanza para MVP; si molesta, el paso siguiente es batchear por tipo"). **Molesta:** con la base en otra región, el feed tarda 12 a 16 s. Medido de nuevo el 2026-10-05 con `c669972`: 15,8 s.
 **Endpoint:** `GET /api/v1/feed/explore` y `GET /api/v1/feed/following` (y en general, toda lista)
 **Motivo:** medido el 2026-10-05 contra `dev` local, con la Supabase de `eu-west-1`:
 
@@ -114,6 +140,8 @@ La página del front con mocks tarda 0,04 s: casi todo el tiempo es esta espera.
 - **Explore con comunidad inexistente**: `GET /feed/explore?community=nope` responde `200` con `items: []`. El front prefería `404` para mostrar "no existe" en lugar de "no hay posts". ¿Se cambia, o el front consulta `GET /communities/{slug}` aparte?
 - **Tesis en el feed**: el feed ya devuelve `kind: "THESIS"`. El front las muestra en la fase 2; mientras tanto pide `?kind=POST,POLL`. ¿OK?
 - **`Poll.totalVotes`**: el contrato lo tipa `number | null`; en `dev` siempre es un número, aun con los resultados ocultos. El front acepta las dos cosas; conviene alinear el contrato.
-- **Documentos del contrato**: viven en `financeshowoff-design-docs/api/` (ese repo tiene cambios sin commitear según el handoff). Pedido: acceso al repo o el `openapi.yaml` actualizado, para refrescar `docs/references/api/`.
+- **Documentos del contrato**: recibimos el `openapi.yaml` del 2026-10-02 y `API-IMPLEMENTATION-NOTES.md` (gracias). Queda pedido el acceso al repo `financeshowoff-design-docs`, para refrescar `docs/references/api/` sin depender de copias.
 - **Imágenes**: van al bucket público `post-images` de Supabase Storage (`HANDOFF-frontend.md` § 8). El front agrega ese dominio a `remotePatterns` y a `img-src` de la CSP cuando se active.
-- **Usuarios del seed**: no son cuentas de Supabase Auth, no se puede entrar con ellos. Para probar Following y votos con login hace falta crear cuentas reales.
+- **Usuarios del seed**: no son cuentas de Supabase Auth, no se puede entrar con ellos. El front ya tiene un login de desarrollo (`specs/dev-login`): una cuenta creada en `asinko-app` (`/login`), `signInWithPassword` desde el servidor y el token como `Authorization: Bearer`.
+- **CORS**: el front llama a `/api/v1` solo desde su servidor (Server Components y Server Actions), nunca desde el navegador. No hace falta sumarlo a `API_ALLOWED_ORIGINS` mientras siga así.
+- **Códigos de error nuevos** (`API-IMPLEMENTATION-NOTES.md`): el front ya trata cualquier `403`/`409`/`422` como error esperado con su clave de traducción. Cuando exista crear post, va a tener mensajes propios para `NOT_COMMUNITY_MEMBER`, `PERSONAL_CHANNEL_OWNER_ONLY` y `CONTENT_DELETED`. Pregunta: `d1a18e7` ("publicar sin ser miembro") ¿deja sin efecto `NOT_COMMUNITY_MEMBER`?
