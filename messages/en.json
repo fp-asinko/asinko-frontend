@@ -167,5 +167,25 @@
       "loaded": "{count, plural, one {# more item loaded} other {# more items loaded}}",
       "error": "Could not load more. Try again."
     }
+  },
+  "rightColumn": {
+    "label": "More from Asinko",
+    "tokens": {
+      "title": "Season tokens",
+      "badge": "Coming soon",
+      "body": "Earn by viewing ads, engagement and correct calls. Spend to post — hot cashtags cost more. Resets each season: <strong>use it or lose it.</strong>"
+    },
+    "footer": {
+      "links": {
+        "rules": "Rules",
+        "privacy": "Privacy",
+        "terms": "Terms",
+        "accessibility": "Accessibility",
+        "about": "About",
+        "careers": "Careers",
+        "press": "Press"
+      },
+      "copyright": "© {year} Asinko"
+    }
   }
 }

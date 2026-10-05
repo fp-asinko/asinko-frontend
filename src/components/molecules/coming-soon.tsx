@@ -2,10 +2,20 @@
 
 import { cva, type VariantProps } from 'class-variance-authority'
 import { useTranslations } from 'next-intl'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 const VISIBLE_MS = 2000
+/** Space kept between the bubble and the edge that would cut it. */
+const EDGE_PX = 4
+
+/** The box that cuts the bubble: the closest ancestor that clips overflow, or the viewport. */
+function clippingBox(element: HTMLElement): { left: number; right: number } {
+  for (let node = element.parentElement; node; node = node.parentElement) {
+    if (getComputedStyle(node).overflowX !== 'visible') return node.getBoundingClientRect()
+  }
+  return { left: 0, right: document.documentElement.clientWidth }
+}
 
 /**
  * Where the "Coming soon" bubble opens. Centered by default; -end aligns it to the button's right
@@ -36,7 +46,9 @@ function hiddenOffset(placement: VariantProps<typeof bubble>['placement']) {
 /**
  * A feature that exists in the prototype but not yet in the product (H-26). Looks dimmed, can be
  * focused, is announced as unavailable (aria-disabled, not disabled) and says "Coming soon" when
- * activated by tap, click or keyboard. No dependencies (~1 KB).
+ * activated by tap, click or keyboard. If the bubble would be cut by a scrolling column or the
+ * screen edge, it moves inward just enough (which item touches an edge depends on the language).
+ * No dependencies (~1 KB).
  */
 export function ComingSoon({
   label,
@@ -52,8 +64,22 @@ export function ComingSoon({
   const t = useTranslations('common')
   const [visible, setVisible] = useState(false)
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const bubbleRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => () => clearTimeout(timer.current), [])
+
+  // Measured once the text is in (its width is known), before paint: no visible jump.
+  useLayoutEffect(() => {
+    const element = bubbleRef.current
+    if (!visible || !element) return
+    element.style.marginLeft = ''
+    const box = element.getBoundingClientRect()
+    const limit = clippingBox(element)
+    const shift =
+      Math.max(limit.left + EDGE_PX - box.left, 0) -
+      Math.max(box.right - (limit.right - EDGE_PX), 0)
+    if (shift) element.style.marginLeft = `${shift}px`
+  }, [visible])
 
   function show() {
     setVisible(true)
@@ -76,6 +102,7 @@ export function ComingSoon({
         {children}
       </button>
       <span
+        ref={bubbleRef}
         role="status"
         className={cn(
           bubble({ placement }),

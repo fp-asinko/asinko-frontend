@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations } from 'next-intl/server'
 import { AppShell, type NavItem } from '@/components/organisms/app-shell'
+import { RightColumn } from '@/components/organisms/right-column'
 import { env } from '@/env'
 import { InterestsSidebar } from '@/features/interests'
 import { OG_LOCALES } from '@/i18n/alternates'
@@ -68,7 +69,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
       <body>
         <NextIntlClientProvider messages={clientMessages}>
           <Providers nonce={nonce}>
-            <AppShell navItems={navItems} sidebar={<InterestsSidebar />}>
+            <AppShell navItems={navItems} sidebar={<InterestsSidebar />} right={<RightColumn />}>
               {children}
             </AppShell>
           </Providers>

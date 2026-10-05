@@ -148,7 +148,7 @@ El diseño y el código arrancan por la pantalla más chica y **se agregan** est
 - **Áreas táctiles**: mínimo 24×24px (WCAG 2.2 AA, criterio 2.5.8); recomendado 44×44px para acciones principales.
 - **Foco no tapado** (WCAG 2.4.11): `html` tiene `scroll-padding` del alto de la barra superior y, en mobile, de la inferior. Un elemento fijo nuevo que tape contenido suma su alto ahí.
 - **Links con varias partes** (handle, etiqueta, descripción): el nombre accesible sale del contenido, sin `aria-label` que lo tape, y con un espacio (`{' '}`) entre `<span>` para que no se lea todo junto.
-- **Globo "Próximamente"**: `ComingSoon` tiene `placement` (`below`, `below-end`, `above`, `above-end`). Contra el borde derecho se usa `-end`; en la barra inferior, `above`.
+- **Globo "Próximamente"**: `ComingSoon` tiene `placement` (`below`, `below-end`, `above`, `above-end`). Contra el borde derecho se usa `-end`; en la barra inferior, `above`. Si igual lo cortaría una columna con scroll o la pantalla, el globo se corre hacia adentro solo, por ejemplo en los links del pie, donde cada idioma corta las filas en otro lugar.
 - **Nada solo con hover**: toda interacción debe funcionar con tap y teclado.
 - **Inputs con `text-base` (16px) o más**: evita el zoom automático de iOS al enfocar.
 - **Imágenes** con `next/image` y `sizes` definido según el layout mobile.

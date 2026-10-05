@@ -167,5 +167,25 @@
       "loaded": "{count, plural, one {# item a mais carregado} other {# itens a mais carregados}}",
       "error": "Não foi possível carregar mais. Tente de novo."
     }
+  },
+  "rightColumn": {
+    "label": "Mais do Asinko",
+    "tokens": {
+      "title": "Tokens da temporada",
+      "badge": "Em breve",
+      "body": "Ganhe vendo anúncios, participando e acertando. Gaste para publicar: cashtags em alta custam mais. Zeram a cada temporada: <strong>use ou perca.</strong>"
+    },
+    "footer": {
+      "links": {
+        "rules": "Regras",
+        "privacy": "Privacidade",
+        "terms": "Termos",
+        "accessibility": "Acessibilidade",
+        "about": "Sobre",
+        "careers": "Carreiras",
+        "press": "Imprensa"
+      },
+      "copyright": "© {year} Asinko"
+    }
   }
 }
