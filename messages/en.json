@@ -187,5 +187,28 @@
       },
       "copyright": "© {year} Asinko"
     }
+  },
+  "authGate": {
+    "title": {
+      "vote-post": "Vote to make your take count",
+      "vote-poll": "Vote to see where you stand",
+      "post": "Join Asinko to post",
+      "join": "Join Asinko to join communities",
+      "following": "Log in to see who you follow",
+      "login": "Log in to Asinko",
+      "signup": "Join Asinko"
+    },
+    "value": "Asinko is where calls get a public, verifiable track record.",
+    "signup": "Create account",
+    "login": "Log in",
+    "close": "Close",
+    "header": {
+      "login": "Log in",
+      "signup": "Sign up"
+    },
+    "joinCard": {
+      "title": "New to Asinko?",
+      "body": "Build a public track record. Every call you make is checked against the market."
+    }
   }
 }

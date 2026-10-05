@@ -6,6 +6,7 @@ import type { AbstractIntlMessages } from 'next-intl'
  * uses a namespace missing here.
  */
 export const CLIENT_NAMESPACES = [
+  'authGate',
   'common',
   'errors.unexpected',
   'feed.card',

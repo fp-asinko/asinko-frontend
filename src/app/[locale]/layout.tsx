@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations } from 'next-intl/server'
 import { AppShell, type NavItem } from '@/components/organisms/app-shell'
+import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { RightColumn } from '@/components/organisms/right-column'
 import { env } from '@/env'
 import { InterestsSidebar } from '@/features/interests'
@@ -13,6 +14,7 @@ import { OG_LOCALES } from '@/i18n/alternates'
 import { pickClientMessages } from '@/i18n/client-messages'
 import { routing } from '@/i18n/routing'
 import { isIndexable } from '@/lib/seo/robots'
+import { getViewer } from '@/lib/session'
 import { Providers } from './providers'
 import '../globals.css'
 
@@ -59,6 +61,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   const t = await getTranslations('common.nav')
   // The browser gets only the namespaces its Client Components use (i18n.md).
   const clientMessages = pickClientMessages(await getMessages())
+  // Who can act: without a session, actions open the account modal (specs/guest-experience).
+  const signedIn = (await getViewer()) !== null
 
   // Only views that exist (F-23b): each view's spec registers its own item.
   const navItems: NavItem[] = [{ href: '/', label: t('home'), icon: <HouseIcon /> }]
@@ -69,9 +73,11 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
       <body>
         <NextIntlClientProvider messages={clientMessages}>
           <Providers nonce={nonce}>
-            <AppShell navItems={navItems} sidebar={<InterestsSidebar />} right={<RightColumn />}>
-              {children}
-            </AppShell>
+            <AuthGateProvider signedIn={signedIn}>
+              <AppShell navItems={navItems} sidebar={<InterestsSidebar />} right={<RightColumn />}>
+                {children}
+              </AppShell>
+            </AuthGateProvider>
           </Providers>
         </NextIntlClientProvider>
       </body>

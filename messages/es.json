@@ -187,5 +187,28 @@
       },
       "copyright": "© {year} Asinko"
     }
+  },
+  "authGate": {
+    "title": {
+      "vote-post": "Vota para que tu opinión cuente",
+      "vote-poll": "Vota para ver dónde te ubicas",
+      "post": "Únete a Asinko para publicar",
+      "join": "Únete a Asinko para sumarte a comunidades",
+      "following": "Inicia sesión para ver a quién sigues",
+      "login": "Inicia sesión en Asinko",
+      "signup": "Únete a Asinko"
+    },
+    "value": "En Asinko, cada predicción tiene un historial público y verificable.",
+    "signup": "Crear cuenta",
+    "login": "Iniciar sesión",
+    "close": "Cerrar",
+    "header": {
+      "login": "Iniciar sesión",
+      "signup": "Registrarse"
+    },
+    "joinCard": {
+      "title": "¿Nuevo en Asinko?",
+      "body": "Construye un historial público. Cada predicción que hagas se contrasta con el mercado."
+    }
   }
 }

@@ -9,10 +9,10 @@ T-01 ─┬─ T-02 ─┬─ T-04 ─ T-06
 
 ## Tareas
 
-- [ ] **T-01 · Contexto `AuthGate`** · S · G-09, G-11
+- [x] **T-01 · Contexto `AuthGate`** · S · G-09, G-11
   - Provider con `signedIn` y `requireAccount`, que el layout alimenta desde `getViewer()`.
   - **Tests:** unitarios del contexto.
-- [ ] **T-02 · Modal** · M · G-05 a G-08, G-10
+- [x] **T-02 · Modal** · M · G-05 a G-08, G-10
   - `Dialog` de shadcn (Base UI), `AuthGateDialog` con `Sheet` en mobile, carga diferida, mensajes en en/es/pt.
   - **Tests:** título por acción, cierre, foco y `ComingSoon` en los botones.
 - [ ] **T-03 · Llamados permanentes** · S · G-02, G-03
