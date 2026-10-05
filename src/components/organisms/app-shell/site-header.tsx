@@ -2,6 +2,7 @@ import { BellIcon, CoinsIcon, SearchIcon, UserIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ComingSoon } from '@/components/molecules/coming-soon'
+import { AccountButtons } from '@/components/organisms/auth-gate'
 import { LocaleSwitcher } from '@/components/molecules/locale-switcher'
 import { ThemeToggle } from '@/components/molecules/theme-toggle'
 import { AsinkoLogo } from '@/components/ui/asinko-logo'
@@ -12,7 +13,8 @@ const ICON_BUTTON =
 
 /*
  * Top bar from the prototype (H-05): 60px, translucent, logo · centered search · actions.
- * Search, tokens, notifications and profile are not in the MVP: shown disabled (H-26).
+ * Search, tokens, notifications and profile are not in the MVP: shown disabled (H-26). Without a
+ * session the profile gives way to Log in and Sign up (specs/guest-experience G-02).
  */
 export function SiteHeader({ menu }: { menu: ReactNode }) {
   const t = useTranslations('common')
@@ -56,10 +58,14 @@ export function SiteHeader({ menu }: { menu: ReactNode }) {
             <ComingSoon label={t('header.notifications')} className={ICON_BUTTON}>
               <BellIcon aria-hidden className="size-5" />
             </ComingSoon>
-            <ComingSoon label={t('header.profile')} className={ICON_BUTTON}>
-              <UserIcon aria-hidden className="size-5" />
-            </ComingSoon>
           </span>
+          <AccountButtons>
+            <span className="hidden md:inline-flex">
+              <ComingSoon label={t('header.profile')} className={ICON_BUTTON}>
+                <UserIcon aria-hidden className="size-5" />
+              </ComingSoon>
+            </span>
+          </AccountButtons>
           <LocaleSwitcher />
           <span className="px-2">
             <ThemeToggle />

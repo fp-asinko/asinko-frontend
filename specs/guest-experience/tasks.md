@@ -15,7 +15,7 @@ T-01 ─┬─ T-02 ─┬─ T-04 ─ T-06
 - [x] **T-02 · Modal** · M · G-05 a G-08, G-10
   - `Dialog` de shadcn (Base UI), `AuthGateDialog` con `Sheet` en mobile, carga diferida, mensajes en en/es/pt.
   - **Tests:** título por acción, cierre, foco y `ComingSoon` en los botones.
-- [ ] **T-03 · Llamados permanentes** · S · G-02, G-03
+- [x] **T-03 · Llamados permanentes** · S · G-02, G-03
   - Botones en `SiteHeader`, `JoinCard` en la columna derecha y botones en el estado vacío de "Following".
   - **Tests:** con y sin sesión.
 - [ ] **T-04 · Acciones con modal** · M · G-04, G-06

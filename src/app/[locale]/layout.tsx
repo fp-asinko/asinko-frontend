@@ -74,7 +74,11 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
         <NextIntlClientProvider messages={clientMessages}>
           <Providers nonce={nonce}>
             <AuthGateProvider signedIn={signedIn}>
-              <AppShell navItems={navItems} sidebar={<InterestsSidebar />} right={<RightColumn />}>
+              <AppShell
+                navItems={navItems}
+                sidebar={<InterestsSidebar />}
+                right={<RightColumn signedIn={signedIn} />}
+              >
                 {children}
               </AppShell>
             </AuthGateProvider>

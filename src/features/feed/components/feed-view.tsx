@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl'
+import { GateButtons } from '@/components/organisms/auth-gate'
 import { EmptyState } from '@/components/organisms/empty-state'
 import { Link } from '@/i18n/navigation'
 import type { CommunityRef, FeedItem } from '../feed.types'
@@ -40,7 +41,11 @@ export function FeedView({
       </div>
       <div className="overflow-hidden bg-card">
         {state.status === 'needs-account' ? (
-          <EmptyState message={t('needAccount')} />
+          // A whole private page: it stays, with the ways in (specs/guest-experience Q2).
+          <EmptyState
+            message={t('needAccount')}
+            action={<GateButtons className="justify-center" />}
+          />
         ) : items.length === 0 ? (
           <EmptyFeed params={params} />
         ) : (

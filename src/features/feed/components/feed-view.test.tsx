@@ -124,5 +124,8 @@ describe('FeedView', () => {
     expect(
       screen.getByText('You need an account to see the communities you follow.'),
     ).toBeInTheDocument()
+    // The ways in, right there (specs/guest-experience Q2).
+    expect(screen.getByRole('button', { name: 'Create account' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Log in' })).toBeInTheDocument()
   })
 })
