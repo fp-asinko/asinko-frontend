@@ -19,7 +19,7 @@ const ICON_BUTTON =
  * Language and dark mode live in "⋯" (HR-03). Search, notifications and profile are not in the
  * MVP: disabled (H-26). Without a session the actions are Sign up and Log in (G-02, HR-02).
  */
-export function SiteHeader({ menu }: { menu: ReactNode }) {
+export function SiteHeader({ menu, devTools }: { menu: ReactNode; devTools?: ReactNode }) {
   const t = useTranslations('common')
 
   return (
@@ -58,6 +58,7 @@ export function SiteHeader({ menu }: { menu: ReactNode }) {
               <SearchIcon aria-hidden className="size-5" />
             </ComingSoon>
           </span>
+          {devTools}
           <AccountButtons>
             {/* With a session: notifications and profile from md (HR-02, Q2). */}
             <span className="hidden items-center gap-1 md:flex">

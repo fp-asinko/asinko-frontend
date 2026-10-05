@@ -214,5 +214,14 @@
     "brand": "Asinko",
     "or": "o",
     "continueWith": "Continuar con {provider}"
+  },
+  "devLogin": {
+    "login": "Dev login",
+    "logout": "@{username} · Dev logout",
+    "errors": {
+      "credentials": "Credenciales de la cuenta de prueba incorrectas",
+      "unavailable": "Backend o Supabase no disponibles",
+      "disabled": "El dev login está apagado"
+    }
   }
 }

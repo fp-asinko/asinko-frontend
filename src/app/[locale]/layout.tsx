@@ -16,6 +16,8 @@ import { pickClientMessages } from '@/i18n/client-messages'
 import { routing } from '@/i18n/routing'
 import { isIndexable } from '@/lib/seo/robots'
 import { getViewer } from '@/lib/session'
+import { isDevLoginEnabled } from '@/lib/auth/dev-session'
+import { DevLoginButton } from '@/features/dev-login'
 import { Providers } from './providers'
 import '../globals.css'
 
@@ -63,7 +65,13 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   // The browser gets only the namespaces its Client Components use (i18n.md).
   const clientMessages = pickClientMessages(await getMessages())
   // Who can act: without a session, actions open the account modal (specs/guest-experience).
-  const signedIn = (await getViewer()) !== null
+  const viewer = await getViewer()
+  const signedIn = viewer !== null
+  // Development login (specs/dev-login): off in production and with every route mocked.
+  const devTools =
+    isDevLoginEnabled() && env.API_MOCKS !== 'all' ? (
+      <DevLoginButton username={viewer?.username ?? null} />
+    ) : null
 
   // Only views that exist (F-23b): each view's spec registers its own item.
   const navItems: NavItem[] = [{ href: '/', label: t('home'), icon: <HouseIcon /> }]
@@ -85,6 +93,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
                   </Suspense>
                 }
                 right={<RightColumn signedIn={signedIn} />}
+                devTools={devTools}
               >
                 {children}
               </AppShell>

@@ -16,11 +16,14 @@ export function AppShell({
   navItems,
   sidebar,
   right,
+  devTools,
   children,
 }: {
   navItems: NavItem[]
   sidebar: ReactNode
   right?: ReactNode
+  /** Development tools for the top bar (specs/dev-login); never in production. */
+  devTools?: ReactNode
   children: ReactNode
 }) {
   const t = useTranslations('common')
@@ -34,7 +37,7 @@ export function AppShell({
       >
         {t('nav.skipToContent')}
       </a>
-      <SiteHeader menu={<MobileSidebar>{sidebar}</MobileSidebar>} />
+      <SiteHeader devTools={devTools} menu={<MobileSidebar>{sidebar}</MobileSidebar>} />
       <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)]">
         <div className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-2 py-2.5 md:block">
           {sidebar}

@@ -8,6 +8,7 @@ import type { AbstractIntlMessages } from 'next-intl'
 export const CLIENT_NAMESPACES = [
   'authGate',
   'common',
+  'devLogin',
   'errors.unexpected',
   'feed.card',
   'feed.comments',
