@@ -95,7 +95,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
                       <InterestsSidebar />
                     </Suspense>
                   }
-                  right={<RightColumn signedIn={signedIn} />}
+                  right={<RightColumn />}
                   devTools={devTools}
                 >
                   {children}

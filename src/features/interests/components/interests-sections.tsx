@@ -1,3 +1,4 @@
+import { JoinCard } from '@/components/organisms/auth-gate'
 import { PlusCircleIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { ComingSoon } from '@/components/molecules/coming-soon'
@@ -13,24 +14,30 @@ const COLUMN_TITLE =
 
 /**
  * The "Your interests" column as in the prototype (H-07). Pure render: data comes in. Without a
- * session the viewer sections would always be empty, so the column is only the biggest
- * communities (decided 2026-10-03).
+ * session the viewer sections would always be empty, so the column is the invitation to join
+ * (specs/guest-sidebar) and the biggest communities (decided 2026-10-03).
  */
 export function InterestsSections({ interests }: { interests: Interests }) {
   const t = useTranslations('interests')
 
   if (!interests.signedIn) {
     return (
-      <section aria-label={t('guestTitle')} className="flex flex-col">
-        <p aria-hidden className={COLUMN_TITLE}>
-          {t('guestTitle')}
-        </p>
-        {interests.suggested.ok ? (
-          <SuggestedCommunities suggestions={interests.suggested.data} />
-        ) : (
-          <p className="px-1 type-meta text-muted-foreground">{t('error')}</p>
-        )}
-      </section>
+      <>
+        {/* The invitation to have an account, as Reddit (specs/guest-sidebar GS-01). */}
+        <JoinCard />
+        {/* Edge to edge: the panel pads 12px on phones, the column 8px from md. */}
+        <hr className="-mx-3 my-3 shrink-0 md:-mx-2" />
+        <section aria-label={t('guestTitle')} className="flex flex-col">
+          <p aria-hidden className={COLUMN_TITLE}>
+            {t('guestTitle')}
+          </p>
+          {interests.suggested.ok ? (
+            <SuggestedCommunities suggestions={interests.suggested.data} />
+          ) : (
+            <p className="px-1 type-meta text-muted-foreground">{t('error')}</p>
+          )}
+        </section>
+      </>
     )
   }
 

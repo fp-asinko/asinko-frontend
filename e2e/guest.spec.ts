@@ -32,13 +32,52 @@ test.describe('Without a session', () => {
     await expect(banner.getByRole('button', { name: 'Profile' })).toHaveCount(0)
   })
 
-  test('the right column invites to join (G-03)', async ({ page, isMobile }) => {
-    test.skip(isMobile, 'The right column exists from 1024px')
+  test('the left column starts with the invitation, the right one no longer has it (specs/guest-sidebar GS-01, GS-05)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'The columns exist from md; the phone panel has its own test')
     await page.setViewportSize({ width: 1280, height: 900 })
     await page.goto('/en')
-    const column = page.getByRole('complementary', { name: 'More from Asinko' })
-    await expect(column.getByRole('heading', { name: 'New to Asinko?' })).toBeVisible()
+    const invite = page.getByRole('region', { name: 'New to Asinko?' })
+    await expect(invite).toBeVisible()
+    await expect(invite.getByRole('button', { name: 'Continue with Reddit' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
+    // Above the communities.
+    const communities = page.getByRole('region', { name: 'Communities' }).filter({ visible: true })
+    expect((await invite.boundingBox())!.y).toBeLessThan((await communities.boundingBox())!.y)
+    const right = page.getByRole('complementary', { name: 'More from Asinko' })
+    await expect(right.getByRole('region', { name: 'New to Asinko?' })).toHaveCount(0)
   })
+
+  for (const theme of ['light', 'dark'] as const) {
+    test(`the phone panel shows the invitation at 360px, accessible in ${theme} (GS-01, GS-06)`, async ({
+      page,
+    }) => {
+      await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
+      await page.setViewportSize({ width: 360, height: 800 })
+      await page.goto('/en')
+      await page.getByRole('button', { name: 'Open menu' }).click()
+      const panel = page.getByRole('dialog')
+      const invite = panel.getByRole('region', { name: 'New to Asinko?' })
+      await expect(invite.getByRole('button', { name: 'Continue with email' })).toBeVisible()
+      // Every label fits its button, and the page does not scroll sideways.
+      for (const button of await invite.getByRole('button', { name: /^Continue with/ }).all()) {
+        expect(await button.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(
+          0,
+        )
+        expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44)
+      }
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        ),
+      ).toBeLessThanOrEqual(0)
+      await expectNoA11yViolations(page)
+    })
+  }
 
   test('voting opens the modal, marks nothing, and Escape gives the focus back (G-04 to G-06)', async ({
     page,

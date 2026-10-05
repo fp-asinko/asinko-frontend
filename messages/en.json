@@ -207,7 +207,11 @@
     },
     "joinCard": {
       "title": "New to Asinko?",
-      "body": "Build a public track record. Every call you make is checked against the market."
+      "body": "Build a public track record. Every call you make is checked against the market.",
+      "email": "Continue with email",
+      "legal": "By continuing, you agree to our <terms>Terms</terms> and <privacy>Privacy Policy</privacy>.",
+      "terms": "Terms",
+      "privacy": "Privacy Policy"
     },
     "brand": "Asinko",
     "or": "or",

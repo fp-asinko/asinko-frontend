@@ -207,7 +207,11 @@
     },
     "joinCard": {
       "title": "Novo no Asinko?",
-      "body": "Construa um histórico público. Cada previsão sua é conferida com o mercado."
+      "body": "Construa um histórico público. Cada previsão sua é conferida com o mercado.",
+      "email": "Continuar com e-mail",
+      "legal": "Ao continuar, você aceita nossos <terms>Termos</terms> e a <privacy>Política de privacidade</privacy>.",
+      "terms": "Termos",
+      "privacy": "Política de privacidade"
     },
     "brand": "Asinko",
     "or": "ou",

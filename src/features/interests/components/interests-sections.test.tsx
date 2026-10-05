@@ -156,6 +156,20 @@ describe('InterestsSections', () => {
       expect(screen.queryByRole('button', { name: 'Create group' })).toBeNull()
     })
 
+    it('starts with the invitation to join, above the communities (specs/guest-sidebar GS-01)', () => {
+      renderWithIntl(<InterestsSections interests={guest} />)
+      const join = screen.getByRole('region', { name: 'New to Asinko?' })
+      const communities = screen.getByRole('region', { name: 'Communities' })
+      expect(
+        join.compareDocumentPosition(communities) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
+    })
+
+    it('has no invitation with a session', () => {
+      renderWithIntl(<InterestsSections interests={interests} />)
+      expect(screen.queryByRole('region', { name: 'New to Asinko?' })).toBeNull()
+    })
+
     it('says when the communities could not be loaded', () => {
       renderWithIntl(<InterestsSections interests={{ ...guest, suggested: { ok: false } }} />)
       expect(screen.getByText('Could not load this section.')).toBeInTheDocument()
