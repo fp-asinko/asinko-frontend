@@ -1,6 +1,6 @@
 # Columna derecha — Design
 
-> **Estado:** para aprobar junto con los requisitos. Asume las respuestas propuestas a Q1–Q3.
+> **Estado:** aprobado el 2026-10-04.
 
 ## 1. Estructura
 
@@ -64,3 +64,11 @@ AppShell (organism)
   - Un link del pie muestra "Coming soon".
   - axe sin violaciones.
 - Presupuesto de JS: `performance.spec.ts`.
+
+## 6. Ajustes de la implementación
+
+- **Globo "Coming soon" recortado (revisión de UI):** a 1024 px, el globo de "Rules" y el de "Careers", que abren cada fila del pie, quedaban cortados por el borde izquierdo de la columna. La columna tiene `overflow-y: auto` y eso también recorta en horizontal. Qué link abre cada fila depende del idioma, así que no sirve elegir la posición del globo link por link. Ahora `ComingSoon`, al mostrarse, mide el globo y lo corre hacia adentro lo justo si lo cortaría el contenedor o la pantalla. Lo cubre un unitario y `e2e/right-column.spec.ts`; verificado en en y es.
+- **Tuteo en español:** las traducciones de Q2 estaban en voseo ("Ganalos… usalos o perdelos") y el resto de `es.json` usa tuteo. Quedó "Gánalos… Gástalos… úsalos o piérdelos".
+- **`RightColumn`** tiene su test, con el orden de RC-01. El `id` del título de la tarjeta sale de `useId`. RC-05 se prueba a 360, 768 y 1023 px.
+- **El año del copyright** sale de `useNow()` de next-intl en el servidor, la misma fuente de "ahora" que el resto de la app.
+- **Los links del pie** se ven atenuados como todo lo que es "Próximamente" (H-26). WCAG 1.4.3 exime a los controles inactivos.

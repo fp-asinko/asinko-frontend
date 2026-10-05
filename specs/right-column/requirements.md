@@ -1,6 +1,6 @@
 # Columna derecha — Requirements
 
-> **Estado:** para aprobar. Pedido el 2026-10-04. Reemplaza H-08 de `specs/home` (columna derecha vacía en el MVP).
+> **Estado:** aprobado el 2026-10-04 con Q1–Q3 como se proponen. Pedido el 2026-10-04. Reemplaza H-08 de `specs/home` (columna derecha vacía en el MVP).
 > **Fuente de verdad:** la columna `sidebar-right` de `docs/references/prototype.html`, medida en el navegador a 1440 px.
 
 ## Objetivo
@@ -24,16 +24,16 @@ El Product Owner decidió, el 2026-10-04:
 
 ## Criterios de aceptación
 
-- [ ] **RC-01** **Columna con contenido:** desde `lg` (1024 px), la columna derecha de 300 px muestra la tarjeta de tokens y el pie, en ese orden. Queda fija al hacer scroll, como la izquierda, y si no entra en la pantalla tiene scroll propio.
-- [ ] **RC-02** **Tokens de temporada como "Próximamente":** la tarjeta tiene el estilo del prototipo, con fondo `--surface`, borde, radio de 12 px, el título "Season tokens" y la explicación de cómo se ganan y se gastan. No muestra saldo, temporada ni días restantes (Q1). Un sello "Coming soon" deja claro que todavía no existe.
-- [ ] **RC-03** **Pie:** muestra Rules, Privacy, Terms, Accessibility, About, Careers y Press, más el copyright. Cada link funciona como un elemento deshabilitado de H-26: se puede enfocar, se anuncia como no disponible y al activarlo muestra "Coming soon".
-- [ ] **RC-04** **Accesibilidad:**
+- [x] **RC-01** **Columna con contenido:** desde `lg` (1024 px), la columna derecha de 300 px muestra la tarjeta de tokens y el pie, en ese orden. Queda fija al hacer scroll, como la izquierda, y si no entra en la pantalla tiene scroll propio.
+- [x] **RC-02** **Tokens de temporada como "Próximamente":** la tarjeta tiene el estilo del prototipo, con fondo `--surface`, borde, radio de 12 px, el título "Season tokens" y la explicación de cómo se ganan y se gastan. No muestra saldo, temporada ni días restantes (Q1). Un sello "Coming soon" deja claro que todavía no existe.
+- [x] **RC-03** **Pie:** muestra Rules, Privacy, Terms, Accessibility, About, Careers y Press, más el copyright. Cada link funciona como un elemento deshabilitado de H-26: se puede enfocar, se anuncia como no disponible y al activarlo muestra "Coming soon".
+- [x] **RC-04** **Accesibilidad:**
   - La columna es una región complementaria con nombre (`aside`), porque ahora tiene contenido.
   - Los textos cumplen AA: el prototipo usa 10–10,5 px en gris `#8A8B8E`; acá van con la escala tipográfica del sistema (`type-meta`) y `--muted-foreground`.
   - Se opera con teclado y no tapa el foco.
-- [ ] **RC-05** **Mobile first:** en mobile y tablet (menos de 1024 px) la columna no se muestra, igual que en el prototipo. El contenido es informativo y "Próximamente", así que no falta nada indexable (`seo.md § Mobile first indexing`).
-- [ ] **RC-06** **i18n:** todos los textos están en en, es y pt (ver Q2 para la explicación de los tokens).
-- [ ] **RC-07** **Sin peso:** todo se renderiza en el servidor. El único JavaScript es el de los botones "Coming soon", que ya existe. El JS del Home se queda en ≤ 230 KB.
+- [x] **RC-05** **Mobile first:** en mobile y tablet (menos de 1024 px) la columna no se muestra, igual que en el prototipo. El contenido es informativo y "Próximamente", así que no falta nada indexable (`seo.md § Mobile first indexing`).
+- [x] **RC-06** **i18n:** todos los textos están en en, es y pt (ver Q2 para la explicación de los tokens).
+- [x] **RC-07** **Sin peso:** todo se renderiza en el servidor. El único JavaScript es el de los botones "Coming soon", que ya existe. El JS del Home se queda en ≤ 230 KB.
 
 ## Fuera de alcance
 

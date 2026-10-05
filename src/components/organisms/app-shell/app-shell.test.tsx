@@ -1,18 +1,20 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ThemeProvider } from 'next-themes'
+import type { ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { AppShell } from './app-shell'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
-function renderShell() {
+function renderShell(right?: ReactNode) {
   return renderWithIntl(
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
       <AppShell
         navItems={[{ href: '/', label: 'Home', icon: <svg /> }]}
         sidebar={<p>Your interests</p>}
+        right={right}
       >
         <h1>Page</h1>
       </AppShell>
@@ -47,5 +49,16 @@ describe('AppShell', () => {
     expect(screen.getByRole('banner')).toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: 'Main navigation' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Open menu' })).toBeInTheDocument()
+  })
+
+  it('renders the right column as a named complementary region (RC-01, RC-04)', () => {
+    renderShell(<p>Season tokens</p>)
+    const aside = screen.getByRole('complementary', { name: 'More from Asinko' })
+    expect(aside).toContainElement(screen.getByText('Season tokens'))
+  })
+
+  it('has no empty region when there is no right column', () => {
+    renderShell()
+    expect(screen.queryByRole('complementary')).toBeNull()
   })
 })

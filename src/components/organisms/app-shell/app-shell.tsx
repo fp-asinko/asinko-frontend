@@ -9,18 +9,22 @@ import { SiteHeader } from './site-header'
  * Layout of the prototype (specs/home/design.md §3), mobile first:
  * < md: 1 column, left column in the menu panel, bottom bar
  * md: left 260px + center · lg: left 260px + [center (max 780px) + right 300px], centered
- * The left column's content comes from the layout (organisms do not know the business).
+ * The content of the left and right columns comes from the layout (organisms do not know the
+ * business). The right one only exists from lg, as in the prototype (specs/right-column).
  */
 export function AppShell({
   navItems,
   sidebar,
+  right,
   children,
 }: {
   navItems: NavItem[]
   sidebar: ReactNode
+  right?: ReactNode
   children: ReactNode
 }) {
   const t = useTranslations('common')
+  const tr = useTranslations('rightColumn')
 
   return (
     <>
@@ -46,8 +50,18 @@ export function AppShell({
           >
             {children}
           </main>
-          {/* Right column: empty in the MVP (Q2). A div, not an aside: no empty landmark. */}
-          <div className="hidden w-75 shrink-0 border-l lg:block" />
+          {/* Right column (RC-01): fixed under the 60px bar like the left one, with its own scroll.
+              Without content it stays an empty div: no empty landmark. */}
+          {right ? (
+            <aside
+              aria-label={tr('label')}
+              className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] w-75 shrink-0 self-start overflow-y-auto border-l lg:block"
+            >
+              {right}
+            </aside>
+          ) : (
+            <div className="hidden w-75 shrink-0 border-l lg:block" />
+          )}
         </div>
       </div>
       <BottomNav items={navItems} />

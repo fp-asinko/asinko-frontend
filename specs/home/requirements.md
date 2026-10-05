@@ -49,7 +49,7 @@ Incluye **reemplazar el estilo iOS de `foundation` por el sistema visual del pro
   - **Grupos**: comunidades donde soy miembro, con avatar, nombre, su último post como subtítulo y etiqueta `MOD` si modero.
   - **Sugeridas**: comunidades para unirme.
   - **Sin sesión** (decidido el 2026-10-03): Activos, Personas, Grupos y "Crear grupo" siempre estarían vacíos, así que la columna se titula **"Comunidades"** y muestra solo las 8 más grandes con "+ Unirse".
-- [x] **H-08** **Columna derecha**: existe en desktop (300 px) para respetar la estructura, **vacía** en el MVP (Q2). Su contenido se define más adelante.
+- [x] **H-08** **Columna derecha**: existe en desktop (300 px) para respetar la estructura, **vacía** en el MVP (Q2). Su contenido se define más adelante. _Reemplazado por `specs/right-column` (2026-10-05): tarjeta de tokens "Próximamente" y pie._
 
 ### Feed
 
