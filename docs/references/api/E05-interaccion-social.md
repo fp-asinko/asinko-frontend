@@ -55,6 +55,8 @@ En la práctica, tres rutas con la misma forma:
 
 **Forma de respuesta:** `{ "items": Comment[] }` donde cada `Comment` trae sus `replies` anidados inline.
 
+**`?limit=N&replies=false`** (P-007, dev, 3cfff41): `limit` acota los comentarios de primer nivel (entero positivo, techo 20; un valor inválido se ignora). Solo el literal `replies=false` trae únicamente el primer nivel: cada comentario con `replies: []` (nunca ausente) y `replyCount` igual. Sin parámetros, el árbol completo. Un comentario borrado trae `body: ""` (P-008).
+
 ### `POST /api/v1/{posts|theses|polls}/{id}/comments` — Crear comentario
 **Auth:** requerida.
 **Usuario:** sin ownership, `userId` explícito — `userId` (body) debe coincidir con la sesión.

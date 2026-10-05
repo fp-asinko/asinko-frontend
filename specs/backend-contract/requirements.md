@@ -16,14 +16,14 @@ Consumir lo que el backend ya resuelve y borrar los atajos del front. La regla e
 
 ## Criterios de aceptación
 
-- [ ] **BC-01** **Comunidad del contenido (P-004):** la tarjeta de post y la de encuesta toman la comunidad del campo `community` del contenido. Toda tarjeta muestra su `$BTC` o `#defi` con link, sin importar en qué página de comunidades esté.
-- [ ] **BC-02** **Un request menos por página:** el feed deja de pedir `GET /communities` en cada página para nombrar comunidades. Solo lo pide si la página trae menciones `$` o `#` para resolver (ver Q1).
-- [ ] **BC-03** **Comentarios de una encuesta (P-006):** el botón de comentarios de la encuesta muestra la cantidad, con el mismo formato y el mismo nombre accesible que el de un post ("6 comments"). Hoy dice solo "Comments".
-- [ ] **BC-04** **Primeros comentarios livianos (P-007):** la vista previa pide `?limit=N&replies=false` y sigue mostrando los 3 primeros comentarios de primer nivel que no estén borrados.
-- [ ] **BC-05** **Mocks al día:** los mocks devuelven `community` y `commentCount` en encuestas, respetan `limit` y `replies`, y un contenido borrado trae `body: ""` (P-008). `src/mocks/fixtures.test.ts` los valida contra el esquema.
-- [ ] **BC-06** **Contrato y propuestas:** el snapshot de `docs/references/api/` y `proposals.md` marcan P-002, P-004, P-006, P-007 y P-008 como implementadas en `dev`. Los atajos anotados en `specs/home` quedan cerrados.
-- [ ] **BC-07** **Contra el backend real:** `pnpm api:smoke` pasa contra `asinko-app` local con los esquemas nuevos.
-- [ ] **BC-08** **Sin regresiones:** nada más cambia a la vista. El JS del Home no crece, porque todo el cambio es de servidor.
+- [x] **BC-01** **Comunidad del contenido (P-004):** la tarjeta de post y la de encuesta toman la comunidad del campo `community` del contenido. Toda tarjeta muestra su `$BTC` o `#defi` con link, sin importar en qué página de comunidades esté.
+- [x] **BC-02** **Un request menos por página:** el feed deja de pedir `GET /communities` en cada página para nombrar comunidades. Solo lo pide si la página trae menciones `$` o `#` para resolver (ver Q1).
+- [x] **BC-03** **Comentarios de una encuesta (P-006):** el botón de comentarios de la encuesta muestra la cantidad, con el mismo formato y el mismo nombre accesible que el de un post ("6 comments"). Hoy dice solo "Comments".
+- [x] **BC-04** **Primeros comentarios livianos (P-007):** la vista previa pide `?limit=N&replies=false` y sigue mostrando los 3 primeros comentarios de primer nivel que no estén borrados.
+- [x] **BC-05** **Mocks al día:** los mocks devuelven `community` y `commentCount` en encuestas, respetan `limit` y `replies`, y un contenido borrado trae `body: ""` (P-008). `src/mocks/fixtures.test.ts` los valida contra el esquema.
+- [x] **BC-06** **Contrato y propuestas:** el snapshot de `docs/references/api/` y `proposals.md` marcan P-002, P-004, P-006, P-007 y P-008 como implementadas en `dev`. Los atajos anotados en `specs/home` quedan cerrados.
+- [x] **BC-07** **Contra el backend real:** `pnpm api:smoke` pasa contra `asinko-app` local con los esquemas nuevos.
+- [x] **BC-08** **Sin regresiones:** nada más cambia a la vista. El JS del Home no crece, porque todo el cambio es de servidor.
 
 ## Fuera de alcance
 

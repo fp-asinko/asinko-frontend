@@ -1,6 +1,15 @@
 # Front adaptado al contrato nuevo del backend — Tasks
 
-> **Estado:** aprobado el 2026-10-04.
+> **Estado:** aprobado y cerrado el 2026-10-04.
+>
+> **Cierre:**
+>
+> - Tests: todos los unitarios, más 109 e2e con mocks y el presupuesto de JS, en verde.
+> - `pnpm api:smoke` contra `asinko-app` local: pasan el feed y los comentarios con `limit`/`replies`. Al smoke se le suma ese paso, con timeout de 60 s porque la base de dev está lejos.
+> - El perfil (`GET /profiles/maria`) devolvió 500 por una falla del servidor de desarrollo del backend ("Jest worker encountered 2 child process exceptions"), ajena a este spec.
+> - Con datos reales, las 14 tarjetas del Home muestran su comunidad, y las encuestas, su cantidad de comentarios.
+>
+> **Ajuste:** el post de las ballenas suma una respuesta en los mocks. Su `commentCount` (6) ahora no cuenta el comentario borrado, como el backend.
 
 ```
 T-01 ─┬─ T-02 ─┐
@@ -29,7 +38,7 @@ T-01 ─┬─ T-02 ─┐
   - `?limit=6&replies=false` en `getCommentsPreview`.
   - **Tests:** `comments-api.test.ts` verifica la query y que sigue filtrando borrados y respuestas.
 
-- [ ] **T-05 · Documentación y verificación** · S · BC-06, BC-07, BC-08
+- [x] **T-05 · Documentación y verificación** · S · BC-06, BC-07, BC-08
   - Snapshot del contrato, `proposals.md`, `specs/home` y `api-integration.md`.
   - `pnpm api:smoke` contra el backend local; el Home con `API_MOCKS=missing`.
   - e2e completo y presupuesto de JS.

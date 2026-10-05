@@ -3,32 +3,11 @@
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla.
 > Cuando el backend la implementa, se mueve al snapshot del contrato y se marca como resuelta acá.
 
-**Revisado contra `asinko-app` rama `dev` (`0cdf243`, 2026-10-01)** y sus notas `HANDOFF-frontend.md` y `API-IMPLEMENTATION-NOTES.md`. En `main` solo está E01; en `dev` están 33 de los 43 paths: E01 a E05, búsqueda y tesis. E07 (notificaciones) y E14 (activos) no están. El contrato vigente vive en `financeshowoff-design-docs/api/` (con `openapi.yaml`) y en el artefacto _ASINKO Endpoint Spec_.
+**Revisado contra `asinko-app` rama `dev` (`0bb6325`, 2026-10-04)**. Antes, contra `0cdf243` (2026-10-01) y sus notas `HANDOFF-frontend.md` y `API-IMPLEMENTATION-NOTES.md`. En `main` solo está E01; en `dev` están 33 de los 43 paths: E01 a E05, búsqueda y tesis. E07 (notificaciones) y E14 (activos) no están. El contrato vigente vive en `financeshowoff-design-docs/api/` (con `openapi.yaml`) y en el artefacto _ASINKO Endpoint Spec_.
 
-## Bloqueo para usar datos reales
+## Bloqueo para usar datos reales — resuelto
 
-Probado el 2026-10-02 con `dev` corriendo en local contra la Supabase de dev: **todas las lecturas públicas responden `500`** (`/communities`, `/communities/{slug}`, `/feed/explore`, `/profiles/{id}`). A la base le faltan **6 migraciones** de `dev` (`HANDOFF-frontend.md` § 3 habla de 3; faltan también las 3 de agosto):
-
-```
-20260817161500_remove_min_points_to_join
-20260817161600_slug_mutability            → communities.slugChangedAt
-20260817161700_personal_channels_replace_follow
-20260921115338_poll_results_visibility    → polls.resultsVisibility
-20260922152054_vote_thesis
-20260922152554_community_favorites
-```
-
-**Causa verificada: es el esquema, no los permisos.** En `information_schema` no existen `communities.slugChangedAt` ni `polls.resultsVisibility`, y el log del backend lo confirma (`The column communities.slugChangedAt does not exist in the current database`). El rol de solo lectura del front (`juan_readonly`) lee las tablas sin problema (12 comunidades, 12 posts, 2 encuestas); un problema de permisos daría `permission denied for table`.
-
-**Pedido:**
-
-- [ ] Aplicar las 6 migraciones en la Supabase de dev (`npx prisma migrate deploy`, `HANDOFF-frontend.md` § 3). Las aplica el backend: el front no corre migraciones.
-- [ ] Decidir si se corre el seed después. **Ojo:** borra todo el contenido antes de reinsertar.
-- [ ] Avisar cuando esté, para que el front repita la prueba (`pnpm api:smoke`).
-
-**No hacen falta credenciales nuevas para el front.** Con las migraciones aplicadas, `juan_readonly` alcanza para todo lo que lee el Home sin login (feed, comunidades, perfiles). Las escrituras (votar, comentar) piden sesión de usuario, y el backend las hace con su propia conexión.
-
-Alternativa del propio handoff: Postgres local con el seed.
+Las 6 migraciones que faltaban en la Supabase de dev se aplicaron el 2026-10-03, y desde entonces el Home corre con datos reales (`API_MOCKS=missing`). El rol de solo lectura `juan_readonly` alcanza para todo lo que se lee sin login.
 
 ## Formato
 
@@ -55,7 +34,7 @@ Alternativa del propio handoff: Postgres local con el seed.
 
 ### P-002 — Autenticación con Bearer en `/api/v1`
 
-**Estado:** propuesta. En `dev`, la sesión sigue siendo solo por cookie (`lib/api/session.ts`).
+**Estado:** implementada en `dev` (`3c5676c`, 2026-10-02). El front la va a usar con el login; mientras tanto, el riesgo de rotación de `api-integration.md` sigue.
 **Endpoint:** todos los de `/api/v1`
 **Motivo:** el front corre en otro dominio y reenvía la cookie de Supabase. El `proxy.ts` del backend puede refrescar la sesión con esa cookie y consumir el refresh token, dejando al usuario deslogueado (ver "Riesgo conocido" en `api-integration.md`). Bloquea el login del front.
 **Cambio:** aceptar `Authorization: Bearer <access_token>` (validado con `supabase.auth.getUser(token)`) y excluir `/api/v1` del refresh de sesión del `proxy.ts`. Las cookies pueden seguir funcionando para la UI propia del backend.
@@ -69,7 +48,7 @@ Alternativa del propio handoff: Postgres local con el seed.
 
 ### P-004 — Comunidad resumida en cada contenido
 
-**Estado:** propuesta. La otra mitad (filtrar por membresía) ya está en `dev` como `GET /communities?mine=true`.
+**Estado:** implementada en `dev` (`3cfff41`, 2026-10-02) y adoptada por el front (`specs/backend-contract`). La otra mitad (filtrar por membresía) ya estaba como `GET /communities?mine=true`.
 **Endpoint:** `Post`, `Poll` y `Thesis` en el feed y en sus `GET /{id}`
 **Motivo:** cada tarjeta muestra `$BTC` o `#defi` con link. Hoy el contenido solo trae `communityId`, así que el front pide `GET /communities` aparte y solo resuelve las de la primera página (las demás quedan sin nombre).
 **Cambio:** agregar al contenido:
@@ -85,21 +64,21 @@ Alternativa del propio handoff: Postgres local con el seed.
 
 ### P-006 — `commentCount` en `Poll`
 
-**Estado:** propuesta
+**Estado:** implementada en `dev` (`3cfff41`) y adoptada por el front (`specs/backend-contract`)
 **Endpoint:** recurso `Poll` (feed y `GET /polls/{id}`)
 **Motivo:** la tarjeta de encuesta muestra la cantidad de comentarios, igual que la de post (H-28).
 **Cambio:** `"commentCount": number`, con el mismo criterio que en `Post` (sin borrados).
 
 ### P-007 — Primeros comentarios sin el árbol completo
 
-**Estado:** propuesta (depende de H-28 en `specs/home`)
+**Estado:** implementada en `dev` (`3cfff41`) y adoptada por el front: la vista previa pide `?limit=6&replies=false` (`specs/backend-contract`). `limit` acota el primer nivel e incluye los borrados; por eso se piden 6 para mostrar 3
 **Endpoint:** `GET /api/v1/posts/{id}/comments`, `GET /api/v1/polls/{id}/comments`
 **Motivo:** la tarjeta del feed muestra los 3 primeros comentarios. Hoy la respuesta trae todo el árbol con las respuestas anidadas.
 **Cambio:** `?limit=3&replies=false`: solo los primeros N de primer nivel, sin `replies`. Sin parámetros, igual que hoy.
 
 ### P-008 — Sin textos en español en las respuestas
 
-**Estado:** propuesta (baja prioridad)
+**Estado:** implementada en `dev` (`3cfff41`). El front ya no leía el `body` de un borrado
 **Endpoint:** `Post` y `Comment` borrados
 **Motivo:** un contenido borrado trae `body: "[contenido eliminado]"`. El front es multi-idioma (inglés por defecto) y muestra su propio texto según `deleted: true`.
 **Cambio:** `body: ""` cuando `deleted` es `true`. El front ya no lee el `body` de un borrado, así que no es bloqueante.

@@ -10,6 +10,7 @@
 {
   "id": "uuid",
   "communityId": "uuid",
+  "community": { "id": "uuid", "slug": "string", "name": "string", "type": "CommunityType" }, // P-004 (dev, 3cfff41)
   "type": "TEXT | LINK | IMAGE",
   "title": "string",
   "body": "string",          // markdown
@@ -22,7 +23,7 @@
   "commentCount": "number",
   "viewerVote": "1 | -1 | null",
   "editedAt": "ISO 8601 | null",
-  "deleted": "boolean",      // true → body ya viene como "[contenido eliminado]"
+  "deleted": "boolean",      // true → title y body vacíos ("", P-008 en dev, 3cfff41)
   "publishedAt": "ISO 8601",
   "createdAt": "ISO 8601"
 }
@@ -65,6 +66,7 @@ Soft-delete.
 {
   "id": "uuid",
   "communityId": "uuid",
+  "community": { "id": "uuid", "slug": "string", "name": "string", "type": "CommunityType" }, // P-004 (dev, 3cfff41)
   "question": "string",
   "options": [{ "id": "uuid", "label": "string", "description": "string | null", "position": "number", "voteCount": "number" }],
   "closesAt": "ISO 8601 | null",
@@ -72,6 +74,7 @@ Soft-delete.
   "allowVoteChange": "boolean", // default true — ver PUT .../vote abajo
   "resultsVisibility": "ALWAYS | ON_VOTE | ON_CLOSE",
   "totalVotes": "number",
+  "commentCount": "number", // sin borrados, como en Post (P-006, dev, 3cfff41)
   "viewerOptionId": "uuid | null", // qué opción votó el viewer, null si no votó o no hay sesión
   "creator": { "id", "username", "avatarUrl" } | null, // null si creatorType = SYSTEM
   "creatorType": "USER | SYSTEM",
