@@ -41,3 +41,12 @@
   - `DevLoginButton`: los dos estados.
   - `env-schema`: `DEV_LOGIN_*` en producción falla.
 - **Sin e2e:** depende de Supabase real. Se verifica a mano contra `asinko-app` local, y el CI no tiene las variables, así que el botón no existe ahí.
+
+## Ajuste: activos de ejemplo (2026-10-05)
+
+Una cuenta de prueba nueva no está unida a ninguna comunidad de activos, y la sección Assets queda vacía. Pedido del usuario: verla con activos sin escribir en la base de dev.
+
+- Con `API_MOCKS=missing` (solo desarrollo: `src/env.ts` lo rechaza en producción), si la cuenta con sesión no sigue ningún activo, la columna muestra `DEV_SAMPLE_ASSETS` (`features/interests/interests.constants.ts`): BTC, ETH, SOL, XRP, LINK y AVAX, con precios de los mocks de E14.
+- Nunca reemplaza los activos que la cuenta sí sigue, nunca aparece sin sesión y no existe con `API_MOCKS=false`.
+- El link de cada mosaico usa la comunidad real del backend cuando existe (BTC, ETH); las demás filtran por un slug que el backend no tiene.
+- Se borra cuando E14 deje de estar mockeado.

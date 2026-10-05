@@ -1,6 +1,11 @@
 import 'server-only'
 import { apiRequest, paginatedSchema } from '@/lib/api'
-import { assetPageSchema, communitySchema, userSummarySchema } from '@/lib/api/contract'
+import {
+  assetPageSchema,
+  communitySchema,
+  userSummarySchema,
+  type RawCommunity,
+} from '@/lib/api/contract'
 import type { Viewer } from '@/lib/session'
 import type { Interests, SectionResult } from '../interests.types'
 import {
@@ -28,8 +33,15 @@ const emptyPage = { ok: true as const, data: { items: [], nextCursor: null } }
  * - Assets and Groups: GET /communities?mine=true (backend dev; needs a session, so without a
  *   viewer those sections stay empty).
  * - Suggested: the biggest communities from GET /communities that are not mine.
+ *
+ * `sampleAssets` is for development only: symbols to show when a signed-in account belongs to no
+ * asset community, so the column can be shown with a fresh test account while the asset routes
+ * are mocked (API_MOCKS=missing). The caller never passes it in production.
  */
-export async function getInterests(viewer: Viewer | null): Promise<Interests> {
+export async function getInterests(
+  viewer: Viewer | null,
+  { sampleAssets = [] }: { sampleAssets?: readonly string[] } = {},
+): Promise<Interests> {
   const communitiesPage = paginatedSchema(communitySchema)
   const [mine, all, following] = await Promise.all([
     viewer
@@ -57,13 +69,17 @@ export async function getInterests(viewer: Viewer | null): Promise<Interests> {
   const suggested = all.ok ? section(toSuggestions(all.data.items, count)) : failed
   if (!mine.ok) return { signedIn, assets: failed, people, groups: failed, suggested }
 
-  const assetCommunities = memberAssetCommunities(mine.data.items)
+  const memberSlugs = memberAssetCommunities(mine.data.items).map((community) => community.slug)
+  const assetSlugs =
+    memberSlugs.length > 0 || !signedIn
+      ? memberSlugs
+      : sampleSlugs(sampleAssets, all.ok ? all.data.items : [])
   const assetPages = await Promise.all(
-    assetCommunities.map((community) =>
+    assetSlugs.map((slug) =>
       apiRequest({
         method: 'GET',
         path: '/api/v1/assets/:symbol',
-        params: { symbol: assetSymbol(community.slug) },
+        params: { symbol: assetSymbol(slug) },
         schema: assetPageSchema,
       }),
     ),
@@ -71,9 +87,19 @@ export async function getInterests(viewer: Viewer | null): Promise<Interests> {
 
   // A missing asset drops only its tile; the section fails only if every asset failed.
   const tiles = assetPages.flatMap((page, index) =>
-    page.ok ? [toAssetTile(page.data, assetCommunities[index]!.slug)] : [],
+    page.ok ? [toAssetTile(page.data, assetSlugs[index]!)] : [],
   )
   const assets = tiles.length === 0 && assetPages.length > 0 ? failed : section(tiles)
 
   return { signedIn, assets, people, groups: section(toGroups(mine.data.items)), suggested }
+}
+
+/** The slug of each sample symbol: the backend's asset community when there is one. */
+function sampleSlugs(symbols: readonly string[], communities: readonly RawCommunity[]) {
+  return symbols.map(
+    (symbol) =>
+      communities.find(
+        (community) => community.type === 'SYSTEM_ASSET' && assetSymbol(community.slug) === symbol,
+      )?.slug ?? symbol.toLowerCase(),
+  )
 }

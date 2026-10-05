@@ -103,4 +103,54 @@ describe('getInterests', () => {
     expect(interests.groups).toEqual({ ok: false })
     expect(interests.suggested.ok).toBe(true)
   })
+
+  describe('sample assets (development only)', () => {
+    // A fresh test account: member of no asset community.
+    function withoutAssetMemberships() {
+      state.routes = MOCK_ROUTES.map((route) =>
+        route.path === '/api/v1/communities'
+          ? {
+              ...route,
+              handler: async (context) => {
+                const response = await route.handler(context)
+                if (context.query.mine !== 'true') return response
+                const body = response.body as { items: { type: string }[]; nextCursor: null }
+                return {
+                  ...response,
+                  body: { ...body, items: body.items.filter((c) => c.type !== 'SYSTEM_ASSET') },
+                }
+              },
+            }
+          : route,
+      )
+    }
+
+    it('shows the sample assets when the account follows none', async () => {
+      withoutAssetMemberships()
+      const interests = await getInterests(viewer, { sampleAssets: ['BTC', 'ETH'] })
+      expect(interests.assets.ok && interests.assets.data.map((tile) => tile.symbol)).toEqual([
+        'BTC',
+        'ETH',
+      ])
+    })
+
+    it('without sample assets, the section stays empty', async () => {
+      withoutAssetMemberships()
+      expect((await getInterests(viewer)).assets).toEqual({ ok: true, data: [] })
+    })
+
+    it('never replaces the assets the account does follow', async () => {
+      const interests = await getInterests(viewer, { sampleAssets: ['XRP'] })
+      expect(interests.assets.ok && interests.assets.data.map((tile) => tile.symbol)).toEqual(
+        expect.arrayContaining(['BTC', 'ETH', 'SOL']),
+      )
+    })
+
+    it('never shows them without a session', async () => {
+      expect((await getInterests(null, { sampleAssets: ['BTC'] })).assets).toEqual({
+        ok: true,
+        data: [],
+      })
+    })
+  })
 })
