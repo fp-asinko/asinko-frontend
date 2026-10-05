@@ -20,6 +20,15 @@ test.describe('Right column', () => {
     const box = await column.boundingBox()
     expect(box?.y).toBeLessThanOrEqual(61)
     await expect(column.getByRole('heading', { name: 'Season tokens' })).toBeInViewport()
+
+    // The footer sits at the bottom of the column (decided 2026-10-05).
+    const footer = (await column
+      .getByRole('contentinfo')
+      .or(column.locator('footer'))
+      .first()
+      .boundingBox())!
+    const aside = (await column.boundingBox())!
+    expect(Math.abs(footer.y + footer.height - (aside.y + aside.height))).toBeLessThanOrEqual(2)
   })
 
   test('footer links say "Coming soon" and the page stays accessible (RC-03, RC-04)', async ({

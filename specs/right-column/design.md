@@ -72,3 +72,14 @@ AppShell (organism)
 - **`RightColumn`** tiene su test, con el orden de RC-01. El `id` del título de la tarjeta sale de `useId`. RC-05 se prueba a 360, 768 y 1023 px.
 - **El año del copyright** sale de `useNow()` de next-intl en el servidor, la misma fuente de "ahora" que el resto de la app.
 - **Los links del pie** se ven atenuados como todo lo que es "Próximamente" (H-26). WCAG 1.4.3 exime a los controles inactivos.
+
+## 7. Ajustes del 2026-10-05 (Product Owner)
+
+- **El pie va al fondo de la columna**, sin importar cuánto ocupen las tarjetas de arriba: `RightColumn` es una columna flex de alto completo, y `SiteFooter` lleva `mt-auto`. Lo verifica `e2e/right-column.spec.ts`.
+- **Q3 resuelta: copyright con la razón social.**
+
+  | Idioma | Texto                                                   |
+  | ------ | ------------------------------------------------------- |
+  | en     | "Asinko, Inc. © {year}. All rights reserved."           |
+  | es     | "Asinko, Inc. © {year}. Todos los derechos reservados." |
+  | pt     | "Asinko, Inc. © {year}. Todos os direitos reservados."  |

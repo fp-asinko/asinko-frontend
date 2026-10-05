@@ -1,5 +1,6 @@
 import { useNow, useTranslations } from 'next-intl'
 import { ComingSoon } from '@/components/molecules/coming-soon'
+import { cn } from '@/lib/utils'
 
 const LINKS = ['rules', 'privacy', 'terms', 'accessibility', 'about', 'careers', 'press'] as const
 
@@ -7,12 +8,12 @@ const LINKS = ['rules', 'privacy', 'terms', 'accessibility', 'about', 'careers',
  * The legal and company links of the prototype (RC-03). None of those pages exists yet: each one is
  * a "Coming soon" control (H-26), opening upwards because it sits at the end of the column.
  */
-export function SiteFooter() {
+export function SiteFooter({ className }: { className?: string }) {
   const t = useTranslations('rightColumn.footer')
   const year = useNow().getUTCFullYear()
 
   return (
-    <footer className="border-t px-3.5 py-4">
+    <footer className={cn('border-t px-3.5 py-4', className)}>
       <ul className="flex flex-wrap gap-x-3 gap-y-1">
         {LINKS.map((key) => (
           <li key={key}>

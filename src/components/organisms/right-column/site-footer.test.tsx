@@ -22,8 +22,10 @@ describe('SiteFooter (RC-03)', () => {
     ).toBe(true)
   })
 
-  it('shows the copyright with the current year (Q3)', () => {
+  it('shows the legal name and the current year (Q3, decided 2026-10-05)', () => {
     renderWithIntl(<SiteFooter />)
-    expect(screen.getByText(`© ${new Date().getUTCFullYear()} Asinko`)).toBeInTheDocument()
+    expect(
+      screen.getByText(`Asinko, Inc. © ${new Date().getUTCFullYear()}. All rights reserved.`),
+    ).toBeInTheDocument()
   })
 })
