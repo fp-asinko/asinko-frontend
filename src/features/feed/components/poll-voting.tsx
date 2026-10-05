@@ -166,7 +166,8 @@ export function PollVoting({
           )
           const box = cn(
             // A locked option does not press in: nothing happens when tapped.
-            'tap relative block w-full overflow-hidden rounded-lg border px-3.5 py-2.5 text-left type-ui font-medium aria-disabled:active:scale-100',
+            // HR-09: a gray box, no border, like Reddit; the fill darkens it to the share.
+            'tap relative block w-full overflow-hidden rounded-lg bg-surface px-3.5 py-2.5 text-left type-ui font-medium aria-disabled:active:scale-100',
           )
           return (
             <li key={option.id}>
@@ -179,7 +180,7 @@ export function PollVoting({
                   className={cn(
                     box,
                     'outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                    canVote && 'hover:bg-surface',
+                    canVote && 'hover:bg-muted',
                     pending && 'cursor-wait',
                   )}
                 >

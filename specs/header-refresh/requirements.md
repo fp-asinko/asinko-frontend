@@ -15,30 +15,32 @@ Una barra con lo mínimo, alineada con el contenido, y una paleta de grises más
 
 ### Barra
 
-- [ ] **HR-01** **Buscador centrado sobre el feed:** desde `md`, el buscador queda centrado sobre la columna central (no sobre la página) y ocupa su ancho, hasta 560 px como en Reddit. Hoy está centrado en la página y mide 264 px.
-- [ ] **HR-02** **Lo mínimo a la derecha.** Sin sesión, "Sign up" (píldora gris), "Log in" (píldora principal) y "⋯". Con sesión, la campana, el perfil y "⋯". Sale el botón "Tokens": la tarjeta de la columna derecha ya lo explica.
-- [ ] **HR-03** **Menú "⋯":** reúne el idioma y el modo oscuro en todos los tamaños. Se opera con teclado, como un menú accesible. En mobile, sin sesión, suma "Sign up", que no entra en la barra.
-- [ ] **HR-04** **Mobile (360 px):** menú ☰, logo, buscar, "Log in" y "⋯", sin desbordar. El idioma y el tema salen del panel ☰ (vuelven al "⋯"), así el panel queda solo con las comunidades.
+- [x] **HR-01** **Buscador centrado sobre el feed:** desde `md`, el buscador queda centrado sobre la columna central (no sobre la página) y ocupa su ancho, hasta 560 px como en Reddit. Hoy está centrado en la página y mide 264 px.
+- [x] **HR-02** **Lo mínimo a la derecha.** Sin sesión, "Sign up" (píldora gris), "Log in" (píldora principal) y "⋯". Con sesión, la campana, el perfil y "⋯". Sale el botón "Tokens": la tarjeta de la columna derecha ya lo explica.
+- [x] **HR-03** **Menú "⋯":** reúne el idioma y el modo oscuro en todos los tamaños. Se opera con teclado, como un menú accesible. En mobile, sin sesión, suma "Sign up", que no entra en la barra.
+- [x] **HR-04** **Mobile (360 px):** menú ☰, logo, buscar, "Log in" y "⋯", sin desbordar. El idioma y el tema salen del panel ☰ (vuelven al "⋯"), así el panel queda solo con las comunidades.
 
 ### Paleta
 
-- [ ] **HR-05** **Grises fríos** en tema claro:
+- [x] **HR-05** **Grises fríos** en tema claro:
   - `--surface` `#F6F8F9`: buscador, composer, panel de comentarios, tarjetas de la columna, hovers.
   - `--muted`, `--secondary` y `--accent` `#EEF1F3`: chips, píldoras grises, pista del voto.
   - `--border` `#E5E8EB` y `--border-strong` `#D5DADF`.
   - `--header` blanco.
   - El tema oscuro no cambia: ya es gris neutro.
-- [ ] **HR-06** **Contraste:** todos los pares del test de contraste siguen en AA. Medidos con la fórmula del proyecto:
+- [x] **HR-06** **Contraste:** todos los pares del test de contraste siguen en AA. Medidos con la fórmula del proyecto:
   - texto secundario sobre `--surface`: 6,18;
   - texto secundario sobre `--muted`: 5,80;
   - `--faint` sobre `--surface`: 3,20.
 
   El verde de las variaciones sigue solo sobre blanco (4,43 sobre `--surface`, igual que hoy).
 
+- [x] **HR-09** **El gris en toda la app** (pedido el 2026-10-05, al ver la primera versión): lo que se toca dentro de una tarjeta es una **píldora gris rellena, sin borde**, como en Reddit: votos, comentarios, compartir, link, chip de comunidad, "Load more", "Join" y los botones secundarios. Las opciones de las encuestas son **cajas grises** (`--surface`) que el relleno oscurece según el porcentaje, y la caja "What are you thinking?" va gris sin borde, como el buscador. Al pasar el mouse, un gris un poco más oscuro (`--muted-hover`, en claro y oscuro, con su par en el test de contraste: 5,29 y 5,39).
+
 ### Generales
 
-- [ ] **HR-07** Sin JS extra al cargar: el menú "⋯" se carga diferido. El JS del Home se queda en ≤ 230 KB.
-- [ ] **HR-08** Textos en en, es y pt, y axe sin violaciones en claro y oscuro, en mobile y desktop.
+- [x] **HR-07** Sin JS extra al cargar: el menú "⋯" se carga diferido. El JS del Home se queda en ≤ 230 KB.
+- [x] **HR-08** Textos en en, es y pt, y axe sin violaciones en claro y oscuro, en mobile y desktop.
 
 ## Fuera de alcance
 

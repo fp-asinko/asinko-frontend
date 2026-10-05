@@ -8,11 +8,12 @@ import { useAuthGate } from './auth-gate'
 
 // 44px on phones (the main action of the bar), 36px from md. Loose text classes, not type-*:
 // cn does not merge those with the Button base (design-system.md § Tipografía).
-const PILL = 'h-11 rounded-full px-4 text-[0.8125rem] font-semibold md:h-9'
+const PILL = 'h-11 rounded-full px-3 text-[0.8125rem] font-semibold md:h-9 md:px-4'
 
 /**
- * "Log in" and "Sign up" in the top bar without a session (G-02); with one, what it already showed
- * (the profile). On phones only "Log in" fits next to the other controls at 360px.
+ * "Sign up" (gray pill) and "Log in" (main pill) in the top bar without a session, like Reddit
+ * (G-02, HR-02); with one, what it already showed. On phones only "Log in" fits at 360px: Sign up
+ * moves into "⋯" (HR-04).
  */
 export function AccountButtons({ children }: { children: ReactNode }) {
   const { signedIn, openGate } = useAuthGate()
@@ -20,16 +21,17 @@ export function AccountButtons({ children }: { children: ReactNode }) {
   if (signedIn) return children
 
   return (
-    <span className="flex items-center gap-1">
-      <Button variant="ghost" size="lg" className={PILL} onClick={() => openGate('login')}>
-        {t('login')}
-      </Button>
+    <span className="flex items-center gap-2">
       <Button
+        variant="secondary"
         size="lg"
         className={cn(PILL, 'hidden md:inline-flex')}
         onClick={() => openGate('signup')}
       >
         {t('signup')}
+      </Button>
+      <Button size="lg" className={PILL} onClick={() => openGate('login')}>
+        {t('login')}
       </Button>
     </span>
   )
@@ -45,7 +47,7 @@ export function GateButtons({ className }: { className?: string }) {
       <Button size="lg" className={PILL} onClick={() => openGate('signup')}>
         {t('signup')}
       </Button>
-      <Button variant="outline" size="lg" className={PILL} onClick={() => openGate('login')}>
+      <Button variant="secondary" size="lg" className={PILL} onClick={() => openGate('login')}>
         {t('login')}
       </Button>
     </span>

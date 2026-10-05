@@ -1,34 +1,35 @@
 import { expect, test } from '@playwright/test'
 import { settings } from './fixtures/settings'
 
-// F-19, F-20, F-21
+// F-19, F-20, F-21 (the toggle is in the "⋯" menu since specs/header-refresh)
 test.describe('theme', () => {
   test.use({ colorScheme: 'dark' })
 
-  test('starts light even when the OS is dark', async ({ page, isMobile }) => {
+  test('starts light even when the OS is dark', async ({ page }) => {
     await page.goto('/en')
     await expect(page.locator('html')).not.toHaveClass(/dark/)
-    const controls = await settings(page, isMobile)
-    await expect(controls.getByRole('switch', { name: 'Dark mode' })).not.toBeChecked()
+    const menu = await settings(page)
+    await expect(menu.getByRole('menuitemcheckbox', { name: 'Dark mode' })).toHaveAttribute(
+      'aria-checked',
+      'false',
+    )
   })
 
   test('the toggle switches to dark with the keyboard and the choice persists', async ({
     page,
-    isMobile,
   }) => {
     await page.goto('/en')
-    const toggle = (await settings(page, isMobile)).getByRole('switch', { name: 'Dark mode' })
+    const menu = await settings(page)
+    const toggle = menu.getByRole('menuitemcheckbox', { name: 'Dark mode' })
     await toggle.focus()
-    await page.keyboard.press('Space')
-
-    await expect(toggle).toBeChecked()
+    await page.keyboard.press('Enter')
     await expect(page.locator('html')).toHaveClass(/dark/)
 
     await page.reload()
     await expect(page.locator('html')).toHaveClass(/dark/)
     await expect(
-      (await settings(page, isMobile)).getByRole('switch', { name: 'Dark mode' }),
-    ).toBeChecked()
+      (await settings(page)).getByRole('menuitemcheckbox', { name: 'Dark mode' }),
+    ).toHaveAttribute('aria-checked', 'true')
   })
 
   test('the theme is applied by an inline script before the page content (no flicker)', async ({

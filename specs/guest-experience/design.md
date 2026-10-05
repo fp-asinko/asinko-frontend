@@ -77,7 +77,7 @@ function onUpvote() {
 
 ## 8. Ajustes de la implementación
 
-- **Idioma y tema en el menú (mobile):** a 360 px, "Log in" no entraba en la barra, que con sesión ya ocupaba 352 px. Debajo de `md`, `LocaleSwitcher` y `ThemeToggle` pasan al panel del menú (`MenuSettings`), con y sin sesión, como en Reddit y X. Lo decidió el Product Owner el 2026-10-05 y lo encontró el e2e (`scrollWidth` > viewport). Los e2e de tema e idioma abren el menú en mobile (`e2e/fixtures/settings.ts`).
+- **Idioma y tema en el menú (mobile):** a 360 px, "Log in" no entraba en la barra, que con sesión ya ocupaba 352 px. Debajo de `md`, `LocaleSwitcher` y `ThemeToggle` pasan al panel del menú (`MenuSettings`), con y sin sesión, como en Reddit y X. Lo decidió el Product Owner el 2026-10-05 y lo encontró el e2e (`scrollWidth` > viewport). Los e2e de tema e idioma abren el menú en mobile (`e2e/fixtures/settings.ts`). _Reemplazado por `specs/header-refresh` (2026-10-05): idioma y tema van en el menú "⋯" de la barra, en todos los tamaños, y el panel ☰ queda solo con las comunidades._
 - **"Following" sin sesión:** no se pide el feed. El estado de "necesita cuenta" sale directo de `getViewer()`, porque el backend lo rechazaría de todos modos. Se quitó `following` de `GatedAction`, ya que la pestaña conserva su página (Q2).
 - **e2e sin sesión:** con `API_MOCKS=true`, la cookie `asinko-mock-guest=1` apaga el usuario demo en ese navegador (`MOCK_GUEST_COOKIE` en `src/lib/session.ts`). Solo se lee en ese modo, que `env.ts` rechaza en producción, y solo puede quitar una sesión, nunca crearla.
 - **El modal:**

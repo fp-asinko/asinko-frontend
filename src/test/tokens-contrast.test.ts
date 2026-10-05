@@ -71,6 +71,9 @@ const TEXT_PAIRS: Array<[string, string]> = [
   ['muted-foreground', 'background'],
   ['muted-foreground', 'surface'],
   ['muted-foreground', 'muted'],
+  // Gray pills on hover (HR-09).
+  ['muted-foreground', 'muted-hover'],
+  ['foreground', 'muted-hover'],
   ['primary', 'background'],
   ['primary-foreground', 'primary'],
   ['secondary-foreground', 'secondary'],

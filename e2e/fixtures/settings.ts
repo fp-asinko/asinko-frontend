@@ -1,15 +1,12 @@
 import type { Locator, Page } from '@playwright/test'
 
 /**
- * Where the language and theme controls live: the top bar from md, the menu panel on phones
- * (specs/guest-experience: no room next to "Log in" at 360px). On phones it opens the menu.
+ * Language and dark mode live in the top bar's "⋯" menu at every size (specs/header-refresh
+ * HR-03). Opens it and returns the menu.
  */
-export async function settings(
-  page: Page,
-  isMobile: boolean,
-  openMenu = 'Open menu',
-): Promise<Locator> {
-  if (!isMobile) return page.locator('body')
-  await page.getByRole('button', { name: openMenu }).click()
-  return page.getByRole('dialog')
+export async function settings(page: Page, moreOptions = 'More options'): Promise<Locator> {
+  await page.getByRole('button', { name: moreOptions }).click()
+  const menu = page.getByRole('menu')
+  await menu.waitFor()
+  return menu
 }

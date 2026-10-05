@@ -14,21 +14,17 @@ test.describe('locale routing', () => {
     })
   }
 
-  test('the header selector switches language and keeps the filters (H-27)', async ({
-    page,
-    isMobile,
-  }) => {
+  test('the "⋯" menu switches language and keeps the filters (H-27, HR-03)', async ({ page }) => {
     await page.goto('/en?community=btc')
-    await (
-      await settings(page, isMobile)
-    )
-      .getByRole('combobox', { name: 'Language' })
-      .selectOption('es')
+    await (await settings(page)).getByRole('menuitemradio', { name: 'Español' }).click()
     await expect(page).toHaveURL(/\/es\?community=btc$/)
     await expect(page.locator('html')).toHaveAttribute('lang', 'es')
-    // On phones the menu closes with the navigation: open it again, now in Spanish.
-    const controls = await settings(page, isMobile, 'Abrir menú')
-    await expect(controls.getByRole('combobox', { name: 'Idioma' })).toHaveValue('es')
+    // The menu closes with the navigation: open it again, now in Spanish.
+    const menu = await settings(page, 'Más opciones')
+    await expect(menu.getByRole('menuitemradio', { name: 'Español' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    )
   })
 
   for (const [locale, heading] of [

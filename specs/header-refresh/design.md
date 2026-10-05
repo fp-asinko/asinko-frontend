@@ -55,3 +55,21 @@ md+:  [ logo 260 ][        centro (max 780)        ][ derecha 300 ]
   - `theme.spec` e `i18n.spec` usan el "⋯" (`e2e/fixtures/settings.ts`).
   - axe en claro y oscuro.
 - **Contraste** (`tokens-contrast.test.ts`) y presupuesto de JS.
+
+## 5. Ajustes de la implementación
+
+- **Grilla de la barra:** desde `lg` usa `lg:gap-0`. El `gap` de la fila corría la celda central 8 px y el buscador quedaba 4 px fuera del centro del feed. Lo detectó el e2e de centrado.
+- **360 px en español** ("Iniciar sesión" es largo): en mobile, las píldoras usan `px-3`, el logo `px-1` y la fila `gap-1`. El e2e lo verifica.
+- **"Sign up" en "⋯":** se renderiza solo si al abrir el menú la pantalla es angosta (`matchMedia`), así nunca hay un item oculto en el recorrido con teclado. El menú se precarga cuando el puntero o el foco llegan a "⋯".
+- **`dropdown-menu.tsx`** (shadcn, Base UI), con comentarios `asinko:`:
+  - `anchor`, para abrir desde el botón diferido.
+  - Anillo de foco visible en los items: el fondo de acento solo da ~1,1:1.
+  - Sin sombra.
+  - Apertura en 200 ms y cierre en 150 ms.
+- **Botones de cuenta:** "Sign up" usa la variante `secondary` (la píldora gris), sin clases repetidas.
+- **Se borraron** `LocaleSwitcher`, `ThemeToggle`, `MenuSettings` y `ui/switch.tsx`, que quedaron sin uso.
+- **HR-09, el gris en toda la app** (pedido al ver la primera versión):
+  - Las acciones de las tarjetas son píldoras grises sin borde.
+  - Las opciones de las encuestas son cajas grises.
+  - El composer va sin borde.
+  - Token nuevo: `--muted-hover` (`#E3E7EA` en claro y `#303136` en oscuro).

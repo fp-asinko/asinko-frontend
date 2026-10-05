@@ -18,7 +18,7 @@ type Vote = { score: number; viewerVote: 1 | -1 | null }
 type Motion = { pop: 'up' | 'down' | null; roll: 'up' | 'down' | null; key: number }
 
 const BUTTON =
-  'tap inline-flex size-8 items-center justify-center rounded-full outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-60'
+  'tap inline-flex size-8 items-center justify-center rounded-full outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-60'
 
 /**
  * The prototype's vote pill (H-15): ▲ score ▼, 136×38 with 32px buttons. Pressing the active
@@ -69,7 +69,8 @@ export function VoteControl({ postId, score, viewerVote }: { postId: string } & 
     <>
       <span
         data-animate={motion.pop ?? undefined}
-        className="inline-flex h-9.5 items-center gap-0.5 rounded-full border bg-card p-0.5 type-action text-muted-foreground"
+        // The gray pill of the card actions (HR-09): filled, no border.
+        className="inline-flex h-9.5 items-center gap-0.5 rounded-full bg-muted p-0.5 type-action text-muted-foreground"
       >
         <button
           type="button"

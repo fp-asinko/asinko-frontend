@@ -51,7 +51,8 @@ export function CommentsToggle({
         aria-expanded={open}
         aria-controls={mounted ? panelId : undefined}
         onClick={toggle}
-        className="inline-flex min-h-7 tap items-center gap-1.5 rounded-sm type-action text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+        // The gray pill of the card actions (HR-09), darker while open.
+        className="inline-flex h-9.5 tap items-center gap-1.5 rounded-full bg-muted px-3 type-action text-muted-foreground outline-none hover:bg-muted-hover hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 aria-expanded:bg-muted-hover aria-expanded:text-foreground"
       >
         {children}
         <ChevronDownIcon

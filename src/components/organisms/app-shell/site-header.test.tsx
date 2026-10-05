@@ -26,9 +26,10 @@ describe('SiteHeader (H-05)', () => {
     expect(logo.closest('a')).toHaveAttribute('href', '/')
   })
 
-  it('shows search, tokens, notifications and profile as unavailable (H-26)', () => {
+  it('shows search, notifications and profile as unavailable, without tokens (H-26, HR-02)', () => {
     renderHeader()
-    for (const name of ['Search', 'Tokens', 'Notifications', 'Profile']) {
+    expect(screen.queryByRole('button', { name: 'Tokens' })).toBeNull()
+    for (const name of ['Search', 'Notifications', 'Profile']) {
       for (const button of screen.getAllByRole('button', { name })) {
         expect(button).toHaveAttribute('aria-disabled', 'true')
       }
@@ -36,16 +37,22 @@ describe('SiteHeader (H-05)', () => {
     expect(screen.getByText('Search tickers, theses, creators…')).toBeInTheDocument()
   })
 
-  it('keeps the theme toggle, the language selector (H-27) and the menu slot', () => {
+  it('groups language and dark mode in "⋯", and keeps the menu slot (HR-03)', () => {
     renderHeader()
-    expect(screen.getByRole('switch', { name: 'Dark mode' })).toBeInTheDocument()
-    expect(screen.getByRole('combobox', { name: 'Language' })).toBeInTheDocument()
+    expect(screen.queryByRole('switch', { name: 'Dark mode' })).toBeNull()
+    expect(screen.queryByRole('combobox', { name: 'Language' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'More options' })).toHaveAttribute(
+      'aria-haspopup',
+      'menu',
+    )
     expect(screen.getByRole('button', { name: 'menu' })).toBeInTheDocument()
   })
 
   it('offers Log in and Sign up instead of the profile without a session (G-02)', async () => {
     renderHeader(false)
     expect(screen.queryByRole('button', { name: 'Profile' })).toBeNull()
+    // No notifications without an account (Q2).
+    expect(screen.queryByRole('button', { name: 'Notifications' })).toBeNull()
     expect(screen.getByRole('button', { name: 'Sign up' })).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Log in' }))

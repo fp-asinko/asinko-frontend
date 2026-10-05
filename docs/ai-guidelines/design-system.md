@@ -57,6 +57,7 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
   - `--muted` (`#EEF1F3`): chips y píldoras grises.
   - `--border` (`#E5E8EB`).
   - Barra superior blanca.
+- **Píldora gris** (como Reddit): todo lo que se toca dentro de una tarjeta (votos, comentarios, compartir, chips, "Join", botones secundarios) va `rounded-full bg-muted hover:bg-muted-hover`, relleno y **sin borde**. Las opciones de encuesta son cajas `bg-surface`. El borde queda para separar capas, no para dibujar botones.
 - **Texto secundario**: `--muted-foreground` (`#5C5D60`). **`--faint` (`#8A8B8E`) no es para texto chico** (3,4:1): solo íconos, separadores y texto de 18 px o más.
 - **Verde en texto** (`--success`/`--bullish`) sobre fondos blancos, no sobre `--surface`. El color nunca es la única señal: siempre con flecha, ícono o texto.
 - **Sin sombras**: las capas se separan con borde. Radios de 4 / 8 / 12 / 16 px y `rounded-full` para píldoras.

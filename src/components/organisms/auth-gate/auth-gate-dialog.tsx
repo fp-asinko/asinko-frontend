@@ -70,7 +70,7 @@ export function AuthGateDialog({
           </ComingSoon>
           <ComingSoon
             label={t('login')}
-            className="flex h-11 w-full tap items-center justify-center rounded-full border type-ui font-semibold"
+            className="flex h-11 w-full tap items-center justify-center rounded-full bg-muted type-ui font-semibold hover:bg-muted-hover"
           >
             {t('login')}
           </ComingSoon>

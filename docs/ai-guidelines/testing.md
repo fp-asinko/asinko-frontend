@@ -224,7 +224,7 @@ test('user can request a quote', async ({ page }) => {
 - `e2e/performance.spec.ts` verifica el presupuesto de JavaScript (`seo.md`). Toda ruta nueva se suma a su lista.
 - Los chequeos que no dependen del dispositivo (headers, peso de JS) corren solo en el proyecto desktop.
 - **Sin sesión:** con `API_MOCKS=true` hay usuario demo. Para probar la experiencia sin sesión, el test agrega la cookie `asinko-mock-guest=1` (`e2e/guest.spec.ts`). Solo funciona en ese modo, nunca en producción.
-- **Idioma y tema en mobile** están en el panel del menú: `settings(page, isMobile)` de `e2e/fixtures/settings.ts` lo abre.
+- **Idioma y tema** están en el menú "⋯" de la barra superior, en todos los tamaños: `settings(page)` de `e2e/fixtures/settings.ts` lo abre y devuelve el `menu`.
 
 ## En el pipeline
 

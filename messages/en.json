@@ -40,9 +40,12 @@
     },
     "header": {
       "search": "Search tickers, theses, creators…",
-      "tokens": "Tokens",
       "notifications": "Notifications",
       "profile": "Profile"
+    },
+    "menu": {
+      "more": "More options",
+      "signup": "Sign up"
     }
   },
   "errors": {

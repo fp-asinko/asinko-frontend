@@ -38,7 +38,7 @@ export function SuggestedCommunities({ suggestions }: { suggestions: Suggestion[
             action="join"
             label={t('joinLabel', { handle: suggestion.handle })}
             placement="below-end"
-            className="inline-flex h-6 tap items-center gap-0.5 rounded-full border px-2 text-[0.625rem] hover:bg-surface"
+            className="inline-flex h-6 tap items-center gap-0.5 rounded-full bg-muted px-2 text-[0.625rem] hover:bg-muted-hover"
           >
             <PlusIcon aria-hidden className="size-2.5" />
             {t('join')}

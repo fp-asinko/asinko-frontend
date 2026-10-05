@@ -40,9 +40,12 @@
     },
     "header": {
       "search": "Buscar tickers, teses, criadores…",
-      "tokens": "Tokens",
       "notifications": "Notificações",
       "profile": "Perfil"
+    },
+    "menu": {
+      "more": "Mais opções",
+      "signup": "Cadastrar-se"
     }
   },
   "errors": {

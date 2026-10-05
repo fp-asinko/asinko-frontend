@@ -30,7 +30,7 @@ export function ComposerPlaceholder({ viewerName }: { viewerName: string | null 
           <GatedComingSoon
             action="post"
             label={t('placeholder')}
-            className="flex h-10.75 w-full tap items-center rounded-full border bg-surface px-4 text-left type-ui text-muted-foreground"
+            className="flex h-10.75 w-full tap items-center rounded-full bg-surface px-4 text-left type-ui text-muted-foreground hover:bg-muted"
           >
             <span className="truncate">{t('placeholder')}</span>
           </GatedComingSoon>

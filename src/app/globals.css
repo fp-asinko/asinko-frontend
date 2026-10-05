@@ -32,6 +32,7 @@
   --muted-foreground: #5c5d60;
   --faint: #8a8b8e;
   --accent: #eef1f3;
+  --muted-hover: #e3e7ea; /* gray pills on hover (specs/header-refresh HR-09) */
   --accent-foreground: #17181a;
   --destructive: #ce2c31;
   --success: #17853b;
@@ -121,6 +122,7 @@
   --muted-foreground: #a6a7aa;
   --faint: #77787b;
   --accent: #26272b;
+  --muted-hover: #303136;
   --accent-foreground: #f4f4f2;
   --destructive: #ff6b6b;
   --success: #3dbe6a;
@@ -190,6 +192,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-surface: var(--surface);
   --color-muted: var(--muted);
+  --color-muted-hover: var(--muted-hover);
   --color-muted-foreground: var(--muted-foreground);
   --color-faint: var(--faint);
   --color-accent: var(--accent);
