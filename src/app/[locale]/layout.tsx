@@ -8,6 +8,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations } from 'next-intl/server'
 import { AppShell, type NavItem } from '@/components/organisms/app-shell'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
+import { JoinedProvider } from '@/components/organisms/join'
 import { RightColumn } from '@/components/organisms/right-column'
 import { env } from '@/env'
 import { InterestsSidebar, InterestsSkeleton } from '@/features/interests'
@@ -83,20 +84,23 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
         <NextIntlClientProvider messages={clientMessages}>
           <Providers nonce={nonce}>
             <AuthGateProvider signedIn={signedIn}>
-              <AppShell
-                navItems={navItems}
-                sidebar={
-                  // Streamed: the shell and the page never wait for the column's data
-                  // (specs/feed-navigation FN-08), as a language switch re-renders the layout.
-                  <Suspense fallback={<InterestsSkeleton />}>
-                    <InterestsSidebar />
-                  </Suspense>
-                }
-                right={<RightColumn signedIn={signedIn} />}
-                devTools={devTools}
-              >
-                {children}
-              </AppShell>
+              {/* Joined communities of this visit: every join button hides at once (specs/community-first). */}
+              <JoinedProvider>
+                <AppShell
+                  navItems={navItems}
+                  sidebar={
+                    // Streamed: the shell and the page never wait for the column's data
+                    // (specs/feed-navigation FN-08), as a language switch re-renders the layout.
+                    <Suspense fallback={<InterestsSkeleton />}>
+                      <InterestsSidebar />
+                    </Suspense>
+                  }
+                  right={<RightColumn signedIn={signedIn} />}
+                  devTools={devTools}
+                >
+                  {children}
+                </AppShell>
+              </JoinedProvider>
             </AuthGateProvider>
           </Providers>
         </NextIntlClientProvider>

@@ -10,6 +10,8 @@ export const communityTypeSchema = z.enum([
   'PERSONAL_CHANNEL',
 ])
 
+export const membershipSchema = z.enum(['MEMBER', 'MODERATOR', 'PRINCIPAL_MODERATOR'])
+
 export const communitySchema = z.object({
   id: z.uuid(),
   slug: z.string(),
@@ -27,7 +29,13 @@ export const communitySchema = z.object({
   /** null = system community. */
   createdByProfileId: z.uuid().nullable(),
   createdAt: z.iso.datetime(),
-  viewerMembership: z.enum(['MEMBER', 'MODERATOR', 'PRINCIPAL_MODERATOR']).nullable(),
+  viewerMembership: membershipSchema.nullable(),
 })
 
 export type RawCommunity = z.infer<typeof communitySchema>
+
+/** PUT /api/v1/communities/{slug}/members/{userId} (E02, 200): the role a join produces. */
+export const joinResponseSchema = z.object({
+  viewerMembership: membershipSchema,
+  memberCount: z.number().int(),
+})

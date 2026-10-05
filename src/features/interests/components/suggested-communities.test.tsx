@@ -3,10 +3,13 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { identityIndex } from '@/lib/identity-color'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
+import { JoinedProvider } from '@/components/organisms/join'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { SuggestedCommunities } from './suggested-communities'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
+const deps = vi.hoisted(() => ({ joinCommunity: vi.fn() }))
+vi.mock('@/lib/communities/join-community.action', () => ({ joinCommunity: deps.joinCommunity }))
 
 const nft = { handle: '#nft', slug: 'nft', name: 'NFT', memberCount: 1200, avatarUrl: null }
 
@@ -19,12 +22,20 @@ describe('SuggestedCommunities (H-07)', () => {
     )
   })
 
-  it('offers joining as coming soon, with a translated label (H-26)', () => {
-    renderWithIntl(<SuggestedCommunities suggestions={[nft]} />)
-    expect(screen.getByRole('button', { name: 'Join #nft' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
+  it('joins for real and hides the row at once (specs/community-first CF-10)', async () => {
+    deps.joinCommunity.mockResolvedValue({ ok: true, data: { memberCount: 1201 } })
+    renderWithIntl(
+      <AuthGateProvider signedIn>
+        <JoinedProvider>
+          <SuggestedCommunities suggestions={[nft]} />
+        </JoinedProvider>
+      </AuthGateProvider>,
     )
+    const join = screen.getByRole('button', { name: 'Join #nft' })
+    expect(join).not.toHaveAttribute('aria-disabled')
+    await userEvent.click(join)
+    expect(deps.joinCommunity).toHaveBeenCalledWith('nft')
+    expect(screen.queryByRole('link', { name: '#nft 1,200 members' })).toBeNull()
   })
 
   it('builds the join label as a whole message in each locale', () => {

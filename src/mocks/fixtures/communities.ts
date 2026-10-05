@@ -123,8 +123,9 @@ export function communityBySlug(slug: string) {
 export function communitySummary(slug: string): RawCommunitySummary {
   const community = communityBySlug(slug)
   if (!community) throw new Error(`Unknown mock community ${slug}`)
-  const { id, name, type } = community
-  return { id, slug, name, type }
+  const { id, name, type, avatarUrl, viewerMembership } = community
+  // avatarUrl and viewerMembership: proposal P-010, the backend does not send them yet.
+  return { id, slug, name, type, avatarUrl, viewerMembership }
 }
 
 export function communityById(id: string) {

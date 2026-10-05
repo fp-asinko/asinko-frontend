@@ -1,6 +1,5 @@
 import { ChartBarIcon, MessageSquareIcon } from 'lucide-react'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
-import { UserAvatar } from '@/components/molecules/user-avatar'
 import type { PollItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
@@ -27,32 +26,30 @@ export function PollCard({ poll }: { poll: PollItem }) {
       className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
       aria-labelledby={`poll-${poll.id}`}
     >
-      <div className="mb-2 flex items-start justify-between gap-3">
+      <div className="mb-2">
         <CardByline
           author={poll.author}
           community={poll.community}
           publishedAt={poll.publishedAt}
+          titleId={`poll-${poll.id}`}
+          badge={
+            <span className="inline-flex min-h-6 shrink-0 items-center gap-1.25 type-action font-extrabold uppercase">
+              <ChartBarIcon aria-hidden className="size-3.5" />
+              {t('badge')}
+            </span>
+          }
         />
-        <span className="inline-flex shrink-0 items-center gap-1.25 type-action font-extrabold uppercase">
-          <ChartBarIcon aria-hidden className="size-3.5" />
-          {t('badge')}
-        </span>
       </div>
 
-      {/* FC-02: the community logo next to the question, like the asset logo of the prototype. */}
-      <div className="flex items-start gap-3">
-        {poll.community && (
-          <UserAvatar
-            name={poll.community.handle}
-            colorKey={poll.community.slug}
-            size="xl"
-            className="rounded-md"
-          />
-        )}
-        <h2 id={`poll-${poll.id}`} className="min-w-0 flex-1 type-post-title font-medium">
-          {poll.question}
-        </h2>
-      </div>
+      {/* The community avatar moved to the header (specs/community-first § 1). */}
+      <h2
+        id={`poll-${poll.id}`}
+        // Focus target when the join button disappears (CF-14); not in the tab order.
+        tabIndex={-1}
+        className="type-post-title font-medium outline-none"
+      >
+        {poll.question}
+      </h2>
 
       <PollVoting
         id={poll.id}

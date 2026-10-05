@@ -82,7 +82,7 @@ describe('mock data is internally consistent', () => {
     }
   })
 
-  it('carries the community summary of each piece of content (P-004)', () => {
+  it('carries the community summary of each piece of content (P-004, P-010)', () => {
     for (const content of [...POSTS, ...POLLS]) {
       const community = COMMUNITIES.find((each) => each.id === content.communityId)
       expect(content.community).toEqual({
@@ -90,6 +90,8 @@ describe('mock data is internally consistent', () => {
         slug: community?.slug,
         name: community?.name,
         type: community?.type,
+        avatarUrl: community?.avatarUrl,
+        viewerMembership: community?.viewerMembership,
       })
     }
   })

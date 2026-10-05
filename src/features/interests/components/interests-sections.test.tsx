@@ -5,6 +5,7 @@ import { renderWithIntl } from '@/test/render-with-intl'
 import type { Interests } from '../interests.types'
 import { InterestsSections } from './interests-sections'
 
+vi.mock('@/lib/communities/join-community.action', () => ({ joinCommunity: vi.fn() }))
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 const interests: Interests = {
@@ -107,16 +108,13 @@ describe('InterestsSections', () => {
     }
   })
 
-  it('shows join and create group as coming soon', async () => {
+  it('joins for real, while create group stays coming soon (specs/community-first CF-10)', async () => {
     renderWithIntl(<InterestsSections interests={interests} />)
 
-    const join = screen.getByRole('button', { name: 'Join #nft' })
-    expect(join).toHaveAttribute('aria-disabled', 'true')
-    expect(screen.getByRole('button', { name: 'Create group' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    )
-    await userEvent.click(join)
+    expect(screen.getByRole('button', { name: 'Join #nft' })).not.toHaveAttribute('aria-disabled')
+    const create = screen.getByRole('button', { name: 'Create group' })
+    expect(create).toHaveAttribute('aria-disabled', 'true')
+    await userEvent.click(create)
     expect(screen.getAllByRole('status').some((s) => s.textContent)).toBe(true)
   })
 

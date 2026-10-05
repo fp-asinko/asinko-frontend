@@ -86,8 +86,6 @@
     "moreAssets": "Más activos",
     "morePeople": "Más personas",
     "moreGroups": "Más grupos",
-    "join": "Unirse",
-    "joinLabel": "Unirse a {handle}",
     "mod": "MOD",
     "stale": "Precio desactualizado",
     "accuracy": "{value} de aciertos",
@@ -223,5 +221,10 @@
       "unavailable": "Backend o Supabase no disponibles",
       "disabled": "El dev login está apagado"
     }
+  },
+  "join": {
+    "label": "Unirse",
+    "labelFor": "Unirse a {handle}",
+    "error": "No se pudo unir a la comunidad. Inténtalo de nuevo."
   }
 }

@@ -135,6 +135,29 @@ La página del front con mocks tarda 0,04 s: casi todo el tiempo es esta espera.
 
 **Mientras tanto, en el front:** `specs/feed-navigation` hace que cambiar de pestaña responda al instante (streaming y esqueleto) y que volver a una pestaña reciente no espere. Eso esconde parte de la espera, pero no la resuelve.
 
+### P-010 — Avatar y membresía en la comunidad de cada contenido
+
+**Estado:** propuesta (2026-10-05). Mockeada (`specs/community-first`).
+**Endpoint:** `GET /api/v1/feed/explore`, `GET /api/v1/feed/following` y todo lo que devuelva la comunidad resumida de P-004.
+**Motivo:** las tarjetas del feed pasan a mostrar el grupo como protagonista, como Reddit: su avatar arriba y un botón "Unirse" si el usuario no es miembro. Hoy el resumen trae solo `id`, `slug`, `name` y `type`. Para no esperar, el front pide en paralelo `GET /communities` y `GET /communities?mine=true` y cruza los datos. Son dos requests más por página, y no alcanza para grupos fuera de la primera página de esas listas.
+**Cambio:** sumar dos campos al resumen de comunidad de cada contenido:
+
+```json
+"community": {
+  "id": "…",
+  "slug": "acciones",
+  "name": "Acciones",
+  "type": "USER_PUBLIC",
+  "avatarUrl": "https://…/storage/v1/object/public/…" ,
+  "viewerMembership": "MEMBER"
+}
+```
+
+- `avatarUrl`: el mismo de `GET /communities/{slug}`, o `null`.
+- `viewerMembership`: el rol del viewer (`MEMBER`, `MODERATOR`, `PRINCIPAL_MODERATOR`), o `null` si no es miembro o no hay sesión. Es el mismo campo de `GET /communities`.
+
+Con eso el front borra los dos requests extra.
+
 ## Preguntas sobre el contrato
 
 - **Explore con comunidad inexistente**: `GET /feed/explore?community=nope` responde `200` con `items: []`. El front prefería `404` para mostrar "no existe" en lugar de "no hay posts". ¿Se cambia, o el front consulta `GET /communities/{slug}` aparte?

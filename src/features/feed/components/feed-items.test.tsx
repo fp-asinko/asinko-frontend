@@ -4,6 +4,7 @@ import { renderWithIntl } from '@/test/render-with-intl'
 import { pollItem, postItem } from '../feed-items.fixture'
 import { FeedItems } from './feed-items'
 
+vi.mock('@/lib/communities/join-community.action', () => ({ joinCommunity: vi.fn() }))
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 vi.mock('../actions/load-comments-preview.action', () => ({ loadCommentsPreview: vi.fn() }))
 vi.mock('../actions/vote-post.action', () => ({ votePost: vi.fn() }))

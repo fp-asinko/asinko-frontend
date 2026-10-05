@@ -110,50 +110,55 @@ describe('getFeed', () => {
     expect(result.data.items.every((item) => item.community !== null)).toBe(true)
   })
 
-  describe('GET /communities only for mentions (BC-02)', () => {
-    function countCommunityRequests(explore?: unknown) {
-      let count = 0
-      state.routes = MOCK_ROUTES.map((route) => {
-        if (route.path === '/api/v1/communities') {
-          return { ...route, handler: (context) => (count++, route.handler(context)) }
-        }
-        if (explore && route.path === '/api/v1/feed/explore') {
-          return { ...route, handler: () => ({ status: 200, body: explore }) }
-        }
-        return route
-      })
-      return () => count
+  describe('community lists in parallel with the feed (specs/community-first CF-12)', () => {
+    function communityQueries() {
+      const queries: Array<Record<string, string | undefined>> = []
+      state.routes = MOCK_ROUTES.map((route) =>
+        route.path === '/api/v1/communities'
+          ? {
+              ...route,
+              handler: (context) => (queries.push(context.query), route.handler(context)),
+            }
+          : route,
+      )
+      return queries
     }
 
-    it('skips it when the page has no $ or # mentions, as with the real backend today', async () => {
-      const page = (await MOCK_ROUTES.find(
-        (route) => route.path === '/api/v1/feed/explore',
-      )!.handler({ params: {}, query: {}, body: undefined })) as {
-        body: { items: Array<{ kind: string; content: object }> }
-      }
-      const withoutEntities = {
-        items: page.body.items.map((item) => ({
-          ...item,
-          content: { ...item.content, entities: [] },
-        })),
-        nextCursor: null,
-      }
-      const requests = countCommunityRequests(withoutEntities)
-      const result = await getFeed(parseFeedParams({}))
-      expect(result.ok).toBe(true)
-      expect(requests()).toBe(0)
+    it('asks for all communities, and for mine only with a session', async () => {
+      const guest = communityQueries()
+      await getFeed(parseFeedParams({}))
+      expect(guest).toEqual([{}])
+
+      const signedIn = communityQueries()
+      await getFeed(parseFeedParams({}), undefined, { signedIn: true })
+      expect(signedIn).toEqual(expect.arrayContaining([{}, { mine: 'true' }]))
     })
 
-    it('asks for it when mentions need community slugs to link', async () => {
-      const requests = countCommunityRequests()
+    it('links $ and # mentions with them (BC-02)', async () => {
+      communityQueries()
       const result = await getFeed(parseFeedParams({}))
       if (!result.ok) throw new Error('expected ok')
-      expect(requests()).toBe(1)
       expect(
         result.data.items.some(
           (item) => item.kind === 'post' && item.body.includes('asinko:community/'),
         ),
       ).toBe(true)
+    })
+
+    it('gives each card its membership only with a session', async () => {
+      const guest = await getFeed(parseFeedParams({}))
+      const signedIn = await getFeed(parseFeedParams({}), undefined, { signedIn: true })
+      if (!guest.ok || !signedIn.ok) throw new Error('expected ok')
+      expect(guest.data.items.every((item) => item.community?.viewerIsMember === null)).toBe(true)
+      const members = signedIn.data.items.map((item) => item.community?.viewerIsMember)
+      expect(members).toContain(true)
+      expect(members).toContain(false)
+    })
+
+    it('keeps the feed when the community lists fail', async () => {
+      state.routes = MOCK_ROUTES.filter((route) => route.path !== '/api/v1/communities')
+      const result = await getFeed(parseFeedParams({}), undefined, { signedIn: true })
+      expect(result.ok).toBe(true)
     })
   })
 

@@ -1,6 +1,7 @@
 import { allowedImageUrl } from '@/lib/images'
 import type {
   RawCommunity,
+  RawCommunitySummary,
   RawFeedItem,
   RawPoll,
   RawPost,
@@ -8,6 +9,7 @@ import type {
 } from '@/lib/api/contract'
 import type {
   Author,
+  CardCommunity,
   CommunityRef,
   FeedItem,
   PollItem,
@@ -41,6 +43,47 @@ export function indexCommunities(communities: readonly RawCommunity[]): MentionL
   return {
     communitySlug: (id) => byId.get(id),
     communityOfAsset: (assetId) => byAsset.get(assetId),
+  }
+}
+
+/**
+ * What the cards need to know about their communities until P-010 sends it in each summary
+ * (specs/community-first CF-12): avatars from GET /communities and membership from ?mine=true.
+ */
+export type CardLookup = {
+  signedIn: boolean
+  avatarOf: (id: string) => string | null | undefined
+  isMember: (id: string) => boolean
+}
+
+export const NO_CARD_LOOKUP: CardLookup = {
+  signedIn: false,
+  avatarOf: () => undefined,
+  isMember: () => false,
+}
+
+export function indexCardCommunities(
+  communities: readonly RawCommunity[],
+  mine: readonly RawCommunity[],
+  signedIn: boolean,
+): CardLookup {
+  const avatars = new Map([...communities, ...mine].map((each) => [each.id, each.avatarUrl]))
+  const member = new Set(mine.filter((each) => each.viewerMembership).map((each) => each.id))
+  return { signedIn, avatarOf: (id) => avatars.get(id), isMember: (id) => member.has(id) }
+}
+
+export function toCardCommunity(summary: RawCommunitySummary, cards: CardLookup): CardCommunity {
+  // The summary wins when the backend sends the field (P-010); the lists are the fallback.
+  const avatarUrl = summary.avatarUrl !== undefined ? summary.avatarUrl : cards.avatarOf(summary.id)
+  const member =
+    summary.viewerMembership !== undefined
+      ? summary.viewerMembership !== null
+      : cards.isMember(summary.id)
+  return {
+    ...toCommunityRef(summary),
+    avatarUrl: allowedImageUrl(avatarUrl ?? null),
+    personal: summary.type === 'PERSONAL_CHANNEL',
+    viewerIsMember: cards.signedIn ? member : null,
   }
 }
 
@@ -78,14 +121,18 @@ function toMedia(post: RawPost): PostMedia | null {
   return null
 }
 
-export function toPostItem(post: RawPost, mentions: MentionLookup): PostItem {
+export function toPostItem(
+  post: RawPost,
+  mentions: MentionLookup,
+  cards: CardLookup = NO_CARD_LOOKUP,
+): PostItem {
   return {
     kind: 'post',
     id: post.id,
     title: post.title,
     body: post.deleted ? '' : markMentions(post.body, post.entities, mentions),
     author: post.creatorType === 'SYSTEM' ? null : toAuthor(post.creator),
-    community: toCommunityRef(post.community),
+    community: toCardCommunity(post.community, cards),
     media: toMedia(post),
     score: post.score,
     viewerVote: post.viewerVote,
@@ -96,7 +143,7 @@ export function toPostItem(post: RawPost, mentions: MentionLookup): PostItem {
   }
 }
 
-export function toPollItem(poll: RawPoll): PollItem {
+export function toPollItem(poll: RawPoll, cards: CardLookup = NO_CARD_LOOKUP): PollItem {
   const total = poll.totalVotes
   const resultsVisible = poll.options.every((option) => option.voteCount !== null) && total !== null
   return {
@@ -124,7 +171,7 @@ export function toPollItem(poll: RawPoll): PollItem {
     closesAt: poll.closesAt,
     commentCount: poll.commentCount,
     author: poll.creatorType === 'SYSTEM' ? null : toAuthor(poll.creator),
-    community: toCommunityRef(poll.community),
+    community: toCardCommunity(poll.community, cards),
     publishedAt: poll.publishedAt,
   }
 }
@@ -135,15 +182,12 @@ export function toPollResults(poll: RawPoll): PollResults {
   return { options, totalVotes, viewerOptionId, resultsVisible }
 }
 
-export function toFeedItem(item: RawFeedItem, mentions: MentionLookup): FeedItem {
-  return item.kind === 'POST' ? toPostItem(item.content, mentions) : toPollItem(item.content)
-}
-
-/** Whether a page has mentions that need community slugs to link ($ and #, not @). */
-export function needsMentionLookup(items: readonly RawFeedItem[]): boolean {
-  return items.some(
-    (item) =>
-      item.kind === 'POST' &&
-      (item.content.entities ?? []).some((entity) => entity.type !== 'MENTION'),
-  )
+export function toFeedItem(
+  item: RawFeedItem,
+  mentions: MentionLookup,
+  cards: CardLookup = NO_CARD_LOOKUP,
+): FeedItem {
+  return item.kind === 'POST'
+    ? toPostItem(item.content, mentions, cards)
+    : toPollItem(item.content, cards)
 }

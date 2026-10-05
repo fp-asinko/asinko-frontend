@@ -4,6 +4,7 @@ import {
   commentListSchema,
   communitySchema,
   feedItemSchema,
+  joinResponseSchema,
   pollSchema,
   postSchema,
   profileSchema,
@@ -22,6 +23,7 @@ import { PROFILES } from './fixtures/users'
 import { commentTree } from './comment-tree'
 import { paginate } from './paginate'
 import type { MockContext, MockRoute } from './types'
+import { joinCommunity } from './memberships'
 import { removePostVote, votePoll, votePost } from './votes'
 
 const notFound = { status: 404, body: { error: { code: 'NOT_FOUND', message: 'mock' } } }
@@ -227,6 +229,19 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       body: { userId: DEMO_USER.id, optionId: POLLS[1]!.options[1]!.id },
     },
     handler: ({ params, body }) => votePoll(params.id ?? '', body),
+  },
+  {
+    method: 'PUT',
+    path: '/api/v1/communities/:slug/members/:userId',
+    kind: 'contract',
+    implemented: true,
+    schema: joinResponseSchema,
+    example: {
+      ...noRequest,
+      params: { slug: 'defi', userId: DEMO_USER.id },
+      body: { userId: DEMO_USER.id },
+    },
+    handler: ({ params, body }) => joinCommunity(params.slug ?? '', params.userId ?? '', body),
   },
 
   // E05: comments

@@ -86,8 +86,6 @@
     "moreAssets": "Mais ativos",
     "morePeople": "Mais pessoas",
     "moreGroups": "Mais grupos",
-    "join": "Entrar",
-    "joinLabel": "Entrar em {handle}",
     "mod": "MOD",
     "stale": "Preço desatualizado",
     "accuracy": "{value} de acertos",
@@ -223,5 +221,10 @@
       "unavailable": "Backend ou Supabase indisponíveis",
       "disabled": "O dev login está desligado"
     }
+  },
+  "join": {
+    "label": "Participar",
+    "labelFor": "Participar de {handle}",
+    "error": "Não foi possível participar da comunidade. Tente de novo."
   }
 }

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { communityTypeSchema } from './communities'
+import { communityTypeSchema, membershipSchema } from './communities'
 import { userSummarySchema } from './users'
 
 // E03, E04, E05 (docs/references/api/). Raw backend shapes.
@@ -22,6 +22,9 @@ export const communitySummarySchema = z.object({
   slug: z.string(),
   name: z.string(),
   type: communityTypeSchema,
+  /** P-010 (proposal): optional until the backend sends them (specs/community-first CF-11). */
+  avatarUrl: z.string().nullable().optional(),
+  viewerMembership: membershipSchema.nullable().optional(),
 })
 
 export const postSchema = z.object({

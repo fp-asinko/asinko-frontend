@@ -86,8 +86,6 @@
     "moreAssets": "More assets",
     "morePeople": "More people",
     "moreGroups": "More groups",
-    "join": "Join",
-    "joinLabel": "Join {handle}",
     "mod": "MOD",
     "stale": "Outdated price",
     "accuracy": "{value} accuracy",
@@ -223,5 +221,10 @@
       "unavailable": "Backend or Supabase unavailable",
       "disabled": "Dev login is off"
     }
+  },
+  "join": {
+    "label": "Join",
+    "labelFor": "Join {handle}",
+    "error": "Could not join the community. Try again."
   }
 }

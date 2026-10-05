@@ -26,7 +26,7 @@ export function useSearchParams() {
 }
 
 /** Spies of the localized router: assert on them, reset with vi.clearAllMocks(). */
-export const router = { push: vi.fn(), replace: vi.fn() }
+export const router = { push: vi.fn(), replace: vi.fn(), refresh: vi.fn() }
 
 export function useRouter() {
   return router

@@ -4,7 +4,14 @@ import type { RawPost } from '@/lib/api/contract'
 import { COMMUNITIES } from '@/mocks/fixtures/communities'
 import { POLLS } from '@/mocks/fixtures/polls'
 import { POSTS } from '@/mocks/fixtures/posts'
-import { indexCommunities, needsMentionLookup, toFeedItem, toPollItem, toPostItem } from './mappers'
+import {
+  indexCardCommunities,
+  indexCommunities,
+  toCardCommunity,
+  toFeedItem,
+  toPollItem,
+  toPostItem,
+} from './mappers'
 
 const communities = indexCommunities(COMMUNITIES)
 const post = (n: number) => POSTS[n - 1]!
@@ -12,7 +19,7 @@ const post = (n: number) => POSTS[n - 1]!
 describe('toPostItem', () => {
   it('resolves the community handle and marks the mentions', () => {
     const item = toPostItem(post(1), communities)
-    expect(item.community).toEqual({ slug: 'btc', name: 'Bitcoin', handle: '$BTC' })
+    expect(item.community).toMatchObject({ slug: 'btc', name: 'Bitcoin', handle: '$BTC' })
     expect(item.author).toMatchObject({ username: 'maria', handle: '@maria', accuracyRate: 0.74 })
     expect(item.body).toContain('[$BTC](asinko:community/btc)')
     expect(item.body).toContain('[#trading-on-chain](asinko:community/trading-on-chain)')
@@ -58,7 +65,7 @@ describe('toPostItem', () => {
       },
     }
     // No communities list at all: the card is still named.
-    expect(toPostItem(elsewhere, indexCommunities([])).community).toEqual({
+    expect(toPostItem(elsewhere, indexCommunities([])).community).toMatchObject({
       slug: 'options-flow',
       name: 'Options flow',
       handle: '#options-flow',
@@ -87,7 +94,7 @@ describe('toPollItem', () => {
   })
 
   it('takes its community from the content (P-004)', () => {
-    expect(toPollItem(POLLS[0]!).community).toEqual({
+    expect(toPollItem(POLLS[0]!).community).toMatchObject({
       slug: 'btc',
       name: 'Bitcoin',
       handle: '$BTC',
@@ -109,20 +116,49 @@ describe('toPollItem', () => {
   })
 })
 
-describe('needsMentionLookup (BC-02)', () => {
-  it('is true only when a post has $ or # mentions to link', () => {
-    expect(needsMentionLookup([{ kind: 'POST', content: post(1) }])).toBe(true)
-    const plain = { ...post(1), entities: [] }
-    const onlyUsers = {
-      ...post(1),
-      entities: (post(1).entities ?? []).filter((entity) => entity.type === 'MENTION'),
-    }
+describe('toCardCommunity (specs/community-first CF-04, CF-12)', () => {
+  const storage = 'https://hqarefesoovfmibncivu.supabase.co/storage/v1/object/public/c/acciones.png'
+  const defi = COMMUNITIES.find((each) => each.slug === 'defi')!
+  const base = { id: defi.id, slug: defi.slug, name: defi.name, type: defi.type }
+
+  it('takes avatar and membership from the summary when the backend sends them (P-010)', () => {
+    const lookup = indexCardCommunities([], [], true)
     expect(
-      needsMentionLookup([
-        { kind: 'POST', content: plain },
-        { kind: 'POST', content: onlyUsers },
-        { kind: 'POLL', content: POLLS[0]! },
-      ]),
-    ).toBe(false)
+      toCardCommunity({ ...base, avatarUrl: storage, viewerMembership: 'MEMBER' }, lookup),
+    ).toMatchObject({ handle: '#defi', avatarUrl: storage, personal: false, viewerIsMember: true })
+    expect(
+      toCardCommunity({ ...base, avatarUrl: null, viewerMembership: null }, lookup),
+    ).toMatchObject({ avatarUrl: null, viewerIsMember: false })
+  })
+
+  it('falls back to the community lists while P-010 is missing', () => {
+    const listed = { ...defi, avatarUrl: storage, viewerMembership: 'MEMBER' as const }
+    expect(toCardCommunity(base, indexCardCommunities([listed], [listed], true))).toMatchObject({
+      avatarUrl: storage,
+      viewerIsMember: true,
+    })
+    expect(toCardCommunity(base, indexCardCommunities([], [], true))).toMatchObject({
+      avatarUrl: null,
+      viewerIsMember: false,
+    })
+  })
+
+  it('has no membership without a session, even if the summary says so', () => {
+    const lookup = indexCardCommunities([], [], false)
+    expect(toCardCommunity({ ...base, viewerMembership: 'MEMBER' }, lookup).viewerIsMember).toBe(
+      null,
+    )
+  })
+
+  it('drops an avatar from a host next/image does not allow', () => {
+    const lookup = indexCardCommunities([], [], false)
+    expect(
+      toCardCommunity({ ...base, avatarUrl: 'https://evil.example/a.png' }, lookup).avatarUrl,
+    ).toBeNull()
+  })
+
+  it('marks the personal channel of a user', () => {
+    const lookup = indexCardCommunities([], [], true)
+    expect(toCardCommunity({ ...base, type: 'PERSONAL_CHANNEL' }, lookup).personal).toBe(true)
   })
 })

@@ -46,12 +46,20 @@ export function PostCard({
           community={post.community}
           publishedAt={post.publishedAt}
           edited={post.edited}
+          titleId={`post-${post.id}`}
+          canJoin={!post.deleted}
         />
       </div>
 
       <h2
         id={`post-${post.id}`}
-        className={post.deleted ? 'type-post-title text-muted-foreground' : 'type-post-title'}
+        // Focus target when the join button disappears (CF-14); not in the tab order.
+        tabIndex={-1}
+        className={
+          post.deleted
+            ? 'type-post-title text-muted-foreground outline-none'
+            : 'type-post-title outline-none'
+        }
       >
         {post.deleted ? t('deleted') : post.title}
       </h2>

@@ -16,6 +16,15 @@ export type CommunityRef = {
   handle: string
 }
 
+/** The community of a card (specs/community-first): the protagonist of its header. */
+export type CardCommunity = CommunityRef & {
+  avatarUrl: string | null
+  /** The personal channel of a user: no group to show nor to join. */
+  personal: boolean
+  /** null without a session: the join button shows and opens the account modal. */
+  viewerIsMember: boolean | null
+}
+
 export type PostMedia =
   | { type: 'image'; url: string }
   /** Only http(s) links; `domain` is shown so the text cannot disguise the destination. */
@@ -30,7 +39,7 @@ export type PostItem = {
   /** null for system posts. */
   author: Author | null
   /** null when the community could not be resolved. */
-  community: CommunityRef | null
+  community: CardCommunity | null
   media: PostMedia | null
   score: number
   viewerVote: 1 | -1 | null
@@ -65,7 +74,7 @@ export type PollItem = {
   /** Without deleted comments (P-006). */
   commentCount: number
   author: Author | null
-  community: CommunityRef | null
+  community: CardCommunity | null
   publishedAt: string
 }
 

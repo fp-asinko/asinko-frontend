@@ -72,7 +72,10 @@ async function FeedList({
   // A slow backend on demand, for the e2e of the streaming (mocks only, never production).
   await mockDelay()
   // The chip resolves the community (and its not-found): the list does not ask for it again.
-  const result = await getFeed(params, undefined, { communityResolved: filtered })
+  const result = await getFeed(params, undefined, {
+    communityResolved: filtered,
+    signedIn: viewer !== null,
+  })
   // Any failure but a missing account throws: the feed is the main content.
   if (!result.ok && result.code !== 'UNAUTHENTICATED') getOrThrow(result)
   const state: FeedState = result.ok

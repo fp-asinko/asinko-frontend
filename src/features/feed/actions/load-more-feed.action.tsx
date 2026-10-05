@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react'
 import { setRequestLocale } from 'next-intl/server'
 import type { ActionResult } from '@/lib/result'
+import { getViewer } from '@/lib/session'
 import { FeedItems } from '../components/feed-items'
 import { getFeed } from '../lib/feed-api'
 import { loadMoreSchema } from '../schemas/load-more.schema'
@@ -19,7 +20,7 @@ export async function loadMoreFeed(raw: unknown): Promise<ActionResult<NextPage>
 
   const { cursor, locale, ...params } = parsed.data
   setRequestLocale(locale)
-  const result = await getFeed(params, cursor)
+  const result = await getFeed(params, cursor, { signedIn: (await getViewer()) !== null })
   if (!result.ok) return { ok: false, error: result.errorKey }
 
   const { items, nextCursor } = result.data
