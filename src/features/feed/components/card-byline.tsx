@@ -72,13 +72,14 @@ export function CardByline({
   )
 
   return (
-    <div className="group/byline flex min-w-0 items-start gap-2">
+    <div className="group/byline flex min-w-0 items-center gap-2">
       <UserAvatar
         name={group ? group.handle : authorName}
         colorKey={group ? group.slug : authorName}
         imageUrl={group ? group.avatarUrl : author?.avatarUrl}
         className={cn(
-          'size-6 text-[0.5625rem] transition-[scale] duration-150 ease-out motion-safe:group-hover/byline:scale-105',
+          // With the first line, not centered on both (the header is centered for the right side).
+          'size-6 self-start text-[0.5625rem] transition-[scale] duration-150 ease-out motion-safe:group-hover/byline:scale-105',
           group && 'rounded-md',
         )}
       />
@@ -116,15 +117,18 @@ export function CardByline({
           </div>
         )}
       </div>
-      {badge}
-      {group && canJoin && group.viewerIsMember !== true && (
-        <JoinButton
-          slug={group.slug}
-          handle={group.handle}
-          action={joinCommunity}
-          focusFallbackId={titleId}
-        />
-      )}
+      {/* Badge and join in one block, centered on the header: join always on the right edge. */}
+      <div className="flex shrink-0 items-center gap-3">
+        {badge}
+        {group && canJoin && group.viewerIsMember !== true && (
+          <JoinButton
+            slug={group.slug}
+            handle={group.handle}
+            action={joinCommunity}
+            focusFallbackId={titleId}
+          />
+        )}
+      </div>
     </div>
   )
 }
