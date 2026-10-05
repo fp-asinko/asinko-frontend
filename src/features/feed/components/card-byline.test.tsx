@@ -28,8 +28,8 @@ describe('CardByline (specs/community-first)', () => {
     const group = screen.getByRole('link', { name: '#defi' })
     expect(group).toHaveAttribute('href', '/?community=defi')
     // The symbol is gray, the name keeps the text color.
-    expect(group.querySelector('span')).toHaveTextContent('#')
-    expect(group.querySelector('span')).toHaveClass('text-muted-foreground')
+    expect(group.querySelector('span span')).toHaveTextContent('#')
+    expect(group.querySelector('span span')).toHaveClass('text-muted-foreground')
     const author = screen.getByText('@maria')
     // The group comes before the author in reading order.
     expect(group.compareDocumentPosition(author) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
