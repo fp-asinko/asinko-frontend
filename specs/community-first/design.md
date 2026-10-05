@@ -138,3 +138,5 @@ En `components/organisms/join/`, junto a su provider.
 - **Error al unirse:** el mensaje es uno solo por idioma (`join.error`). Las claves `api.errors.*` no viajan al cliente.
 - **Tests de componentes:** toda tarjeta importa la Server Action, así que sus tests la mockean (`vi.mock('@/lib/communities/join-community.action')`), como pide `testing.md`.
 - **`needsMentionLookup`** se borra: `GET /communities` se pide siempre, en paralelo, y también sirve para las menciones.
+
+- **Símbolo del grupo** (2026-10-05): el `#` o `$` va en `--muted-foreground` y sin negrita; el nombre sigue en negro y negrita. El `@` del autor no se aclara más: `--faint` no cumple contraste en texto de 11 px.
