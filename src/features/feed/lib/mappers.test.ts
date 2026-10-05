@@ -4,7 +4,7 @@ import type { RawPost } from '@/lib/api/contract'
 import { COMMUNITIES } from '@/mocks/fixtures/communities'
 import { POLLS } from '@/mocks/fixtures/polls'
 import { POSTS } from '@/mocks/fixtures/posts'
-import { indexCommunities, toFeedItem, toPollItem, toPostItem } from './mappers'
+import { indexCommunities, needsMentionLookup, toFeedItem, toPollItem, toPostItem } from './mappers'
 
 const communities = indexCommunities(COMMUNITIES)
 const post = (n: number) => POSTS[n - 1]!
@@ -47,15 +47,33 @@ describe('toPostItem', () => {
     expect(deleted).toMatchObject({ deleted: true, body: '', media: null })
   })
 
-  it('leaves the community null when it is unknown', () => {
-    const orphan: RawPost = { ...post(1), communityId: '00000000-0000-4000-8000-00000000ffff' }
-    expect(toPostItem(orphan, communities).community).toBeNull()
+  it('takes the community from the content, whatever page of communities it is on (BC-01)', () => {
+    const elsewhere: RawPost = {
+      ...post(1),
+      community: {
+        id: '00000000-0000-4000-8000-00000000ffff',
+        slug: 'options-flow',
+        name: 'Options flow',
+        type: 'USER_PUBLIC',
+      },
+    }
+    // No communities list at all: the card is still named.
+    expect(toPostItem(elsewhere, indexCommunities([])).community).toEqual({
+      slug: 'options-flow',
+      name: 'Options flow',
+      handle: '#options-flow',
+    })
+  })
+
+  it('leaves $ and # mentions as plain text without the communities to resolve them', () => {
+    const item = toPostItem(post(1), indexCommunities([]))
+    expect(item.body).not.toContain('asinko:community/')
   })
 })
 
 describe('toPollItem', () => {
   it('computes each option share when results are visible', () => {
-    const poll = toPollItem(POLLS[0]!, communities)
+    const poll = toPollItem(POLLS[0]!)
     expect(poll.resultsVisible).toBe(true)
     const total = poll.options.reduce((sum, option) => sum + (option.votes ?? 0), 0)
     expect(poll.totalVotes).toBe(total)
@@ -63,9 +81,17 @@ describe('toPollItem', () => {
   })
 
   it('hides the results until voting (ON_VOTE)', () => {
-    const poll = toPollItem(POLLS[1]!, communities)
+    const poll = toPollItem(POLLS[1]!)
     expect(poll.resultsVisible).toBe(false)
     expect(poll.options.every((option) => option.share === null)).toBe(true)
+  })
+
+  it('takes its community from the content (P-004)', () => {
+    expect(toPollItem(POLLS[0]!).community).toEqual({
+      slug: 'btc',
+      name: 'Bitcoin',
+      handle: '$BTC',
+    })
   })
 
   it('maps through the feed item kind', () => {
@@ -79,6 +105,24 @@ describe('toPollItem', () => {
       totalVotes: 0,
       options: POLLS[0]!.options.map((option) => ({ ...option, voteCount: 0 })),
     }
-    expect(toPollItem(empty, communities).options.every((option) => option.share === 0)).toBe(true)
+    expect(toPollItem(empty).options.every((option) => option.share === 0)).toBe(true)
+  })
+})
+
+describe('needsMentionLookup (BC-02)', () => {
+  it('is true only when a post has $ or # mentions to link', () => {
+    expect(needsMentionLookup([{ kind: 'POST', content: post(1) }])).toBe(true)
+    const plain = { ...post(1), entities: [] }
+    const onlyUsers = {
+      ...post(1),
+      entities: (post(1).entities ?? []).filter((entity) => entity.type === 'MENTION'),
+    }
+    expect(
+      needsMentionLookup([
+        { kind: 'POST', content: plain },
+        { kind: 'POST', content: onlyUsers },
+        { kind: 'POLL', content: POLLS[0]! },
+      ]),
+    ).toBe(false)
   })
 })

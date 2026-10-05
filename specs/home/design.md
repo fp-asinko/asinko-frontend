@@ -210,7 +210,7 @@ Medidas del prototipo: caja con fondo `--surface`, borde superior, radio inferio
 
 - Se muestran los **3 primeros comentarios de primer nivel** que devuelve `GET /posts/:id/comments` (o `/polls/:id/comments`), sin respuestas anidadas y sin los borrados. Texto en Markdown seguro (`PostMarkdown`); los comentarios no traen `entities`, así que sus menciones se ven como texto.
 - El botón 💬 tiene `aria-expanded` y `aria-controls`; el resto de la tarjeta no cambia.
-- **Encuestas**: el contrato de `Poll` no trae `commentCount`. El botón se muestra sin número y se propone **P-006** (`commentCount` en `Poll`).
+- **Encuestas**: el contrato de `Poll` no trae `commentCount`. El botón se muestra sin número y se propone **P-006** (`commentCount` en `Poll`). _Cerrado por `specs/backend-contract` (2026-10-04): el botón muestra la cantidad, como en un post._
 
 > **D-H2 — ✅ aprobada la opción A (2026-10-02): cuándo se cargan los comentarios.**
 >
@@ -253,7 +253,7 @@ src/components/
 ```
 
 - **Mappers** (`api-integration.md`): esquema crudo del contrato (`@/lib/api/contract`) → tipos de dominio. Ejemplo: `PostItem` lleva `author`, `community` (slug y nombre, resueltos con la lista de comunidades), `publishedAt`, `body` ya con las menciones marcadas, `score`, `viewerVote`, `media`.
-- El feed resuelve el slug y nombre de cada comunidad con `GET /communities` (el `Post` del contrato solo trae `communityId`). Limitación anotada para el backend como P-004.
+- El feed resuelve el slug y nombre de cada comunidad con `GET /communities` (el `Post` del contrato solo trae `communityId`). Limitación anotada para el backend como P-004. _Cerrado por `specs/backend-contract` (2026-10-04): la comunidad viene en cada contenido y `GET /communities` se pide solo para resolver menciones._
 - Ítems inválidos del feed: `keepValidItems` (H-20).
 - `features/feed` y `features/interests` no se importan entre sí (`structure.md`); lo común (tipos de usuario o de comunidad) vive en `@/lib/api/contract`.
 
@@ -289,16 +289,16 @@ src/components/
 
 Estado al 2026-10-02, revisado contra la rama `dev` de `asinko-app`. El detalle y la forma exacta de cada una están en `docs/references/api/proposals.md`.
 
-| #     | Qué                                         | Estado                                                   | Lo usa                                     |
-| ----- | ------------------------------------------- | -------------------------------------------------------- | ------------------------------------------ |
-| P-001 | `entities` en la lectura de posts           | Propuesta. La detección está postergada en el backend    | Menciones (H-14): hoy solo con mocks       |
-| P-002 | Autenticación con Bearer en `/api/v1`       | Propuesta                                                | Login (fase siguiente)                     |
-| P-003 | Catálogo de activos (E14)                   | Propuesta. E14 postergado en el backend                  | Mosaicos de activos (H-07, H-21)           |
-| P-004 | Comunidad resumida en cada contenido        | Propuesta. `?mine=true` (la otra mitad) ya está en `dev` | Línea de autor y chip de comunidad         |
-| P-005 | Filtro por tipo en el feed (`?kind=`)       | **Implementada** en `dev`. Falta `sort=hot               | new                                        | top` | Filtro _Polls_ (H-11); _Hot_ y _Top_ |
-| P-006 | `commentCount` en `Poll`                    | Propuesta                                                | Botón de comentarios de la encuesta (H-28) |
-| P-007 | `?limit=3&replies=false` en los comentarios | Propuesta                                                | Vista previa de comentarios (H-28)         |
-| P-008 | Sin textos en español en las respuestas     | Propuesta (baja prioridad)                               | Posts y comentarios borrados               |
+| #     | Qué                                         | Estado                                                | Lo usa                                     |
+| ----- | ------------------------------------------- | ----------------------------------------------------- | ------------------------------------------ |
+| P-001 | `entities` en la lectura de posts           | Propuesta. La detección está postergada en el backend | Menciones (H-14): hoy solo con mocks       |
+| P-002 | Autenticación con Bearer en `/api/v1`       | Implementada en `dev`; se usa con el login            | Login (fase siguiente)                     |
+| P-003 | Catálogo de activos (E14)                   | Propuesta. E14 postergado en el backend               | Mosaicos de activos (H-07, H-21)           |
+| P-004 | Comunidad resumida en cada contenido        | Adoptada (`specs/backend-contract`)                   | Línea de autor y chip de comunidad         |
+| P-005 | Filtro por tipo en el feed (`?kind=`)       | **Implementada** en `dev`. Falta `sort=hot            | new                                        | top` | Filtro _Polls_ (H-11); _Hot_ y _Top_ |
+| P-006 | `commentCount` en `Poll`                    | Adoptada (`specs/backend-contract`)                   | Botón de comentarios de la encuesta (H-28) |
+| P-007 | `?limit=3&replies=false` en los comentarios | Adoptada (`?limit=6`, `specs/backend-contract`)       | Vista previa de comentarios (H-28)         |
+| P-008 | Sin textos en español en las respuestas     | Implementada en `dev`                                 | Posts y comentarios borrados               |
 
 Cambios en `src/mocks/`:
 

@@ -1,5 +1,5 @@
 import type { RawPoll } from '@/lib/api/contract'
-import { communityBySlug } from './communities'
+import { communitySummary } from './communities'
 import { daysAgo, hoursAgo, minutesAgo, mockId } from './ids'
 import { summary } from './users'
 
@@ -13,10 +13,10 @@ function options(pollN: number, entries: Array<[label: string, votes: number | n
   }))
 }
 
-function communityId(slug: string) {
-  const id = communityBySlug(slug)?.id
-  if (!id) throw new Error(`Unknown mock community ${slug}`)
-  return id
+/** communityId and its summary (P-004), as the backend sends both. */
+function community(slug: string) {
+  const contentCommunity = communitySummary(slug)
+  return { communityId: contentCommunity.id, community: contentCommunity }
 }
 
 function creator(username: string) {
@@ -28,7 +28,7 @@ function creator(username: string) {
 export const POLLS: RawPoll[] = [
   {
     id: mockId(5, 1),
-    communityId: communityId('btc'),
+    ...community('btc'),
     question: 'Where does $BTC close 2026?',
     options: options(1, [
       ['Above 150,000 USD', 412],
@@ -41,6 +41,7 @@ export const POLLS: RawPoll[] = [
     allowVoteChange: true,
     resultsVisibility: 'ALWAYS',
     totalVotes: 1787,
+    commentCount: 1, // Its thread in comments.ts (without deleted ones, as the backend counts)
     viewerOptionId: null,
     creator: null,
     creatorType: 'SYSTEM',
@@ -49,7 +50,7 @@ export const POLLS: RawPoll[] = [
   },
   {
     id: mockId(5, 2),
-    communityId: communityId('defi'),
+    ...community('defi'),
     question: 'How much of your portfolio is in DeFi?',
     options: options(2, [
       ['0%', null],
@@ -63,6 +64,7 @@ export const POLLS: RawPoll[] = [
     resultsVisibility: 'ON_VOTE',
     // Hidden until the viewer votes (E03).
     totalVotes: null,
+    commentCount: 0,
     viewerOptionId: null,
     creator: creator('esmev'),
     creatorType: 'USER',
@@ -71,7 +73,7 @@ export const POLLS: RawPoll[] = [
   },
   {
     id: mockId(5, 3),
-    communityId: communityId('macro'),
+    ...community('macro'),
     question: 'Next Fed move?',
     options: options(3, [
       ['50 bps cut', 98],
@@ -84,6 +86,7 @@ export const POLLS: RawPoll[] = [
     allowVoteChange: false,
     resultsVisibility: 'ALWAYS',
     totalVotes: 1293,
+    commentCount: 0,
     viewerOptionId: mockId(7, 31),
     creator: creator('macropilar'),
     creatorType: 'USER',

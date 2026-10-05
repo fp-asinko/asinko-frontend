@@ -4,7 +4,7 @@ import { POLLS } from '@/mocks/fixtures/polls'
 import { POSTS } from '@/mocks/fixtures/posts'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
-import { getCommentsPreview, PREVIEW_SIZE } from './comments-api'
+import { getCommentsPreview, PREVIEW_FETCH, PREVIEW_SIZE } from './comments-api'
 
 const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[] }))
 
@@ -35,6 +35,40 @@ describe('getCommentsPreview', () => {
     expect(result.data.map((comment) => comment.id)).toEqual(expected.map((each) => each.id))
     expect(result.data.length).toBeLessThanOrEqual(PREVIEW_SIZE)
     expect(result.data[0]!.author.handle).toMatch(/^@/)
+  })
+
+  it.each(['post', 'poll'] as const)(
+    'asks the %s for the top level only, with room for deleted ones (BC-04)',
+    async (kind) => {
+      const queries: Record<string, string>[] = []
+      state.routes = MOCK_ROUTES.map((route) =>
+        route.path.endsWith('/comments')
+          ? {
+              ...route,
+              handler: (context) => (queries.push(context.query), route.handler(context)),
+            }
+          : route,
+      )
+      const id = kind === 'post' ? POSTS[0]!.id : POLLS[0]!.id
+      await getCommentsPreview({ kind, id, locale: 'en' })
+      expect(queries).toEqual([{ limit: String(PREVIEW_FETCH), replies: 'false' }])
+    },
+  )
+
+  it('still filters replies and deleted ones when the backend ignores the parameters', async () => {
+    const post = POSTS[0]!
+    state.routes = MOCK_ROUTES.map((route) =>
+      route.path === '/api/v1/posts/:id/comments'
+        ? {
+            ...route,
+            handler: () => ({ status: 200, body: { items: COMMENTS_BY_CONTENT[post.id] } }),
+          }
+        : route,
+    )
+    const result = await getCommentsPreview({ kind: 'post', id: post.id, locale: 'en' })
+    if (!result.ok) throw new Error('expected ok')
+    const roots = COMMENTS_BY_CONTENT[post.id]!.filter((comment) => !comment.deleted)
+    expect(result.data.map((comment) => comment.id)).toEqual(roots.map((each) => each.id))
   })
 
   it('reads the comments of a poll', async () => {

@@ -111,6 +111,13 @@ test.describe('Home feed', () => {
     )
   })
 
+  test('a poll shows how many comments it has and opens them (P-006)', async ({ page }) => {
+    await page.goto('/en?filter=polls')
+    const poll = card(page, 'Where does $BTC close 2026?')
+    await poll.getByRole('button', { name: '1 comment' }).click()
+    await expect(poll.getByText('150k is conservative.')).toBeVisible()
+  })
+
   test('loads the next page when scrolling, until the end (H-16)', async ({ page }) => {
     await page.goto('/en')
     await expect(articles(page)).toHaveCount(20)

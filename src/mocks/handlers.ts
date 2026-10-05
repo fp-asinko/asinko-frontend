@@ -19,6 +19,7 @@ import { COMMUNITIES, communityBySlug } from './fixtures/communities'
 import { POLLS, pollById } from './fixtures/polls'
 import { POSTS, postById } from './fixtures/posts'
 import { PROFILES } from './fixtures/users'
+import { commentTree } from './comment-tree'
 import { paginate } from './paginate'
 import type { MockContext, MockRoute } from './types'
 import { removePostVote, votePoll, votePost } from './votes'
@@ -137,6 +138,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     implemented: true,
     schema: paginatedSchema(feedItemSchema),
     example: noRequest,
+    // The feed the Home asks for: checks Post and Poll (community, commentCount) on the real API.
+    liveExample: { ...noRequest, query: { kind: 'POST,POLL' } },
     handler: ({ query }) => {
       // Backend dev: an unknown community answers an empty page, not a 404.
       if (query.community && !communityBySlug(query.community)) {
@@ -233,10 +236,14 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     kind: 'contract',
     implemented: true,
     schema: commentListSchema,
-    example: { ...noRequest, params: { id: POSTS[0]!.id } },
-    handler: ({ params }) =>
+    example: {
+      ...noRequest,
+      params: { id: POSTS[0]!.id },
+      query: { limit: '3', replies: 'false' },
+    },
+    handler: ({ params, query }) =>
       params.id && postById(params.id)
-        ? { status: 200, body: { items: COMMENTS_BY_CONTENT[params.id] ?? [] } }
+        ? { status: 200, body: { items: commentTree(COMMENTS_BY_CONTENT[params.id] ?? [], query) } }
         : notFound,
   },
   {
@@ -245,10 +252,14 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     kind: 'contract',
     implemented: true,
     schema: commentListSchema,
-    example: { ...noRequest, params: { id: POLLS[0]!.id } },
-    handler: ({ params }) =>
+    example: {
+      ...noRequest,
+      params: { id: POLLS[0]!.id },
+      query: { limit: '3', replies: 'false' },
+    },
+    handler: ({ params, query }) =>
       params.id && pollById(params.id)
-        ? { status: 200, body: { items: COMMENTS_BY_CONTENT[params.id] ?? [] } }
+        ? { status: 200, body: { items: commentTree(COMMENTS_BY_CONTENT[params.id] ?? [], query) } }
         : notFound,
   },
 

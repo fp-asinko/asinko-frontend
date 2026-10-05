@@ -1,5 +1,5 @@
 import type { RawPost } from '@/lib/api/contract'
-import { communityBySlug } from './communities'
+import { communitySummary } from './communities'
 import { extractEntities } from './entities'
 import { hoursAgo, minutesAgo, mockId } from './ids'
 import { summary } from './users'
@@ -8,15 +8,15 @@ type Seed = Pick<RawPost, 'title' | 'body'> & {
   community: string
   author: string | null
   publishedAt: string
-} & Partial<Omit<RawPost, 'creator' | 'communityId'>>
+} & Partial<Omit<RawPost, 'creator' | 'communityId' | 'community'>>
 
 function post(n: number, seed: Seed): RawPost {
   const { community, author, ...rest } = seed
-  const communityId = communityBySlug(community)?.id
-  if (!communityId) throw new Error(`Unknown mock community ${community}`)
+  const contentCommunity = communitySummary(community)
   return {
     id: mockId(4, n),
-    communityId,
+    communityId: contentCommunity.id,
+    community: contentCommunity,
     type: 'TEXT',
     url: null,
     imageUrl: null,
@@ -161,7 +161,8 @@ export const POSTS: RawPost[] = [
     community: 'memecoins',
     author: 'diamondgrandma',
     title: 'This post was deleted by its author',
-    body: '[deleted]',
+    // P-008: the backend sends an empty body for deleted content.
+    body: '',
     deleted: true,
     score: 3,
     commentCount: 0,

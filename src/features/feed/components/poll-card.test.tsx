@@ -63,4 +63,10 @@ describe('PollCard (H-13)', () => {
     renderWithIntl(<PollCard poll={pollItem({ community: null })} />)
     expect(screen.getAllByTestId('user-avatar')).toHaveLength(1)
   })
+
+  it('shows how many comments the poll has, like a post (BC-03)', () => {
+    renderWithIntl(<PollCard poll={pollItem({ commentCount: 12_400 })} />)
+    const button = screen.getByRole('button', { name: '12,400 comments' })
+    expect(button).toHaveTextContent('12.4K')
+  })
 })

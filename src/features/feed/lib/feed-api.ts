@@ -7,10 +7,10 @@ import {
   paginatedSchema,
   type ApiResult,
 } from '@/lib/api'
-import { communitySchema, feedItemSchema, type RawCommunity } from '@/lib/api/contract'
+import { communitySchema, feedItemSchema } from '@/lib/api/contract'
 import type { FeedPage } from '../feed.types'
 import type { FeedParams } from '../schemas/feed-params.schema'
-import { indexCommunities, toCommunityRef, toFeedItem } from './mappers'
+import { indexCommunities, needsMentionLookup, toCommunityRef, toFeedItem } from './mappers'
 
 /** Items are validated one by one (keepValidItems), so the envelope accepts anything (H-20). */
 const looseListSchema = z.object({ items: z.array(z.unknown()), nextCursor: z.string().nullable() })
@@ -51,31 +51,33 @@ function requestCommunity(params: FeedParams) {
  *
  * - Explore answers an empty page for an unknown community, so the community is fetched in
  *   parallel: NOT_FOUND there makes the page a 404 (backend dev).
- * - Posts only carry `communityId`, so names come from GET /communities (proposal P-004).
+ * - Each item carries its community (P-004). GET /communities is asked only when the page has $ or
+ *   # mentions to link (`entities` by id, P-001): with the real backend today, never.
  */
 export async function getFeed(params: FeedParams, cursor?: string): Promise<ApiResult<FeedPage>> {
   const endpoint = params.feed === 'following' ? FOLLOWING : EXPLORE
   if (cursor !== undefined && !cursorSchema.safeParse(cursor).success) return invalidInput(endpoint)
 
-  const [feed, communities, filtered] = await Promise.all([
+  const [feed, filtered] = await Promise.all([
     requestFeed(params, cursor),
-    apiRequest({
-      method: 'GET',
-      path: '/api/v1/communities',
-      schema: paginatedSchema(communitySchema),
-    }),
     requestCommunity(params),
   ])
   if (filtered && !filtered.ok && filtered.code === 'NOT_FOUND') return filtered
   if (!feed.ok) return feed
 
-  // Without communities the feed still renders, only without community names (degraded).
-  const known: RawCommunity[] = communities.ok ? [...communities.data.items] : []
+  const valid = keepValidItems(feed.data.items, feedItemSchema, `GET ${endpoint}`)
+  // If the communities fail, mentions stay plain text; the cards keep their own community.
+  const communities = needsMentionLookup(valid)
+    ? await apiRequest({
+        method: 'GET',
+        path: '/api/v1/communities',
+        schema: paginatedSchema(communitySchema),
+      })
+    : null
+  const known = communities?.ok ? [...communities.data.items] : []
   if (filtered?.ok) known.push(filtered.data)
-  const index = indexCommunities(known)
-  const items = keepValidItems(feed.data.items, feedItemSchema, `GET ${endpoint}`).map((item) =>
-    toFeedItem(item, index),
-  )
+  const mentions = indexCommunities(known)
+  const items = valid.map((item) => toFeedItem(item, mentions))
 
   return {
     ok: true,

@@ -63,6 +63,8 @@ export type PollItem = {
   resultsVisible: boolean
   isClosed: boolean
   closesAt: string | null
+  /** Without deleted comments (P-006). */
+  commentCount: number
   author: Author | null
   community: CommunityRef | null
   publishedAt: string

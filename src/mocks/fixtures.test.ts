@@ -75,9 +75,29 @@ describe('mock data is internally consistent', () => {
     expect(types).toEqual(new Set(['TICKER', 'COMMUNITY', 'MENTION']))
   })
 
-  it('keeps each post commentCount equal to its real comments', () => {
-    for (const post of POSTS) {
-      expect(flatten(COMMENTS_BY_CONTENT[post.id] ?? []).length, post.title).toBe(post.commentCount)
+  it('keeps each commentCount equal to its comments, without deleted ones (as the backend)', () => {
+    for (const content of [...POSTS, ...POLLS]) {
+      const alive = flatten(COMMENTS_BY_CONTENT[content.id] ?? []).filter((each) => !each.deleted)
+      expect(alive.length, content.id).toBe(content.commentCount)
+    }
+  })
+
+  it('carries the community summary of each piece of content (P-004)', () => {
+    for (const content of [...POSTS, ...POLLS]) {
+      const community = COMMUNITIES.find((each) => each.id === content.communityId)
+      expect(content.community).toEqual({
+        id: community?.id,
+        slug: community?.slug,
+        name: community?.name,
+        type: community?.type,
+      })
+    }
+  })
+
+  it('sends an empty body for deleted posts and comments (P-008)', () => {
+    const comments = flatten(Object.values(COMMENTS_BY_CONTENT).flat())
+    for (const deleted of [...POSTS, ...comments].filter((each) => each.deleted)) {
+      expect(deleted.body).toBe('')
     }
   })
 

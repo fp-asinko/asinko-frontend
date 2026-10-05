@@ -13,7 +13,8 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.smoke.ts'],
-    testTimeout: 20_000,
+    // The dev backend reads a database in another region: a feed page can take ~15 s.
+    testTimeout: 90_000,
     env: { API_SMOKE_BASE_URL: process.env.API_SMOKE_BASE_URL ?? 'http://localhost:3001' },
   },
 })
