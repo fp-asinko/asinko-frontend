@@ -11,7 +11,7 @@
 
 - **Línea 1:**
   - `UserAvatar` del grupo: `size="sm"` ajustado a `size-6 rounded-md`, con `colorKey = slug`.
-  - El handle en `type-small font-bold text-foreground` con `truncate`.
+  - El handle en `type-ui font-bold text-foreground` (14 px desde el 2026-10-05) con `truncate`.
   - `· tiempo` en `type-meta text-muted-foreground`.
   - El botón con `ml-auto shrink-0`.
 - **Línea 2** (11 px desde el ajuste del 2026-10-05):

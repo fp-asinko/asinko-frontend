@@ -88,7 +88,7 @@ export function CardByline({
           {group ? (
             <Link
               href={{ pathname: '/', query: { community: group.slug } }}
-              className="inline-flex min-h-6 min-w-0 items-center truncate type-small font-bold text-foreground hover:underline"
+              className="inline-flex min-h-6 min-w-0 items-center truncate type-ui font-bold text-foreground hover:underline"
             >
               {/* The symbol (# or $) in gray: the name is the protagonist. One text node each, so
                   the accessible name stays "#crypto". */}
