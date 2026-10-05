@@ -83,6 +83,32 @@ Las 6 migraciones que faltaban en la Supabase de dev se aplicaron el 2026-10-03,
 **Motivo:** un contenido borrado trae `body: "[contenido eliminado]"`. El front es multi-idioma (inglés por defecto) y muestra su propio texto según `deleted: true`.
 **Cambio:** `body: ""` cuando `deleted` es `true`. El front ya no lee el `body` de un borrado, así que no es bloqueante.
 
+### P-009 — Feed en pocas consultas, y backend en la región de la base
+
+**Estado:** propuesta (2026-10-05). Es lo que más afecta a la experiencia hoy.
+**Endpoint:** `GET /api/v1/feed/explore` y `GET /api/v1/feed/following` (y en general, toda lista)
+**Motivo:** medido el 2026-10-05 contra `dev` local, con la Supabase de `eu-west-1`:
+
+| Request | Tiempo |
+| --- | --- |
+| `/feed/explore?kind=POST,POLL` (20 ítems) | **12 s** |
+| `/feed/explore?kind=POLL` | **6 s** |
+| Una consulta trivial a la base (pooler 6543) | ~1,3 s |
+
+La página del front con mocks tarda 0,04 s: casi todo el tiempo es esta espera. Hoy la serialización hace aproximadamente **una consulta por ítem y por dato**: autor, comunidad, votos, `commentCount`, voto del viewer y opciones de encuesta. Son unas 60 por página. Con ~1 s de ida y vuelta cada una, el feed no puede bajar de varios segundos.
+**Cambio:**
+
+1. **Armar la página en 2 o 3 consultas:**
+   - Contenido con `include` de `creator`, `community`, `post` y `poll.options`.
+   - Un `groupBy` para los conteos (votos, comentarios y votos por opción) de todos los ids de la página juntos.
+   - Una consulta con los votos del viewer para esos ids.
+   
+   El mismo patrón sirve para `/communities` y para los comentarios.
+2. **Desplegar el backend en la misma región que la base** (Vercel en `eu-west-1`, o mover la base a la región del backend). Cada consulta pasa de ~1 s a pocos ms. Junto con el punto 1, el feed debería quedar por debajo de 300 ms.
+3. **Opcional:** subir `CONNECTION LIMIT` del rol `juan_readonly` (hoy 5), porque el front pide feed, comunidades e intereses en paralelo.
+
+**Mientras tanto, en el front:** `specs/feed-navigation` hace que cambiar de pestaña responda al instante (streaming y esqueleto) y que volver a una pestaña reciente no espere. Eso esconde parte de la espera, pero no la resuelve.
+
 ## Preguntas sobre el contrato
 
 - **Explore con comunidad inexistente**: `GET /feed/explore?community=nope` responde `200` con `items: []`. El front prefería `404` para mostrar "no existe" en lugar de "no hay posts". ¿Se cambia, o el front consulta `GET /communities/{slug}` aparte?
