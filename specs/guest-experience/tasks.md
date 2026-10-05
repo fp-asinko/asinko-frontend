@@ -1,6 +1,6 @@
 # Experiencia sin sesión — Tasks
 
-> **Estado:** para aprobar junto con `requirements.md` y `design.md`.
+> **Estado:** aprobado el 2026-10-05.
 
 ```
 T-01 ─┬─ T-02 ─┬─ T-04 ─ T-06

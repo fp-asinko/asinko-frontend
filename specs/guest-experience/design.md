@@ -1,6 +1,6 @@
 # Experiencia sin sesión — Design
 
-> **Estado:** para aprobar junto con los requisitos. Asume las respuestas propuestas a Q1–Q3.
+> **Estado:** aprobado el 2026-10-05 con Q1–Q3 como se proponen.
 
 ## 1. Saber si hay sesión en el cliente
 

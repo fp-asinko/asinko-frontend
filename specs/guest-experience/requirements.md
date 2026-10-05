@@ -1,6 +1,6 @@
 # Experiencia sin sesión — Requirements
 
-> **Estado:** para aprobar. Pedido el 2026-10-05, como paso previo a crear posts (fase 1), que necesitan login.
+> **Estado:** aprobado el 2026-10-05 con Q1–Q3 como se proponen. Pedido el 2026-10-05, como paso previo a crear posts (fase 1), que necesitan login.
 > **Decisiones del Product Owner (2026-10-05):**
 >
 > - Dos specs seguidos: este (vista sin sesión y modal) y después `auth` (login real con Supabase).
