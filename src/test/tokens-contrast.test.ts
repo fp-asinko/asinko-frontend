@@ -62,7 +62,6 @@ function contrast(theme: Record<string, string>, fg: string, bg: string): number
 }
 
 const AVATARS = [0, 1, 2, 3, 4, 5, 6, 7]
-const POLLS = [1, 2, 3, 4, 5, 6]
 
 const TEXT_PAIRS: Array<[string, string]> = [
   ['foreground', 'background'],
@@ -82,14 +81,9 @@ const TEXT_PAIRS: Array<[string, string]> = [
   ['success', 'card'],
   ['bearish', 'card'],
   ['sidebar-foreground', 'sidebar'],
-  // Feed cards (FC-12): initials on the lighter stop of each avatar gradient, consensus and accuracy.
+  // Feed cards (FC-12): initials on the lighter stop of each avatar gradient, and accuracy.
   ...AVATARS.map((n): [string, string] => [`avatar-${n}-foreground`, `avatar-${n}`]),
   ...AVATARS.map((n): [string, string] => [`avatar-${n}-foreground`, `avatar-${n}-to`]),
-  // The consensus banner: title in the main color, subtitle secondary (feed-cards § 12).
-  ['foreground', 'consensus-majority'],
-  ['muted-foreground', 'consensus-majority'],
-  ['foreground', 'consensus-minority'],
-  ['muted-foreground', 'consensus-minority'],
   ['accuracy-high-foreground', 'accuracy-high'],
   ['accuracy-mid-foreground', 'accuracy-mid'],
   ['accuracy-low-foreground', 'accuracy-low'],
@@ -104,11 +98,6 @@ const NON_TEXT_PAIRS: Array<[string, string]> = [
   ['bullish', 'card'],
   ['brand-dot', 'background'],
   ['input', 'card'],
-  // Poll legend squares and bars against their track and the results box (FC-04).
-  ...POLLS.map((n): [string, string] => [`poll-${n}`, 'poll-track']),
-  ...POLLS.map((n): [string, string] => [`poll-${n}`, 'surface']),
-  // The check of the voted option sits on its legend color (FC-04).
-  ...POLLS.map((n): [string, string] => ['card', `poll-${n}`]),
 ]
 
 describe.each(Object.entries(THEMES))('%s theme tokens', (_name, theme) => {
@@ -116,15 +105,14 @@ describe.each(Object.entries(THEMES))('%s theme tokens', (_name, theme) => {
     expect(contrast(theme, fg, bg)).toBeGreaterThanOrEqual(4.5)
   })
 
-  // FC-13: identity and poll colors never reuse the price up/down colors.
-  it('keeps avatar and poll colors apart from --bullish and --bearish', () => {
+  // FC-13: identity colors never reuse the price up/down colors (polls are monochrome, § 13).
+  it('keeps avatar colors apart from --bullish and --bearish', () => {
     const meaning = [resolve(theme, 'bullish'), resolve(theme, 'bearish')].map((c) =>
       c.toLowerCase(),
     )
-    const colors = [
-      ...AVATARS.flatMap((n) => [`avatar-${n}`, `avatar-${n}-to`]),
-      ...POLLS.map((n) => `poll-${n}`),
-    ].map((token) => resolve(theme, token).toLowerCase())
+    const colors = AVATARS.flatMap((n) => [`avatar-${n}`, `avatar-${n}-to`]).map((token) =>
+      resolve(theme, token).toLowerCase(),
+    )
     for (const color of colors) expect(meaning).not.toContain(color)
   })
 

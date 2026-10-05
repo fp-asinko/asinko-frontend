@@ -138,12 +138,7 @@
       "closed": "Closed",
       "hidden": "Vote to see the results",
       "yourVote": "Your vote",
-      "consensus": {
-        "title": "{percent} of the community thinks like you",
-        "majority": "You are with the majority. Is the consensus right?",
-        "minority": "You are in the minority. Early, or wrong?",
-        "tie": "The community is split down the middle."
-      }
+      "consensus": "{percent} of the community thinks like you"
     },
     "empty": {
       "forYou": "Nothing posted yet.",

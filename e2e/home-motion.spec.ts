@@ -40,7 +40,7 @@ test.describe('Home motion', () => {
     const poll = card(page, 'How much of your portfolio is in DeFi?')
     await poll.getByRole('button', { name: '1–10%' }).click()
 
-    const bar = poll.locator('[data-revealed] [data-bar] > span').first()
+    const bar = poll.locator('[data-revealed] [data-bar]').first()
     await expect(bar).toBeAttached()
     // The bar is scaled to its share (inline style); mid-animation it is still below it.
     const target = await bar.evaluate((el) => new DOMMatrix((el as HTMLElement).style.transform).a)

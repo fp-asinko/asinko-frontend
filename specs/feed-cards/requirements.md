@@ -81,3 +81,12 @@ Que cada tarjeta del feed transmita identidad (quién, dónde) y que votar o lee
 | R1-Q1 | Las encuestas reales tienen 9 votos y el consenso pide 10 (Q2): hoy nunca se ve. ¿Bajamos el mínimo? | **5 votos.** Con menos, "el 100 % piensa como vos" no dice nada                                                                                                                                                               |
 | R1-Q2 | Subtítulos del banner (el prototipo solo tiene el de mayoría)                                        | Mayoría: "You are with the majority. Is the consensus right?" · Minoría: "You are in the minority. Early, or wrong?" · Empate: "The community is split down the middle." Título: "{percent} of the community thinks like you" |
 | R1-Q3 | Encuesta con resultados visibles sin haber votado (visibilidad `ALWAYS`, o una visita sin cuenta)    | Se ven las filas de resultados, todas en tono suave. Si se puede votar, cada fila es el botón para votar. Los botones limpios de FC-18 quedan solo para cuando los resultados están ocultos                                   |
+
+## Revisión 2 — Encuestas minimalistas (2026-10-05)
+
+> **Estado:** aprobado el 2026-10-05 por el Product Owner, con sus respuestas sobre el consenso y el voto propio: "Menos es más". Los colores por opción no convencen. La referencia son los botones limpios del prototipo, y los resultados van dentro de la misma caja, rellenando el fondo según el porcentaje. Reemplaza FC-15, FC-16 y FC-17 (`design.md § 13`).
+
+- [x] **FC-20** **Una sola forma:** antes y después de votar, cada opción es la caja limpia de FC-18. Con resultados, el fondo de la caja se rellena de izquierda a derecha según el porcentaje: etiqueta a la izquierda, porcentaje a la derecha. Sin colores por opción, sin cuadrados, sin barras aparte, sin línea de colores y sin recuadro exterior.
+- [x] **FC-21** **La que gana, resaltada:** la opción con más votos (o las que empatan arriba) lleva el relleno pleno y el texto en negrita. Las demás tienen el mismo relleno con menos opacidad y el texto secundario.
+- [x] **FC-22** **Tu voto:** un ✓ junto a la etiqueta de la opción que votaste, gane o no; para lectores de pantalla, "(your vote)".
+- [x] **FC-23** **Consenso en una línea:** debajo de las opciones, en gris y sin caja ni color: "49% of the community thinks like you" (mínimo de 5 votos, R1-Q1).

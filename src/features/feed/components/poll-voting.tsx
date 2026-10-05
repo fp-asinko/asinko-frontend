@@ -1,29 +1,12 @@
 'use client'
 
+import { CheckIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { useOptimistic, useState, useTransition, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { votePoll } from '../actions/vote-poll.action'
 import type { PollItem, PollResults } from '../feed.types'
-import { pollConsensus, type Consensus } from '../lib/poll-consensus'
-
-// One color per option (FC-15), repeated after 6: the label and the percentage carry the meaning.
-// Full class names, never interpolated, so Tailwind generates them.
-const OPTION_COLORS = [
-  'bg-poll-1',
-  'bg-poll-2',
-  'bg-poll-3',
-  'bg-poll-4',
-  'bg-poll-5',
-  'bg-poll-6',
-] as const
-
-// The banner tint (FC-17); its title is in the main text color, as in the prototype.
-const CONSENSUS_CLASSES: Record<Consensus['tier'], string> = {
-  majority: 'border-consensus-majority-border bg-consensus-majority',
-  minority: 'border-consensus-minority-border bg-consensus-minority',
-  tie: 'border-border bg-surface',
-}
+import { pollConsensus } from '../lib/poll-consensus'
 
 type Props = Pick<
   PollItem,
@@ -47,10 +30,10 @@ type Props = Pick<
  * server's answer. A closed poll, or one that does not allow changing a cast vote, is read-only.
  * Options that started as buttons stay buttons (aria-disabled once locked), so the focused option
  * is never unmounted (WCAG 2.4.3); the saved vote is announced in a live region.
- * Look (specs/feed-cards § 12, as the prototype): clean buttons while the results are hidden;
- * otherwise compact rows (square, label, bar, percent) in a box, soft except the viewer's vote,
- * under the consensus banner. Both states share one tree (div > ul > li > button), so the button
- * with focus survives the change.
+ * Look (specs/feed-cards § 13, less is more): one shape, the prototype's clean box. With results
+ * its background fills to the share in a single color; the leading option is full and bold, the
+ * rest the same but softer. A check marks the viewer's vote. The box never changes size, so
+ * results that arrive seconds later move nothing, and the focused button is never replaced.
  */
 export function PollVoting({
   id,
@@ -104,13 +87,13 @@ export function PollVoting({
 
   // From the server results only (never the optimistic choice); dimmed while a new vote travels.
   const consensus = pollConsensus(results)
-  const consensusTitle = consensus
-    ? t('consensus.title', {
+  const consensusText = consensus
+    ? t('consensus', {
         percent: format.number(consensus.share, { style: 'percent', maximumFractionDigits: 0 }),
       })
     : null
-  const consensusText = consensus ? t(`consensus.${consensus.tier}`) : null
-  const hasResults = shown.options.some((option) => option.share !== null)
+  // FC-21: the leading share (every option tied at the top leads).
+  const top = Math.max(0, ...shown.options.map((option) => option.share ?? 0))
 
   const footer = [
     !shown.resultsVisible && !isClosed ? t('hidden') : null,
@@ -120,153 +103,112 @@ export function PollVoting({
 
   return (
     <>
-      <div
-        className={cn(
-          'relative mt-3.5',
-          // The results box (FC-15): gradient, border and a thin line of the option colors on top.
-          hasResults &&
-            'overflow-hidden rounded-lg border bg-linear-to-b from-surface to-card p-3.5',
-        )}
-      >
-        {hasResults && (
-          <span
-            aria-hidden
-            className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-poll-1 via-poll-2 to-poll-3"
-          />
-        )}
-        {consensus && (
-          <div
-            // Remounts (and enters again) only when a changed vote changes the tier. Inserted text
-            // is not announced: the live region below says it together with the saved vote.
-            key={consensus.tier}
-            data-consensus={consensus.tier}
-            className={cn(
-              'mb-3 rounded-lg border px-4 pt-3.5 pb-3 transition-opacity duration-150 ease-out',
-              CONSENSUS_CLASSES[consensus.tier],
-              pending && 'opacity-60',
-              consensusEntry === 'after-bars' && 'animate-fade-up delay-after-bars',
-              consensusEntry === 'now' && 'animate-fade-up',
-            )}
-          >
-            <p className="text-base font-bold text-foreground">{consensusTitle}</p>
-            <p className="mt-0.5 type-meta text-muted-foreground italic">{consensusText}</p>
-          </div>
-        )}
-        <ul
-          data-revealed={revealed || undefined}
-          className={cn('flex flex-col', hasResults ? 'gap-1.5' : 'gap-2')}
-        >
-          {shown.options.map((option, index) => {
-            const mine = option.id === shown.viewerOptionId
-            const fill = OPTION_COLORS[index % OPTION_COLORS.length] ?? OPTION_COLORS[0]
-            // FC-16: soft unless it is the viewer's vote.
-            const soft = !mine && 'opacity-45'
-            const percent =
-              option.share === null
-                ? null
-                : format.number(option.share, { style: 'percent', maximumFractionDigits: 0 })
-            const yourVote = mine && !asButtons && (
-              <span className="sr-only"> ({t('yourVote')})</span>
-            )
-            const content =
-              option.share === null ? (
-                // FC-18: a clean button (or, closed, a clean row) while the results are hidden.
-                <span className="block min-w-0">
-                  {option.label}
-                  {yourVote}
-                </span>
-              ) : (
-                <span className="grid grid-cols-[0.625rem_minmax(0,8.75rem)_1fr_2.25rem] items-center gap-2">
-                  <span
-                    aria-hidden
-                    data-marker
-                    className={cn(
-                      'size-2.5 rounded-xs',
-                      fill,
-                      soft,
-                      revealed && !mine && 'animate-fade-in',
-                      // The pop moved here from the check (§ 12.4), on the tap that chose it.
-                      mine && lastVotedId === option.id && 'animate-vote-pop',
-                    )}
-                  />
-                  <span className={cn('min-w-0', mine && 'font-semibold text-foreground')}>
-                    {option.label}
-                    {yourVote}
-                  </span>
-                  <span
-                    aria-hidden
-                    data-bar
-                    className="block h-2 overflow-hidden rounded-full bg-poll-track"
-                  >
-                    {/* Full width, scaled to its share on the GPU: grows from 0 when revealed, a
-                        later vote transitions it. */}
-                    <span
+      <ul data-revealed={revealed || undefined} className="mt-3.5 flex flex-col gap-2">
+        {shown.options.map((option) => {
+          const mine = option.id === shown.viewerOptionId
+          const leading = option.share !== null && top > 0 && option.share === top
+          const percent =
+            option.share === null
+              ? null
+              : format.number(option.share, { style: 'percent', maximumFractionDigits: 0 })
+          const text =
+            option.share === null
+              ? null
+              : leading
+                ? 'font-semibold text-foreground'
+                : 'text-muted-foreground'
+          const content = (
+            <>
+              {option.share !== null && (
+                <span
+                  aria-hidden
+                  data-bar
+                  // FC-20: the background fills to the share, on the GPU. Grows from 0 when
+                  // revealed; a later vote transitions it. FC-21: softer unless leading.
+                  className={cn(
+                    'absolute inset-0 origin-left bg-primary/10 transition-[transform,opacity] duration-600 ease-bars',
+                    !leading && 'opacity-50',
+                    revealed && 'animate-bar-grow',
+                  )}
+                  style={{ transform: `scaleX(${option.share})` }}
+                />
+              )}
+              <span className="relative flex items-center justify-between gap-3">
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <span className={cn('min-w-0', text)}>{option.label}</span>
+                  {mine && (
+                    // FC-22: the viewer's vote, whether it leads or not; it pops on the tap.
+                    <CheckIcon
+                      aria-hidden
+                      data-mine
                       className={cn(
-                        'block size-full origin-left transition-[transform,opacity] duration-600 ease-bars',
-                        fill,
-                        soft,
-                        revealed && 'animate-bar-grow',
+                        'size-4 shrink-0 text-foreground',
+                        lastVotedId === option.id && 'animate-vote-pop',
                       )}
-                      style={{ transform: `scaleX(${option.share})` }}
                     />
-                  </span>
+                  )}
+                  {mine && !asButtons && <span className="sr-only">({t('yourVote')})</span>}
+                </span>
+                {percent && (
                   <span
-                    className={cn(
-                      'text-right tabular-nums',
-                      mine && 'font-semibold text-foreground',
-                      revealed && 'animate-fade-in',
-                    )}
+                    className={cn('shrink-0 tabular-nums', text, revealed && 'animate-fade-in')}
                   >
                     {percent}
                   </span>
-                </span>
-              )
-            const box = cn(
-              // A locked option does not press in: nothing happens when tapped.
-              'tap block w-full text-left aria-disabled:active:scale-100',
-              option.share === null
-                ? cn(
-                    'rounded-lg border px-3.5 py-2.5 type-ui font-medium',
-                    mine && 'border-foreground font-semibold',
-                  )
-                : '-mx-1.5 min-h-6 w-[calc(100%+0.75rem)] rounded-md px-1.5 py-0.5 type-action font-medium text-muted-foreground',
-            )
-            return (
-              <li key={option.id}>
-                {asButtons ? (
-                  <button
-                    type="button"
-                    aria-pressed={mine}
-                    aria-disabled={pending || !canVote || undefined}
-                    onClick={() => vote(option.id)}
-                    className={cn(
-                      box,
-                      'outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                      canVote && (option.share === null ? 'hover:bg-surface' : 'hover:bg-card'),
-                      pending && 'cursor-wait',
-                    )}
-                  >
-                    {content}
-                  </button>
-                ) : (
-                  <div className={box}>{content}</div>
                 )}
-              </li>
-            )
-          })}
-        </ul>
-      </div>
+              </span>
+            </>
+          )
+          const box = cn(
+            // A locked option does not press in: nothing happens when tapped.
+            'tap relative block w-full overflow-hidden rounded-lg border px-3.5 py-2.5 text-left type-ui font-medium aria-disabled:active:scale-100',
+          )
+          return (
+            <li key={option.id}>
+              {asButtons ? (
+                <button
+                  type="button"
+                  aria-pressed={mine}
+                  aria-disabled={pending || !canVote || undefined}
+                  onClick={() => vote(option.id)}
+                  className={cn(
+                    box,
+                    'outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+                    canVote && 'hover:bg-surface',
+                    pending && 'cursor-wait',
+                  )}
+                >
+                  {content}
+                </button>
+              ) : (
+                <div className={box}>{content}</div>
+              )}
+            </li>
+          )
+        })}
+      </ul>
+      {consensus && (
+        <p
+          // FC-23: one quiet line. Remounts (and enters again) only when a changed vote changes
+          // the tier; inserted text is not announced, the live region below says it.
+          key={consensus.tier}
+          data-consensus={consensus.tier}
+          className={cn(
+            'mt-2 type-meta text-muted-foreground transition-opacity duration-150 ease-out',
+            pending && 'opacity-60',
+            consensusEntry === 'after-bars' && 'animate-fade-up delay-after-bars',
+            consensusEntry === 'now' && 'animate-fade-up',
+          )}
+        >
+          {consensusText}
+        </p>
+      )}
       {/* Two whole sentences, never fragments of one: "Vote saved." and the consensus (WCAG 4.1.3). */}
       <p role="status" className="sr-only">
         {saved && (
           <>
             <span>{tv('saved')}</span>
-            {consensus && (
-              <span>
-                {' '}
-                {consensusTitle}. {consensusText}
-              </span>
-            )}
+            {consensusText && <span> {consensusText}.</span>}
           </>
         )}
       </p>

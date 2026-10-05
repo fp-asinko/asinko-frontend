@@ -78,3 +78,9 @@ T-01 ─┬─ T-02 ─ T-03
   - **Tests:** `poll-consensus.test.ts` con el mínimo nuevo, `poll-voting.test.tsx` y `e2e/feed-cards.spec.ts`.
 - [x] **T-11 · Cierre de la revisión** · S
   - axe en claro y oscuro, presupuesto de JS y capturas a 360 y 1280 px comparadas con el prototipo.
+
+## Revisión 2 — Encuestas minimalistas
+
+- [x] **T-12 · Caja única con relleno** · M · FC-20 a FC-23
+  - `PollVoting` con relleno por porcentaje, la ganadora resaltada, ✓ en tu voto y el consenso en una línea. Se sacan los tokens y mensajes que quedan sin uso.
+  - **Tests:** `poll-voting.test.tsx` (ganadora y empate resaltados, el resto suave, ✓ en tu voto aunque no gane, consenso en una línea, foco conservado). En `e2e/feed-cards.spec.ts`, la caja de cada opción mide lo mismo antes y después de votar. Contraste, axe en claro y oscuro, y presupuesto de JS.

@@ -8,24 +8,23 @@ const card = (page: Page, text: string) => articles(page).filter({ hasText: text
 const DEFI = 'How much of your portfolio is in DeFi?'
 
 test.describe('Feed cards', () => {
-  test('voting turns the buttons into compact rows under the consensus, after the bars (FC-15, FC-17, FC-09)', async ({
+  test('voting fills the same boxes and says where the vote stands, after the fill (FC-20, FC-23, FC-09)', async ({
     page,
   }) => {
     await page.goto('/en?filter=polls')
     const poll = card(page, DEFI)
-    await poll.getByRole('button', { name: '1–10%' }).click()
+    const option = poll.getByRole('button', { name: /1–10%/ })
+    const before = (await option.boundingBox())!.height
+    await option.click()
 
     const consensus = poll
       .locator('[data-consensus]')
       .filter({ hasText: /\d+% of the community thinks like you/ })
     await expect(consensus).toBeVisible()
-    await expect(consensus).toContainText('You are with the majority. Is the consensus right?')
     expect(await consensus.evaluate((el) => getComputedStyle(el).animationDelay)).toBe('0.4s')
     await expect(poll.locator('[data-bar]')).toHaveCount(4)
-    // FC-15: one compact row per option, as the prototype (20px rows, 24px targets).
-    for (const option of await poll.getByRole('listitem').all()) {
-      expect((await option.boundingBox())!.height).toBeLessThanOrEqual(24)
-    }
+    // FC-20: the same box before and after voting, now filled to its share.
+    expect((await option.boundingBox())!.height).toBe(before)
   })
 
   test('a vote cast earlier shows its consensus at once', async ({ page }) => {

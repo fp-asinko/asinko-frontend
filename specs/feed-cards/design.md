@@ -304,3 +304,20 @@ El marcador de radio y leyenda (D-C1), el acento de color en hover (FC-06), el �
 - **Filas:** cuando se puede votar, la fila entera es el botón (`min-h-6`, 24 px, WCAG 2.5.8). Para que el texto quede alineado con el recuadro, ocupa el ancho más 6 px a cada lado (`-mx-1.5`).
 - **Etiquetas largas:** a 360 px, o con etiquetas como "Between 100,000 and 150,000 USD", ocupan dos líneas y la fila crece. El e2e de alto (≤ 24 px) usa la encuesta de DeFi, que tiene etiquetas cortas.
 - **Español:** el título es "El {percent} de la comunidad piensa como tú", en tuteo como el resto de `es.json`.
+
+## 13. Revisión 2 — Encuestas minimalistas (2026-10-05)
+
+> **Estado:** aprobado el 2026-10-05 (FC-20 a FC-23). Reemplaza § 12.1 a § 12.3. D-C4 deja de aplicar: la caja es la misma antes y después de votar, así que al llegar los resultados nada cambia de alto.
+
+| Pieza     | Implementación                                                                                                                                         |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Caja      | La de FC-18: `rounded-lg border px-3.5 py-2.5 type-ui font-medium`, con `overflow-hidden`                                                              |
+| Relleno   | `absolute inset-0 origin-left bg-primary/10` con `scaleX(share)`. Crece desde 0 al revelarse (`bar-grow`, 600 ms) y transiciona si cambia el voto      |
+| Ganadora  | Relleno pleno, etiqueta y porcentaje en `font-semibold text-foreground`. Si hay empate arriba, todas las empatadas                                     |
+| Las demás | Relleno con `opacity-50`, texto `text-muted-foreground`                                                                                                |
+| Tu voto   | `CheckIcon` de 16 px después de la etiqueta, en el color del texto, con "pop" al votar; "(your vote)" en sr-only cuando la opción ya no es un botón    |
+| Consenso  | `<p>` `mt-2 type-meta text-muted-foreground` debajo de las opciones. Entra después del relleno la primera vez y se atenúa mientras viaja un voto nuevo |
+
+- **Un solo color:** el relleno es `--primary` con transparencia, así que funciona igual en claro y en oscuro. El texto se lee sobre cualquier relleno, porque al 10 % el fondo queda casi blanco (o casi negro en oscuro).
+- **Se van:** los tokens `--poll-1…6`, `--poll-track` y `--consensus-*`, los subtítulos del banner (`consensus.majority|minority|tie`), la línea de colores y el recuadro exterior. El test de contraste deja de medirlos.
+- **Foco (WCAG 2.4.3):** cada opción es el mismo `button` en todos los estados; solo cambia lo que tiene adentro.

@@ -62,11 +62,9 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
 ### Color de las tarjetas (`specs/feed-cards`)
 
 - **Identidad**: 8 tonos (`--avatar-0…7`, gradiente a `-to` y texto `-foreground`). `UserAvatar` elige el tono con `identityIndex` (`src/lib/identity-color.ts`) sobre una clave estable: el username de una persona y el **slug** de una comunidad (`colorKey`), nunca el nombre visible.
-- **Encuestas**: `--poll-1…6` para leyenda y barra, sobre `--poll-track`.
-- **Consenso** (`--consensus-majority`, `--consensus-minority` y sus `-border`): fondo y borde tintados del banner, con título en `--foreground` y subtítulo en `--muted-foreground`.
 - **Precisión por tramos** (`--accuracy-high|mid|low`): fondo tintado con texto del mismo tono.
-- **Encuestas:** las opciones van suaves (`opacity-45`) y solo la votada en color pleno, como el prototipo. Las barras suaves son decorativas, porque el porcentaje lleva el dato.
-- **Sin verde ni rojo de sube/baja** en avatares ni encuestas: lo verifica el test de contraste.
+- **Encuestas, menos es más** (`specs/feed-cards § 13`): un solo color. Cada opción es la caja limpia del prototipo, con el fondo relleno según el porcentaje (`bg-primary/10`). La que gana va plena y en negrita; las demás, al 50 % y con texto secundario. Tu voto lleva un ✓, y el consenso es una línea gris.
+- **Sin verde ni rojo de sube/baja** en los avatares: lo verifica el test de contraste. Las encuestas son monocromas.
 - Las clases por tono van escritas completas en un array (`IDENTITY_CLASSES[i]`), nunca interpoladas: Tailwind solo genera las clases que encuentra escritas.
 
 ### Tipografía

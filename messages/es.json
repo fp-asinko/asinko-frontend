@@ -138,12 +138,7 @@
       "closed": "Cerrada",
       "hidden": "Vota para ver los resultados",
       "yourVote": "Tu voto",
-      "consensus": {
-        "title": "El {percent} de la comunidad piensa como tú",
-        "majority": "Estás con la mayoría. ¿Tendrá razón el consenso?",
-        "minority": "Estás en la minoría. ¿Adelantado o equivocado?",
-        "tie": "La comunidad está dividida a la mitad."
-      }
+      "consensus": "El {percent} de la comunidad piensa como tú"
     },
     "empty": {
       "forYou": "Todavía no hay publicaciones.",
