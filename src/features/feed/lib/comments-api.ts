@@ -7,6 +7,14 @@ import type { CommentsTarget } from '../schemas/comments-preview.schema'
 /** How many comments the card shows (H-28, as the prototype). */
 export const PREVIEW_SIZE = 3
 
+/**
+ * How many top-level comments to ask for (P-007): the backend's limit counts deleted ones, which
+ * the card skips, so twice the preview leaves room for them (Q2 of specs/backend-contract).
+ */
+export const PREVIEW_FETCH = 6
+
+const PREVIEW_QUERY = { limit: String(PREVIEW_FETCH), replies: 'false' }
+
 function toCommentPreview(comment: RawComment): CommentPreview {
   return {
     id: comment.id,
@@ -22,8 +30,9 @@ function toCommentPreview(comment: RawComment): CommentPreview {
 }
 
 /**
- * The first top-level comments of a post or poll, without replies or deleted ones (H-28).
- * The contract returns the whole tree; proposal P-007 asks for ?limit=3&replies=false.
+ * The first top-level comments of a post or poll, without replies or deleted ones (H-28). Asks
+ * only for the top level (P-007); the filter and the slice stay, so an older backend that ignores
+ * the parameters gives the same result.
  */
 export async function getCommentsPreview(
   target: CommentsTarget,
@@ -34,12 +43,14 @@ export async function getCommentsPreview(
           method: 'GET',
           path: '/api/v1/posts/:id/comments',
           params: { id: target.id },
+          query: PREVIEW_QUERY,
           schema: commentListSchema,
         }
       : {
           method: 'GET',
           path: '/api/v1/polls/:id/comments',
           params: { id: target.id },
+          query: PREVIEW_QUERY,
           schema: commentListSchema,
         },
   )

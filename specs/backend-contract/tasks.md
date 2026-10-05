@@ -25,7 +25,7 @@ T-01 ─┬─ T-02 ─┐
   - `commentCount` en `PollItem` y el botón con la cantidad.
   - **Tests:** `poll-card.test.tsx` y un caso en `e2e/home.spec.ts`.
 
-- [ ] **T-04 · Vista previa con `limit`** · S · BC-04
+- [x] **T-04 · Vista previa con `limit`** · S · BC-04
   - `?limit=6&replies=false` en `getCommentsPreview`.
   - **Tests:** `comments-api.test.ts` verifica la query y que sigue filtrando borrados y respuestas.
 
