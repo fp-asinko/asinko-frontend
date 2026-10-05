@@ -1,4 +1,4 @@
-import type { RawCommunity } from '@/lib/api/contract'
+import type { RawCommunity, RawCommunitySummary } from '@/lib/api/contract'
 import { assetBySymbol } from './assets'
 import { daysAgo, mockId } from './ids'
 import { userByUsername } from './users'
@@ -117,6 +117,14 @@ export const COMMUNITIES: RawCommunity[] = [
 
 export function communityBySlug(slug: string) {
   return COMMUNITIES.find((each) => each.slug === slug)
+}
+
+/** The community summary every piece of content carries (P-004). */
+export function communitySummary(slug: string): RawCommunitySummary {
+  const community = communityBySlug(slug)
+  if (!community) throw new Error(`Unknown mock community ${slug}`)
+  const { id, name, type } = community
+  return { id, slug, name, type }
 }
 
 export function communityById(id: string) {

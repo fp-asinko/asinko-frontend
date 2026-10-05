@@ -68,17 +68,28 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
         ),
       ],
     ),
-    comment({
-      author: 'diamondgrandma',
-      body: 'I accumulated too. 0.01 BTC but it counts 😂',
-      ago: minutesAgo(18),
-      score: 41,
-      viewerVote: 1,
-    }),
+    comment(
+      {
+        author: 'diamondgrandma',
+        body: 'I accumulated too. 0.01 BTC but it counts 😂',
+        ago: minutesAgo(18),
+        score: 41,
+        viewerVote: 1,
+      },
+      [
+        comment({
+          author: 'jeppe',
+          body: 'Every sat counts. Stacking is the whole strategy.',
+          ago: minutesAgo(16),
+          score: 9,
+        }),
+      ],
+    ),
     comment(
       {
         author: 'capitalprudente',
-        body: '[deleted]',
+        // P-008: empty body when deleted.
+        body: '',
         ago: minutesAgo(15),
         deleted: true,
       },

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { communityTypeSchema } from './communities'
 import { userSummarySchema } from './users'
 
 // E03, E04, E05 (docs/references/api/). Raw backend shapes.
@@ -15,12 +16,21 @@ export const entitySchema = z.object({
   position: z.tuple([z.number().int(), z.number().int()]),
 })
 
+/** P-004: the community of a piece of content, just what a card needs (always present). */
+export const communitySummarySchema = z.object({
+  id: z.uuid(),
+  slug: z.string(),
+  name: z.string(),
+  type: communityTypeSchema,
+})
+
 export const postSchema = z.object({
   id: z.uuid(),
   communityId: z.uuid(),
+  community: communitySummarySchema,
   type: z.enum(['TEXT', 'LINK', 'IMAGE']),
   title: z.string(),
-  /** Markdown. */
+  /** Markdown. Empty when deleted (P-008). */
   body: z.string(),
   url: z.string().nullable(),
   imageUrl: z.string().nullable(),
@@ -47,6 +57,7 @@ export const voteResultSchema = z.object({
 export const pollSchema = z.object({
   id: z.uuid(),
   communityId: z.uuid(),
+  community: communitySummarySchema,
   question: z.string(),
   options: z.array(
     z.object({
@@ -63,6 +74,8 @@ export const pollSchema = z.object({
   allowVoteChange: z.boolean(),
   resultsVisibility: z.enum(['ALWAYS', 'ON_VOTE', 'ON_CLOSE']),
   totalVotes: z.number().int().nullable(),
+  /** P-006: without deleted comments, as in Post. */
+  commentCount: z.number().int(),
   viewerOptionId: z.uuid().nullable(),
   creator: userSummarySchema.omit({ accuracyRate: true }).nullable(),
   creatorType: z.enum(['USER', 'SYSTEM']),
@@ -85,7 +98,10 @@ export type RawComment = {
   replies: RawComment[]
 }
 
-/** Comments come with their replies nested inline (E05). */
+/**
+ * Comments come with their replies nested inline (E05). With ?replies=false (P-007) only the top
+ * level, each with `replies: []` (never absent) and `replyCount` still counting them.
+ */
 export const commentSchema: z.ZodType<RawComment> = z.lazy(() =>
   z.object({
     id: z.uuid(),
@@ -114,4 +130,5 @@ export const feedItemSchema = z.discriminatedUnion('kind', [
 export type RawPost = z.infer<typeof postSchema>
 export type RawPoll = z.infer<typeof pollSchema>
 export type RawEntity = z.infer<typeof entitySchema>
+export type RawCommunitySummary = z.infer<typeof communitySummarySchema>
 export type RawFeedItem = z.infer<typeof feedItemSchema>

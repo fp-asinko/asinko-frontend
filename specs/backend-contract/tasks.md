@@ -1,6 +1,6 @@
 # Front adaptado al contrato nuevo del backend — Tasks
 
-> **Estado:** para aprobar junto con `requirements.md` y `design.md`.
+> **Estado:** aprobado el 2026-10-04.
 
 ```
 T-01 ─┬─ T-02 ─┐
@@ -10,7 +10,7 @@ T-01 ─┬─ T-02 ─┐
 
 ## Tareas
 
-- [ ] **T-01 · Esquemas y mocks** · M · BC-05
+- [x] **T-01 · Esquemas y mocks** · M · BC-05
   - `communitySummarySchema`, `community` en `postSchema`/`pollSchema` y `commentCount` en `pollSchema`.
   - En los fixtures: `community` y `commentCount`, y `body: ""` en lo borrado.
   - En los handlers de comentarios: `limit` y `replies`.

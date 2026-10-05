@@ -1,6 +1,6 @@
 # Front adaptado al contrato nuevo del backend — Design
 
-> **Estado:** para aprobar junto con los requisitos. Asume las respuestas propuestas a Q1–Q3.
+> **Estado:** aprobado el 2026-10-04.
 
 ## 1. Contrato (`src/lib/api/contract/content.ts`)
 

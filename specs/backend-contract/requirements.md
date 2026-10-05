@@ -1,6 +1,6 @@
 # Front adaptado al contrato nuevo del backend — Requirements
 
-> **Estado:** para aprobar. Pedido el 2026-10-03. Cambio de contrato: requiere spec (`sdd-philosophy.md`).
+> **Estado:** aprobado el 2026-10-04 con Q1–Q3 como se proponen. Pedido el 2026-10-03. Cambio de contrato: requiere spec (`sdd-philosophy.md`).
 > **Origen:** `asinko-app` en `dev` implementó P-004, P-006, P-007 y P-008 (commit `3cfff41`, 2026-10-02) y P-002 (`3c5676c`). Hoy el front sigue compensando con los atajos de `specs/home/design.md § 6`.
 
 ## Objetivo
