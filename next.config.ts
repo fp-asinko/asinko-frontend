@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next'
 import { withSentryConfig } from '@sentry/nextjs/config'
 import createNextIntlPlugin from 'next-intl/plugin'
-import { REMOTE_IMAGE_HOSTS } from './src/lib/images'
+import { REMOTE_IMAGE_HOSTS, REMOTE_IMAGE_PATH } from './src/lib/images'
 import { isIndexable } from './src/lib/seo/robots'
 
 // Validates environment variables at build time (F-29, F-30).
@@ -29,7 +29,11 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // The same allowlist the feed mappers use: an image from any other host is dropped before render.
   images: {
-    remotePatterns: REMOTE_IMAGE_HOSTS.map((hostname) => ({ protocol: 'https', hostname })),
+    remotePatterns: REMOTE_IMAGE_HOSTS.map((hostname) => ({
+      protocol: 'https',
+      hostname,
+      pathname: `${REMOTE_IMAGE_PATH}**`,
+    })),
   },
   async headers() {
     return [{ source: '/:path*', headers: SECURITY_HEADERS }]

@@ -70,4 +70,13 @@ describe('interests mappers', () => {
       toPerson({ id: 'x', username: 'ana', avatarUrl: null } as Parameters<typeof toPerson>[0]),
     ).toMatchObject({ handle: '@ana', accuracyRate: null })
   })
+
+  it('drops an avatar from a host next/image does not allow, so the column never breaks', () => {
+    const person = (avatarUrl: string) =>
+      toPerson({ id: 'x', username: 'ana', avatarUrl } as Parameters<typeof toPerson>[0])
+    expect(person('https://evil.example/a.png').avatarUrl).toBeNull()
+    const storage =
+      'https://hqarefesoovfmibncivu.supabase.co/storage/v1/object/public/avatars/seed/ana.png'
+    expect(person(storage).avatarUrl).toBe(storage)
+  })
 })

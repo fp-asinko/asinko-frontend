@@ -1,5 +1,6 @@
 import type { RawAsset, RawCommunity, RawUserSummary } from '@/lib/api/contract'
 import type { AssetTile, Group, Person, Suggestion } from '../interests.types'
+import { allowedImageUrl } from '@/lib/images'
 
 /** Suggestions under the viewer sections; without a session the list is all the column shows. */
 export const SUGGESTION_COUNT = { signedIn: 3, guest: 8 } as const
@@ -38,7 +39,7 @@ export function toPerson(user: RawUserSummary): Person {
     handle: `@${user.username}`,
     id: user.id,
     username: user.username,
-    avatarUrl: user.avatarUrl,
+    avatarUrl: allowedImageUrl(user.avatarUrl),
     accuracyRate: user.accuracyRate ?? null,
   }
 }
@@ -52,7 +53,7 @@ export function toGroups(communities: readonly RawCommunity[]): Group[] {
       slug: c.slug,
       name: c.name,
       description: c.description,
-      avatarUrl: c.avatarUrl,
+      avatarUrl: allowedImageUrl(c.avatarUrl),
       isModerator:
         c.viewerMembership === 'MODERATOR' || c.viewerMembership === 'PRINCIPAL_MODERATOR',
     }))
@@ -73,6 +74,6 @@ export function toSuggestions(
       slug: c.slug,
       name: c.name,
       memberCount: c.memberCount,
-      avatarUrl: c.avatarUrl,
+      avatarUrl: allowedImageUrl(c.avatarUrl),
     }))
 }

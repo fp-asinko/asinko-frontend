@@ -51,7 +51,7 @@ function toAuthor(user: RawAuthor | null): Author | null {
   return {
     username: user.username,
     handle: `@${user.username}`,
-    avatarUrl: user.avatarUrl,
+    avatarUrl: allowedImageUrl(user.avatarUrl),
     accuracyRate: user.accuracyRate ?? null,
   }
 }

@@ -18,4 +18,12 @@ describe('allowedImageUrl (security.md § 6)', () => {
     expect(allowedImageUrl('not a url')).toBeNull()
     expect(allowedImageUrl(null)).toBeNull()
   })
+
+  it("keeps public objects of the backend's Supabase Storage, and nothing else of that project", () => {
+    const storage = 'https://hqarefesoovfmibncivu.supabase.co'
+    const avatar = `${storage}/storage/v1/object/public/avatars/seed/john.png`
+    expect(allowedImageUrl(avatar)).toBe(avatar)
+    expect(allowedImageUrl(`${storage}/storage/v1/object/sign/avatars/x.png`)).toBeNull()
+    expect(allowedImageUrl(`${storage}/rest/v1/profiles`)).toBeNull()
+  })
 })
