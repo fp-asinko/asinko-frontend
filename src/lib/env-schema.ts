@@ -19,6 +19,14 @@ export const serverEnvSchema = {
    */
   API_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60_000).default(10_000),
   SENTRY_DSN: z.url().optional(),
+  /**
+   * Development login (specs/dev-login): signs in with a test account of asinko-app and sends its
+   * token as Bearer. Server-only, never in production (refineEnv). All four or none.
+   */
+  SUPABASE_URL: z.url().optional(),
+  SUPABASE_ANON_KEY: z.string().min(1).optional(),
+  DEV_LOGIN_EMAIL: z.email().optional(),
+  DEV_LOGIN_PASSWORD: z.string().min(1).optional(),
 }
 
 // Set by Next.js; shared by server and client.
@@ -34,16 +42,31 @@ export const clientEnvSchema = {
 }
 
 export const MOCKS_IN_PRODUCTION_ERROR = 'API_MOCKS must be false when APP_ENV is production'
+export const DEV_LOGIN_IN_PRODUCTION_ERROR =
+  'DEV_LOGIN_* must not be set when APP_ENV is production'
 
 export type MocksMode = 'off' | 'missing' | 'all'
 
 /** Cross-variable rules. On the client only client variables exist, so they are skipped. */
 export function refineEnv(
-  env: { APP_ENV?: string; API_MOCKS?: MocksMode },
+  env: {
+    APP_ENV?: string
+    API_MOCKS?: MocksMode
+    DEV_LOGIN_EMAIL?: string
+    DEV_LOGIN_PASSWORD?: string
+  },
   ctx: z.RefinementCtx,
 ): void {
   if (env.APP_ENV === 'production' && env.API_MOCKS !== undefined && env.API_MOCKS !== 'off') {
     ctx.addIssue({ code: 'custom', path: ['API_MOCKS'], message: MOCKS_IN_PRODUCTION_ERROR })
+  }
+  // The development login can never reach production (specs/dev-login DL-07).
+  if (env.APP_ENV === 'production' && (env.DEV_LOGIN_EMAIL || env.DEV_LOGIN_PASSWORD)) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['DEV_LOGIN_EMAIL'],
+      message: DEV_LOGIN_IN_PRODUCTION_ERROR,
+    })
   }
 }
 

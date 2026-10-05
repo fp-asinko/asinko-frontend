@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { envSchema, MOCKS_IN_PRODUCTION_ERROR } from './env-schema'
+import { DEV_LOGIN_IN_PRODUCTION_ERROR, envSchema, MOCKS_IN_PRODUCTION_ERROR } from './env-schema'
 
 const validPreview = {
   APP_ENV: 'preview',
@@ -69,5 +69,30 @@ describe('envSchema', () => {
       API_MOCKS: 'false',
     })
     expect(result.success).toBe(true)
+  })
+
+  it('rejects the development login in production (specs/dev-login DL-07)', () => {
+    const production = {
+      ...validPreview,
+      APP_ENV: 'production',
+      API_MOCKS: 'false',
+      DEV_LOGIN_EMAIL: 'dev@example.com',
+      DEV_LOGIN_PASSWORD: 'not-a-real-password',
+    }
+    expect(issuesOf(production).map((issue) => issue.message)).toContain(
+      DEV_LOGIN_IN_PRODUCTION_ERROR,
+    )
+  })
+
+  it('accepts the development login outside production', () => {
+    const development = {
+      ...validPreview,
+      APP_ENV: 'development',
+      SUPABASE_URL: 'https://project.supabase.co',
+      SUPABASE_ANON_KEY: 'public-anon-key',
+      DEV_LOGIN_EMAIL: 'dev@example.com',
+      DEV_LOGIN_PASSWORD: 'not-a-real-password',
+    }
+    expect(envSchema.safeParse(development).success).toBe(true)
   })
 })
