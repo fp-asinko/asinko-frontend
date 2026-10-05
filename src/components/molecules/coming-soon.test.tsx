@@ -35,4 +35,23 @@ describe('ComingSoon (H-26)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Profile' }))
     expect(screen.getByRole('status')).toHaveTextContent('Coming soon')
   })
+
+  it('moves the bubble inward when a clipping column would cut it', async () => {
+    // jsdom has no layout: the column clips from x=0 to 300, the bubble would start at -20.
+    const rects = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockImplementation(function (this: HTMLElement) {
+        const box = this.getAttribute('role') === 'status' ? [-20, 60] : [0, 300]
+        return { left: box[0], right: box[1] } as DOMRect
+      })
+    renderWithIntl(
+      // overflowX, not overflowY: jsdom does not derive one from the other as browsers do.
+      <div style={{ overflowX: 'auto' }}>
+        <ComingSoon label="Rules">Rules</ComingSoon>
+      </div>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Rules' }))
+    expect(screen.getByRole('status').style.marginLeft).toBe('24px')
+    rects.mockRestore()
+  })
 })
