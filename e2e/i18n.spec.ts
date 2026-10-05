@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import { settings } from './fixtures/settings'
 
 // F-11, F-13 and H-27 (English first: replaces F-12's browser-language redirect)
 test.describe('locale routing', () => {
@@ -13,12 +14,21 @@ test.describe('locale routing', () => {
     })
   }
 
-  test('the header selector switches language and keeps the filters (H-27)', async ({ page }) => {
+  test('the header selector switches language and keeps the filters (H-27)', async ({
+    page,
+    isMobile,
+  }) => {
     await page.goto('/en?community=btc')
-    await page.getByRole('combobox', { name: 'Language' }).selectOption('es')
+    await (
+      await settings(page, isMobile)
+    )
+      .getByRole('combobox', { name: 'Language' })
+      .selectOption('es')
     await expect(page).toHaveURL(/\/es\?community=btc$/)
     await expect(page.locator('html')).toHaveAttribute('lang', 'es')
-    await expect(page.getByRole('combobox', { name: 'Idioma' })).toHaveValue('es')
+    // On phones the menu closes with the navigation: open it again, now in Spanish.
+    const controls = await settings(page, isMobile, 'Abrir menú')
+    await expect(controls.getByRole('combobox', { name: 'Idioma' })).toHaveValue('es')
   })
 
   for (const [locale, heading] of [

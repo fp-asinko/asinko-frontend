@@ -66,9 +66,12 @@ export function SiteHeader({ menu }: { menu: ReactNode }) {
               </ComingSoon>
             </span>
           </AccountButtons>
-          <LocaleSwitcher />
-          <span className="px-2">
-            <ThemeToggle />
+          {/* Below md they live in the menu panel (MenuSettings): no room next to "Log in". */}
+          <span className="hidden items-center gap-1 md:flex">
+            <LocaleSwitcher />
+            <span className="px-2">
+              <ThemeToggle />
+            </span>
           </span>
         </div>
       </div>

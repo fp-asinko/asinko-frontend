@@ -1,20 +1,23 @@
 import { expect, test } from '@playwright/test'
+import { settings } from './fixtures/settings'
 
 // F-19, F-20, F-21
 test.describe('theme', () => {
   test.use({ colorScheme: 'dark' })
 
-  test('starts light even when the OS is dark', async ({ page }) => {
+  test('starts light even when the OS is dark', async ({ page, isMobile }) => {
     await page.goto('/en')
     await expect(page.locator('html')).not.toHaveClass(/dark/)
-    await expect(page.getByRole('switch', { name: 'Dark mode' })).not.toBeChecked()
+    const controls = await settings(page, isMobile)
+    await expect(controls.getByRole('switch', { name: 'Dark mode' })).not.toBeChecked()
   })
 
   test('the toggle switches to dark with the keyboard and the choice persists', async ({
     page,
+    isMobile,
   }) => {
     await page.goto('/en')
-    const toggle = page.getByRole('switch', { name: 'Dark mode' })
+    const toggle = (await settings(page, isMobile)).getByRole('switch', { name: 'Dark mode' })
     await toggle.focus()
     await page.keyboard.press('Space')
 
@@ -23,7 +26,9 @@ test.describe('theme', () => {
 
     await page.reload()
     await expect(page.locator('html')).toHaveClass(/dark/)
-    await expect(page.getByRole('switch', { name: 'Dark mode' })).toBeChecked()
+    await expect(
+      (await settings(page, isMobile)).getByRole('switch', { name: 'Dark mode' }),
+    ).toBeChecked()
   })
 
   test('the theme is applied by an inline script before the page content (no flicker)', async ({

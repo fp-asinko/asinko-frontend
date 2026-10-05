@@ -1,6 +1,12 @@
 # Experiencia sin sesión — Tasks
 
-> **Estado:** aprobado el 2026-10-05.
+> **Estado:** aprobado y cerrado el 2026-10-05.
+>
+> **Cierre:**
+>
+> - Tests: 527 unitarios y 140 e2e en verde, entre ellos 23 sin sesión (mobile y desktop, axe en claro y oscuro).
+> - JS del Home: 228,1 KB de 230, sin cambios: el modal se carga diferido.
+> - Revisión con `ui-reviewer` aplicada; los detalles, en `design.md § 8`.
 
 ```
 T-01 ─┬─ T-02 ─┬─ T-04 ─ T-06
@@ -21,10 +27,10 @@ T-01 ─┬─ T-02 ─┬─ T-04 ─ T-06
 - [x] **T-04 · Acciones con modal** · M · G-04, G-06
   - Votos de post y de encuesta, composer y Join. Se borran los `needAccount`.
   - **Tests:** sin sesión, nada se marca ni se envía.
-- [ ] **T-05 · e2e sin sesión** · S · G-01, G-04 a G-08
+- [x] **T-05 · e2e sin sesión** · S · G-01, G-04 a G-08
   - Un proyecto de Playwright sin sesión (`API_MOCKS=missing` con los mocks que hagan falta), o un flag de mocks sin usuario demo.
   - **Tests:** `e2e/guest.spec.ts`.
-- [ ] **T-06 · Cierre** · S · G-10, G-12
+- [x] **T-06 · Cierre** · S · G-10, G-12
   - Presupuesto de JS, axe, revisión con `ui-reviewer`, y `api-integration.md` y `specs/home` actualizados.
 
 ## Criterios → tests

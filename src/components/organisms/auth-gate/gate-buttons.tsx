@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useAuthGate } from './auth-gate'
 
-const PILL = 'h-9 rounded-full px-4 type-action'
+// 44px on phones (the main action of the bar), 36px from md. Loose text classes, not type-*:
+// cn does not merge those with the Button base (design-system.md § Tipografía).
+const PILL = 'h-11 rounded-full px-4 text-[0.8125rem] font-semibold md:h-9'
 
 /**
  * "Log in" and "Sign up" in the top bar without a session (G-02); with one, what it already showed

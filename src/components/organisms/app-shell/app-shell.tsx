@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { BottomNav } from './bottom-nav'
+import { MenuSettings } from './menu-settings'
 import { MobileSidebar } from './mobile-sidebar'
 import type { NavItem } from './nav-item.types'
 import { SiteHeader } from './site-header'
@@ -34,7 +35,14 @@ export function AppShell({
       >
         {t('nav.skipToContent')}
       </a>
-      <SiteHeader menu={<MobileSidebar>{sidebar}</MobileSidebar>} />
+      <SiteHeader
+        menu={
+          <MobileSidebar>
+            {sidebar}
+            <MenuSettings />
+          </MobileSidebar>
+        }
+      />
       <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)]">
         <div className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-2 py-2.5 md:block">
           {sidebar}

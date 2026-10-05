@@ -127,7 +127,7 @@ Cuando una ruta se mockea, el cliente la responde desde `src/mocks/` en vez de l
 - **Mock por endpoint**, no todo o nada. Lo que el backend ya tiene (hoy, E01) va siempre contra la API real.
 - `src/env.ts` **rechaza `API_MOCKS` distinto de `false` en producción**: el build falla.
 - Cada ruta declara `implemented`: si el backend ya la tiene (rama `dev` de `asinko-app`). Al implementarse una ruta en el backend, se marca `implemented: true` y deja de mockearse con `missing`.
-- El usuario demo (`getViewer`) existe solo con `true`: con el backend real, las escrituras piden login.
+- El usuario demo (`getViewer`) existe solo con `true`: con el backend real, las escrituras piden login. En ese modo, la cookie `asinko-mock-guest=1` lo apaga en un navegador, para probar la experiencia sin sesión (`specs/guest-experience`).
 - Sin librería de mocking: un registro de rutas (`src/mocks/handlers.ts`) que el cliente consulta antes de ir a la red (menos de ~50 líneas, ver criterio en `libraries.md`).
 - **El cliente aplica a la respuesta del mock la misma validación y el mismo mapeo de errores** que a la real: un mock también prueba ese camino.
 

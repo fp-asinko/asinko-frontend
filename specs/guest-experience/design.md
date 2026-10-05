@@ -74,3 +74,18 @@ function onUpvote() {
   - `site-header` y `join-card` con y sin sesión.
 - **e2e** (`e2e/guest.spec.ts`, el build con `API_MOCKS=missing` sin sesión): votar abre el modal, Esc lo cierra y el foco vuelve, axe con el modal abierto, mobile como panel inferior y presupuesto de JS.
 - Los e2e actuales (con usuario demo) siguen en verde: G-11.
+
+## 8. Ajustes de la implementación
+
+- **Idioma y tema en el menú (mobile):** a 360 px, "Log in" no entraba en la barra, que con sesión ya ocupaba 352 px. Debajo de `md`, `LocaleSwitcher` y `ThemeToggle` pasan al panel del menú (`MenuSettings`), con y sin sesión, como en Reddit y X. Lo decidió el Product Owner el 2026-10-05 y lo encontró el e2e (`scrollWidth` > viewport). Los e2e de tema e idioma abren el menú en mobile (`e2e/fixtures/settings.ts`).
+- **"Following" sin sesión:** no se pide el feed. El estado de "necesita cuenta" sale directo de `getViewer()`, porque el backend lo rechazaría de todos modos. Se quitó `following` de `GatedAction`, ya que la pestaña conserva su página (Q2).
+- **e2e sin sesión:** con `API_MOCKS=true`, la cookie `asinko-mock-guest=1` apaga el usuario demo en ese navegador (`MOCK_GUEST_COOKIE` en `src/lib/session.ts`). Solo se lee en ese modo, que `env.ts` rechaza en producción, y solo puede quitar una sesión, nunca crearla.
+- **El modal:**
+  - Lleva su propio botón de cerrar de 44 px, como el menú, porque el de shadcn mide 28 px.
+  - Ocupa todo el ancho hasta `md` (`sm:max-w-none`; antes, entre 640 y 767 px, quedaba de 384 px).
+  - Las clases de texto van sueltas y no `type-*`, porque `cn` no las combina con las de la base del Dialog y del Button.
+- **Botones de cuenta:** 44 px de alto en mobile y 36 px desde `md`.
+- **`dialog.tsx`** (shadcn, Base UI), con comentarios `asinko:`:
+  - `closeLabel` obligatorio.
+  - Apertura en 200 ms y cierre en 150 ms con `ease-out`.
+  - `DialogFooter` sin el "Close" fijo en inglés.

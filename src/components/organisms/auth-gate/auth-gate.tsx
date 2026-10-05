@@ -4,8 +4,7 @@ import dynamic from 'next/dynamic'
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 
 /** What the visitor was about to do: the modal says it (G-05) and auth resumes it (G-09). */
-export type GatedAction =
-  'vote-post' | 'vote-poll' | 'post' | 'join' | 'following' | 'login' | 'signup'
+export type GatedAction = 'vote-post' | 'vote-poll' | 'post' | 'join' | 'login' | 'signup'
 
 /** The pending action and where to come back after logging in (a relative path, security.md). */
 export type GateRequest = { action: GatedAction; next: string }

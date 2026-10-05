@@ -28,35 +28,35 @@ Que alguien sin cuenta pueda leer todo Asinko sin trabas y, cuando quiera partic
 
 ### Lectura abierta
 
-- [ ] **G-01** Sin sesión se lee todo lo público (feed "For you", filtros, comunidades, comentarios), sin límite de scroll, sin muros y sin carteles que no se puedan cerrar.
+- [x] **G-01** Sin sesión se lee todo lo público (feed "For you", filtros, comunidades, comentarios), sin límite de scroll, sin muros y sin carteles que no se puedan cerrar.
 
 ### Llamados a crear cuenta
 
-- [ ] **G-02** **Barra superior:** sin sesión, el lugar del perfil (hoy deshabilitado) muestra "Log in" y "Sign up". En mobile, solo "Log in", para que entre en 360 px. Con sesión, todo sigue como hoy.
-- [ ] **G-03** **Tarjeta "Join Asinko":** en la columna derecha, arriba de la de tokens, solo sin sesión. Lleva un título, una línea de valor (track record verificable) y los dos botones.
+- [x] **G-02** **Barra superior:** sin sesión, el lugar del perfil (hoy deshabilitado) muestra "Log in" y "Sign up". En mobile, solo "Log in", para que entre en 360 px. Con sesión, todo sigue como hoy. **Ajuste (2026-10-05, decisión del Product Owner):** a 360 px la barra ya ocupaba 352 px y "Log in" no entraba. Debajo de `md`, el idioma y el tema pasan al panel del menú, con y sin sesión.
+- [x] **G-03** **Tarjeta "Join Asinko":** en la columna derecha, arriba de la de tokens, solo sin sesión. Lleva un título, una línea de valor (track record verificable) y los dos botones.
 
 ### Modal contextual
 
-- [ ] **G-04** Sin sesión, estas acciones abren un **modal**, en lugar de un error o de "Coming soon":
+- [x] **G-04** Sin sesión, estas acciones abren un **modal**, en lugar de un error o de "Coming soon":
   - votar un post;
   - votar una encuesta;
   - la caja "What are you thinking?" y sus acciones Post, Thesis y Live;
   - unirse a una comunidad;
   - la pestaña "Following".
-- [ ] **G-05** El modal **dice qué ibas a hacer** ("Vote to make your take count", "Join Asinko to post", etc.) y ofrece "Log in" y "Create account". Hasta que exista `auth`, los dos botones dicen "Coming soon" (H-26).
-- [ ] **G-06** Se cierra con Esc, tocando afuera o con su botón de cerrar. Al cerrarse, el foco vuelve al control que lo abrió. No deja nada a medias: el voto no queda marcado.
-- [ ] **G-07** **Mobile first:** en mobile es un panel que sube desde abajo; desde `md`, un diálogo centrado.
-- [ ] **G-08** **Accesible:** diálogo con título y descripción, foco atrapado mientras está abierto y AA en claro y oscuro.
+- [x] **G-05** El modal **dice qué ibas a hacer** ("Vote to make your take count", "Join Asinko to post", etc.) y ofrece "Log in" y "Create account". Hasta que exista `auth`, los dos botones dicen "Coming soon" (H-26).
+- [x] **G-06** Se cierra con Esc, tocando afuera o con su botón de cerrar. Al cerrarse, el foco vuelve al control que lo abrió. No deja nada a medias: el voto no queda marcado.
+- [x] **G-07** **Mobile first:** en mobile es un panel que sube desde abajo; desde `md`, un diálogo centrado.
+- [x] **G-08** **Accesible:** diálogo con título y descripción, foco atrapado mientras está abierto y AA en claro y oscuro.
 
 ### Base para `auth`
 
-- [ ] **G-09** El modal recibe la acción que lo abrió (por ejemplo `vote-post`) y la página actual, para que `auth` pueda volver ahí después de entrar (`?next=` relativo, `security.md § 5`).
+- [x] **G-09** El modal recibe la acción que lo abrió (por ejemplo `vote-post`) y la página actual, para que `auth` pueda volver ahí después de entrar (`?next=` relativo, `security.md § 5`).
 
 ### Generales
 
-- [ ] **G-10** **Sin peso:** el modal se carga recién la primera vez que hace falta (`next/dynamic`). El JS del Home se queda en ≤ 230 KB.
-- [ ] **G-11** Con sesión (hoy, el usuario demo con `API_MOCKS=true`) nada cambia: no se ven los llamados y las acciones funcionan igual.
-- [ ] **G-12** Textos en en, es y pt.
+- [x] **G-10** **Sin peso:** el modal se carga recién la primera vez que hace falta (`next/dynamic`). El JS del Home se queda en ≤ 230 KB.
+- [x] **G-11** Con sesión (hoy, el usuario demo con `API_MOCKS=true`) nada cambia: no se ven los llamados y las acciones funcionan igual. La única excepción es el ajuste de G-02: en mobile, idioma y tema están en el menú.
+- [x] **G-12** Textos en en, es y pt.
 
 ## Fuera de alcance
 

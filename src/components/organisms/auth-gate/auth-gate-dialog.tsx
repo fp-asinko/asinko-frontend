@@ -1,8 +1,16 @@
 'use client'
 
+import { XIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { ComingSoon } from '@/components/molecules/coming-soon'
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import type { GateRequest } from './auth-gate'
 
 /**
@@ -25,19 +33,31 @@ export function AuthGateDialog({
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
       <DialogContent
-        closeLabel={t('close')}
+        // Own 44px close button, as the menu panel: on phones it is the main way out.
+        showCloseButton={false}
         data-action={request.action}
         // For the auth spec (G-09): where to come back after logging in.
         data-next={request.next}
-        className="top-auto bottom-0 left-0 max-w-none translate-x-0 translate-y-0 gap-5 rounded-b-none px-5 pt-7 pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:top-1/2 md:bottom-auto md:left-1/2 md:max-w-sm md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-b-xl md:px-6 md:pb-6 data-open:slide-in-from-bottom-10 data-open:zoom-in-100 md:data-open:slide-in-from-bottom-0 md:data-open:zoom-in-95 data-closed:slide-out-to-bottom-10 data-closed:zoom-out-100 md:data-closed:slide-out-to-bottom-0 md:data-closed:zoom-out-95"
+        className="top-auto bottom-0 left-0 max-w-none translate-x-0 translate-y-0 gap-5 rounded-b-none px-5 pt-7 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:max-w-none md:top-1/2 md:bottom-auto md:left-1/2 md:max-w-sm md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-b-xl md:px-6 md:pb-6 data-open:slide-in-from-bottom-10 data-open:zoom-in-100 md:data-open:slide-in-from-bottom-0 md:data-open:zoom-in-95 data-closed:slide-out-to-bottom-10 data-closed:zoom-out-100 md:data-closed:slide-out-to-bottom-0 md:data-closed:zoom-out-95"
       >
-        <div className="flex flex-col gap-2 pr-6">
-          <DialogTitle className="type-page-title leading-tight">
+        <DialogClose
+          render={
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 size-11"
+              aria-label={t('close')}
+            />
+          }
+        >
+          <XIcon aria-hidden />
+        </DialogClose>
+        <div className="flex flex-col gap-2 pr-10">
+          {/* Loose classes, not type-*: cn does not merge them with the base text-* (design-system.md). */}
+          <DialogTitle className="text-[1.375rem] leading-tight font-bold">
             {t(`title.${request.action}`)}
           </DialogTitle>
-          <DialogDescription className="type-ui text-muted-foreground">
-            {t('value')}
-          </DialogDescription>
+          <DialogDescription className="leading-normal">{t('value')}</DialogDescription>
         </div>
         {/* Column flex: stretches each coming-soon wrapper (and its button) to the full width. */}
         <div className="flex flex-col gap-2">

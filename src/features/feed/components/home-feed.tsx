@@ -8,11 +8,15 @@ import { FeedView, type FeedState } from './feed-view'
 /**
  * Loads the Home feed on the server. The feed is the page's main content: an unexpected failure
  * throws to error.tsx (with retry); an unknown community is a 404; Following without an account
- * shows its own state.
+ * shows its own state, without asking the backend what it would refuse (specs/guest-experience Q2).
  */
 export async function HomeFeed({ searchParams }: { searchParams: Promise<unknown> }) {
   const params = parseFeedParams(await searchParams)
-  const [viewer, result] = await Promise.all([getViewer(), getFeed(params)])
+  const viewer = await getViewer()
+  if (params.feed === 'following' && !viewer) {
+    return <FeedView params={params} state={{ status: 'needs-account' }} viewerName={null} />
+  }
+  const result = await getFeed(params)
 
   if (!result.ok) {
     if (result.code === 'NOT_FOUND' && params.community) notFound()
