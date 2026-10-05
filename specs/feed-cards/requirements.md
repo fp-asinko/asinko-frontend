@@ -68,13 +68,13 @@ Que cada tarjeta del feed transmita identidad (quién, dónde) y que votar o lee
 
 ## Revisión 1 — Encuestas como el prototipo (2026-10-03)
 
-> **Estado:** para aprobar. Pedido del Product Owner después de ver las encuestas con datos reales: colores muy fuertes, filas muy altas, consenso poco visible y botones de antes de votar que no convencen. Reemplaza FC-04 y FC-06, mueve FC-05 y deja sin efecto D-C1 y D-C2 (`design.md § 12`). Medidas tomadas del prototipo en el navegador, a 1280 y a 360 px.
+> **Estado:** aprobado el 2026-10-05 con R1-Q1 a R1-Q3 como se proponen. Pedido del Product Owner después de ver las encuestas con datos reales: colores muy fuertes, filas muy altas, consenso poco visible y botones de antes de votar que no convencen. Reemplaza FC-04 y FC-06, mueve FC-05 y deja sin efecto D-C1 y D-C2 (`design.md § 12`). Medidas tomadas del prototipo en el navegador, a 1280 y a 360 px.
 
-- [ ] **FC-15** **Resultados compactos:** una fila por opción, con cuadrado de color, etiqueta, barra en el medio y porcentaje. Todo va dentro de un recuadro con fondo degradado y una línea fina de colores arriba. A 360 px la barra se achica y la etiqueta nunca se corta.
-- [ ] **FC-16** **Color con jerarquía:** las opciones van en tono suave, con texto secundario. La tuya, si votaste, va en color pleno, negrita y texto principal. Sin voto propio, todas quedan suaves.
-- [ ] **FC-17** **Consenso arriba:** si votaste, un banner encabeza el recuadro. Tiene un título grande ("El 50 % de la comunidad piensa como vos") y un subtítulo según el tramo: mayoría, minoría o empate.
-- [ ] **FC-18** **Antes de votar** (resultados ocultos): botones limpios a lo ancho, con borde y esquinas redondeadas, sin marcador ni color. Al pasar el mouse cambian de fondo; con foco, muestran anillo.
-- [ ] **FC-19** **Logo:** el de la encuesta es un cuadrado de esquinas redondeadas, como el del activo en el prototipo, no un círculo.
+- [x] **FC-15** **Resultados compactos:** una fila por opción, con cuadrado de color, etiqueta, barra en el medio y porcentaje. Todo va dentro de un recuadro con fondo degradado y una línea fina de colores arriba. A 360 px la barra se achica y la etiqueta nunca se corta.
+- [x] **FC-16** **Color con jerarquía:** las opciones van en tono suave, con texto secundario. La tuya, si votaste, va en color pleno, negrita y texto principal. Sin voto propio, todas quedan suaves.
+- [x] **FC-17** **Consenso arriba:** si votaste, un banner encabeza el recuadro. Tiene un título grande ("50% of the community thinks like you") y un subtítulo según el tramo: mayoría, minoría o empate.
+- [x] **FC-18** **Antes de votar** (resultados ocultos): botones limpios a lo ancho, con borde y esquinas redondeadas, sin marcador ni color. Al pasar el mouse cambian de fondo; con foco, muestran anillo.
+- [x] **FC-19** **Logo:** el de la encuesta es un cuadrado de esquinas redondeadas, como el del activo en el prototipo, no un círculo.
 
 | #     | Pregunta                                                                                             | Propuesta                                                                                                                                                                                                                     |
 | ----- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

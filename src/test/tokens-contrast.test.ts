@@ -85,8 +85,11 @@ const TEXT_PAIRS: Array<[string, string]> = [
   // Feed cards (FC-12): initials on the lighter stop of each avatar gradient, consensus and accuracy.
   ...AVATARS.map((n): [string, string] => [`avatar-${n}-foreground`, `avatar-${n}`]),
   ...AVATARS.map((n): [string, string] => [`avatar-${n}-foreground`, `avatar-${n}-to`]),
-  ['consensus-majority-foreground', 'consensus-majority'],
-  ['consensus-minority-foreground', 'consensus-minority'],
+  // The consensus banner: title in the main color, subtitle secondary (feed-cards § 12).
+  ['foreground', 'consensus-majority'],
+  ['muted-foreground', 'consensus-majority'],
+  ['foreground', 'consensus-minority'],
+  ['muted-foreground', 'consensus-minority'],
   ['accuracy-high-foreground', 'accuracy-high'],
   ['accuracy-mid-foreground', 'accuracy-mid'],
   ['accuracy-low-foreground', 'accuracy-low'],

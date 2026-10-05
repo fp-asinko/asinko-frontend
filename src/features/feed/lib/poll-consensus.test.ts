@@ -36,8 +36,8 @@ describe('pollConsensus (FC-05)', () => {
     ).toBe('minority')
   })
 
-  it('stays quiet with fewer than 10 votes, without a vote or with hidden results', () => {
-    expect(pollConsensus({ options: options(6, 3), viewerOptionId: '0', totalVotes: 9 })).toBeNull()
+  it('stays quiet with fewer than 5 votes (R1-Q1), without a vote or with hidden results', () => {
+    expect(pollConsensus({ options: options(3, 1), viewerOptionId: '0', totalVotes: 4 })).toBeNull()
     expect(
       pollConsensus({ options: options(7, 3), viewerOptionId: null, totalVotes: 10 }),
     ).toBeNull()

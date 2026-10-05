@@ -132,7 +132,7 @@ describe('PollVoting (H-13, H-15)', () => {
     })
   })
 
-  describe('color and consensus (feed-cards)', () => {
+  describe('polls like the prototype (feed-cards revision 1)', () => {
     const results = (viewerOptionId: string) => ({
       ok: true,
       data: {
@@ -145,74 +145,97 @@ describe('PollVoting (H-13, H-15)', () => {
         resultsVisible: true,
       },
     })
+    const consensusOf = (container: HTMLElement) => container.querySelector('[data-consensus]')
 
-    it('gives each option its own color and a bar (FC-04)', () => {
-      const { container } = renderPoll(pollItem())
-      const markers = [...container.querySelectorAll('[data-marker]')].map((m) => m.className)
-      expect(new Set(markers).size).toBe(2)
-      expect(container.querySelectorAll('[data-bar]')).toHaveLength(2)
-    })
-
-    it('marks the voted option and keeps the box geometry: no bars before results', () => {
+    it('shows clean buttons, without squares or bars, while the results are hidden (FC-18)', () => {
       const { container } = renderPoll()
-      expect(container.querySelectorAll('[data-marker]')).toHaveLength(2)
+      expect(screen.getByRole('button', { name: 'Yes' })).toBeInTheDocument()
+      expect(container.querySelector('[data-marker]')).toBeNull()
       expect(container.querySelector('[data-bar]')).toBeNull()
     })
 
-    it('says where the vote stands only once the server answers (FC-05)', async () => {
+    it('shows soft rows, each a button to vote, when the results are visible without a vote (R1-Q3)', () => {
+      const { container } = renderPoll(pollItem())
+      const markers = [...container.querySelectorAll('[data-marker]')]
+      expect(markers).toHaveLength(2)
+      expect(container.querySelectorAll('[data-bar]')).toHaveLength(2)
+      // Each option its own color, all soft: nobody voted (FC-16).
+      expect(new Set(markers.map((marker) => marker.className.match(/bg-poll-\d/)?.[0])).size).toBe(
+        2,
+      )
+      for (const marker of markers) expect(marker).toHaveClass('opacity-45')
+      expect(screen.getByRole('button', { name: /Above 150K/ })).toHaveAttribute(
+        'aria-pressed',
+        'false',
+      )
+    })
+
+    it('brings the viewer vote to full color and bold, the rest stays soft (FC-16)', () => {
+      const { container } = renderPoll(pollItem({ viewerOptionId: 'b' }))
+      const [other, mine] = [...container.querySelectorAll('[data-marker]')]
+      expect(other).toHaveClass('opacity-45')
+      expect(mine).not.toHaveClass('opacity-45')
+      expect(screen.getByRole('button', { name: /Below 150K/ })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      )
+    })
+
+    it('keeps the focused option when a vote turns the buttons into rows (WCAG 2.4.3)', async () => {
+      action.votePoll.mockResolvedValue(results('a'))
+      renderPoll()
+      const yes = screen.getByRole('button', { name: 'Yes' })
+      await userEvent.click(yes)
+      await screen.findByText('80%')
+      expect(yes).toBeInTheDocument()
+      expect(yes).toHaveFocus()
+    })
+
+    it('heads the results with the consensus once the server answers (FC-17)', async () => {
       let answer: (value: unknown) => void = () => {}
       action.votePoll.mockReturnValue(new Promise((resolve) => (answer = resolve)))
-      renderPoll()
+      const { container } = renderPoll()
 
       await userEvent.click(screen.getByRole('button', { name: 'No' }))
-      expect(screen.queryByText(/minority/)).toBeNull()
+      expect(consensusOf(container)).toBeNull()
 
       answer(results('b'))
-      const message = await screen.findByText('You are in the minority: 20% chose the same', {
-        selector: 'p',
-      })
-      expect(message).toHaveClass('animate-fade-up', 'delay-after-bars')
+      await screen.findByText('20%')
+      const banner = consensusOf(container)!
+      expect(banner).toHaveTextContent('20% of the community thinks like you')
+      expect(banner).toHaveTextContent('You are in the minority. Early, or wrong?')
+      expect(banner).toHaveClass('animate-fade-up', 'delay-after-bars')
+      // Above the rows, as in the prototype.
+      const list = container.querySelector('ul')!
+      expect(banner.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
       // Inserted text is not read: the live region says it with the saved vote (WCAG 4.1.3).
       expect(screen.getByRole('status')).toHaveTextContent(
-        'Vote saved. You are in the minority: 20% chose the same',
+        'Vote saved. 20% of the community thinks like you. You are in the minority. Early, or wrong?',
       )
     })
 
     it('enters again at once when a changed vote changes the tier', async () => {
       action.votePoll.mockResolvedValueOnce(results('b')).mockResolvedValueOnce(results('a'))
-      renderPoll()
+      const { container } = renderPoll()
 
       await userEvent.click(screen.getByRole('button', { name: 'No' }))
       await screen.findByText(/minority/, { selector: 'p' })
       await userEvent.click(screen.getByRole('button', { name: /Yes/ }))
-      const majority = await screen.findByText('You voted with the majority: 80% chose the same', {
+      await screen.findByText('You are with the majority. Is the consensus right?', {
         selector: 'p',
       })
-      expect(majority).toHaveClass('animate-fade-up')
-      expect(majority).not.toHaveClass('delay-after-bars')
-    })
-
-    it('accents a votable option with its color on hover and focus, not a locked one (FC-06)', async () => {
-      action.votePoll.mockResolvedValue(results('a'))
-      renderPoll({ ...hidden, allowVoteChange: false })
-      const yes = screen.getByRole('button', { name: 'Yes' })
-      expect(yes.className).toMatch(/focus-visible:border-poll-1/)
-
-      await userEvent.click(yes)
-      await screen.findByText(/majority/, { selector: 'p' })
-      expect(yes).toHaveAttribute('aria-disabled', 'true')
-      expect(yes.className).not.toMatch(/border-poll/)
+      expect(consensusOf(container)).toHaveClass('animate-fade-up')
+      expect(consensusOf(container)).not.toHaveClass('delay-after-bars')
     })
 
     it('shows the consensus of a vote cast earlier at once, without animation', () => {
-      renderPoll(pollItem({ viewerOptionId: 'b' }))
-      expect(screen.getByText('You voted with the majority: 75% chose the same')).not.toHaveClass(
-        'animate-fade-up',
-      )
+      const { container } = renderPoll(pollItem({ viewerOptionId: 'b' }))
+      expect(consensusOf(container)).toHaveTextContent('75% of the community thinks like you')
+      expect(consensusOf(container)).not.toHaveClass('animate-fade-up')
     })
 
-    it('stays quiet below 10 votes (Q2)', () => {
-      renderPoll(
+    it('stays quiet below 5 votes (R1-Q1)', () => {
+      const { container } = renderPoll(
         pollItem({
           viewerOptionId: 'a',
           totalVotes: 4,
@@ -222,7 +245,20 @@ describe('PollVoting (H-13, H-15)', () => {
           ],
         }),
       )
-      expect(screen.queryByText(/majority/)).toBeNull()
+      expect(consensusOf(container)).toBeNull()
+    })
+
+    it('says when the community is split', () => {
+      const tie = pollItem({
+        viewerOptionId: 'a',
+        totalVotes: 10,
+        options: [
+          { id: 'a', label: 'Yes', votes: 5, share: 0.5 },
+          { id: 'b', label: 'No', votes: 5, share: 0.5 },
+        ],
+      })
+      const { container } = renderPoll(tie)
+      expect(consensusOf(container)).toHaveTextContent('The community is split down the middle.')
     })
   })
 })

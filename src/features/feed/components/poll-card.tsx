@@ -41,7 +41,12 @@ export function PollCard({ poll }: { poll: PollItem }) {
       {/* FC-02: the community logo next to the question, like the asset logo of the prototype. */}
       <div className="flex items-start gap-3">
         {poll.community && (
-          <UserAvatar name={poll.community.handle} colorKey={poll.community.slug} size="xl" />
+          <UserAvatar
+            name={poll.community.handle}
+            colorKey={poll.community.slug}
+            size="xl"
+            className="rounded-md"
+          />
         )}
         <h2 id={`poll-${poll.id}`} className="min-w-0 flex-1 type-post-title font-medium">
           {poll.question}

@@ -139,9 +139,10 @@
       "hidden": "Vote para ver os resultados",
       "yourVote": "Seu voto",
       "consensus": {
-        "majority": "Você votou com a maioria: {percent} escolheu o mesmo",
-        "minority": "Você está na minoria: {percent} escolheu o mesmo",
-        "tie": "Deu empate: {percent} escolheu o mesmo"
+        "title": "{percent} da comunidade pensa como você",
+        "majority": "Você está com a maioria. O consenso está certo?",
+        "minority": "Você está na minoria. Adiantado ou errado?",
+        "tie": "A comunidade está dividida ao meio."
       }
     },
     "empty": {

@@ -1,7 +1,7 @@
 import type { PollResults } from '../feed.types'
 
-/** Below this many votes "the majority" is a handful of people: only the results show (Q2). */
-export const CONSENSUS_MIN_VOTES = 10
+/** Below this many votes "the majority" is a handful of people: only the results show (R1-Q1). */
+export const CONSENSUS_MIN_VOTES = 5
 
 export type Consensus = { tier: 'majority' | 'minority' | 'tie'; share: number }
 

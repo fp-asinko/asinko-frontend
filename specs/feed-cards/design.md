@@ -256,7 +256,7 @@ Surgieron al implementar o en las revisiones de cierre (`ui-reviewer` y una revi
 
 ## 12. Revisión 1 — Encuestas como el prototipo (2026-10-03)
 
-> **Estado:** para aprobar junto con la Revisión 1 de los requisitos (FC-15 a FC-19). Reemplaza § 5.2, mueve el consenso de § 5.3 y deja sin efecto D-C1 y D-C2.
+> **Estado:** aprobado el 2026-10-05 (FC-15 a FC-19). Reemplaza § 5.2, mueve el consenso de § 5.3 y deja sin efecto D-C1 y D-C2.
 
 ### 12.1 Medidas del prototipo
 
@@ -296,3 +296,11 @@ Surgieron al implementar o en las revisiones de cierre (`ui-reviewer` y una revi
 ### 12.4 Qué se va
 
 El marcador de radio y leyenda (D-C1), el acento de color en hover (FC-06), el ✓ y su "pop", y las barras bajo la etiqueta. El "pop" pasa al cuadrado de tu opción.
+
+### 12.5 Ajustes de la implementación (2026-10-05)
+
+- **Foco:** los dos estados comparten el mismo árbol (`div > ul > li > button`). Al votar con resultados ocultos, el botón con foco pasa a ser la fila de esa misma opción y no se desmonta. Lo prueba `poll-voting.test.tsx`.
+- **Título del banner:** va en `--foreground` y el subtítulo en `--muted-foreground`, como en el prototipo. Los tokens `--consensus-*-foreground` de § 2.3 quedaron sin uso y se borraron. El test de contraste mide ahora título y subtítulo sobre cada fondo.
+- **Filas:** cuando se puede votar, la fila entera es el botón (`min-h-6`, 24 px, WCAG 2.5.8). Para que el texto quede alineado con el recuadro, ocupa el ancho más 6 px a cada lado (`-mx-1.5`).
+- **Etiquetas largas:** a 360 px, o con etiquetas como "Between 100,000 and 150,000 USD", ocupan dos líneas y la fila crece. El e2e de alto (≤ 24 px) usa la encuesta de DeFi, que tiene etiquetas cortas.
+- **Español:** el título es "El {percent} de la comunidad piensa como tú", en tuteo como el resto de `es.json`.

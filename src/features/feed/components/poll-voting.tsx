@@ -1,6 +1,5 @@
 'use client'
 
-import { CheckIcon, UsersIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { useOptimistic, useState, useTransition, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
@@ -8,47 +7,22 @@ import { votePoll } from '../actions/vote-poll.action'
 import type { PollItem, PollResults } from '../feed.types'
 import { pollConsensus, type Consensus } from '../lib/poll-consensus'
 
-// One color per option (FC-04), repeated after 6: the label and the percentage carry the meaning.
+// One color per option (FC-15), repeated after 6: the label and the percentage carry the meaning.
 // Full class names, never interpolated, so Tailwind generates them.
 const OPTION_COLORS = [
-  {
-    fill: 'bg-poll-1',
-    accent: 'hover:border-poll-1 focus-visible:border-poll-1',
-    marker: 'group-hover:border-poll-1 group-focus-visible:border-poll-1',
-  },
-  {
-    fill: 'bg-poll-2',
-    accent: 'hover:border-poll-2 focus-visible:border-poll-2',
-    marker: 'group-hover:border-poll-2 group-focus-visible:border-poll-2',
-  },
-  {
-    fill: 'bg-poll-3',
-    accent: 'hover:border-poll-3 focus-visible:border-poll-3',
-    marker: 'group-hover:border-poll-3 group-focus-visible:border-poll-3',
-  },
-  {
-    fill: 'bg-poll-4',
-    accent: 'hover:border-poll-4 focus-visible:border-poll-4',
-    marker: 'group-hover:border-poll-4 group-focus-visible:border-poll-4',
-  },
-  {
-    fill: 'bg-poll-5',
-    accent: 'hover:border-poll-5 focus-visible:border-poll-5',
-    marker: 'group-hover:border-poll-5 group-focus-visible:border-poll-5',
-  },
-  {
-    fill: 'bg-poll-6',
-    accent: 'hover:border-poll-6 focus-visible:border-poll-6',
-    marker: 'group-hover:border-poll-6 group-focus-visible:border-poll-6',
-  },
+  'bg-poll-1',
+  'bg-poll-2',
+  'bg-poll-3',
+  'bg-poll-4',
+  'bg-poll-5',
+  'bg-poll-6',
 ] as const
 
+// The banner tint (FC-17); its title is in the main text color, as in the prototype.
 const CONSENSUS_CLASSES: Record<Consensus['tier'], string> = {
-  majority:
-    'border-consensus-majority-border bg-consensus-majority text-consensus-majority-foreground',
-  minority:
-    'border-consensus-minority-border bg-consensus-minority text-consensus-minority-foreground',
-  tie: 'border-border bg-surface text-foreground',
+  majority: 'border-consensus-majority-border bg-consensus-majority',
+  minority: 'border-consensus-minority-border bg-consensus-minority',
+  tie: 'border-border bg-surface',
 }
 
 type Props = Pick<
@@ -73,8 +47,10 @@ type Props = Pick<
  * server's answer. A closed poll, or one that does not allow changing a cast vote, is read-only.
  * Options that started as buttons stay buttons (aria-disabled once locked), so the focused option
  * is never unmounted (WCAG 2.4.3); the saved vote is announced in a live region.
- * Color and motion (specs/feed-cards § 5): the box keeps its geometry before and after voting, so
- * results that arrive seconds later never move the card; only colors and contents change.
+ * Look (specs/feed-cards § 12, as the prototype): clean buttons while the results are hidden;
+ * otherwise compact rows (square, label, bar, percent) in a box, soft except the viewer's vote,
+ * under the consensus banner. Both states share one tree (div > ul > li > button), so the button
+ * with focus survives the change.
  */
 export function PollVoting({
   id,
@@ -128,11 +104,12 @@ export function PollVoting({
 
   // From the server results only (never the optimistic choice); dimmed while a new vote travels.
   const consensus = pollConsensus(results)
-  const consensusText = consensus
-    ? t(`consensus.${consensus.tier}`, {
+  const consensusTitle = consensus
+    ? t('consensus.title', {
         percent: format.number(consensus.share, { style: 'percent', maximumFractionDigits: 0 }),
       })
     : null
+  const consensusText = consensus ? t(`consensus.${consensus.tier}`) : null
   const hasResults = shown.options.some((option) => option.share !== null)
 
   const footer = [
@@ -143,88 +120,116 @@ export function PollVoting({
 
   return (
     <>
-      {/* The results box (FC-04): always there, transparent until there are results. */}
       <div
         className={cn(
-          'mt-3.5 rounded-xl border p-1.5 transition-colors duration-150 ease-out',
-          hasResults ? 'bg-linear-to-b from-surface to-card' : 'border-transparent',
+          'relative mt-3.5',
+          // The results box (FC-15): gradient, border and a thin line of the option colors on top.
+          hasResults &&
+            'overflow-hidden rounded-lg border bg-linear-to-b from-surface to-card p-3.5',
         )}
       >
-        <ul data-revealed={revealed || undefined} className="flex flex-col gap-1.5">
+        {hasResults && (
+          <span
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-poll-1 via-poll-2 to-poll-3"
+          />
+        )}
+        {consensus && (
+          <div
+            // Remounts (and enters again) only when a changed vote changes the tier. Inserted text
+            // is not announced: the live region below says it together with the saved vote.
+            key={consensus.tier}
+            data-consensus={consensus.tier}
+            className={cn(
+              'mb-3 rounded-lg border px-4 pt-3.5 pb-3 transition-opacity duration-150 ease-out',
+              CONSENSUS_CLASSES[consensus.tier],
+              pending && 'opacity-60',
+              consensusEntry === 'after-bars' && 'animate-fade-up delay-after-bars',
+              consensusEntry === 'now' && 'animate-fade-up',
+            )}
+          >
+            <p className="text-base font-bold text-foreground">{consensusTitle}</p>
+            <p className="mt-0.5 type-meta text-muted-foreground italic">{consensusText}</p>
+          </div>
+        )}
+        <ul
+          data-revealed={revealed || undefined}
+          className={cn('flex flex-col', hasResults ? 'gap-1.5' : 'gap-2')}
+        >
           {shown.options.map((option, index) => {
             const mine = option.id === shown.viewerOptionId
-            const color = OPTION_COLORS[index % OPTION_COLORS.length] ?? OPTION_COLORS[0]
+            const fill = OPTION_COLORS[index % OPTION_COLORS.length] ?? OPTION_COLORS[0]
+            // FC-16: soft unless it is the viewer's vote.
+            const soft = !mine && 'opacity-45'
             const percent =
               option.share === null
                 ? null
                 : format.number(option.share, { style: 'percent', maximumFractionDigits: 0 })
-            const content = (
-              <>
-                <span className="flex items-center justify-between gap-3">
-                  <span className="flex min-w-0 items-center gap-2">
-                    {/* D-C1: a radio before voting, the legend square after; never moves the label. */}
-                    <span
-                      aria-hidden
-                      data-marker
-                      className={cn(
-                        'flex size-4 shrink-0 items-center justify-center rounded-xs border transition-colors duration-150 ease-out',
-                        option.share !== null
-                          ? cn('border-transparent text-card', color.fill)
-                          : mine
-                            ? 'border-foreground bg-foreground text-background'
-                            : cn('border-input', canVote && color.marker),
-                        // The voted marker was already there: it changes color, it does not blink.
-                        revealed && option.share !== null && !mine && 'animate-fade-in',
-                      )}
-                    >
-                      {mine && (
-                        <CheckIcon
-                          strokeWidth={3}
-                          className={cn('size-3', lastVotedId === option.id && 'animate-vote-pop')}
-                        />
-                      )}
-                    </span>
-                    <span className={cn('min-w-0', mine && 'font-bold text-foreground')}>
-                      {option.label}
-                    </span>
-                    {mine && !asButtons && <span className="sr-only">({t('yourVote')})</span>}
-                  </span>
-                  {percent && (
-                    <span
-                      className={cn(
-                        'shrink-0 tabular-nums',
-                        mine ? 'font-bold text-foreground' : 'text-muted-foreground',
-                        revealed && 'animate-fade-in',
-                      )}
-                    >
-                      {percent}
-                    </span>
-                  )}
+            const yourVote = mine && !asButtons && (
+              <span className="sr-only"> ({t('yourVote')})</span>
+            )
+            const content =
+              option.share === null ? (
+                // FC-18: a clean button (or, closed, a clean row) while the results are hidden.
+                <span className="block min-w-0">
+                  {option.label}
+                  {yourVote}
                 </span>
-                {option.share !== null && (
-                  // Thin bar in the bottom padding (no layout change): full width, scaled to its
-                  // share on the GPU. Grows from 0 when revealed; a later vote transitions it.
+              ) : (
+                <span className="grid grid-cols-[0.625rem_minmax(0,8.75rem)_1fr_2.25rem] items-center gap-2">
+                  <span
+                    aria-hidden
+                    data-marker
+                    className={cn(
+                      'size-2.5 rounded-xs',
+                      fill,
+                      soft,
+                      revealed && !mine && 'animate-fade-in',
+                      // The pop moved here from the check (§ 12.4), on the tap that chose it.
+                      mine && lastVotedId === option.id && 'animate-vote-pop',
+                    )}
+                  />
+                  <span className={cn('min-w-0', mine && 'font-semibold text-foreground')}>
+                    {option.label}
+                    {yourVote}
+                  </span>
                   <span
                     aria-hidden
                     data-bar
-                    className="absolute inset-x-3.5 bottom-1.5 h-1.5 overflow-hidden rounded-full bg-poll-track"
+                    className="block h-2 overflow-hidden rounded-full bg-poll-track"
                   >
+                    {/* Full width, scaled to its share on the GPU: grows from 0 when revealed, a
+                        later vote transitions it. */}
                     <span
                       className={cn(
-                        'block size-full origin-left transition-transform duration-600 ease-bars',
-                        color.fill,
+                        'block size-full origin-left transition-[transform,opacity] duration-600 ease-bars',
+                        fill,
+                        soft,
                         revealed && 'animate-bar-grow',
                       )}
                       style={{ transform: `scaleX(${option.share})` }}
                     />
                   </span>
-                )}
-              </>
-            )
+                  <span
+                    className={cn(
+                      'text-right tabular-nums',
+                      mine && 'font-semibold text-foreground',
+                      revealed && 'animate-fade-in',
+                    )}
+                  >
+                    {percent}
+                  </span>
+                </span>
+              )
             const box = cn(
               // A locked option does not press in: nothing happens when tapped.
-              'group tap relative block w-full rounded-lg border px-3.5 pt-2.5 pb-4.5 text-left type-ui font-medium aria-disabled:active:scale-100',
-              hasResults ? 'border-transparent' : mine && 'border-foreground',
+              'tap block w-full text-left aria-disabled:active:scale-100',
+              option.share === null
+                ? cn(
+                    'rounded-lg border px-3.5 py-2.5 type-ui font-medium',
+                    mine && 'border-foreground font-semibold',
+                  )
+                : '-mx-1.5 min-h-6 w-[calc(100%+0.75rem)] rounded-md px-1.5 py-0.5 type-action font-medium text-muted-foreground',
             )
             return (
               <li key={option.id}>
@@ -237,9 +242,7 @@ export function PollVoting({
                     className={cn(
                       box,
                       'outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                      // FC-06: the option's color on hover and focus, while it can still be chosen.
-                      canVote &&
-                        cn(hasResults ? 'hover:bg-card' : 'hover:bg-surface', color.accent),
+                      canVote && (option.share === null ? 'hover:bg-surface' : 'hover:bg-card'),
                       pending && 'cursor-wait',
                     )}
                   >
@@ -252,32 +255,18 @@ export function PollVoting({
             )
           })}
         </ul>
-        {consensus && (
-          <p
-            // Remounts (and enters again) only when a changed vote changes the tier. Inserted text is
-            // not announced: the live region below says it together with the saved vote.
-            key={consensus.tier}
-            data-consensus={consensus.tier}
-            className={cn(
-              'mt-1.5 flex items-center gap-2 rounded-md border px-3 py-2 type-action',
-              CONSENSUS_CLASSES[consensus.tier],
-              'transition-opacity duration-150 ease-out',
-              pending && 'opacity-60',
-              consensusEntry === 'after-bars' && 'animate-fade-up delay-after-bars',
-              consensusEntry === 'now' && 'animate-fade-up',
-            )}
-          >
-            <UsersIcon aria-hidden className="size-4 shrink-0" />
-            {consensusText}
-          </p>
-        )}
       </div>
       {/* Two whole sentences, never fragments of one: "Vote saved." and the consensus (WCAG 4.1.3). */}
       <p role="status" className="sr-only">
         {saved && (
           <>
             <span>{tv('saved')}</span>
-            {consensusText && <span> {consensusText}</span>}
+            {consensus && (
+              <span>
+                {' '}
+                {consensusTitle}. {consensusText}
+              </span>
+            )}
           </>
         )}
       </p>

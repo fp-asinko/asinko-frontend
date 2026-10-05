@@ -99,10 +99,8 @@
   --poll-track: var(--muted);
   /* Consensus after voting: teal (far from the up green) and the violet of --interesting. */
   --consensus-majority: #e6f7f3;
-  --consensus-majority-foreground: #0f5f55;
   --consensus-majority-border: #99e6d6;
   --consensus-minority: #f1edfe;
-  --consensus-minority-foreground: #5b32c2;
   --consensus-minority-border: #d9ccfb;
   /* Accuracy tiers: tinted chip with dark text of the same hue (white on gold was 3.16:1). */
   --accuracy-high: #e4f4e8;
@@ -185,10 +183,8 @@
   --poll-5: #f772b7;
   --poll-6: #e0a957;
   --consensus-majority: #10302b;
-  --consensus-majority-foreground: #7ee0cc;
   --consensus-majority-border: #1e5249;
   --consensus-minority: #231c3d;
-  --consensus-minority-foreground: #c4b2ff;
   --consensus-minority-border: #3c2f6b;
   --accuracy-high: #173424;
   --accuracy-high-foreground: #7fd99b;
@@ -276,10 +272,8 @@
   --color-poll-6: var(--poll-6);
   --color-poll-track: var(--poll-track);
   --color-consensus-majority: var(--consensus-majority);
-  --color-consensus-majority-foreground: var(--consensus-majority-foreground);
   --color-consensus-majority-border: var(--consensus-majority-border);
   --color-consensus-minority: var(--consensus-minority);
-  --color-consensus-minority-foreground: var(--consensus-minority-foreground);
   --color-consensus-minority-border: var(--consensus-minority-border);
   --color-accuracy-high: var(--accuracy-high);
   --color-accuracy-high-foreground: var(--accuracy-high-foreground);

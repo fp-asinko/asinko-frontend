@@ -70,11 +70,11 @@ T-01 ─┬─ T-02 ─ T-03
 
 ## Revisión 1 — Encuestas como el prototipo
 
-- [ ] **T-09 · Resultados compactos y jerarquía de color** · M · FC-15, FC-16, FC-18, FC-19
+- [x] **T-09 · Resultados compactos y jerarquía de color** · M · FC-15, FC-16, FC-18, FC-19
   - `PollVoting` con los estados de § 12.2, filas en grilla, botones limpios y logo cuadrado.
   - **Tests:** `poll-voting.test.tsx` cubre los cuatro estados de § 12.2, que la tuya se anuncie como "(your vote)" y que el foco se conserve al pasar de botón a fila. El e2e de geometría se reemplaza por uno que verifica que cada fila de resultados mide 24 px o menos.
-- [ ] **T-10 · Banner de consenso** · S · FC-17
+- [x] **T-10 · Banner de consenso** · S · FC-17
   - Banner arriba, título y subtítulo, mínimo de 5 votos y mensajes en en, es y pt.
   - **Tests:** `poll-consensus.test.ts` con el mínimo nuevo, `poll-voting.test.tsx` y `e2e/feed-cards.spec.ts`.
-- [ ] **T-11 · Cierre de la revisión** · S
+- [x] **T-11 · Cierre de la revisión** · S
   - axe en claro y oscuro, presupuesto de JS y capturas a 360 y 1280 px comparadas con el prototipo.

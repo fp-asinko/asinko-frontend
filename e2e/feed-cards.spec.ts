@@ -8,31 +8,31 @@ const card = (page: Page, text: string) => articles(page).filter({ hasText: text
 const DEFI = 'How much of your portfolio is in DeFi?'
 
 test.describe('Feed cards', () => {
-  test('voting colors the results and says where the vote stands, after the bars (FC-04, FC-05, FC-09)', async ({
+  test('voting turns the buttons into compact rows under the consensus, after the bars (FC-15, FC-17, FC-09)', async ({
     page,
   }) => {
     await page.goto('/en?filter=polls')
     const poll = card(page, DEFI)
-    const options = poll.getByRole('list').first()
-    const before = await options.boundingBox()
-
     await poll.getByRole('button', { name: '1–10%' }).click()
 
     const consensus = poll
       .locator('[data-consensus]')
-      .filter({ hasText: /You voted with the majority: \d+% chose the same/ })
+      .filter({ hasText: /\d+% of the community thinks like you/ })
     await expect(consensus).toBeVisible()
+    await expect(consensus).toContainText('You are with the majority. Is the consensus right?')
     expect(await consensus.evaluate((el) => getComputedStyle(el).animationDelay)).toBe('0.4s')
     await expect(poll.locator('[data-bar]')).toHaveCount(4)
-    // D-C1: results arrive without moving the options.
-    expect((await options.boundingBox())?.height).toBe(before?.height)
+    // FC-15: one compact row per option, as the prototype (20px rows, 24px targets).
+    for (const option of await poll.getByRole('listitem').all()) {
+      expect((await option.boundingBox())!.height).toBeLessThanOrEqual(24)
+    }
   })
 
   test('a vote cast earlier shows its consensus at once', async ({ page }) => {
     await page.goto('/en?filter=polls')
     const consensus = card(page, 'Next Fed move?')
       .locator('[data-consensus]')
-      .filter({ hasText: /chose the same/ })
+      .filter({ hasText: /of the community thinks like you/ })
     await expect(consensus).toBeVisible()
     expect(await consensus.evaluate((el) => getComputedStyle(el).animationName)).toBe('none')
   })
@@ -70,7 +70,7 @@ test.describe('Feed cards', () => {
       const poll = card(page, DEFI)
       await poll.getByRole('button', { name: '1–10%' }).click()
       await expect(
-        poll.locator('[data-consensus]').filter({ hasText: /chose the same/ }),
+        poll.locator('[data-consensus]').filter({ hasText: /of the community thinks like you/ }),
       ).toBeVisible()
 
       await expectNoA11yViolations(page)
@@ -85,7 +85,9 @@ test.describe('Feed cards with reduced motion (FC-11)', () => {
     await page.goto('/en?filter=polls')
     const poll = card(page, DEFI)
     await poll.getByRole('button', { name: '1–10%' }).click()
-    const consensus = poll.locator('[data-consensus]').filter({ hasText: /chose the same/ })
+    const consensus = poll
+      .locator('[data-consensus]')
+      .filter({ hasText: /of the community thinks like you/ })
     await expect(consensus).toBeVisible()
     expect(
       await consensus.evaluate((el) => parseFloat(getComputedStyle(el).animationDuration)),
