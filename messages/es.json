@@ -153,7 +153,6 @@
       "needAccount": "Necesitas una cuenta para ver las comunidades que sigues."
     },
     "comments": {
-      "label": "Comentarios",
       "loading": "Cargando comentarios…",
       "error": "No se pudieron cargar los comentarios. Ciérralos y ábrelos para reintentar.",
       "empty": "Todavía no hay comentarios.",

@@ -21,7 +21,7 @@ T-01 ─┬─ T-02 ─┐
   - `MentionIndex` solo cuando hay entidades. `getFeed` sin el request fijo a `/communities`.
   - **Tests:** `mappers.test.ts` y `feed-api.test.ts` (los tres casos de § 6).
 
-- [ ] **T-03 · Comentarios de la encuesta** · S · BC-03
+- [x] **T-03 · Comentarios de la encuesta** · S · BC-03
   - `commentCount` en `PollItem` y el botón con la cantidad.
   - **Tests:** `poll-card.test.tsx` y un caso en `e2e/home.spec.ts`.
 

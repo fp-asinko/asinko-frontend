@@ -44,6 +44,7 @@ export function pollItem(overrides: Partial<PollItem> = {}): PollItem {
     resultsVisible: true,
     isClosed: false,
     closesAt: new Date(Date.now() + 4 * 86400_000).toISOString(),
+    commentCount: 12,
     author: null,
     community: { slug: 'btc', name: 'Bitcoin', handle: '$BTC' },
     publishedAt: new Date(Date.now() - 86400_000).toISOString(),

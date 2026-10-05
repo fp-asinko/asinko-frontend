@@ -2,6 +2,7 @@ import { ChartBarIcon, MessageSquareIcon } from 'lucide-react'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import type { PollItem } from '../feed.types'
+import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
 import { CommentsToggle } from './comments-toggle'
 import { PollVoting } from './poll-voting'
@@ -12,7 +13,7 @@ import { PollVoting } from './poll-voting'
  */
 export function PollCard({ poll }: { poll: PollItem }) {
   const t = useTranslations('feed.poll')
-  const tc = useTranslations('feed.comments')
+  const tc = useTranslations('feed.card')
   const format = useFormatter()
   const now = useNow()
   const closing = poll.isClosed
@@ -58,10 +59,13 @@ export function PollCard({ poll }: { poll: PollItem }) {
         allowVoteChange={poll.allowVoteChange}
         closing={closing}
         comments={
-          // The contract's Poll has no commentCount (proposal P-006): the button shows a label.
+          // Same as a post's (P-006): the compact count, and the full sentence for screen readers.
           <CommentsToggle kind="poll" id={poll.id}>
             <MessageSquareIcon aria-hidden className="size-4" />
-            {tc('label')}
+            <span aria-hidden>
+              {format.number(poll.commentCount, countFormat(poll.commentCount))}
+            </span>
+            <span className="sr-only">{tc('comments', { count: poll.commentCount })}</span>
           </CommentsToggle>
         }
       />

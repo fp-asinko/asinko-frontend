@@ -123,6 +123,7 @@ export function toPollItem(poll: RawPoll): PollItem {
     resultsVisible,
     isClosed: poll.isClosed,
     closesAt: poll.closesAt,
+    commentCount: poll.commentCount,
     author: poll.creatorType === 'SYSTEM' ? null : toAuthor(poll.creator),
     community: toCommunityRef(poll.community),
     publishedAt: poll.publishedAt,
