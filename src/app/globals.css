@@ -8,7 +8,8 @@
 
 /*
  * Design tokens: the prototype's visual system (specs/home/design.md §2), measured in the browser.
- * Monochrome, warm grays, no shadows. Replaces the iOS tokens of the foundation spec (D-01).
+ * Monochrome, cool grays (Reddit's, specs/header-refresh), no shadows. Replaces the iOS tokens of
+ * the foundation spec (D-01).
  * - --muted-foreground (#5C5D60) is the secondary TEXT color. --faint (#8A8B8E) is 3.4:1: only for
  *   icons, separators and text >= 18px, never small text.
  * - Green text (--success) goes on white surfaces (4.7:1), not on --surface (4.4:1).
@@ -24,13 +25,13 @@
   --primary: #17181a; /* monochrome */
   --primary-foreground: #ffffff;
   --primary-hover: #000000;
-  --secondary: #f1f0ed;
+  --secondary: #eef1f3;
   --secondary-foreground: #17181a;
-  --surface: #f7f6f4; /* search, composer, hover */
-  --muted: #f1f0ed;
+  --surface: #f6f8f9; /* search, composer, comments, hover */
+  --muted: #eef1f3;
   --muted-foreground: #5c5d60;
   --faint: #8a8b8e;
-  --accent: #f1f0ed;
+  --accent: #eef1f3;
   --accent-foreground: #17181a;
   --destructive: #ce2c31;
   --success: #17853b;
@@ -38,12 +39,12 @@
   --bearish: var(--destructive);
   --interesting: #8b5cf6;
   --brand-dot: #155de9; /* only the logo dot */
-  --border: #ecebe7;
-  --border-strong: #d9d8d4;
+  --border: #e5e8eb;
+  --border-strong: #d5dadf;
   /* Border of ACTIVE inputs: 3:1 against the background (WCAG 1.4.11). */
   --input: #8a8b8e;
   --ring: #17181a;
-  --header: #fcfcfb;
+  --header: #ffffff;
   --chart-1: #17181a;
   --chart-2: #17853b;
   --chart-3: #ce2c31;

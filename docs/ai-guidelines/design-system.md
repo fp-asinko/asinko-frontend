@@ -52,7 +52,11 @@ shadcn define el tema con variables semánticas en `globals.css`:
 El sistema visual sale del prototipo (`docs/references/prototype.html`), medido en el navegador. Valores y motivos en `specs/home/design.md § 2`.
 
 - **Monocromático**: `--primary` es casi negro (`#17181A`) en claro y casi blanco en oscuro. El único azul es el punto del logo (`--brand-dot`).
-- **Grises cálidos**: `--surface` (`#F7F6F4`) para buscador, caja para publicar y hovers; `--muted` (`#F1F0ED`) para chips; `--border` (`#ECEBE7`).
+- **Grises fríos** (los de Reddit, `specs/header-refresh`; antes eran cálidos):
+  - `--surface` (`#F6F8F9`): buscador, caja para publicar, comentarios, tarjetas de la columna y hovers.
+  - `--muted` (`#EEF1F3`): chips y píldoras grises.
+  - `--border` (`#E5E8EB`).
+  - Barra superior blanca.
 - **Texto secundario**: `--muted-foreground` (`#5C5D60`). **`--faint` (`#8A8B8E`) no es para texto chico** (3,4:1): solo íconos, separadores y texto de 18 px o más.
 - **Verde en texto** (`--success`/`--bullish`) sobre fondos blancos, no sobre `--surface`. El color nunca es la única señal: siempre con flecha, ícono o texto.
 - **Sin sombras**: las capas se separan con borde. Radios de 4 / 8 / 12 / 16 px y `rounded-full` para píldoras.

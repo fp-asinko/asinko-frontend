@@ -1,6 +1,6 @@
 # Barra superior simple y grises fríos — Requirements
 
-> **Estado:** para aprobar. Pedido el 2026-10-05 con capturas de Reddit: "mucho más simple", el buscador centrado sobre el contenido, "siempre minimalista", y el gris de Reddit (`#F6F8F9`) en la mayoría de los fondos.
+> **Estado:** aprobado el 2026-10-05 con Q1–Q3 como se proponen. Pedido el 2026-10-05 con capturas de Reddit: "mucho más simple", el buscador centrado sobre el contenido, "siempre minimalista", y el gris de Reddit (`#F6F8F9`) en la mayoría de los fondos.
 > **Referencia:** la barra de Reddit sin sesión:
 >
 > - El logo.

@@ -1,6 +1,6 @@
 # Barra superior simple y grises fríos — Design
 
-> **Estado:** para aprobar junto con los requisitos. Asume las respuestas propuestas a Q1–Q3.
+> **Estado:** aprobado el 2026-10-05.
 
 ## 1. Alineación con el contenido (HR-01)
 

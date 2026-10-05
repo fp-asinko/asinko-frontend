@@ -9,7 +9,7 @@ Asinko es una red social de finanzas. La inspiración es Reddit: comunidades, po
 
 ## Estilo
 
-La interfaz sigue el **prototipo** (`docs/references/prototype.html`), fuente de verdad de estilos y estructura: monocromático, grises cálidos, sin sombras y tipografía Figtree. De iOS (skill `apple-design`) se toma el criterio de movimiento e interacción.
+La interfaz sigue el **prototipo** (`docs/references/prototype.html`), fuente de verdad de estilos y estructura: monocromático, grises fríos (como Reddit, desde `specs/header-refresh`), sin sombras y tipografía Figtree. De iOS (skill `apple-design`) se toma el criterio de movimiento e interacción.
 
 - **Reddit es la referencia de estructura**: el Home (y en general las vistas de contenido) usa **3 columnas** en desktop — comunidades a la izquierda, contenido al centro, widgets a la derecha. Mobile first: a 360px es una sola columna, con las comunidades en un panel lateral y navegación inferior. Breakpoints como el prototipo: 1 columna en mobile, 2 en tablet (sin la derecha), 3 desde desktop.
 - **Tema claro por defecto**, sin importar la preferencia del sistema operativo.

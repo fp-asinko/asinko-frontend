@@ -1,8 +1,8 @@
 # Barra superior simple y grises fríos — Tasks
 
-> **Estado:** para aprobar junto con `requirements.md` y `design.md`.
+> **Estado:** aprobado el 2026-10-05.
 
-- [ ] **T-01 · Grises fríos** · S · HR-05, HR-06
+- [x] **T-01 · Grises fríos** · S · HR-05, HR-06
   - Tokens en `globals.css` y `design-system.md`.
   - **Tests:** `tokens-contrast.test.ts`, axe.
 - [ ] **T-02 · Menú "⋯"** · M · HR-03, HR-07
