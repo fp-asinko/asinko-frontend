@@ -59,3 +59,9 @@ En `docs/references/api/proposals.md`:
 - **`loading.tsx` reutiliza `FeedListSkeleton`:** un solo esqueleto, sin copias que se desincronicen.
 - **e2e:** la demora del mock (`x-mock-delay`) también frena la consulta de la comunidad, como pasaría con el backend real.
 - **Pendiente de verificar a mano:** que NVDA y VoiceOver anuncien el `role="status"` del esqueleto, que entra ya con texto. Es el mismo patrón que usaba `loading.tsx`.
+
+## 7. Columna izquierda en streaming (FN-08)
+
+- Cambiar de idioma cambia el segmento `[locale]` y re-renderiza el layout. El layout esperaba a `InterestsSidebar` (`GET /communities` y los intereses, ~2,7 s), y como `loading.tsx` vive dentro del layout, no había ninguna señal.
+- `InterestsSidebar` va en un `Suspense` con `InterestsSkeleton` (filas del tamaño de las sugerencias). Sirve también para el panel ☰, que recibe el mismo nodo, y para la primera carga de cualquier página.
+- La demora simulada (`mockDelay`) también frena la columna, y el e2e lo cubre.

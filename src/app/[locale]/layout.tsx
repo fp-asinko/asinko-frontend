@@ -1,4 +1,5 @@
 import { HouseIcon } from 'lucide-react'
+import { Suspense } from 'react'
 import type { Metadata, Viewport } from 'next'
 import { Figtree } from 'next/font/google'
 import { headers } from 'next/headers'
@@ -9,7 +10,7 @@ import { AppShell, type NavItem } from '@/components/organisms/app-shell'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { RightColumn } from '@/components/organisms/right-column'
 import { env } from '@/env'
-import { InterestsSidebar } from '@/features/interests'
+import { InterestsSidebar, InterestsSkeleton } from '@/features/interests'
 import { OG_LOCALES } from '@/i18n/alternates'
 import { pickClientMessages } from '@/i18n/client-messages'
 import { routing } from '@/i18n/routing'
@@ -76,7 +77,13 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
             <AuthGateProvider signedIn={signedIn}>
               <AppShell
                 navItems={navItems}
-                sidebar={<InterestsSidebar />}
+                sidebar={
+                  // Streamed: the shell and the page never wait for the column's data
+                  // (specs/feed-navigation FN-08), as a language switch re-renders the layout.
+                  <Suspense fallback={<InterestsSkeleton />}>
+                    <InterestsSidebar />
+                  </Suspense>
+                }
                 right={<RightColumn signedIn={signedIn} />}
               >
                 {children}

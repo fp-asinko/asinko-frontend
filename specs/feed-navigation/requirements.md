@@ -1,6 +1,6 @@
 # Navegación del feed sin esperas a ciegas — Requirements
 
-> **Estado:** aprobado el 2026-10-05 por el Product Owner ("dale hagamos eso"), con el enfoque medido y propuesto en la conversación.
+> **Estado:** aprobado el 2026 10-05 por el Product Owner ("dale hagamos eso"), con el enfoque medido y propuesto en la conversación.
 > **Medición (2026-10-05, datos reales de `asinko-app` dev):**
 >
 > | Qué                                   | Tiempo |

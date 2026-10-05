@@ -78,4 +78,19 @@ test.describe('Feed navigation with a slow backend', () => {
     await expect(page.getByRole('heading', { name: 'Page not found' })).toBeVisible()
     await expect(page.locator('meta[name="robots"][content*="noindex"]').first()).toBeAttached()
   })
+
+  test('a language switch answers at once, without waiting for the column (FN-08)', async ({
+    page,
+  }) => {
+    await page.goto('/en')
+    await expect(page.getByRole('article').first()).toBeVisible()
+    await page.setExtraHTTPHeaders({ 'x-mock-delay': String(DELAY_MS) })
+
+    const started = Date.now()
+    await page.getByRole('button', { name: 'More options' }).click()
+    await page.getByRole('menuitemradio', { name: 'Español' }).click()
+    await expect(page.locator('html')).toHaveAttribute('lang', 'es', { timeout: 2000 })
+    await expect(page.getByTestId('feed-skeleton')).toBeVisible({ timeout: 2000 })
+    expect(Date.now() - started).toBeLessThan(DELAY_MS)
+  })
 })
