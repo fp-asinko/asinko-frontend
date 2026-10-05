@@ -14,7 +14,7 @@
   - El handle en `type-small font-bold text-foreground` con `truncate`.
   - `· tiempo` en `type-meta text-muted-foreground`.
   - El botón con `ml-auto shrink-0`.
-- **Línea 2:**
+- **Línea 2** (11 px desde el ajuste del 2026-10-05):
   - Va con `pl-8`, alineada con el texto de la línea 1.
   - Lleva `@usuario` en `type-meta` gris, sin negrita, más el chip de accuracy actual (FC-03).
 - **Canal personal:** una línea con el `UserAvatar` del autor (`size-6 rounded-full`), `@usuario` en negrita, accuracy y tiempo.

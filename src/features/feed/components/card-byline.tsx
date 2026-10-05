@@ -109,8 +109,8 @@ export function CardByline({
           )}
         </div>
         {group && (
-          // CF-02: the author in second place, smaller and without a photo.
-          <div className="flex min-w-0 items-center gap-x-1.25 type-meta text-muted-foreground">
+          // CF-02: the author in second place, smaller (11px) and without a photo.
+          <div className="flex min-w-0 items-center gap-x-1.25 text-[0.6875rem] leading-4 text-muted-foreground">
             <span className="min-w-0 truncate">{authorName}</span>
             {chip}
           </div>
