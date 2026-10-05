@@ -59,3 +59,4 @@
 - **Botones:** ícono y texto en línea, desde la izquierda, en 13 px (`type-action`). Con el ícono absoluto y el texto centrado, en los ~220 px de la tarjeta el ícono pisaba el texto. La tarjeta va sin margen lateral y con `px-3`.
 - **Separador** de borde a borde entre la tarjeta y "Comunidades" (pedido del PO): `<hr>` con `-mx-3` en el panel mobile y `-mx-2` desde `md`.
 - **`shrink-0`** en la tarjeta: en el panel mobile (columna flex de alto fijo) se encogía y quedaba cortada.
+- **Espacios y separadores** (pedido del PO): 16 px entre secciones de la columna (antes 2 px). Los separadores (antes de Comunidades sin sesión y antes de Sugeridas con sesión) son una línea corta (`mx-1`) y suave (`border-border/60`), con 24 px de aire arriba y abajo. Reemplaza al separador de borde a borde.

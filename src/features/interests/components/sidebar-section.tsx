@@ -33,7 +33,7 @@ export function SidebarSection<T>({
   const headingId = useId()
 
   return (
-    <section aria-labelledby={headingId} className={cn('mb-0.5', className)}>
+    <section aria-labelledby={headingId} className={cn('mb-4', className)}>
       <h2 id={headingId} className="sr-only">
         {title}
       </h2>

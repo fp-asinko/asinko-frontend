@@ -25,8 +25,8 @@ export function InterestsSections({ interests }: { interests: Interests }) {
       <>
         {/* The invitation to have an account, as Reddit (specs/guest-sidebar GS-01). */}
         <JoinCard />
-        {/* Edge to edge: the panel pads 12px on phones, the column 8px from md. */}
-        <hr className="-mx-3 my-3 shrink-0 md:-mx-2" />
+        {/* A short, soft line: it separates without weighing (same as before Suggested). */}
+        <hr className="mx-1 my-6 shrink-0 border-border/60" />
         <section aria-label={t('guestTitle')} className="flex flex-col">
           <p aria-hidden className={COLUMN_TITLE}>
             {t('guestTitle')}
@@ -72,7 +72,7 @@ export function InterestsSections({ interests }: { interests: Interests }) {
       </SidebarSection>
       {/* After the groups' "more", as in the prototype; shown even without groups. A column flex
           container so the coming-soon wrapper (and its button) spans the width. */}
-      <div className="mt-1 flex flex-col">
+      <div className="mt-1 mb-6 flex flex-col">
         <ComingSoon
           label={t('createGroup')}
           className="flex h-7.5 w-full tap items-center gap-1.75 rounded-md border border-dashed px-1.5 type-meta font-semibold text-muted-foreground hover:bg-surface"
@@ -81,11 +81,9 @@ export function InterestsSections({ interests }: { interests: Interests }) {
           {t('createGroup')}
         </ComingSoon>
       </div>
-      <SidebarSection
-        title={t('suggested')}
-        result={interests.suggested}
-        className="mt-auto border-t pt-2"
-      >
+      {/* At the bottom of the column, after a short, soft line (as without a session). */}
+      <hr className="mx-1 mt-auto mb-6 shrink-0 border-border/60" />
+      <SidebarSection title={t('suggested')} result={interests.suggested}>
         {(suggestions) => <SuggestedCommunities suggestions={suggestions} />}
       </SidebarSection>
     </section>
