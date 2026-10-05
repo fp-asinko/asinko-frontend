@@ -40,18 +40,13 @@ export function PostCard({
       className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
       aria-labelledby={`post-${post.id}`}
     >
-      <div className="mb-2 flex items-start justify-between gap-3">
+      <div className="mb-2">
         <CardByline
           author={post.author}
           community={post.community}
           publishedAt={post.publishedAt}
           edited={post.edited}
         />
-        {post.tag && !post.deleted && (
-          <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 type-meta font-semibold">
-            {post.tag}
-          </span>
-        )}
       </div>
 
       <h2
@@ -108,7 +103,10 @@ export function PostCard({
       )}
 
       {!post.deleted && (
+        // Votes first, then comments, as Reddit (specs/feed-cards § 14). Share stays on the right in
+        // mobile and joins the group from md.
         <div className="mt-3 flex flex-wrap items-center gap-3">
+          <VoteControl postId={post.id} score={post.score} viewerVote={post.viewerVote} />
           <CommentsToggle kind="post" id={post.id}>
             <MessageSquareIcon aria-hidden className="size-4" />
             <span aria-hidden>
@@ -116,8 +114,7 @@ export function PostCard({
             </span>
             <span className="sr-only">{t('comments', { count: post.commentCount })}</span>
           </CommentsToggle>
-          <VoteControl postId={post.id} score={post.score} viewerVote={post.viewerVote} />
-          <span className="ml-auto">
+          <span className="ml-auto md:ml-0">
             <ComingSoon
               label={t('share')}
               placement="below-end"

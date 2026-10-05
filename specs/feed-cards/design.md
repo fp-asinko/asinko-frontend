@@ -321,3 +321,15 @@ El marcador de radio y leyenda (D-C1), el acento de color en hover (FC-06), el �
 - **Un solo color:** el relleno es `--primary` con transparencia, así que funciona igual en claro y en oscuro. El texto se lee sobre cualquier relleno, porque al 10 % el fondo queda casi blanco (o casi negro en oscuro).
 - **Se van:** los tokens `--poll-1…6`, `--poll-track` y `--consensus-*`, los subtítulos del banner (`consensus.majority|minority|tie`), la línea de colores y el recuadro exterior. El test de contraste deja de medirlos.
 - **Foco (WCAG 2.4.3):** cada opción es el mismo `button` en todos los estados; solo cambia lo que tiene adentro.
+
+## 14. Revisión 3 — Acciones como Reddit y sin tags (2026-10-05)
+
+Pedido del usuario, con capturas de Reddit.
+
+- **Orden de las acciones del post:** votos, después comentarios (antes era al revés), en todos los tamaños.
+- **Compartir:**
+  - En mobile sigue a la derecha (`ml-auto`).
+  - Desde `md` se suma al grupo de la izquierda, como Reddit: votos · comentarios · compartir.
+  - Sigue siendo "Próximamente".
+- **Sin tags:** se saca la etiqueta del post ("Análisis", "Discusión", "On-chain"…). El backend sigue mandando `tag`; el mapper ya no lo pasa a la UI y `PostItem` no lo tiene.
+- Las encuestas no cambian: su fila solo tiene comentarios y el resumen de votos.

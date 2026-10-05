@@ -86,7 +86,6 @@ export function toPostItem(post: RawPost, mentions: MentionLookup): PostItem {
     body: post.deleted ? '' : markMentions(post.body, post.entities, mentions),
     author: post.creatorType === 'SYSTEM' ? null : toAuthor(post.creator),
     community: toCommunityRef(post.community),
-    tag: post.tag,
     media: toMedia(post),
     score: post.score,
     viewerVote: post.viewerVote,

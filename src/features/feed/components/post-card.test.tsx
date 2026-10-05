@@ -11,7 +11,7 @@ vi.mock('../actions/vote-post.action', () => ({ votePost: vi.fn() }))
 vi.mock('../actions/vote-poll.action', () => ({ votePoll: vi.fn() }))
 
 describe('PostCard (H-12)', () => {
-  it('shows byline, title, Markdown body with mentions, tag and actions', () => {
+  it('shows byline, title, Markdown body with mentions and actions, without a tag', () => {
     renderWithIntl(<PostCard post={postItem()} />)
 
     expect(
@@ -20,7 +20,8 @@ describe('PostCard (H-12)', () => {
     expect(screen.getByText('@maria')).toBeInTheDocument()
     expect(screen.getByText('74% accuracy, high')).toBeInTheDocument()
     expect(screen.getByText('2 hours ago')).toBeInTheDocument()
-    expect(screen.getByText('On-chain')).toBeInTheDocument()
+    // Post tags are not shown (specs/feed-cards § 14).
+    expect(screen.queryByText('On-chain')).not.toBeInTheDocument()
     // The byline community and the body mention both link to the filtered Home.
     for (const link of screen.getAllByRole('link', { name: '$BTC' })) {
       expect(link).toHaveAttribute('href', '/?community=btc')
@@ -28,6 +29,15 @@ describe('PostCard (H-12)', () => {
     expect(screen.getByText('6 comments')).toBeInTheDocument()
     expect(screen.getByText('1,284 points')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Share' })).toHaveAttribute('aria-disabled', 'true')
+  })
+
+  it('orders the actions as Reddit: votes, then comments, then share', () => {
+    renderWithIntl(<PostCard post={postItem()} />)
+    const upvote = screen.getByRole('button', { name: /upvote/i })
+    const comments = screen.getByText('6 comments')
+    const share = screen.getByRole('button', { name: 'Share' })
+    expect(upvote.compareDocumentPosition(comments) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(comments.compareDocumentPosition(share) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
   it('links the community in the byline', () => {
@@ -65,7 +75,7 @@ describe('PostCard (H-12)', () => {
   })
 
   it('shows a deleted post without body, tag or actions', () => {
-    renderWithIntl(<PostCard post={postItem({ deleted: true, body: '', tag: 'On-chain' })} />)
+    renderWithIntl(<PostCard post={postItem({ deleted: true, body: '' })} />)
     expect(screen.getByRole('heading', { name: '[deleted]' })).toBeInTheDocument()
     expect(screen.queryByText('On-chain')).toBeNull()
     expect(screen.queryByText(/points/)).toBeNull()

@@ -17,7 +17,6 @@ export function postItem(overrides: Partial<PostItem> = {}): PostItem {
     body: 'Long [$BTC](asinko:community/btc) for now.',
     author: MARIA,
     community: { slug: 'btc', name: 'Bitcoin', handle: '$BTC' },
-    tag: 'On-chain',
     media: null,
     score: 1284,
     viewerVote: null,

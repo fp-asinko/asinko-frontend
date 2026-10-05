@@ -31,7 +31,6 @@ export type PostItem = {
   author: Author | null
   /** null when the community could not be resolved. */
   community: CommunityRef | null
-  tag: string | null
   media: PostMedia | null
   score: number
   viewerVote: 1 | -1 | null
