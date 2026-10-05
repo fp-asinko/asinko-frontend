@@ -103,11 +103,58 @@ describe('getFeed', () => {
     expect(state.dropped).toEqual([2])
   })
 
-  it('still renders the feed when communities fail, without community names', async () => {
+  it('keeps every card named when communities fail: the content carries it (BC-01)', async () => {
     state.routes = MOCK_ROUTES.filter((route) => route.path !== '/api/v1/communities')
     const result = await getFeed(parseFeedParams({}))
     if (!result.ok) throw new Error('expected ok')
-    expect(result.data.items.every((item) => item.community === null)).toBe(true)
+    expect(result.data.items.every((item) => item.community !== null)).toBe(true)
+  })
+
+  describe('GET /communities only for mentions (BC-02)', () => {
+    function countCommunityRequests(explore?: unknown) {
+      let count = 0
+      state.routes = MOCK_ROUTES.map((route) => {
+        if (route.path === '/api/v1/communities') {
+          return { ...route, handler: (context) => (count++, route.handler(context)) }
+        }
+        if (explore && route.path === '/api/v1/feed/explore') {
+          return { ...route, handler: () => ({ status: 200, body: explore }) }
+        }
+        return route
+      })
+      return () => count
+    }
+
+    it('skips it when the page has no $ or # mentions, as with the real backend today', async () => {
+      const page = (await MOCK_ROUTES.find(
+        (route) => route.path === '/api/v1/feed/explore',
+      )!.handler({ params: {}, query: {}, body: undefined })) as {
+        body: { items: Array<{ kind: string; content: object }> }
+      }
+      const withoutEntities = {
+        items: page.body.items.map((item) => ({
+          ...item,
+          content: { ...item.content, entities: [] },
+        })),
+        nextCursor: null,
+      }
+      const requests = countCommunityRequests(withoutEntities)
+      const result = await getFeed(parseFeedParams({}))
+      expect(result.ok).toBe(true)
+      expect(requests()).toBe(0)
+    })
+
+    it('asks for it when mentions need community slugs to link', async () => {
+      const requests = countCommunityRequests()
+      const result = await getFeed(parseFeedParams({}))
+      if (!result.ok) throw new Error('expected ok')
+      expect(requests()).toBe(1)
+      expect(
+        result.data.items.some(
+          (item) => item.kind === 'post' && item.body.includes('asinko:community/'),
+        ),
+      ).toBe(true)
+    })
   })
 
   it('fails when the feed itself fails', async () => {

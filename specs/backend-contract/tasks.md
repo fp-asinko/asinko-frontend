@@ -16,7 +16,7 @@ T-01 ─┬─ T-02 ─┐
   - En los handlers de comentarios: `limit` y `replies`.
   - **Tests:** `fixtures.test.ts` con los ejemplos nuevos; unitario de los handlers (`limit` inválido ignorado, `replies=false` sin respuestas).
 
-- [ ] **T-02 · Comunidad desde el contenido** · M · BC-01, BC-02
+- [x] **T-02 · Comunidad desde el contenido** · M · BC-01, BC-02
   - Mappers con `post.community` y `poll.community`.
   - `MentionIndex` solo cuando hay entidades. `getFeed` sin el request fijo a `/communities`.
   - **Tests:** `mappers.test.ts` y `feed-api.test.ts` (los tres casos de § 6).

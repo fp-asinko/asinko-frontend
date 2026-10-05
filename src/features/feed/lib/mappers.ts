@@ -17,11 +17,10 @@ import type {
 } from '../feed.types'
 import { markMentions, type MentionLookup } from './mentions'
 
-/** Communities by id, plus the lookups mentions need. Built once per feed page. */
-export type CommunityIndex = MentionLookup & { byId: (id: string) => CommunityRef | null }
-
 /** The mention handle of a community: $ for an asset, # for a group (overview.md § Menciones). */
-export function toCommunityRef(community: RawCommunity): CommunityRef {
+export function toCommunityRef(
+  community: Pick<RawCommunity, 'slug' | 'name' | 'type'>,
+): CommunityRef {
   return {
     slug: community.slug,
     name: community.name,
@@ -30,17 +29,17 @@ export function toCommunityRef(community: RawCommunity): CommunityRef {
   }
 }
 
-export function indexCommunities(communities: readonly RawCommunity[]): CommunityIndex {
-  const byId = new Map(communities.map((each) => [each.id, each]))
+/**
+ * What mentions need to link: the slug of a community by id and of an asset's community. Cards
+ * take their own community from the content (P-004); this is only for `entities` (P-001).
+ */
+export function indexCommunities(communities: readonly RawCommunity[]): MentionLookup {
+  const byId = new Map(communities.map((each) => [each.id, each.slug]))
   const byAsset = new Map(
     communities.flatMap((each) => (each.assetId ? [[each.assetId, each.slug] as const] : [])),
   )
   return {
-    byId: (id) => {
-      const community = byId.get(id)
-      return community ? toCommunityRef(community) : null
-    },
-    communitySlug: (id) => byId.get(id)?.slug,
+    communitySlug: (id) => byId.get(id),
     communityOfAsset: (assetId) => byAsset.get(assetId),
   }
 }
@@ -79,14 +78,14 @@ function toMedia(post: RawPost): PostMedia | null {
   return null
 }
 
-export function toPostItem(post: RawPost, communities: CommunityIndex): PostItem {
+export function toPostItem(post: RawPost, mentions: MentionLookup): PostItem {
   return {
     kind: 'post',
     id: post.id,
     title: post.title,
-    body: post.deleted ? '' : markMentions(post.body, post.entities, communities),
+    body: post.deleted ? '' : markMentions(post.body, post.entities, mentions),
     author: post.creatorType === 'SYSTEM' ? null : toAuthor(post.creator),
-    community: communities.byId(post.communityId),
+    community: toCommunityRef(post.community),
     tag: post.tag,
     media: toMedia(post),
     score: post.score,
@@ -98,7 +97,7 @@ export function toPostItem(post: RawPost, communities: CommunityIndex): PostItem
   }
 }
 
-export function toPollItem(poll: RawPoll, communities: CommunityIndex): PollItem {
+export function toPollItem(poll: RawPoll): PollItem {
   const total = poll.totalVotes
   const resultsVisible = poll.options.every((option) => option.voteCount !== null) && total !== null
   return {
@@ -125,22 +124,26 @@ export function toPollItem(poll: RawPoll, communities: CommunityIndex): PollItem
     isClosed: poll.isClosed,
     closesAt: poll.closesAt,
     author: poll.creatorType === 'SYSTEM' ? null : toAuthor(poll.creator),
-    community: communities.byId(poll.communityId),
+    community: toCommunityRef(poll.community),
     publishedAt: poll.publishedAt,
   }
 }
 
 /** The part of a poll a vote changes (the vote endpoint answers the whole poll). */
 export function toPollResults(poll: RawPoll): PollResults {
-  const { options, totalVotes, viewerOptionId, resultsVisible } = toPollItem(
-    poll,
-    indexCommunities([]),
-  )
+  const { options, totalVotes, viewerOptionId, resultsVisible } = toPollItem(poll)
   return { options, totalVotes, viewerOptionId, resultsVisible }
 }
 
-export function toFeedItem(item: RawFeedItem, communities: CommunityIndex): FeedItem {
-  return item.kind === 'POST'
-    ? toPostItem(item.content, communities)
-    : toPollItem(item.content, communities)
+export function toFeedItem(item: RawFeedItem, mentions: MentionLookup): FeedItem {
+  return item.kind === 'POST' ? toPostItem(item.content, mentions) : toPollItem(item.content)
+}
+
+/** Whether a page has mentions that need community slugs to link ($ and #, not @). */
+export function needsMentionLookup(items: readonly RawFeedItem[]): boolean {
+  return items.some(
+    (item) =>
+      item.kind === 'POST' &&
+      (item.content.entities ?? []).some((entity) => entity.type !== 'MENTION'),
+  )
 }
