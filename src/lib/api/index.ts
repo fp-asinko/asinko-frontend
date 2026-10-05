@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/nextjs'
 import type { z } from 'zod'
 import { env } from '@/env'
 import type { MocksMode } from '@/lib/env-schema'
+import { getAccessToken } from '@/lib/session'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import { createApiClient } from './create-client'
 import { keepValidItems as keepValid } from './helpers'
@@ -20,6 +21,11 @@ export const apiRequest = createApiClient({
   // Never in production: src/env.ts rejects any API_MOCKS but false there (F-30).
   mocks: mockedRoutes(env.API_MOCKS),
   timeoutMs: env.API_TIMEOUT_MS,
+  // The session's token as Bearer on every backend call (P-002, specs/dev-login DL-04).
+  getHeaders: async (): Promise<Record<string, string>> => {
+    const token = await getAccessToken()
+    return token ? { Authorization: `Bearer ${token}` } : {}
+  },
   // A no-op when Sentry has no DSN. Tags carry the endpoint pattern, never URLs or values.
   onUnexpected: (failure, cause) => {
     Sentry.captureException(new Error(`API ${failure.code} on ${failure.endpoint}`), {

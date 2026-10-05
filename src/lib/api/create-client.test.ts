@@ -249,3 +249,21 @@ describe('error translations', () => {
     )
   })
 })
+
+describe('getHeaders (specs/dev-login DL-04)', () => {
+  it('adds the session headers to every network request', async () => {
+    const fetchImpl = vi.fn(
+      async (_input: string | URL, _init?: RequestInit) =>
+        new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    )
+    const api = createApiClient({
+      baseUrl: 'http://backend.test',
+      fetch: fetchImpl as unknown as typeof fetch,
+      getHeaders: async () => ({ Authorization: 'Bearer token-123' }),
+    })
+    await api({ method: 'GET', path: '/api/v1/communities', schema: z.unknown() })
+    expect(fetchImpl.mock.calls[0]?.[1]).toMatchObject({
+      headers: { Authorization: 'Bearer token-123', Accept: 'application/json' },
+    })
+  })
+})

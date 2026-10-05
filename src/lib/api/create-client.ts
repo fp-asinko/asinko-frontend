@@ -30,6 +30,8 @@ export type ApiClientOptions = {
   timeoutMs?: number
   /** Mocked routes (API_MOCKS). A registered route never reaches the network (F-36). */
   mocks?: readonly MockRoute[]
+  /** Extra headers for every network request, e.g. the session's Bearer token (specs/dev-login). */
+  getHeaders?: () => Promise<Record<string, string>> | Record<string, string>
   /** Called for every unexpected failure (5xx, network, timeout, contract drift): reporting. */
   onUnexpected?: (failure: UnexpectedFailure, cause?: unknown) => void
 }
@@ -59,6 +61,7 @@ export function createApiClient({
   fetch: fetchImpl = fetch,
   timeoutMs = DEFAULT_TIMEOUT_MS,
   mocks,
+  getHeaders,
   onUnexpected,
 }: ApiClientOptions) {
   function fail(failure: UnexpectedFailure, cause?: unknown): UnexpectedFailure {
@@ -78,6 +81,7 @@ export function createApiClient({
     const response = await fetchImpl(url, {
       method,
       headers: {
+        ...(getHeaders ? await getHeaders() : {}),
         Accept: 'application/json',
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
       },
