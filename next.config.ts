@@ -21,6 +21,11 @@ const SECURITY_HEADERS = [
 ]
 
 const nextConfig: NextConfig = {
+  experimental: {
+    // Going back to a feed tab seen in the last 30 s is instant, from the router cache
+    // (specs/feed-navigation FN-04). Accepted: a vote cast meanwhile shows on that tab after 30 s.
+    staleTimes: { dynamic: 30 },
+  },
   poweredByHeader: false,
   // The same allowlist the feed mappers use: an image from any other host is dropped before render.
   images: {

@@ -27,7 +27,7 @@ const viewer = await getViewer() // a cookie, instant
   - Un `role="status"` con "Loading…" (FN-03).
   - `loading.tsx` sigue para llegar desde otra ruta.
 - **El chip de comunidad** va dentro de `FeedList`: aparece cuando llega el nombre. Al estar alineado a la derecha en el renglón de los filtros, no mueve nada al aparecer.
-- **404 con streaming:** `notFound()` dentro del `Suspense` ya no puede cambiar el status a 404, porque la respuesta ya empezó con 200. Por eso la comunidad se valida **antes**, fuera del `Suspense`, con `GET /communities/:slug`. Es una llamada aparte que ya se hace hoy en paralelo. Con eso, `/en?community=nope` sigue devolviendo 404 real.
+- **Comunidad inexistente:** se valida **antes** del `Suspense`, con `GET /communities/:slug` (la misma llamada que ya se hacía en paralelo). Así muestra la página "not found" sin esperar al feed, y el chip lleva el nombre correcto desde el principio. _Ajuste al implementar:_ el status ya era 200 con `noindex`, por el streaming del Home (`specs/home § 5`). Ese spec lo había decidido así, y este no lo cambia.
 
 ## 3. Caché del router (FN-04)
 
@@ -49,3 +49,13 @@ En `docs/references/api/proposals.md`:
   - Del lado de los mocks: una espera en `getFeed` cuando `API_MOCKS=true` y llega ese header, nunca en producción.
 - **e2e:** `/en?community=nope` sigue siendo 404.
 - **Presupuesto de JS.**
+
+## 6. Ajustes de la implementación
+
+- **El chip de comunidad tiene su propio `Suspense`** (reemplaza lo que decía § 2 sobre resolver la comunidad antes). Resolverla antes hacía esperar toda la página 1 a 2 s al tocar una comunidad, y eso no cumplía FN-01: lo marcó la revisión de UI.
+  - Ahora `FilteredCommunity` va en el renglón de los filtros, con un hueco del mismo tamaño (`CommunityChipSkeleton`) mientras carga.
+  - Una comunidad inexistente sigue mostrando la página "not found". El status ya era 200 con `noindex`, por el streaming del Home (`specs/home § 5`).
+  - La lista no vuelve a pedir la comunidad (`communityResolved`).
+- **`loading.tsx` reutiliza `FeedListSkeleton`:** un solo esqueleto, sin copias que se desincronicen.
+- **e2e:** la demora del mock (`x-mock-delay`) también frena la consulta de la comunidad, como pasaría con el backend real.
+- **Pendiente de verificar a mano:** que NVDA y VoiceOver anuncien el `role="status"` del esqueleto, que entra ya con texto. Es el mismo patrón que usaba `loading.tsx`.

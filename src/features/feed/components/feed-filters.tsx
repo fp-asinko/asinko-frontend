@@ -1,22 +1,16 @@
-import { XIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import type { ReactNode } from 'react'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
-import type { CommunityRef } from '../feed.types'
 import { feedHref } from '../lib/feed-href'
 import type { FeedParams } from '../schemas/feed-params.schema'
 
 /**
- * New · Polls pills (H-11, Q3) and, with ?community, a chip to remove that filter. Hot and Top
- * arrive when the backend can sort the feed.
+ * New · Polls pills (H-11, Q3) and, with ?community, the slot of the chip that removes that filter
+ * (CommunityChip, streamed on its own: specs/feed-navigation § 2). Hot and Top arrive when the
+ * backend can sort the feed.
  */
-export function FeedFilters({
-  params,
-  community,
-}: {
-  params: FeedParams
-  community: CommunityRef | null
-}) {
+export function FeedFilters({ params, chip }: { params: FeedParams; chip?: ReactNode }) {
   const t = useTranslations('feed')
   const filters = [
     { filter: 'new', label: t('filters.new') },
@@ -45,16 +39,7 @@ export function FeedFilters({
           )
         })}
       </nav>
-      {params.community && params.feed === 'for-you' && (
-        <Link
-          href={feedHref({ ...params, community: undefined })}
-          aria-label={t('chip.remove', { handle: community?.handle ?? `#${params.community}` })}
-          className="ml-auto inline-flex h-8 max-w-full min-w-0 tap items-center gap-1.5 rounded-full bg-muted px-3 type-action font-semibold outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          <span className="truncate">{community?.handle ?? `#${params.community}`}</span>
-          <XIcon aria-hidden className="size-3.5 shrink-0" />
-        </Link>
-      )}
+      {chip}
     </div>
   )
 }

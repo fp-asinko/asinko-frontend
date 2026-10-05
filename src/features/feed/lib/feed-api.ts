@@ -8,7 +8,7 @@ import {
   type ApiResult,
 } from '@/lib/api'
 import { communitySchema, feedItemSchema } from '@/lib/api/contract'
-import type { FeedPage } from '../feed.types'
+import type { CommunityRef, FeedPage } from '../feed.types'
 import type { FeedParams } from '../schemas/feed-params.schema'
 import { indexCommunities, needsMentionLookup, toCommunityRef, toFeedItem } from './mappers'
 
@@ -46,6 +46,18 @@ function requestCommunity(params: FeedParams) {
 }
 
 /**
+ * The community the feed is filtered by: the chip's name, streamed on its own (specs/feed-navigation
+ * § 2). NOT_FOUND passes through, for the not-found page. null without a community filter.
+ */
+export async function getFilteredCommunity(
+  params: FeedParams,
+): Promise<ApiResult<CommunityRef> | null> {
+  const result = await requestCommunity(params)
+  if (!result) return null
+  return result.ok ? { ok: true, data: toCommunityRef(result.data) } : result
+}
+
+/**
  * One page of the Home feed (specs/home/design.md § 5). Never throws: the page decides what a
  * failure means (getOrThrow, notFound or an empty state).
  *
@@ -54,13 +66,18 @@ function requestCommunity(params: FeedParams) {
  * - Each item carries its community (P-004). GET /communities is asked only when the page has $ or
  *   # mentions to link (`entities` by id, P-001): with the real backend today, never.
  */
-export async function getFeed(params: FeedParams, cursor?: string): Promise<ApiResult<FeedPage>> {
+export async function getFeed(
+  params: FeedParams,
+  cursor?: string,
+  // The page already resolved the filtered community (getFilteredCommunity): do not ask twice.
+  { communityResolved = false }: { communityResolved?: boolean } = {},
+): Promise<ApiResult<FeedPage>> {
   const endpoint = params.feed === 'following' ? FOLLOWING : EXPLORE
   if (cursor !== undefined && !cursorSchema.safeParse(cursor).success) return invalidInput(endpoint)
 
   const [feed, filtered] = await Promise.all([
     requestFeed(params, cursor),
-    requestCommunity(params),
+    communityResolved ? Promise.resolve(null) : requestCommunity(params),
   ])
   if (filtered && !filtered.ok && filtered.code === 'NOT_FOUND') return filtered
   if (!feed.ok) return feed

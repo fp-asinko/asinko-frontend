@@ -2,7 +2,8 @@ import { useTranslations } from 'next-intl'
 import { GateButtons } from '@/components/organisms/auth-gate'
 import { EmptyState } from '@/components/organisms/empty-state'
 import { Link } from '@/i18n/navigation'
-import type { CommunityRef, FeedItem } from '../feed.types'
+import type { ReactNode } from 'react'
+import type { FeedItem } from '../feed.types'
 import { feedHref } from '../lib/feed-href'
 import type { FeedParams } from '../schemas/feed-params.schema'
 import { ComposerPlaceholder } from './composer-placeholder'
@@ -12,33 +13,41 @@ import { FeedItems } from './feed-items'
 import { LoadMore } from './load-more'
 
 export type FeedState =
-  | { status: 'ok'; items: FeedItem[]; nextCursor: string | null; community: CommunityRef | null }
-  | { status: 'needs-account' }
+  { status: 'ok'; items: FeedItem[]; nextCursor: string | null } | { status: 'needs-account' }
 
 /**
- * The center column as in the prototype (specs/home/design.md § 5): composer, tabs, filters and
- * the feed box (16px radius, dividers between cards). Pure render: the data comes in.
+ * The top of the center column as in the prototype (specs/home/design.md § 5): composer, tabs and
+ * filters. Rendered right away, outside the list's Suspense, so a tab switch shows at once while
+ * the feed loads (specs/feed-navigation FN-02). Pure render.
  */
-export function FeedView({
+export function FeedTop({
   params,
-  state,
   viewerName,
+  chip,
 }: {
   params: FeedParams
-  state: FeedState
   viewerName: string | null
+  /** The community chip, streamed on its own (specs/feed-navigation § 2). */
+  chip?: ReactNode
 }) {
-  const t = useTranslations('feed.empty')
-  const items = state.status === 'ok' ? state.items : []
-  const community = state.status === 'ok' ? state.community : null
-
   return (
     <>
       <ComposerPlaceholder viewerName={viewerName} />
       <div className="px-2 pt-4 sm:px-0">
         <FeedTabs params={params} />
-        <FeedFilters params={params} community={community} />
+        <FeedFilters params={params} chip={chip} />
       </div>
+    </>
+  )
+}
+
+/** The feed box (dividers between cards) or its empty state. Pure render: the data comes in. */
+export function FeedListView({ params, state }: { params: FeedParams; state: FeedState }) {
+  const t = useTranslations('feed.empty')
+  const items = state.status === 'ok' ? state.items : []
+
+  return (
+    <>
       <div className="overflow-hidden bg-card">
         {state.status === 'needs-account' ? (
           // A whole private page: it stays, with the ways in (specs/guest-experience Q2).

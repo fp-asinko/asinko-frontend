@@ -56,3 +56,4 @@ export {
 export { getOrThrow } from './helpers'
 export type { EndpointPattern } from './path'
 export { noContentSchema, paginatedSchema } from './schemas'
+export { mockDelay } from './mock-delay'

@@ -8,7 +8,7 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 describe('FeedFilters (H-11)', () => {
   it('marks the active filter and keeps the feed in the links', () => {
-    renderWithIntl(<FeedFilters params={parseFeedParams({ feed: 'following' })} community={null} />)
+    renderWithIntl(<FeedFilters params={parseFeedParams({ feed: 'following' })} />)
     expect(screen.getByRole('link', { name: 'New' })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: 'Polls' })).toHaveAttribute(
       'href',
@@ -17,11 +17,10 @@ describe('FeedFilters (H-11)', () => {
     expect(screen.queryByRole('link', { name: /Remove/ })).toBeNull()
   })
 
-  it('shows the community chip, with the slug when the community is unknown', () => {
-    renderWithIntl(<FeedFilters params={parseFeedParams({ community: 'defi' })} community={null} />)
-    expect(screen.getByRole('link', { name: 'Remove the #defi filter' })).toHaveAttribute(
-      'href',
-      '/',
+  it('places the community chip it receives in the row (streamed on its own)', () => {
+    renderWithIntl(
+      <FeedFilters params={parseFeedParams({ community: 'defi' })} chip={<span>chip</span>} />,
     )
+    expect(screen.getByText('chip')).toBeInTheDocument()
   })
 })

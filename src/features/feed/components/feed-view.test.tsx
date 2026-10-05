@@ -3,7 +3,34 @@ import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { pollItem, postItem } from '../feed-items.fixture'
 import { parseFeedParams } from '../schemas/feed-params.schema'
-import { FeedView } from './feed-view'
+import type { CommunityRef } from '../feed.types'
+import type { FeedParams } from '../schemas/feed-params.schema'
+import { CommunityChip } from './community-chip'
+import { FeedListView, FeedTop, type FeedState } from './feed-view'
+
+/** The center column as the page composes it: the top and the list (specs/feed-navigation). */
+function FeedView({
+  params,
+  state,
+  viewerName,
+}: {
+  params: FeedParams
+  state: FeedState & { community?: CommunityRef | null }
+  viewerName: string | null
+}) {
+  return (
+    <>
+      <FeedTop
+        params={params}
+        viewerName={viewerName}
+        chip={
+          params.community && <CommunityChip params={params} community={state.community ?? null} />
+        }
+      />
+      <FeedListView params={params} state={state} />
+    </>
+  )
+}
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 vi.mock('../actions/load-comments-preview.action', () => ({ loadCommentsPreview: vi.fn() }))
@@ -13,7 +40,7 @@ vi.mock('../actions/load-more-feed.action', () => ({ loadMoreFeed: vi.fn() }))
 
 const params = (raw: Record<string, string> = {}) => parseFeedParams(raw)
 
-describe('FeedView', () => {
+describe('FeedTop and FeedListView, as the page composes them', () => {
   it('renders composer, tabs, filters and the cards in order', () => {
     renderWithIntl(
       <FeedView

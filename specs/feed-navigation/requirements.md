@@ -17,13 +17,13 @@ Que cambiar de pestaña o de filtro responda al instante aunque el backend tarde
 
 ## Criterios de aceptación
 
-- [ ] **FN-01** **Respuesta inmediata:** al tocar una pestaña ("For you" o "Following"), un filtro ("New" o "Polls") o una comunidad, la URL cambia, la pestaña o el filtro se marcan y aparece el esqueleto de la lista en menos de 300 ms, sin esperar al backend.
-- [ ] **FN-02** **La parte de arriba no parpadea:** el composer, las pestañas y los filtros quedan en pantalla mientras carga la lista; solo la lista muestra el esqueleto. El chip de la comunidad filtrada aparece cuando llega su nombre.
-- [ ] **FN-03** **Lectores de pantalla:** la carga se anuncia ("Loading…").
-- [ ] **FN-04** **Volver es instantáneo:** volver a una combinación de pestaña y filtro visitada en los últimos 30 s se muestra al momento, desde el caché del router de Next (`staleTimes.dynamic`).
-- [ ] **FN-05** **Primera carga en streaming:** la página llega con la parte de arriba y el esqueleto, y la lista entra cuando el backend responde.
-- [ ] **FN-06** **Sin peso extra:** el JS del Home se queda en ≤ 230 KB.
-- [ ] **FN-07** **Propuesta al backend:** P-009 en `proposals.md`, con la medición, el pedido de armar el feed en pocas consultas y el de desplegar en la misma región que la base.
+- [x] **FN-01** **Respuesta inmediata:** al tocar una pestaña ("For you" o "Following"), un filtro ("New" o "Polls") o una comunidad, la URL cambia, la pestaña o el filtro se marcan y aparece el esqueleto de la lista en menos de 300 ms, sin esperar al backend.
+- [x] **FN-02** **La parte de arriba no parpadea:** el composer, las pestañas y los filtros quedan en pantalla mientras carga la lista; solo la lista muestra el esqueleto. El chip de la comunidad filtrada tiene su propio lugar y aparece cuando llega su nombre, sin mover nada.
+- [x] **FN-03** **Lectores de pantalla:** la carga se anuncia ("Loading…").
+- [x] **FN-04** **Volver es instantáneo:** volver a una combinación de pestaña y filtro visitada en los últimos 30 s se muestra al momento, desde el caché del router de Next (`staleTimes.dynamic`).
+- [x] **FN-05** **Primera carga en streaming:** la página llega con la parte de arriba y el esqueleto, y la lista entra cuando el backend responde.
+- [x] **FN-06** **Sin peso extra:** el JS del Home se queda en ≤ 230 KB.
+- [x] **FN-07** **Propuesta al backend:** P-009 en `proposals.md`, con la medición, el pedido de armar el feed en pocas consultas y el de desplegar en la misma región que la base.
 
 ## Fuera de alcance
 

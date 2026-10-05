@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
 import { parseFeedParams } from '../schemas/feed-params.schema'
-import { getFeed } from './feed-api'
+import { getFeed, getFilteredCommunity } from './feed-api'
 
 // The real client against the mock routes; a route left out reaches a fetch that always fails.
 const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[], dropped: [] as number[] }))
@@ -167,5 +167,40 @@ describe('getFeed', () => {
       ok: false,
       code: 'INVALID',
     })
+  })
+})
+
+describe('getFilteredCommunity (specs/feed-navigation § 2)', () => {
+  beforeEach(() => {
+    state.routes = MOCK_ROUTES
+  })
+
+  it('resolves the filtered community before the list streams', async () => {
+    expect(await getFilteredCommunity(parseFeedParams({ community: 'btc' }))).toEqual({
+      ok: true,
+      data: { slug: 'btc', name: 'Bitcoin', handle: '$BTC' },
+    })
+  })
+
+  it('passes NOT_FOUND through, for a real 404', async () => {
+    expect(await getFilteredCommunity(parseFeedParams({ community: 'nope' }))).toMatchObject({
+      ok: false,
+      code: 'NOT_FOUND',
+    })
+  })
+
+  it('is null without a community filter', async () => {
+    expect(await getFilteredCommunity(parseFeedParams({}))).toBeNull()
+  })
+
+  it('is not asked twice: getFeed skips it once resolved', async () => {
+    let lookups = 0
+    state.routes = MOCK_ROUTES.map((route) =>
+      route.path === '/api/v1/communities/:slug'
+        ? { ...route, handler: (context) => (lookups++, route.handler(context)) }
+        : route,
+    )
+    await getFeed(parseFeedParams({ community: 'btc' }), undefined, { communityResolved: true })
+    expect(lookups).toBe(0)
   })
 })
