@@ -210,6 +210,9 @@
     "joinCard": {
       "title": "¿Nuevo en Asinko?",
       "body": "Construye un historial público. Cada predicción que hagas se contrasta con el mercado."
-    }
+    },
+    "brand": "Asinko",
+    "or": "o",
+    "continueWith": "Continuar con {provider}"
   }
 }

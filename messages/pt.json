@@ -210,6 +210,9 @@
     "joinCard": {
       "title": "Novo no Asinko?",
       "body": "Construa um histórico público. Cada previsão sua é conferida com o mercado."
-    }
+    },
+    "brand": "Asinko",
+    "or": "ou",
+    "continueWith": "Continuar com {provider}"
   }
 }

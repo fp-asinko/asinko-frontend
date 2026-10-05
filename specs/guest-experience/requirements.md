@@ -48,6 +48,10 @@ Que alguien sin cuenta pueda leer todo Asinko sin trabas y, cuando quiera partic
 - [x] **G-07** **Mobile first:** en mobile es un panel que sube desde abajo; desde `md`, un diálogo centrado.
 - [x] **G-08** **Accesible:** diálogo con título y descripción, foco atrapado mientras está abierto y AA en claro y oscuro.
 
+### Marca y redes (pedido el 2026-10-05, después del cierre)
+
+- [x] **G-13** El modal muestra el **logo de Asinko arriba** y, al pie, después de un separador "or", el **login con redes**: Reddit, Instagram y X. Son **solo las imágenes** por ahora: botones redondos grises "Coming soon" (H-26), con nombre accesible "Continue with Reddit" y similares. Los logos son de Simple Icons (CC0), en el color del texto.
+
 ### Base para `auth`
 
 - [x] **G-09** El modal recibe la acción que lo abrió (por ejemplo `vote-post`) y la página actual, para que `auth` pueda volver ahí después de entrar (`?next=` relativo, `security.md § 5`).

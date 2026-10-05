@@ -210,6 +210,9 @@
     "joinCard": {
       "title": "New to Asinko?",
       "body": "Build a public track record. Every call you make is checked against the market."
-    }
+    },
+    "brand": "Asinko",
+    "or": "or",
+    "continueWith": "Continue with {provider}"
   }
 }

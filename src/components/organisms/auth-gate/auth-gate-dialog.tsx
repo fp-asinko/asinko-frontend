@@ -3,6 +3,8 @@
 import { XIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { ComingSoon } from '@/components/molecules/coming-soon'
+import { AsinkoLogo } from '@/components/ui/asinko-logo'
+import { InstagramMark, RedditMark, XMark } from '@/components/ui/brand-marks'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -12,6 +14,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import type { GateRequest } from './auth-gate'
+
+// G-13: social logins, images only until the auth spec (Supabase has X; Reddit and Instagram
+// would need their own integration, see specs/guest-experience § 9).
+const SOCIAL = [
+  { name: 'Reddit', Mark: RedditMark },
+  { name: 'Instagram', Mark: InstagramMark },
+  { name: 'X', Mark: XMark },
+] as const
 
 /**
  * The account modal (G-05 to G-08): says what the visitor was about to do and offers to create an
@@ -52,7 +62,11 @@ export function AuthGateDialog({
         >
           <XIcon aria-hidden />
         </DialogClose>
-        <div className="flex flex-col gap-2 pr-10">
+        {/* G-13: the brand on top. Decorative: the title says what the modal is about. */}
+        <div aria-hidden className="flex justify-center">
+          <AsinkoLogo label={t('brand')} />
+        </div>
+        <div className="flex flex-col gap-2 px-6 text-center">
           {/* Loose classes, not type-*: cn does not merge them with the base text-* (design-system.md). */}
           <DialogTitle className="text-[1.375rem] leading-tight font-bold">
             {t(`title.${request.action}`)}
@@ -75,6 +89,23 @@ export function AuthGateDialog({
             {t('login')}
           </ComingSoon>
         </div>
+        <div className="flex items-center gap-3 type-meta text-muted-foreground">
+          <span aria-hidden className="h-px flex-1 bg-border" />
+          {t('or')}
+          <span aria-hidden className="h-px flex-1 bg-border" />
+        </div>
+        <ul className="flex justify-center gap-3">
+          {SOCIAL.map(({ name, Mark }) => (
+            <li key={name}>
+              <ComingSoon
+                label={t('continueWith', { provider: name })}
+                className="inline-flex size-11 tap items-center justify-center rounded-full bg-muted text-foreground hover:bg-muted-hover"
+              >
+                <Mark className="size-5" />
+              </ComingSoon>
+            </li>
+          ))}
+        </ul>
       </DialogContent>
     </Dialog>
   )

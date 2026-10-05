@@ -89,3 +89,9 @@ function onUpvote() {
   - `closeLabel` obligatorio.
   - Apertura en 200 ms y cierre en 150 ms con `ease-out`.
   - `DialogFooter` sin el "Close" fijo en inglés.
+
+## 9. Logo y redes (G-13, 2026-10-05)
+
+- **Logo:** `AsinkoLogo` arriba, centrado y decorativo (`aria-hidden`): el título ya dice de qué trata el modal. Título y descripción pasan a ir centrados.
+- **Redes:** `ui/brand-marks.tsx`, un átomo de marca como `asinko-logo`, con tres SVG de Simple Icons (CC0) en `currentColor`, sin dependencias. Van en píldoras grises de 44 px, y cada una es un `ComingSoon` con "Continue with {provider}".
+- **Para `auth`:** Supabase Auth tiene X (Twitter) como proveedor nativo, pero **no Reddit ni Instagram**. Ese spec tiene que elegir entre cambiar a proveedores con soporte (Google, Apple, X, Discord…) o integrar Reddit e Instagram por fuera de Supabase.

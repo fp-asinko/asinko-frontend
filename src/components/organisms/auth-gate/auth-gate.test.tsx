@@ -79,4 +79,17 @@ describe('AuthGate', () => {
     expect(dialog).toHaveAttribute('data-action', 'vote-poll')
     expect(dialog).toHaveAttribute('data-next', '/en?filter=polls')
   })
+
+  it('shows the brand on top and the social logins as coming soon (G-13)', async () => {
+    renderGate(false)
+    await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
+    const dialog = await screen.findByRole('dialog')
+    expect(dialog.querySelector('[aria-hidden] [role="img"]')).not.toBeNull()
+    for (const provider of ['Reddit', 'Instagram', 'X']) {
+      expect(screen.getByRole('button', { name: `Continue with ${provider}` })).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      )
+    }
+  })
 })
