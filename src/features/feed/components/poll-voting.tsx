@@ -190,11 +190,20 @@ export function PollVoting({
                       <span
                         data-mine
                         className={cn(
-                          'inline-flex shrink-0',
+                          'relative inline-flex shrink-0',
                           lastVotedId === option.id && 'animate-vote-pop',
                         )}
                       >
                         {viewerAvatar}
+                        {/* The check of Reddit, over the avatar's corner: the ring cuts it out of
+                            the box behind. */}
+                        <span
+                          aria-hidden
+                          data-mine-check
+                          className="absolute -right-1 -bottom-1 flex size-3 items-center justify-center rounded-full bg-foreground text-background ring-2 ring-surface"
+                        >
+                          <CheckIcon className="size-2" strokeWidth={4} />
+                        </span>
                       </span>
                     ) : (
                       <CheckIcon

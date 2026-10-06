@@ -237,6 +237,8 @@ describe('PollVoting (H-13, H-15)', () => {
       expect(option).toHaveAttribute('aria-pressed', 'true')
       expect(mine[0]).toContainElement(screen.getByTestId('user-avatar'))
       expect(screen.getByTestId('user-avatar')).toHaveTextContent('MA')
+      // With the check of Reddit over its corner.
+      expect(mine[0]!.querySelector('[data-mine-check]')).not.toBeNull()
     })
 
     it('falls back to the check without a known viewer name (FC-22)', () => {

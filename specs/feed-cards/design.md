@@ -370,3 +370,5 @@ Pedido del usuario, con capturas de Reddit.
 | `openRequest` abre y carga                                                                                                                             | `comments-toggle.test.tsx` |
 | `viewerAvatar` del provider                                                                                                                            | `auth-gate.test.tsx`       |
 | E2E: votar muestra avatar, números y nota; "Tell us why" despliega los comentarios; axe claro/oscuro; reducir movimiento                               | `feed-cards.spec.ts`       |
+
+- **Check sobre el avatar** (pedido del PO, como Reddit): un círculo de 12 px con el ✓ en la esquina inferior derecha del avatar, `bg-foreground` con un anillo del color de la caja.
