@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations } from 'next-intl/server'
 import { AppShell, type NavItem } from '@/components/organisms/app-shell'
+import { UserAvatar } from '@/components/molecules/user-avatar'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { JoinedProvider } from '@/components/organisms/join'
 import { RightColumn } from '@/components/organisms/right-column'
@@ -83,7 +84,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
       <body>
         <NextIntlClientProvider messages={clientMessages}>
           <Providers nonce={nonce}>
-            <AuthGateProvider signedIn={signedIn}>
+            <AuthGateProvider
+              signedIn={signedIn}
+              viewerAvatar={viewer && <UserAvatar name={viewer.username} size="xs" />}
+            >
               {/* Joined communities of this visit: every join button hides at once (specs/community-first). */}
               <JoinedProvider>
                 <AppShell

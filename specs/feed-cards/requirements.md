@@ -90,3 +90,22 @@ Que cada tarjeta del feed transmita identidad (quién, dónde) y que votar o lee
 - [x] **FC-21** **La que gana, resaltada:** la opción con más votos (o las que empatan arriba) lleva el relleno pleno y el texto en negrita. Las demás tienen el mismo relleno con menos opacidad y el texto secundario.
 - [x] **FC-22** **Tu voto:** un ✓ junto a la etiqueta de la opción que votaste, gane o no; para lectores de pantalla, "(your vote)".
 - [x] **FC-23** **Consenso en una línea:** debajo de las opciones, en gris y sin caja ni color: "49% of the community thinks like you" (mínimo de 5 votos, R1-Q1).
+
+## Revisión 4 — Votos, tu avatar y nota con invitación a comentar (2026-10-05)
+
+> **Estado:** aprobado por el PO el 2026-10-05.
+> **Pedido del PO**, con capturas de Reddit y del prototipo: "agregar tu logo en lo que votes y a la derecha la cantidad de votos, arriba dejar alguna nota como hace el prototipo, con una invitación a que me comentes".
+> **Decisiones con el PO:**
+>
+> - Votos y porcentaje chico.
+> - Nota con un botón que abre los comentarios.
+> - La nota reemplaza a la línea de consenso y solo aparece después de votar.
+
+- [x] **FC-24** **Tu avatar en tu voto:** la opción que votaste lleva tu avatar (20 px, iniciales sobre tu color de identidad, igual que el composer) en lugar del ✓, con el mismo "pop" al votar. Para lectores de pantalla sigue diciendo "(your vote)".
+- [x] **FC-25** **Votos a la derecha:** con resultados, cada opción muestra la cantidad de votos en el color del texto de la opción y, al lado, el porcentaje más chico y en gris. Si el backend da el porcentaje pero no la cantidad, solo el porcentaje.
+- [x] **FC-26** **Nota arriba de las opciones:** después de votar (con resultados y al menos 5 votos, R1-Q1), una caja arriba de las opciones dice cuántos piensan como vos y hace una pregunta según el caso:
+  - **minoría**: "19% share your view. The other 81% bet differently. What are they seeing that you are not?";
+  - **mayoría**: "63% share your view. You are with the majority. What could the other 37% be seeing?";
+  - **empate**: "50% share your view. It is a tie. What tips the balance?"
+- [x] **FC-27** **Invitación a comentar:** la nota lleva el botón "Tell us why", que despliega los comentarios de la encuesta (el mismo panel del 💬). Cuando exista crear comentarios, ese botón abre la caja para escribir.
+- [x] **FC-28** **Sin saltos:** la nota entra desplegándose (alto animado, como los comentarios) después del relleno, así las opciones bajan de a poco. Para un voto anterior está desde el principio, sin animación. La línea gris de consenso de FC-23 se va.

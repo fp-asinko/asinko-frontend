@@ -81,4 +81,31 @@ describe('CommentsToggle (H-28)', () => {
     await userEvent.click(button)
     expect(await screen.findByText('Back')).toBeInTheDocument()
   })
+
+  it('opens and loads when asked from outside, and stays open on the next request (FC-27)', async () => {
+    action.loadCommentsPreview.mockResolvedValue({ ok: true, data: <p>First comment</p> })
+    const view = renderWithIntl(
+      <CommentsToggle kind="poll" id={ID} openRequest={0}>
+        6 comments
+      </CommentsToggle>,
+    )
+    const button = screen.getByRole('button', { name: /6 comments/ })
+    expect(button).toHaveAttribute('aria-expanded', 'false')
+
+    view.rerender(
+      <CommentsToggle kind="poll" id={ID} openRequest={1}>
+        6 comments
+      </CommentsToggle>,
+    )
+    expect(button).toHaveAttribute('aria-expanded', 'true')
+    expect(await screen.findByText('First comment')).toBeInTheDocument()
+
+    view.rerender(
+      <CommentsToggle kind="poll" id={ID} openRequest={2}>
+        6 comments
+      </CommentsToggle>,
+    )
+    expect(button).toHaveAttribute('aria-expanded', 'true')
+    expect(action.loadCommentsPreview).toHaveBeenCalledOnce()
+  })
 })

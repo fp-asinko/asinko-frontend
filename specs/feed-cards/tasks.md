@@ -84,3 +84,10 @@ T-01 ─┬─ T-02 ─ T-03
 - [x] **T-12 · Caja única con relleno** · M · FC-20 a FC-23
   - `PollVoting` con relleno por porcentaje, la ganadora resaltada, ✓ en tu voto y el consenso en una línea. Se sacan los tokens y mensajes que quedan sin uso.
   - **Tests:** `poll-voting.test.tsx` (ganadora y empate resaltados, el resto suave, ✓ en tu voto aunque no gane, consenso en una línea, foco conservado). En `e2e/feed-cards.spec.ts`, la caja de cada opción mide lo mismo antes y después de votar. Contraste, axe en claro y oscuro, y presupuesto de JS.
+
+## Revisión 4 — Votos, tu avatar y nota
+
+- [x] **R4-T1 (S)** `viewerAvatar` en `AuthGateProvider` y en el layout, con su test. → FC-24
+- [x] **R4-T2 (S)** `openRequest` en `CommentsToggle`, con su test. → FC-27
+- [x] **R4-T3 (M)** `PollVoting`: avatar, números, nota con botón y entrada desplegable; mensajes en en/es/pt; se va la línea de consenso. Tests. → FC-24 a FC-28
+- [x] **R4-T4 (S)** E2E en `feed-cards.spec.ts` y ajuste de los que miraban el ✓ o la línea de consenso. → FC-24 a FC-28

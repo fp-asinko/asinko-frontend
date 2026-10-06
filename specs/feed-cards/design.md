@@ -333,3 +333,40 @@ Pedido del usuario, con capturas de Reddit.
   - Sigue siendo "Próximamente".
 - **Sin tags:** se saca la etiqueta del post ("Análisis", "Discusión", "On-chain"…). El backend sigue mandando `tag`; el mapper ya no lo pasa a la UI y `PostItem` no lo tiene.
 - Las encuestas no cambian: su fila solo tiene comentarios y el resumen de votos.
+
+## 15. Revisión 4 — Votos, tu avatar y nota (2026-10-05)
+
+> **Estado:** aprobado el 2026-10-05 (FC-24 a FC-28).
+
+| Pieza                | Implementación                                                                                                                                                                                                                                                                |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tu avatar            | `UserAvatar size="xs"` con el `username` del viewer, en lugar del `CheckIcon`. Si no se conoce el nombre (tests sin provider), queda el ✓                                                                                                                                     |
+| Viewer en el cliente | `AuthGateProvider` suma `viewerAvatar`: el layout dibuja `UserAvatar` en el servidor con el `username` de `getViewer()` y pasa el nodo. Así el código del avatar no llega al navegador (con él, el JS pasaba a 230,25 KB). Sin tocar `FeedItems` ni la acción de "cargar más" |
+| Números              | `97` en el color del texto de la opción (negrita si gana) y `63 %` en `type-meta text-muted-foreground`, con `tabular-nums`                                                                                                                                                   |
+| Nota                 | Caja `rounded-lg border px-3.5 py-3` arriba de la lista: título `type-ui font-bold` y pregunta `type-meta text-muted-foreground`. El botón va abajo a la izquierda                                                                                                            |
+| Botón                | Píldora gris `h-8 bg-muted type-action` con `MessageSquareIcon`: "Tell us why"                                                                                                                                                                                                |
+| Abrir comentarios    | `CommentsToggle` suma `openRequest?: number`: cada vez que sube, abre el panel (y lo carga si hace falta). `PollVoting` pasa a renderizar el toggle (la tarjeta le pasa el contenido del botón) y sube el número desde la nota                                                |
+| Entrada              | Contenedor `grid` con `grid-rows-[0fr]` → `[1fr]` en 200 ms, después del relleno (`delay-after-bars`). Con reducir movimiento, al instante. Al cambiar el voto de tramo, se actualiza el texto sin volver a desplegar                                                         |
+| Consenso             | `pollConsensus` no cambia. El resto (`rest`) es `1 − share`                                                                                                                                                                                                                   |
+
+### Mensajes (`feed.poll.note`)
+
+| Clave      | en                                                                       | es                                                             | pt                                                                     |
+| ---------- | ------------------------------------------------------------------------ | -------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `title`    | {percent} share your view.                                               | {percent} piensa como tú.                                      | {percent} pensam como você.                                            |
+| `minority` | The other {rest} bet differently. What are they seeing that you are not? | El otro {rest} apostó distinto. ¿Qué ven que tú no?            | Os outros {rest} apostaram diferente. O que eles veem que você não vê? |
+| `majority` | You are with the majority. What could the other {rest} be seeing?        | Estás con la mayoría. ¿Qué podría estar viendo el otro {rest}? | Você está com a maioria. O que os outros {rest} podem estar vendo?     |
+| `tie`      | It is a tie. What tips the balance?                                      | Hay empate. ¿Qué inclina la balanza?                           | Está empatado. O que desempata?                                        |
+| `cta`      | Tell us why                                                              | Cuéntanos por qué                                              | Conte por quê                                                          |
+
+- Es copy de producto: las traducciones van marcadas `TODO(i18n)` en el PR, para que las revise el PO (`i18n.md`).
+- Se borra `feed.poll.consensus`.
+
+### Tests
+
+| Qué                                                                                                                                                    | Dónde                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------- |
+| Avatar en tu voto (y ✓ sin nombre); votos y porcentaje; nota por tramo; sin nota antes de votar ni con menos de 5 votos; el botón abre los comentarios | `poll-voting.test.tsx`     |
+| `openRequest` abre y carga                                                                                                                             | `comments-toggle.test.tsx` |
+| `viewerAvatar` del provider                                                                                                                            | `auth-gate.test.tsx`       |
+| E2E: votar muestra avatar, números y nota; "Tell us why" despliega los comentarios; axe claro/oscuro; reducir movimiento                               | `feed-cards.spec.ts`       |

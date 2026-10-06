@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { UserAvatar } from '@/components/molecules/user-avatar'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { pollItem } from '../feed-items.fixture'
@@ -9,6 +10,8 @@ import { PollVoting } from './poll-voting'
 
 const action = vi.hoisted(() => ({ votePoll: vi.fn() }))
 vi.mock('../actions/vote-poll.action', () => action)
+const comments = vi.hoisted(() => ({ loadCommentsPreview: vi.fn() }))
+vi.mock('../actions/load-comments-preview.action', () => comments)
 
 const hidden = pollItem({
   resultsVisible: false,
@@ -19,8 +22,8 @@ const hidden = pollItem({
   ],
 })
 
-function renderPoll(poll: PollItem = hidden) {
-  return renderWithIntl(
+function renderPoll(poll: PollItem = hidden, { viewerName }: { viewerName?: string } = {}) {
+  const ui = (
     <PollVoting
       id={poll.id}
       options={poll.options}
@@ -30,8 +33,17 @@ function renderPoll(poll: PollItem = hidden) {
       isClosed={poll.isClosed}
       allowVoteChange={poll.allowVoteChange}
       closing="Closes in 3 days"
-      comments={<button type="button">Comments</button>}
-    />,
+      commentsLabel="Comments"
+    />
+  )
+  return renderWithIntl(
+    viewerName ? (
+      <AuthGateProvider signedIn viewerAvatar={<UserAvatar name={viewerName} size="xs" />}>
+        {ui}
+      </AuthGateProvider>
+    ) : (
+      ui
+    ),
   )
 }
 
@@ -85,7 +97,7 @@ describe('PollVoting (H-13, H-15)', () => {
           isClosed={false}
           allowVoteChange
           closing={null}
-          comments={null}
+          commentsLabel="Comments"
         />
       </AuthGateProvider>,
     )
@@ -112,9 +124,12 @@ describe('PollVoting (H-13, H-15)', () => {
     expect(screen.getByText('(Your vote)')).toBeInTheDocument()
   })
 
-  it('keeps the comments slot in the footer', () => {
+  it('keeps the comments button in the footer', () => {
     renderPoll()
-    expect(screen.getByRole('button', { name: 'Comments' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Comments' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    )
   })
 
   it('keeps the focused option a button once the vote locks, and announces it (WCAG 2.4.3)', async () => {
@@ -126,7 +141,9 @@ describe('PollVoting (H-13, H-15)', () => {
 
     const yes = screen.getByRole('button', { name: 'Yes' })
     await userEvent.click(yes)
-    expect(await screen.findByRole('status')).toHaveTextContent('Vote saved')
+    expect(
+      await screen.findByText('Vote saved.', { selector: '[role=status] span' }),
+    ).toBeInTheDocument()
     expect(yes).toBeInTheDocument()
     expect(yes).toHaveFocus()
     expect(yes).toHaveAttribute('aria-disabled', 'true')
@@ -156,13 +173,13 @@ describe('PollVoting (H-13, H-15)', () => {
       })
       const { container } = renderPoll()
       await userEvent.click(screen.getByRole('button', { name: 'Yes' }))
-      expect(await screen.findByText('100%')).toHaveClass('animate-fade-in')
+      expect((await screen.findByText('100%')).parentElement).toHaveClass('animate-fade-in')
       expect(container.querySelector('ul')).toHaveAttribute('data-revealed', 'true')
       expect(container.querySelector('[data-bar].animate-bar-grow')).not.toBeNull()
     })
   })
 
-  describe('minimal polls (feed-cards revision 2)', () => {
+  describe('minimal polls (feed-cards revisions 2 and 4)', () => {
     const results = (viewerOptionId: string) => ({
       ok: true,
       data: {
@@ -211,17 +228,28 @@ describe('PollVoting (H-13, H-15)', () => {
       for (const fill of fills(container)) expect(fill).not.toHaveClass('opacity-50')
     })
 
-    it('marks the viewer vote with a check even when it does not lead (FC-22)', () => {
+    it('marks the viewer vote with their avatar even when it does not lead (FC-24)', () => {
+      const { container } = renderPoll(pollItem({ viewerOptionId: 'a' }), { viewerName: 'maria' })
+      const mine = container.querySelectorAll('[data-mine]')
+      expect(mine).toHaveLength(1)
+      const option = screen.getByRole('button', { name: /Above 150K/ })
+      expect(option).toContainElement(mine[0] as HTMLElement)
+      expect(option).toHaveAttribute('aria-pressed', 'true')
+      expect(mine[0]).toContainElement(screen.getByTestId('user-avatar'))
+      expect(screen.getByTestId('user-avatar')).toHaveTextContent('MA')
+    })
+
+    it('falls back to the check without a known viewer name (FC-22)', () => {
       const { container } = renderPoll(pollItem({ viewerOptionId: 'a' }))
-      const checks = container.querySelectorAll('[data-mine]')
-      expect(checks).toHaveLength(1)
-      expect(screen.getByRole('button', { name: /Above 150K/ })).toContainElement(
-        checks[0] as HTMLElement,
-      )
-      expect(screen.getByRole('button', { name: /Above 150K/ })).toHaveAttribute(
-        'aria-pressed',
-        'true',
-      )
+      expect(container.querySelector('svg[data-mine]')).not.toBeNull()
+      expect(screen.queryByTestId('user-avatar')).toBeNull()
+    })
+
+    it('shows the votes and, smaller, the share of each option (FC-25)', () => {
+      renderPoll(pollItem())
+      expect(screen.getByText('75')).toHaveClass('font-semibold')
+      expect(screen.getByText('75%')).toHaveClass('type-meta', 'text-muted-foreground')
+      expect(screen.getByText('25')).toBeInTheDocument()
     })
 
     it('keeps the same focused button when the results arrive (WCAG 2.4.3)', async () => {
@@ -234,7 +262,7 @@ describe('PollVoting (H-13, H-15)', () => {
       expect(yes).toHaveFocus()
     })
 
-    it('says where the vote stands in one quiet line, once the server answers (FC-23)', async () => {
+    it('unfolds a note above the options once the server answers, after the bars (FC-26, FC-28)', async () => {
       let answer: (value: unknown) => void = () => {}
       action.votePoll.mockReturnValue(new Promise((resolve) => (answer = resolve)))
       const { container } = renderPoll()
@@ -244,36 +272,75 @@ describe('PollVoting (H-13, H-15)', () => {
 
       answer(results('b'))
       await screen.findByText('20%')
-      const line = consensusOf(container)!
-      expect(line.tagName).toBe('P')
-      expect(line).toHaveTextContent('20% of the community thinks like you')
-      expect(line).toHaveClass('animate-fade-up', 'delay-after-bars')
+      const note = consensusOf(container)!
+      expect(note).toHaveAttribute('data-consensus', 'minority')
+      expect(note).toHaveTextContent('20% share your view.')
+      expect(note).toHaveTextContent(
+        'The other 80% bet differently. What are they seeing that you are not?',
+      )
+      // Above the options, unfolding after the bars.
+      const list = container.querySelector('ul')!
+      expect(note.compareDocumentPosition(list) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+      const unfold = note.parentElement!.parentElement!
+      expect(unfold).toHaveClass('grid-rows-[1fr]', 'delay-400')
       // Inserted text is not read: the live region says it with the saved vote (WCAG 4.1.3).
-      expect(screen.getByRole('status')).toHaveTextContent(
-        'Vote saved. 20% of the community thinks like you.',
+      // The comments toggle has its own status: find the poll's by its text.
+      expect(
+        screen
+          .getAllByRole('status')
+          .some((status) =>
+            status.textContent?.startsWith(
+              'Vote saved. 20% share your view. The other 80% bet differently.',
+            ),
+          ),
+      ).toBe(true)
+    })
+
+    it('asks the majority what the others could be seeing', async () => {
+      action.votePoll.mockResolvedValue(results('a'))
+      const { container } = renderPoll()
+      await userEvent.click(screen.getByRole('button', { name: 'Yes' }))
+      await screen.findByText('80% share your view.')
+      expect(consensusOf(container)).toHaveTextContent(
+        'You are with the majority. What could the other 20% be seeing?',
       )
     })
 
-    it('enters again at once when a changed vote changes the tier', async () => {
+    it('changes the note at once, without waiting for the bars, when a vote changes the tier', async () => {
       action.votePoll.mockResolvedValueOnce(results('b')).mockResolvedValueOnce(results('a'))
       const { container } = renderPoll()
 
       await userEvent.click(screen.getByRole('button', { name: 'No' }))
-      await screen.findByText('20% of the community thinks like you', { selector: 'p' })
+      await screen.findByText('20% share your view.')
       await userEvent.click(screen.getByRole('button', { name: /Yes/ }))
-      await screen.findByText('80% of the community thinks like you', { selector: 'p' })
-      expect(consensusOf(container)).toHaveClass('animate-fade-up')
-      expect(consensusOf(container)).not.toHaveClass('delay-after-bars')
+      await screen.findByText('80% share your view.')
+      expect(consensusOf(container)!.parentElement!.parentElement).not.toHaveClass('delay-400')
     })
 
-    it('shows the consensus of a vote cast earlier at once, without animation', () => {
+    it('shows the note of a vote cast earlier from the start (FC-28)', () => {
       const { container } = renderPoll(pollItem({ viewerOptionId: 'b' }))
-      expect(consensusOf(container)).toHaveTextContent('75% of the community thinks like you')
-      expect(consensusOf(container)).not.toHaveClass('animate-fade-up')
+      const note = consensusOf(container)!
+      expect(note).toHaveTextContent('75% share your view.')
+      expect(note.parentElement!.parentElement).toHaveClass('grid-rows-[1fr]')
+      expect(note.parentElement!.parentElement).not.toHaveClass('delay-400')
     })
 
-    it('stays quiet below 5 votes (R1-Q1)', () => {
-      const { container } = renderPoll(
+    it('opens the comments from the note (FC-27)', async () => {
+      comments.loadCommentsPreview.mockResolvedValue({ ok: true, data: <p>First comment</p> })
+      renderPoll(pollItem({ viewerOptionId: 'b' }))
+      await userEvent.click(screen.getByRole('button', { name: 'Tell us why' }))
+      expect(screen.getByRole('button', { name: 'Comments' })).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      )
+      expect(await screen.findByText('First comment')).toBeInTheDocument()
+    })
+
+    it('has no note before voting nor below 5 votes (R1-Q1)', () => {
+      const { container, unmount } = renderPoll(pollItem())
+      expect(consensusOf(container)).toBeNull()
+      unmount()
+      const few = renderPoll(
         pollItem({
           viewerOptionId: 'a',
           totalVotes: 4,
@@ -283,7 +350,7 @@ describe('PollVoting (H-13, H-15)', () => {
           ],
         }),
       )
-      expect(consensusOf(container)).toBeNull()
+      expect(consensusOf(few.container)).toBeNull()
     })
   })
 })

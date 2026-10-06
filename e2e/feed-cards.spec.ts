@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 import { expectNoA11yViolations } from './fixtures/axe'
 
 // specs/feed-cards against the production build with API_MOCKS=true.
@@ -6,9 +6,17 @@ import { expectNoA11yViolations } from './fixtures/axe'
 const articles = (page: Page) => page.getByRole('article')
 const card = (page: Page, text: string) => articles(page).filter({ hasText: text })
 const DEFI = 'How much of your portfolio is in DeFi?'
+// The note of revision 4 (FC-26). It unfolds inside a grid two levels up (FC-28).
+const noteOf = (poll: Locator) =>
+  poll.locator('[data-consensus]').filter({ hasText: /\d+% share your view\./ })
+const unfoldStyle = (note: Locator) =>
+  note.evaluate((el) => {
+    const style = getComputedStyle(el.parentElement!.parentElement!)
+    return { delay: style.transitionDelay, duration: parseFloat(style.transitionDuration) }
+  })
 
 test.describe('Feed cards', () => {
-  test('voting fills the same boxes and says where the vote stands, after the fill (FC-20, FC-23, FC-09)', async ({
+  test('voting fills the same boxes, marks it with your avatar and unfolds the note after the fill (FC-20, FC-24 to FC-28)', async ({
     page,
   }) => {
     await page.goto('/en?filter=polls')
@@ -17,23 +25,31 @@ test.describe('Feed cards', () => {
     const before = (await option.boundingBox())!.height
     await option.click()
 
-    const consensus = poll
-      .locator('[data-consensus]')
-      .filter({ hasText: /\d+% of the community thinks like you/ })
-    await expect(consensus).toBeVisible()
-    expect(await consensus.evaluate((el) => getComputedStyle(el).animationDelay)).toBe('0.4s')
+    const note = noteOf(poll)
+    await expect(note).toBeVisible()
+    expect((await unfoldStyle(note)).delay).toBe('0.4s')
+    // FC-24: the demo viewer's avatar on the voted option.
+    await expect(option.locator('[data-mine]').getByTestId('user-avatar')).toBeVisible()
     await expect(poll.locator('[data-bar]')).toHaveCount(4)
     // FC-20: the same box before and after voting, now filled to its share.
     expect((await option.boundingBox())!.height).toBe(before)
   })
 
-  test('a vote cast earlier shows its consensus at once', async ({ page }) => {
+  test('a vote cast earlier shows its note from the start (FC-28)', async ({ page }) => {
     await page.goto('/en?filter=polls')
-    const consensus = card(page, 'Next Fed move?')
-      .locator('[data-consensus]')
-      .filter({ hasText: /of the community thinks like you/ })
-    await expect(consensus).toBeVisible()
-    expect(await consensus.evaluate((el) => getComputedStyle(el).animationName)).toBe('none')
+    const note = noteOf(card(page, 'Next Fed move?'))
+    await expect(note).toBeVisible()
+    expect((await unfoldStyle(note)).delay).toBe('0s')
+  })
+
+  test('Tell us why opens the comments of the poll (FC-27)', async ({ page }) => {
+    await page.goto('/en?filter=polls')
+    const poll = card(page, 'Next Fed move?')
+    await poll.getByRole('button', { name: 'Tell us why' }).click()
+    await expect(poll.getByRole('button', { name: /comments/ })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
   })
 
   test('comments enter one after another and avatars answer the hover (FC-10)', async ({
@@ -68,9 +84,7 @@ test.describe('Feed cards', () => {
       await expect(whales.getByRole('button', { name: 'See all comments' })).toBeVisible()
       const poll = card(page, DEFI)
       await poll.getByRole('button', { name: '1–10%' }).click()
-      await expect(
-        poll.locator('[data-consensus]').filter({ hasText: /of the community thinks like you/ }),
-      ).toBeVisible()
+      await expect(noteOf(poll)).toBeVisible()
 
       await expectNoA11yViolations(page)
     })
@@ -80,16 +94,12 @@ test.describe('Feed cards', () => {
 test.describe('Feed cards with reduced motion (FC-11)', () => {
   test.use({ reducedMotion: 'reduce' })
 
-  test('the colored results and the consensus arrive in their final state', async ({ page }) => {
+  test('the results and the note arrive in their final state', async ({ page }) => {
     await page.goto('/en?filter=polls')
     const poll = card(page, DEFI)
     await poll.getByRole('button', { name: '1–10%' }).click()
-    const consensus = poll
-      .locator('[data-consensus]')
-      .filter({ hasText: /of the community thinks like you/ })
-    await expect(consensus).toBeVisible()
-    expect(
-      await consensus.evaluate((el) => parseFloat(getComputedStyle(el).animationDuration)),
-    ).toBeLessThanOrEqual(0.001)
+    const note = noteOf(poll)
+    await expect(note).toBeVisible()
+    expect((await unfoldStyle(note)).duration).toBeLessThanOrEqual(0.001)
   })
 })

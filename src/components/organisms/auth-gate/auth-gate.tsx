@@ -11,6 +11,11 @@ export type GateRequest = { action: GatedAction; next: string }
 
 type AuthGate = {
   signedIn: boolean
+  /**
+   * The viewer's avatar, rendered on the server (FC-24: on their poll vote). A node, not a name:
+   * the avatar code never reaches the browser (JS budget, seo.md).
+   */
+  viewerAvatar: ReactNode
   /** true when there is a session; otherwise opens the modal for `action` and returns false. */
   requireAccount: (action: GatedAction) => boolean
   /** Opens the modal directly: the Log in and Sign up buttons. */
@@ -20,6 +25,7 @@ type AuthGate = {
 // Without a provider (isolated component tests) everything behaves as signed in, like before.
 const AuthGateContext = createContext<AuthGate>({
   signedIn: true,
+  viewerAvatar: null,
   requireAccount: () => true,
   openGate: () => {},
 })
@@ -38,9 +44,11 @@ const AuthGateDialog = dynamic(
  */
 export function AuthGateProvider({
   signedIn,
+  viewerAvatar = null,
   children,
 }: {
   signedIn: boolean
+  viewerAvatar?: ReactNode
   children: ReactNode
 }) {
   const [request, setRequest] = useState<GateRequest | null>(null)
@@ -57,6 +65,7 @@ export function AuthGateProvider({
   const value = useMemo<AuthGate>(
     () => ({
       signedIn,
+      viewerAvatar: signedIn ? viewerAvatar : null,
       openGate,
       requireAccount: (action) => {
         if (signedIn) return true
@@ -64,7 +73,7 @@ export function AuthGateProvider({
         return false
       },
     }),
-    [signedIn, openGate],
+    [signedIn, viewerAvatar, openGate],
   )
 
   return (

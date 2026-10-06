@@ -92,4 +92,23 @@ describe('AuthGate', () => {
       )
     }
   })
+
+  it('shares the viewer avatar only with a session (FC-24)', () => {
+    function Name() {
+      return <p>{useAuthGate().viewerAvatar ?? 'nobody'}</p>
+    }
+    const { unmount } = renderWithIntl(
+      <AuthGateProvider signedIn viewerAvatar="maria">
+        <Name />
+      </AuthGateProvider>,
+    )
+    expect(screen.getByText('maria')).toBeInTheDocument()
+    unmount()
+    renderWithIntl(
+      <AuthGateProvider signedIn={false} viewerAvatar="maria">
+        <Name />
+      </AuthGateProvider>,
+    )
+    expect(screen.getByText('nobody')).toBeInTheDocument()
+  })
 })

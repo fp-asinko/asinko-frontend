@@ -139,7 +139,13 @@
       "closed": "Cerrada",
       "hidden": "Vota para ver los resultados",
       "yourVote": "Tu voto",
-      "consensus": "El {percent} de la comunidad piensa como tú"
+      "note": {
+        "title": "{percent} piensa como tú.",
+        "minority": "El otro {rest} apostó distinto. ¿Qué ven que tú no?",
+        "majority": "Estás con la mayoría. ¿Qué podría estar viendo el otro {rest}?",
+        "tie": "Hay empate. ¿Qué inclina la balanza?",
+        "cta": "Cuéntanos por qué"
+      }
     },
     "empty": {
       "forYou": "Todavía no hay publicaciones.",

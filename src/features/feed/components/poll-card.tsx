@@ -3,7 +3,6 @@ import { useFormatter, useNow, useTranslations } from 'next-intl'
 import type { PollItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
-import { CommentsToggle } from './comments-toggle'
 import { PollVoting } from './poll-voting'
 
 /**
@@ -60,15 +59,15 @@ export function PollCard({ poll }: { poll: PollItem }) {
         isClosed={poll.isClosed}
         allowVoteChange={poll.allowVoteChange}
         closing={closing}
-        comments={
+        commentsLabel={
           // Same as a post's (P-006): the compact count, and the full sentence for screen readers.
-          <CommentsToggle kind="poll" id={poll.id}>
+          <>
             <MessageSquareIcon aria-hidden className="size-4" />
             <span aria-hidden>
               {format.number(poll.commentCount, countFormat(poll.commentCount))}
             </span>
             <span className="sr-only">{tc('comments', { count: poll.commentCount })}</span>
-          </CommentsToggle>
+          </>
         }
       />
     </article>

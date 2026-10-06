@@ -2,7 +2,7 @@
 
 import { ChevronDownIcon } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
-import { useId, useState, useTransition, type ReactNode } from 'react'
+import { useEffect, useEffectEvent, useId, useState, useTransition, type ReactNode } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { loadCommentsPreview } from '../actions/load-comments-preview.action'
@@ -15,10 +15,13 @@ import { loadCommentsPreview } from '../actions/load-comments-preview.action'
 export function CommentsToggle({
   kind,
   id,
+  openRequest = 0,
   children,
 }: {
   kind: 'post' | 'poll'
   id: string
+  /** Each time it goes up, the panel opens (and loads): the poll note's "Tell us why" (FC-27). */
+  openRequest?: number
   /** Button content rendered by the card: icon and count. */
   children: ReactNode
 }) {
@@ -31,6 +34,13 @@ export function CommentsToggle({
   const [preview, setPreview] = useState<ReactNode>(null)
   const [failed, setFailed] = useState(false)
   const [pending, startTransition] = useTransition()
+
+  const openFromOutside = useEffectEvent(() => {
+    if (!open) toggle()
+  })
+  useEffect(() => {
+    if (openRequest > 0) openFromOutside()
+  }, [openRequest])
 
   function toggle() {
     const next = !open

@@ -139,7 +139,13 @@
       "closed": "Closed",
       "hidden": "Vote to see the results",
       "yourVote": "Your vote",
-      "consensus": "{percent} of the community thinks like you"
+      "note": {
+        "title": "{percent} share your view.",
+        "minority": "The other {rest} bet differently. What are they seeing that you are not?",
+        "majority": "You are with the majority. What could the other {rest} be seeing?",
+        "tie": "It is a tie. What tips the balance?",
+        "cta": "Tell us why"
+      }
     },
     "empty": {
       "forYou": "Nothing posted yet.",
