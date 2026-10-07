@@ -26,7 +26,14 @@ import { commentTree } from './comment-tree'
 import { paginate } from './paginate'
 import type { MockContext, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
-import { createComment, createPost, findPost, removeCommentVote, voteComment } from './posting'
+import {
+  commentsOf,
+  createComment,
+  createPost,
+  findPost,
+  removeCommentVote,
+  voteComment,
+} from './posting'
 import { removePostVote, votePoll, votePost } from './votes'
 
 const notFound = { status: 404, body: { error: { code: 'NOT_FOUND', message: 'mock' } } }
@@ -311,7 +318,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     },
     handler: ({ params, query }) =>
       params.id && findPost(params.id)
-        ? { status: 200, body: { items: commentTree(COMMENTS_BY_CONTENT[params.id] ?? [], query) } }
+        ? { status: 200, body: { items: commentTree(commentsOf(params.id), query) } }
         : notFound,
   },
   {

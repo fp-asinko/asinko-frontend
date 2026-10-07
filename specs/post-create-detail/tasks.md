@@ -12,7 +12,7 @@
   - 308 al slug canónico y 404.
   - Metadata.
   - Tests. → PC-12, PC-13
-- [ ] **T-04 (M)** Comentarios del detalle:
+- [x] **T-04 (M)** Comentarios del detalle:
   - Árbol completo con plegado desde el nivel 4.
   - Comentar y responder (`createComment`, al instante y después `refresh`).
   - Votar comentarios (`voteComment`).

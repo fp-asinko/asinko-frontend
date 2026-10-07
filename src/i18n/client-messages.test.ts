@@ -35,6 +35,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
     const picked = pickClientMessages(en)
     expect(Object.keys(picked).sort()).toEqual([
       'authGate',
+      'comments',
       'common',
       'communities',
       'devLogin',

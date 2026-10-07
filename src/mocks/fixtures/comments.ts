@@ -112,13 +112,44 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
         score: 63,
       },
       [
-        comment({
-          author: 'macropilar',
-          body: 'Exactly. And Powell sounded more dovish than expected.',
-          ago: hoursAgo(1.2),
-          score: 22,
-          editedAt: hoursAgo(1),
-        }),
+        comment(
+          {
+            author: 'macropilar',
+            body: 'Exactly. And Powell sounded more dovish than expected.',
+            ago: hoursAgo(1.2),
+            score: 22,
+            editedAt: hoursAgo(1),
+          },
+          // A deep thread: from level 4 the detail folds the replies (specs/post-create-detail § 4).
+          [
+            comment(
+              {
+                author: 'federico',
+                body: 'Dovish, but he kept saying "data dependent" five times.',
+                ago: hoursAgo(1.1),
+                score: 8,
+              },
+              [
+                comment(
+                  {
+                    author: 'macropilar',
+                    body: 'He always does. The dots matter more than the words.',
+                    ago: hoursAgo(0.9),
+                    score: 5,
+                  },
+                  [
+                    comment({
+                      author: 'jeppe',
+                      body: 'Until the next CPI print changes the dots again.',
+                      ago: hoursAgo(0.8),
+                      score: 3,
+                    }),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
       ],
     ),
     comment({

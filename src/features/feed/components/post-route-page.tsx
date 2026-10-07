@@ -10,7 +10,9 @@ import { postPath, postSlug } from '@/lib/posts/paths'
 import type { PostItem } from '../feed.types'
 import { getPost } from '../lib/post-api'
 import { postExcerpt } from '../lib/post-excerpt'
+import { CommentThread } from './comment-thread'
 import { PostCard } from './post-card'
+import { PostComments } from './post-comments'
 
 function safeLocale(locale: string): Locale {
   return routing.locales.find((each) => each === locale) ?? routing.defaultLocale
@@ -62,7 +64,12 @@ export async function resolvePostRoute(
   return post
 }
 
-/** The post of its own page: the card's pieces, whole (PC-13). */
+/** The post of its own page, whole (PC-13), and its comments (PC-14 to PC-16). */
 export function PostDetail({ post }: { post: PostItem }) {
-  return <PostCard post={post} variant="detail" />
+  return (
+    <CommentThread>
+      <PostCard post={post} variant="detail" />
+      <PostComments postId={post.id} count={post.commentCount} closed={post.deleted} />
+    </CommentThread>
+  )
 }

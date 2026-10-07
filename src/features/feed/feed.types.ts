@@ -105,3 +105,18 @@ export type FeedPage = {
   /** The filtered community (?community=), when there is one. */
   community: CommunityRef | null
 }
+
+/** A comment of a post's page, with its replies (specs/post-create-detail § 4). */
+export type CommentNode = {
+  id: string
+  /** null when deleted: the comment stays only to hold its replies. */
+  author: Author | null
+  /** Markdown; empty when deleted. */
+  body: string
+  createdAt: string
+  edited: boolean
+  deleted: boolean
+  score: number
+  viewerVote: 1 | -1 | null
+  replies: CommentNode[]
+}

@@ -5,6 +5,7 @@ import { useFormatter, useTranslations } from 'next-intl'
 import { useOptimistic, useState, useTransition } from 'react'
 import { useAuthGate } from '@/components/organisms/auth-gate'
 import { cn } from '@/lib/utils'
+import { voteComment } from '../actions/vote-comment.action'
 import { votePost } from '../actions/vote-post.action'
 import { countFormat } from '../lib/count-format'
 
@@ -18,15 +19,33 @@ type Vote = { score: number; viewerVote: 1 | -1 | null }
 type Motion = { pop: 'up' | 'down' | null; roll: 'up' | 'down' | null; key: number }
 
 const BUTTON =
-  'tap inline-flex size-8 items-center justify-center rounded-full outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-60'
+  'tap inline-flex items-center justify-center rounded-full outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-60'
+
+/** The post's pill, and the comment's smaller one with 24px buttons (PC-16, WCAG 2.5.8). */
+const SIZES = {
+  default: { pill: 'h-9.5 type-action', button: 'size-8', icon: 'size-4.5' },
+  sm: { pill: 'h-7 type-meta', button: 'size-6', icon: 'size-4' },
+} as const
 
 /**
  * The prototype's vote pill (H-15): ▲ score ▼, 136×38 with 32px buttons. Pressing the active
  * arrow removes the vote. The change shows at once (useOptimistic); if the Server Action fails,
  * React drops the optimistic value, the score goes back and the pill says why. Without a session
- * nothing is marked: the account modal opens instead (specs/guest-experience G-04).
+ * nothing is marked: the account modal opens instead (specs/guest-experience G-04). Comments use
+ * the small size (specs/post-create-detail PC-16).
  */
-export function VoteControl({ postId, score, viewerVote }: { postId: string } & Vote) {
+export function VoteControl({
+  kind = 'post',
+  id,
+  size = 'default',
+  score,
+  viewerVote,
+}: {
+  kind?: 'post' | 'comment'
+  id: string
+  size?: keyof typeof SIZES
+} & Vote) {
+  const sizes = SIZES[size]
   const t = useTranslations('feed.vote')
   const tc = useTranslations('feed.card')
   const format = useFormatter()
@@ -50,7 +69,10 @@ export function VoteControl({ postId, score, viewerVote }: { postId: string } & 
     }))
     startTransition(async () => {
       setShown({ score: nextScore, viewerVote: next })
-      const result = await votePost({ postId, value: next })
+      const result =
+        kind === 'post'
+          ? await votePost({ postId: id, value: next })
+          : await voteComment({ commentId: id, value: next })
       if (result.ok) {
         // Removing answers 204 without a score: the computed one stands.
         setConfirmed({ score: result.data.score ?? nextScore, viewerVote: result.data.viewerVote })
@@ -70,7 +92,10 @@ export function VoteControl({ postId, score, viewerVote }: { postId: string } & 
       <span
         data-animate={motion.pop ?? undefined}
         // The gray pill of the card actions (HR-09): filled, no border.
-        className="inline-flex h-9.5 items-center gap-0.5 rounded-full bg-muted p-0.5 type-action text-muted-foreground"
+        className={cn(
+          'inline-flex items-center gap-0.5 rounded-full bg-muted p-0.5 text-muted-foreground',
+          sizes.pill,
+        )}
       >
         <button
           type="button"
@@ -78,13 +103,13 @@ export function VoteControl({ postId, score, viewerVote }: { postId: string } & 
           aria-pressed={shown.viewerVote === 1}
           aria-disabled={pending || undefined}
           onClick={() => vote(1)}
-          className={BUTTON}
+          className={cn(BUTTON, sizes.button)}
         >
           <ArrowBigUpIcon
             key={motion.pop === 'up' ? motion.key : 'still'}
             aria-hidden
             className={cn(
-              'size-4.5',
+              sizes.icon,
               shown.viewerVote === 1 && 'fill-current text-foreground',
               motion.pop === 'up' && 'animate-vote-pop',
             )}
@@ -113,13 +138,13 @@ export function VoteControl({ postId, score, viewerVote }: { postId: string } & 
           aria-pressed={shown.viewerVote === -1}
           aria-disabled={pending || undefined}
           onClick={() => vote(-1)}
-          className={BUTTON}
+          className={cn(BUTTON, sizes.button)}
         >
           <ArrowBigDownIcon
             key={motion.pop === 'down' ? motion.key : 'still'}
             aria-hidden
             className={cn(
-              'size-4.5',
+              sizes.icon,
               shown.viewerVote === -1 && 'fill-current text-foreground',
               motion.pop === 'down' && 'animate-vote-pop',
             )}

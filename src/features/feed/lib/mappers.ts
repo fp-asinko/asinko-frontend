@@ -64,7 +64,7 @@ export function toCardCommunity(summary: RawCommunitySummary, signedIn: boolean)
 
 type RawAuthor = Pick<RawUserSummary, 'username' | 'avatarUrl'> & { accuracyRate?: number | null }
 
-function toAuthor(user: RawAuthor | null): Author | null {
+export function toAuthor(user: RawAuthor | null): Author | null {
   if (!user) return null
   return {
     username: user.username,

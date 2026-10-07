@@ -2,7 +2,7 @@ import 'server-only'
 import { apiRequest, noContentSchema, type ApiResult } from '@/lib/api'
 import { pollSchema, voteResultSchema } from '@/lib/api/contract'
 import type { PollResults } from '../feed.types'
-import type { VotePollInput, VotePostInput } from '../schemas/vote.schema'
+import type { VoteCommentInput, VotePollInput, VotePostInput } from '../schemas/vote.schema'
 import { toPollResults } from './mappers'
 
 type PostVote = { score: number | null; viewerVote: 1 | -1 | null }
@@ -47,4 +47,28 @@ export async function votePollAs(
     schema: pollSchema,
   })
   return result.ok ? { ok: true, data: toPollResults(result.data) } : result
+}
+
+/** Votes on a comment (PC-16, E05): the same as a post, on /comments. */
+export async function voteCommentAs(
+  userId: string,
+  { commentId, value }: VoteCommentInput,
+): Promise<ApiResult<PostVote>> {
+  if (value === null) {
+    const removed = await apiRequest({
+      method: 'DELETE',
+      path: '/api/v1/comments/:id/vote',
+      params: { id: commentId },
+      query: { userId },
+      schema: noContentSchema,
+    })
+    return removed.ok ? { ok: true, data: { score: null, viewerVote: null } } : removed
+  }
+  return apiRequest({
+    method: 'PUT',
+    path: '/api/v1/comments/:id/vote',
+    params: { id: commentId },
+    body: { userId, value },
+    schema: voteResultSchema,
+  })
 }

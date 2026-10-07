@@ -57,7 +57,7 @@ export const POSTS: RawPost[] = [
     body: 'A 25 basis point cut, in line with expectations. The market had it priced in, so the big move will come from the press conference. Historically $BTC and $ETH react more to the dot plot than to the cut itself.',
     tag: 'Analysis',
     score: 642,
-    commentCount: 3,
+    commentCount: 6,
     publishedAt: hoursAgo(2),
   }),
   post(3, {

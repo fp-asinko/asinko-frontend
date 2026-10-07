@@ -4,7 +4,14 @@ import { POLLS } from '@/mocks/fixtures/polls'
 import { POSTS } from '@/mocks/fixtures/posts'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
-import { getCommentsPreview, PREVIEW_FETCH, PREVIEW_SIZE } from './comments-api'
+import { DEMO_USER } from '@/mocks/demo-user'
+import {
+  createCommentAs,
+  getCommentTree,
+  getCommentsPreview,
+  PREVIEW_FETCH,
+  PREVIEW_SIZE,
+} from './comments-api'
 
 const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[] }))
 
@@ -83,5 +90,66 @@ describe('getCommentsPreview', () => {
       locale: 'en',
     })
     expect(result).toMatchObject({ ok: false, code: 'NOT_FOUND' })
+  })
+})
+
+describe('getCommentTree (specs/post-create-detail PC-14)', () => {
+  beforeEach(() => {
+    state.routes = MOCK_ROUTES
+  })
+
+  it('returns the whole thread, nested, keeping a deleted comment only while it has replies', async () => {
+    const post = POSTS[0]!
+    const result = await getCommentTree(post.id)
+    if (!result.ok) throw new Error('expected ok')
+    expect(result.data.map((each) => each.id)).toEqual(
+      COMMENTS_BY_CONTENT[post.id]!.map((each) => each.id),
+    )
+    const deleted = result.data.find((each) => each.deleted)!
+    expect(deleted).toMatchObject({ author: null, body: '' })
+    expect(deleted.replies).toHaveLength(1)
+    expect(result.data[0]!.replies[0]!.replies[0]!.author?.path).toBe('/user/quantsimula')
+  })
+
+  it('drops a deleted comment without replies', async () => {
+    const post = POSTS[0]!
+    const [first] = COMMENTS_BY_CONTENT[post.id]!
+    state.routes = MOCK_ROUTES.map((route) =>
+      route.path === '/api/v1/posts/:id/comments' && route.method === 'GET'
+        ? {
+            ...route,
+            handler: () => ({
+              status: 200,
+              body: { items: [{ ...first!, deleted: true, body: '', replies: [], replyCount: 0 }] },
+            }),
+          }
+        : route,
+    )
+    expect(await getCommentTree(post.id)).toEqual({ ok: true, data: [] })
+  })
+})
+
+describe('createCommentAs (PC-15)', () => {
+  beforeEach(() => {
+    state.routes = MOCK_ROUTES
+  })
+
+  it('comments as the session user and answers the new id', async () => {
+    const result = await createCommentAs(DEMO_USER.id, {
+      postId: POSTS[0]!.id,
+      parentCommentId: null,
+      body: 'Agree',
+    })
+    expect(result).toMatchObject({ ok: true, data: { id: expect.any(String) } })
+  })
+
+  it('passes the backend failure through', async () => {
+    expect(
+      await createCommentAs('someone-else', {
+        postId: POSTS[0]!.id,
+        parentCommentId: null,
+        body: 'Agree',
+      }),
+    ).toMatchObject({ ok: false, code: 'USER_MISMATCH' })
   })
 })

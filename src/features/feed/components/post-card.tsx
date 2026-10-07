@@ -133,7 +133,7 @@ export function PostCard({
         // Votes first, then comments, as Reddit (specs/feed-cards § 14). Share stays on the right in
         // mobile and joins the group from md.
         <div className="mt-3 flex flex-wrap items-center gap-3">
-          <VoteControl postId={post.id} score={post.score} viewerVote={post.viewerVote} />
+          <VoteControl id={post.id} score={post.score} viewerVote={post.viewerVote} />
           {detail ? (
             <a
               href="#comments"

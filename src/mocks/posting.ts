@@ -8,8 +8,8 @@ import { summary } from './fixtures/users'
 import type { MockResponse } from './types'
 
 // Creating posts and comments, and voting comments (E03, E05), for the demo viewer
-// (specs/post-create-detail § 6). Validates as the backend does. Created posts live in this
-// process's memory, so an e2e can publish and then open the post; nothing else is stored.
+// (specs/post-create-detail § 6). Validates as the backend does. Created posts and comments live
+// in this process's memory, so an e2e can publish and then see them; votes are not stored.
 
 const TITLE_MAX = 300
 const error = (status: number, code: string): MockResponse => ({
@@ -67,6 +67,25 @@ export function createPost(body: unknown): MockResponse {
   return { status: 201, body: post }
 }
 
+/** Comments created in this process, flat, by content id (oldest first). */
+const CREATED_COMMENTS: Record<string, RawComment[]> = {}
+
+function withCreated(
+  list: readonly RawComment[],
+  parentId: string | null,
+  created: readonly RawComment[],
+): RawComment[] {
+  return [...list, ...created.filter((each) => each.parentCommentId === parentId)].map((each) => {
+    const replies = withCreated(each.replies, each.id, created)
+    return { ...each, replies, replyCount: replies.length }
+  })
+}
+
+/** The whole thread of a content, with the comments created here at the end of their level. */
+export function commentsOf(contentId: string): RawComment[] {
+  return withCreated(COMMENTS_BY_CONTENT[contentId] ?? [], null, CREATED_COMMENTS[contentId] ?? [])
+}
+
 function allComments(): RawComment[] {
   const flat: RawComment[] = []
   const walk = (list: readonly RawComment[]) =>
@@ -75,6 +94,7 @@ function allComments(): RawComment[] {
       walk(each.replies)
     })
   Object.values(COMMENTS_BY_CONTENT).forEach(walk)
+  Object.values(CREATED_COMMENTS).forEach(walk)
   return flat
 }
 
@@ -85,7 +105,7 @@ export function createComment(contentId: string, body: unknown): MockResponse {
   if (typeof input.body !== 'string' || !input.body.trim()) return error(422, 'VALIDATION_ERROR')
   const parentId = input.parentCommentId ?? null
   if (parentId !== null) {
-    const thread = COMMENTS_BY_CONTENT[contentId] ?? []
+    const thread = commentsOf(contentId)
     const inThread = (list: readonly RawComment[]): boolean =>
       list.some((each) => each.id === parentId || inThread(each.replies))
     if (typeof parentId !== 'string' || !inThread(thread)) return error(422, 'VALIDATION_ERROR')
@@ -105,6 +125,7 @@ export function createComment(contentId: string, body: unknown): MockResponse {
     createdAt: new Date().toISOString(),
     replies: [],
   }
+  ;(CREATED_COMMENTS[contentId] ??= []).push(comment)
   return { status: 201, body: comment }
 }
 

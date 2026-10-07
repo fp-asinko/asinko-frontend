@@ -14,3 +14,11 @@ export const votePollSchema = z.object({
 
 export type VotePostInput = z.infer<typeof votePostSchema>
 export type VotePollInput = z.infer<typeof votePollSchema>
+
+/** Input of voteComment (PC-16). null removes the vote. */
+export const voteCommentSchema = z.object({
+  commentId: z.uuid(),
+  value: z.union([z.literal(1), z.literal(-1), z.null()]),
+})
+
+export type VoteCommentInput = z.infer<typeof voteCommentSchema>

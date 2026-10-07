@@ -61,7 +61,8 @@ layout (servidor)
 - **Comentar:**
   - Una caja arriba del árbol y "Responder" en cada comentario, que abre una caja debajo.
   - `createComment` (Server Action) con `parentCommentId`.
-  - El comentario nuevo aparece al instante como texto plano y `router.refresh()` lo reemplaza por el de servidor, con Markdown.
+  - El comentario nuevo aparece al instante como texto plano, al final de su nivel (el backend los ordena del más viejo al más nuevo).
+  - La action llama a `refresh()` de `next/cache` (Next 16): la respuesta trae la página nueva y el comentario del servidor, con Markdown, reemplaza al optimista en el mismo render.
   - Sin sesión, el modal de cuenta.
 - **Votos de comentarios:** `CommentVote` (cliente), la versión chica de `VoteControl`, con `voteComment` (`PUT/DELETE /comments/{id}/vote`).
 - **SEO:**
@@ -86,8 +87,8 @@ layout (servidor)
 - **Mocks:**
   - `POST /posts`: valida como el backend (422, 403 del canal ajeno) y devuelve un post con un id nuevo.
   - `POST /posts/:id/comments` y `PUT/DELETE /comments/:id/vote`.
-  - No guardan estado, como los votos.
-  - Sí guardan el último post creado en memoria del proceso (`GET /posts/:id` lo encuentra), para que el e2e pueda publicar y ver el detalle.
+  - Los votos no guardan estado.
+  - Los posts y comentarios creados sí quedan en memoria del proceso (`GET /posts/:id` y sus comentarios los encuentran), para que el e2e pueda publicar y ver el resultado.
 
 ## 7. Mensajes
 

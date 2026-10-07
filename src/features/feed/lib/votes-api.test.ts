@@ -4,7 +4,8 @@ import { POLLS } from '@/mocks/fixtures/polls'
 import { POSTS } from '@/mocks/fixtures/posts'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
-import { votePollAs, votePostAs } from './votes-api'
+import { COMMENTS_BY_CONTENT } from '@/mocks/fixtures/comments'
+import { voteCommentAs, votePollAs, votePostAs } from './votes-api'
 
 // The real client against the mock routes, which follow the contract (E03, E05).
 const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[] }))
@@ -74,5 +75,27 @@ describe('votePollAs', () => {
       optionId: closed.options[0]!.id,
     })
     expect(result).toMatchObject({ ok: false, kind: 'expected' })
+  })
+})
+
+describe('voteCommentAs (specs/post-create-detail PC-16)', () => {
+  const comment = COMMENTS_BY_CONTENT[POSTS[0]!.id]![0]! // score 88, no viewer vote
+
+  beforeEach(() => {
+    state.routes = MOCK_ROUTES
+  })
+
+  it('votes and returns the new score', async () => {
+    expect(await voteCommentAs(DEMO_USER.id, { commentId: comment.id, value: -1 })).toEqual({
+      ok: true,
+      data: { score: 87, viewerVote: -1 },
+    })
+  })
+
+  it('removes the vote with DELETE (204, no score)', async () => {
+    expect(await voteCommentAs(DEMO_USER.id, { commentId: comment.id, value: null })).toEqual({
+      ok: true,
+      data: { score: null, viewerVote: null },
+    })
   })
 })

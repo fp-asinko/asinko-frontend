@@ -201,7 +201,8 @@
       "post": "Entre no Asinko para publicar",
       "join": "Entre no Asinko para participar de comunidades",
       "login": "Entre no Asinko",
-      "signup": "Junte-se ao Asinko"
+      "signup": "Junte-se ao Asinko",
+      "comment": "Entre no Asinko para comentar"
     },
     "value": "No Asinko, cada previsão ganha um histórico público e verificável.",
     "signup": "Criar conta",
@@ -288,5 +289,23 @@
       "ask": "Perguntar para {name}",
       "rulesTitle": "Regras de {name}"
     }
+  },
+  "postDetail": {
+    "title": "{count, plural, =0 {Comentários} one {# comentário} other {# comentários}}",
+    "empty": "Ainda não há comentários. Comece a conversa.",
+    "error": "Não foi possível carregar os comentários. Recarregue a página para tentar de novo.",
+    "seeReplies": "{count, plural, one {Ver # resposta} other {Ver # respostas}}",
+    "hideReplies": "Ocultar respostas"
+  },
+  "comments": {
+    "label": "Seu comentário",
+    "placeholder": "Adicione um comentário",
+    "replyPlaceholder": "Escreva uma resposta",
+    "submit": "Comentar",
+    "reply": "Responder",
+    "cancel": "Cancelar",
+    "sending": "Enviando…",
+    "you": "Você",
+    "error": "Não foi possível publicar seu comentário. Tente de novo."
   }
 }

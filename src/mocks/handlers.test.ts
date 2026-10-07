@@ -265,6 +265,29 @@ describe('mock writes (stateless, demo viewer)', () => {
       ).toBe(422)
     })
 
+    it('keeps the created comments in their thread, at the end of their level', async () => {
+      const post = POSTS[1]!
+      const root = COMMENTS_BY_CONTENT[post.id]![0]!
+      const params = { id: post.id }
+      const created = await call('POST', '/api/v1/posts/:id/comments', {
+        params,
+        body: { userId: DEMO_USER.id, body: 'Kept', parentCommentId: root.id },
+      })
+      const id = (created.body as { id: string }).id
+      const thread = (await call('GET', '/api/v1/posts/:id/comments', { params })).body as {
+        items: Array<{ id: string; replyCount: number; replies: Array<{ id: string }> }>
+      }
+      const parent = thread.items.find((each) => each.id === root.id)!
+      expect(parent.replies.at(-1)?.id).toBe(id)
+      expect(parent.replyCount).toBe(parent.replies.length)
+      // Replying to a created comment works too.
+      const reply = await call('POST', '/api/v1/posts/:id/comments', {
+        params,
+        body: { userId: DEMO_USER.id, body: 'Deeper', parentCommentId: id },
+      })
+      expect(reply.status).toBe(201)
+    })
+
     it('votes a comment and removes the vote', async () => {
       const root = COMMENTS_BY_CONTENT[POSTS[0]!.id]![0]!
       const params = { id: root.id }

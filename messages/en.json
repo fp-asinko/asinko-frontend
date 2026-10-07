@@ -201,7 +201,8 @@
       "post": "Join Asinko to post",
       "join": "Join Asinko to join communities",
       "login": "Log in to Asinko",
-      "signup": "Join Asinko"
+      "signup": "Join Asinko",
+      "comment": "Join Asinko to comment"
     },
     "value": "Asinko is where calls get a public, verifiable track record.",
     "signup": "Create account",
@@ -288,5 +289,23 @@
       "ask": "Ask {name}",
       "rulesTitle": "Rules of {name}"
     }
+  },
+  "postDetail": {
+    "title": "{count, plural, =0 {Comments} one {# comment} other {# comments}}",
+    "empty": "No comments yet. Start the conversation.",
+    "error": "Could not load the comments. Reload the page to retry.",
+    "seeReplies": "{count, plural, one {See # reply} other {See # replies}}",
+    "hideReplies": "Hide replies"
+  },
+  "comments": {
+    "label": "Your comment",
+    "placeholder": "Add a comment",
+    "replyPlaceholder": "Write a reply",
+    "submit": "Comment",
+    "reply": "Reply",
+    "cancel": "Cancel",
+    "sending": "Sending…",
+    "you": "You",
+    "error": "Could not post your comment. Try again."
   }
 }
