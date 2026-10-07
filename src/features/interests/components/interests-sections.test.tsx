@@ -20,7 +20,7 @@ const interests: Interests = {
         changePct: 2.4,
         price: 64000,
         stale: false,
-        communitySlug: 'btc',
+        communitySlug: 'BTC',
       },
       {
         handle: '$AVAX',
@@ -75,7 +75,7 @@ describe('InterestsSections', () => {
 
     expect(screen.getByRole('link', { name: /^Bitcoin \$BTC/ })).toHaveAttribute(
       'href',
-      '/?community=btc',
+      '/?community=BTC',
     )
     expect(screen.getByRole('link', { name: /^#trading MOD On-chain/ })).toHaveAttribute(
       'href',

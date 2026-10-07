@@ -53,7 +53,7 @@ test.describe('Home feed', () => {
     await page.goto('/en')
     const post = card(page, 'Whales accumulated 48,000 $BTC')
     await post.locator('p').getByRole('link', { name: '$BTC' }).first().click()
-    await expect(page).toHaveURL(/\/en\?community=btc$/)
+    await expect(page).toHaveURL(/\/en\?community=BTC$/)
     for (const each of await articles(page).all()) {
       await expect(each.getByRole('link', { name: '$BTC' }).first()).toBeVisible()
     }

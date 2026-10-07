@@ -18,6 +18,7 @@ function community(n: number, seed: Seed): RawCommunity {
     createdByProfileId: null,
     createdAt: daysAgo(200 - n * 10),
     viewerMembership: null,
+    viewerIsFavorite: null,
     ...seed,
   }
 }
@@ -25,7 +26,8 @@ function community(n: number, seed: Seed): RawCommunity {
 function assetCommunity(n: number, symbol: string, memberCount: number, description: string) {
   const asset = assetBySymbol(symbol)
   return community(n, {
-    slug: symbol.toLowerCase(),
+    // As the backend: an asset community slug is its symbol, upper case (case-sensitive).
+    slug: symbol,
     name: asset?.name ?? symbol,
     description,
     type: 'SYSTEM_ASSET',

@@ -82,12 +82,12 @@ describe('FeedTop and FeedListView, as the page composes them', () => {
   it('shows the community chip with ?community, linking back to the unfiltered feed', () => {
     renderWithIntl(
       <FeedView
-        params={params({ community: 'btc' })}
+        params={params({ community: 'BTC' })}
         state={{
           status: 'ok',
           items: [postItem()],
           nextCursor: null,
-          community: { slug: 'btc', name: 'Bitcoin', handle: '$BTC' },
+          community: { slug: 'BTC', name: 'Bitcoin', handle: '$BTC' },
         }}
         viewerName="demo"
       />,

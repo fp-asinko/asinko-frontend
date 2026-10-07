@@ -28,7 +28,7 @@ function creator(username: string) {
 export const POLLS: RawPoll[] = [
   {
     id: mockId(5, 1),
-    ...community('btc'),
+    ...community('BTC'),
     question: 'Where does $BTC close 2026?',
     options: options(1, [
       ['Above 150,000 USD', 412],

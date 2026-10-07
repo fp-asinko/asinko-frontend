@@ -1,7 +1,8 @@
 import { z } from 'zod'
 
 /** A community slug as the backend writes them: lowercase letters, digits and inner hyphens. */
-export const SLUG_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/
+// Upper case too: an asset community slug is its symbol (BTC), and the backend is case-sensitive.
+export const SLUG_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9_-]{0,62}[A-Za-z0-9])?$/
 
 /** searchParams values can repeat (?a=1&a=2): the first one wins. */
 const first = (value: unknown) => (Array.isArray(value) ? value[0] : value)

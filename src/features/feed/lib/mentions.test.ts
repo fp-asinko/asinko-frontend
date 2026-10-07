@@ -4,7 +4,7 @@ import type { RawEntity } from '@/lib/api/contract'
 import { markMentions, parseMention, type MentionLookup } from './mentions'
 
 const lookup: MentionLookup = {
-  communityOfAsset: (id) => ({ 'asset-btc': 'btc' })[id],
+  communityOfAsset: (id) => ({ 'asset-btc': 'BTC' })[id],
   communitySlug: (id) => ({ 'community-defi': 'defi' })[id],
 }
 
@@ -27,7 +27,7 @@ describe('markMentions', () => {
       lookup,
     )
     expect(marked).toBe(
-      'Long [$BTC](asinko:community/btc), read [#defi](asinko:community/defi) and ask [@maria](asinko:user).',
+      'Long [$BTC](asinko:community/BTC), read [#defi](asinko:community/defi) and ask [@maria](asinko:user).',
     )
   })
 
@@ -58,7 +58,7 @@ describe('markMentions', () => {
     const overlapping: RawEntity = { ...ok, raw: 'g $B', position: [3, 7] }
     expect(markMentions(text, [wrong, outOfRange], lookup)).toBe(text)
     expect(markMentions(text, [ok, overlapping], lookup)).toBe(
-      'Long [$BTC](asinko:community/btc) now',
+      'Long [$BTC](asinko:community/BTC) now',
     )
   })
 
@@ -70,7 +70,7 @@ describe('markMentions', () => {
 
 describe('parseMention', () => {
   it('reads back the links made by markMentions', () => {
-    expect(parseMention('asinko:community/btc')).toEqual({ type: 'community', slug: 'btc' })
+    expect(parseMention('asinko:community/BTC')).toEqual({ type: 'community', slug: 'BTC' })
     expect(parseMention('asinko:ticker')).toEqual({ type: 'ticker' })
     expect(parseMention('asinko:user')).toEqual({ type: 'user' })
   })

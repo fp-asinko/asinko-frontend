@@ -24,13 +24,13 @@ describe('parseFeedParams', () => {
       filter: 'new',
       community: undefined,
     })
-    expect(parseFeedParams({ community: 'BTC' }).community).toBeUndefined()
+    expect(parseFeedParams({ community: 'B T C' }).community).toBeUndefined()
     expect(parseFeedParams({ community: '-btc' }).community).toBeUndefined()
   })
 
   it('takes the first value of a repeated parameter', () => {
     expect(
-      parseFeedParams({ feed: ['following', 'for-you'], community: ['btc', 'eth'] }),
-    ).toMatchObject({ feed: 'following', community: 'btc' })
+      parseFeedParams({ feed: ['following', 'for-you'], community: ['BTC', 'ETH'] }),
+    ).toMatchObject({ feed: 'following', community: 'BTC' })
   })
 })

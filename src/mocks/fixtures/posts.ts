@@ -38,7 +38,7 @@ function post(n: number, seed: Seed): RawPost {
 // long and short bodies, votes in both directions, edited, deleted and system posts.
 export const POSTS: RawPost[] = [
   post(1, {
-    community: 'btc',
+    community: 'BTC',
     author: 'maria',
     title: 'Whales accumulated 48,000 $BTC in two weeks',
     body: 'On-chain data shows wallets holding over 1,000 BTC added **48,000 $BTC** since 9/15. The last time this happened was right before the March rally.\n\nCareful: correlation is not causation. What do you think, #trading-on-chain?',
@@ -61,7 +61,7 @@ export const POSTS: RawPost[] = [
     publishedAt: hoursAgo(2),
   }),
   post(3, {
-    community: 'eth',
+    community: 'ETH',
     author: 'jeppe',
     title: 'ETH/BTC at a 4-year low. Capitulation or opportunity?',
     body: 'The $ETH/$BTC ratio just printed its lowest weekly close since 2021. Staking yield barely beats T-bills now, and L2s capture most of the activity. I am not bearish on Ethereum the network, I am bearish on $ETH the asset vs $BTC. Change my mind, @federico.',
@@ -105,7 +105,7 @@ export const POSTS: RawPost[] = [
     publishedAt: hoursAgo(7),
   }),
   post(7, {
-    community: 'sol',
+    community: 'SOL',
     author: 'quantsimula',
     title: 'Backtest: buying $SOL after 10% drops in 24 h',
     body: 'I ran the backtest since 2022: buying after a 10% drop in 24 h and selling 7 days later returned +3.1% on average, with a max drawdown of -38%. Not a strategy, a roller coaster.',
@@ -117,7 +117,7 @@ export const POSTS: RawPost[] = [
     publishedAt: hoursAgo(9),
   }),
   post(8, {
-    community: 'btc',
+    community: 'BTC',
     author: null,
     title: 'Welcome to Asinko: how mentions work',
     body: 'Use $ for assets ($BTC), # for communities (#defi) and @ for people. Mentions become links and the mentioned person gets a notification.',
@@ -136,7 +136,7 @@ export const POSTS: RawPost[] = [
     publishedAt: hoursAgo(13),
   }),
   post(10, {
-    community: 'eth',
+    community: 'ETH',
     author: 'federico',
     title: 'Re: ETH/BTC, a reply to @jeppe',
     body: 'Replying here because it does not fit in a comment. The ratio falls because the market still does not know how to value an asset that is both a commodity and equity in a network. Once $ETH ETFs add staking, the yield argument changes.',
@@ -189,7 +189,7 @@ export const POSTS: RawPost[] = [
     publishedAt: hoursAgo(26),
   }),
   post(15, {
-    community: 'btc',
+    community: 'BTC',
     author: 'capitalprudente',
     title: 'Weekly or monthly DCA?',
     body: 'I am new and have 100 USD a month to put into $BTC. Should I buy it all at once or split it by week?',
@@ -198,7 +198,7 @@ export const POSTS: RawPost[] = [
     publishedAt: hoursAgo(30),
   }),
   post(16, {
-    community: 'sol',
+    community: 'SOL',
     author: 'maria',
     title: 'Solana memecoins drive 60% of network fees',
     body: 'If memecoins cool down, validator revenue drops hard. It is the risk nobody watches in $SOL. More context in #memecoins.',
@@ -216,7 +216,7 @@ export const POSTS: RawPost[] = [
     publishedAt: hoursAgo(40),
   }),
   post(18, {
-    community: 'eth',
+    community: 'ETH',
     author: 'quantsimula',
     title: 'Average L1 gas: the lowest since 2020',
     body: 'With most activity on L2s, mainnet gas is at its lows. A good time to move old funds or clean up approvals.',
@@ -243,7 +243,7 @@ export const POSTS: RawPost[] = [
     publishedAt: hoursAgo(60),
   }),
   post(21, {
-    community: 'btc',
+    community: 'BTC',
     author: 'federico',
     title: 'A long thread on why the halving no longer moves the price like it used to',
     body: 'This is a long post on purpose, to see how long text behaves in the feed card. With every halving, new issuance weighs less against daily volume: in 2012 the reward was a huge share of the liquid supply, today it is marginal. That is why the supply effect keeps shrinking and demand is what matters: ETFs, corporate treasuries and global liquidity. If the next cycle goes up, it will be because of demand, not the halving. And if it does not, the halving will not save it. Bottom line: stop using the halving as the market clock and start watching flows. #macro',

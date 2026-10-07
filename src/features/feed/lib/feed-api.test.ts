@@ -48,18 +48,18 @@ describe('getFeed', () => {
   })
 
   it('filters For you by community and returns that community for the chip', async () => {
-    const result = await getFeed(parseFeedParams({ community: 'btc' }))
+    const result = await getFeed(parseFeedParams({ community: 'BTC' }))
     if (!result.ok) throw new Error('expected ok')
     expect(result.data.items.length).toBeGreaterThan(0)
-    expect(result.data.items.every((item) => item.community?.slug === 'btc')).toBe(true)
-    expect(result.data.community).toEqual({ slug: 'btc', name: 'Bitcoin', handle: '$BTC' })
+    expect(result.data.items.every((item) => item.community?.slug === 'BTC')).toBe(true)
+    expect(result.data.community).toEqual({ slug: 'BTC', name: 'Bitcoin', handle: '$BTC' })
   })
 
   it('names the filtered community even when the communities list fails', async () => {
     state.routes = MOCK_ROUTES.filter((route) => route.path !== '/api/v1/communities')
-    const result = await getFeed(parseFeedParams({ community: 'btc' }))
+    const result = await getFeed(parseFeedParams({ community: 'BTC' }))
     if (!result.ok) throw new Error('expected ok')
-    expect(result.data.items.every((item) => item.community?.slug === 'btc')).toBe(true)
+    expect(result.data.items.every((item) => item.community?.slug === 'BTC')).toBe(true)
   })
 
   it('returns NOT_FOUND for an unknown community, although Explore answers an empty page', async () => {
@@ -181,9 +181,9 @@ describe('getFilteredCommunity (specs/feed-navigation § 2)', () => {
   })
 
   it('resolves the filtered community before the list streams', async () => {
-    expect(await getFilteredCommunity(parseFeedParams({ community: 'btc' }))).toEqual({
+    expect(await getFilteredCommunity(parseFeedParams({ community: 'BTC' }))).toEqual({
       ok: true,
-      data: { slug: 'btc', name: 'Bitcoin', handle: '$BTC' },
+      data: { slug: 'BTC', name: 'Bitcoin', handle: '$BTC' },
     })
   })
 
@@ -205,7 +205,7 @@ describe('getFilteredCommunity (specs/feed-navigation § 2)', () => {
         ? { ...route, handler: (context) => (lookups++, route.handler(context)) }
         : route,
     )
-    await getFeed(parseFeedParams({ community: 'btc' }), undefined, { communityResolved: true })
+    await getFeed(parseFeedParams({ community: 'BTC' }), undefined, { communityResolved: true })
     expect(lookups).toBe(0)
   })
 })

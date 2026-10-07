@@ -16,7 +16,7 @@ export function usePathname() {
 
 let search = new URLSearchParams()
 
-/** Sets the query string read by useSearchParams, e.g. setSearch('community=btc'). */
+/** Sets the query string read by useSearchParams, e.g. setSearch('community=BTC'). */
 export function setSearch(query: string) {
   search = new URLSearchParams(query)
 }

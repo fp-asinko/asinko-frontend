@@ -3,6 +3,7 @@ import {
   assetSchema,
   commentListSchema,
   communitySchema,
+  favoriteResponseSchema,
   feedItemSchema,
   joinResponseSchema,
   pollSchema,
@@ -23,7 +24,7 @@ import { PROFILES } from './fixtures/users'
 import { commentTree } from './comment-tree'
 import { paginate } from './paginate'
 import type { MockContext, MockRoute } from './types'
-import { joinCommunity } from './memberships'
+import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
 import { removePostVote, votePoll, votePost } from './votes'
 
 const notFound = { status: 404, body: { error: { code: 'NOT_FOUND', message: 'mock' } } }
@@ -125,7 +126,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     kind: 'contract',
     implemented: true,
     schema: communitySchema,
-    example: { ...noRequest, params: { slug: 'btc' } },
+    example: { ...noRequest, params: { slug: 'BTC' } },
     handler: ({ params }) => {
       const community = params.slug ? communityBySlug(params.slug) : undefined
       return community ? { status: 200, body: community } : notFound
@@ -242,6 +243,38 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       body: { userId: DEMO_USER.id },
     },
     handler: ({ params, body }) => joinCommunity(params.slug ?? '', params.userId ?? '', body),
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/communities/:slug/members/:userId',
+    kind: 'contract',
+    implemented: true,
+    schema: noContentSchema,
+    example: {
+      ...noRequest,
+      params: { slug: 'defi', userId: DEMO_USER.id },
+      query: { userId: DEMO_USER.id },
+    },
+    handler: ({ params, query }) =>
+      leaveCommunity(params.slug ?? '', params.userId ?? '', query.userId),
+  },
+  {
+    method: 'PUT',
+    path: '/api/v1/communities/:slug/favorite',
+    kind: 'contract',
+    implemented: true,
+    schema: favoriteResponseSchema,
+    example: { ...noRequest, params: { slug: 'defi' }, body: { userId: DEMO_USER.id } },
+    handler: ({ params, body }) => addFavorite(params.slug ?? '', body),
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/communities/:slug/favorite',
+    kind: 'contract',
+    implemented: true,
+    schema: noContentSchema,
+    example: { ...noRequest, params: { slug: 'defi' }, query: { userId: DEMO_USER.id } },
+    handler: ({ params, query }) => removeFavorite(params.slug ?? '', query.userId),
   },
 
   // E05: comments

@@ -1,6 +1,6 @@
 # Páginas de comunidad, activo y perfil — Requirements
 
-> **Estado:** en revisión (2026-10-07).
+> **Estado:** aprobado por el PO el 2026-10-07.
 > **Fuente:** [`docs/references/ASINKO-requirements.pdf`](../../docs/references/ASINKO-requirements.pdf), sección "Páginas de comunidad, activo y perfil" (págs. 3 a 5), entregado por el PO. El "mockup" que menciona es el prototipo (`docs/references/prototype.html`): sus vistas de grupo, activo y perfil son la referencia del layout (`design.md`).
 > **Decisiones con el PO (2026-10-07):**
 >

@@ -1,6 +1,6 @@
 # Páginas de comunidad, activo y perfil — Design
 
-> **Estado:** en revisión (2026-10-07).
+> **Estado:** aprobado por el PO el 2026-10-07.
 > **Referencia visual:** las vistas de grupo (`#WallStreetBets`), activo (`$NVDA`) y perfil (`Jeppe Kirk`) del prototipo. Las tres comparten la estructura: banner, avatar superpuesto, nombre, datos, acción a la derecha, un desplegable, pestañas y el feed.
 
 ## 1. Estructura de la página
@@ -72,7 +72,7 @@ features/communities/
   - El diálogo es el `Dialog` existente, cargado con `next/dynamic` al primer uso (presupuesto de JS): "¿Salir de #macro?", con los botones "Salir" y "Cancelar".
   - Al confirmar: optimista, y vuelve "Unirse".
   - Un `PRINCIPAL_MODERATOR` ve "Moderador" sin acción, con una ayuda: "Transferí el rol para poder salir".
-- **Favorito:** botón de ícono (estrella) con `aria-pressed`, optimista. Sin sesión, `requireAccount('join')`.
+- **Favorito:** botón de ícono (estrella) con `aria-pressed`, optimista, **solo para miembros**: el backend responde `404 NOT_MEMBER` si no lo sos. Al salir de la comunidad, la estrella se va.
 - **Estado compartido:** `JoinedProvider` suma `left` (los que dejaste en esta visita), así la cabecera y la columna izquierda se ponen de acuerdo. Después de cada acción, `router.refresh()` en segundo plano, como en `community-first`.
 
 ## 5. Desplegables

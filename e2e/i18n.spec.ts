@@ -15,9 +15,9 @@ test.describe('locale routing', () => {
   }
 
   test('the "⋯" menu switches language and keeps the filters (H-27, HR-03)', async ({ page }) => {
-    await page.goto('/en?community=btc')
+    await page.goto('/en?community=BTC')
     await (await settings(page)).getByRole('menuitemradio', { name: 'Español' }).click()
-    await expect(page).toHaveURL(/\/es\?community=btc$/)
+    await expect(page).toHaveURL(/\/es\?community=BTC$/)
     await expect(page.locator('html')).toHaveAttribute('lang', 'es')
     // The menu closes with the navigation: open it again, now in Spanish.
     const menu = await settings(page, 'Más opciones')

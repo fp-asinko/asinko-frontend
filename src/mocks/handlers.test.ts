@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { DEMO_USER } from './demo-user'
 import { COMMUNITIES } from './fixtures/communities'
 import { POSTS } from './fixtures/posts'
 import { MOCK_ROUTES } from './handlers'
@@ -29,8 +30,8 @@ describe('mock handlers behave like the contract', () => {
   })
 
   it('filters the explore feed by community', async () => {
-    const btc = COMMUNITIES.find((each) => each.slug === 'btc')!
-    const page = (await call('GET', '/api/v1/feed/explore', { query: { community: 'btc' } }))
+    const btc = COMMUNITIES.find((each) => each.slug === 'BTC')!
+    const page = (await call('GET', '/api/v1/feed/explore', { query: { community: 'BTC' } }))
       .body as Page
     expect(page.items.length).toBeGreaterThan(0)
     for (const item of page.items) expect(item.content?.communityId).toBe(btc.id)
@@ -105,7 +106,7 @@ describe('mock handlers behave like the contract', () => {
       .body as {
       linkedCommunity: { slug: string } | null
     }
-    expect(page.linkedCommunity?.slug).toBe('btc')
+    expect(page.linkedCommunity?.slug).toBe('BTC')
   })
 })
 
@@ -155,5 +156,43 @@ describe('mock writes (stateless, demo viewer)', () => {
       body: { userId: demo, optionId: closed.options[0]!.id },
     })
     expect(result.status).toBe(409)
+  })
+
+  it('leaves a community with 204, only for the viewer themself (E02)', async () => {
+    const path = '/api/v1/communities/:slug/members/:userId'
+    const params = { slug: 'defi', userId: DEMO_USER.id }
+    expect((await call('DELETE', path, { params, query: { userId: DEMO_USER.id } })).status).toBe(
+      204,
+    )
+    expect(
+      (await call('DELETE', path, { params, query: { userId: 'someone-else' } })).body,
+    ).toMatchObject({ error: { code: 'USER_MISMATCH' } })
+    expect(
+      (
+        await call('DELETE', path, {
+          params: { ...params, slug: 'nope' },
+          query: { userId: DEMO_USER.id },
+        })
+      ).status,
+    ).toBe(404)
+  })
+
+  it('marks a favorite only as a member, and removes it idempotently (E02)', async () => {
+    const path = '/api/v1/communities/:slug/favorite'
+    const body = { userId: DEMO_USER.id }
+    expect((await call('PUT', path, { params: { slug: 'defi' }, body })).body).toEqual({
+      viewerIsFavorite: true,
+    })
+    expect((await call('PUT', path, { params: { slug: 'memecoins' }, body })).body).toMatchObject({
+      error: { code: 'NOT_MEMBER' },
+    })
+    expect(
+      (
+        await call('DELETE', path, {
+          params: { slug: 'memecoins' },
+          query: { userId: DEMO_USER.id },
+        })
+      ).status,
+    ).toBe(204)
   })
 })

@@ -77,7 +77,7 @@ test.describe('Home motion', () => {
   })
 
   test('marks the community the feed shows in the column (S-04)', async ({ page, isMobile }) => {
-    await page.goto('/en?community=btc')
+    await page.goto('/en?community=BTC')
     if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click()
     const column = page.getByRole('region', { name: 'Your interests' }).filter({ visible: true })
     await expect(column.getByRole('link', { name: /^Bitcoin \$BTC/ })).toHaveAttribute(
@@ -104,7 +104,7 @@ test.describe('Home motion', () => {
   })
 
   test('stays accessible with the new states (G-06)', async ({ page }) => {
-    await page.goto('/en?community=btc')
+    await page.goto('/en?community=BTC')
     await card(page, 'Whales accumulated 48,000 $BTC')
       .getByRole('button', { name: /comments/ })
       .click()

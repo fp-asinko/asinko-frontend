@@ -16,11 +16,11 @@ function community(overrides: Partial<RawCommunity>): RawCommunity {
 describe('interests mappers', () => {
   it('keeps only the asset communities the viewer belongs to', () => {
     const list = [
-      community({ slug: 'btc', type: 'SYSTEM_ASSET', viewerMembership: 'MEMBER' }),
-      community({ slug: 'eth', type: 'SYSTEM_ASSET', viewerMembership: null }),
+      community({ slug: 'BTC', type: 'SYSTEM_ASSET', viewerMembership: 'MEMBER' }),
+      community({ slug: 'ETH', type: 'SYSTEM_ASSET', viewerMembership: null }),
       community({ slug: 'defi', type: 'USER_PUBLIC', viewerMembership: 'MEMBER' }),
     ]
-    expect(memberAssetCommunities(list).map((c) => c.slug)).toEqual(['btc'])
+    expect(memberAssetCommunities(list).map((c) => c.slug)).toEqual(['BTC'])
   })
 
   it('lists member groups with the moderated ones first', () => {
@@ -46,7 +46,7 @@ describe('interests mappers', () => {
 
   it('marks suggested asset communities with $ and groups with #', () => {
     const list = [
-      community({ slug: 'eth', type: 'SYSTEM_ASSET', viewerMembership: null, memberCount: 2 }),
+      community({ slug: 'ETH', type: 'SYSTEM_ASSET', viewerMembership: null, memberCount: 2 }),
       community({ slug: 'macro', type: 'USER_PUBLIC', viewerMembership: null, memberCount: 1 }),
     ]
     expect(toSuggestions(list).map((s) => s.handle)).toEqual(['$ETH', '#macro'])

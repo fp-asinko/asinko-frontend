@@ -11,14 +11,14 @@ describe('feedHref', () => {
   })
 
   it('keeps every non-default value', () => {
-    expect(feedHref({ feed: 'for-you', filter: 'polls', community: 'btc' }).query).toEqual({
+    expect(feedHref({ feed: 'for-you', filter: 'polls', community: 'BTC' }).query).toEqual({
       filter: 'polls',
-      community: 'btc',
+      community: 'BTC',
     })
   })
 
   it('drops the community on Following', () => {
-    expect(feedHref({ feed: 'following', filter: 'new', community: 'btc' }).query).toEqual({
+    expect(feedHref({ feed: 'following', filter: 'new', community: 'BTC' }).query).toEqual({
       feed: 'following',
     })
   })

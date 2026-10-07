@@ -19,9 +19,9 @@ const post = (n: number) => POSTS[n - 1]!
 describe('toPostItem', () => {
   it('resolves the community handle and marks the mentions', () => {
     const item = toPostItem(post(1), communities)
-    expect(item.community).toMatchObject({ slug: 'btc', name: 'Bitcoin', handle: '$BTC' })
+    expect(item.community).toMatchObject({ slug: 'BTC', name: 'Bitcoin', handle: '$BTC' })
     expect(item.author).toMatchObject({ username: 'maria', handle: '@maria', accuracyRate: 0.74 })
-    expect(item.body).toContain('[$BTC](asinko:community/btc)')
+    expect(item.body).toContain('[$BTC](asinko:community/BTC)')
     expect(item.body).toContain('[#trading-on-chain](asinko:community/trading-on-chain)')
     expect(item.media).toEqual({ type: 'image', url: '/mocks/chart-btc.svg' })
   })
@@ -95,7 +95,7 @@ describe('toPollItem', () => {
 
   it('takes its community from the content (P-004)', () => {
     expect(toPollItem(POLLS[0]!).community).toMatchObject({
-      slug: 'btc',
+      slug: 'BTC',
       name: 'Bitcoin',
       handle: '$BTC',
     })

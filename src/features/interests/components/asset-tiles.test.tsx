@@ -12,7 +12,7 @@ const tile = {
   changePct: 2.4,
   price: 64000,
   stale: false,
-  communitySlug: 'btc',
+  communitySlug: 'BTC',
 }
 
 describe('AssetTiles (H-07, H-21)', () => {
@@ -20,7 +20,7 @@ describe('AssetTiles (H-07, H-21)', () => {
     renderWithIntl(<AssetTiles tiles={[tile]} />)
     expect(screen.getByRole('link', { name: /^Bitcoin \$BTC/ })).toHaveAttribute(
       'href',
-      '/?community=btc',
+      '/?community=BTC',
     )
     expect(screen.getByText('24h')).toBeInTheDocument()
   })

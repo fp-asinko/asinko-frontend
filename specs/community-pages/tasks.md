@@ -2,7 +2,7 @@
 
 ## Parte 1: comunidad y activo
 
-- [ ] **T-01 (M)** Contrato y mocks:
+- [x] **T-01 (M)** Contrato y mocks:
   - `viewerIsFavorite` en `communitySchema`, y las respuestas de salir y favorito.
   - Mocks de `DELETE …/members/:userId` y `PUT/DELETE …/favorite`.
   - Slugs de activos en mayúsculas en los fixtures, como el backend, y ajuste de los tests que usan `btc`.

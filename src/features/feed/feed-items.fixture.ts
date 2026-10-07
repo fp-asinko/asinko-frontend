@@ -14,10 +14,10 @@ export function postItem(overrides: Partial<PostItem> = {}): PostItem {
     kind: 'post',
     id: 'post-1',
     title: 'Whales accumulated 48,000 $BTC',
-    body: 'Long [$BTC](asinko:community/btc) for now.',
+    body: 'Long [$BTC](asinko:community/BTC) for now.',
     author: MARIA,
     community: {
-      slug: 'btc',
+      slug: 'BTC',
       name: 'Bitcoin',
       handle: '$BTC',
       avatarUrl: null,
@@ -53,7 +53,7 @@ export function pollItem(overrides: Partial<PollItem> = {}): PollItem {
     commentCount: 12,
     author: null,
     community: {
-      slug: 'btc',
+      slug: 'BTC',
       name: 'Bitcoin',
       handle: '$BTC',
       avatarUrl: null,

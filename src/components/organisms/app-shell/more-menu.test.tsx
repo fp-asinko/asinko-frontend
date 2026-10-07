@@ -42,11 +42,11 @@ describe('MoreMenu (HR-03)', () => {
 
   it('switches the language on the same page, keeping the filters (H-27)', async () => {
     setPathname('/')
-    window.history.replaceState(null, '', '/?community=btc')
+    window.history.replaceState(null, '', '/?community=BTC')
     renderMenu()
     await userEvent.click(screen.getByRole('button', { name: 'More options' }))
     await userEvent.click(await screen.findByRole('menuitemradio', { name: 'Español' }))
-    expect(router.replace).toHaveBeenCalledWith('/?community=btc', { locale: 'es' })
+    expect(router.replace).toHaveBeenCalledWith('/?community=BTC', { locale: 'es' })
     window.history.replaceState(null, '', '/')
   })
 

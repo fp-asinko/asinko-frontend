@@ -8,13 +8,13 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 describe('FeedTabs (H-10)', () => {
   it('marks the active tab and keeps the filter in the links', () => {
-    renderWithIntl(<FeedTabs params={parseFeedParams({ filter: 'polls', community: 'btc' })} />)
+    renderWithIntl(<FeedTabs params={parseFeedParams({ filter: 'polls', community: 'BTC' })} />)
     const nav = screen.getByRole('navigation', { name: 'Feed' })
 
     expect(screen.getByRole('link', { name: 'For you' })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: 'For you' })).toHaveAttribute(
       'href',
-      '/?filter=polls&community=btc',
+      '/?filter=polls&community=BTC',
     )
     // Following has no community filter in the contract.
     expect(screen.getByRole('link', { name: 'Following' })).toHaveAttribute(

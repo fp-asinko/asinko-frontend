@@ -30,6 +30,8 @@ export const communitySchema = z.object({
   createdByProfileId: z.uuid().nullable(),
   createdAt: z.iso.datetime(),
   viewerMembership: membershipSchema.nullable(),
+  /** null without a session (E02). */
+  viewerIsFavorite: z.boolean().nullable(),
 })
 
 export type RawCommunity = z.infer<typeof communitySchema>
@@ -39,3 +41,6 @@ export const joinResponseSchema = z.object({
   viewerMembership: membershipSchema,
   memberCount: z.number().int(),
 })
+
+/** PUT /api/v1/communities/{slug}/favorite (E02, 200). Needs membership (404 NOT_MEMBER). */
+export const favoriteResponseSchema = z.object({ viewerIsFavorite: z.literal(true) })

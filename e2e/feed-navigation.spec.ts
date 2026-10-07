@@ -46,7 +46,7 @@ test.describe('Feed navigation with a slow backend', () => {
 
     const started = Date.now()
     await page.getByRole('article').first().getByRole('link', { name: '$BTC' }).first().click()
-    await expect(page).toHaveURL(/community=btc/, { timeout: 1500 })
+    await expect(page).toHaveURL(/community=BTC/, { timeout: 1500 })
     await expect(page.getByTestId('feed-skeleton')).toBeVisible({ timeout: 1500 })
     expect(Date.now() - started).toBeLessThan(DELAY_MS)
 

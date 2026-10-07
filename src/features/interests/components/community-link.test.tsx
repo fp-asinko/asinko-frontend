@@ -12,26 +12,26 @@ describe('CommunityLink (home-motion S-04)', () => {
   })
 
   it('links to the Home filtered by the community', () => {
-    render(<CommunityLink slug="btc">$BTC</CommunityLink>)
-    expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/?community=btc')
+    render(<CommunityLink slug="BTC">$BTC</CommunityLink>)
+    expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/?community=BTC')
     expect(screen.getByRole('link')).not.toHaveAttribute('aria-current')
   })
 
   it('is the current page while the Home shows that community', () => {
-    setSearch('community=btc')
-    render(<CommunityLink slug="btc">$BTC</CommunityLink>)
+    setSearch('community=BTC')
+    render(<CommunityLink slug="BTC">$BTC</CommunityLink>)
     expect(screen.getByRole('link')).toHaveAttribute('aria-current', 'page')
   })
 
   it('is not current for another community or outside the Home', () => {
-    setSearch('community=eth')
-    const { unmount } = render(<CommunityLink slug="btc">$BTC</CommunityLink>)
+    setSearch('community=ETH')
+    const { unmount } = render(<CommunityLink slug="BTC">$BTC</CommunityLink>)
     expect(screen.getByRole('link')).not.toHaveAttribute('aria-current')
     unmount()
 
-    setSearch('community=btc')
+    setSearch('community=BTC')
     setPathname('/communities')
-    render(<CommunityLink slug="btc">$BTC</CommunityLink>)
+    render(<CommunityLink slug="BTC">$BTC</CommunityLink>)
     expect(screen.getByRole('link')).not.toHaveAttribute('aria-current')
   })
 })

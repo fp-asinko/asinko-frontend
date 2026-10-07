@@ -10,8 +10,8 @@ describe('CommunityChip (H-14)', () => {
   it('names the community and links back to the unfiltered feed', () => {
     renderWithIntl(
       <CommunityChip
-        params={parseFeedParams({ community: 'btc', filter: 'polls' })}
-        community={{ slug: 'btc', name: 'Bitcoin', handle: '$BTC' }}
+        params={parseFeedParams({ community: 'BTC', filter: 'polls' })}
+        community={{ slug: 'BTC', name: 'Bitcoin', handle: '$BTC' }}
       />,
     )
     expect(screen.getByRole('link', { name: 'Remove the $BTC filter' })).toHaveAttribute(
