@@ -8,7 +8,7 @@
   - Slugs de activos en mayúsculas en los fixtures, como el backend, y ajuste de los tests que usan `btc`.
   - Tests: `fixtures.test.ts`. → CP-05, CP-06
 - [x] **T-02 (S)** `leaveCommunity` y `setFavorite` en `lib/communities/`, con sus tests. → CP-05, CP-06
-- [ ] **T-03 (M)** Feature `communities`: `getCommunityPage`, mappers y tipos, con validación, 404 y tipo de ruta. Tests. → CP-02, CP-04, CP-08, CP-09
+- [x] **T-03 (M)** Feature `communities`: `getCommunityPage`, mappers y tipos, con validación, 404 y tipo de ruta. Tests. → CP-02, CP-04, CP-08, CP-09
 - [ ] **T-04 (M)** Rutas `/hub/[slug]` y `/asset/[symbol]` con `pathnames` iguales en los tres idiomas, `loading.tsx`, redirecciones y metadata. Excepción en `i18n.md`. → CP-01, CP-02, CP-03
 - [ ] **T-05 (M)** Cabecera, acciones (unirse, "Unido" y salir con confirmación diferida, favorito) y desplegables (reglas y datos del activo). Tests. → CP-04 a CP-06, CP-08, CP-10
 - [ ] **T-06 (S)** Feed propio en la página, sin el Unirse repetido en las tarjetas. Tests. → CP-07
