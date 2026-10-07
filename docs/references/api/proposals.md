@@ -6,7 +6,7 @@
 
 ## Pendientes
 
-En orden de prioridad para el front.
+En orden de prioridad para el front: P-010, P-011, P-012, P-001, P-003, P-009 y P-005.
 
 ### P-010: Avatar y membresía en la comunidad de cada contenido
 
@@ -54,6 +54,16 @@ En orden de prioridad para el front.
 
 **A decidir con producto:** si el rating público es el mismo `internalRating` o uno derivado. El front muestra lo que venga y no lo calcula.
 
+### P-012: Todo lo que publica un usuario
+
+**Estado:** propuesta (2026-10-07).
+
+**Endpoint:** nuevo, por ejemplo `GET /api/v1/users/{userId}/content?kind=POST,POLL&cursor=`, o un filtro `?creator={userId}` en `GET /feed/explore`.
+
+**Motivo:** el perfil (`/user/{username}`, `specs/community-pages`) muestra lo que publica la persona, como el prototipo (pestañas All, Theses, Posts y Replies). Hoy solo existe el feed de su canal personal (`/feed/explore?community={username}`), y en la base de dev ese feed está vacío para todos: el seed publica en grupos. El overview del producto también lo pide así: seguir a un usuario suma "todo lo que publica". Las tesis ya tienen el suyo (`GET /users/{userId}/theses`).
+
+**Cambio:** una lista estándar (`{ "items": FeedItem[], "nextCursor": string | null }`) con el contenido que creó el usuario, en cualquier comunidad, del más nuevo al más viejo, con el mismo `FeedItem` y el mismo filtro `kind` que el feed. Respeta `isPublic` del perfil, igual que el resto de E01.
+
 ### P-001: Menciones resueltas en la lectura de posts
 
 **Estado:** propuesta. La detección se postergó en el backend (21/09). Sigue pendiente: `GET /posts/{id}` y el feed no traen `entities`.
@@ -85,6 +95,8 @@ En orden de prioridad para el front.
 **Estado:** el filtro por tipo (`?kind=POST,POLL`) ya está. **Falta:** `sort=hot|new|top`, para los filtros _Hot_ y _Top_ del prototipo. ¿Cuándo? Y sumar `kind` al contrato (E04).
 
 ## Pedidos operativos
+
+- **Datos de las páginas en el seed:** las páginas de grupo, activo y perfil ya muestran banner, avatar, descripción, reglas y bio, pero el seed casi no los tiene. De los 7 grupos y activos de la primera página, ninguno tiene avatar, banner ni reglas, y solo uno tiene descripción. Ningún usuario tiene bio ni verificado. **Pedido:** sumar al seed avatar y banner (en Storage, como los avatares de usuario), descripción y reglas para los grupos, logo para todos los activos y bio para los usuarios, así las páginas se pueden probar con datos reales. Si se acepta P-011, también `displayName`, `tier` y `rating`.
 
 - **Cuentas de prueba después de cada seed:** el seed borra todos los perfiles, incluidos los de `qa_uno`, `qa_dos` y `qa_tres`. Sin perfil, el login de desarrollo del front no entra. Hoy los tres dan `404`. **Pedido:** correr `npm run seed:auth --workspace=packages/db` después de cada `seed`, o encadenarlo en el mismo script.
 
