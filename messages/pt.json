@@ -236,5 +236,10 @@
     "label": "Participar",
     "labelFor": "Participar de {handle}",
     "error": "Não foi possível participar da comunidade. Tente de novo."
+  },
+  "communities": {
+    "meta": {
+      "description": "{handle} no Asinko: posts, enquetes e conversas."
+    }
   }
 }

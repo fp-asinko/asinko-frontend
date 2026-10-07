@@ -236,5 +236,10 @@
     "label": "Unirse",
     "labelFor": "Unirse a {handle}",
     "error": "No se pudo unir a la comunidad. Inténtalo de nuevo."
+  },
+  "communities": {
+    "meta": {
+      "description": "{handle} en Asinko: posts, encuestas y conversación."
+    }
   }
 }

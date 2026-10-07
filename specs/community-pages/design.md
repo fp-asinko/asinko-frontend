@@ -29,19 +29,19 @@
 ## 2. Rutas
 
 ```
-src/app/[locale]/(main)/
+src/app/[locale]/
 ├── hub/[slug]/page.tsx       # comunidad
 ├── asset/[symbol]/page.tsx   # activo
 └── user/[username]/page.tsx  # perfil (parte 2)
 ```
 
-- **Rutas iguales en todos los idiomas** (CP-01): en `routing.ts` van como `pathnames` con el mismo valor en `en`, `es` y `pt`, así `Link` y `redirect` de `@/i18n/navigation` las tipan. `i18n.md` suma la excepción.
-- **Dentro de `(main)`**, con su propio `loading.tsx` (esqueleto de cabecera y tarjetas), así el 404 no se vuelve "blando" (`i18n.md § 404`).
+- **Rutas iguales en todos los idiomas** (CP-01): sin `pathnames` en `routing.ts`, porque no se traducen. `communityPath(kind, slug)` (`lib/communities/paths.ts`) las arma para todos (menciones, columna, páginas). `i18n.md` suma la excepción.
+- **Fuera de `(main)` y sin `loading.tsx`** (ajuste de la implementación): cualquier `loading.tsx` por encima de la página, incluido el del Home en `(main)`, empieza a enviar la respuesta con 200 antes de resolver la comunidad. La redirección quedaba en el navegador y el 404 era "blando". Así, la página resuelve la comunidad primero (~0,5 s con Vercel) y responde 308 o 404 reales; el feed se transmite adentro con su `Suspense`.
 - **Resolución y redirección** (CP-02), en una función del feature:
   1. Se valida el parámetro con zod (`communitySlugSchema` de `lib/communities`).
   2. `GET /communities/{slug}`. Si da `NOT_FOUND`, `notFound()`.
   3. Si `type` no corresponde a la ruta, `permanentRedirect` a la correcta (`/hub` ↔ `/asset` ↔ `/user`), en el mismo idioma.
-- **Mayúsculas:** el backend distingue mayúsculas (`/communities/btc` → 404) y los símbolos son mayúsculas (`BTC`). `/asset/btc` redirige a `/asset/BTC` sin pedir nada.
+- **Mayúsculas:** el backend distingue mayúsculas (`/communities/btc` → 404) y los símbolos son mayúsculas (`BTC`). En `/asset`, un slug en minúscula que no existe se prueba en mayúscula: `/asset/btc` → `/asset/BTC`. Se busca primero tal cual, así `/asset/macro` va a `/hub/macro`.
 - **Mocks:** las comunidades de activo de `src/mocks/` pasan a tener el slug en mayúsculas (`BTC`), igual que el backend real. Los tests que usan `?community=btc` se ajustan.
 
 ## 3. Datos

@@ -4,4 +4,5 @@ export { useSearchParams } from 'next/navigation'
 import { routing } from './routing'
 
 // The only navigation the app uses: next/link and next/navigation lose the locale (tooling.md).
-export const { Link, redirect, usePathname, useRouter, getPathname } = createNavigation(routing)
+export const { Link, redirect, permanentRedirect, usePathname, useRouter, getPathname } =
+  createNavigation(routing)

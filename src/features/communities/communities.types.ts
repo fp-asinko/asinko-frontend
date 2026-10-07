@@ -1,8 +1,9 @@
 // Domain types of the community, asset and profile pages (specs/community-pages § 3). The UI only
 // knows these, never the raw contract shapes.
 
-/** Which page a community belongs on: /hub, /asset or /user (CP-02). */
-export type CommunityKind = 'group' | 'asset' | 'user'
+import type { CommunityKind } from '@/lib/communities/paths'
+
+export type { CommunityKind }
 
 export type CommunityPage = {
   slug: string

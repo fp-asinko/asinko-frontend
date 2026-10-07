@@ -236,5 +236,10 @@
     "label": "Join",
     "labelFor": "Join {handle}",
     "error": "Could not join the community. Try again."
+  },
+  "communities": {
+    "meta": {
+      "description": "{handle} on Asinko: posts, polls and discussion."
+    }
   }
 }
