@@ -1,33 +1,28 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { Link, usePathname, useSearchParams } from '@/i18n/navigation'
+import { Link, usePathname } from '@/i18n/navigation'
 
 /**
- * A link to the Home filtered by a community that marks itself as the current page when the feed
- * shows that community (S-04, D-M2). The column lives in the layout, which gets no query params,
- * so this small client leaf reads them; its content stays server-rendered (children). Style the
- * active state with `aria-[current=page]:` in `className`.
+ * A link to a community's page that marks itself as the current page there (S-04, D-M2;
+ * specs/community-pages CP-14). The column lives in the layout, so this small client leaf reads
+ * the path; its content stays server-rendered (children). Style the active state with
+ * `aria-[current=page]:` in `className`.
  */
 export function CommunityLink({
-  slug,
+  href,
   className,
   children,
 }: {
-  slug: string
+  /** /hub/{slug} or /asset/{SYMBOL}, from communityPath. */
+  href: string
   className?: string
   children: ReactNode
 }) {
-  const pathname = usePathname()
-  const search = useSearchParams()
-  const active = pathname === '/' && search.get('community') === slug
+  const active = usePathname() === href
 
   return (
-    <Link
-      href={{ pathname: '/', query: { community: slug } }}
-      aria-current={active ? 'page' : undefined}
-      className={className}
-    >
+    <Link href={href} aria-current={active ? 'page' : undefined} className={className}>
       {children}
     </Link>
   )

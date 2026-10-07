@@ -18,6 +18,8 @@ export type CommunityRef = {
 
 /** The community of a card (specs/community-first): the protagonist of its header. */
 export type CardCommunity = CommunityRef & {
+  /** Its page: /hub/{slug} or /asset/{SYMBOL} (specs/community-pages CP-14). */
+  path: string
   avatarUrl: string | null
   /** The personal channel of a user: no group to show nor to join. */
   personal: boolean

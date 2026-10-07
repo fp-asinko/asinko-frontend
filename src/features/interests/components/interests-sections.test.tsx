@@ -21,6 +21,7 @@ const interests: Interests = {
         price: 64000,
         stale: false,
         communitySlug: 'BTC',
+        path: '/asset/BTC',
       },
       {
         handle: '$AVAX',
@@ -30,6 +31,7 @@ const interests: Interests = {
         price: 30,
         stale: true,
         communitySlug: 'avax',
+        path: '/asset/AVAX',
       },
     ],
   },
@@ -43,6 +45,7 @@ const interests: Interests = {
       {
         handle: '#trading',
         slug: 'trading',
+        path: '/hub/trading',
         name: 'Trading',
         description: 'On-chain',
         avatarUrl: null,
@@ -52,7 +55,16 @@ const interests: Interests = {
   },
   suggested: {
     ok: true,
-    data: [{ handle: '#nft', slug: 'nft', name: 'NFT', memberCount: 1200, avatarUrl: null }],
+    data: [
+      {
+        handle: '#nft',
+        slug: 'nft',
+        path: '/hub/nft',
+        name: 'NFT',
+        memberCount: 1200,
+        avatarUrl: null,
+      },
+    ],
   },
 }
 
@@ -70,16 +82,16 @@ describe('InterestsSections', () => {
     }
   })
 
-  it('links assets and groups to the Home filtered by their community', () => {
+  it('links assets and groups to their pages (specs/community-pages CP-14)', () => {
     renderWithIntl(<InterestsSections interests={interests} />)
 
     expect(screen.getByRole('link', { name: /^Bitcoin \$BTC/ })).toHaveAttribute(
       'href',
-      '/?community=BTC',
+      '/asset/BTC',
     )
     expect(screen.getByRole('link', { name: /^#trading MOD On-chain/ })).toHaveAttribute(
       'href',
-      '/?community=trading',
+      '/hub/trading',
     )
   })
 

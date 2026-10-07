@@ -11,14 +11,21 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 const deps = vi.hoisted(() => ({ joinCommunity: vi.fn() }))
 vi.mock('@/lib/communities/join-community.action', () => ({ joinCommunity: deps.joinCommunity }))
 
-const nft = { handle: '#nft', slug: 'nft', name: 'NFT', memberCount: 1200, avatarUrl: null }
+const nft = {
+  handle: '#nft',
+  slug: 'nft',
+  path: '/hub/nft',
+  name: 'NFT',
+  memberCount: 1200,
+  avatarUrl: null,
+}
 
 describe('SuggestedCommunities (H-07)', () => {
   it('links each suggestion, named by its handle and member count', () => {
     renderWithIntl(<SuggestedCommunities suggestions={[nft]} />)
     expect(screen.getByRole('link', { name: '#nft 1,200 members' })).toHaveAttribute(
       'href',
-      '/?community=nft',
+      '/hub/nft',
     )
   })
 

@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl'
 import type { ComponentProps, ReactNode } from 'react'
 import Markdown, { type Components } from 'react-markdown'
 import { Link } from '@/i18n/navigation'
+import { communityPath } from '@/lib/communities/paths'
 import { MENTION_SCHEME, parseMention } from '../lib/mentions'
 
 /**
@@ -38,10 +39,10 @@ const mentionClass = 'font-extrabold text-foreground'
 function Anchor({ href, children }: ComponentProps<'a'>) {
   const t = useTranslations('feed.card')
   const mention = parseMention(href)
-  if (mention?.type === 'community') {
+  if (mention?.type === 'community' || mention?.type === 'asset') {
     return (
       <Link
-        href={{ pathname: '/', query: { community: mention.slug } }}
+        href={communityPath(mention.type === 'asset' ? 'asset' : 'group', mention.slug)}
         className={`${mentionClass} underline underline-offset-2 hover:decoration-2`}
       >
         {children}

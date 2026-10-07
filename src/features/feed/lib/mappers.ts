@@ -1,3 +1,4 @@
+import { communityPath, kindOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 import type {
   RawCommunity,
@@ -81,6 +82,7 @@ export function toCardCommunity(summary: RawCommunitySummary, cards: CardLookup)
       : cards.isMember(summary.id)
   return {
     ...toCommunityRef(summary),
+    path: communityPath(kindOf(summary.type), summary.slug),
     avatarUrl: allowedImageUrl(avatarUrl ?? null),
     personal: summary.type === 'PERSONAL_CHANNEL',
     viewerIsMember: cards.signedIn ? member : null,

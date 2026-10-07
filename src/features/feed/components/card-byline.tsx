@@ -87,7 +87,7 @@ export function CardByline({
         <div className="flex min-h-6 min-w-0 items-center gap-x-1.25 type-meta text-muted-foreground">
           {group ? (
             <Link
-              href={{ pathname: '/', query: { community: group.slug } }}
+              href={group.path}
               className="inline-flex min-h-6 min-w-0 items-center type-ui font-bold text-foreground hover:underline"
             >
               {/* The symbol (# or $) in gray: the name is the protagonist. Both inside one span: as

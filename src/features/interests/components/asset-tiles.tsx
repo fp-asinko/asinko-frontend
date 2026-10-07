@@ -25,7 +25,7 @@ export function AssetTiles({ tiles }: { tiles: AssetTile[] }) {
           return (
             <li key={tile.symbol}>
               <CommunityLink
-                slug={tile.communitySlug}
+                href={tile.path}
                 className={cn(
                   'flex min-h-19.5 tap flex-col items-center justify-center gap-0.5 rounded-md border border-b-3 bg-card p-1 text-center outline-none hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-0',
                   'aria-[current=page]:border-x-foreground aria-[current=page]:border-t-foreground',

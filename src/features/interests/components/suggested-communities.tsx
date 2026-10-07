@@ -19,7 +19,7 @@ export function SuggestedCommunities({ suggestions }: { suggestions: Suggestion[
         <HideWhenJoined key={suggestion.slug} slug={suggestion.slug}>
           <li className="flex items-center gap-2 rounded-md px-0.5 py-1.5">
             <CommunityLink
-              slug={suggestion.slug}
+              href={suggestion.path}
               className="group flex min-w-0 flex-1 tap items-center gap-2 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted aria-[current=page]:ring-1 aria-[current=page]:ring-foreground"
             >
               <UserAvatar

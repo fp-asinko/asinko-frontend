@@ -15,8 +15,10 @@ export type MentionLookup = {
 }
 
 export type Mention =
-  /** $BTC with a community and #defi: link to the Home filtered by that community. */
+  /** #defi: link to the group's page (specs/community-pages CP-14). */
   | { type: 'community'; slug: string }
+  /** $BTC with a community: link to the asset's page. */
+  | { type: 'asset'; slug: string }
   /** $XYZ without a community: highlighted, no link. */
   | { type: 'ticker' }
   /** @maria: highlighted, no link until profiles exist (phase 2). */
@@ -26,7 +28,7 @@ function hrefFor(entity: RawEntity, lookup: MentionLookup): string | null {
   switch (entity.type) {
     case 'TICKER': {
       const slug = lookup.communityOfAsset(entity.resolvedId)
-      return slug ? `${MENTION_SCHEME}community/${slug}` : `${MENTION_SCHEME}ticker`
+      return slug ? `${MENTION_SCHEME}asset/${slug}` : `${MENTION_SCHEME}ticker`
     }
     case 'COMMUNITY': {
       const slug = lookup.communitySlug(entity.resolvedId)
@@ -75,6 +77,7 @@ export function parseMention(href: string | undefined): Mention | null {
   if (!href?.startsWith(MENTION_SCHEME)) return null
   const [type, slug] = href.slice(MENTION_SCHEME.length).split('/')
   if (type === 'community' && slug && SLUG_PATTERN.test(slug)) return { type: 'community', slug }
+  if (type === 'asset' && slug && SLUG_PATTERN.test(slug)) return { type: 'asset', slug }
   if (type === 'ticker') return { type: 'ticker' }
   if (type === 'user') return { type: 'user' }
   return null

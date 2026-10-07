@@ -21,7 +21,7 @@ describe('toPostItem', () => {
     const item = toPostItem(post(1), communities)
     expect(item.community).toMatchObject({ slug: 'BTC', name: 'Bitcoin', handle: '$BTC' })
     expect(item.author).toMatchObject({ username: 'maria', handle: '@maria', accuracyRate: 0.74 })
-    expect(item.body).toContain('[$BTC](asinko:community/BTC)')
+    expect(item.body).toContain('[$BTC](asinko:asset/BTC)')
     expect(item.body).toContain('[#trading-on-chain](asinko:community/trading-on-chain)')
     expect(item.media).toEqual({ type: 'image', url: '/mocks/chart-btc.svg' })
   })

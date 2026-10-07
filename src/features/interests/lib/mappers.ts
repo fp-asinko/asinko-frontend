@@ -1,5 +1,6 @@
 import type { RawAsset, RawCommunity, RawUserSummary } from '@/lib/api/contract'
 import type { AssetTile, Group, Person, Suggestion } from '../interests.types'
+import { communityPath, kindOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 
 /** Suggestions under the viewer sections; without a session the list is all the column shows. */
@@ -31,6 +32,7 @@ export function toAssetTile(asset: RawAsset, communitySlug: string): AssetTile {
     price: asset.price,
     stale: asset.priceStale,
     communitySlug,
+    path: communityPath('asset', communitySlug),
   }
 }
 
@@ -51,6 +53,7 @@ export function toGroups(communities: readonly RawCommunity[]): Group[] {
     .map((c) => ({
       handle: communityHandle(c),
       slug: c.slug,
+      path: communityPath(kindOf(c.type), c.slug),
       name: c.name,
       description: c.description,
       avatarUrl: allowedImageUrl(c.avatarUrl),
@@ -72,6 +75,7 @@ export function toSuggestions(
     .map((c) => ({
       handle: communityHandle(c),
       slug: c.slug,
+      path: communityPath(kindOf(c.type), c.slug),
       name: c.name,
       memberCount: c.memberCount,
       avatarUrl: allowedImageUrl(c.avatarUrl),

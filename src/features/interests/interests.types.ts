@@ -11,6 +11,8 @@ export type AssetTile = {
   stale: boolean
   /** Slug of the asset community: the tile links to the Home filtered by it. */
   communitySlug: string
+  /** The asset's page: /asset/{SYMBOL} (specs/community-pages CP-14). */
+  path: string
 }
 
 export type Person = {
@@ -26,6 +28,8 @@ export type Group = {
   /** How it is mentioned: #defi */
   handle: string
   slug: string
+  /** Its page: /hub/{slug} (CP-14). */
+  path: string
   name: string
   description: string | null
   avatarUrl: string | null
@@ -36,6 +40,8 @@ export type Suggestion = {
   /** $BTC for an asset community, #slug for a group */
   handle: string
   slug: string
+  /** Its page: /hub/{slug} or /asset/{SYMBOL} (CP-14). */
+  path: string
   name: string
   memberCount: number
   avatarUrl: string | null

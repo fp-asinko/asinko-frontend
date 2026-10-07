@@ -58,16 +58,16 @@ describe('PostMarkdown', () => {
     expect(container.querySelector('img')).toBeNull()
   })
 
-  it('renders mentions: communities as Home filters, users and loose tickers highlighted (H-14)', () => {
+  it('renders mentions: groups and assets linking to their pages, users and loose tickers highlighted (H-14, CP-14)', () => {
     renderWithIntl(
       <PostMarkdown>
         {
-          '[$BTC](asinko:community/BTC) [#defi](asinko:community/defi) [@maria](asinko:user) [$XYZ](asinko:ticker)'
+          '[$BTC](asinko:asset/BTC) [#defi](asinko:community/defi) [@maria](asinko:user) [$XYZ](asinko:ticker)'
         }
       </PostMarkdown>,
     )
-    expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/?community=BTC')
-    expect(screen.getByRole('link', { name: '#defi' })).toHaveAttribute('href', '/?community=defi')
+    expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/asset/BTC')
+    expect(screen.getByRole('link', { name: '#defi' })).toHaveAttribute('href', '/hub/defi')
     expect(screen.queryByRole('link', { name: '@maria' })).toBeNull()
     expect(screen.getByText('@maria').tagName).toBe('STRONG')
     expect(screen.getByText('$XYZ').tagName).toBe('STRONG')

@@ -13,14 +13,15 @@ const tile = {
   price: 64000,
   stale: false,
   communitySlug: 'BTC',
+  path: '/asset/BTC',
 }
 
 describe('AssetTiles (H-07, H-21)', () => {
-  it('links each tile to the Home filtered by its community', () => {
+  it('links each tile to its asset page (specs/community-pages CP-14)', () => {
     renderWithIntl(<AssetTiles tiles={[tile]} />)
     expect(screen.getByRole('link', { name: /^Bitcoin \$BTC/ })).toHaveAttribute(
       'href',
-      '/?community=BTC',
+      '/asset/BTC',
     )
     expect(screen.getByText('24h')).toBeInTheDocument()
   })

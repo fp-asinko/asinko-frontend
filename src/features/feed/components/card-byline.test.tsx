@@ -12,6 +12,7 @@ const hourAgo = () => new Date(Date.now() - 3600_000).toISOString()
 
 const defi = (overrides: Partial<CardCommunity> = {}): CardCommunity => ({
   slug: 'defi',
+  path: '/hub/defi',
   name: 'DeFi',
   handle: '#defi',
   avatarUrl: null,
@@ -26,7 +27,7 @@ describe('CardByline (specs/community-first)', () => {
       <CardByline author={MARIA} community={defi()} publishedAt={hourAgo()} titleId="t" />,
     )
     const group = screen.getByRole('link', { name: '#defi' })
-    expect(group).toHaveAttribute('href', '/?community=defi')
+    expect(group).toHaveAttribute('href', '/hub/defi')
     // The symbol is gray, the name keeps the text color.
     expect(group.querySelector('span span')).toHaveTextContent('#')
     expect(group.querySelector('span span')).toHaveClass('text-muted-foreground')

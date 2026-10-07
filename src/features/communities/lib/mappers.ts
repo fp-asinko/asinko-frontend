@@ -1,13 +1,9 @@
 import type { RawCommunity } from '@/lib/api/contract'
 import { allowedImageUrl } from '@/lib/images'
+import { kindOf } from '@/lib/communities/paths'
 import type { CommunityKind, CommunityPage } from '../communities.types'
 
-/** The page of each community type: assets and personal channels have their own (CP-02). */
-export function kindOf(type: RawCommunity['type']): CommunityKind {
-  if (type === 'SYSTEM_ASSET') return 'asset'
-  if (type === 'PERSONAL_CHANNEL') return 'user'
-  return 'group'
-}
+export { kindOf }
 
 const SYMBOL: Record<CommunityKind, string> = { group: '#', asset: '$', user: '@' }
 

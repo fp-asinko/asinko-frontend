@@ -9,6 +9,7 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 const group = {
   handle: '#trading',
   slug: 'trading',
+  path: '/hub/trading',
   name: 'Trading',
   description: 'On-chain flows',
   avatarUrl: null,
@@ -19,7 +20,7 @@ describe('GroupList (H-07)', () => {
   it('links each group to the Home filtered by it; the name includes the description', () => {
     renderWithIntl(<GroupList groups={[group]} />)
     const link = screen.getByRole('link', { name: '#trading On-chain flows' })
-    expect(link).toHaveAttribute('href', '/?community=trading')
+    expect(link).toHaveAttribute('href', '/hub/trading')
     expect(screen.queryByText('MOD')).toBeNull()
   })
 
@@ -29,7 +30,11 @@ describe('GroupList (H-07)', () => {
   })
 
   it('colors the avatar by the slug, like the feed does (FC-01)', () => {
-    renderWithIntl(<GroupList groups={[{ ...group, name: 'On-chain', slug: 'onchain' }]} />)
+    renderWithIntl(
+      <GroupList
+        groups={[{ ...group, name: 'On-chain', slug: 'onchain', path: '/hub/onchain' }]}
+      />,
+    )
     expect(screen.getByTestId('user-avatar')).toHaveAttribute(
       'data-color',
       String(identityIndex('onchain')),
