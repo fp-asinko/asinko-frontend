@@ -21,7 +21,7 @@
 
 ## Parte 2: crear
 
-- [ ] **T-06 (S)** Componentes de shadcn (`field`, `input`, `textarea`, `tabs`, `combobox`) y `react-hook-form` con `@hookform/resolvers`. Se suman a `libraries.md` si cambia algo. → PC-08
+- [x] **T-06 (S)** Componentes de shadcn (`field`, `input`, `textarea`, `tabs`, `combobox`) y `react-hook-form` con `@hookform/resolvers`. Se suman a `libraries.md` si cambia algo. → PC-08
 - [ ] **T-07 (M)** Contexto `compose` (organismo), `ComposerRoot` y `ComposeScope` (feature), y los accesos: "+ Crear" en la barra superior, "Crear" en la barra inferior y la caja de arriba. Sin sesión, el modal. Tests. → PC-01 a PC-04
 - [ ] **T-08 (L)** El editor:
   - Esquema, comunidad (combobox con tus comunidades y búsqueda), pestañas (Imagen Próximamente), campos con contador y errores, y descartar con confirmación.
