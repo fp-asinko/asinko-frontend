@@ -5,8 +5,8 @@ import { COMMUNITIES } from '@/mocks/fixtures/communities'
 import { POLLS } from '@/mocks/fixtures/polls'
 import { POSTS } from '@/mocks/fixtures/posts'
 import {
-  indexCardCommunities,
   indexCommunities,
+  needsMentionLookup,
   toCardCommunity,
   toFeedItem,
   toPollItem,
@@ -62,6 +62,8 @@ describe('toPostItem', () => {
         slug: 'options-flow',
         name: 'Options flow',
         type: 'USER_PUBLIC',
+        avatarUrl: null,
+        viewerMembership: null,
       },
     }
     // No communities list at all: the card is still named.
@@ -116,49 +118,46 @@ describe('toPollItem', () => {
   })
 })
 
-describe('toCardCommunity (specs/community-first CF-04, CF-12)', () => {
+describe('toCardCommunity (specs/community-first CF-04, P-010)', () => {
   const storage = 'https://hqarefesoovfmibncivu.supabase.co/storage/v1/object/public/c/acciones.png'
   const defi = COMMUNITIES.find((each) => each.slug === 'defi')!
-  const base = { id: defi.id, slug: defi.slug, name: defi.name, type: defi.type }
+  const base = {
+    id: defi.id,
+    slug: defi.slug,
+    name: defi.name,
+    type: defi.type,
+    avatarUrl: null,
+    viewerMembership: null,
+  }
 
-  it('takes avatar and membership from the summary when the backend sends them (P-010)', () => {
-    const lookup = indexCardCommunities([], [], true)
+  it('takes avatar and membership from the summary (P-010)', () => {
     expect(
-      toCardCommunity({ ...base, avatarUrl: storage, viewerMembership: 'MEMBER' }, lookup),
+      toCardCommunity({ ...base, avatarUrl: storage, viewerMembership: 'MEMBER' }, true),
     ).toMatchObject({ handle: '#defi', avatarUrl: storage, personal: false, viewerIsMember: true })
-    expect(
-      toCardCommunity({ ...base, avatarUrl: null, viewerMembership: null }, lookup),
-    ).toMatchObject({ avatarUrl: null, viewerIsMember: false })
-  })
-
-  it('falls back to the community lists while P-010 is missing', () => {
-    const listed = { ...defi, avatarUrl: storage, viewerMembership: 'MEMBER' as const }
-    expect(toCardCommunity(base, indexCardCommunities([listed], [listed], true))).toMatchObject({
-      avatarUrl: storage,
-      viewerIsMember: true,
-    })
-    expect(toCardCommunity(base, indexCardCommunities([], [], true))).toMatchObject({
-      avatarUrl: null,
-      viewerIsMember: false,
-    })
+    expect(toCardCommunity(base, true)).toMatchObject({ avatarUrl: null, viewerIsMember: false })
   })
 
   it('has no membership without a session, even if the summary says so', () => {
-    const lookup = indexCardCommunities([], [], false)
-    expect(toCardCommunity({ ...base, viewerMembership: 'MEMBER' }, lookup).viewerIsMember).toBe(
+    expect(toCardCommunity({ ...base, viewerMembership: 'MEMBER' }, false).viewerIsMember).toBe(
       null,
     )
   })
 
   it('drops an avatar from a host next/image does not allow', () => {
-    const lookup = indexCardCommunities([], [], false)
     expect(
-      toCardCommunity({ ...base, avatarUrl: 'https://evil.example/a.png' }, lookup).avatarUrl,
+      toCardCommunity({ ...base, avatarUrl: 'https://evil.example/a.png' }, false).avatarUrl,
     ).toBeNull()
   })
 
   it('marks the personal channel of a user', () => {
-    const lookup = indexCardCommunities([], [], true)
-    expect(toCardCommunity({ ...base, type: 'PERSONAL_CHANNEL' }, lookup).personal).toBe(true)
+    expect(toCardCommunity({ ...base, type: 'PERSONAL_CHANNEL' }, true).personal).toBe(true)
+  })
+})
+
+describe('needsMentionLookup (BC-02)', () => {
+  it('is true only when a post has $ or # mentions to link', () => {
+    expect(needsMentionLookup([{ kind: 'POST', content: post(1) }])).toBe(true)
+    const plain = { ...post(1), entities: [] }
+    expect(needsMentionLookup([{ kind: 'POST', content: plain }])).toBe(false)
   })
 })

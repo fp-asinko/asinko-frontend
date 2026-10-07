@@ -22,9 +22,9 @@ export const communitySummarySchema = z.object({
   slug: z.string(),
   name: z.string(),
   type: communityTypeSchema,
-  /** P-010 (proposal): optional until the backend sends them (specs/community-first CF-11). */
-  avatarUrl: z.string().nullable().optional(),
-  viewerMembership: membershipSchema.nullable().optional(),
+  /** P-010 (in the backend since 2026-10-07): the card's avatar and the viewer's role. */
+  avatarUrl: z.string().nullable(),
+  viewerMembership: membershipSchema.nullable(),
 })
 
 export const postSchema = z.object({

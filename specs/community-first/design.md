@@ -140,3 +140,11 @@ En `components/organisms/join/`, junto a su provider.
 - **`needsMentionLookup`** se borra: `GET /communities` se pide siempre, en paralelo, y también sirve para las menciones.
 
 - **Símbolo del grupo** (2026-10-05): el `#` o `$` va en `--muted-foreground` y sin negrita; el nombre sigue en negro y negrita. El `@` del autor no se aclara más: `--faint` no cumple contraste en texto de 11 px.
+
+## 9. P-010 en el backend (2026-10-07)
+
+El backend ya manda `avatarUrl` y `viewerMembership` en la comunidad de cada contenido (`e3fc57b`, en Vercel). Se borra la vía alternativa de CF-12:
+
+- `getFeed` ya no pide `GET /communities?mine=true`, y `GET /communities` vuelve a pedirse solo cuando hay menciones `$` o `#` para linkear (BC-02).
+- `toCardCommunity` lee el avatar y la membresía del resumen. Sin sesión no hay membresía, aunque la respuesta diga otra cosa: el backend manda `null` y los mocks responden como el usuario demo.
+- En el contrato, los dos campos pasan a ser obligatorios.

@@ -110,7 +110,7 @@ describe('getFeed', () => {
     expect(result.data.items.every((item) => item.community !== null)).toBe(true)
   })
 
-  describe('community lists in parallel with the feed (specs/community-first CF-12)', () => {
+  describe('community data from each summary (P-010)', () => {
     function communityQueries() {
       const queries: Array<Record<string, string | undefined>> = []
       state.routes = MOCK_ROUTES.map((route) =>
@@ -124,20 +124,17 @@ describe('getFeed', () => {
       return queries
     }
 
-    it('asks for all communities, and for mine only with a session', async () => {
-      const guest = communityQueries()
-      await getFeed(parseFeedParams({}))
-      expect(guest).toEqual([{}])
-
-      const signedIn = communityQueries()
+    it('never asks for the viewer communities: membership comes with each card', async () => {
+      const queries = communityQueries()
       await getFeed(parseFeedParams({}), undefined, { signedIn: true })
-      expect(signedIn).toEqual(expect.arrayContaining([{}, { mine: 'true' }]))
+      expect(queries.some((query) => query.mine === 'true')).toBe(false)
     })
 
-    it('links $ and # mentions with them (BC-02)', async () => {
-      communityQueries()
+    it('links $ and # mentions with GET /communities (BC-02)', async () => {
+      const queries = communityQueries()
       const result = await getFeed(parseFeedParams({}))
       if (!result.ok) throw new Error('expected ok')
+      expect(queries).toEqual([{}])
       expect(
         result.data.items.some(
           (item) => item.kind === 'post' && item.body.includes('asinko:community/'),
@@ -155,7 +152,7 @@ describe('getFeed', () => {
       expect(members).toContain(false)
     })
 
-    it('keeps the feed when the community lists fail', async () => {
+    it('keeps the feed when the community list fails', async () => {
       state.routes = MOCK_ROUTES.filter((route) => route.path !== '/api/v1/communities')
       const result = await getFeed(parseFeedParams({}), undefined, { signedIn: true })
       expect(result.ok).toBe(true)
