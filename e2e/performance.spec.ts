@@ -17,6 +17,7 @@ test.describe('JavaScript budget', () => {
     // specs/community-pages CP-18
     '/en/hub/defi',
     '/en/asset/BTC',
+    '/en/user/federico',
   ]) {
     test(`${path} stays under ${BUDGET_KB} KB gzip`, async ({ request }) => {
       const html = await (await request.get(path)).text()

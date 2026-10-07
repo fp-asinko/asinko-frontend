@@ -69,21 +69,21 @@ El PDF asigna `/hub` a `USER_PUBLIC`, pero en la base de dev los grupos del sist
 > - "Ask" como Próximamente.
 > - Dejar de seguir pide confirmación.
 
-- [ ] **CP-11** **Perfil** con `GET /profiles/{identifier}` y el canal personal (`GET /communities/{username}`), con la misma estructura de las otras páginas:
+- [x] **CP-11** **Perfil** con `GET /profiles/{identifier}` y el canal personal (`GET /communities/{username}`), con la misma estructura de las otras páginas:
   - Banner, avatar redondo y título: el nombre visible si existe, y si no, `@usuario`. Con nombre visible, `@usuario` va debajo.
   - Junto al título: la etiqueta **Creator** o **Partner**, el **rating** (AAA…D) y la marca de **verificado** o **institucional**, cada uno solo si viene.
   - La bio, si existe.
   - Estadísticas: **seguidores · acierto · racha**. La racha son tesis acertadas seguidas, no días.
   - Un botón **"Preguntarle a {nombre}"**, Próximamente.
   - Las reglas de su canal, si tiene, en el desplegable.
-- [ ] **CP-12** **Seguir:**
+- [x] **CP-12** **Seguir:**
   - "Seguir" es unirse a su canal personal (CP-05).
   - Siguiendo, el botón dice "Siguiendo", y tocarlo pide confirmación para dejar de seguir.
   - Sin estrella de favorito.
   - En tu propio perfil no hay acciones.
-- [ ] **CP-13** **Contenido:** el feed de su canal (CP-07). El historial de tesis (`GET /users/{userId}/theses`) entra con las tesis, en la fase 2.
-- [ ] **CP-20** **Datos que el backend no tiene** (propuesta **P-011** en `proposals.md`): `displayName`, `tier` (`CREATOR` / `PARTNER`) y `rating` público. Van en los mocks y se muestran cuando vienen. Mientras no vengan, el chip de acierto (el de las tarjetas, por tramos) da la reputación.
-- [ ] **CP-21** `@usuario` lleva a `/user/{username}`: en el cuerpo de los posts, en la cabecera de las tarjetas y en "Personas" de la columna izquierda.
+- [x] **CP-13** **Contenido:** el feed de su canal (CP-07). El historial de tesis (`GET /users/{userId}/theses`) entra con las tesis, en la fase 2.
+- [x] **CP-20** **Datos que el backend no tiene** (propuesta **P-011** en `proposals.md`): `displayName`, `tier` (`CREATOR` / `PARTNER`) y `rating` público. Van en los mocks y se muestran cuando vienen. Mientras no vengan, el chip de acierto (el de las tarjetas, por tramos) da la reputación.
+- [x] **CP-21** `@usuario` lleva a `/user/{username}`: en el cuerpo de los posts, en la cabecera de las tarjetas y en "Personas" de la columna izquierda.
 
 ### Menciones y enlaces
 

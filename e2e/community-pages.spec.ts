@@ -119,3 +119,57 @@ test.describe('Quality (CP-16)', () => {
     })
   }
 })
+
+test.describe('Profile pages (CP-11 to CP-13, CP-21)', () => {
+  test('a profile: name, marks and stats; following asks before unfollowing', async ({ page }) => {
+    await page.goto('/en/user/federico')
+    await expect(heading(page, 'Federico Piva')).toBeVisible()
+    const header = page.getByRole('main').locator('header')
+    await expect(header.getByText('Creator')).toBeVisible()
+    await expect(header.getByText('Rating AAA')).toBeAttached()
+    await expect(header.getByText(/followers/)).toBeVisible()
+    await expect(header.getByRole('button', { name: /favorites/ })).toHaveCount(0)
+
+    await header.getByRole('button', { name: /^Following/ }).click()
+    const dialog = page.getByRole('dialog', { name: 'Unfollow @federico?' })
+    await expect(dialog).toBeVisible()
+    await dialog.getByRole('button', { name: 'Unfollow' }).click()
+    await expect(header.getByRole('button', { name: 'Follow @federico' })).toBeVisible()
+  })
+
+  test('your own profile has no follow actions', async ({ page }) => {
+    await page.goto('/en/user/demo')
+    await expect(heading(page, '@demo')).toBeVisible()
+    await expect(page.getByRole('main').getByRole('button', { name: /Follow/ })).toHaveCount(0)
+  })
+
+  test('a personal channel asked as a group goes to the profile; an unknown user is a 404', async ({
+    request,
+  }) => {
+    const response = await request.get('/en/hub/federico', { maxRedirects: 0 })
+    expect(response.status()).toBe(308)
+    expect(new URL(response.headers().location!, 'http://x').pathname).toBe('/en/user/federico')
+    expect((await request.get('/en/user/nobody')).status()).toBe(404)
+  })
+
+  test('the author of a card links to the profile (CP-21)', async ({ page }) => {
+    await page.goto('/en')
+    await page.getByRole('main').getByRole('link', { name: '@maria' }).first().click()
+    await expect(page).toHaveURL(/\/en\/user\/maria$/)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  })
+
+  for (const theme of ['light', 'dark'] as const) {
+    test(`a profile fits 360px and stays accessible in ${theme}`, async ({ page }) => {
+      await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
+      await page.setViewportSize({ width: 360, height: 800 })
+      await page.goto('/en/user/federico')
+      await expect(heading(page, 'Federico Piva')).toBeVisible()
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      )
+      expect(overflow).toBeLessThanOrEqual(0)
+      await expectNoA11yViolations(page)
+    })
+  }
+})

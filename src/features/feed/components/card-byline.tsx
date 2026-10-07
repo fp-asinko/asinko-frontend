@@ -156,7 +156,12 @@ function AuthorName({
 }) {
   if (!author) return <span className={cn('min-w-0 truncate', className)}>{fallback}</span>
   return (
-    <Link href={author.path} className={cn('min-w-0 truncate hover:underline', className)}>
+    // pb-2 -mb-2: a 24px target (WCAG 2.5.8) on a 16px line, without moving it. Only downwards,
+    // over the header's bottom margin: upwards it would overlap the group's link (axe).
+    <Link
+      href={author.path}
+      className={cn('-mb-2 inline-block min-w-0 truncate pb-2 hover:underline', className)}
+    >
       {author.handle}
     </Link>
   )
