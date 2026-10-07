@@ -6,7 +6,7 @@
   - Respuestas de crear post, crear comentario y votar comentario.
   - Mocks de `POST /posts`, `POST /posts/:id/comments` y `PUT/DELETE /comments/:id/vote`.
   - Tests: `fixtures.test.ts` y `handlers.test.ts`. → PC-10, PC-15, PC-16
-- [ ] **T-02 (S)** `postPath` y el slug en `lib/posts/`, con sus tests. → PC-12
+- [x] **T-02 (S)** `postPath` y el slug en `lib/posts/`, con sus tests. → PC-12
 - [ ] **T-03 (M)** Ruta `/post/[id]/[[...slug]]`:
   - El post completo, reusando las piezas de la tarjeta.
   - 308 al slug canónico y 404.
