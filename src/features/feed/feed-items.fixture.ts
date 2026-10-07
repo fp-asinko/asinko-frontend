@@ -1,4 +1,4 @@
-import type { Author, PollItem, PostItem } from './feed.types'
+import type { Author, CommentNode, PollItem, PostItem } from './feed.types'
 
 // Domain items for component tests (the mappers have their own tests against the mock fixtures).
 
@@ -65,6 +65,28 @@ export function pollItem(overrides: Partial<PollItem> = {}): PollItem {
       viewerIsMember: false,
     },
     publishedAt: new Date(Date.now() - 86400_000).toISOString(),
+    ...overrides,
+  }
+}
+
+let commentCount = 0
+
+/** A comment of the detail, with unique id and body ("Comment 1", "Comment 2"…). */
+export function commentNode(
+  overrides: Partial<CommentNode> = {},
+  replies: CommentNode[] = [],
+): CommentNode {
+  commentCount += 1
+  return {
+    id: `00000000-0000-4000-8000-${String(commentCount).padStart(12, '0')}`,
+    author: MARIA,
+    body: `Comment ${commentCount}`,
+    createdAt: new Date().toISOString(),
+    edited: false,
+    deleted: false,
+    score: 1,
+    viewerVote: null,
+    replies,
     ...overrides,
   }
 }

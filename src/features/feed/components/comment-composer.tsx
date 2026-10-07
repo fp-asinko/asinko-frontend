@@ -16,8 +16,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { createComment } from '../actions/create-comment.action'
 import { useThread } from './comment-thread'
 
+// 44px in mobile (the main action, design-system.md § Mobile first), 32px from md.
 const PILL =
-  'inline-flex h-8 tap items-center justify-center rounded-full px-3.5 type-action outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-60 aria-disabled:active:scale-100'
+  'inline-flex h-11 md:h-8 tap items-center justify-center rounded-full px-3.5 type-action outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-60 aria-disabled:active:scale-100'
 
 /**
  * The box to comment a post, or to reply to a comment when `parentId` is set (PC-15). The comment
@@ -42,6 +43,8 @@ export function CommentComposer({
   const { requireAccount, openGate } = useAuthGate()
   const [text, setText] = useState('')
   const [error, setError] = useState<string | null>(null)
+  // Read by screen readers: the comment shows at once, but only visually.
+  const [announcement, setAnnouncement] = useState('')
   const [sending, startTransition] = useTransition()
   const sent = useRef(0)
   const errorId = useId()
@@ -60,6 +63,7 @@ export function CommentComposer({
     // aria-disabled, not disabled: the focused button keeps the focus while sending (WCAG 2.4.3).
     if (blocked || !requireAccount('comment')) return
     setError(null)
+    setAnnouncement(t('sending'))
     setText('')
     sent.current += 1
     const key = `${parentId ?? 'post'}-${sent.current}`
@@ -67,9 +71,11 @@ export function CommentComposer({
       addPending({ key, parentId, body })
       const result = await createComment({ postId, parentCommentId: parentId, body })
       if (result.ok) {
+        setAnnouncement(t('sent'))
         if (onSent) startTransition(onSent)
         return
       }
+      setAnnouncement('')
       setText(body)
       if (result.error === 'api.errors.UNAUTHENTICATED') openGate('comment')
       else setError(t('error'))
@@ -86,13 +92,16 @@ export function CommentComposer({
         value={text}
         onChange={(event) => setText(event.target.value)}
         onKeyDown={onKeyDown}
-        aria-label={t('label')}
+        aria-label={t(reply ? 'replyLabel' : 'label')}
         placeholder={t(reply ? 'replyPlaceholder' : 'placeholder')}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         ref={field}
         className="min-h-20 bg-background"
       />
+      <span role="status" className="sr-only">
+        {announcement}
+      </span>
       {error && (
         <p id={errorId} role="alert" className="type-meta text-destructive">
           {error}
@@ -113,7 +122,7 @@ export function CommentComposer({
           aria-disabled={blocked || undefined}
           className={cn(PILL, 'bg-primary text-primary-foreground hover:bg-primary/85')}
         >
-          {t(reply ? 'reply' : 'submit')}
+          {t(reply ? 'sendReply' : 'submit')}
         </button>
       </div>
     </form>

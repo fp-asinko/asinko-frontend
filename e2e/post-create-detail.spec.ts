@@ -83,10 +83,10 @@ test.describe('Post detail comments', () => {
 
     const thread = section.getByRole('listitem').filter({ hasText: mine }).first()
     await thread.getByRole('button', { name: 'Reply' }).click()
-    const box = thread.getByRole('textbox', { name: 'Your comment' })
+    const box = thread.getByRole('textbox', { name: 'Your reply' })
     await expect(box).toBeFocused()
     await box.fill(reply)
-    await thread.locator('form').getByRole('button', { name: 'Reply' }).click()
+    await thread.getByRole('button', { name: 'Send reply' }).click()
     await expect(thread.getByText(reply)).toBeVisible()
     await expect(thread.getByRole('textbox')).toHaveCount(0)
 

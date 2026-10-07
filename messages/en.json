@@ -306,6 +306,9 @@
     "cancel": "Cancel",
     "sending": "Sending…",
     "you": "You",
-    "error": "Could not post your comment. Try again."
+    "error": "Could not post your comment. Try again.",
+    "replyLabel": "Your reply",
+    "sendReply": "Send reply",
+    "sent": "Comment posted."
   }
 }

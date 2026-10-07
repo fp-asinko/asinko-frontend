@@ -151,7 +151,7 @@ export function PostCard({
           {detail ? (
             <a
               href="#comments"
-              className="inline-flex h-9.5 tap items-center gap-1.5 rounded-full bg-muted px-3 type-action text-muted-foreground hover:bg-muted-hover"
+              className="inline-flex h-9.5 tap items-center gap-1.5 rounded-full bg-muted px-3 type-action text-muted-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               {commentCount}
             </a>

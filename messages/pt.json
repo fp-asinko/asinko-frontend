@@ -306,6 +306,9 @@
     "cancel": "Cancelar",
     "sending": "Enviando…",
     "you": "Você",
-    "error": "Não foi possível publicar seu comentário. Tente de novo."
+    "error": "Não foi possível publicar seu comentário. Tente de novo.",
+    "replyLabel": "Sua resposta",
+    "sendReply": "Enviar resposta",
+    "sent": "Comentário publicado."
   }
 }

@@ -72,18 +72,18 @@ function CommentItem({
         )}
         <div className="min-w-0 flex-1 wrap-anywhere">
           <p className="mb-0.75 flex flex-wrap items-center gap-x-1.25 type-meta text-muted-foreground">
-            {comment.author ? (
-              // py-1 -my-1: a 24px target (WCAG 2.5.8) on the 16px line, without moving it.
-              <Link
-                href={comment.author.path}
-                className="-my-1 inline-block py-1 font-bold text-foreground hover:underline"
-              >
-                {comment.author.handle}
-              </Link>
-            ) : (
-              <span>{tc('deleted')}</span>
+            {comment.author && (
+              <>
+                {/* py-1 -my-1: a 24px target (WCAG 2.5.8) on the 16px line, without moving it. */}
+                <Link
+                  href={comment.author.path}
+                  className="-my-1 inline-block py-1 font-bold text-foreground hover:underline"
+                >
+                  {comment.author.handle}
+                </Link>
+                <span aria-hidden>·</span>
+              </>
             )}
-            <span aria-hidden>·</span>
             <time dateTime={comment.createdAt}>
               {format.relativeTime(new Date(comment.createdAt), now)}
             </time>
