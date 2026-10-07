@@ -335,7 +335,8 @@
       "url": "Link",
       "body": "Corpo",
       "bodyHelp": "Aceita Markdown",
-      "counter": "{count}/{max}"
+      "counter": "{count}/{max}",
+      "urlPlaceholder": "https://"
     },
     "submit": "Publicar",
     "submitting": "Publicando…",
@@ -348,7 +349,7 @@
     "errors": {
       "community": "Escolha uma comunidade",
       "titleRequired": "Adicione um título",
-      "titleTooLong": "O título pode ter até 300 caracteres",
+      "titleTooLong": "O título pode ter até {max} caracteres",
       "bodyRequired": "Escreva algo no corpo",
       "url": "Digite um link que comece com http:// ou https://",
       "ownProfileOnly": "Você só pode publicar no seu próprio perfil",

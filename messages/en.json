@@ -335,7 +335,8 @@
       "url": "Link",
       "body": "Body",
       "bodyHelp": "Supports Markdown",
-      "counter": "{count}/{max}"
+      "counter": "{count}/{max}",
+      "urlPlaceholder": "https://"
     },
     "submit": "Post",
     "submitting": "Posting…",
@@ -348,7 +349,7 @@
     "errors": {
       "community": "Choose a community",
       "titleRequired": "Add a title",
-      "titleTooLong": "Keep the title within 300 characters",
+      "titleTooLong": "Keep the title within {max} characters",
       "bodyRequired": "Write something in the body",
       "url": "Enter a link that starts with http:// or https://",
       "ownProfileOnly": "You can only post on your own profile",

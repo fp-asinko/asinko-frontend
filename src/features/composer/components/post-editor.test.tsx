@@ -88,6 +88,16 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
     expect(title()).toHaveAttribute('aria-invalid', 'true')
   })
 
+  it('says what is missing when Post is pressed too early (WCAG 3.3.1)', async () => {
+    renderEditor({ community: null })
+    await userEvent.click(publish())
+    expect(actions.createPost).not.toHaveBeenCalled()
+    expect(await screen.findByText('Choose a community')).toBeInTheDocument()
+    expect(screen.getByText('Add a title')).toBeInTheDocument()
+    expect(screen.getByText('Write something in the body')).toBeInTheDocument()
+    expect(title()).toHaveAccessibleDescription(/Add a title/)
+  })
+
   it("publishes and hands over the new post's page", async () => {
     actions.createPost.mockResolvedValue({
       ok: true,

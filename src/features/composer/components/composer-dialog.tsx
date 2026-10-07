@@ -52,6 +52,9 @@ export function ComposerDialog({
     <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(true) : requestClose())}>
       <DialogContent
         showCloseButton={false}
+        // Into the form, not onto Close: the community, or the title when it comes chosen.
+        initialFocus={() => document.querySelector<HTMLElement>('[data-composer] [data-autofocus]')}
+        data-composer
         className="inset-0 flex h-dvh max-h-dvh w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none p-0 pt-[env(safe-area-inset-top)] sm:max-w-none md:inset-auto md:top-1/2 md:left-1/2 md:h-auto md:max-h-[min(90dvh,48rem)] md:max-w-xl md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-xl md:pt-0"
       >
         <div className="flex h-14 shrink-0 items-center justify-between border-b pr-1.5 pl-4 md:pl-6">

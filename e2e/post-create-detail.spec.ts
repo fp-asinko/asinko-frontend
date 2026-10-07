@@ -171,6 +171,8 @@ test.describe('Create post', () => {
     await page.goto('/en')
     const editor = await openEditor(page, isMobile)
     await expect(editor).toBeVisible()
+    // The focus enters the form, on the first thing to fill (PC-18).
+    await expect(editor.getByRole('combobox', { name: 'Community' })).toBeFocused()
     await expect(editor.getByRole('button', { name: 'Post' })).toHaveAttribute(
       'aria-disabled',
       'true',
@@ -196,6 +198,7 @@ test.describe('Create post', () => {
     await page.getByRole('button', { name: 'Post in #defi' }).click()
     const editor = page.getByRole('dialog', { name: 'Create post' })
     await expect(editor.getByRole('combobox', { name: 'Community' })).toHaveValue('#defi')
+    await expect(editor.getByRole('textbox', { name: 'Title' })).toBeFocused()
 
     await editor.getByRole('tab', { name: 'Link' }).click()
     await editor.getByRole('textbox', { name: 'Link' }).fill('javascript:alert(1)')

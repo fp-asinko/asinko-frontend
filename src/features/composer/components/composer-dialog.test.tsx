@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -34,6 +34,11 @@ const dialog = () => screen.queryByRole('dialog', { name: 'Create post' })
 
 describe('ComposerDialog (specs/post-create-detail PC-05, PC-10)', () => {
   beforeEach(() => vi.clearAllMocks())
+
+  it('puts the focus on the title when the community comes chosen (PC-18)', async () => {
+    renderWithIntl(<Host />)
+    await waitFor(() => expect(screen.getByRole('textbox', { name: 'Title' })).toHaveFocus())
+  })
 
   it('closes at once when nothing is written', async () => {
     renderWithIntl(<Host />)

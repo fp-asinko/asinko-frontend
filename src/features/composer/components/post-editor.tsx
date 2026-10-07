@@ -74,7 +74,8 @@ export function PostEditor({
     defaultValues: { communityId: community?.id ?? '', type, title: '', body: '', url: '' },
     mode: 'onTouched',
   })
-  const { register, control, handleSubmit, setValue, setError, getValues, formState } = form
+  const { register, control, handleSubmit, setValue, setError, getValues, trigger, formState } =
+    form
   const [title = '', body = '', url = '', current = type] = useWatch({
     control,
     name: ['title', 'body', 'url', 'type'],
@@ -115,7 +116,16 @@ export function PostEditor({
 
   const fieldError = (name: (typeof FIELDS)[number]) => {
     const message = formState.errors[name]?.message
-    return message ? [{ message: t(`errors.${errorName(message)}`) }] : undefined
+    if (!message) return undefined
+    const key = errorName(message)
+    return [
+      {
+        message:
+          key === 'titleTooLong'
+            ? t('errors.titleTooLong', { max: TITLE_MAX })
+            : t(`errors.${key}`),
+      },
+    ]
   }
   const invalid = (name: (typeof FIELDS)[number]) => Boolean(formState.errors[name])
 
@@ -127,11 +137,12 @@ export function PostEditor({
           id={`${ids}-title`}
           {...register('title')}
           aria-invalid={invalid('title') || undefined}
-          aria-describedby={`${ids}-title-count`}
+          aria-describedby={`${ids}-title-count ${ids}-title-error`}
+          data-autofocus={chosen ? true : undefined}
           className="h-11 text-foreground"
         />
         <div className="flex justify-between gap-2">
-          <FieldError errors={fieldError('title')} />
+          <FieldError id={`${ids}-title-error`} errors={fieldError('title')} />
           <span
             id={`${ids}-title-count`}
             className="ml-auto type-meta text-muted-foreground tabular-nums"
@@ -147,11 +158,11 @@ export function PostEditor({
           id={`${ids}-body`}
           {...register('body')}
           aria-invalid={invalid('body') || undefined}
-          aria-describedby={`${ids}-body-help`}
+          aria-describedby={`${ids}-body-help ${ids}-body-error`}
           className="min-h-36 text-foreground"
         />
         <FieldDescription id={`${ids}-body-help`}>{t('fields.bodyHelp')}</FieldDescription>
-        <FieldError errors={fieldError('body')} />
+        <FieldError id={`${ids}-body-error`} errors={fieldError('body')} />
       </Field>
     </>
   )
@@ -160,9 +171,11 @@ export function PostEditor({
     <form
       noValidate
       onSubmit={(event) => {
-        // aria-disabled, not disabled: the focused button keeps the focus (WCAG 2.4.3).
-        if (blocked) event.preventDefault()
-        else void handleSubmit(publish)(event)
+        // aria-disabled, not disabled: the focused button keeps the focus (WCAG 2.4.3). Pressed
+        // with something missing, every field says what it needs (WCAG 3.3.1).
+        if (!blocked) return void handleSubmit(publish)(event)
+        event.preventDefault()
+        if (!formState.isSubmitting) void trigger()
       }}
       className="flex min-h-full flex-col gap-5 px-4 pt-4 md:px-6"
     >
@@ -180,10 +193,12 @@ export function PostEditor({
                 field.onChange(next?.id ?? '')
               }}
               invalid={invalid('communityId')}
+              describedBy={`${ids}-community-error`}
+              firstFocus={!chosen}
             />
           )}
         />
-        <FieldError errors={fieldError('communityId')} />
+        <FieldError id={`${ids}-community-error`} errors={fieldError('communityId')} />
       </Field>
 
       <Tabs
@@ -194,14 +209,18 @@ export function PostEditor({
         className="gap-4"
       >
         <TabsList aria-label={t('type.label')} className="h-10 w-full">
-          <TabsTrigger value="TEXT" className="text-muted-foreground">
+          <TabsTrigger value="TEXT" className="text-muted-foreground data-active:shadow-none">
             {t('type.text')}
           </TabsTrigger>
-          <TabsTrigger value="LINK" className="text-muted-foreground">
+          <TabsTrigger value="LINK" className="text-muted-foreground data-active:shadow-none">
             {t('type.link')}
           </TabsTrigger>
           {/* Image waits for uploads (P-013): visible, not selectable. */}
-          <TabsTrigger value="IMAGE" disabled className="text-muted-foreground">
+          <TabsTrigger
+            value="IMAGE"
+            disabled
+            className="text-muted-foreground data-active:shadow-none"
+          >
             {t('type.image')}
             <span className="rounded-full bg-background px-1.5 type-meta">{t('type.soon')}</span>
           </TabsTrigger>
@@ -217,12 +236,13 @@ export function PostEditor({
               type="url"
               inputMode="url"
               autoComplete="url"
-              placeholder="https://"
+              placeholder={t('fields.urlPlaceholder')}
               {...register('url')}
               aria-invalid={invalid('url') || undefined}
+              aria-describedby={`${ids}-url-error`}
               className="h-11 text-foreground"
             />
-            <FieldError errors={fieldError('url')} />
+            <FieldError id={`${ids}-url-error`} errors={fieldError('url')} />
           </Field>
         </TabsContent>
       </Tabs>
@@ -236,6 +256,8 @@ export function PostEditor({
 
       {/* Always in reach, also with the phone's keyboard open (PC-18). */}
       <div className="sticky bottom-0 -mx-4 mt-auto flex justify-end border-t bg-popover px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] md:-mx-6 md:px-6">
+        {/* The black pill of the main actions (JoinButton, comments), 44px in mobile: written
+            out as there, not a Button variant (Button has no full pill of that size). */}
         <button
           type="submit"
           aria-disabled={blocked || undefined}
