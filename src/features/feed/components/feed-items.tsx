@@ -6,14 +6,21 @@ import { PostCard } from './post-card'
 export function FeedItems({
   items,
   later = false,
+  feedCommunity,
 }: {
   items: FeedItem[]
   /** A page loaded with "Load more": its images fade in (D-M1). */
   later?: boolean
+  /** The community the feed is filtered by: its cards do not repeat its join button (CP-07). */
+  feedCommunity?: string
 }) {
   return items.map((item) => (
     <li key={`${item.kind}-${item.id}`}>
-      {item.kind === 'post' ? <PostCard post={item} fadeImage={later} /> : <PollCard poll={item} />}
+      {item.kind === 'post' ? (
+        <PostCard post={item} fadeImage={later} feedCommunity={feedCommunity} />
+      ) : (
+        <PollCard poll={item} feedCommunity={feedCommunity} />
+      )}
     </li>
   ))
 }

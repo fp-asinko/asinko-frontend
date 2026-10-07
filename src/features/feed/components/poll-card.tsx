@@ -9,7 +9,14 @@ import { PollVoting } from './poll-voting'
  * Poll card of the prototype (H-13): byline, question and the POLL badge on the server; options,
  * results and voting in PollVoting, the client leaf (H-15).
  */
-export function PollCard({ poll }: { poll: PollItem }) {
+export function PollCard({
+  poll,
+  feedCommunity,
+}: {
+  poll: PollItem
+  /** The community the feed is filtered by: no join button for it (CP-07). */
+  feedCommunity?: string
+}) {
   const t = useTranslations('feed.poll')
   const tc = useTranslations('feed.card')
   const format = useFormatter()
@@ -31,6 +38,7 @@ export function PollCard({ poll }: { poll: PollItem }) {
           community={poll.community}
           publishedAt={poll.publishedAt}
           titleId={`poll-${poll.id}`}
+          canJoin={poll.community?.slug !== feedCommunity}
           badge={
             <span className="inline-flex min-h-6 shrink-0 items-center gap-1.25 type-action font-extrabold uppercase">
               <ChartBarIcon aria-hidden className="size-3.5" />

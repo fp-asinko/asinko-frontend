@@ -23,3 +23,15 @@ describe('feedHref', () => {
     })
   })
 })
+
+describe('feedHref on a community page (specs/community-pages CP-07)', () => {
+  it('stays on the page, with only the filter in the query', () => {
+    expect(
+      feedHref({ feed: 'for-you', filter: 'polls', community: 'macro' }, '/hub/macro'),
+    ).toEqual({ pathname: '/hub/macro', query: { filter: 'polls' } })
+    expect(feedHref({ feed: 'for-you', filter: 'new', community: 'BTC' }, '/asset/BTC')).toEqual({
+      pathname: '/asset/BTC',
+      query: {},
+    })
+  })
+})

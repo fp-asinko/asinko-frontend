@@ -4,6 +4,7 @@ import { env } from '@/env'
 import { buildAlternates, OG_LOCALES } from '@/i18n/alternates'
 import { routing, type Locale } from '@/i18n/routing'
 import { communityPath, type CommunityKind } from '@/lib/communities/paths'
+import type { CommunityPage } from '../communities.types'
 import { getCommunityPage } from '../lib/community-api'
 import { resolveCommunityPage } from '../lib/community-route'
 import { CommunityDetails } from './community-details'
@@ -36,17 +37,14 @@ export async function communityMetadata(
   }
 }
 
-/** The top of a group's or an asset's page (specs/community-pages): header and details. */
-export async function CommunityRoutePage({
-  kind,
-  slug,
-  locale,
-}: {
-  kind: CommunityKind
-  slug: string
-  locale: string
-}) {
+/** The community of a route, or its 404 or redirect (CP-02), with the page's own path. */
+export async function resolveCommunityRoute(kind: CommunityKind, slug: string, locale: string) {
   const page = await resolveCommunityPage(slug, kind, safeLocale(locale))
+  return { page, path: communityPath(kind, page.slug) }
+}
+
+/** The top of a group's or an asset's page: header and details (specs/community-pages). */
+export function CommunityTop({ page }: { page: CommunityPage }) {
   return (
     <>
       <CommunityHeader page={page} />

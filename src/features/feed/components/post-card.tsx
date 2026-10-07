@@ -25,10 +25,13 @@ function isLong(body: string) {
 export function PostCard({
   post,
   fadeImage = false,
+  feedCommunity,
 }: {
   post: PostItem
   /** Fade the image in once loaded: only cards loaded later (D-M1, protects LCP). */
   fadeImage?: boolean
+  /** The community the feed is filtered by: no join button for it (CP-07). */
+  feedCommunity?: string
 }) {
   const PostImage = fadeImage ? FadeImage : Image
   const t = useTranslations('feed.card')
@@ -47,7 +50,7 @@ export function PostCard({
           publishedAt={post.publishedAt}
           edited={post.edited}
           titleId={`post-${post.id}`}
-          canJoin={!post.deleted}
+          canJoin={!post.deleted && post.community?.slug !== feedCommunity}
         />
       </div>
 

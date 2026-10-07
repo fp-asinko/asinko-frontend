@@ -10,7 +10,16 @@ import type { FeedParams } from '../schemas/feed-params.schema'
  * (CommunityChip, streamed on its own: specs/feed-navigation § 2). Hot and Top arrive when the
  * backend can sort the feed.
  */
-export function FeedFilters({ params, chip }: { params: FeedParams; chip?: ReactNode }) {
+export function FeedFilters({
+  params,
+  chip,
+  pagePath,
+}: {
+  params: FeedParams
+  chip?: ReactNode
+  /** On a community page, the filters stay on it (specs/community-pages CP-07). */
+  pagePath?: string
+}) {
   const t = useTranslations('feed')
   const filters = [
     { filter: 'new', label: t('filters.new') },
@@ -25,7 +34,7 @@ export function FeedFilters({ params, chip }: { params: FeedParams; chip?: React
           return (
             <Link
               key={filter.filter}
-              href={feedHref({ ...params, filter: filter.filter })}
+              href={feedHref({ ...params, filter: filter.filter }, pagePath)}
               aria-current={active ? 'page' : undefined}
               className={cn(
                 'inline-flex h-8 tap items-center rounded-full px-3.5 type-action font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50',

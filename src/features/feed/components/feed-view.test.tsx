@@ -130,6 +130,38 @@ describe('FeedTop and FeedListView, as the page composes them', () => {
     expect(screen.getByText('Nothing posted in #defi yet.')).toBeInTheDocument()
   })
 
+  it('names an asset community by its handle on its own page (specs/community-pages)', () => {
+    renderWithIntl(
+      <FeedListView
+        params={params({ community: 'BTC' })}
+        state={{ status: 'ok', items: [], nextCursor: null }}
+        communityHandle="$BTC"
+      />,
+    )
+    expect(screen.getByText('Nothing posted in $BTC yet.')).toBeInTheDocument()
+  })
+
+  it('does not repeat the join button of the community the feed shows (CP-07)', () => {
+    renderWithIntl(
+      <FeedListView
+        params={params({ community: 'BTC' })}
+        state={{
+          status: 'ok',
+          items: [
+            postItem({ community: { ...postItem().community!, slug: 'BTC', handle: '$BTC' } }),
+            postItem({
+              id: 'post-2',
+              community: { ...postItem().community!, slug: 'defi', handle: '#defi' },
+            }),
+          ],
+          nextCursor: null,
+        }}
+      />,
+    )
+    expect(screen.queryByRole('button', { name: 'Join $BTC' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Join #defi' })).toBeInTheDocument()
+  })
+
   it('says when the general feed is empty', () => {
     renderWithIntl(
       <FeedView

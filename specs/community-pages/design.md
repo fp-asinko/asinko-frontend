@@ -113,3 +113,11 @@ features/communities/
 | Desplegables: reglas y link seguro; estado vacío del activo                                                                                                        | `community-details.test.tsx`                 |
 | Menciones a las rutas nuevas                                                                                                                                       | `mentions.test.ts`, `post-markdown.test.tsx` |
 | E2E: `/hub/macro`, `/asset/BTC`; redirecciones (`/hub/BTC`, `/asset/btc`); 404; unirse, salir con confirmación y favorito; menciones; 360 px; axe claro/oscuro; JS | `e2e/community-pages.spec.ts`                |
+
+## 11. Ajustes de la implementación (2026-10-07)
+
+- **Rutas fuera de `(main)` y sin `loading.tsx`**, para responder 308 y 404 reales (§ 2).
+- **Sin caja para publicar en `/hub`:** el prototipo tiene "Publicar en el grupo", pero crear posts es otra spec y el placeholder del Home suma su propia fila de acciones. Se agrega con crear post.
+- **Composición en `app/`:** el feature `communities` no puede importar el feed. La página resuelve la comunidad una sola vez (`resolveCommunityRoute`) y arma `CommunityTop` (de `communities`) y `CommunityFeed` (de `feed`).
+- **Sin "Unirse" repetido:** las tarjetas no muestran el botón para la comunidad por la que está filtrado el feed. Vale también para el Home filtrado por URL (`/?community=`), que ya no se enlaza desde el sitio (CP-15).
+- **Avatar con imagen:** `UserAvatar` usa fondo neutro detrás de una imagen, así un logo redondo ($BTC) no muestra el degradé en las esquinas.

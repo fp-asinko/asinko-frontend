@@ -11,7 +11,7 @@
 - [x] **T-03 (M)** Feature `communities`: `getCommunityPage`, mappers y tipos, con validación, 404 y tipo de ruta. Tests. → CP-02, CP-04, CP-08, CP-09
 - [x] **T-04 (M)** Rutas `/hub/[slug]` y `/asset/[symbol]` con `pathnames` iguales en los tres idiomas, `loading.tsx`, redirecciones y metadata. Excepción en `i18n.md`. → CP-01, CP-02, CP-03
 - [x] **T-05 (M)** Cabecera, acciones (unirse, "Unido" y salir con confirmación diferida, favorito) y desplegables (reglas y datos del activo). Tests. → CP-04 a CP-06, CP-08, CP-10
-- [ ] **T-06 (S)** Feed propio en la página, sin el Unirse repetido en las tarjetas. Tests. → CP-07
+- [x] **T-06 (S)** Feed propio en la página, sin el Unirse repetido en las tarjetas. Tests. → CP-07
 - [ ] **T-07 (S)** Menciones, cabecera de las tarjetas y columna izquierda a las rutas nuevas. Tests. → CP-14, CP-15
 - [ ] **T-08 (M)** E2E `community-pages.spec.ts` (mobile + desktop, axe claro/oscuro), presupuesto de JS y ajustes de los e2e que usaban el Home filtrado. Guías (`i18n.md`, `design-system.md`). → CP-16 a CP-19
 

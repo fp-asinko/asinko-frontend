@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import { PageColumns } from '@/components/organisms/app-shell'
-import { communityMetadata, CommunityRoutePage } from '@/features/communities'
+import { communityMetadata, CommunityTop, resolveCommunityRoute } from '@/features/communities'
+import { CommunityFeed } from '@/features/feed'
 
 // A group's page: /hub/{slug} in every locale (specs/community-pages CP-01). Outside (main) and
 // without loading.tsx: the community resolves before anything streams, so a redirect is a real 308
-// and an unknown community a real 404 (a loading boundary would send a 200 first).
+// and an unknown community a real 404 (a loading boundary would send a 200 first). The feed then
+// streams with its own skeleton.
 export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/hub/[slug]'>): Promise<Metadata> {
@@ -12,11 +14,18 @@ export async function generateMetadata({
   return communityMetadata('group', decodeURIComponent(slug), locale)
 }
 
-export default async function HubPage({ params }: PageProps<'/[locale]/hub/[slug]'>) {
+export default async function HubPage({ params, searchParams }: PageProps<'/[locale]/hub/[slug]'>) {
   const { locale, slug } = await params
+  const { page, path } = await resolveCommunityRoute('group', decodeURIComponent(slug), locale)
   return (
     <PageColumns>
-      <CommunityRoutePage kind="group" slug={decodeURIComponent(slug)} locale={locale} />
+      <CommunityTop page={page} />
+      <CommunityFeed
+        slug={page.slug}
+        handle={page.handle}
+        pagePath={path}
+        searchParams={searchParams}
+      />
     </PageColumns>
   )
 }

@@ -42,7 +42,16 @@ export function FeedTop({
 }
 
 /** The feed box (dividers between cards) or its empty state. Pure render: the data comes in. */
-export function FeedListView({ params, state }: { params: FeedParams; state: FeedState }) {
+export function FeedListView({
+  params,
+  state,
+  communityHandle,
+}: {
+  params: FeedParams
+  state: FeedState
+  /** $BTC or #defi, for the empty state of a community page. */
+  communityHandle?: string
+}) {
   const t = useTranslations('feed.empty')
   const items = state.status === 'ok' ? state.items : []
 
@@ -56,11 +65,11 @@ export function FeedListView({ params, state }: { params: FeedParams; state: Fee
             action={<GateButtons className="justify-center" />}
           />
         ) : items.length === 0 ? (
-          <EmptyFeed params={params} />
+          <EmptyFeed params={params} communityHandle={communityHandle} />
         ) : (
           <>
             <ul className="divide-y">
-              <FeedItems items={items} />
+              <FeedItems items={items} feedCommunity={params.community} />
             </ul>
             {state.status === 'ok' && state.nextCursor && (
               <LoadMore params={params} cursor={state.nextCursor} />
@@ -72,7 +81,7 @@ export function FeedListView({ params, state }: { params: FeedParams; state: Fee
   )
 }
 
-function EmptyFeed({ params }: { params: FeedParams }) {
+function EmptyFeed({ params, communityHandle }: { params: FeedParams; communityHandle?: string }) {
   const t = useTranslations('feed.empty')
 
   if (params.filter === 'polls') return <EmptyState message={t('polls')} />
@@ -92,7 +101,9 @@ function EmptyFeed({ params }: { params: FeedParams }) {
     )
   }
   if (params.community) {
-    return <EmptyState message={t('community', { handle: `#${params.community}` })} />
+    return (
+      <EmptyState message={t('community', { handle: communityHandle ?? `#${params.community}` })} />
+    )
   }
   return <EmptyState message={t('forYou')} />
 }
