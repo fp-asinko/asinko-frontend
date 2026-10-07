@@ -21,8 +21,10 @@ export type Mention =
   | { type: 'asset'; slug: string }
   /** $XYZ without a community: highlighted, no link. */
   | { type: 'ticker' }
-  /** @maria: highlighted, no link until profiles exist (phase 2). */
-  | { type: 'user' }
+  /** @maria: link to the profile (specs/community-pages CP-21). */
+  | { type: 'user'; username: string }
+  /** An @ whose text is not a valid username: highlighted, no link. */
+  | { type: 'person' }
 
 function hrefFor(entity: RawEntity, lookup: MentionLookup): string | null {
   switch (entity.type) {
@@ -34,8 +36,13 @@ function hrefFor(entity: RawEntity, lookup: MentionLookup): string | null {
       const slug = lookup.communitySlug(entity.resolvedId)
       return slug ? `${MENTION_SCHEME}community/${slug}` : null
     }
-    case 'MENTION':
-      return `${MENTION_SCHEME}user`
+    case 'MENTION': {
+      // The text was checked against the body at its offsets (markMentions): @maria.
+      const username = entity.raw.replace(/^@/, '')
+      return SLUG_PATTERN.test(username)
+        ? `${MENTION_SCHEME}user/${username}`
+        : `${MENTION_SCHEME}person`
+    }
   }
 }
 
@@ -79,6 +86,7 @@ export function parseMention(href: string | undefined): Mention | null {
   if (type === 'community' && slug && SLUG_PATTERN.test(slug)) return { type: 'community', slug }
   if (type === 'asset' && slug && SLUG_PATTERN.test(slug)) return { type: 'asset', slug }
   if (type === 'ticker') return { type: 'ticker' }
-  if (type === 'user') return { type: 'user' }
+  if (type === 'user' && slug && SLUG_PATTERN.test(slug)) return { type: 'user', username: slug }
+  if (type === 'person' || type === 'user') return { type: 'person' }
   return null
 }

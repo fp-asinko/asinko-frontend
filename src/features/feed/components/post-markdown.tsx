@@ -39,10 +39,14 @@ const mentionClass = 'font-extrabold text-foreground'
 function Anchor({ href, children }: ComponentProps<'a'>) {
   const t = useTranslations('feed.card')
   const mention = parseMention(href)
-  if (mention?.type === 'community' || mention?.type === 'asset') {
+  if (mention?.type === 'community' || mention?.type === 'asset' || mention?.type === 'user') {
+    const href =
+      mention.type === 'user'
+        ? communityPath('user', mention.username)
+        : communityPath(mention.type === 'asset' ? 'asset' : 'group', mention.slug)
     return (
       <Link
-        href={communityPath(mention.type === 'asset' ? 'asset' : 'group', mention.slug)}
+        href={href}
         className={`${mentionClass} underline underline-offset-2 hover:decoration-2`}
       >
         {children}

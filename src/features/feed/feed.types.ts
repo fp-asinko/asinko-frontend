@@ -3,6 +3,8 @@
 
 export type Author = {
   username: string
+  /** The profile: /user/{username} (specs/community-pages CP-21). */
+  path: string
   /** How it is mentioned: @maria */
   handle: string
   avatarUrl: string | null

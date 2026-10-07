@@ -95,6 +95,7 @@ function toAuthor(user: RawAuthor | null): Author | null {
   if (!user) return null
   return {
     username: user.username,
+    path: communityPath('user', user.username),
     handle: `@${user.username}`,
     avatarUrl: allowedImageUrl(user.avatarUrl),
     accuracyRate: user.accuracyRate ?? null,

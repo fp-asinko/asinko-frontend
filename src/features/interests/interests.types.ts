@@ -16,6 +16,8 @@ export type AssetTile = {
 }
 
 export type Person = {
+  /** The profile: /user/{username} (CP-21). */
+  path: string
   /** How it is mentioned: @maria */
   handle: string
   id: string

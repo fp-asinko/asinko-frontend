@@ -3,6 +3,7 @@ import { apiRequest, type ApiResult } from '@/lib/api'
 import { commentListSchema, type RawComment } from '@/lib/api/contract'
 import type { CommentPreview } from '../feed.types'
 import type { CommentsTarget } from '../schemas/comments-preview.schema'
+import { communityPath } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 
 /** How many comments the card shows (H-28, as the prototype). */
@@ -21,6 +22,7 @@ function toCommentPreview(comment: RawComment): CommentPreview {
     id: comment.id,
     author: {
       username: comment.author.username,
+      path: communityPath('user', comment.author.username),
       handle: `@${comment.author.username}`,
       avatarUrl: allowedImageUrl(comment.author.avatarUrl),
       accuracyRate: comment.author.accuracyRate ?? null,

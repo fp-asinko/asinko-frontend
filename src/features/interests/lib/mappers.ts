@@ -39,6 +39,7 @@ export function toAssetTile(asset: RawAsset, communitySlug: string): AssetTile {
 export function toPerson(user: RawUserSummary): Person {
   return {
     handle: `@${user.username}`,
+    path: communityPath('user', user.username),
     id: user.id,
     username: user.username,
     avatarUrl: allowedImageUrl(user.avatarUrl),

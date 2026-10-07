@@ -4,6 +4,7 @@ import type { Author, PollItem, PostItem } from './feed.types'
 
 export const MARIA: Author = {
   username: 'maria',
+  path: '/user/maria',
   handle: '@maria',
   avatarUrl: null,
   accuracyRate: 0.74,

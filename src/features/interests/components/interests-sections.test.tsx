@@ -37,7 +37,16 @@ const interests: Interests = {
   },
   people: {
     ok: true,
-    data: [{ handle: '@maria', id: '1', username: 'maria', avatarUrl: null, accuracyRate: 0.74 }],
+    data: [
+      {
+        handle: '@maria',
+        path: '/user/maria',
+        id: '1',
+        username: 'maria',
+        avatarUrl: null,
+        accuracyRate: 0.74,
+      },
+    ],
   },
   groups: {
     ok: true,

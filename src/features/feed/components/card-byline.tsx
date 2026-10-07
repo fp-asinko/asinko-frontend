@@ -101,7 +101,11 @@ export function CardByline({
             </Link>
           ) : (
             <>
-              <span className="min-w-0 truncate font-bold text-foreground">{authorName}</span>
+              <AuthorName
+                author={author}
+                fallback={authorName}
+                className="font-bold text-foreground"
+              />
               {chip}
             </>
           )}
@@ -119,7 +123,7 @@ export function CardByline({
         {group && (
           // CF-02: the author in second place, smaller (11px) and without a photo.
           <div className="flex min-w-0 items-center gap-x-1.25 text-[0.6875rem] leading-4 text-muted-foreground">
-            <span className="min-w-0 truncate">{authorName}</span>
+            <AuthorName author={author} fallback={authorName} />
             {chip}
           </div>
         )}
@@ -137,5 +141,23 @@ export function CardByline({
         )}
       </div>
     </div>
+  )
+}
+
+/** The author's @handle, a link to the profile; a system item ("Asinko") has none. */
+function AuthorName({
+  author,
+  fallback,
+  className,
+}: {
+  author: Author | null
+  fallback: string
+  className?: string
+}) {
+  if (!author) return <span className={cn('min-w-0 truncate', className)}>{fallback}</span>
+  return (
+    <Link href={author.path} className={cn('min-w-0 truncate hover:underline', className)}>
+      {author.handle}
+    </Link>
   )
 }

@@ -62,14 +62,14 @@ describe('PostMarkdown', () => {
     renderWithIntl(
       <PostMarkdown>
         {
-          '[$BTC](asinko:asset/BTC) [#defi](asinko:community/defi) [@maria](asinko:user) [$XYZ](asinko:ticker)'
+          '[$BTC](asinko:asset/BTC) [#defi](asinko:community/defi) [@maria](asinko:user/maria) [$XYZ](asinko:ticker)'
         }
       </PostMarkdown>,
     )
     expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/asset/BTC')
     expect(screen.getByRole('link', { name: '#defi' })).toHaveAttribute('href', '/hub/defi')
-    expect(screen.queryByRole('link', { name: '@maria' })).toBeNull()
-    expect(screen.getByText('@maria').tagName).toBe('STRONG')
+    // @maria goes to the profile (specs/community-pages CP-21).
+    expect(screen.getByRole('link', { name: '@maria' })).toHaveAttribute('href', '/user/maria')
     expect(screen.getByText('$XYZ').tagName).toBe('STRONG')
   })
 })

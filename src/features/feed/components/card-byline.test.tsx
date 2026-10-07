@@ -92,8 +92,9 @@ describe('CardByline (specs/community-first)', () => {
         titleId="t"
       />,
     )
-    expect(screen.getByText('@maria')).toBeInTheDocument()
-    expect(screen.queryByRole('link')).toBeNull()
+    // The only link is the author, to the profile (CP-21): no group, no join.
+    expect(screen.getByRole('link', { name: '@maria' })).toHaveAttribute('href', '/user/maria')
+    expect(screen.getAllByRole('link')).toHaveLength(1)
     expect(screen.queryByRole('button')).toBeNull()
     expect(screen.getByTestId('user-avatar')).toHaveTextContent('MA')
   })

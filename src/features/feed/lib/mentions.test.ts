@@ -27,7 +27,7 @@ describe('markMentions', () => {
       lookup,
     )
     expect(marked).toBe(
-      'Long [$BTC](asinko:asset/BTC), read [#defi](asinko:community/defi) and ask [@maria](asinko:user).',
+      'Long [$BTC](asinko:asset/BTC), read [#defi](asinko:community/defi) and ask [@maria](asinko:user/maria).',
     )
   })
 
@@ -70,7 +70,8 @@ describe('parseMention', () => {
   it('reads back the links made by markMentions', () => {
     expect(parseMention('asinko:asset/BTC')).toEqual({ type: 'asset', slug: 'BTC' })
     expect(parseMention('asinko:ticker')).toEqual({ type: 'ticker' })
-    expect(parseMention('asinko:user')).toEqual({ type: 'user' })
+    expect(parseMention('asinko:user/maria')).toEqual({ type: 'user', username: 'maria' })
+    expect(parseMention('asinko:person')).toEqual({ type: 'person' })
   })
 
   it('rejects anything else', () => {
