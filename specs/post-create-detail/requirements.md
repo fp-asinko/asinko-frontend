@@ -1,6 +1,6 @@
 # Crear post y detalle de post — Requirements
 
-> **Estado:** en revisión (2026-10-07).
+> **Estado:** aprobado por el PO el 2026-10-07.
 > **Fuente:** [`docs/references/ASINKO-requirements.pdf`](../../docs/references/ASINKO-requirements.pdf), sección "Creación y detalle de posts" (págs. 5 y 6), y el pedido del PO: "me gusta la idea que esté arriba, pero cuando el usuario empieza a scrollear pierde un shortcut cercano".
 > **Decisiones con el PO (2026-10-07):**
 >

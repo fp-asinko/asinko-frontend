@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { DEMO_USER } from './demo-user'
-import { COMMUNITIES } from './fixtures/communities'
+import { COMMENTS_BY_CONTENT } from './fixtures/comments'
+import { COMMUNITIES, PERSONAL_CHANNELS } from './fixtures/communities'
 import { POSTS } from './fixtures/posts'
 import { MOCK_ROUTES } from './handlers'
 import type { MockContext } from './types'
@@ -215,5 +216,74 @@ describe('mock writes (stateless, demo viewer)', () => {
     expect(profile).toMatchObject({ displayName: 'Federico Piva' })
     expect(profile).not.toHaveProperty('tier')
     expect(profile).not.toHaveProperty('rating')
+  })
+
+  describe('creating posts and comments (specs/post-create-detail)', () => {
+    const defi = COMMUNITIES.find((each) => each.slug === 'defi')!
+    const valid = {
+      userId: DEMO_USER.id,
+      communityId: defi.id,
+      type: 'TEXT',
+      title: 'A title',
+      body: 'A body',
+    }
+    const create = (body: object) => call('POST', '/api/v1/posts', { body })
+    const errorCode = async (response: ReturnType<typeof create>) =>
+      ((await response).body as { error?: { code: string } }).error?.code
+
+    it('creates a post that GET /posts/:id finds afterwards', async () => {
+      const response = await create(valid)
+      expect(response.status).toBe(201)
+      const id = (response.body as { id: string }).id
+      expect((await call('GET', '/api/v1/posts/:id', { params: { id } })).status).toBe(200)
+    })
+
+    it('validates as the backend: community, personal channels, title, body and url', async () => {
+      const other = PERSONAL_CHANNELS.find((each) => each.slug === 'maria')!
+      const own = PERSONAL_CHANNELS.find((each) => each.slug === 'demo')!
+      expect(await errorCode(create({ ...valid, communityId: 'nope' }))).toBe('INVALID_COMMUNITY')
+      expect(await errorCode(create({ ...valid, communityId: other.id }))).toBe(
+        'PERSONAL_CHANNEL_OWNER_ONLY',
+      )
+      expect((await create({ ...valid, communityId: own.id })).status).toBe(201)
+      expect(await errorCode(create({ ...valid, title: 'x'.repeat(301) }))).toBe('VALIDATION_ERROR')
+      expect(await errorCode(create({ ...valid, body: ' ' }))).toBe('VALIDATION_ERROR')
+      expect(await errorCode(create({ ...valid, url: 'https://x.com' }))).toBe('VALIDATION_ERROR')
+      expect((await create({ ...valid, type: 'LINK', url: 'https://x.com' })).status).toBe(201)
+    })
+
+    it('creates a comment or a reply, only under a comment of the same post', async () => {
+      const post = POSTS[0]!
+      const root = COMMENTS_BY_CONTENT[post.id]![0]!
+      const comment = (body: object) =>
+        call('POST', '/api/v1/posts/:id/comments', { params: { id: post.id }, body })
+      expect((await comment({ userId: DEMO_USER.id, body: 'Yes' })).status).toBe(201)
+      const reply = await comment({ userId: DEMO_USER.id, body: 'Yes', parentCommentId: root.id })
+      expect(reply.body).toMatchObject({ parentCommentId: root.id })
+      expect(
+        (await comment({ userId: DEMO_USER.id, body: 'Yes', parentCommentId: 'nope' })).status,
+      ).toBe(422)
+    })
+
+    it('votes a comment and removes the vote', async () => {
+      const root = COMMENTS_BY_CONTENT[POSTS[0]!.id]![0]!
+      const params = { id: root.id }
+      expect(
+        (
+          await call('PUT', '/api/v1/comments/:id/vote', {
+            params,
+            body: { userId: DEMO_USER.id, value: 1 },
+          })
+        ).body,
+      ).toMatchObject({ viewerVote: 1 })
+      expect(
+        (
+          await call('DELETE', '/api/v1/comments/:id/vote', {
+            params,
+            query: { userId: DEMO_USER.id },
+          })
+        ).status,
+      ).toBe(204)
+    })
   })
 })

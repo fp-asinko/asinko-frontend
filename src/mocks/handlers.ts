@@ -2,6 +2,7 @@ import {
   assetPageSchema,
   assetSchema,
   commentListSchema,
+  commentSchema,
   communitySchema,
   favoriteResponseSchema,
   feedItemSchema,
@@ -19,12 +20,13 @@ import { ASSETS, assetBySymbol } from './fixtures/assets'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { COMMUNITIES, communityBySlug } from './fixtures/communities'
 import { POLLS, pollById } from './fixtures/polls'
-import { POSTS, postById } from './fixtures/posts'
+import { POSTS } from './fixtures/posts'
 import { PROFILES } from './fixtures/users'
 import { commentTree } from './comment-tree'
 import { paginate } from './paginate'
 import type { MockContext, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
+import { createComment, createPost, findPost, removeCommentVote, voteComment } from './posting'
 import { removePostVote, votePoll, votePost } from './votes'
 
 const notFound = { status: 404, body: { error: { code: 'NOT_FOUND', message: 'mock' } } }
@@ -171,6 +173,24 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
 
   // E03 (entities on reads: proposal P-001)
   {
+    method: 'POST',
+    path: '/api/v1/posts',
+    kind: 'contract',
+    implemented: true,
+    schema: postSchema,
+    example: {
+      ...noRequest,
+      body: {
+        userId: DEMO_USER.id,
+        communityId: COMMUNITIES.find((each) => each.slug === 'defi')!.id,
+        type: 'TEXT',
+        title: 'Stablecoin yields are back above 8%',
+        body: 'Where are they coming from? Lending demand, mostly.',
+      },
+    },
+    handler: ({ body }) => createPost(body),
+  },
+  {
     method: 'GET',
     path: '/api/v1/posts/:id',
     kind: 'contract',
@@ -178,7 +198,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     schema: postSchema,
     example: { ...noRequest, params: { id: POSTS[0]!.id } },
     handler: ({ params }) => {
-      const post = params.id ? postById(params.id) : undefined
+      const post = params.id ? findPost(params.id) : undefined
       return post ? { status: 200, body: post } : notFound
     },
   },
@@ -290,9 +310,48 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       query: { limit: '3', replies: 'false' },
     },
     handler: ({ params, query }) =>
-      params.id && postById(params.id)
+      params.id && findPost(params.id)
         ? { status: 200, body: { items: commentTree(COMMENTS_BY_CONTENT[params.id] ?? [], query) } }
         : notFound,
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/posts/:id/comments',
+    kind: 'contract',
+    implemented: true,
+    schema: commentSchema,
+    example: {
+      ...noRequest,
+      params: { id: POSTS[0]!.id },
+      body: { userId: DEMO_USER.id, body: 'Agree, the flows say so.' },
+    },
+    handler: ({ params, body }) => createComment(params.id ?? '', body),
+  },
+  {
+    method: 'PUT',
+    path: '/api/v1/comments/:id/vote',
+    kind: 'contract',
+    implemented: true,
+    schema: voteResultSchema,
+    example: {
+      ...noRequest,
+      params: { id: COMMENTS_BY_CONTENT[POSTS[0]!.id]![0]!.id },
+      body: { userId: DEMO_USER.id, value: 1 },
+    },
+    handler: ({ params, body }) => voteComment(params.id ?? '', body),
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/comments/:id/vote',
+    kind: 'contract',
+    implemented: true,
+    schema: noContentSchema,
+    example: {
+      ...noRequest,
+      params: { id: COMMENTS_BY_CONTENT[POSTS[0]!.id]![0]!.id },
+      query: { userId: DEMO_USER.id },
+    },
+    handler: ({ params, query }) => removeCommentVote(params.id ?? '', query.userId),
   },
   {
     method: 'GET',

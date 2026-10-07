@@ -1,6 +1,6 @@
 # Crear post y detalle de post — Design
 
-> **Estado:** en revisión (2026-10-07).
+> **Estado:** aprobado por el PO el 2026-10-07.
 
 ## 1. Rutas
 

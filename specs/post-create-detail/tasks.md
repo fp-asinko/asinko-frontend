@@ -2,7 +2,7 @@
 
 ## Parte 1: detalle
 
-- [ ] **T-01 (S)** Contrato y mocks:
+- [x] **T-01 (S)** Contrato y mocks:
   - Respuestas de crear post, crear comentario y votar comentario.
   - Mocks de `POST /posts`, `POST /posts/:id/comments` y `PUT/DELETE /comments/:id/vote`.
   - Tests: `fixtures.test.ts` y `handlers.test.ts`. → PC-10, PC-15, PC-16

@@ -160,5 +160,7 @@ export function communitySummary(slug: string): RawCommunitySummary {
 }
 
 export function communityById(id: string) {
-  return COMMUNITIES.find((each) => each.id === id)
+  return (
+    COMMUNITIES.find((each) => each.id === id) ?? PERSONAL_CHANNELS.find((each) => each.id === id)
+  )
 }
