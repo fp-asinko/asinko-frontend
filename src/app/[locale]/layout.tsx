@@ -12,6 +12,7 @@ import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { JoinedProvider } from '@/components/organisms/join'
 import { RightColumn } from '@/components/organisms/right-column'
 import { env } from '@/env'
+import { ComposerRoot } from '@/features/composer'
 import { InterestsSidebar, InterestsSkeleton } from '@/features/interests'
 import { OG_LOCALES } from '@/i18n/alternates'
 import { pickClientMessages } from '@/i18n/client-messages'
@@ -90,20 +91,23 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
             >
               {/* Joined communities of this visit: every join button hides at once (specs/community-first). */}
               <JoinedProvider>
-                <AppShell
-                  navItems={navItems}
-                  sidebar={
-                    // Streamed: the shell and the page never wait for the column's data
-                    // (specs/feed-navigation FN-08), as a language switch re-renders the layout.
-                    <Suspense fallback={<InterestsSkeleton />}>
-                      <InterestsSidebar />
-                    </Suspense>
-                  }
-                  right={<RightColumn />}
-                  devTools={devTools}
-                >
-                  {children}
-                </AppShell>
+                {/* The post editor behind every "Create" (specs/post-create-detail § 2). */}
+                <ComposerRoot>
+                  <AppShell
+                    navItems={navItems}
+                    sidebar={
+                      // Streamed: the shell and the page never wait for the column's data
+                      // (specs/feed-navigation FN-08), as a language switch re-renders the layout.
+                      <Suspense fallback={<InterestsSkeleton />}>
+                        <InterestsSidebar />
+                      </Suspense>
+                    }
+                    right={<RightColumn />}
+                    devTools={devTools}
+                  >
+                    {children}
+                  </AppShell>
+                </ComposerRoot>
               </JoinedProvider>
             </AuthGateProvider>
           </Providers>

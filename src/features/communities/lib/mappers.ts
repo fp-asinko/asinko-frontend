@@ -30,6 +30,7 @@ export function toCommunityPage(community: RawCommunity, signedIn = true): Commu
   const bareName = community.name.replace(/^[#$@]/, '')
   const subtitle = bareName.toLowerCase() === community.slug.toLowerCase() ? null : community.name
   return {
+    id: community.id,
     slug: community.slug,
     handle,
     subtitle,

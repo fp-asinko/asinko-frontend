@@ -106,6 +106,9 @@ test.describe('Post detail comments', () => {
     const upvote = first.getByRole('button', { name: 'Upvote' }).first()
     await upvote.click()
     await expect(upvote).toHaveAttribute('aria-pressed', 'true')
+    // From the top: scrolled, the sticky top bar covers the post's votes and axe counts them as
+    // obscured targets (target-size), which they are not once in view.
+    await page.evaluate(() => window.scrollTo(0, 0))
     await expectNoA11yViolations(page)
   })
 
@@ -148,4 +151,125 @@ test.describe('From the feed', () => {
     await whales.getByRole('link', { name: 'See all comments' }).click()
     await expect(page).toHaveURL(new RegExp(`/en${WHALES_PATH}$`))
   })
+})
+
+/** "+ Create" in the top bar from md; "Create" in the bottom bar in mobile (PC-01, PC-02). */
+async function openEditor(page: Page, isMobile: boolean) {
+  const bar = isMobile
+    ? page.getByRole('navigation', { name: 'Main navigation' })
+    : page.getByRole('banner')
+  await bar.getByRole('button', { name: 'Create' }).click()
+  return page.getByRole('dialog', { name: 'Create post' })
+}
+
+test.describe('Create post', () => {
+  test('publishes from anywhere, choosing the community, and lands on the post (PC-01 to PC-10)', async ({
+    page,
+    isMobile,
+  }, testInfo) => {
+    const title = `Funding rates flipped (${testInfo.project.name} ${Date.now()})`
+    await page.goto('/en')
+    const editor = await openEditor(page, isMobile)
+    await expect(editor).toBeVisible()
+    await expect(editor.getByRole('button', { name: 'Post' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
+
+    await editor.getByRole('combobox', { name: 'Community' }).click()
+    await expect(page.getByRole('option').first()).toContainText('Your profile')
+    await page.getByRole('option', { name: /#defi/ }).click()
+    await editor.getByRole('textbox', { name: 'Title' }).fill(title)
+    await editor.getByRole('textbox', { name: 'Body' }).fill('Longs are **paying** again.')
+    await editor.getByRole('button', { name: 'Post' }).click()
+
+    await expect(page).toHaveURL(/\/en\/post\/[0-9a-f-]+\/funding-rates-flipped-/)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(title)
+    await expect(page.getByRole('main').getByText('paying')).toHaveCSS('font-weight', '700')
+  })
+
+  test("a group's page preselects it and says so in its box (PC-03, PC-06)", async ({
+    page,
+  }, testInfo) => {
+    const title = `Yields on the move (${testInfo.project.name} ${Date.now()})`
+    await page.goto('/en/hub/defi')
+    await page.getByRole('button', { name: 'Post in #defi' }).click()
+    const editor = page.getByRole('dialog', { name: 'Create post' })
+    await expect(editor.getByRole('combobox', { name: 'Community' })).toHaveValue('#defi')
+
+    await editor.getByRole('tab', { name: 'Link' }).click()
+    await editor.getByRole('textbox', { name: 'Link' }).fill('javascript:alert(1)')
+    await editor.getByRole('textbox', { name: 'Title' }).fill(title)
+    await editor.getByRole('textbox', { name: 'Body' }).fill('Worth a read.')
+    await expect(
+      editor.getByText('Enter a link that starts with http:// or https://'),
+    ).toBeVisible()
+    await editor.getByRole('textbox', { name: 'Link' }).fill('https://example.com/yields')
+    await editor.getByRole('button', { name: 'Post' }).click()
+
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(title)
+    await expect(page.getByRole('main').getByRole('link', { name: 'example.com' })).toBeVisible()
+  })
+
+  test('your own profile offers the box; someone else’s does not (PC-03)', async ({ page }) => {
+    await page.goto('/en/user/demo')
+    await expect(page.getByRole('button', { name: 'Post in @demo' })).toBeVisible()
+    await page.goto('/en/user/federico')
+    await expect(page.getByRole('button', { name: /^Post in/ })).toHaveCount(0)
+  })
+
+  test('asks before discarding, and gives the focus back (PC-05, PC-18)', async ({
+    page,
+    isMobile,
+  }) => {
+    await page.goto('/en')
+    const editor = await openEditor(page, isMobile)
+    await editor.getByRole('textbox', { name: 'Title' }).fill('Half a thought')
+    await page.keyboard.press('Escape')
+    const confirm = page.getByRole('alertdialog', { name: 'Discard this post?' })
+    await confirm.getByRole('button', { name: 'Keep editing' }).click()
+    await expect(editor.getByRole('textbox', { name: 'Title' })).toHaveValue('Half a thought')
+
+    await editor.getByRole('button', { name: 'Close' }).click()
+    await confirm.getByRole('button', { name: 'Discard' }).click()
+    await expect(editor).toBeHidden()
+    const bar = isMobile
+      ? page.getByRole('navigation', { name: 'Main navigation' })
+      : page.getByRole('banner')
+    await expect(bar.getByRole('button', { name: 'Create' })).toBeFocused()
+  })
+
+  test('without a session, Create asks for an account (PC-04)', async ({
+    page,
+    context,
+    baseURL,
+    isMobile,
+  }) => {
+    await context.addCookies([{ name: 'asinko-mock-guest', value: '1', url: baseURL! }])
+    await page.goto('/en')
+    await openEditor(page, isMobile)
+    await expect(page.getByRole('dialog', { name: 'Join Asinko to post' })).toBeVisible()
+    await expect(page.getByRole('dialog', { name: 'Create post' })).toHaveCount(0)
+  })
+
+  for (const theme of ['light', 'dark'] as const) {
+    test(`the editor fits 360px and stays accessible in ${theme} (PC-18)`, async ({
+      page,
+      isMobile,
+    }) => {
+      await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
+      if (isMobile) await page.setViewportSize({ width: 360, height: 740 })
+      await page.goto('/en')
+      if (theme === 'dark') await expect(page.locator('html')).toHaveClass(/dark/)
+      const editor = await openEditor(page, isMobile)
+      await editor.getByRole('textbox', { name: 'Title' }).fill('x')
+      await editor.getByRole('textbox', { name: 'Title' }).fill('')
+      await editor.getByRole('textbox', { name: 'Body' }).click()
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      )
+      expect(overflow).toBeLessThanOrEqual(0)
+      await expectNoA11yViolations(page)
+    })
+  }
 })

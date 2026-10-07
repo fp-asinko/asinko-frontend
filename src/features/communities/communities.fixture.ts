@@ -3,6 +3,7 @@ import type { CommunityPage } from './communities.types'
 /** A community page for component tests: #macro, a group, no session data. */
 export function communityPage(overrides: Partial<CommunityPage> = {}): CommunityPage {
   return {
+    id: '00000000-0000-4000-8000-000000001001',
     slug: 'macro',
     handle: '#macro',
     subtitle: null,

@@ -1,8 +1,9 @@
-import { BellIcon, SearchIcon, UserIcon } from 'lucide-react'
+import { BellIcon, PlusIcon, SearchIcon, UserIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ComingSoon } from '@/components/molecules/coming-soon'
 import { AccountButtons } from '@/components/organisms/auth-gate'
+import { ComposeTrigger } from '@/components/organisms/compose'
 import { AsinkoLogo } from '@/components/ui/asinko-logo'
 import { Link } from '@/i18n/navigation'
 import { MoreMenu } from './more-menu'
@@ -18,6 +19,8 @@ const ICON_BUTTON =
  * so the search shrinks instead of running into the actions.
  * Language and dark mode live in "⋯" (HR-03). Search, notifications and profile are not in the
  * MVP: disabled (H-26). Without a session the actions are Sign up and Log in (G-02, HR-02).
+ * "+ Create" stays at hand from md, at every scroll (specs/post-create-detail PC-01); without a
+ * session it opens the account modal.
  */
 export function SiteHeader({ menu, devTools }: { menu: ReactNode; devTools?: ReactNode }) {
   const t = useTranslations('common')
@@ -59,6 +62,10 @@ export function SiteHeader({ menu, devTools }: { menu: ReactNode; devTools?: Rea
             </ComingSoon>
           </span>
           {devTools}
+          <ComposeTrigger className="hidden h-10 tap items-center gap-1.5 rounded-full bg-muted pr-4 pl-3 type-action text-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex">
+            <PlusIcon aria-hidden className="size-4.5" />
+            {t('nav.create')}
+          </ComposeTrigger>
           <AccountButtons>
             {/* With a session: notifications and profile from md (HR-02, Q2). */}
             <span className="hidden items-center gap-1 md:flex">

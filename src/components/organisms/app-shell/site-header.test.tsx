@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { ThemeProvider } from 'next-themes'
 import { describe, expect, it, vi } from 'vitest'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
+import { ComposeContext } from '@/components/organisms/compose'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { SiteHeader } from './site-header'
 
@@ -57,5 +58,28 @@ describe('SiteHeader (H-05)', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Log in' }))
     expect(await screen.findByRole('dialog', { name: 'Log in to Asinko' })).toBeInTheDocument()
+  })
+})
+
+describe('SiteHeader: Create (specs/post-create-detail PC-01)', () => {
+  it('opens the post editor from "+ Create", with or without a session', async () => {
+    for (const signedIn of [true, false]) {
+      const openCompose = vi.fn()
+      const { unmount } = renderWithIntl(
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <AuthGateProvider signedIn={signedIn}>
+            <ComposeContext value={{ openCompose, setScope: vi.fn() }}>
+              <SiteHeader menu={<button type="button">menu</button>} />
+            </ComposeContext>
+          </AuthGateProvider>
+        </ThemeProvider>,
+      )
+      const create = screen.getByRole('button', { name: 'Create' })
+      expect(create).toHaveAttribute('aria-haspopup', 'dialog')
+      await userEvent.click(create)
+      // The root decides: the editor with a session, the account modal without.
+      expect(openCompose).toHaveBeenCalledOnce()
+      unmount()
+    }
   })
 })

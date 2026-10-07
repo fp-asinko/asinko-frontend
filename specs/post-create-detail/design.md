@@ -25,7 +25,7 @@ layout (servidor)
 - **`features/composer/`:** implementa el provider (`ComposerRoot`):
   - Pide cuenta con `requireAccount('post')`.
   - Carga el editor con `next/dynamic` la primera vez (PC-19).
-  - Lo monta en un `Dialog` desde `md` y en un `Sheet` de pantalla completa en mobile.
+  - Lo monta en un solo `Dialog`: pantalla completa en mobile y centrado desde `md` (sin `Sheet`: un componente menos y el mismo foco y Esc).
 - **`ComposeScope`:** un componente de cliente sin markup que las páginas de grupo, activo y tu perfil ponen con su comunidad. Así "+ Crear" sabe qué comunidad precargar (PC-06).
 
 ## 3. El editor
@@ -37,12 +37,15 @@ layout (servidor)
   - `url` (`http(s)`, solo si es `LINK`).
   - Los mensajes de error son claves de traducción (`i18n.md`).
 - **Comunidad:** un `Combobox`.
-  - Al abrir muestra tus comunidades (`GET /communities?mine=true`) con "Tu perfil" primero.
+  - Al abrir muestra tus comunidades (`GET /communities?mine=true`) con "Tu perfil" primero. Tu canal se pide aparte por su slug (`GET /communities/{username}`): `?mine=true` también trae los canales de la gente que seguís, donde no se puede publicar, y esos se filtran.
+  - Se abre tocando el campo; sin el botón de flecha de shadcn, que no tiene nombre accesible (axe).
   - Al escribir busca (`GET /communities?search=`), con una pausa de 250 ms.
   - Las dos búsquedas son Server Actions (el navegador no llama a la API).
 - **Tipo:** `Tabs`: Texto, Link e Imagen. Imagen es Próximamente (P-013).
+  - El panel de Link solo agrega la URL. Título y cuerpo quedan fuera de los paneles, montados en todas las pestañas: un campo que se vuelve a montar al cambiar de pestaña puede perder lo que se acaba de escribir (lo encontró el e2e).
 - **Cuerpo:** `textarea` que crece con el texto, con la ayuda "Admite Markdown".
-- **Descartar** (PC-05): con algo escrito, Esc, × o afuera abren una confirmación ("¿Descartar el post?").
+- **Descartar** (PC-05): con algo escrito, Esc, × o afuera abren una confirmación ("¿Descartar el post?", `AlertDialog` de shadcn).
+  - Si hay algo escrito se le pregunta al formulario en el momento de cerrar (`getValues`), no a un estado que el editor avisa en un efecto: ese aviso podía llegar después de un Esc rápido.
 - **Publicar:** `createPost` (Server Action). Valida, toma el `userId` de la sesión y llama a `POST /posts`.
   - Si sale bien, devuelve el `id` y el `title`: el cliente cierra el editor y navega a `postPath`.
   - Si falla, devuelve las claves por campo (`422`) o una general (`403 PERSONAL_CHANNEL_OWNER_ONLY`, `401`). El formulario no se borra.
@@ -101,7 +104,16 @@ layout (servidor)
 
 - **El editor**, con `react-hook-form`, el combobox y las pestañas, va diferido: se descarga al primer toque.
 - **En la primera carga** solo suman el contexto `compose`, el botón de la barra y la lógica de abrir, menos de 1 KB.
-- **Hoy estamos en 230,6 / 235 KB.** La página de detalle se suma a `e2e/performance.spec.ts`.
+- **Medido al cerrar la spec**, en KB gzip (build de producción, mismo método que `e2e/performance.spec.ts`; la página de detalle se sumó a ese test):
+
+  |                          | Home  | Comunidad, activo y perfil | Detalle |
+  | ------------------------ | ----- | -------------------------- | ------- |
+  | Antes de la spec         | 230,7 | 232,1                      | —       |
+  | Con el detalle (parte 1) | 232,4 | 233,9                      | —       |
+  | Con crear (parte 2)      | 233,0 | 234,6                      | 233,0   |
+  - La parte 2 suma 0,6 KB, como se estimó. El editor, el combobox, las pestañas y `react-hook-form` no llegan a la primera carga.
+  - La parte 1 suma 1,7 KB: "Ver todos los comentarios" pasó al cliente (link o Próximamente, en `CommentsToggle`) y el control de votos ahora vota también comentarios.
+  - **En las páginas de comunidad queda 0,4 KB.** Lo próximo que sume JS ahí necesita recortar antes o una decisión del PO.
 
 ## 9. Tests
 

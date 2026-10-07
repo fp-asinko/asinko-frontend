@@ -31,9 +31,11 @@ test.describe('app shell', () => {
     if (isMobile) {
       const nav = page.getByRole('navigation', { name: 'Main navigation' })
       await expect(nav.getByRole('link')).toHaveText(['Home'])
-      for (const name of ['Search', 'Create', 'Notif', 'Profile']) {
+      for (const name of ['Search', 'Notif', 'Profile']) {
         await expect(nav.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
       }
+      // Create opens the post editor (specs/post-create-detail PC-02).
+      await expect(nav.getByRole('button', { name: 'Create' })).not.toHaveAttribute('aria-disabled')
     } else {
       await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeHidden()
       await expect(page.getByRole('banner').getByRole('link').first()).toHaveAttribute(

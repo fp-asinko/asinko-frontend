@@ -51,10 +51,7 @@ describe('FeedTop and FeedListView, as the page composes them', () => {
         viewerName="demo"
       />,
     )
-    expect(screen.getByRole('button', { name: 'What are you thinking?' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    )
+    expect(screen.getByRole('button', { name: 'What are you thinking?' })).toBeInTheDocument()
     const cards = screen.getAllByRole('article')
     expect(cards).toHaveLength(2)
     expect(within(cards[1]!).getByText('Poll')).toBeInTheDocument()

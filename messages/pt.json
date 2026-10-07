@@ -102,7 +102,8 @@
       "placeholder": "No que você está pensando?",
       "post": "Post",
       "thesis": "Tese",
-      "live": "Live"
+      "live": "Live",
+      "postIn": "Publicar em {handle}"
     },
     "tabs": {
       "label": "Feed",
@@ -310,5 +311,50 @@
     "replyLabel": "Sua resposta",
     "sendReply": "Enviar resposta",
     "sent": "Comentário publicado."
+  },
+  "composer": {
+    "title": "Criar post",
+    "close": "Fechar",
+    "community": {
+      "label": "Comunidade",
+      "placeholder": "Escolha uma comunidade",
+      "yourProfile": "Seu perfil",
+      "loading": "Buscando…",
+      "empty": "Nenhuma comunidade encontrada",
+      "error": "Não foi possível carregar as comunidades. Digite para tentar de novo."
+    },
+    "type": {
+      "label": "Tipo de post",
+      "text": "Texto",
+      "link": "Link",
+      "image": "Imagem",
+      "soon": "Em breve"
+    },
+    "fields": {
+      "title": "Título",
+      "url": "Link",
+      "body": "Corpo",
+      "bodyHelp": "Aceita Markdown",
+      "counter": "{count}/{max}"
+    },
+    "submit": "Publicar",
+    "submitting": "Publicando…",
+    "discard": {
+      "title": "Descartar o post?",
+      "body": "O que você escreveu será perdido.",
+      "confirm": "Descartar",
+      "cancel": "Continuar editando"
+    },
+    "errors": {
+      "community": "Escolha uma comunidade",
+      "titleRequired": "Adicione um título",
+      "titleTooLong": "O título pode ter até 300 caracteres",
+      "bodyRequired": "Escreva algo no corpo",
+      "url": "Digite um link que comece com http:// ou https://",
+      "ownProfileOnly": "Você só pode publicar no seu próprio perfil",
+      "invalidCommunity": "Você não pode publicar nessa comunidade",
+      "invalid": "Revise os campos e tente de novo",
+      "general": "Não foi possível publicar seu post. Tente de novo."
+    }
   }
 }

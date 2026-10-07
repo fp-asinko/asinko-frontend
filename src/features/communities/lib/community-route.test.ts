@@ -22,6 +22,7 @@ vi.mock('@/i18n/navigation', () => ({
 }))
 
 const page = (overrides: Partial<CommunityPage>): CommunityPage => ({
+  id: '00000000-0000-4000-8000-000000001001',
   slug: 'macro',
   handle: '#macro',
   subtitle: null,

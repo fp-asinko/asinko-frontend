@@ -1,17 +1,29 @@
 import { PenLineIcon, RadioIcon, ZapIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { GatedComingSoon } from '@/components/organisms/auth-gate'
+import { ComposeTrigger } from '@/components/organisms/compose'
 import { UserAvatar } from '@/components/molecules/user-avatar'
+import { cn } from '@/lib/utils'
+
+const ACTION =
+  'flex h-9 w-full tap items-center justify-center gap-2 rounded-lg type-action text-muted-foreground'
 
 /**
- * The prototype's "What are you thinking?" box (H-09). Creating posts is postponed, so the input
- * and the Post / Thesis / Live actions are coming soon (H-26); without a session they open the
- * account modal instead (specs/guest-experience G-04).
+ * The prototype's "What are you thinking?" box (H-09). The box and Post open the post editor
+ * (specs/post-create-detail PC-03); Thesis and Live are coming soon (H-26). Without a session,
+ * all of them open the account modal (specs/guest-experience G-04). On a community's page it
+ * says where the post goes: "Post in #defi".
  */
-export function ComposerPlaceholder({ viewerName }: { viewerName: string | null }) {
+export function ComposerPlaceholder({
+  viewerName,
+  communityHandle,
+}: {
+  viewerName: string | null
+  communityHandle?: string
+}) {
   const t = useTranslations('feed.composer')
-  const actions = [
-    { key: 'post', icon: PenLineIcon },
+  const prompt = communityHandle ? t('postIn', { handle: communityHandle }) : t('placeholder')
+  const soon = [
     { key: 'thesis', icon: ZapIcon },
     { key: 'live', icon: RadioIcon },
   ] as const
@@ -25,25 +37,24 @@ export function ComposerPlaceholder({ viewerName }: { viewerName: string | null 
           size="md"
           className="size-10"
         />
-        {/* Column flex: stretches the coming-soon wrapper (and its button) to the full width. */}
-        <div className="flex min-w-0 flex-1 flex-col">
-          <GatedComingSoon
-            action="post"
-            label={t('placeholder')}
-            className="flex h-10.75 w-full tap items-center rounded-full bg-surface px-4 text-left type-ui text-muted-foreground hover:bg-muted"
-          >
-            <span className="truncate">{t('placeholder')}</span>
-          </GatedComingSoon>
-        </div>
+        <ComposeTrigger className="flex h-10.75 min-w-0 flex-1 tap items-center rounded-full bg-surface px-4 text-left type-ui text-muted-foreground outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50">
+          <span className="truncate">{prompt}</span>
+        </ComposeTrigger>
       </div>
       <div className="mt-3 grid grid-cols-3 gap-1 border-t pt-3">
-        {actions.map(({ key, icon: Icon }) => (
+        <ComposeTrigger
+          type="TEXT"
+          className={cn(
+            ACTION,
+            'outline-none hover:bg-surface hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50',
+          )}
+        >
+          <PenLineIcon aria-hidden className="size-4" />
+          {t('post')}
+        </ComposeTrigger>
+        {soon.map(({ key, icon: Icon }) => (
           <div key={key} className="flex flex-col">
-            <GatedComingSoon
-              action="post"
-              label={t(key)}
-              className="flex h-9 w-full tap items-center justify-center gap-2 rounded-lg type-action text-muted-foreground"
-            >
+            <GatedComingSoon action="post" label={t(key)} className={ACTION}>
               <Icon aria-hidden className="size-4" />
               {t(key)}
             </GatedComingSoon>

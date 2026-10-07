@@ -22,11 +22,11 @@
 ## Parte 2: crear
 
 - [x] **T-06 (S)** Componentes de shadcn (`field`, `input`, `textarea`, `tabs`, `combobox`) y `react-hook-form` con `@hookform/resolvers`. Se suman a `libraries.md` si cambia algo. → PC-08
-- [ ] **T-07 (M)** Contexto `compose` (organismo), `ComposerRoot` y `ComposeScope` (feature), y los accesos: "+ Crear" en la barra superior, "Crear" en la barra inferior y la caja de arriba. Sin sesión, el modal. Tests. → PC-01 a PC-04
-- [ ] **T-08 (L)** El editor:
+- [x] **T-07 (M)** Contexto `compose` (organismo), `ComposerRoot` y `ComposeScope` (feature), y los accesos: "+ Crear" en la barra superior, "Crear" en la barra inferior y la caja de arriba. Sin sesión, el modal. Tests. → PC-01 a PC-04
+- [x] **T-08 (L)** El editor:
   - Esquema, comunidad (combobox con tus comunidades y búsqueda), pestañas (Imagen Próximamente), campos con contador y errores, y descartar con confirmación.
   - `createPost`, y al publicar, el detalle.
   - Tests. → PC-05 a PC-11
-- [ ] **T-09 (M)** E2E `post-create-detail.spec.ts` (mobile + desktop, axe, 360 px), presupuesto de JS y guías. → PC-18 a PC-20
+- [x] **T-09 (M)** E2E `post-create-detail.spec.ts` (mobile + desktop, axe, 360 px), presupuesto de JS y guías. → PC-18 a PC-20
 
 Orden: T-01 → T-02 → T-03 → T-04 → T-05 → (parte 2) T-06 → T-07 → T-08 → T-09.

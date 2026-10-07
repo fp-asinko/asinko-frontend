@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { PageColumns } from '@/components/organisms/app-shell'
 import { communityMetadata, CommunityTop, resolveCommunityRoute } from '@/features/communities'
+import { ComposeScope } from '@/features/composer'
 import { CommunityFeed } from '@/features/feed'
 
 // A group's page: /hub/{slug} in every locale (specs/community-pages CP-01). Outside (main) and
@@ -19,12 +20,14 @@ export default async function HubPage({ params, searchParams }: PageProps<'/[loc
   const { page, path } = await resolveCommunityRoute('group', decodeURIComponent(slug), locale)
   return (
     <PageColumns>
+      <ComposeScope id={page.id} handle={page.handle} name={page.subtitle ?? page.handle} />
       <CommunityTop page={page} />
       <CommunityFeed
         slug={page.slug}
         handle={page.handle}
         pagePath={path}
         searchParams={searchParams}
+        canPost
       />
     </PageColumns>
   )

@@ -21,6 +21,8 @@ export type ProfileDetails = {
 }
 
 export type CommunityPage = {
+  /** Where a post from this page goes (specs/post-create-detail PC-06). */
+  id: string
   slug: string
   /** #macro, $BTC or @maria: the page title. */
   handle: string

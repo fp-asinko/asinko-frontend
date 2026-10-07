@@ -9,6 +9,7 @@ export const CLIENT_NAMESPACES = [
   'authGate',
   'common',
   'comments',
+  'composer',
   'communities.actions',
   'devLogin',
   'errors.unexpected',
