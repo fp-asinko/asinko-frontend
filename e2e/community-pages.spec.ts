@@ -31,6 +31,7 @@ test.describe('Community pages', () => {
   }) => {
     await page.goto('/en/asset/BTC')
     await expect(heading(page, '$BTC')).toBeVisible()
+    await page.getByRole('button', { name: 'Asset data' }).click()
     await expect(page.getByText('No market data yet')).toBeVisible()
   })
 

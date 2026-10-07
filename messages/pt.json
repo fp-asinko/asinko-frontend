@@ -241,7 +241,7 @@
     "meta": {
       "description": "{handle} no Asinko: posts, enquetes e conversas."
     },
-    "members": "{count, plural, one {# membro} other {# membros}}",
+    "members": "{count, plural, one {<b>#</b> membro} other {<b>#</b> membros}}",
     "actions": {
       "back": "Voltar",
       "joined": "Participando",

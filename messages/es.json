@@ -241,7 +241,7 @@
     "meta": {
       "description": "{handle} en Asinko: posts, encuestas y conversación."
     },
-    "members": "{count, plural, one {# miembro} other {# miembros}}",
+    "members": "{count, plural, one {<b>#</b> miembro} other {<b>#</b> miembros}}",
     "actions": {
       "back": "Volver",
       "joined": "Unido",

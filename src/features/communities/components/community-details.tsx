@@ -5,9 +5,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import type { CommunityPage } from '../communities.types'
 
 /**
- * The row under the header (specs/community-pages § 5): a group's rules and website, closed on
- * load; an asset's market data, open, with an explicit empty state until there is a price
- * provider (CP-10: never invented numbers). A group without rules nor website shows nothing.
+ * The row under the header (specs/community-pages § 5), the prototype's gray box, closed on
+ * load: a group's rules and website; an asset's market data, with an explicit empty state until
+ * there is a price provider (CP-10: never invented numbers). A group without rules nor website
+ * shows nothing.
  */
 export function CommunityDetails({ page }: { page: CommunityPage }) {
   const t = useTranslations('communities')
@@ -17,7 +18,6 @@ export function CommunityDetails({ page }: { page: CommunityPage }) {
       <Details
         title={t('assetData.title')}
         icon={<ChartNoAxesColumnIcon aria-hidden className="size-4" />}
-        defaultOpen
       >
         <div className="flex flex-col items-center gap-1 py-4 text-center">
           <p className="type-ui font-semibold">{t('assetData.empty')}</p>
@@ -61,8 +61,11 @@ function Details({
   children: ReactNode
 }) {
   return (
-    <Collapsible defaultOpen={defaultOpen} className="mx-4 mb-4 rounded-lg border sm:mx-0">
-      <CollapsibleTrigger className="group flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-lg px-3.5 type-ui font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+    <Collapsible
+      defaultOpen={defaultOpen}
+      className="mx-4 mt-3.5 mb-1 rounded-lg border bg-surface sm:mx-0"
+    >
+      <CollapsibleTrigger className="group flex min-h-10 w-full cursor-pointer items-center gap-2 rounded-lg px-3.5 type-action outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
         {icon}
         <span className="flex-1 text-left">{title}</span>
         <ChevronDownIcon

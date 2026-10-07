@@ -241,7 +241,7 @@
     "meta": {
       "description": "{handle} on Asinko: posts, polls and discussion."
     },
-    "members": "{count, plural, one {# member} other {# members}}",
+    "members": "{count, plural, one {<b>#</b> member} other {<b>#</b> members}}",
     "actions": {
       "back": "Back",
       "joined": "Joined",

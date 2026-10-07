@@ -29,7 +29,8 @@ export async function CommunityFeed({
 
   return (
     <>
-      <div className="px-2 sm:px-0">
+      {/* Air after the header or its details box, as the prototype. */}
+      <div className="px-2 pt-3.5 sm:px-0">
         <FeedFilters params={params} pagePath={pagePath} />
       </div>
       <Suspense key={filter} fallback={<FeedListSkeleton />}>

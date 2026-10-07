@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { communityPage } from '../communities.fixture'
@@ -15,7 +16,8 @@ describe('CommunityHeader (specs/community-pages CP-04)', () => {
     renderWithIntl(<CommunityHeader page={communityPage()} />)
     expect(screen.getByRole('heading', { level: 1, name: '#macro' })).toBeInTheDocument()
     expect(screen.getByText('Rates, inflation and central banks.')).toBeInTheDocument()
-    expect(screen.getByText('1,204 members')).toBeInTheDocument()
+    // The number in bold, the label gray (prototype): one sentence for screen readers.
+    expect(screen.getByText('1,204').closest('p')).toHaveTextContent('1,204 members')
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Join #macro' })).toBeInTheDocument()
   })
@@ -32,7 +34,7 @@ describe('CommunityHeader (specs/community-pages CP-04)', () => {
 
   it('counts members in the page locale', () => {
     renderWithIntl(<CommunityHeader page={communityPage({ memberCount: 1 })} />, { locale: 'es' })
-    expect(screen.getByText('1 miembro')).toBeInTheDocument()
+    expect(screen.getByText('1').closest('p')).toHaveTextContent('1 miembro')
   })
 })
 
@@ -55,15 +57,14 @@ describe('CommunityDetails (specs/community-pages CP-08, CP-10)', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('shows an asset market data open, with an explicit empty state and no numbers', () => {
+  it('shows an asset market data closed, as the prototype, with an explicit empty state', async () => {
     renderWithIntl(
       <CommunityDetails page={communityPage({ slug: 'BTC', handle: '$BTC', kind: 'asset' })} />,
     )
-    expect(screen.getByRole('button', { name: 'Asset data' })).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    )
-    expect(screen.getByText('No market data yet')).toBeInTheDocument()
+    const trigger = screen.getByRole('button', { name: 'Asset data' })
+    expect(trigger).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(trigger)
+    expect(await screen.findByText('No market data yet')).toBeInTheDocument()
     expect(screen.queryByText(/\$\d|%/)).toBeNull()
   })
 })

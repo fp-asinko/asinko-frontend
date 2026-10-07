@@ -78,7 +78,7 @@ features/communities/
 ## 5. Desplegables
 
 - **`/hub`:** "Reglas del grupo" con `rules` (texto plano con saltos de línea), cerrado al cargar, y el `mainUrl` como link externo debajo. Si no hay reglas ni link, no se muestra.
-- **`/asset`:** "Datos del activo", **abierto** al cargar, con el estado vacío de CP-10: un ícono, "Sin datos de mercado todavía" y "Precio, variación y sentimiento llegan pronto." Sin números.
+- **`/asset`:** "Datos del activo", **cerrado** al cargar como en el prototipo (ajuste del 2026-10-07), con el estado vacío de CP-10 adentro: "Sin datos de mercado todavía" y "Precio, variación y sentimiento llegan pronto." Sin números.
 
 ## 6. Menciones y enlaces (CP-14)
 
@@ -121,3 +121,12 @@ features/communities/
 - **Composición en `app/`:** el feature `communities` no puede importar el feed. La página resuelve la comunidad una sola vez (`resolveCommunityRoute`) y arma `CommunityTop` (de `communities`) y `CommunityFeed` (de `feed`).
 - **Sin "Unirse" repetido:** las tarjetas no muestran el botón para la comunidad por la que está filtrado el feed. Vale también para el Home filtrado por URL (`/?community=`), que ya no se enlaza desde el sitio (CP-15).
 - **Avatar con imagen:** `UserAvatar` usa fondo neutro detrás de una imagen, así un logo redondo ($BTC) no muestra el degradé en las esquinas.
+- **Estructura del prototipo** (pedido del PO, medido en su vista `$NVDA`):
+  - El banner ocupa toda la columna central, de borde a borde hasta el separador de la columna derecha, sin esquinas redondeadas y con 120 px de alto desde `md`.
+  - El contenido (logo, título y datos) sangra 16 px respecto del banner.
+  - El logo mide 56 px, con anillo blanco, montado sobre el borde del banner.
+  - El título va en 22 px extra-negrita.
+  - Los miembros van con el número en negrita, y debajo un separador.
+  - El desplegable es la caja gris (`surface`) con borde, cerrado al cargar.
+  - "Volver" es una píldora oscura translúcida (`bg-black/45`, como el overlay de los diálogos), igual en los dos temas.
+  - La misma estructura vale para `/hub`, `/asset` y, después, `/user`.
