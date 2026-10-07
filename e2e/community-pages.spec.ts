@@ -121,12 +121,12 @@ test.describe('Quality (CP-16)', () => {
 })
 
 test.describe('Profile pages (CP-11 to CP-13, CP-21)', () => {
-  test('a profile: name, marks and stats; following asks before unfollowing', async ({ page }) => {
+  test('a profile: name and stats; following asks before unfollowing', async ({ page }) => {
     await page.goto('/en/user/federico')
     await expect(heading(page, 'Federico Piva')).toBeVisible()
     const header = page.getByRole('main').locator('header')
-    await expect(header.getByText('Creator')).toBeVisible()
-    await expect(header.getByText('Rating AAA')).toBeAttached()
+    // Tier and rating come after the MVP (backend, 2026-10-07).
+    await expect(header.getByText('Creator')).toHaveCount(0)
     await expect(header.getByText(/followers/)).toBeVisible()
     await expect(header.getByRole('button', { name: /favorites/ })).toHaveCount(0)
 

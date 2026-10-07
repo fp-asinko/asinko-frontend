@@ -171,3 +171,7 @@ Referencia: la vista de perfil del prototipo (`Federico Piva`).
 ### Mensajes
 
 `communities.profile.*` (estadísticas, tier, verificado/institucional, "Preguntarle a {name}", título de reglas), `communities.actions.unfollow.*` y `join.follow|followFor|following`.
+
+## 13. Ajuste: sin tier ni rating (2026-10-07)
+
+El backend dejó el tier (Creator/Partner) y el rating para después del MVP: "no los muestres por ahora". Se borran del contrato, los mocks, los mensajes y `ProfileMarks`, que queda solo con la marca de verificado o institucional. P-011 sigue pidiendo solo `displayName`.

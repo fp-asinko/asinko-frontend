@@ -26,14 +26,10 @@ export const userSchema = z.object({
   createdAt: z.iso.datetime(),
 })
 
-/** P-011 (proposal): a public rating, AAA (best) to D. */
-export const ratingSchema = z.enum(['AAA', 'AA', 'A', 'BBB', 'BB', 'B', 'C', 'D'])
-
 export const profileSchema = userSchema.extend({
-  /** P-011 (proposal): optional until the backend sends them (specs/community-pages CP-20). */
+  /** P-011 (proposal): optional until the backend sends it (specs/community-pages CP-20). Tier and
+   * rating stay out until after the MVP (backend, 2026-10-07). */
   displayName: z.string().nullable().optional(),
-  tier: z.enum(['CREATOR', 'PARTNER']).nullable().optional(),
-  rating: ratingSchema.nullable().optional(),
   points: z.number().int(),
   badgeStatus: z.enum(['NONE', 'IDENTITY_VERIFIED', 'INSTITUTIONAL']),
   accuracyRate: z.number().nullable(),

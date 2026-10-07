@@ -26,11 +26,9 @@ describe('profile details (specs/community-pages § 12)', () => {
     state.viewer = null
   })
 
-  it('maps the proposed fields (P-011) and the badge', () => {
+  it('maps the proposed display name (P-011) and the badge', () => {
     expect(toProfileDetails(federico, null)).toMatchObject({
       displayName: 'Federico Piva',
-      tier: 'creator',
-      rating: 'AAA',
       isSelf: false,
     })
     expect(toProfileDetails({ ...federico, badgeStatus: 'INSTITUTIONAL' }, null).badge).toBe(
@@ -38,16 +36,10 @@ describe('profile details (specs/community-pages § 12)', () => {
     )
   })
 
-  it('works without the proposed fields, as the backend today', () => {
-    const { displayName, tier, rating, ...today } = federico
+  it('works without the display name, as the backend today', () => {
+    const { displayName, ...today } = federico
     void displayName
-    void tier
-    void rating
-    expect(toProfileDetails(today, null)).toMatchObject({
-      displayName: null,
-      tier: null,
-      rating: null,
-    })
+    expect(toProfileDetails(today, null).displayName).toBeNull()
   })
 
   it('knows when the viewer is this user', () => {

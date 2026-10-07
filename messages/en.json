@@ -281,11 +281,6 @@
       "followers": "{count, plural, one {<b>#</b> follower} other {<b>#</b> followers}}",
       "accuracy": "<b>{value}</b> accuracy",
       "streak": "<b>{count}</b> streak",
-      "tier": {
-        "creator": "Creator",
-        "partner": "Partner"
-      },
-      "rating": "Rating {rating}",
       "badge": {
         "verified": "Verified",
         "institutional": "Institutional"

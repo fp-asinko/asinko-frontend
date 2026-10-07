@@ -13,14 +13,11 @@ const BADGES = {
   IDENTITY_VERIFIED: 'verified',
   INSTITUTIONAL: 'institutional',
 } as const
-const TIERS = { CREATOR: 'creator', PARTNER: 'partner' } as const
 
 export function toProfileDetails(profile: RawProfile, viewerName: string | null): ProfileDetails {
   return {
     username: profile.username,
     displayName: profile.displayName?.trim() || null,
-    tier: profile.tier ? TIERS[profile.tier] : null,
-    rating: profile.rating ?? null,
     badge: BADGES[profile.badgeStatus],
     bio: profile.bio?.trim() || null,
     avatarUrl: allowedImageUrl(profile.avatarUrl),

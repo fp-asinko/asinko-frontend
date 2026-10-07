@@ -71,7 +71,7 @@ El PDF asigna `/hub` a `USER_PUBLIC`, pero en la base de dev los grupos del sist
 
 - [x] **CP-11** **Perfil** con `GET /profiles/{identifier}` y el canal personal (`GET /communities/{username}`), con la misma estructura de las otras páginas:
   - Banner, avatar redondo y título: el nombre visible si existe, y si no, `@usuario`. Con nombre visible, `@usuario` va debajo.
-  - Junto al título: la etiqueta **Creator** o **Partner**, el **rating** (AAA…D) y la marca de **verificado** o **institucional**, cada uno solo si viene.
+  - Junto al título: la marca de **verificado** o **institucional**, si viene. La etiqueta Creator/Partner y el rating quedan para después del MVP (backend, 2026-10-07).
   - La bio, si existe.
   - Estadísticas: **seguidores · acierto · racha**. La racha son tesis acertadas seguidas, no días.
   - Un botón **"Preguntarle a {nombre}"**, Próximamente.
@@ -82,7 +82,7 @@ El PDF asigna `/hub` a `USER_PUBLIC`, pero en la base de dev los grupos del sist
   - Sin estrella de favorito.
   - En tu propio perfil no hay acciones.
 - [x] **CP-13** **Contenido:** el feed de su canal (CP-07). El historial de tesis (`GET /users/{userId}/theses`) entra con las tesis, en la fase 2.
-- [x] **CP-20** **Datos que el backend no tiene** (propuesta **P-011** en `proposals.md`): `displayName`, `tier` (`CREATOR` / `PARTNER`) y `rating` público. Van en los mocks y se muestran cuando vienen. Mientras no vengan, el chip de acierto (el de las tarjetas, por tramos) da la reputación.
+- [x] **CP-20** **El nombre visible** (`displayName`, propuesta **P-011** en `proposals.md`): va en los mocks y se muestra cuando viene. **Tier y rating no se muestran:** el backend los dejó para después del MVP (2026-10-07). La reputación la dan el acierto y la racha de las estadísticas.
 - [x] **CP-21** `@usuario` lleva a `/user/{username}`: en el cuerpo de los posts, en la cabecera de las tarjetas y en "Personas" de la columna izquierda.
 
 ### Menciones y enlaces

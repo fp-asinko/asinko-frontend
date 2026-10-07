@@ -2,57 +2,21 @@
 
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla. Cuando el backend la implementa, pasa a "Resueltas" y al snapshot del contrato.
 
-**Revisado el 2026-10-07** contra el deploy de `asinko-app` en Vercel (`https://asinko-app-web.vercel.app`, rama `dev` en `c669972`), con `pnpm api:smoke` y llamadas directas.
+**Revisado el 2026-10-07** contra el deploy de `asinko-app` en Vercel (`https://asinko-app-web.vercel.app`, rama `dev` en `bd91e4b`), con `pnpm api:smoke`, llamadas directas y la respuesta del backend del mismo día.
 
 ## Pendientes
 
-En orden de prioridad para el front: P-010, P-011, P-012, P-001, P-003, P-009 y P-005.
+En orden de prioridad para el front: P-012, P-001, P-011, P-003 y P-005.
 
-### P-010: Avatar y membresía en la comunidad de cada contenido
+### P-011: Nombre visible en el perfil
 
-**Estado:** propuesta (2026-10-05). Mockeada (`specs/community-first`).
-
-**Endpoint:** `GET /feed/explore`, `GET /feed/following` y todo lo que devuelva la comunidad resumida de cada contenido (P-004).
-
-**Motivo:** las tarjetas muestran el grupo como protagonista: su avatar y un botón "Unirse" si el usuario no es miembro. Hoy el resumen trae solo `id`, `slug`, `name` y `type`. Mientras tanto, el front pide en paralelo `GET /communities` y `GET /communities?mine=true` y cruza los datos. Son dos requests más por página, y no alcanza para grupos fuera de la primera página de esas listas.
-
-**Cambio:** dos campos más en el resumen:
-
-```json
-"community": {
-  "id": "…",
-  "slug": "acciones",
-  "name": "Acciones",
-  "type": "USER_PUBLIC",
-  "avatarUrl": "https://…/storage/v1/object/public/…",
-  "viewerMembership": "MEMBER"
-}
-```
-
-- `avatarUrl`: el mismo de `GET /communities/{slug}`, o `null`.
-- `viewerMembership`: el rol del viewer (`MEMBER`, `MODERATOR`, `PRINCIPAL_MODERATOR`), o `null` si no es miembro o no hay sesión.
-
-### P-011: Nombre visible, tier y rating público en el perfil
-
-**Estado:** propuesta (2026-10-07). Se mockea con la página de perfil (`specs/community-pages`, parte 2).
+**Estado:** propuesta (2026-10-07), mockeada. **Tier y rating quedan para después del MVP** (respuesta del backend, 2026-10-07): el front no los muestra.
 
 **Endpoint:** `GET /profiles/{identifier}`.
 
-**Motivo:** el perfil del prototipo muestra el nombre ("Federico Piva"), la etiqueta **Creator** o **Partner** y el **rating** (AAA…D) junto al nombre. El overview del producto define el rating como público ("estilo calificadora, nunca se compra") y los tiers para usuarios públicos con historial. Hoy el perfil no tiene ninguno de los tres, y el contrato E12 dice que `internalRating` "no se expone".
+**Motivo:** el perfil del prototipo se titula con el nombre de la persona ("Federico Piva") y pone `@usuario` debajo. Hoy el perfil solo tiene `username`, así que el título es `@usuario`.
 
-**Cambio:**
-
-```json
-"displayName": "Federico Piva",
-"tier": "CREATOR",
-"rating": "AAA"
-```
-
-- `displayName`: texto libre, o `null`.
-- `tier`: `CREATOR`, `PARTNER` o `null`.
-- `rating`: `AAA`, `AA`, `A`, `BBB`, `BB`, `B`, `C` o `D`, o `null` sin historial suficiente.
-
-**A decidir con producto:** si el rating público es el mismo `internalRating` o uno derivado. El front muestra lo que venga y no lo calcula.
+**Cambio:** `"displayName": "Federico Piva"`, texto libre o `null`. ¿Entra en el MVP?
 
 ### P-012: Todo lo que publica un usuario
 
@@ -84,28 +48,19 @@ En orden de prioridad para el front: P-010, P-011, P-012, P-001, P-003, P-009 y 
 
 **Efecto:** la columna de activos sigue con precios de prueba, y la página de activo muestra "Sin datos de mercado todavía". **Pedido:** avisar cuando haya precios.
 
-### P-009: Feed en pocas consultas
-
-**Estado:** resuelta en parte. Desplegado en Vercel, el feed responde en **0,7 s** (antes, 12 a 16 s con el backend local contra la base en otra región).
-
-**Queda:** armar cada página en 2 o 3 consultas (`include` del contenido, un `groupBy` para los conteos y una consulta con los votos del viewer) en lugar de una por ítem y por dato. Va a pesar cuando crezca el feed y se nota en el backend local.
-
 ### P-005: Orden del feed
 
-**Estado:** el filtro por tipo (`?kind=POST,POLL`) ya está. **Falta:** `sort=hot|new|top`, para los filtros _Hot_ y _Top_ del prototipo. ¿Cuándo? Y sumar `kind` al contrato (E04).
+**Estado:** el filtro por tipo (`?kind=POST,POLL`) ya está y está en el contrato. **Falta:** `sort=hot|new|top`, para los filtros _Hot_ y _Top_ del prototipo. ¿Cuándo?
 
 ## Pedidos operativos
 
 - **Datos de las páginas en el seed:** las páginas de grupo, activo y perfil ya muestran banner, avatar, descripción, reglas y bio, pero el seed casi no los tiene. De los 7 grupos y activos de la primera página, ninguno tiene avatar, banner ni reglas, y solo uno tiene descripción. Ningún usuario tiene bio ni verificado. **Pedido:** sumar al seed avatar y banner (en Storage, como los avatares de usuario), descripción y reglas para los grupos, logo para todos los activos y bio para los usuarios, así las páginas se pueden probar con datos reales. Si se acepta P-011, también `displayName`, `tier` y `rating`.
 
-- **Cuentas de prueba después de cada seed:** el seed borra todos los perfiles, incluidos los de `qa_uno`, `qa_dos` y `qa_tres`. Sin perfil, el login de desarrollo del front no entra. Hoy los tres dan `404`. **Pedido:** correr `npm run seed:auth --workspace=packages/db` después de cada `seed`, o encadenarlo en el mismo script.
 
 ## Preguntas sobre el contrato
 
-- **`email` en el perfil:** el contrato dice que viene solo cuando el viewer es el usuario, pero para otro perfil llega `"email": null` (detectado por `pnpm api:smoke`). El front acepta las dos formas. ¿Se alinea el contrato con `null`?
-- **`Poll.totalVotes`:** el contrato lo tipa `number | null`; siempre llega un número, aun con los resultados ocultos. El front acepta las dos cosas. Conviene alinear el contrato.
 - **Tesis en el feed:** el feed ya devuelve `kind: "THESIS"`. El front las muestra en la fase 2 y mientras tanto pide `?kind=POST,POLL`. ¿OK?
-- **Códigos de error para crear post:** el front va a tener mensajes propios para `NOT_COMMUNITY_MEMBER`, `PERSONAL_CHANNEL_OWNER_ONLY` y `CONTENT_DELETED`. ¿`d1a18e7` ("publicar sin ser miembro") deja sin efecto `NOT_COMMUNITY_MEMBER`?
+- **Códigos de error para crear post:** el front va a tener mensajes propios para `PERSONAL_CHANNEL_OWNER_ONLY` y `CONTENT_DELETED` (`NOT_COMMUNITY_MEMBER` ya no existe, confirmado el 2026-10-07).
 - **Documentos del contrato:** queda pedido el acceso al repo `financeshowoff-design-docs`, para refrescar `docs/references/api/` sin depender de copias.
 
 ## Resueltas
@@ -117,6 +72,10 @@ En orden de prioridad para el front: P-010, P-011, P-012, P-001, P-003, P-009 y 
 | P-006 | `commentCount` en `Poll` | `3cfff41` |
 | P-007 | Primeros comentarios sin el árbol (`?limit=&replies=false`) | `3cfff41` |
 | P-008 | `body: ""` en contenido borrado, sin textos en español | `3cfff41` |
+| P-009 | Feed y listados con los conteos en lote, y backend en la región de la base (Vercel) | `2784c74`, 2026-10-06 |
+| P-010 | `avatarUrl` y `viewerMembership` en la comunidad de cada contenido | `e3fc57b`, 2026-10-07 |
+| Cuentas de prueba y seed | El seed conserva las cuentas reales de Auth (`qa_uno`…) | `33e81b3`, 2026-10-07 |
+| Contrato | `kind` en el feed, `email: null`, `totalVotes` numérico; `NOT_COMMUNITY_MEMBER` ya no existe | Confirmado 2026-10-07 |
 | Migraciones de dev | Las 6 pendientes (2026-10-03) y `asset_logo` (2026-10-06) | Aplicadas |
 | Explore con comunidad inexistente | Respondía `200` vacío. El front ya consulta `GET /communities/{slug}` antes (páginas de comunidad y filtro del Home), así que no hace falta cambiarlo | Cerrada |
 | Imágenes de Storage | Bucket público de Supabase Storage | El front permite ese host (`next.config.ts`) |

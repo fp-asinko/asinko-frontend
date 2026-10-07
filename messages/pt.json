@@ -281,11 +281,6 @@
       "followers": "{count, plural, one {<b>#</b> seguidor} other {<b>#</b> seguidores}}",
       "accuracy": "<b>{value}</b> de acerto",
       "streak": "<b>{count}</b> de sequência",
-      "tier": {
-        "creator": "Creator",
-        "partner": "Partner"
-      },
-      "rating": "Rating {rating}",
       "badge": {
         "verified": "Verificado",
         "institutional": "Institucional"

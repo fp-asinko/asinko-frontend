@@ -28,8 +28,6 @@ const channel = communityPage({
 const profile = (overrides: Partial<ProfileDetails> = {}): ProfileDetails => ({
   username: 'federico',
   displayName: 'Federico Piva',
-  tier: 'creator',
-  rating: 'AAA',
   badge: null,
   bio: 'Macro + crypto.',
   avatarUrl: null,
@@ -51,20 +49,18 @@ function renderHeader(details: ProfileDetails, membership: 'MEMBER' | null = nul
 }
 
 describe('Profile header (specs/community-pages CP-11, CP-12)', () => {
-  it('titles with the display name, @username below, and the marks next to it', () => {
+  it('titles with the display name and @username below, without tier nor rating (after the MVP)', () => {
     renderHeader(profile())
     expect(screen.getByRole('heading', { level: 1, name: 'Federico Piva' })).toBeInTheDocument()
     expect(screen.getByText('@federico')).toBeInTheDocument()
-    expect(screen.getByText('Creator')).toBeInTheDocument()
-    expect(screen.getByText('Rating AAA')).toBeInTheDocument()
+    expect(screen.queryByText('Creator')).toBeNull()
+    expect(screen.queryByText(/^Rating/)).toBeNull()
     expect(screen.getByText('Macro + crypto.')).toBeInTheDocument()
   })
 
-  it('titles with @username when there is no display name nor marks (the backend today)', () => {
-    renderHeader(profile({ displayName: null, tier: null, rating: null }))
+  it('titles with @username when there is no display name (the backend today)', () => {
+    renderHeader(profile({ displayName: null }))
     expect(screen.getByRole('heading', { level: 1, name: '@federico' })).toBeInTheDocument()
-    expect(screen.queryByText('Creator')).toBeNull()
-    expect(screen.queryByText(/^Rating/)).toBeNull()
   })
 
   it('shows followers, accuracy and streak, each number with its word', () => {

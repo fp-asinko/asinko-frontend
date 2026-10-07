@@ -10,9 +10,6 @@ export type ProfileDetails = {
   username: string
   /** P-011: null until the backend sends it; the title is then @username. */
   displayName: string | null
-  tier: 'creator' | 'partner' | null
-  /** AAA (best) to D (P-011). */
-  rating: 'AAA' | 'AA' | 'A' | 'BBB' | 'BB' | 'B' | 'C' | 'D' | null
   badge: 'verified' | 'institutional' | null
   bio: string | null
   avatarUrl: string | null

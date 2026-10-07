@@ -208,10 +208,12 @@ describe('mock writes (stateless, demo viewer)', () => {
     expect(list.items.some((each) => each.type === 'PERSONAL_CHANNEL')).toBe(false)
   })
 
-  it('sends the proposed profile fields (P-011) for a creator', async () => {
+  it('sends the proposed display name (P-011), without tier nor rating', async () => {
     const profile = (
       await call('GET', '/api/v1/profiles/:identifier', { params: { identifier: 'federico' } })
     ).body
-    expect(profile).toMatchObject({ displayName: 'Federico Piva', tier: 'CREATOR', rating: 'AAA' })
+    expect(profile).toMatchObject({ displayName: 'Federico Piva' })
+    expect(profile).not.toHaveProperty('tier')
+    expect(profile).not.toHaveProperty('rating')
   })
 })
