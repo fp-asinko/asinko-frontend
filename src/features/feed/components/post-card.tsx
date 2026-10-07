@@ -21,13 +21,18 @@ function isLong(body: string) {
  * Post card of the prototype (H-12), a Server Component: byline, title (17/700), body (15px,
  * Markdown), image or link, and the actions row. A long body is clamped with CSS and expands with a
  * native <details>: no JavaScript.
+ *
+ * The `detail` variant is the post's own page (specs/post-create-detail § 4): the title is the h1,
+ * the body is whole and the comment count points to the comments below.
  */
 export function PostCard({
   post,
+  variant = 'card',
   fadeImage = false,
   feedCommunity,
 }: {
   post: PostItem
+  variant?: 'card' | 'detail'
   /** Fade the image in once loaded: only cards loaded later (D-M1, protects LCP). */
   fadeImage?: boolean
   /** The community the feed is filtered by: no join button for it (CP-07). */
@@ -36,6 +41,15 @@ export function PostCard({
   const PostImage = fadeImage ? FadeImage : Image
   const t = useTranslations('feed.card')
   const format = useFormatter()
+  const detail = variant === 'detail'
+  const Title = detail ? 'h1' : 'h2'
+  const commentCount = (
+    <>
+      <MessageSquareIcon aria-hidden className="size-4" />
+      <span aria-hidden>{format.number(post.commentCount, countFormat(post.commentCount))}</span>
+      <span className="sr-only">{t('comments', { count: post.commentCount })}</span>
+    </>
+  )
 
   return (
     // wrap-anywhere: a long word or URL from a user wraps instead of being cut off at 360px.
@@ -54,7 +68,7 @@ export function PostCard({
         />
       </div>
 
-      <h2
+      <Title
         id={`post-${post.id}`}
         // Focus target when the join button disappears (CF-14); not in the tab order.
         tabIndex={-1}
@@ -65,11 +79,11 @@ export function PostCard({
         }
       >
         {post.deleted ? t('deleted') : post.title}
-      </h2>
+      </Title>
 
       {!post.deleted && post.body && (
         <div className="group/body mt-1.5 type-post-body">
-          {isLong(post.body) ? (
+          {!detail && isLong(post.body) ? (
             <>
               <div className="line-clamp-6 group-has-[details[open]]/body:line-clamp-none">
                 <PostMarkdown>{post.body}</PostMarkdown>
@@ -95,6 +109,8 @@ export function PostCard({
             fill
             sizes="(min-width: 1024px) 732px, (min-width: 768px) calc(100vw - 300px), 100vw"
             className="object-cover"
+            // The detail's image is its largest paint (seo.md § Performance).
+            priority={detail}
             // Local SVG mocks skip the optimizer; backend images get remotePatterns when they exist.
             unoptimized={post.media.url.endsWith('.svg')}
           />
@@ -118,13 +134,18 @@ export function PostCard({
         // mobile and joins the group from md.
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <VoteControl postId={post.id} score={post.score} viewerVote={post.viewerVote} />
-          <CommentsToggle kind="post" id={post.id}>
-            <MessageSquareIcon aria-hidden className="size-4" />
-            <span aria-hidden>
-              {format.number(post.commentCount, countFormat(post.commentCount))}
-            </span>
-            <span className="sr-only">{t('comments', { count: post.commentCount })}</span>
-          </CommentsToggle>
+          {detail ? (
+            <a
+              href="#comments"
+              className="inline-flex h-9.5 tap items-center gap-1.5 rounded-full bg-muted px-3 type-action text-muted-foreground hover:bg-muted-hover"
+            >
+              {commentCount}
+            </a>
+          ) : (
+            <CommentsToggle kind="post" id={post.id}>
+              {commentCount}
+            </CommentsToggle>
+          )}
           <span className="ml-auto md:ml-0">
             <ComingSoon
               label={t('share')}

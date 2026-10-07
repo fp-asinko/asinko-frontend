@@ -101,3 +101,27 @@ describe('PostCard (H-12)', () => {
     expect(screen.queryByText('See more')).toBeNull()
   })
 })
+
+describe('PostCard detail variant (specs/post-create-detail PC-13)', () => {
+  const longBody = Array.from({ length: 10 }, (_, i) => `Line ${i + 1}`).join('\n\n')
+
+  it('titles the page with an h1 and shows the whole body, without "See more"', () => {
+    renderWithIntl(<PostCard post={postItem({ body: longBody })} variant="detail" />)
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Whales accumulated 48,000 $BTC' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Line 10')).toBeInTheDocument()
+    expect(screen.queryByText('See more')).not.toBeInTheDocument()
+  })
+
+  it('points the comment count to the comments below instead of opening a preview', () => {
+    renderWithIntl(<PostCard post={postItem()} variant="detail" />)
+    expect(screen.getByRole('link', { name: '6 comments' })).toHaveAttribute('href', '#comments')
+  })
+
+  it('keeps the h2 and "See more" in the feed', () => {
+    renderWithIntl(<PostCard post={postItem({ body: longBody })} />)
+    expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument()
+    expect(screen.getByText('See more')).toBeInTheDocument()
+  })
+})
