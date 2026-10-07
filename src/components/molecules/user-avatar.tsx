@@ -59,7 +59,8 @@ export function UserAvatar({
       data-color={imageUrl || color === null ? undefined : color}
       className={cn(
         'relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full font-semibold',
-        color === null
+        // With an image, a neutral background: a round logo ($BTC) shows no gradient in its corners.
+        imageUrl || color === null
           ? 'bg-muted text-muted-foreground'
           : cn('bg-linear-135', IDENTITY_CLASSES[color]),
         box,

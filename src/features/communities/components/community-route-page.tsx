@@ -6,6 +6,8 @@ import { routing, type Locale } from '@/i18n/routing'
 import { communityPath, type CommunityKind } from '@/lib/communities/paths'
 import { getCommunityPage } from '../lib/community-api'
 import { resolveCommunityPage } from '../lib/community-route'
+import { CommunityDetails } from './community-details'
+import { CommunityHeader } from './community-header'
 
 function safeLocale(locale: string): Locale {
   return routing.locales.find((each) => each === locale) ?? routing.defaultLocale
@@ -34,7 +36,7 @@ export async function communityMetadata(
   }
 }
 
-/** The page of a group or an asset (specs/community-pages): header and feed come in T-05/T-06. */
+/** The top of a group's or an asset's page (specs/community-pages): header and details. */
 export async function CommunityRoutePage({
   kind,
   slug,
@@ -45,5 +47,10 @@ export async function CommunityRoutePage({
   locale: string
 }) {
   const page = await resolveCommunityPage(slug, kind, safeLocale(locale))
-  return <h1 className="px-4 pt-4 type-page-title sm:px-0">{page.handle}</h1>
+  return (
+    <>
+      <CommunityHeader page={page} />
+      <CommunityDetails page={page} />
+    </>
+  )
 }

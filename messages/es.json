@@ -240,6 +240,32 @@
   "communities": {
     "meta": {
       "description": "{handle} en Asinko: posts, encuestas y conversación."
+    },
+    "members": "{count, plural, one {# miembro} other {# miembros}}",
+    "actions": {
+      "back": "Volver",
+      "joined": "Unido",
+      "leaveHint": "Salir de {handle}",
+      "principal": "Moderador",
+      "principalHint": "Transfiere el rol para poder salir.",
+      "favoriteAdd": "Agregar {handle} a favoritos",
+      "favoriteRemove": "Quitar {handle} de favoritos",
+      "error": "No se pudo guardar. Inténtalo de nuevo.",
+      "leave": {
+        "title": "¿Salir de {handle}?",
+        "body": "Vas a dejar de ver sus posts en Siguiendo.",
+        "confirm": "Salir",
+        "cancel": "Cancelar"
+      }
+    },
+    "rules": {
+      "title": "Reglas del grupo",
+      "newTab": "(se abre en una pestaña nueva)"
+    },
+    "assetData": {
+      "title": "Datos del activo",
+      "empty": "Sin datos de mercado todavía",
+      "soon": "Precio, variación y sentimiento llegan pronto."
     }
   }
 }

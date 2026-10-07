@@ -47,4 +47,11 @@ describe('UserAvatar', () => {
       String(identityIndex('onchain')),
     )
   })
+
+  it('has a neutral background behind an image, so a round logo shows no gradient corners', () => {
+    render(<UserAvatar name="$BTC" colorKey="BTC" imageUrl="/mocks/btc.png" />)
+    const avatar = screen.getByTestId('user-avatar')
+    expect(avatar.className).not.toMatch(/from-avatar-/)
+    expect(avatar).toHaveClass('bg-muted')
+  })
 })

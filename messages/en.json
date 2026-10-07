@@ -240,6 +240,32 @@
   "communities": {
     "meta": {
       "description": "{handle} on Asinko: posts, polls and discussion."
+    },
+    "members": "{count, plural, one {# member} other {# members}}",
+    "actions": {
+      "back": "Back",
+      "joined": "Joined",
+      "leaveHint": "Leave {handle}",
+      "principal": "Moderator",
+      "principalHint": "Transfer the role to be able to leave.",
+      "favoriteAdd": "Add {handle} to favorites",
+      "favoriteRemove": "Remove {handle} from favorites",
+      "error": "Could not save. Try again.",
+      "leave": {
+        "title": "Leave {handle}?",
+        "body": "You will stop seeing its posts in Following.",
+        "confirm": "Leave",
+        "cancel": "Cancel"
+      }
+    },
+    "rules": {
+      "title": "Group rules",
+      "newTab": "(opens in a new tab)"
+    },
+    "assetData": {
+      "title": "Asset data",
+      "empty": "No market data yet",
+      "soon": "Price, change and sentiment are coming soon."
     }
   }
 }

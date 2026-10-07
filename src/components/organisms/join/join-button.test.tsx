@@ -93,3 +93,34 @@ describe('JoinButton (specs/community-first)', () => {
     finish({ ok: true, data: { memberCount: 1 } })
   })
 })
+
+describe('JoinedProvider: leaving (specs/community-pages § 4)', () => {
+  it('brings the join button back after leaving in this visit, and forgets on unmark', async () => {
+    const { useJoined } = await import('./joined')
+    function Leave() {
+      const joined = useJoined()
+      return (
+        <>
+          <button type="button" onClick={() => joined.markLeft('defi')}>
+            leave
+          </button>
+          <button type="button" onClick={() => joined.unmark('defi')}>
+            forget
+          </button>
+          <p>{joined.hasLeft('defi') ? 'left' : 'server'}</p>
+        </>
+      )
+    }
+    renderWithIntl(
+      <JoinedProvider>
+        <JoinButton slug="defi" handle="#defi" action={vi.fn() as never} />
+        <Leave />
+      </JoinedProvider>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'leave' }))
+    expect(screen.getByText('left')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Join #defi' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'forget' }))
+    expect(screen.getByText('server')).toBeInTheDocument()
+  })
+})

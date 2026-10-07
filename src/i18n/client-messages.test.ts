@@ -36,6 +36,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
     expect(Object.keys(picked).sort()).toEqual([
       'authGate',
       'common',
+      'communities',
       'devLogin',
       'errors',
       'feed',
@@ -48,6 +49,8 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'poll',
       'vote',
     ])
+    // Only the client part of the namespace: the page texts stay on the server.
+    expect(Object.keys(picked.communities as object)).toEqual(['actions'])
     expect(picked.errors).toEqual({ unexpected: en.errors.unexpected })
     expect(picked).not.toHaveProperty('interests')
   })

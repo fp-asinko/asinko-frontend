@@ -3,35 +3,54 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 
 type Joined = {
+  /** Joined during this visit. */
   has: (slug: string) => boolean
+  /** Left during this visit (specs/community-pages CP-05). */
+  hasLeft: (slug: string) => boolean
   mark: (slug: string) => void
+  markLeft: (slug: string) => void
+  /** Forgets what this visit did to the community: the server data rules again (a rollback). */
   unmark: (slug: string) => void
 }
 
-// Without a provider (isolated component tests) nothing is ever marked as joined.
-const JoinedContext = createContext<Joined>({ has: () => false, mark: () => {}, unmark: () => {} })
+// Without a provider (isolated component tests) nothing is ever marked.
+const JoinedContext = createContext<Joined>({
+  has: () => false,
+  hasLeft: () => false,
+  mark: () => {},
+  markLeft: () => {},
+  unmark: () => {},
+})
 
 /**
- * Communities joined during this visit (specs/community-first § 3.2): every join button of a
- * community hides at once, in the feed and the column. Mounted in the layout, so it survives
- * router.refresh(); a reload starts empty and the server data takes over.
+ * Communities joined or left during this visit (specs/community-first § 3.2, community-pages
+ * § 4): every join button of a community hides at once, in the feed, the column and the page
+ * header, and leaving brings them back. Mounted in the layout, so it survives router.refresh(); a
+ * reload starts empty and the server data takes over.
  */
 export function JoinedProvider({ children }: { children: ReactNode }) {
-  const [slugs, setSlugs] = useState<ReadonlySet<string>>(new Set())
+  // true: joined, false: left. A community not in the map follows the server data.
+  const [state, setState] = useState<ReadonlyMap<string, boolean>>(new Map())
 
-  const mark = useCallback((slug: string) => setSlugs((last) => new Set(last).add(slug)), [])
-  const unmark = useCallback(
-    (slug: string) =>
-      setSlugs((last) => {
-        const next = new Set(last)
-        next.delete(slug)
+  const set = useCallback(
+    (slug: string, joined: boolean | null) =>
+      setState((last) => {
+        const next = new Map(last)
+        if (joined === null) next.delete(slug)
+        else next.set(slug, joined)
         return next
       }),
     [],
   )
   const value = useMemo<Joined>(
-    () => ({ has: (slug) => slugs.has(slug), mark, unmark }),
-    [slugs, mark, unmark],
+    () => ({
+      has: (slug) => state.get(slug) === true,
+      hasLeft: (slug) => state.get(slug) === false,
+      mark: (slug) => set(slug, true),
+      markLeft: (slug) => set(slug, false),
+      unmark: (slug) => set(slug, null),
+    }),
+    [state, set],
   )
 
   return <JoinedContext.Provider value={value}>{children}</JoinedContext.Provider>
