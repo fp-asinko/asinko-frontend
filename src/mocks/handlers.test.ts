@@ -202,7 +202,7 @@ describe('mock writes (stateless, demo viewer)', () => {
     ).body as { type: string; viewerMembership: string | null; rules: string | null }
     expect(channel).toMatchObject({ type: 'PERSONAL_CHANNEL', viewerMembership: 'MEMBER' })
     expect(channel.rules).toEqual(expect.any(String))
-    const list = (await call('GET', '/api/v1/communities')).body as Page & {
+    const list = (await call('GET', '/api/v1/communities')).body as {
       items: Array<{ type: string }>
     }
     expect(list.items.some((each) => each.type === 'PERSONAL_CHANNEL')).toBe(false)

@@ -4,9 +4,12 @@ import { env } from '@/env'
 import { buildAlternates, OG_LOCALES } from '@/i18n/alternates'
 import { routing, type Locale } from '@/i18n/routing'
 import { communityPath, type CommunityKind } from '@/lib/communities/paths'
-import type { CommunityPage } from '../communities.types'
+import { notFound } from 'next/navigation'
+import { getOrThrow } from '@/lib/api'
+import type { CommunityPage, ProfileDetails } from '../communities.types'
 import { getCommunityPage } from '../lib/community-api'
 import { resolveCommunityPage } from '../lib/community-route'
+import { getProfileDetails } from '../lib/profile-api'
 import { CommunityDetails } from './community-details'
 import { CommunityHeader } from './community-header'
 
@@ -28,12 +31,18 @@ export async function communityMetadata(
   if (!result.ok || result.data.kind !== kind) return {}
   const page = result.data
   const t = await getTranslations({ locale, namespace: 'communities.meta' })
-  const description = page.description ?? t('description', { handle: page.handle })
+  // A profile is titled with its display name when there is one.
+  const profile = kind === 'user' ? await getProfileDetails(page.slug) : null
+  const title = (profile?.ok && profile.data.displayName) || page.handle
+  const description =
+    (profile?.ok && profile.data.bio) ||
+    page.description ||
+    t('description', { handle: page.handle })
   return {
-    title: page.handle,
+    title,
     description,
     alternates: buildAlternates(env.NEXT_PUBLIC_SITE_URL, locale, communityPath(kind, page.slug)),
-    openGraph: { title: page.handle, description, locale: OG_LOCALES[locale] },
+    openGraph: { title, description, locale: OG_LOCALES[locale] },
   }
 }
 
@@ -43,12 +52,25 @@ export async function resolveCommunityRoute(kind: CommunityKind, slug: string, l
   return { page, path: communityPath(kind, page.slug) }
 }
 
-/** The top of a group's or an asset's page: header and details (specs/community-pages). */
-export function CommunityTop({ page }: { page: CommunityPage }) {
+/**
+ * A /user page: the personal channel (404 or redirect as any community) and the profile, in
+ * parallel (specs/community-pages § 12). A profile that does not exist is the not-found page.
+ */
+export async function resolveProfileRoute(username: string, locale: string) {
+  const [route, profile] = await Promise.all([
+    resolveCommunityRoute('user', username, locale),
+    getProfileDetails(username),
+  ])
+  if (!profile.ok && (profile.code === 'NOT_FOUND' || profile.code === 'INVALID')) notFound()
+  return { ...route, profile: getOrThrow(profile) }
+}
+
+/** The top of a community's page: header and details (specs/community-pages). */
+export function CommunityTop({ page, profile }: { page: CommunityPage; profile?: ProfileDetails }) {
   return (
     <>
-      <CommunityHeader page={page} />
-      <CommunityDetails page={page} />
+      <CommunityHeader page={page} profile={profile} />
+      <CommunityDetails page={page} profile={profile} />
     </>
   )
 }

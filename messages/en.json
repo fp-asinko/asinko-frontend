@@ -235,7 +235,9 @@
   "join": {
     "label": "Join",
     "labelFor": "Join {handle}",
-    "error": "Could not join the community. Try again."
+    "error": "Could not join the community. Try again.",
+    "follow": "Follow",
+    "followFor": "Follow {handle}"
   },
   "communities": {
     "meta": {
@@ -256,6 +258,14 @@
         "body": "You will stop seeing its posts in Following.",
         "confirm": "Leave",
         "cancel": "Cancel"
+      },
+      "following": "Following",
+      "unfollowHint": "Unfollow {handle}",
+      "unfollow": {
+        "title": "Unfollow {handle}?",
+        "body": "You will stop seeing their posts in Following.",
+        "confirm": "Unfollow",
+        "cancel": "Cancel"
       }
     },
     "rules": {
@@ -266,6 +276,22 @@
       "title": "Asset data",
       "empty": "No market data yet",
       "soon": "Price, change and sentiment are coming soon."
+    },
+    "profile": {
+      "followers": "{count, plural, one {<b>#</b> follower} other {<b>#</b> followers}}",
+      "accuracy": "<b>{value}</b> accuracy",
+      "streak": "<b>{count}</b> streak",
+      "tier": {
+        "creator": "Creator",
+        "partner": "Partner"
+      },
+      "rating": "Rating {rating}",
+      "badge": {
+        "verified": "Verified",
+        "institutional": "Institutional"
+      },
+      "ask": "Ask {name}",
+      "rulesTitle": "Rules of {name}"
     }
   }
 }

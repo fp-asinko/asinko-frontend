@@ -2,7 +2,7 @@ import { ArrowUpRightIcon, ChartNoAxesColumnIcon, ChevronDownIcon, ListIcon } fr
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import type { CommunityPage } from '../communities.types'
+import type { CommunityPage, ProfileDetails } from '../communities.types'
 
 /**
  * The row under the header (specs/community-pages § 5), the prototype's gray box, closed on
@@ -10,7 +10,13 @@ import type { CommunityPage } from '../communities.types'
  * there is a price provider (CP-10: never invented numbers). A group without rules nor website
  * shows nothing.
  */
-export function CommunityDetails({ page }: { page: CommunityPage }) {
+export function CommunityDetails({
+  page,
+  profile,
+}: {
+  page: CommunityPage
+  profile?: ProfileDetails
+}) {
   const t = useTranslations('communities')
 
   if (page.kind === 'asset') {
@@ -29,7 +35,14 @@ export function CommunityDetails({ page }: { page: CommunityPage }) {
 
   if (!page.rules && !page.mainUrl) return null
   return (
-    <Details title={t('rules.title')} icon={<ListIcon aria-hidden className="size-4" />}>
+    <Details
+      title={
+        profile
+          ? t('profile.rulesTitle', { name: profile.displayName ?? page.handle })
+          : t('rules.title')
+      }
+      icon={<ListIcon aria-hidden className="size-4" />}
+    >
       {page.rules && (
         <p className="type-ui whitespace-pre-line text-muted-foreground">{page.rules}</p>
       )}

@@ -32,10 +32,14 @@ export function CommunityActions({
   handle,
   membership,
   favorite,
+  variant = 'community',
 }: Pick<CommunityPage, 'slug' | 'handle'> & {
   membership: CommunityPage['viewerMembership']
   favorite: boolean
+  /** A profile follows (joins the personal channel), with no favorite star (CP-12). */
+  variant?: 'community' | 'user'
 }) {
+  const user = variant === 'user'
   const t = useTranslations('communities.actions')
   const joined = useJoined()
   const router = useRouter()
@@ -61,7 +65,14 @@ export function CommunityActions({
   }
 
   if (!member) {
-    return <JoinButton slug={slug} handle={handle} action={joinCommunity} />
+    return (
+      <JoinButton
+        slug={slug}
+        handle={handle}
+        action={joinCommunity}
+        label={user ? 'follow' : 'join'}
+      />
+    )
   }
 
   function leave() {
@@ -82,7 +93,7 @@ export function CommunityActions({
 
   return (
     <div className="relative flex items-center gap-2">
-      <FavoriteButton slug={slug} handle={handle} initial={favorite} />
+      {!user && <FavoriteButton slug={slug} handle={handle} initial={favorite} />}
       <button
         type="button"
         aria-disabled={pending || undefined}
@@ -94,11 +105,12 @@ export function CommunityActions({
         }}
         className={cn(PILL, 'bg-muted hover:bg-muted-hover')}
       >
-        {t('joined')}
-        <span className="sr-only">. {t('leaveHint', { handle })}</span>
+        {t(user ? 'following' : 'joined')}
+        <span className="sr-only">. {t(user ? 'unfollowHint' : 'leaveHint', { handle })}</span>
       </button>
       {dialogMounted && (
         <LeaveDialog
+          variant={user ? 'unfollow' : 'leave'}
           handle={handle}
           open={confirming}
           onConfirm={leave}

@@ -35,6 +35,7 @@ export function JoinButton({
   handle,
   action,
   variant,
+  label = 'join',
   focusFallbackId,
   className,
 }: {
@@ -42,6 +43,8 @@ export function JoinButton({
   /** #defi or $BTC: the accessible name says which community. */
   handle: string
   action: (slug: string) => Promise<ActionResult<unknown>>
+  /** "Join" a community, or "Follow" a user (joining their personal channel). */
+  label?: 'join' | 'follow'
   /** Where the focus goes when the button disappears under it (CF-14): the post title. */
   focusFallbackId?: string
   className?: string
@@ -85,8 +88,10 @@ export function JoinButton({
         className={cn(joinVariants({ variant }), className)}
       >
         {variant === 'compact' && <PlusIcon aria-hidden className="size-2.5" />}
-        <span aria-hidden>{t('label')}</span>
-        <span className="sr-only">{t('labelFor', { handle })}</span>
+        <span aria-hidden>{t(label === 'follow' ? 'follow' : 'label')}</span>
+        <span className="sr-only">
+          {t(label === 'follow' ? 'followFor' : 'labelFor', { handle })}
+        </span>
       </button>
       {error && (
         <span

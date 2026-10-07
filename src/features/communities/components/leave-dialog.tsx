@@ -16,17 +16,20 @@ import {
  * destructive action is confirmed). Loaded on first use (next/dynamic), off the first-load JS.
  */
 export function LeaveDialog({
+  variant = 'leave',
   handle,
   open,
   onConfirm,
   onClose,
 }: {
+  /** Leaving a community, or unfollowing a user (specs/community-pages CP-12). */
+  variant?: 'leave' | 'unfollow'
   handle: string
   open: boolean
   onConfirm: () => void
   onClose: () => void
 }) {
-  const t = useTranslations('communities.actions.leave')
+  const t = useTranslations(`communities.actions.${variant}`)
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>

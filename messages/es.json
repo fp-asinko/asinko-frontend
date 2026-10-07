@@ -235,7 +235,9 @@
   "join": {
     "label": "Unirse",
     "labelFor": "Unirse a {handle}",
-    "error": "No se pudo unir a la comunidad. Inténtalo de nuevo."
+    "error": "No se pudo unir a la comunidad. Inténtalo de nuevo.",
+    "follow": "Seguir",
+    "followFor": "Seguir a {handle}"
   },
   "communities": {
     "meta": {
@@ -256,6 +258,14 @@
         "body": "Vas a dejar de ver sus posts en Siguiendo.",
         "confirm": "Salir",
         "cancel": "Cancelar"
+      },
+      "following": "Siguiendo",
+      "unfollowHint": "Dejar de seguir a {handle}",
+      "unfollow": {
+        "title": "¿Dejar de seguir a {handle}?",
+        "body": "Vas a dejar de ver sus posts en Siguiendo.",
+        "confirm": "Dejar de seguir",
+        "cancel": "Cancelar"
       }
     },
     "rules": {
@@ -266,6 +276,22 @@
       "title": "Datos del activo",
       "empty": "Sin datos de mercado todavía",
       "soon": "Precio, variación y sentimiento llegan pronto."
+    },
+    "profile": {
+      "followers": "{count, plural, one {<b>#</b> seguidor} other {<b>#</b> seguidores}}",
+      "accuracy": "<b>{value}</b> de acierto",
+      "streak": "<b>{count}</b> de racha",
+      "tier": {
+        "creator": "Creator",
+        "partner": "Partner"
+      },
+      "rating": "Rating {rating}",
+      "badge": {
+        "verified": "Verificado",
+        "institutional": "Institucional"
+      },
+      "ask": "Preguntarle a {name}",
+      "rulesTitle": "Reglas de {name}"
     }
   }
 }

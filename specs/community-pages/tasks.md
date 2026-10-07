@@ -18,8 +18,8 @@
 ## Parte 2: perfil (después, en la misma spec)
 
 - [x] **T-09 (S)** Contrato y mocks: `displayName`, `tier` y `rating` opcionales en el perfil, fixtures, y P-011 en `proposals.md`. → CP-20
-- [ ] **T-10 (M)** Datos y ruta `/user/[username]`: canal y perfil en paralelo, 404 y redirecciones, metadata. Tests. → CP-11, CP-13
-- [ ] **T-11 (M)** Cabecera del perfil (título, marcas, estadísticas, "Preguntarle"), variante `user` de las acciones (Seguir/Siguiendo con confirmación, sin estrella y nada en tu propio perfil) y reglas. Tests. → CP-11, CP-12
+- [x] **T-10 (M)** Datos y ruta `/user/[username]`: canal y perfil en paralelo, 404 y redirecciones, metadata. Tests. → CP-11, CP-13
+- [x] **T-11 (M)** Cabecera del perfil (título, marcas, estadísticas, "Preguntarle"), variante `user` de las acciones (Seguir/Siguiendo con confirmación, sin estrella y nada en tu propio perfil) y reglas. Tests. → CP-11, CP-12
 - [ ] **T-12 (S)** `@` a `/user/…` en menciones, cabecera de las tarjetas y "Personas". Tests. → CP-21
 - [ ] **T-13 (S)** E2E del perfil (mobile + desktop, axe, 360 px), presupuesto de JS. → CP-11 a CP-13, CP-16, CP-18
 

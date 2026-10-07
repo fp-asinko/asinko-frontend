@@ -235,7 +235,9 @@
   "join": {
     "label": "Participar",
     "labelFor": "Participar de {handle}",
-    "error": "Não foi possível participar da comunidade. Tente de novo."
+    "error": "Não foi possível participar da comunidade. Tente de novo.",
+    "follow": "Seguir",
+    "followFor": "Seguir {handle}"
   },
   "communities": {
     "meta": {
@@ -256,6 +258,14 @@
         "body": "Você vai deixar de ver os posts em Seguindo.",
         "confirm": "Sair",
         "cancel": "Cancelar"
+      },
+      "following": "Seguindo",
+      "unfollowHint": "Deixar de seguir {handle}",
+      "unfollow": {
+        "title": "Deixar de seguir {handle}?",
+        "body": "Você vai deixar de ver os posts em Seguindo.",
+        "confirm": "Deixar de seguir",
+        "cancel": "Cancelar"
       }
     },
     "rules": {
@@ -266,6 +276,22 @@
       "title": "Dados do ativo",
       "empty": "Ainda sem dados de mercado",
       "soon": "Preço, variação e sentimento chegam em breve."
+    },
+    "profile": {
+      "followers": "{count, plural, one {<b>#</b> seguidor} other {<b>#</b> seguidores}}",
+      "accuracy": "<b>{value}</b> de acerto",
+      "streak": "<b>{count}</b> de sequência",
+      "tier": {
+        "creator": "Creator",
+        "partner": "Partner"
+      },
+      "rating": "Rating {rating}",
+      "badge": {
+        "verified": "Verificado",
+        "institutional": "Institucional"
+      },
+      "ask": "Perguntar para {name}",
+      "rulesTitle": "Regras de {name}"
     }
   }
 }
