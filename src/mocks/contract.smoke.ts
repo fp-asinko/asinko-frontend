@@ -8,7 +8,8 @@ import { MOCK_ROUTES } from './handlers'
 // Contract drift detector (api-integration.md § Smoke tests): every implemented endpoint with a
 // liveExample is called on the real dev backend and its response validated with the mock's schema.
 // Set by vitest.smoke.config.mts (test infrastructure, not app code).
-const baseUrl = process.env.API_SMOKE_BASE_URL ?? 'http://localhost:3001'
+// The development deploy of asinko-app (Vercel). http://localhost:3001 for a local backend.
+const baseUrl = process.env.API_SMOKE_BASE_URL ?? 'https://asinko-app-web.vercel.app'
 const failures: unknown[] = []
 // Same reason as the test timeout: the dev database is far from the local backend.
 const api = createApiClient({

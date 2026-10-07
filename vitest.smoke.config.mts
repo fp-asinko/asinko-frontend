@@ -2,7 +2,8 @@ import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitest/config'
 
 // `pnpm api:smoke`: checks the real backend against our contract schemas. Development only, never
-// in CI or against production. Backend URL: API_SMOKE_BASE_URL (default: local asinko-app on 3001).
+// in CI or against production. Backend URL: API_SMOKE_BASE_URL (default: the development deploy
+// of asinko-app on Vercel; http://localhost:3001 for a local backend).
 export default defineConfig({
   resolve: {
     tsconfigPaths: true,
@@ -13,8 +14,10 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.smoke.ts'],
-    // The dev backend reads a database in another region: a feed page can take ~15 s.
+    // Generous for a local backend against a database in another region (~15 s per feed page).
     testTimeout: 90_000,
-    env: { API_SMOKE_BASE_URL: process.env.API_SMOKE_BASE_URL ?? 'http://localhost:3001' },
+    env: {
+      API_SMOKE_BASE_URL: process.env.API_SMOKE_BASE_URL ?? 'https://asinko-app-web.vercel.app',
+    },
   },
 })

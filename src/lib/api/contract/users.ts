@@ -16,8 +16,8 @@ export const userSchema = z.object({
   usernameChangedAt: z.iso.datetime().nullable(),
   avatarUrl: z.string().nullable(),
   bio: z.string().nullable(),
-  /** Only when the viewer is the user. */
-  email: z.string().optional(),
+  /** Only when the viewer is the user. The backend sends null otherwise (the contract says absent). */
+  email: z.string().nullable().optional(),
   countryCode: z.string().length(2).nullable(),
   countrySource: z.enum(['IP', 'MANUAL']).nullable(),
   language: z.string().nullable(),

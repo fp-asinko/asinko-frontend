@@ -15,11 +15,11 @@ Navegador ──► asinko-web (Next.js)  ──HTTP──►  asinko-app /api/v
 
 ## Configuración
 
-| Variable                        | Dónde              | Para qué                                                   |
-| ------------------------------- | ------------------ | ---------------------------------------------------------- |
-| `API_BASE_URL`                  | Servidor           | URL base de `asinko-app` por ambiente (sin `NEXT_PUBLIC_`) |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Cliente y servidor | Mismo proyecto Supabase que el backend                     |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Cliente y servidor | Key pública; la protección real son las políticas RLS      |
+| Variable                        | Dónde              | Para qué                                                                                                                                                     |
+| ------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `API_BASE_URL`                  | Servidor           | URL base de `asinko-app` por ambiente (sin `NEXT_PUBLIC_`). Desarrollo: `https://asinko-app-web.vercel.app` (o `http://localhost:3001` con el backend local) |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Cliente y servidor | Mismo proyecto Supabase que el backend                                                                                                                       |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Cliente y servidor | Key pública; la protección real son las políticas RLS                                                                                                        |
 
 Todas validadas en `src/env.ts` (ver `libraries.md`). **Nunca** usar la `service_role` key de Supabase en este repo.
 
@@ -90,7 +90,7 @@ El `message` del backend **nunca llega a la UI** (viene en español y es para de
 
 ### Smoke tests contra el backend real
 
-`pnpm api:smoke` llama al backend de desarrollo (`API_SMOKE_BASE_URL`, por defecto `asinko-app` en `http://localhost:3001`) con el `liveExample` de cada mock de tipo "contrato" y valida la respuesta con **el mismo esquema** que usa el mock. Detecta cuándo el backend y nuestro contrato se separaron. Solo en desarrollo: nunca en el CI normal ni contra producción.
+`pnpm api:smoke` llama al backend de desarrollo (`API_SMOKE_BASE_URL`, por defecto el deploy de `asinko-app` en Vercel, `https://asinko-app-web.vercel.app`) con el `liveExample` de cada mock de tipo "contrato" y valida la respuesta con **el mismo esquema** que usa el mock. Detecta cuándo el backend y nuestro contrato se separaron. Solo en desarrollo: nunca en el CI normal ni contra producción.
 
 ## Sesión
 

@@ -3,7 +3,7 @@
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla.
 > Cuando el backend la implementa, se mueve al snapshot del contrato y se marca como resuelta acá.
 
-**Revisado contra `asinko-app` rama `dev` (`c669972`, 2026-10-05)**, con su `API-IMPLEMENTATION-NOTES.md` y el `openapi.yaml` del 2026-10-02. Antes, contra `0bb6325` (2026-10-04) y `0cdf243` (2026-10-01).
+**Revisado contra `asinko-app` rama `dev` (`c669972`, 2026-10-05)** y contra su deploy en Vercel (`https://asinko-app-web.vercel.app`, 2026-10-07, con `pnpm api:smoke`), con su `API-IMPLEMENTATION-NOTES.md` y el `openapi.yaml` del 2026-10-02. Antes, contra `0bb6325` (2026-10-04) y `0cdf243` (2026-10-01).
 
 `dev` ya tiene:
 - E01 a E05, búsqueda, tesis (sin `resolution-vote`) y E12.
@@ -14,22 +14,9 @@
 
 El contrato vigente vive en `financeshowoff-design-docs/api/` (con `openapi.yaml`) y en el artefacto _ASINKO Endpoint Spec_.
 
-## Pedido urgente: una migración sin aplicar en la base de dev (2026-10-05)
+## Migración `asset_logo` — resuelta
 
-Con `dev` en `c669972`, la base de dev tiene aplicadas 4 de las 5 migraciones nuevas. **Falta `20261005130156_asset_logo`** (`4ff913a`):
-
-```sql
-ALTER TABLE "assets" ADD COLUMN "logoUrl" TEXT;
-```
-
-**Efecto:** todo lo que lee activos responde `500 INTERNAL`. Lo verificamos con `GET /assets/BTC` y `GET /assets?q=b`, y el log del backend dice `P2022: The column assets.logoUrl does not exist in the current database`. Eso alcanza a E14, a la columna de activos del front y a las tesis.
-
-**Pedido:**
-
-- [ ] Aplicar la migración en la Supabase de dev (`npx prisma migrate deploy`). Es una sola columna nullable, sin riesgo para los datos.
-- [ ] Avisar cuando esté, para que el front pase los activos de mocks a datos reales (P-003).
-
-Comprobado con el rol de solo lectura del front, leyendo `_prisma_migrations`. El front no corre migraciones.
+La migración `20261005130156_asset_logo` faltaba en la base de dev y hacía que todo lo que lee activos respondiera `500` (pedido del 2026-10-05). Se aplicó el 2026-10-06: `GET /assets/BTC` responde `200`, con logo y sentimiento.
 
 ## Bloqueo para usar datos reales — resuelto
 
@@ -67,7 +54,7 @@ Las 6 migraciones que faltaban en la Supabase de dev se aplicaron el 2026-10-03,
 
 ### P-003 — Catálogo de activos (E14)
 
-**Estado:** implementada en `dev` (`6e2d05b`, 2026-10-04), **bloqueada** por la migración `asset_logo` sin aplicar (ver el pedido urgente). Cuando responda, el front saca los activos de los mocks.
+**Estado:** implementada en `dev` (`6e2d05b`, 2026-10-04) y desbloqueada (la migración `asset_logo` se aplicó el 2026-10-06). **Sin precios:** los 10 activos llegan con `price`, `priceChangePct` y `priceUpdatedAt` en `null` y `priceStale: true` (falta el proveedor de precios). Por eso el front sigue con los activos en mocks: los mosaicos de la columna muestran justamente precio y variación. Pedido: avisar cuando haya precios.
 **Endpoint:** `GET /api/v1/assets?q=`, `GET /api/v1/assets/{symbol}`
 **Motivo:** la columna "Tus intereses" muestra precio y variación de los activos (hoy mockeado) y el autocompletado de `$` necesita el catálogo.
 **Cambio:** implementar E14. Para `GET /assets?q=`, confirmar que responde la lista estándar, `{ "items": Asset[], "nextCursor": string | null }`, con el recurso `Asset` de E14. El mock del front ya asume esa forma.
@@ -111,7 +98,7 @@ Las 6 migraciones que faltaban en la Supabase de dev se aplicaron el 2026-10-03,
 
 ### P-009 — Feed en pocas consultas, y backend en la región de la base
 
-**Estado:** propuesta (2026-10-05). Es lo que más afecta a la experiencia hoy. `API-IMPLEMENTATION-NOTES.md` lo anota como hueco conocido ("~3 queries por contenido. Alcanza para MVP; si molesta, el paso siguiente es batchear por tipo"). **Molesta:** con la base en otra región, el feed tarda 12 a 16 s. Medido de nuevo el 2026-10-05 con `c669972`: 15,8 s.
+**Estado:** resuelta en parte (2026-10-07). Con el backend desplegado en Vercel (`https://asinko-app-web.vercel.app`), el feed responde en **0,7 s** (`/feed/explore?kind=POST,POLL`), comunidades en ~3 s la primera vez y perfiles en 0,5 s: el punto 2 (misma región) se cumple. Queda el punto 1 (pocas consultas por página) para el backend local y para cuando crezca el feed. Antes: propuesta (2026-10-05), lo que más afectaba a la experiencia. `API-IMPLEMENTATION-NOTES.md` lo anota como hueco conocido ("~3 queries por contenido. Alcanza para MVP; si molesta, el paso siguiente es batchear por tipo"). **Molesta:** con la base en otra región, el feed tarda 12 a 16 s. Medido de nuevo el 2026-10-05 con `c669972`: 15,8 s.
 **Endpoint:** `GET /api/v1/feed/explore` y `GET /api/v1/feed/following` (y en general, toda lista)
 **Motivo:** medido el 2026-10-05 contra `dev` local, con la Supabase de `eu-west-1`:
 
@@ -159,6 +146,8 @@ La página del front con mocks tarda 0,04 s: casi todo el tiempo es esta espera.
 Con eso el front borra los dos requests extra.
 
 ## Preguntas sobre el contrato
+
+- **`email` en el perfil** (`GET /profiles/{identifier}`, detectado por `pnpm api:smoke` el 2026-10-07): el contrato dice que viene solo cuando el viewer es el usuario, pero para otro perfil llega `"email": null`. El front acepta las dos formas. ¿Se alinea el contrato con `null`, o el backend lo omite?
 
 - **Explore con comunidad inexistente**: `GET /feed/explore?community=nope` responde `200` con `items: []`. El front prefería `404` para mostrar "no existe" en lugar de "no hay posts". ¿Se cambia, o el front consulta `GET /communities/{slug}` aparte?
 - **Tesis en el feed**: el feed ya devuelve `kind: "THESIS"`. El front las muestra en la fase 2; mientras tanto pide `?kind=POST,POLL`. ¿OK?
