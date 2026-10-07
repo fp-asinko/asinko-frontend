@@ -130,3 +130,44 @@ features/communities/
   - El desplegable es la caja gris (`surface`) con borde, cerrado al cargar.
   - "Volver" es una píldora oscura translúcida (`bg-black/45`, como el overlay de los diálogos), igual en los dos temas.
   - La misma estructura vale para `/hub`, `/asset` y, después, `/user`.
+
+## 12. Parte 2: perfil (2026-10-07)
+
+Referencia: la vista de perfil del prototipo (`Federico Piva`).
+
+### Datos
+
+- **Dos pedidos en paralelo:** `GET /communities/{username}` (el canal personal: tipo, membresía, reglas y banner) y `GET /profiles/{username}` (lo demás). Si alguno da `NOT_FOUND`, `notFound()`. Si el slug es de otro tipo, redirige como en § 2.
+- **Tipo `ProfileDetails`**, que suma a la página:
+  - `displayName` y `bio`;
+  - `tier` (`'creator' | 'partner' | null`) y `rating` (`string | null`);
+  - `badge` (`'verified' | 'institutional' | null`, de `badgeStatus`);
+  - `followerCount`, `accuracyRate` y `currentStreak`;
+  - `isSelf` (el viewer es este usuario).
+- **Contrato:** `profileSchema` suma `displayName`, `tier` y `rating` opcionales (P-011). Los fixtures los traen para algunos usuarios (`@federico`: Creator, AAA; `@jeppe`: Partner, AA).
+
+### Cabecera
+
+- **La misma `CommunityHeader`** (§ 1), con el avatar redondo. El título es `displayName ?? @username`, y el subtítulo, `@username` cuando hay nombre.
+- **Marcas junto al título**, en una fila que se parte en mobile:
+  - **Tier:** píldora gris `bg-muted` con "✦ Creator" o "✦ Partner". El sistema es monocromático: el azul del prototipo no se usa.
+  - **Rating:** chip con los tonos de acierto ya existentes. A…AAA usan `accuracy-high`, B…BBB `accuracy-mid` y C/D `accuracy-low`. El texto sigue visible, así que el color no es la única señal.
+  - **Verificado / institucional:** `BadgeCheckIcon` con su nombre para lectores de pantalla.
+- **Estadísticas:** "**6** seguidores · **85 %** de acierto · **8** de racha", con el número en negrita como los miembros. Sin acierto (`null`), esa parte no se muestra.
+- **"Preguntarle a {nombre}":** `ComingSoon` con píldora con borde, debajo de las estadísticas, como en el prototipo.
+- **Acciones:**
+  - `CommunityActions` en variante `user`: "Seguir" / "Siguiendo", la confirmación "¿Dejar de seguir a @maria?" y sin estrella.
+  - `JoinButton` suma `label: 'join' | 'follow'`.
+  - Con `isSelf`, no se muestran.
+- **Desplegable:** "Reglas de @maria" con las reglas del canal, si tiene.
+
+### Rutas y enlaces
+
+- `src/app/[locale]/user/[username]/page.tsx`, como `/hub` (fuera de `(main)` y sin `loading.tsx`).
+- **Menciones:** `hrefFor` pasa `MENTION` a `asinko:user/{username}`, con el username tomado del texto ya verificado (`@maria`) y validado con su patrón. `PostMarkdown` lo lleva a `/user/maria`.
+- **Cabecera de las tarjetas:** `@usuario` pasa a ser un link a su perfil (`Author.path`).
+- **"Personas" de la columna:** cada persona lleva a su perfil.
+
+### Mensajes
+
+`communities.profile.*` (estadísticas, tier, verificado/institucional, "Preguntarle a {name}", título de reglas), `communities.actions.unfollow.*` y `join.follow|followFor|following`.

@@ -1,7 +1,7 @@
 import type { RawCommunity, RawCommunitySummary } from '@/lib/api/contract'
 import { assetBySymbol } from './assets'
 import { daysAgo, mockId } from './ids'
-import { userByUsername } from './users'
+import { PROFILES, userByUsername } from './users'
 
 type Seed = Pick<RawCommunity, 'slug' | 'name' | 'description' | 'type' | 'memberCount'> &
   Partial<RawCommunity>
@@ -117,8 +117,37 @@ export const COMMUNITIES: RawCommunity[] = [
   }),
 ]
 
+/**
+ * The personal channel of each profile (E02: slug = username), owned by its user. The demo viewer
+ * is a member of the channels of the people it follows (isFollowedByViewer). Kept out of
+ * COMMUNITIES so the column and the feed keep their lists; found by slug for /user pages.
+ */
+export const PERSONAL_CHANNELS: RawCommunity[] = PROFILES.map((profile, index) =>
+  community(100 + index, {
+    slug: profile.username,
+    name: profile.username,
+    description: null,
+    type: 'PERSONAL_CHANNEL',
+    memberCount: profile.followerCount,
+    createdByProfileId: profile.id,
+    rules:
+      profile.username === 'federico'
+        ? 'Data first. No paid signals. Argue the thesis, not the person.'
+        : null,
+    viewerMembership:
+      profile.username === 'demo'
+        ? 'PRINCIPAL_MODERATOR'
+        : profile.isFollowedByViewer
+          ? 'MEMBER'
+          : null,
+  }),
+)
+
 export function communityBySlug(slug: string) {
-  return COMMUNITIES.find((each) => each.slug === slug)
+  return (
+    COMMUNITIES.find((each) => each.slug === slug) ??
+    PERSONAL_CHANNELS.find((each) => each.slug === slug)
+  )
 }
 
 /** The community summary every piece of content carries (P-004). */

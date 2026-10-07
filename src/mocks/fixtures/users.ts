@@ -42,6 +42,9 @@ export const PROFILES: RawProfile[] = [
   },
   profile(1, {
     username: 'maria',
+    // P-011 (proposal): not in the backend yet.
+    displayName: 'María Ruiz',
+    rating: 'A',
     bio: "On-chain analyst. If it's not on the blockchain, it didn't happen.",
     accuracyRate: 0.74,
     points: 12400,
@@ -58,6 +61,10 @@ export const PROFILES: RawProfile[] = [
   }),
   profile(2, {
     username: 'federico',
+    // P-011 (proposal): not in the backend yet.
+    displayName: 'Federico Piva',
+    tier: 'CREATOR',
+    rating: 'AAA',
     bio: 'Macro + crypto. I write long and I am wrong in public.',
     accuracyRate: 0.68,
     points: 3200,
@@ -71,6 +78,10 @@ export const PROFILES: RawProfile[] = [
   }),
   profile(3, {
     username: 'jeppe',
+    // P-011 (proposal): not in the backend yet.
+    displayName: 'Jeppe Kirk',
+    tier: 'PARTNER',
+    rating: 'AA',
     bio: 'Building a public track record. Long BTC, short narratives.',
     accuracyRate: 0.79,
     points: 18900,

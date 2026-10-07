@@ -195,4 +195,23 @@ describe('mock writes (stateless, demo viewer)', () => {
       ).status,
     ).toBe(204)
   })
+
+  it('answers a personal channel by username, outside the community lists (specs/community-pages)', async () => {
+    const channel = (
+      await call('GET', '/api/v1/communities/:slug', { params: { slug: 'federico' } })
+    ).body as { type: string; viewerMembership: string | null; rules: string | null }
+    expect(channel).toMatchObject({ type: 'PERSONAL_CHANNEL', viewerMembership: 'MEMBER' })
+    expect(channel.rules).toEqual(expect.any(String))
+    const list = (await call('GET', '/api/v1/communities')).body as Page & {
+      items: Array<{ type: string }>
+    }
+    expect(list.items.some((each) => each.type === 'PERSONAL_CHANNEL')).toBe(false)
+  })
+
+  it('sends the proposed profile fields (P-011) for a creator', async () => {
+    const profile = (
+      await call('GET', '/api/v1/profiles/:identifier', { params: { identifier: 'federico' } })
+    ).body
+    expect(profile).toMatchObject({ displayName: 'Federico Piva', tier: 'CREATOR', rating: 'AAA' })
+  })
 })
