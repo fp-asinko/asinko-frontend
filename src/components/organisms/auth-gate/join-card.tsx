@@ -39,7 +39,8 @@ export function JoinCard() {
 
   return (
     <section
-      aria-labelledby={titleId} // shrink-0: in the phone panel (a fixed-height flex column) it would be squeezed and cut.
+      aria-labelledby={titleId}
+      // shrink-0: in the phone panel (a fixed-height flex column) it would be squeezed and cut.
       className="shrink-0 overflow-hidden rounded-xl bg-surface px-3 pt-5"
     >
       <h2 id={titleId} className="text-center text-[1.25rem] leading-tight font-bold">
