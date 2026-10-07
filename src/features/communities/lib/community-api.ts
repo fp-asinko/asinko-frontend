@@ -3,6 +3,7 @@ import { cache } from 'react'
 import { apiRequest, invalidInput, type ApiResult } from '@/lib/api'
 import { communitySchema } from '@/lib/api/contract'
 import { communitySlugSchema } from '@/lib/communities/community-slug.schema'
+import { getViewer } from '@/lib/session'
 import type { CommunityPage } from '../communities.types'
 import { toCommunityPage } from './mappers'
 
@@ -18,11 +19,14 @@ export const getCommunityPage = cache(async function getCommunityPage(
   slug: string,
 ): Promise<ApiResult<CommunityPage>> {
   if (!communitySlugSchema.safeParse(slug).success) return invalidInput(ENDPOINT)
-  const result = await apiRequest({
-    method: 'GET',
-    path: '/api/v1/communities/:slug',
-    params: { slug },
-    schema: communitySchema,
-  })
-  return result.ok ? { ok: true, data: toCommunityPage(result.data) } : result
+  const [result, viewer] = await Promise.all([
+    apiRequest({
+      method: 'GET',
+      path: '/api/v1/communities/:slug',
+      params: { slug },
+      schema: communitySchema,
+    }),
+    getViewer(),
+  ])
+  return result.ok ? { ok: true, data: toCommunityPage(result.data, viewer !== null) } : result
 })

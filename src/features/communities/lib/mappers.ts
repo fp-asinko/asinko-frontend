@@ -19,7 +19,11 @@ function safeLink(url: string | null): CommunityPage['mainUrl'] {
   }
 }
 
-export function toCommunityPage(community: RawCommunity): CommunityPage {
+/**
+ * Without a session there is no membership nor favorite, whatever the response says (the backend
+ * already sends null; the mocks answer as the demo user): the same rule as the cards (CF-12).
+ */
+export function toCommunityPage(community: RawCommunity, signedIn = true): CommunityPage {
   const kind = kindOf(community.type)
   const handle = `${SYMBOL[kind]}${community.slug}`
   // The backend names system communities with their symbol (#Macro, $BTC): no subtitle then.
@@ -36,7 +40,7 @@ export function toCommunityPage(community: RawCommunity): CommunityPage {
     memberCount: community.memberCount,
     rules: community.rules?.trim() || null,
     mainUrl: safeLink(community.mainUrl),
-    viewerMembership: community.viewerMembership,
-    viewerIsFavorite: community.viewerIsFavorite === true,
+    viewerMembership: signedIn ? community.viewerMembership : null,
+    viewerIsFavorite: signedIn && community.viewerIsFavorite === true,
   }
 }

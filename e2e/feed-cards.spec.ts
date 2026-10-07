@@ -46,7 +46,7 @@ test.describe('Feed cards', () => {
     await page.goto('/en?filter=polls')
     const poll = card(page, 'Next Fed move?')
     await poll.getByRole('button', { name: 'Tell us why' }).click()
-    await expect(poll.getByRole('button', { name: /comments/ })).toHaveAttribute(
+    await expect(poll.getByRole('button', { name: /^\d+ comments?$/ })).toHaveAttribute(
       'aria-expanded',
       'true',
     )

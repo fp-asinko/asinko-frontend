@@ -72,9 +72,10 @@ Las reglas que sostienen los Core Web Vitals:
 - **JavaScript del cliente al mínimo**: Server Components por defecto, `'use client'` solo en hojas (ver `structure.md`).
 - **Carga diferida** con `next/dynamic` para componentes pesados que no se ven al cargar (modales, carruseles, mapas, editores).
 - **Scripts de terceros** (analytics, chat, pixels) con `next/script` y `strategy="lazyOnload"` o `afterInteractive`, nunca bloqueantes.
-- **Presupuesto de JS**: máximo **230 KB** (gzip) de JavaScript de primera carga por ruta. **Medido al cerrar `right-column` (2026-10-05): 228,1 KB**, con y sin filtros. Quedan ~2 KB: lo nuevo del Home va diferido (`next/dynamic`, `import()` o Server Actions que devuelven UI ya renderizada).
+- **Presupuesto de JS**: máximo **235 KB** (gzip) de JavaScript de primera carga por ruta. **Medido al cerrar `community-pages` (2026-10-07): Home 230,6 KB y páginas de comunidad y activo 232,0 KB.** Quedan ~3 KB: lo nuevo y pesado va diferido (`next/dynamic`, `import()` o Server Actions que devuelven UI ya renderizada).
   - **Cómo se mide**: suma de todos los `<script src>` del HTML inicial de la ruta, comprimidos con gzip, contra el build de producción. Lo verifica un test e2e (`e2e/performance.spec.ts`) en cada PR.
-  - **Por qué 230**: Next.js 16 + React 19 vacíos ya pesan ~175 KB medidos así (Turbopack y webpack por igual, medido en 2026-10). El margen es para el código propio.
+  - **Por qué 235**: Next.js 16 + React 19 vacíos ya pesan ~175 KB medidos así (Turbopack y webpack por igual, medido en 2026-10). El margen es para el código propio.
+  - **Historial:** 230 KB hasta el 2026-10-07. Lo subió el PO a 235 al cerrar `community-pages`: unirse, salir y favorito, la revisión 4 de las encuestas y el estado compartido de membresías lo llevaron a 230,6 KB sin código duplicado (medido por chunk), y la fase 1 todavía suma crear post y detalle.
   - Superarlo requiere justificación en el PR. Para encontrar qué pesa, `@next/bundle-analyzer`.
   - Lo que no hace falta al cargar (modales, paneles, SDKs opcionales) se carga diferido con `next/dynamic` o `import()`.
 

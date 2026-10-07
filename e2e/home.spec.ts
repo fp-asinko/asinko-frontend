@@ -47,17 +47,23 @@ test.describe('Home feed', () => {
     }
   })
 
-  test('a $BTC mention filters the Home by its community, and the chip removes it (H-14)', async ({
+  test("a $BTC mention goes to the asset's page, with its own feed (H-14, specs/community-pages CP-14)", async ({
     page,
   }) => {
     await page.goto('/en')
     const post = card(page, 'Whales accumulated 48,000 $BTC')
     await post.locator('p').getByRole('link', { name: '$BTC' }).first().click()
-    await expect(page).toHaveURL(/\/en\?community=BTC$/)
+    await expect(page).toHaveURL(/\/en\/asset\/BTC$/)
+    await expect(page.getByRole('heading', { level: 1, name: '$BTC' })).toBeVisible()
     for (const each of await articles(page).all()) {
       await expect(each.getByRole('link', { name: '$BTC' }).first()).toBeVisible()
     }
+  })
 
+  test('the Home still filters by community through the URL, and the chip removes it (CP-15)', async ({
+    page,
+  }) => {
+    await page.goto('/en?community=BTC')
     await page.getByRole('link', { name: 'Remove the $BTC filter' }).click()
     await expect(page).toHaveURL(/\/en$/)
   })

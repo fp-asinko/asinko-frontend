@@ -76,8 +76,11 @@ test.describe('Home motion', () => {
     await expect(panel).toHaveCount(0)
   })
 
-  test('marks the community the feed shows in the column (S-04)', async ({ page, isMobile }) => {
-    await page.goto('/en?community=BTC')
+  test('marks the community page being shown in the column (S-04, specs/community-pages)', async ({
+    page,
+    isMobile,
+  }) => {
+    await page.goto('/en/asset/BTC')
     if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click()
     const column = page.getByRole('region', { name: 'Your interests' }).filter({ visible: true })
     await expect(column.getByRole('link', { name: /^Bitcoin \$BTC/ })).toHaveAttribute(

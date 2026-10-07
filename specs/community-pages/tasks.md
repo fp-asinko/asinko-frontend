@@ -13,7 +13,7 @@
 - [x] **T-05 (M)** Cabecera, acciones (unirse, "Unido" y salir con confirmación diferida, favorito) y desplegables (reglas y datos del activo). Tests. → CP-04 a CP-06, CP-08, CP-10
 - [x] **T-06 (S)** Feed propio en la página, sin el Unirse repetido en las tarjetas. Tests. → CP-07
 - [x] **T-07 (S)** Menciones, cabecera de las tarjetas y columna izquierda a las rutas nuevas. Tests. → CP-14, CP-15
-- [ ] **T-08 (M)** E2E `community-pages.spec.ts` (mobile + desktop, axe claro/oscuro), presupuesto de JS y ajustes de los e2e que usaban el Home filtrado. Guías (`i18n.md`, `design-system.md`). → CP-16 a CP-19
+- [x] **T-08 (M)** E2E `community-pages.spec.ts` (mobile + desktop, axe claro/oscuro), presupuesto de JS y ajustes de los e2e que usaban el Home filtrado. Guías (`i18n.md`, `design-system.md`). → CP-16 a CP-19
 
 ## Parte 2: perfil (después, en la misma spec)
 

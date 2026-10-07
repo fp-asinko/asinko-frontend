@@ -37,7 +37,7 @@ test.describe('Feed navigation with a slow backend', () => {
     await expect(page.getByTestId('feed-skeleton')).toHaveCount(0)
   })
 
-  test('a community mention answers at once too: the chip keeps its place (FN-01, § 2)', async ({
+  test("a community mention answers at once too: the page's header, then its feed (FN-01, specs/community-pages)", async ({
     page,
   }) => {
     await page.goto('/en')
@@ -46,14 +46,12 @@ test.describe('Feed navigation with a slow backend', () => {
 
     const started = Date.now()
     await page.getByRole('article').first().getByRole('link', { name: '$BTC' }).first().click()
-    await expect(page).toHaveURL(/community=BTC/, { timeout: 1500 })
+    await expect(page).toHaveURL(/\/en\/asset\/BTC$/, { timeout: 1500 })
+    await expect(page.getByRole('heading', { level: 1, name: '$BTC' })).toBeVisible({
+      timeout: 1500,
+    })
     await expect(page.getByTestId('feed-skeleton')).toBeVisible({ timeout: 1500 })
     expect(Date.now() - started).toBeLessThan(DELAY_MS)
-
-    // The chip arrives with its real name ($, not #).
-    await expect(page.getByRole('link', { name: 'Remove the $BTC filter' })).toBeVisible({
-      timeout: DELAY_MS + 5000,
-    })
   })
 
   test('going back to a tab seen moments ago is instant, from the router cache (FN-04)', async ({

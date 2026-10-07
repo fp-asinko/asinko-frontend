@@ -31,32 +31,32 @@ El PDF asigna `/hub` a `USER_PUBLIC`, pero en la base de dev los grupos del sist
 
 ### Rutas e idiomas
 
-- [ ] **CP-01** Las rutas son las mismas en los tres idiomas, con el prefijo de idioma: `/en/hub/macro`, `/es/hub/macro`, `/pt/hub/macro`. Es una excepción a las rutas traducidas de `i18n.md`, que se documenta ahí.
-- [ ] **CP-02** El slug o símbolo de la URL se valida antes de pedir nada (`api-integration.md § Validar antes de la red`). Una comunidad que no existe muestra la página 404 traducida. Si el tipo no corresponde a la ruta (`/hub/BTC`), **redirige** con 308 a su ruta correcta (`/asset/BTC`), en el mismo idioma (decidido por el PO).
-- [ ] **CP-03** Cada página tiene metadata traducida (título, descripción, `og:*`), canonical propio por idioma y `hreflang` (`seo.md`).
+- [x] **CP-01** Las rutas son las mismas en los tres idiomas, con el prefijo de idioma: `/en/hub/macro`, `/es/hub/macro`, `/pt/hub/macro`. Es una excepción a las rutas traducidas de `i18n.md`, que se documenta ahí.
+- [x] **CP-02** El slug o símbolo de la URL se valida antes de pedir nada (`api-integration.md § Validar antes de la red`). Una comunidad que no existe muestra la página 404 traducida. Si el tipo no corresponde a la ruta (`/hub/BTC`), **redirige** con 308 a su ruta correcta (`/asset/BTC`), en el mismo idioma (decidido por el PO).
+- [x] **CP-03** Cada página tiene metadata traducida (título, descripción, `og:*`), canonical propio por idioma y `hreflang` (`seo.md`).
 
 ### Común a comunidad y activo (y después, al perfil)
 
-- [ ] **CP-04** **Cabecera:** nombre (con su `#` o `$`), descripción, avatar (imagen o iniciales sobre su color de identidad), banner si existe y cantidad de miembros.
-- [ ] **CP-05** **Unirse / salir:**
+- [x] **CP-04** **Cabecera:** nombre (con su `#` o `$`), descripción, avatar (imagen o iniciales sobre su color de identidad), banner si existe y cantidad de miembros.
+- [x] **CP-05** **Unirse / salir:**
   - Si no sos miembro: "Unirse" (`PUT /communities/{slug}/members/{userId}`), con el mismo comportamiento que el botón de las tarjetas (`community-first`).
   - Si sos miembro: "Salir" (`DELETE …`), **con confirmación** (`security.md § 7`).
   - Un `PRINCIPAL_MODERATOR` no puede salir (`403 CANNOT_LEAVE_AS_PRINCIPAL_MODERATOR`): se le explica en lugar de ofrecer el botón.
   - Sin sesión, el modal de cuenta.
-- [ ] **CP-06** **Favorito:** con sesión, marcar y desmarcar (`PUT/DELETE /communities/{slug}/favorite`), con `viewerIsFavorite` como estado inicial. Sin sesión, el modal de cuenta.
-- [ ] **CP-07** **Feed propio:**
+- [x] **CP-06** **Favorito:** con sesión, marcar y desmarcar (`PUT/DELETE /communities/{slug}/favorite`), con `viewerIsFavorite` como estado inicial. Sin sesión, el modal de cuenta.
+- [x] **CP-07** **Feed propio:**
   - `GET /feed/explore?community={slug}`, con las mismas tarjetas, filtros (Nuevos / Encuestas) y paginación que el Home.
   - Una comunidad sin contenido muestra un estado vacío.
   - Las tarjetas de esa página no repiten el botón Unirse del grupo, porque ya está en la cabecera.
 
 ### Comunidad — `/hub/{slug}`
 
-- [ ] **CP-08** Muestra las reglas (`rules`) y el link externo (`mainUrl`) cuando existen. El link sigue las reglas de links de usuarios (`security.md § 1`: solo http/https, `rel` completo, dominio visible).
+- [x] **CP-08** Muestra las reglas (`rules`) y el link externo (`mainUrl`) cuando existen. El link sigue las reglas de links de usuarios (`security.md § 1`: solo http/https, `rel` completo, dominio visible).
 
 ### Activo — `/asset/{symbol}`
 
-- [ ] **CP-09** Se resuelve con `GET /communities/{SYMBOL}` (el slug es el símbolo). De ahí salen nombre, descripción, avatar (el logo), miembros, membresía y favorito.
-- [ ] **CP-10** **Sin datos de mercado:** el lugar del precio, la variación y el sentimiento muestra un estado vacío explícito ("Sin datos de mercado todavía"). Nunca valores inventados ni de ejemplo.
+- [x] **CP-09** Se resuelve con `GET /communities/{SYMBOL}` (el slug es el símbolo). De ahí salen nombre, descripción, avatar (el logo), miembros, membresía y favorito.
+- [x] **CP-10** **Sin datos de mercado:** el lugar del precio, la variación y el sentimiento muestra un estado vacío explícito ("Sin datos de mercado todavía"). Nunca valores inventados ni de ejemplo.
 
 ### Perfil — `/user/{username}` (segunda parte de esta spec)
 
@@ -66,15 +66,15 @@ El PDF asigna `/hub` a `USER_PUBLIC`, pero en la base de dev los grupos del sist
 
 ### Menciones y enlaces
 
-- [ ] **CP-14** `$BTC` lleva a `/asset/BTC`, `#defi` a `/hub/defi` y `@maria` a `/user/maria` (hoy no tiene link). Vale en el cuerpo de los posts, en la cabecera de las tarjetas y en la columna izquierda (activos, personas, grupos y sugeridas).
-- [ ] **CP-15** El filtro del Home por comunidad (`/?community=`) sigue funcionando por URL, pero nada del sitio lleva a él.
+- [x] **CP-14** `$BTC` lleva a `/asset/BTC`, `#defi` a `/hub/defi` y `@maria` a `/user/maria` (hoy no tiene link). Vale en el cuerpo de los posts, en la cabecera de las tarjetas y en la columna izquierda (activos, personas, grupos y sugeridas).
+- [x] **CP-15** El filtro del Home por comunidad (`/?community=`) sigue funcionando por URL, pero nada del sitio lleva a él.
 
 ### Calidad
 
-- [ ] **CP-16** Mobile first: a 360 px, sin scroll horizontal y con las acciones al alcance. Teclado y lector de pantalla. axe sin violaciones, en claro y oscuro.
-- [ ] **CP-17** Cada sección secundaria (miembros, reglas) degrada sola si su request falla. Si falla la comunidad, la página muestra `error.tsx` (`engineering-principles.md § Manejo de errores`).
-- [ ] **CP-18** El JS de primera carga de cada ruta nueva queda dentro de los 230 KB y se suma a `e2e/performance.spec.ts`.
-- [ ] **CP-19** Textos nuevos en en, es y pt.
+- [x] **CP-16** Mobile first: a 360 px, sin scroll horizontal y con las acciones al alcance. Teclado y lector de pantalla. axe sin violaciones, en claro y oscuro.
+- [x] **CP-17** Cada sección secundaria (miembros, reglas) degrada sola si su request falla. Si falla la comunidad, la página muestra `error.tsx` (`engineering-principles.md § Manejo de errores`).
+- [x] **CP-18** El JS de primera carga de cada ruta nueva queda dentro del presupuesto y se suma a `e2e/performance.spec.ts`. El PO subió el presupuesto de 230 a 235 KB el 2026-10-07 (`seo.md`): el Home quedó en 230,6 KB y estas páginas en 232,0 KB.
+- [x] **CP-19** Textos nuevos en en, es y pt.
 
 ## Fuera de alcance
 

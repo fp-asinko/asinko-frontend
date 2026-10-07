@@ -4,7 +4,12 @@ import type { MockRoute } from '@/mocks/types'
 import { getCommunityPage } from './community-api'
 
 // The real client against the mock routes; a route left out reaches a fetch that always fails.
-const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[], calls: 0 }))
+const state = vi.hoisted(() => ({
+  routes: [] as readonly MockRoute[],
+  calls: 0,
+  viewer: { id: 'viewer', username: 'demo' } as { id: string; username: string } | null,
+}))
+vi.mock('@/lib/session', () => ({ getViewer: async () => state.viewer }))
 vi.mock('@/lib/api', async () => {
   const { createApiClient } = await import('@/lib/api/create-client')
   const { invalidInput } = await import('@/lib/api/errors')
@@ -25,6 +30,19 @@ describe('getCommunityPage (specs/community-pages)', () => {
   beforeEach(() => {
     state.routes = MOCK_ROUTES
     state.calls = 0
+    state.viewer = { id: 'viewer', username: 'demo' }
+  })
+
+  it('has no membership nor favorite without a session, whatever the response says', async () => {
+    expect(await getCommunityPage('defi')).toMatchObject({
+      ok: true,
+      data: { viewerMembership: 'MEMBER' },
+    })
+    state.viewer = null
+    expect(await getCommunityPage('defi')).toMatchObject({
+      ok: true,
+      data: { viewerMembership: null, viewerIsFavorite: false },
+    })
   })
 
   it('maps a group and an asset community', async () => {

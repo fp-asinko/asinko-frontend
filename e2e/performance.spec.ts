@@ -1,14 +1,23 @@
 import { gzipSync } from 'node:zlib'
 import { expect, test } from '@playwright/test'
 
-// F-41 / seo.md § Performance: first-load JS per route ≤ 230 KB gzip, measured as the sum of every
+// F-41 / seo.md § Performance: first-load JS per route ≤ 235 KB gzip, measured as the sum of every
 // <script src> in the initial HTML, gzipped.
-const BUDGET_KB = 230
+// 230 until 2026-10-07; raised by the PO with specs/community-pages (seo.md § Performance).
+const BUDGET_KB = 235
 
 test.describe('JavaScript budget', () => {
   test.skip(({ isMobile }) => isMobile, 'Same bundle on every device')
 
-  for (const path of ['/en', '/en?filter=polls', '/en?community=BTC', '/en/does-not-exist']) {
+  for (const path of [
+    '/en',
+    '/en?filter=polls',
+    '/en?community=BTC',
+    '/en/does-not-exist',
+    // specs/community-pages CP-18
+    '/en/hub/defi',
+    '/en/asset/BTC',
+  ]) {
     test(`${path} stays under ${BUDGET_KB} KB gzip`, async ({ request }) => {
       const html = await (await request.get(path)).text()
       const sources = [
