@@ -81,7 +81,7 @@ test.describe('Feed cards', () => {
 
       const whales = card(page, 'Whales accumulated 48,000 $BTC')
       await whales.getByRole('button', { name: /6 comments/ }).click()
-      await expect(whales.getByRole('button', { name: 'See all comments' })).toBeVisible()
+      await expect(whales.getByRole('link', { name: 'See all comments' })).toBeVisible()
       const poll = card(page, DEFI)
       await poll.getByRole('button', { name: '1–10%' }).click()
       await expect(noteOf(poll)).toBeVisible()

@@ -1,5 +1,6 @@
 import { communityPath, kindOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
+import { postPath } from '@/lib/posts/paths'
 import type {
   RawCommunity,
   RawCommunitySummary,
@@ -102,6 +103,7 @@ export function toPostItem(post: RawPost, mentions: MentionLookup, signedIn = fa
     kind: 'post',
     id: post.id,
     title: post.title,
+    path: postPath(post.id, post.title),
     body: post.deleted ? '' : markMentions(post.body, post.entities, mentions),
     author: post.creatorType === 'SYSTEM' ? null : toAuthor(post.creator),
     community: toCardCommunity(post.community, signedIn),

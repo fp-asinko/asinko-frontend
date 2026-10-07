@@ -39,12 +39,4 @@ describe('CommentsPreview (H-28)', () => {
     renderWithIntl(<CommentsPreview comments={[]} />)
     expect(screen.getByText('No comments yet.')).toBeInTheDocument()
   })
-
-  it('offers all comments as coming soon until the post detail exists', () => {
-    renderWithIntl(<CommentsPreview comments={[]} />)
-    expect(screen.getByRole('button', { name: 'See all comments' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    )
-  })
 })

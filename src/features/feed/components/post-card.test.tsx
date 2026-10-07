@@ -126,3 +126,23 @@ describe('PostCard detail variant (specs/post-create-detail PC-13)', () => {
     expect(screen.getByText('See more')).toBeInTheDocument()
   })
 })
+
+describe('PostCard into the detail (specs/post-create-detail PC-17)', () => {
+  it("links its title to the post's page, but not on the page itself", () => {
+    const { unmount } = renderWithIntl(<PostCard post={postItem()} />)
+    expect(screen.getByRole('link', { name: 'Whales accumulated 48,000 $BTC' })).toHaveAttribute(
+      'href',
+      '/post/post-1/whales-accumulated-48-000-btc',
+    )
+    unmount()
+    renderWithIntl(<PostCard post={postItem()} variant="detail" />)
+    expect(
+      screen.queryByRole('link', { name: 'Whales accumulated 48,000 $BTC' }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('does not link a deleted post', () => {
+    renderWithIntl(<PostCard post={postItem({ deleted: true })} />)
+    expect(screen.queryByRole('link', { name: '[deleted]' })).not.toBeInTheDocument()
+  })
+})

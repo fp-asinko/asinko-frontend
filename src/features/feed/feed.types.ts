@@ -38,6 +38,8 @@ export type PostItem = {
   kind: 'post'
   id: string
   title: string
+  /** Its page: /post/{id}/{slug} (specs/post-create-detail § 1). */
+  path: string
   /** Markdown, with the resolved mentions turned into `asinko:` links (lib/mentions.ts). */
   body: string
   /** null for system posts. */

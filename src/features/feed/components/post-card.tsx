@@ -2,6 +2,7 @@ import { ArrowUpRightIcon, MessageSquareIcon, Share2Icon } from 'lucide-react'
 import Image from 'next/image'
 import { useFormatter, useTranslations } from 'next-intl'
 import { ComingSoon } from '@/components/molecules/coming-soon'
+import { Link } from '@/i18n/navigation'
 import type { PostItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
@@ -78,7 +79,20 @@ export function PostCard({
             : 'type-post-title outline-none'
         }
       >
-        {post.deleted ? t('deleted') : post.title}
+        {post.deleted ? (
+          t('deleted')
+        ) : detail ? (
+          post.title
+        ) : (
+          // The way into the post's page (PC-17). pb-0.5 -mb-0.5: a 24px target (WCAG 2.5.8) on the
+          // 22px line; only downwards, as the author's link above already reaches the title.
+          <Link
+            href={post.path}
+            className="-mb-0.5 inline-block rounded-sm pb-0.5 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {post.title}
+          </Link>
+        )}
       </Title>
 
       {!post.deleted && post.body && (
@@ -142,7 +156,7 @@ export function PostCard({
               {commentCount}
             </a>
           ) : (
-            <CommentsToggle kind="post" id={post.id}>
+            <CommentsToggle kind="post" id={post.id} href={post.path}>
               {commentCount}
             </CommentsToggle>
           )}

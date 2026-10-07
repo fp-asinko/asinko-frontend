@@ -24,6 +24,8 @@ describe('toPostItem', () => {
     expect(item.body).toContain('[$BTC](asinko:asset/BTC)')
     expect(item.body).toContain('[#trading-on-chain](asinko:community/trading-on-chain)')
     expect(item.media).toEqual({ type: 'image', url: '/mocks/chart-btc.svg' })
+    // Its page, with the slug of its title (specs/post-create-detail § 1).
+    expect(item.path).toMatch(new RegExp(`^/post/${item.id}/[a-z0-9-]+$`))
   })
 
   it('shows the real domain of links', () => {

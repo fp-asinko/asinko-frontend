@@ -17,7 +17,7 @@
   - Comentar y responder (`createComment`, al instante y después `refresh`).
   - Votar comentarios (`voteComment`).
   - Tests. → PC-14 a PC-16
-- [ ] **T-05 (S)** Del feed al detalle: el título de la tarjeta y "Ver todos los comentarios". Tests. → PC-17
+- [x] **T-05 (S)** Del feed al detalle: el título de la tarjeta y "Ver todos los comentarios". Tests. → PC-17
 
 ## Parte 2: crear
 

@@ -6,6 +6,7 @@ import { CommentsToggle } from './comments-toggle'
 
 const action = vi.hoisted(() => ({ loadCommentsPreview: vi.fn() }))
 vi.mock('../actions/load-comments-preview.action', () => action)
+vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 const ID = '00000000-0000-4000-8000-000000000001'
 
@@ -107,5 +108,37 @@ describe('CommentsToggle (H-28)', () => {
     )
     expect(button).toHaveAttribute('aria-expanded', 'true')
     expect(action.loadCommentsPreview).toHaveBeenCalledOnce()
+  })
+})
+
+describe('CommentsToggle: all comments (specs/post-create-detail PC-17)', () => {
+  beforeEach(() => action.loadCommentsPreview.mockReset())
+
+  it("links to the post's page under the comments", async () => {
+    action.loadCommentsPreview.mockResolvedValue({ ok: true, data: <p>First comment</p> })
+    renderWithIntl(
+      <CommentsToggle kind="post" id={ID} href="/post/abc/a-title">
+        6 comments
+      </CommentsToggle>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: /6 comments/ }))
+    expect(await screen.findByRole('link', { name: 'See all comments' })).toHaveAttribute(
+      'href',
+      '/post/abc/a-title',
+    )
+  })
+
+  it('stays "Coming soon" without a page (polls)', async () => {
+    action.loadCommentsPreview.mockResolvedValue({ ok: true, data: <p>First comment</p> })
+    renderWithIntl(
+      <CommentsToggle kind="poll" id={ID}>
+        6 comments
+      </CommentsToggle>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: /6 comments/ }))
+    expect(await screen.findByRole('button', { name: 'See all comments' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
   })
 })

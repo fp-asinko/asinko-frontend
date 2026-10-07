@@ -111,9 +111,9 @@ test.describe('Home feed', () => {
     await toggle.click()
     await expect(toggle).toHaveAttribute('aria-expanded', 'true')
     await expect(post.getByRole('listitem').first()).toBeVisible()
-    await expect(post.getByRole('button', { name: 'See all comments' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
+    await expect(post.getByRole('link', { name: 'See all comments' })).toHaveAttribute(
+      'href',
+      /^\/en\/post\/[0-9a-f-]+\/whales-accumulated-48-000-btc-in-two-weeks$/,
     )
   })
 
@@ -197,7 +197,7 @@ test.describe('Home health', () => {
     await card(page, 'Whales accumulated 48,000 $BTC')
       .getByRole('button', { name: /6 comments/ })
       .click()
-    await expect(page.getByRole('button', { name: 'See all comments' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'See all comments' })).toBeVisible()
     await expectNoA11yViolations(page)
 
     await page.goto('/en?filter=polls')
@@ -211,7 +211,7 @@ test.describe('Home health', () => {
     await card(page, 'Whales accumulated 48,000 $BTC')
       .getByRole('button', { name: /6 comentarios/ })
       .click()
-    await expect(page.getByRole('button', { name: 'Ver todos los comentarios' })).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Ver todos los comentarios' })).toBeVisible()
     await page.getByRole('button', { name: 'Cargar más' }).scrollIntoViewIfNeeded()
     await expect(articles(page)).toHaveCount(26)
     expect(errors).toEqual([])

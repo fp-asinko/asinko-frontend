@@ -132,3 +132,20 @@ test.describe('Post detail comments', () => {
     expect(overflow).toBeLessThanOrEqual(0)
   })
 })
+
+test.describe('From the feed', () => {
+  test('the title and "See all comments" lead to the post page (PC-17)', async ({ page }) => {
+    await page.goto('/en')
+    const whales = page.getByRole('article').filter({ hasText: 'Whales accumulated 48,000 $BTC' })
+    await whales.getByRole('link', { name: 'Whales accumulated 48,000 $BTC in two weeks' }).click()
+    await expect(page).toHaveURL(new RegExp(`/en${WHALES_PATH}$`))
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+      'Whales accumulated 48,000 $BTC in two weeks',
+    )
+
+    await page.goBack()
+    await whales.getByRole('button', { name: /6 comments/ }).click()
+    await whales.getByRole('link', { name: 'See all comments' }).click()
+    await expect(page).toHaveURL(new RegExp(`/en${WHALES_PATH}$`))
+  })
+})

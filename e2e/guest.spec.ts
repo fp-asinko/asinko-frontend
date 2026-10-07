@@ -17,7 +17,7 @@ test.describe('Without a session', () => {
     await expect(articles(page).first()).toBeVisible()
     const whales = card(page, 'Whales accumulated 48,000 $BTC')
     await whales.getByRole('button', { name: /6 comments/ }).click()
-    await expect(whales.getByRole('button', { name: 'See all comments' })).toBeVisible()
+    await expect(whales.getByRole('link', { name: 'See all comments' })).toBeVisible()
     await page.goto('/en?community=BTC')
     await expect(articles(page).first()).toBeVisible()
     await expect(page.getByRole('dialog')).toHaveCount(0)
