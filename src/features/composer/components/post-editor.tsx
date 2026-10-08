@@ -151,6 +151,9 @@ export function PostEditor({
     ]
   }
   const invalid = (name: (typeof FIELDS)[number]) => Boolean(formState.errors[name])
+  // In the box, the editor starts next to the avatar (40px + 12px). Only the community chip stays
+  // there; the fields and the footer reach back under it, to the column's edge, as the posts.
+  const wide = variant === 'inline' ? '-ml-13' : undefined
 
   return (
     <form
@@ -173,7 +176,11 @@ export function PostEditor({
       >
         {/* The parts arrive one after the other, quickly (specs/home-motion: stagger). */}
         <div className="flex stagger flex-col gap-3">
-          <Field data-invalid={invalid('communityId') || undefined} className="gap-1">
+          <Field
+            data-invalid={invalid('communityId') || undefined}
+            // In the box, as tall as the avatar beside it (43px): the title starts below both.
+            className={cn('gap-1', variant === 'inline' && 'min-h-10.75 justify-center')}
+          >
             <FieldLabel htmlFor={`${ids}-community`} className="sr-only">
               {t('community.label')}
             </FieldLabel>
@@ -201,7 +208,7 @@ export function PostEditor({
             />
           </Field>
 
-          <Field data-invalid={invalid('title') || undefined} className="gap-1">
+          <Field data-invalid={invalid('title') || undefined} className={cn('gap-1', wide)}>
             <FieldLabel htmlFor={`${ids}-title`} className="sr-only">
               {t('fields.title')}
             </FieldLabel>
@@ -224,7 +231,7 @@ export function PostEditor({
           {/* Title and body stay outside the panels, mounted across formats: a field remounted
               on a switch could drop what was just typed. Link only adds its URL. */}
           <TabsContent value="TEXT" />
-          <TabsContent value="LINK">
+          <TabsContent value="LINK" className={wide}>
             <Field data-invalid={invalid('url') || undefined} className="gap-1">
               <FieldLabel htmlFor={`${ids}-url`} className="sr-only">
                 {t('fields.url')}
@@ -251,7 +258,7 @@ export function PostEditor({
             </Field>
           </TabsContent>
 
-          <Field data-invalid={invalid('body') || undefined} className="gap-1">
+          <Field data-invalid={invalid('body') || undefined} className={cn('gap-1', wide)}>
             <FieldLabel htmlFor={`${ids}-body`} className="sr-only">
               {t('fields.body')}
             </FieldLabel>
@@ -279,7 +286,7 @@ export function PostEditor({
         </div>
 
         {serverError && (
-          <p role="alert" className="mt-3 type-small text-destructive">
+          <p role="alert" className={cn('mt-3 type-small text-destructive', wide)}>
             {t(`errors.${serverError}`)}
           </p>
         )}
@@ -289,6 +296,7 @@ export function PostEditor({
         <div
           className={cn(
             'mt-3 flex items-center gap-2 border-t pt-3',
+            wide,
             variant === 'sheet' &&
               'sticky bottom-0 -mx-4 mt-auto bg-popover px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))]',
           )}

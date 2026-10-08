@@ -32,7 +32,8 @@ export function ComposerPlaceholder({
   ] as const
 
   return (
-    <div className="border-b bg-card px-4 py-3.5">
+    // The cards' edges: the whole column from md, as the posts and their images below.
+    <div className="border-b bg-card px-4 py-3.5 md:px-0">
       <ComposeSlot
         avatar={
           <UserAvatar
@@ -49,8 +50,8 @@ export function ComposerPlaceholder({
           </ComposeTrigger>
         }
         actions={
-          // Under the prompt, past the avatar (40px + 12px), as the open editor's footer.
-          <div className="mt-2 ml-13 flex items-center gap-0.5 border-t pt-2.5">
+          // Edge to edge, as the open editor's footer.
+          <div className="mt-3 flex items-center gap-0.5 border-t pt-2.5">
             <ComposeTrigger type="LINK" aria-label={t('link')} className={ICON}>
               <LinkIcon aria-hidden />
             </ComposeTrigger>
