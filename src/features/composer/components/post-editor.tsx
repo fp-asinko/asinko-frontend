@@ -5,6 +5,7 @@ import { AlignLeftIcon, ImageIcon, LinkIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type RefObject } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
+import { EmojiButton } from '@/components/molecules/emoji-picker'
 import { MentionField } from '@/components/molecules/mention-assist'
 import { useAuthGate } from '@/components/organisms/auth-gate'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -330,6 +331,8 @@ export function PostEditor({
               </span>
             </TabsTrigger>
           </TabsList>
+          {/* Emojis go into the body, at its caret (specs/emoji-picker EP-01). */}
+          <EmojiButton fieldRef={bodyRef} />
           <div className="ml-auto flex items-center gap-1.5">
             {variant === 'inline' && (
               <button

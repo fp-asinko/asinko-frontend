@@ -22,7 +22,7 @@ emoji-picker/
 - **Buscador** (`input type="search"`, 16 px en mobile) con lupa, `aria-label` "Buscar emoji", foco al abrir.
 - **Barra de categorías:** un botón por categoría con su emoji representativo y nombre accesible; lleva a su sección (scroll suave salvo con reducir movimiento).
 - **Secciones:** título (`type-section`) y una grilla de 8 columnas de botones de 40 px. El emoji con `font-family` de emojis del sistema (`"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"`) en 22 px.
-- **Teclado:** la grilla es un `grid` ARIA con foco itinerante (`tabIndex` 0 en uno solo): flechas por fila y columna, Inicio y Fin. Enter o Espacio insertan.
+- **Teclado:** los emojis son botones con foco itinerante (`tabIndex` 0 en uno solo, sin `role="grid"`: cada sección es su propia grilla de 8 columnas). `gridMove` (puro, con tests) resuelve flechas, Inicio y Fin; ↑ y ↓ mantienen la columna también entre secciones. La barra de categorías es un `toolbar` con su propio foco itinerante: elegir una lleva la sección a la vista (suave salvo con reducir movimiento) y el foco a su primer emoji. Enter o Espacio insertan.
 - **Buscar:** filtra al escribir (sin pausa: es una lista local), por palabras que empiezan con lo escrito, sin mayúsculas ni acentos, en el idioma de la página y en inglés. Muestra una sola sección "Resultados" y una región `role="status"` que dice "N emojis".
 - Al insertar: guarda en recientes, cierra y devuelve el foco al campo.
 
@@ -47,7 +47,7 @@ type Category = {
 
 ## 5. Performance
 
-- Primera carga: solo `EmojiButton` y una entrada en el manifiesto de chunks diferidos (~0,5 KB). En las páginas sin caja de comentario, nada (el editor de posts ya es diferido).
+- Primera carga: solo `EmojiButton` y una entrada en el manifiesto de chunks diferidos. **Medido al cerrar (2026-10-08): +0,8 KB por ruta**, Home 236,8 KB y páginas de comunidad 238,5 KB (contra 240). Lo pagan todas las rutas, también las que no tienen caja de comentario: el manifiesto de chunks diferidos de Turbopack se carga en todas (`seo.md`).
 - El panel, el `Popover`, la lista y los nombres: un chunk diferido (~15 KB gzip).
 
 ## 6. Tests

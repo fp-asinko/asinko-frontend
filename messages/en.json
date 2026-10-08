@@ -399,5 +399,23 @@
       "streak": "Streak",
       "since": "Member since"
     }
+  },
+  "emoji": {
+    "button": "Add emoji",
+    "dialog": "Emojis",
+    "search": "Search emoji",
+    "recent": "Recent",
+    "results": "{count, plural, =0 {No emojis found} one {# emoji} other {# emojis}}",
+    "categories": {
+      "smileys": "Smileys",
+      "people": "People and gestures",
+      "nature": "Animals and nature",
+      "food": "Food and drink",
+      "activities": "Activities",
+      "travel": "Travel and places",
+      "objects": "Objects",
+      "symbols": "Symbols"
+    },
+    "categoriesLabel": "Categories"
   }
 }

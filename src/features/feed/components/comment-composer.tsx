@@ -10,6 +10,7 @@ import {
   type FormEvent,
   type KeyboardEvent,
 } from 'react'
+import { EmojiButton } from '@/components/molecules/emoji-picker'
 import { MentionField } from '@/components/molecules/mention-assist'
 import { useAuthGate } from '@/components/organisms/auth-gate'
 import { cn } from '@/lib/utils'
@@ -111,6 +112,12 @@ export function CommentComposer({
       // Closed only when the focus leaves the whole box, not when it moves to its buttons.
       onBlur={(event) => {
         if (event.currentTarget.contains(event.relatedTarget)) return
+        // Nor when it goes into the emoji panel, which floats outside the form (specs/emoji-picker).
+        if (
+          event.relatedTarget instanceof Element &&
+          event.relatedTarget.closest('[data-emoji-panel]')
+        )
+          return
         setFocused(false)
         setHeld(false)
       }}
@@ -149,7 +156,9 @@ export function CommentComposer({
         </p>
       )}
       {open && (
-        <div className="flex justify-end gap-2">
+        <div className="flex items-center justify-end gap-2">
+          {/* Emojis at the caret (specs/emoji-picker EP-01); the buttons stay on the right. */}
+          <EmojiButton fieldRef={field} className="mr-auto" />
           {(onCancel || !reply) && (
             <button
               type="button"

@@ -209,6 +209,8 @@
   --color-interesting: var(--interesting);
   --color-brand-dot: var(--brand-dot);
   --color-mention: var(--mention);
+  /* The system's color emoji fonts: the picker draws each device's own (specs/emoji-picker). */
+  --font-emoji: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-input: var(--input);

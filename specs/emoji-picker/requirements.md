@@ -31,7 +31,7 @@ Poner emojis en un post o un comentario sin saber el atajo del sistema operativo
 
 ### Interacción y accesibilidad
 
-- [ ] **EP-07** **Teclado:** al abrir, el foco va al buscador; ↓ o Tab pasan a la grilla, las flechas recorren los emojis, Enter o Espacio insertan, Esc cierra y devuelve el foco al campo. Enter en el buscador inserta el primer resultado.
+- [ ] **EP-07** **Teclado:** al abrir, el foco va al buscador; ↓ pasa a los emojis, y Tab pasa por la barra de categorías (una sola parada, recorrida con las flechas) y después a los emojis. Las flechas recorren los emojis manteniendo la columna, también entre secciones; ↑ desde la primera fila vuelve al buscador. Enter o Espacio insertan, Esc cierra solo el panel y devuelve el foco al campo. Enter en el buscador inserta el primer resultado.
 - [ ] **EP-08** El panel es un diálogo con nombre ("Emojis"); cada emoji es un botón con su nombre en el idioma de la página; el lector de pantalla anuncia cuántos resultados hay al buscar. axe sin violaciones, en claro y oscuro.
 - [ ] **EP-09** **Mobile first:** a 360 px el panel entra en pantalla (ancho de la pantalla menos márgenes), con áreas táctiles de 40 px por emoji. En el teléfono también funciona, aunque su teclado ya tenga emojis.
 

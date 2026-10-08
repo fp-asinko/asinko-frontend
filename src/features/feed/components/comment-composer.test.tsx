@@ -1,4 +1,4 @@
-import { act, screen } from '@testing-library/react'
+import { act, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
@@ -79,6 +79,8 @@ describe('CommentComposer (specs/post-create-detail PC-15)', () => {
     await userEvent.click(box())
     expect(send()).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+    // Emojis too, once open (specs/emoji-picker EP-01).
+    expect(screen.getByRole('button', { name: 'Add emoji' })).toBeInTheDocument()
   })
 
   it('closes again when left empty, keeps what was written, and Cancel empties it (PD-02)', async () => {
@@ -99,6 +101,17 @@ describe('CommentComposer (specs/post-create-detail PC-15)', () => {
     expect(box()).toHaveFocus()
     await userEvent.click(box())
     expect(send()).toBeInTheDocument()
+  })
+
+  it('stays open while its emoji panel has the focus, and takes the emoji (specs/emoji-picker)', async () => {
+    renderComposer()
+    await userEvent.click(box())
+    await userEvent.click(screen.getByRole('button', { name: 'Add emoji' }))
+    const panel = await screen.findByRole('dialog', { name: 'Emojis' })
+    expect(send()).toBeInTheDocument()
+    await userEvent.click(within(panel).getByRole('button', { name: /^rocket/ }))
+    expect(box()).toHaveValue('🚀')
+    expect(box()).toHaveFocus()
   })
 
   it('without a session, sending opens the account modal instead', async () => {

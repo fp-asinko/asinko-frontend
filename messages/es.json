@@ -399,5 +399,23 @@
       "streak": "Racha",
       "since": "Miembro desde"
     }
+  },
+  "emoji": {
+    "button": "Agregar emoji",
+    "dialog": "Emojis",
+    "search": "Buscar emoji",
+    "recent": "Recientes",
+    "results": "{count, plural, =0 {No se encontraron emojis} one {# emoji} other {# emojis}}",
+    "categories": {
+      "smileys": "Caritas",
+      "people": "Personas y gestos",
+      "nature": "Animales y naturaleza",
+      "food": "Comida y bebida",
+      "activities": "Actividades",
+      "travel": "Viajes y lugares",
+      "objects": "Objetos",
+      "symbols": "Símbolos"
+    },
+    "categoriesLabel": "Categorías"
   }
 }

@@ -13,6 +13,7 @@ export const CLIENT_NAMESPACES = [
   'communities.actions',
   'communities.profile',
   'devLogin',
+  'emoji',
   'errors.unexpected',
   'feed.card',
   'feed.comments',

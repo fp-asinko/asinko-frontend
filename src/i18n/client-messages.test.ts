@@ -40,6 +40,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'communities',
       'composer',
       'devLogin',
+      'emoji',
       'errors',
       'feed',
       'join',

@@ -59,6 +59,14 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
     expect(screen.getByRole('textbox', { name: 'Link' })).toBeInTheDocument()
   })
 
+  it('offers emojis for the body (specs/emoji-picker EP-01)', () => {
+    renderEditor()
+    expect(screen.getByRole('button', { name: 'Add emoji' })).toHaveAttribute(
+      'aria-haspopup',
+      'dialog',
+    )
+  })
+
   it('shows Text and Link, and Image as not yet available', async () => {
     renderEditor()
     expect(screen.queryByRole('textbox', { name: 'Link' })).not.toBeInTheDocument()
