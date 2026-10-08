@@ -36,7 +36,7 @@ Lo usan dos features que no se importan entre sí (el editor de posts y los come
 
 ## 4. La lista
 
-- Un panel debajo de la línea del cursor. La posición sale de un espejo del `textarea` (un `div` con los mismos estilos y el texto hasta el cursor): unas 30 líneas propias, sin librería (`libraries.md § Criterio`).
+- Un panel debajo de la línea del cursor, **fijo y en un portal**: ni una respuesta plegada (`overflow-hidden`) ni una columna con scroll lo recortan. Va al `body`, o dentro del diálogo de la pantalla completa (afuera de un diálogo modal todo queda inerte). Se reubica con el scroll y al cambiar el tamaño de la pantalla (el teclado del teléfono). La posición del cursor sale de un espejo del `textarea` (un `div` con los mismos estilos y el texto hasta el cursor): unas 30 líneas propias, sin librería (`libraries.md § Criterio`).
 - El mismo estilo que la lista de comunidades: borde (sin el anillo de shadcn), fondo `popover`, radio 12 px, entrada con fundido y un leve desplazamiento (`animate-fade-in`, ≤ 150 ms).
 - Cada opción: `UserAvatar` chico (persona: redondo; comunidad o activo: cuadrado redondeado, como en las tarjetas), el handle en negrita y el nombre en gris si dice algo más.
 - A 360 px: ancho de la columna menos los márgenes; si no entra debajo, se abre arriba del cursor.
@@ -45,7 +45,8 @@ Lo usan dos features que no se importan entre sí (el editor de posts y los come
 
 - Un `textarea` no admite `role="combobox"` ni `aria-expanded` (ARIA in HTML; axe lo marca). Queda como campo de texto con `aria-autocomplete="list"` y, mientras hay lista, `aria-controls` y `aria-activedescendant` hacia la opción marcada. La lista es un `listbox` con sus `option`, y cada opción se lee "$BTC Bitcoin" (un espacio entre las partes).
 - ↑ ↓ mueven la marca, Enter y Tab eligen, Esc cierra la lista. Con la lista abierta esas teclas no siguen (`preventDefault` y `stopPropagation`): ni el formulario ni el Esc del editor o de la respuesta las ven. Las opciones no reciben foco: el teclado vive en el campo, y tocar una opción no le saca el foco.
-- Una región `aria-live` anuncia "N sugerencias" al abrir y la mención elegida.
+- Una región `aria-live` anuncia cada resultado: "N sugerencias", "Sin coincidencias" o el error (WCAG 4.1.3), y la mención elegida.
+- La opción marcada se distingue por el fondo y por un borde con `--input` (3:1): el tinte solo no alcanza (WCAG 1.4.11).
 
 ## 6. Insertar
 

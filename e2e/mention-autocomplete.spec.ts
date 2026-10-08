@@ -92,6 +92,25 @@ test.describe('Mention autocomplete', () => {
     await expect(reply).toHaveValue('$BTC ')
   })
 
+  test('the list floats over everything, even inside a folded thread (MA-08)', async ({ page }) => {
+    await page.goto(FED_PATH)
+    const section = page.getByRole('region', { name: /comments/i })
+    await section.getByRole('button', { name: 'See 2 replies' }).click()
+    const deep = section.getByRole('listitem').filter({ hasText: 'He always does' }).first()
+    await deep.getByRole('button', { name: 'Reply' }).first().click()
+    const reply = deep.getByRole('textbox', { name: 'Your reply' })
+    await suggest(page, reply, '@mar')
+    const option = page.getByRole('option', { name: /^@maria/ })
+    await expect(option).toBeInViewport()
+    // Nothing covers or cuts it: the topmost element at its center is the option itself.
+    const box = (await option.boundingBox())!
+    const onTop = await page.evaluate(
+      ({ x, y }) => document.elementFromPoint(x, y)?.closest('[role="option"]')?.textContent ?? '',
+      { x: box.x + box.width / 2, y: box.y + box.height / 2 },
+    )
+    expect(onTop).toContain('@maria')
+  })
+
   for (const theme of ['light', 'dark'] as const) {
     test(`the list fits 360px and stays accessible in ${theme} (MA-07, MA-08)`, async ({
       page,

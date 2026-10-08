@@ -137,13 +137,17 @@ describe('MentionAssist (specs/mention-autocomplete)', () => {
     search.mockResolvedValue({ ok: true, data: [] })
     renderWithIntl(<Harness search={search} />)
     await userEvent.type(body(), '#zz')
-    expect(await screen.findByText('No matches')).toBeInTheDocument()
+    // Seen in the panel and announced (WCAG 4.1.3).
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('No matches'))
+    expect(screen.getAllByText('No matches')).toHaveLength(2)
     await userEvent.keyboard('{Enter}')
     expect(body()).toHaveValue('#zz\n')
 
     search.mockResolvedValue({ ok: false, error: 'api.errors.UNAVAILABLE' })
     await userEvent.type(body(), '@ma')
-    expect(await screen.findByText('Could not load the suggestions')).toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent('Could not load the suggestions'),
+    )
   })
 
   it('looks for each symbol in its own place (MA-02)', async () => {

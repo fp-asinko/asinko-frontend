@@ -11,8 +11,9 @@ const MentionAssist = dynamic(() => import('./mention-assist').then((mod) => mod
 
 /**
  * Turns on mention suggestions for a textarea (specs/mention-autocomplete § 1). Put it next to
- * the textarea, inside a `relative` box (the list is placed against it). Nothing is downloaded
- * until the textarea is focused; the textarea is never replaced, so it keeps its focus and text.
+ * the textarea; the list floats over the page (a portal), so no box can cut it. Nothing is
+ * downloaded until the textarea is focused; the textarea is never replaced, so it keeps its focus
+ * and text.
  */
 export function MentionField({
   fieldRef,

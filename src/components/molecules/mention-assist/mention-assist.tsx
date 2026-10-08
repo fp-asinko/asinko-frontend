@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 import { useEffect, useEffectEvent, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import { activeMention, type ActiveMention, type MentionKind } from '@/lib/mentions/active-mention'
 import type { MentionOption } from '@/lib/mentions/mentions.types'
@@ -14,6 +15,8 @@ const SEARCH_DELAY = 150
 /** One option's height (44px, MA-08) plus the panel's padding: to decide above or below. */
 const OPTION_HEIGHT = 44
 const PANEL_WIDTH = 288
+/** The panel never touches the screen's edges. */
+const EDGE = 8
 
 export type MentionSearch = (input: {
   kind: MentionKind
@@ -52,7 +55,9 @@ export function MentionAssist({
   const [options, setOptions] = useState<MentionOption[]>([])
   const [status, setStatus] = useState<Status>('idle')
   const [active, setActive] = useState(0)
-  const [place, setPlace] = useState({ top: 0, left: 0 })
+  const [place, setPlace] = useState({ top: 0, left: 0, width: PANEL_WIDTH })
+  // Inside the dialog when there is one: outside it, a modal dialog makes everything inert.
+  const container = field.closest<HTMLElement>('[role="dialog"]') ?? document.body
   const [announcement, setAnnouncement] = useState('')
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const asked = useRef<string | null>(null)
@@ -67,19 +72,29 @@ export function MentionAssist({
     setOptions([])
   }
 
+  /**
+   * Where the panel goes, in the screen's coordinates (it is fixed, in a portal: no folded reply
+   * nor scrolling column can cut it). Under the caret's line, or above it when there is no room
+   * below (a phone's keyboard); always inside the screen.
+   */
   function where(found: ActiveMention, count: number) {
     const caret = caretPosition(field, found.start)
-    const top = field.offsetTop + caret.top + 4
-    const height = Math.max(count, 1) * OPTION_HEIGHT + 8
-    const room =
-      (window.visualViewport?.height ?? window.innerHeight) - field.getBoundingClientRect().top
-    // Not enough room below (a phone's keyboard): above the caret's line.
-    const above = caret.top + height > room && caret.top > height
+    const box = field.getBoundingClientRect()
     const lineHeight = parseFloat(getComputedStyle(field).lineHeight) || 20
-    const parent = field.offsetParent?.clientWidth ?? PANEL_WIDTH
+    const height = Math.max(count, 1) * OPTION_HEIGHT + 8
+    const screenHeight = window.visualViewport?.height ?? window.innerHeight
+    const screenWidth = window.visualViewport?.width ?? window.innerWidth
+    const below = box.top + caret.top + 4
+    const above = below + height > screenHeight && below - lineHeight - height - 8 > 0
+    // A fixed element inside a transformed one (the full screen dialog) is placed against it.
+    const frame =
+      container === document.body ? { top: 0, left: 0 } : container.getBoundingClientRect()
+    const width = Math.min(PANEL_WIDTH, screenWidth - 2 * EDGE)
     return {
-      top: above ? top - height - lineHeight - 8 : top,
-      left: Math.max(0, Math.min(field.offsetLeft + caret.left, parent - PANEL_WIDTH)),
+      top: (above ? below - lineHeight - height - 8 : below) - frame.top,
+      left:
+        Math.max(EDGE, Math.min(box.left + caret.left, screenWidth - width - EDGE)) - frame.left,
+      width,
     }
   }
 
@@ -102,7 +117,10 @@ export function MentionAssist({
       setActive(0)
       setStatus(!result.ok ? 'error' : next.length === 0 ? 'empty' : 'ready')
       setPlace(where(found, next.length))
-      setAnnouncement(result.ok && next.length > 0 ? t('count', { count: next.length }) : '')
+      // Every outcome is announced, not only the suggestions (WCAG 4.1.3).
+      setAnnouncement(
+        !result.ok ? t('error') : next.length > 0 ? t('count', { count: next.length }) : t('empty'),
+      )
     }, SEARCH_DELAY)
   })
 
@@ -162,6 +180,22 @@ export function MentionAssist({
     }
   }, [field])
 
+  const follow = useEffectEvent(() => {
+    if (mention) setPlace(where(mention, options.length))
+  })
+  useEffect(() => {
+    if (!open) return
+    const update = () => follow()
+    window.addEventListener('scroll', update, true)
+    window.addEventListener('resize', update)
+    window.visualViewport?.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update, true)
+      window.removeEventListener('resize', update)
+      window.visualViewport?.removeEventListener('resize', update)
+    }
+  }, [open])
+
   // The textbox points at the list and at the marked option while it is open.
   useEffect(() => {
     if (open && status === 'ready') {
@@ -178,55 +212,57 @@ export function MentionAssist({
       <span role="status" className="sr-only">
         {announcement}
       </span>
-      {open && (
-        <div
-          // The panel of the community list: border (the system has no shadows), popover color.
-          className="absolute z-30 w-72 max-w-full animate-fade-in rounded-xl border bg-popover p-1 text-popover-foreground"
-          style={{ top: place.top, left: place.left }}
-        >
-          {status === 'ready' ? (
-            <ul id={listId} role="listbox" aria-label={t('label')}>
-              {options.map((option, index) => (
-                // The keyboard lives in the textarea (aria-activedescendant): options never take the focus.
-                // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- keys handled by the textbox
-                <li
-                  key={option.handle}
-                  id={`${listId}-${index}`}
-                  role="option"
-                  aria-selected={index === active}
-                  // Keep the focus in the textarea: choosing must not blur it.
-                  onMouseDown={(event) => event.preventDefault()}
-                  onMouseMove={() => setActive(index)}
-                  onClick={() => choose(option)}
-                  className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 aria-selected:bg-muted"
-                >
-                  <UserAvatar
-                    name={option.handle}
-                    colorKey={option.colorKey}
-                    imageUrl={option.avatarUrl}
-                    size="sm"
-                    // People round; communities and assets square, as on the cards.
-                    className={cn(option.kind !== 'user' && 'rounded-md')}
-                  />
-                  <span className="flex min-w-0 flex-col">
-                    <span className="truncate type-small font-bold">{option.handle}</span>
-                    {/* A space between the parts: read as "$BTC Bitcoin", not "$BTCBitcoin". */}{' '}
-                    {option.label && (
-                      <span className="truncate type-meta text-muted-foreground">
-                        {option.label}
-                      </span>
-                    )}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="px-2.5 py-2 type-meta text-muted-foreground">
-              {status === 'error' ? t('error') : t('empty')}
-            </p>
-          )}
-        </div>
-      )}
+      {open &&
+        createPortal(
+          <div
+            // The panel of the community list: border (the system has no shadows), popover color.
+            className="fixed z-50 animate-fade-in rounded-xl border bg-popover p-1 text-popover-foreground"
+            style={{ top: place.top, left: place.left, width: place.width }}
+          >
+            {status === 'ready' ? (
+              <ul id={listId} role="listbox" aria-label={t('label')}>
+                {options.map((option, index) => (
+                  // The keyboard lives in the textarea (aria-activedescendant): options never take the focus.
+                  // eslint-disable-next-line jsx-a11y/click-events-have-key-events -- keys handled by the textbox
+                  <li
+                    key={option.handle}
+                    id={`${listId}-${index}`}
+                    role="option"
+                    aria-selected={index === active}
+                    // Keep the focus in the textarea: choosing must not blur it.
+                    onMouseDown={(event) => event.preventDefault()}
+                    onMouseMove={() => setActive(index)}
+                    onClick={() => choose(option)}
+                    className="flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 aria-selected:bg-muted aria-selected:ring-1 aria-selected:ring-input aria-selected:ring-inset"
+                  >
+                    <UserAvatar
+                      name={option.handle}
+                      colorKey={option.colorKey}
+                      imageUrl={option.avatarUrl}
+                      size="sm"
+                      // People round; communities and assets square, as on the cards.
+                      className={cn(option.kind !== 'user' && 'rounded-md')}
+                    />
+                    <span className="flex min-w-0 flex-col">
+                      <span className="truncate type-small font-bold">{option.handle}</span>
+                      {/* A space between the parts: read as "$BTC Bitcoin", not "$BTCBitcoin". */}{' '}
+                      {option.label && (
+                        <span className="truncate type-meta text-muted-foreground">
+                          {option.label}
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="px-2.5 py-2 type-meta text-muted-foreground">
+                {status === 'error' ? t('error') : t('empty')}
+              </p>
+            )}
+          </div>,
+          container,
+        )}
     </>
   )
 }
