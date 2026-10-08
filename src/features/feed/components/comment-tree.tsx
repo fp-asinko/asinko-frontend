@@ -3,6 +3,7 @@ import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Link } from '@/i18n/navigation'
+import { previewProps } from '@/lib/communities/preview'
 import type { CommentNode } from '../feed.types'
 import { CommentReply } from './comment-reply'
 import { PendingComments } from './comment-thread'
@@ -77,6 +78,8 @@ function CommentItem({
                 {/* py-1 -my-1: a 24px target (WCAG 2.5.8) on the 16px line, without moving it. */}
                 <Link
                   href={comment.author.path}
+                  // Its hover card (specs/mention-preview MP-01).
+                  {...previewProps('user', comment.author.username)}
                   className="-my-1 inline-block py-1 font-bold text-foreground hover:underline"
                 >
                   {comment.author.handle}

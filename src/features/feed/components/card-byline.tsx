@@ -4,6 +4,7 @@ import { UserAvatar } from '@/components/molecules/user-avatar'
 import { JoinButton } from '@/components/organisms/join'
 import { Link } from '@/i18n/navigation'
 import { joinCommunity } from '@/lib/communities/join-community.action'
+import { previewProps } from '@/lib/communities/preview'
 import { cn } from '@/lib/utils'
 import type { Author, CardCommunity } from '../feed.types'
 import { accuracyTier, type AccuracyTier } from '../lib/accuracy-tier'
@@ -88,6 +89,8 @@ export function CardByline({
           {group ? (
             <Link
               href={group.path}
+              // Its hover card (specs/mention-preview MP-01).
+              {...previewProps(group.kind, group.slug)}
               className="inline-flex min-h-6 min-w-0 items-center type-ui font-bold text-foreground hover:underline"
             >
               {/* The symbol (# or $) in gray: the name is the protagonist. Both inside one span: as
@@ -160,6 +163,7 @@ function AuthorName({
     // over the header's bottom margin: upwards it would overlap the group's link (axe).
     <Link
       href={author.path}
+      {...previewProps('user', author.username)}
       className={cn('-mb-2 inline-block min-w-0 truncate pb-2 hover:underline', className)}
     >
       {author.handle}

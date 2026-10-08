@@ -56,6 +56,7 @@ export function indexCommunities(communities: readonly RawCommunity[]): MentionL
 export function toCardCommunity(summary: RawCommunitySummary, signedIn: boolean): CardCommunity {
   return {
     ...toCommunityRef(summary),
+    kind: kindOf(summary.type),
     path: communityPath(kindOf(summary.type), summary.slug),
     avatarUrl: allowedImageUrl(summary.avatarUrl),
     personal: summary.type === 'PERSONAL_CHANNEL',

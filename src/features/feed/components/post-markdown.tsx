@@ -4,6 +4,7 @@ import type { ComponentProps, ReactNode } from 'react'
 import Markdown, { type Components } from 'react-markdown'
 import { Link } from '@/i18n/navigation'
 import { communityPath } from '@/lib/communities/paths'
+import { previewProps } from '@/lib/communities/preview'
 import { MENTION_SCHEME, parseMention } from '../lib/mentions'
 
 /**
@@ -40,13 +41,13 @@ function Anchor({ href, children }: ComponentProps<'a'>) {
   const t = useTranslations('feed.card')
   const mention = parseMention(href)
   if (mention?.type === 'community' || mention?.type === 'asset' || mention?.type === 'user') {
-    const href =
-      mention.type === 'user'
-        ? communityPath('user', mention.username)
-        : communityPath(mention.type === 'asset' ? 'asset' : 'group', mention.slug)
+    const kind = mention.type === 'user' ? 'user' : mention.type === 'asset' ? 'asset' : 'group'
+    const slug = mention.type === 'user' ? mention.username : mention.slug
     return (
       <Link
-        href={href}
+        href={communityPath(kind, slug)}
+        // Its hover card (specs/mention-preview MP-01).
+        {...previewProps(kind, slug)}
         className={`${mentionClass} underline underline-offset-2 hover:decoration-2`}
       >
         {children}

@@ -44,6 +44,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'feed',
       'join',
       'mentions',
+      'preview',
     ])
     expect(Object.keys(picked.feed as object).sort()).toEqual([
       'card',
@@ -53,7 +54,8 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'vote',
     ])
     // Only the client part of the namespace: the page texts stay on the server.
-    expect(Object.keys(picked.communities as object)).toEqual(['actions'])
+    // (members and profile: the hover cards, specs/mention-preview).
+    expect(Object.keys(picked.communities as object)).toEqual(['actions', 'members', 'profile'])
     expect(picked.errors).toEqual({ unexpected: en.errors.unexpected })
     expect(picked).not.toHaveProperty('interests')
   })

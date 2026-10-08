@@ -13,6 +13,7 @@ const hourAgo = () => new Date(Date.now() - 3600_000).toISOString()
 const defi = (overrides: Partial<CardCommunity> = {}): CardCommunity => ({
   slug: 'defi',
   path: '/hub/defi',
+  kind: 'group',
   name: 'DeFi',
   handle: '#defi',
   avatarUrl: null,

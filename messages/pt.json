@@ -371,5 +371,8 @@
     "error": "Não foi possível carregar as sugestões",
     "added": "{handle} adicionado",
     "loading": "Buscando…"
+  },
+  "preview": {
+    "loading": "Carregando prévia"
   }
 }

@@ -1,6 +1,5 @@
 import { CircleHelpIcon } from 'lucide-react'
-import { useFormatter, useTranslations } from 'next-intl'
-import type { ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 import { ComingSoon } from '@/components/molecules/coming-soon'
 import { IdentityBanner } from '@/components/molecules/identity-banner'
 import { UserAvatar } from '@/components/molecules/user-avatar'
@@ -8,6 +7,7 @@ import { cn } from '@/lib/utils'
 import type { CommunityPage, ProfileDetails } from '../communities.types'
 import { BackButton } from './back-button'
 import { CommunityActions } from './community-actions'
+import { MemberCount, ProfileStats } from './community-stats'
 import { ProfileMarks } from './profile-marks'
 
 /**
@@ -67,7 +67,11 @@ export function CommunityHeader({
         )}
       </div>
       {description && <p className="mt-2 type-ui text-muted-foreground">{description}</p>}
-      {profile ? <ProfileStats profile={profile} /> : <MemberCount count={page.memberCount} />}
+      {profile ? (
+        <ProfileStats profile={profile} className="mt-3" />
+      ) : (
+        <MemberCount count={page.memberCount} className="mt-3" />
+      )}
       {profile && (
         <div className="mt-3">
           <ComingSoon
@@ -80,52 +84,5 @@ export function CommunityHeader({
         </div>
       )}
     </header>
-  )
-}
-
-function MemberCount({ count }: { count: number }) {
-  const t = useTranslations('communities')
-  return (
-    <p className="mt-3 type-meta text-muted-foreground">
-      {t.rich('members', { count, b: (chunks) => <Strong>{chunks}</Strong> })}
-    </p>
-  )
-}
-
-function Strong({ children }: { children: ReactNode }) {
-  return <strong className="font-semibold text-foreground">{children}</strong>
-}
-
-/** Followers · accuracy · streak (CP-11); the streak counts correct theses in a row, not days. */
-function ProfileStats({ profile }: { profile: ProfileDetails }) {
-  const t = useTranslations('communities.profile')
-  const format = useFormatter()
-  const parts = [
-    t.rich('followers', {
-      count: profile.followerCount,
-      b: (chunks) => <Strong>{chunks}</Strong>,
-    }),
-    profile.accuracyRate !== null &&
-      t.rich('accuracy', {
-        value: format.number(profile.accuracyRate, { style: 'percent' }),
-        b: (chunks) => <Strong>{chunks}</Strong>,
-      }),
-    t.rich('streak', { count: profile.currentStreak, b: (chunks) => <Strong>{chunks}</Strong> }),
-  ].filter(Boolean)
-
-  return (
-    <p className="mt-3 flex flex-wrap gap-x-2 type-meta text-muted-foreground">
-      {parts.map((part, index) => (
-        // Not flex inside: the bold number and its word keep a normal space between them.
-        <span key={index}>
-          {index > 0 && (
-            <span aria-hidden className="mr-2">
-              ·
-            </span>
-          )}
-          {part}
-        </span>
-      ))}
-    </p>
   )
 }

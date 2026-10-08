@@ -33,11 +33,15 @@ export function CommunityActions({
   membership,
   favorite,
   variant = 'community',
+  focusFallbackId,
 }: Pick<CommunityPage, 'slug' | 'handle'> & {
   membership: CommunityPage['viewerMembership']
-  favorite: boolean
+  /** null: no star, as in a hover card (specs/mention-preview MP-03). */
+  favorite: boolean | null
   /** A profile follows (joins the personal channel), with no favorite star (CP-12). */
   variant?: 'community' | 'user'
+  /** Where the focus goes when Join turns into "Joined" under it (as the cards, CF-14). */
+  focusFallbackId?: string
 }) {
   const user = variant === 'user'
   const t = useTranslations('communities.actions')
@@ -55,7 +59,7 @@ export function CommunityActions({
   if (membership === 'PRINCIPAL_MODERATOR' && member) {
     return (
       <div className="flex items-center gap-2">
-        <FavoriteButton slug={slug} handle={handle} initial={favorite} />
+        {favorite !== null && <FavoriteButton slug={slug} handle={handle} initial={favorite} />}
         <span className={cn(PILL, 'bg-muted text-muted-foreground')}>
           {t('principal')}
           <span className="sr-only">. {t('principalHint')}</span>
@@ -71,6 +75,7 @@ export function CommunityActions({
         handle={handle}
         action={joinCommunity}
         label={user ? 'follow' : 'join'}
+        focusFallbackId={focusFallbackId}
       />
     )
   }
@@ -93,7 +98,9 @@ export function CommunityActions({
 
   return (
     <div className="relative flex items-center gap-2">
-      {!user && <FavoriteButton slug={slug} handle={handle} initial={favorite} />}
+      {!user && favorite !== null && (
+        <FavoriteButton slug={slug} handle={handle} initial={favorite} />
+      )}
       <button
         type="button"
         aria-disabled={pending || undefined}

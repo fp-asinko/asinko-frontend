@@ -39,3 +39,20 @@ export type CommunityPage = {
   viewerMembership: 'MEMBER' | 'MODERATOR' | 'PRINCIPAL_MODERATOR' | null
   viewerIsFavorite: boolean
 }
+
+/** The community part of a hover card (specs/mention-preview § 3): only what the card shows. */
+export type PreviewCommunity = Pick<
+  CommunityPage,
+  | 'slug'
+  | 'handle'
+  | 'subtitle'
+  | 'description'
+  | 'avatarUrl'
+  | 'bannerUrl'
+  | 'kind'
+  | 'memberCount'
+  | 'viewerMembership'
+>
+
+/** A hover card: a group or an asset, or a person with their personal channel. */
+export type Preview = { community: PreviewCommunity; profile: ProfileDetails | null }

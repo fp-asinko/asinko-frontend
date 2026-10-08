@@ -12,6 +12,9 @@ import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { JoinedProvider } from '@/components/organisms/join'
 import { RightColumn } from '@/components/organisms/right-column'
 import { env } from '@/env'
+// Its own path, not the feature's index: the index also exports the community page, and every
+// client component reachable from the layout would load on every page (JS budget, seo.md).
+import { MentionPreviews } from '@/features/communities/components/mention-previews'
 import { ComposerRoot } from '@/features/composer'
 import { InterestsSidebar, InterestsSkeleton } from '@/features/interests'
 import { OG_LOCALES } from '@/i18n/alternates'
@@ -107,6 +110,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
                   >
                     {children}
                   </AppShell>
+                  {/* Hover cards of groups, people and assets (specs/mention-preview). */}
+                  <MentionPreviews />
                 </ComposerRoot>
               </JoinedProvider>
             </AuthGateProvider>

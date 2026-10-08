@@ -11,6 +11,8 @@ export const CLIENT_NAMESPACES = [
   'comments',
   'composer',
   'communities.actions',
+  'communities.members',
+  'communities.profile',
   'devLogin',
   'errors.unexpected',
   'feed.card',
@@ -20,6 +22,7 @@ export const CLIENT_NAMESPACES = [
   'feed.vote',
   'join',
   'mentions',
+  'preview',
 ] as const
 
 /** The subset of `messages` under CLIENT_NAMESPACES, keeping their nesting. */

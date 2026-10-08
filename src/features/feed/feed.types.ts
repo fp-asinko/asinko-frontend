@@ -1,6 +1,8 @@
 // Domain types of the Home feed (specs/home/design.md § 5 and § 6). The UI only knows these, never
 // the raw contract shapes.
 
+import type { CommunityKind } from '@/lib/communities/paths'
+
 export type Author = {
   username: string
   /** The profile: /user/{username} (specs/community-pages CP-21). */
@@ -23,6 +25,8 @@ export type CardCommunity = CommunityRef & {
   /** Its page: /hub/{slug} or /asset/{SYMBOL} (specs/community-pages CP-14). */
   path: string
   avatarUrl: string | null
+  /** Its page and its hover card: group or asset (or user, a personal channel). */
+  kind: CommunityKind
   /** The personal channel of a user: no group to show nor to join. */
   personal: boolean
   /** null without a session: the join button shows and opens the account modal. */
