@@ -146,3 +146,14 @@ describe('PostCard into the detail (specs/post-create-detail PC-17)', () => {
     expect(screen.queryByRole('link', { name: '[deleted]' })).not.toBeInTheDocument()
   })
 })
+
+describe('PostCard leading slot (specs/post-detail-refresh PD-01)', () => {
+  it('puts what comes first, the back button of the page, before the header', () => {
+    renderWithIntl(
+      <PostCard post={postItem()} variant="detail" leading={<button type="button">Back</button>} />,
+    )
+    const back = screen.getByRole('button', { name: 'Back' })
+    const group = screen.getAllByRole('link')[0]!
+    expect(back.compareDocumentPosition(group) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+})

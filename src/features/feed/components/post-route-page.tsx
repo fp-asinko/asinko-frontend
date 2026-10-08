@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { BackButton } from '@/components/molecules/back-button'
 import { env } from '@/env'
 import { buildAlternates, OG_LOCALES } from '@/i18n/alternates'
 import { permanentRedirect } from '@/i18n/navigation'
@@ -68,7 +69,7 @@ export async function resolvePostRoute(
 export function PostDetail({ post }: { post: PostItem }) {
   return (
     <CommentThread>
-      <PostCard post={post} variant="detail" />
+      <PostCard post={post} variant="detail" leading={<BackButton variant="plain" />} />
       <PostComments postId={post.id} count={post.commentCount} closed={post.deleted} />
     </CommentThread>
   )

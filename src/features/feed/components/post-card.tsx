@@ -1,6 +1,7 @@
 import { ArrowUpRightIcon, MessageSquareIcon, Share2Icon } from 'lucide-react'
 import Image from 'next/image'
 import { useFormatter, useTranslations } from 'next-intl'
+import type { ReactNode } from 'react'
 import { ComingSoon } from '@/components/molecules/coming-soon'
 import { Link } from '@/i18n/navigation'
 import type { PostItem } from '../feed.types'
@@ -32,6 +33,7 @@ export function PostCard({
   variant = 'card',
   fadeImage = false,
   feedCommunity,
+  leading,
 }: {
   post: PostItem
   variant?: 'card' | 'detail'
@@ -39,6 +41,8 @@ export function PostCard({
   fadeImage?: boolean
   /** The community the feed is filtered by: no join button for it (CP-07). */
   feedCommunity?: string
+  /** Before the header, as Reddit's post page: its back button (specs/post-detail-refresh PD-01). */
+  leading?: ReactNode
 }) {
   const PostImage = fadeImage ? FadeImage : Image
   const t = useTranslations('feed.card')
@@ -59,15 +63,18 @@ export function PostCard({
       className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
       aria-labelledby={`post-${post.id}`}
     >
-      <div className="mb-2">
-        <CardByline
-          author={post.author}
-          community={post.community}
-          publishedAt={post.publishedAt}
-          edited={post.edited}
-          titleId={`post-${post.id}`}
-          canJoin={!post.deleted && post.community?.slug !== feedCommunity}
-        />
+      <div className="mb-2 flex items-center gap-2.5">
+        {leading}
+        <div className="min-w-0 flex-1">
+          <CardByline
+            author={post.author}
+            community={post.community}
+            publishedAt={post.publishedAt}
+            edited={post.edited}
+            titleId={`post-${post.id}`}
+            canJoin={!post.deleted && post.community?.slug !== feedCommunity}
+          />
+        </div>
       </div>
 
       <Title

@@ -242,6 +242,8 @@ test.describe('Create post', () => {
     test.skip(isMobile, 'Mobile always uses the full screen')
     await page.goto(`/en${WHALES_PATH}`)
     await page.mouse.wheel(0, 600)
+    // The wheel scrolls a moment later: measure once it did.
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0)
     const scrolled = await page.evaluate(() => window.scrollY)
     await createButton(page, false).click()
     await expect(page.getByRole('dialog', { name: 'Create post' })).toBeVisible()

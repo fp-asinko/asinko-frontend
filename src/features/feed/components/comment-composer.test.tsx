@@ -66,9 +66,39 @@ describe('CommentComposer (specs/post-create-detail PC-15)', () => {
 
   it('sends nothing while the box is empty', async () => {
     renderComposer()
+    await userEvent.click(box())
     expect(send()).toHaveAttribute('aria-disabled', 'true')
     await userEvent.click(send())
     expect(actions.createComment).not.toHaveBeenCalled()
+  })
+
+  it('starts as a one-line pill, and opens with its buttons on focus (specs/post-detail-refresh PD-02)', async () => {
+    renderComposer()
+    expect(box()).toHaveAttribute('placeholder', 'Join the conversation')
+    expect(screen.queryByRole('button', { name: 'Comment' })).not.toBeInTheDocument()
+    await userEvent.click(box())
+    expect(send()).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+  })
+
+  it('closes again when left empty, keeps what was written, and Cancel empties it (PD-02)', async () => {
+    renderComposer()
+    await userEvent.click(box())
+    await userEvent.tab({ shift: true })
+    expect(screen.queryByRole('button', { name: 'Comment' })).not.toBeInTheDocument()
+
+    await userEvent.type(box(), 'Half a thought')
+    await userEvent.tab({ shift: true })
+    expect(box()).toHaveValue('Half a thought')
+    expect(send()).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(box()).toHaveValue('')
+    expect(screen.queryByRole('button', { name: 'Comment' })).not.toBeInTheDocument()
+    // The focus goes back to the field, still closed, and a click opens it again.
+    expect(box()).toHaveFocus()
+    await userEvent.click(box())
+    expect(send()).toBeInTheDocument()
   })
 
   it('without a session, sending opens the account modal instead', async () => {

@@ -46,7 +46,8 @@
     "menu": {
       "more": "More options",
       "signup": "Sign up"
-    }
+    },
+    "back": "Back"
   },
   "errors": {
     "notFound": {
@@ -250,7 +251,6 @@
     },
     "members": "{count, plural, one {<b>#</b> member} other {<b>#</b> members}}",
     "actions": {
-      "back": "Back",
       "joined": "Joined",
       "leaveHint": "Leave {handle}",
       "principal": "Moderator",
@@ -303,7 +303,6 @@
   },
   "comments": {
     "label": "Your comment",
-    "placeholder": "Add a comment",
     "replyPlaceholder": "Write a reply",
     "submit": "Comment",
     "reply": "Reply",
@@ -313,7 +312,8 @@
     "error": "Could not post your comment. Try again.",
     "replyLabel": "Your reply",
     "sendReply": "Send reply",
-    "sent": "Comment posted."
+    "sent": "Comment posted.",
+    "join": "Join the conversation"
   },
   "composer": {
     "title": "Create post",

@@ -46,7 +46,8 @@
     "menu": {
       "more": "Mais opções",
       "signup": "Cadastrar-se"
-    }
+    },
+    "back": "Voltar"
   },
   "errors": {
     "notFound": {
@@ -250,7 +251,6 @@
     },
     "members": "{count, plural, one {<b>#</b> membro} other {<b>#</b> membros}}",
     "actions": {
-      "back": "Voltar",
       "joined": "Participando",
       "leaveHint": "Sair de {handle}",
       "principal": "Moderador",
@@ -303,7 +303,6 @@
   },
   "comments": {
     "label": "Seu comentário",
-    "placeholder": "Adicione um comentário",
     "replyPlaceholder": "Escreva uma resposta",
     "submit": "Comentar",
     "reply": "Responder",
@@ -313,7 +312,8 @@
     "error": "Não foi possível publicar seu comentário. Tente de novo.",
     "replyLabel": "Sua resposta",
     "sendReply": "Enviar resposta",
-    "sent": "Comentário publicado."
+    "sent": "Comentário publicado.",
+    "join": "Participe da conversa"
   },
   "composer": {
     "title": "Criar post",
