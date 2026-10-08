@@ -72,12 +72,13 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
 - **Sin verde ni rojo de sube/baja** en los avatares: lo verifica el test de contraste. Las encuestas son monocromas.
 - **Cabecera de la tarjeta** (`specs/community-first`): el grupo es el protagonista. Su avatar (cuadrado redondeado de 40 px) ocupa el alto de las dos líneas, como Reddit: el handle en la primera y el autor en la segunda, en gris y sin foto. A la derecha, la píldora negra **Unirse** (`JoinButton`, organismo con variantes `card` y `compact`). Un post del canal personal muestra al autor con su foto, en una sola línea.
 - **Páginas de comunidad, activo y perfil** (`specs/community-pages`): banner (su imagen o el degradé del tono de identidad, `IdentityBanner`), avatar superpuesto, el handle como H1, acciones a la derecha (Unirse; siendo miembro, "Unido" pide confirmación para salir, y la estrella de favorito) y un desplegable debajo (reglas del grupo, o los datos del activo con su estado vacío). Un avatar con imagen va sobre fondo neutro.
+- **Hilos de comentarios** (`specs/comment-threads`): el cableado de Reddit vive en `globals.css` (`thread-item`, `thread-body`, `thread-children`, `thread-child`, `thread-elbow`, `thread-strip`, `thread-collapse`), con `--av` como ancho de la columna del avatar (24 px, 32 desde `sm`). Línea de 1 px `--border`, codo con radio de 12 px, `--border-strong` al pasar el mouse por la franja.
 - Las clases por tono van escritas completas en un array (`IDENTITY_CLASSES[i]`), nunca interpoladas: Tailwind solo genera las clases que encuentra escritas.
 
 ### Tipografía
 
 - **Figtree** con `next/font/google`: se descarga en el build y se sirve desde el sitio, sin requests a Google.
-- Escala del prototipo como utilidades: `type-page-title`, `type-post-title` (17 px, 700), `type-post-body` (15 px), `type-ui` (14 px, base del `body`), `type-action` (13 px, 600), `type-small` (13 px, regular: comentarios y nombres de la columna izquierda), `type-meta` (12 px), `type-section` (11 px, mayúsculas).
+- Escala del prototipo como utilidades: `type-page-title`, `type-post-title` (17 px, 700), `type-post-body` (15 px), `type-ui` (14 px, base del `body`), `type-action` (13 px, 600), `type-small` (13 px, regular: comentarios y nombres de la columna izquierda), `type-meta` (12 px), `type-section` (11 px, mayúsculas) y `type-comment` (14 px con 20 px de interlineado: el cuerpo de un comentario en el detalle, como Reddit, `specs/comment-threads`).
 - **Prefijo `type-`, no `text-`**: `cn` trata cualquier `text-<algo>` desconocido como un color y lo descarta al combinarlo con `text-muted-foreground`. Con `type-` no hay conflicto y no hace falta configurar `cn` (configurarlo sumaba ~20 KB al bundle). Como `cn` no las combina, no se ponen junto a otra clase que pise lo mismo (`text-[…]`, `font-*`): en ese caso se escriben las clases sueltas.
 
 ### Materiales
@@ -90,7 +91,7 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
 
 Definido en `specs/home-motion`. Los valores salen del prototipo y el criterio, de las skills `emil-design-eng` y `review-animations`.
 
-- **Tokens** en `globals.css`: `--ease-out` (`cubic-bezier(0.23, 1, 0.32, 1)`, salidas e interacciones) y `--ease-bars` (`cubic-bezier(0.4, 0, 0.2, 1)`, las barras del prototipo); animaciones `animate-vote-pop`, `animate-count-up/down`, `animate-bar-grow`, `animate-fade-up`, `animate-fade-in`, `animate-underline-in` y `animate-live-pulse`. Un valor nuevo se agrega ahí, no suelto en un componente.
+- **Tokens** en `globals.css`: `--ease-out` (`cubic-bezier(0.23, 1, 0.32, 1)`, salidas e interacciones) y `--ease-bars` (`cubic-bezier(0.4, 0, 0.2, 1)`, las barras del prototipo); animaciones `animate-vote-pop`, `animate-count-up/down`, `animate-bar-grow`, `animate-fade-up`, `animate-fade-in`, `animate-underline-in`, `animate-live-pulse` y `animate-comment-flash` (el comentario abierto desde su link: un tinte que se va en 1,5 s, más que 300 ms a propósito porque no responde a un toque). Un valor nuevo se agrega ahí, no suelto en un componente.
 - **Utilidades**: `tap` (hover de color en 150 ms y presión a `scale(0.97)` en 120 ms) para todo lo interactivo, `stagger` (entrada escalonada de los primeros 5 hijos) y `delay-after-bars` (400 ms: lo que entra después de las barras de encuesta). Un control bloqueado (`aria-disabled`) no se hunde al tocarlo: `aria-disabled:active:scale-100`.
 - **Escalas al hover** con `motion-safe:`: la red de seguridad acorta duraciones pero no quita la escala, que saltaría al instante.
 - **Reglas**:

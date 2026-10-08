@@ -294,6 +294,9 @@
   --animate-bar-grow: bar-grow 600ms var(--ease-bars);
   --animate-fade-up: fade-up 200ms var(--ease-out) backwards;
   --animate-fade-in: fade-in 200ms var(--ease-out);
+  /* A shared comment opened from its link (specs/comment-threads CT-12): a tint that fades out.
+     Longer than 300ms on purpose: it is a "here it is", not a response to a tap. */
+  --animate-comment-flash: comment-flash 1.5s var(--ease-out);
   --animate-underline-in: underline-in 200ms var(--ease-out);
   --animate-live-pulse: live-pulse 2s var(--ease-out) infinite;
 
@@ -328,6 +331,11 @@
   @keyframes fade-in {
     from {
       opacity: 0;
+    }
+  }
+  @keyframes comment-flash {
+    from {
+      background-color: var(--muted);
     }
   }
   @keyframes underline-in {
@@ -411,6 +419,11 @@
 @utility type-small {
   font-size: 0.8125rem;
   line-height: 1.5;
+}
+/* A comment's body, as Reddit's: 14px on a 20px line (specs/comment-threads CT-02). */
+@utility type-comment {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
 }
 @utility type-meta {
   font-size: 0.75rem;
@@ -514,5 +527,65 @@
 @media (forced-colors: active) {
   [data-mention-highlight] {
     display: none;
+  }
+}
+
+/* The threads' wiring, measured on Reddit (specs/comment-threads § 1). --av is the avatar column:
+   24px, 32px from sm. A comment (.thread-item) with replies draws a 1px line from under its avatar
+   (.thread-body::before); each reply (.thread-child) continues it down to the next one, and joins
+   it with an elbow (.thread-elbow::after) that curves into its avatar's center. The last reply
+   ends the line. The strip over the line (.thread-strip) and the collapse button show only when
+   there are replies; hovering the strip darkens this thread's lines. */
+@layer components {
+  .thread-item {
+    position: relative;
+  }
+  .thread-body::before,
+  .thread-child:not(:last-child)::before {
+    position: absolute;
+    left: calc(var(--av) / -2 - 0.5px);
+    width: 1px;
+    background-color: var(--border);
+  }
+  .thread-item:has(> .thread-children > li) > .thread-body::before {
+    content: '';
+    top: 0.25rem;
+    bottom: -0.25rem;
+  }
+  .thread-child {
+    position: relative;
+  }
+  .thread-child:not(:last-child)::before {
+    content: '';
+    top: 0;
+    bottom: -0.25rem;
+  }
+  .thread-elbow::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: calc(var(--av) / -2 - 0.5px);
+    width: calc(var(--av) / 2 + 0.5px);
+    height: calc(var(--av) / 2);
+    border-bottom-left-radius: 0.75rem;
+    border-left: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .thread-strip,
+  .thread-collapse {
+    display: none;
+  }
+  .thread-item:has(> .thread-children > li) > .thread-strip {
+    display: block;
+  }
+  .thread-item:has(> .thread-children > li) > .thread-body .thread-collapse {
+    display: inline-flex;
+  }
+  .thread-item:has(> .thread-strip:hover) > .thread-body::before,
+  .thread-item:has(> .thread-strip:hover) > .thread-children > .thread-child::before {
+    background-color: var(--border-strong);
+  }
+  .thread-item:has(> .thread-strip:hover) > .thread-children > .thread-elbow::after {
+    border-color: var(--border-strong);
   }
 }

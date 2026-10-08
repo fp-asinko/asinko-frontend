@@ -21,10 +21,14 @@ type Motion = { pop: 'up' | 'down' | null; roll: 'up' | 'down' | null; key: numb
 const BUTTON =
   'tap inline-flex items-center justify-center rounded-full outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-60'
 
-/** The post's pill, and the comment's smaller one with 24px buttons (PC-16, WCAG 2.5.8). */
+/**
+ * The post's pill, the feed's comment previews' smaller one with 24px buttons (PC-16, WCAG 2.5.8),
+ * and the post page's comments', as Reddit's: no pill, 32px arrows (specs/comment-threads CT-03).
+ */
 const SIZES = {
   default: { pill: 'h-9.5 type-action', button: 'size-8', icon: 'size-4.5' },
   sm: { pill: 'h-7 type-meta', button: 'size-6', icon: 'size-4' },
+  plain: { pill: 'h-8 type-meta bg-transparent p-0 gap-0', button: 'size-8', icon: 'size-4' },
 } as const
 
 /**

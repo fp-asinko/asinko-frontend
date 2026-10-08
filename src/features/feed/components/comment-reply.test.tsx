@@ -87,4 +87,29 @@ describe('CommentReply (specs/post-create-detail PC-15)', () => {
     expect(await screen.findByRole('dialog', { name: 'Join Asinko to comment' })).toBeVisible()
     expect(screen.queryAllByRole('textbox', { hidden: true })).toHaveLength(0)
   })
+
+  it('puts the lead before the votes and the other actions after Reply (specs/comment-threads CT-03)', () => {
+    renderWithIntl(
+      <AuthGateProvider signedIn>
+        <CommentThread>
+          <CommentReply
+            postId={POST}
+            commentId={COMMENT}
+            lead={<button type="button">Collapse</button>}
+            actions={<button type="button">Share</button>}
+          >
+            <span>votes</span>
+          </CommentReply>
+        </CommentThread>
+      </AuthGateProvider>,
+    )
+    const [lead, , share] = ['Collapse', 'Reply', 'Share'].map((name) =>
+      screen.getByRole('button', { name }),
+    )
+    const reply = screen.getByRole('button', { name: 'Reply' })
+    expect(lead!.compareDocumentPosition(screen.getByText('votes'))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    expect(reply.compareDocumentPosition(share!)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+  })
 })

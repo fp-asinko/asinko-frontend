@@ -2,7 +2,7 @@ import { ArrowUpRightIcon, MessageSquareIcon, Share2Icon } from 'lucide-react'
 import Image from 'next/image'
 import { useFormatter, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
-import { ComingSoon } from '@/components/molecules/coming-soon'
+import { ShareButton } from '@/components/molecules/share-button'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 import type { PostItem } from '../feed.types'
@@ -177,14 +177,14 @@ export function PostCard({
             </CommentsToggle>
           )}
           <span className="ml-auto md:ml-0">
-            <ComingSoon
-              label={t('share')}
-              placement="below-end"
-              className="inline-flex h-9.5 min-w-9.5 tap items-center justify-center gap-1.5 rounded-full bg-muted px-3 type-action text-muted-foreground hover:bg-muted-hover"
+            <ShareButton
+              href={post.path}
+              className="inline-flex h-9.5 min-w-9.5 tap items-center justify-center gap-1.5 rounded-full bg-muted px-3 type-action text-muted-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               <Share2Icon aria-hidden className="size-3.5" />
-              <span className="hidden sm:inline">{t('share')}</span>
-            </ComingSoon>
+              {/* Its name in phones too, where only the icon shows. */}
+              <span className="sr-only sm:not-sr-only">{t('share')}</span>
+            </ShareButton>
           </span>
         </div>
       )}

@@ -46,7 +46,7 @@ describe('CommentTree (specs/post-create-detail PC-14)', () => {
     expect(screen.getAllByRole('button', { name: 'Reply' })).toHaveLength(1)
   })
 
-  it('folds the replies from level 4 and opens them on demand', async () => {
+  it('folds the replies from level 4 as "⊕ N more replies" and opens them on demand (CT-08)', async () => {
     renderTree([
       node({ body: 'Level 1' }, [
         node({ body: 'Level 2' }, [
@@ -57,11 +57,38 @@ describe('CommentTree (specs/post-create-detail PC-14)', () => {
     expect(screen.getByText('Level 3')).toBeInTheDocument()
     expect(screen.queryByText('Level 4')).not.toBeInTheDocument()
 
-    const toggle = screen.getByRole('button', { name: /See 2 replies/ })
-    await userEvent.click(toggle)
+    const more = screen.getByRole('button', { name: '2 more replies' })
+    expect(more).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(more)
     expect(screen.getByText('Level 4')).toBeInTheDocument()
     expect(screen.getByText('Level 5')).toBeInTheDocument()
-    expect(toggle).toHaveTextContent('Hide replies')
+    expect(more).not.toBeInTheDocument()
+    // The focus goes to the first reply shown.
+    expect(screen.getByText('Level 4').closest('li')).toHaveFocus()
+  })
+})
+
+describe('CommentTree wired as Reddit (specs/comment-threads)', () => {
+  it('gives each comment its link id and a Share button (CT-11, CT-12)', () => {
+    const parent = node({ body: 'Top' }, [node({ body: 'Nested' })])
+    renderTree([parent])
+    expect(screen.getByText('Top').closest('li')).toHaveAttribute('id', `comment-${parent.id}`)
+    expect(screen.getAllByRole('button', { name: 'Share' })).toHaveLength(2)
+  })
+
+  it('closes a thread with ⊖ and opens it with ⊕, the focus on ⊕ (CT-06, CT-09)', async () => {
+    renderTree([node({ body: 'Top' }, [node({ body: 'Nested' })])])
+    const collapse = screen.getAllByRole('button', { name: "Collapse @maria's comment" })[0]!
+    expect(collapse).toHaveAttribute('aria-expanded', 'true')
+    await userEvent.click(collapse)
+    expect(screen.getByText('Top')).not.toBeVisible()
+    expect(screen.getByText('Nested')).not.toBeVisible()
+    const expand = screen.getByRole('button', { name: "Expand @maria's comment" })
+    expect(expand).toHaveFocus()
+    expect(expand).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.click(expand)
+    expect(screen.getByText('Top')).toBeVisible()
+    expect(screen.getByText('Nested')).toBeVisible()
   })
 })
 

@@ -30,30 +30,37 @@ export function CommentThread({ children }: { children: ReactNode }) {
 
 /**
  * The comments being sent under `parentId` (null: the post), at the end of that level: the
- * backend lists comments oldest first, so that is where they land.
+ * backend lists comments oldest first, so that is where they land. `<li>`s for that level's list;
+ * replies hang from the thread's line (`itemClassName`, specs/comment-threads CT-10).
  */
-export function PendingComments({ parentId }: { parentId: string | null }) {
+export function PendingComments({
+  parentId,
+  itemClassName,
+}: {
+  parentId: string | null
+  itemClassName?: string
+}) {
   const t = useTranslations('comments')
   const { pending } = useThread()
   const { viewerAvatar } = useAuthGate()
   const mine = pending.filter((comment) => comment.parentId === parentId)
   if (mine.length === 0) return null
 
-  return (
-    <ul className="flex flex-col gap-4">
-      {mine.map((comment) => (
-        <li key={comment.key} aria-busy="true" className="flex gap-2.5 opacity-70">
-          <span className="shrink-0">{viewerAvatar}</span>
-          <div className="min-w-0 flex-1 wrap-anywhere">
-            <p className="mb-0.75 flex gap-1.25 type-meta text-muted-foreground">
-              <span className="font-bold text-foreground">{t('you')}</span>
-              <span aria-hidden>·</span>
-              <span>{t('sending')}</span>
-            </p>
-            <p className="type-small whitespace-pre-wrap">{comment.body}</p>
-          </div>
-        </li>
-      ))}
-    </ul>
-  )
+  return mine.map((comment) => (
+    <li key={comment.key} aria-busy="true" className={itemClassName}>
+      <div className="flex min-h-(--av) items-center gap-2 opacity-70">
+        <span className="flex size-(--av) shrink-0 items-center justify-center">
+          {viewerAvatar}
+        </span>
+        <p className="flex gap-1 type-meta text-muted-foreground">
+          <span className="font-bold text-foreground">{t('you')}</span>
+          <span aria-hidden>•</span>
+          <span>{t('sending')}</span>
+        </p>
+      </div>
+      <p className="mt-1 ml-(--av) pl-2 type-comment wrap-anywhere whitespace-pre-wrap opacity-70">
+        {comment.body}
+      </p>
+    </li>
+  ))
 }

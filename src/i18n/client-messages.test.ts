@@ -48,6 +48,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'postDetail',
       'preview',
       'rightColumn',
+      'share',
     ])
     expect(Object.keys(picked.feed as object).sort()).toEqual([
       'card',

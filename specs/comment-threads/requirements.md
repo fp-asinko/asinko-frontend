@@ -1,6 +1,6 @@
 # Hilos de comentarios como Reddit — Requirements
 
-> **Estado:** borrador para el PO (2026-10-08). Preguntas abiertas al final.
+> **Estado:** aprobado por el PO el 2026-10-08, con Q1 a Q4 como se recomendaron.
 > **Fuente:** pedido del PO (2026-10-08): "en la sección de comentarios del post: primero fijate tamaño de imágenes y texto de Reddit; segundo agregar el botón de compartir como tiene Reddit; tercero agregar esa especie de cableado para abrir y cerrar comentarios y que estén unidos, copialo tal cual".
 > **Medido** en un post de Reddit (r/AskReddit, 2026-10-08, 1280 px, sin sesión), con Playwright: tamaños, colores y geometría de las líneas en `design.md § 1`.
 
@@ -27,7 +27,7 @@ Que los comentarios de un post se lean como los de Reddit: avatares y texto del 
 - [ ] **CT-04** Un comentario con respuestas tiene una **línea vertical** de 1 px, gris claro, que baja desde debajo de su avatar, por el centro de la columna del avatar.
 - [ ] **CT-05** Cada respuesta se une a esa línea con un **codo**: baja por la línea y dobla con una curva (radio de 12 px) hasta el centro del avatar de la respuesta. La línea termina en el codo de la última respuesta: no sigue de largo.
 - [ ] **CT-06** En la línea, a la altura de la fila de acciones, un botón **⊖** (16 px, sobre fondo blanco que tapa la línea) **cierra el hilo**: quedan el autor y la fecha, con **⊕** en lugar del avatar; se ocultan el cuerpo, las acciones y las respuestas. **⊕** lo vuelve a abrir. Toda la franja de la línea (32 px de ancho) también cierra el hilo al tocarla, y se oscurece al pasar el mouse.
-- [ ] **CT-07** Un comentario sin respuestas también se puede cerrar con ⊖ (como Reddit).
+- [ ] **CT-07** **Ajustado al implementar (2026-10-08):** un comentario sin respuestas no tiene línea ni ⊖, como Reddit (medido: las hojas no lo muestran). La versión anterior decía que también se cerraba; era un error de lectura del borrador.
 - [ ] **CT-08** Las respuestas plegadas desde el nivel 4 (PC-14) se muestran como Reddit: **⊕ N respuestas más** sobre la línea, con su codo; al tocarlo se abren.
 - [ ] **CT-09** Teclado y lectores de pantalla: ⊖ y ⊕ son botones con nombre ("Cerrar el comentario de @maria", "Abrir el comentario de @maria") y `aria-expanded`. Cerrar un hilo deja el foco en ⊕. La franja de la línea es solo para el mouse (el teclado usa ⊖).
 - [ ] **CT-10** Lo que se está enviando (comentarios pendientes) y los anuncios entre comentarios cuelgan de la misma línea; el anuncio sin codo.
@@ -49,7 +49,7 @@ Que los comentarios de un post se lean como los de Reddit: avatares y texto del 
 - Cargar más respuestas desde el servidor ("Ver más respuestas" de Reddit sin sesión): hoy llegan todas con el post.
 - Recordar qué hilos cerró cada persona al recargar.
 
-## Preguntas abiertas
+## Preguntas resueltas (2026-10-08)
 
 - **Q1. Compartir:** ¿menú del sistema en el teléfono y copiar el link en desktop (**recomendado**, sin dependencias y sin pantalla nueva)? Alternativa: un menú como el de Reddit ("Copiar link", "Embeber"), que suma un desplegable.
 - **Q2. Award y ⋯:** ¿los dejamos afuera (**recomendado**: Award es de la fase 4, economía, y ⋯ no tiene acciones todavía) o los mostramos como "Próximamente"?

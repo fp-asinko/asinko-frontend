@@ -76,7 +76,7 @@ test.describe('Post detail comments', () => {
     const section = comments(page)
 
     await section.getByRole('textbox', { name: 'Join the conversation' }).fill(mine)
-    await section.getByRole('button', { name: 'Comment' }).click()
+    await section.getByRole('button', { name: 'Comment', exact: true }).click()
     // First the box empties: while it holds the text, its blue copy (MA-12) shows it too.
     await expect(section.getByRole('textbox', { name: 'Join the conversation' })).toHaveValue('')
     await expect(section.getByText(mine)).toBeVisible()
@@ -99,7 +99,7 @@ test.describe('Post detail comments', () => {
     await page.goto(FED_PATH)
     const section = comments(page)
     await expect(section.getByText('He always does.')).toBeHidden()
-    await section.getByRole('button', { name: 'See 2 replies' }).click()
+    await section.getByRole('button', { name: '2 more replies' }).click()
     await expect(section.getByText(/He always does/)).toBeVisible()
     await expect(section.getByText(/Until the next CPI print/)).toBeVisible()
 
@@ -122,14 +122,14 @@ test.describe('Post detail comments', () => {
     await page.goto(FED_PATH)
     const section = comments(page)
     await section.getByRole('textbox', { name: 'Join the conversation' }).fill('Hello')
-    await section.getByRole('button', { name: 'Comment' }).click()
+    await section.getByRole('button', { name: 'Comment', exact: true }).click()
     await expect(page.getByRole('dialog', { name: 'Join Asinko to comment' })).toBeVisible()
   })
 
   test('fits 360px without horizontal scroll (PC-18)', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 })
     await page.goto(FED_PATH)
-    await comments(page).getByRole('button', { name: 'See 2 replies' }).click()
+    await comments(page).getByRole('button', { name: '2 more replies' }).click()
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     )

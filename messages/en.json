@@ -310,8 +310,6 @@
     "title": "{count, plural, =0 {Comments} one {# comment} other {# comments}}",
     "empty": "No comments yet. Start the conversation.",
     "error": "Could not load the comments. Reload the page to retry.",
-    "seeReplies": "{count, plural, one {See # reply} other {See # replies}}",
-    "hideReplies": "Hide replies",
     "sort": {
       "best": "Best",
       "top": "Top",
@@ -329,7 +327,8 @@
       "cta": "Learn more",
       "ctaLabel": "Learn more about {advertiser} (opens in a new tab)",
       "region": "Ad: {advertiser}"
-    }
+    },
+    "moreReplies": "{count, plural, one {# more reply} other {# more replies}}"
   },
   "comments": {
     "label": "Join the conversation",
@@ -342,7 +341,10 @@
     "error": "Could not post your comment. Try again.",
     "replyLabel": "Your reply",
     "sendReply": "Send reply",
-    "sent": "Comment posted."
+    "sent": "Comment posted.",
+    "share": "Share",
+    "collapse": "Collapse {handle}'s comment",
+    "expand": "Expand {handle}'s comment"
   },
   "composer": {
     "title": "Create post",
@@ -429,5 +431,9 @@
       "symbols": "Symbols"
     },
     "categoriesLabel": "Categories"
+  },
+  "share": {
+    "copied": "Link copied",
+    "failed": "Could not copy"
   }
 }

@@ -30,7 +30,8 @@ describe('PostCard (H-12)', () => {
     }
     expect(screen.getByText('6 comments')).toBeInTheDocument()
     expect(screen.getByText('1,284 points')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Share' })).toHaveAttribute('aria-disabled', 'true')
+    // Share works now (specs/comment-threads Q4): no longer "coming soon".
+    expect(screen.getByRole('button', { name: 'Share' })).not.toHaveAttribute('aria-disabled')
   })
 
   it('orders the actions as Reddit: votes, then comments, then share', () => {

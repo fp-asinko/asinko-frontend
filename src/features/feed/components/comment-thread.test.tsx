@@ -50,4 +50,17 @@ describe('CommentThread and PendingComments (specs/post-create-detail PC-15)', (
     expect(screen.getByRole('region', { name: 'c1' })).toHaveTextContent('On c1')
     expect(screen.getAllByText('You')).toHaveLength(2)
   })
+
+  it('hangs each one from the thread with the class it is given (specs/comment-threads CT-10)', async () => {
+    renderWithIntl(
+      <CommentThread>
+        <Sender parentId="c1" body="A reply" />
+        <ul aria-label="replies">
+          <PendingComments parentId="c1" itemClassName="thread-child thread-elbow" />
+        </ul>
+      </CommentThread>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Send A reply' }))
+    expect(screen.getByText('A reply').closest('li')).toHaveClass('thread-child', 'thread-elbow')
+  })
 })

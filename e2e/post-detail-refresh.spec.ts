@@ -32,14 +32,18 @@ test.describe('Post detail refresh', () => {
     const closed = (await box.boundingBox())!.height
     expect(closed).toBeLessThanOrEqual(46)
     await expect(box).toHaveAttribute('placeholder', 'Join the conversation')
-    await expect(comments(page).getByRole('button', { name: 'Comment' })).toHaveCount(0)
+    await expect(comments(page).getByRole('button', { name: 'Comment', exact: true })).toHaveCount(
+      0,
+    )
 
     await box.click()
-    await expect(comments(page).getByRole('button', { name: 'Comment' })).toBeVisible()
+    await expect(comments(page).getByRole('button', { name: 'Comment', exact: true })).toBeVisible()
     await expect.poll(async () => (await box.boundingBox())!.height).toBeGreaterThan(closed)
 
     await page.getByRole('heading', { name: /comments/ }).click()
-    await expect(comments(page).getByRole('button', { name: 'Comment' })).toHaveCount(0)
+    await expect(comments(page).getByRole('button', { name: 'Comment', exact: true })).toHaveCount(
+      0,
+    )
   })
 
   test('sorts by New and Top, in the URL, and back returns (PD-03, PD-04)', async ({ page }) => {

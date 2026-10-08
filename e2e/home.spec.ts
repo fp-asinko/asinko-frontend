@@ -134,12 +134,11 @@ test.describe('Home feed', () => {
 
   test('features of later phases say "Coming soon" (H-26)', async ({ page }) => {
     await page.goto('/en')
-    const share = articles(page).first().getByRole('button', { name: 'Share' })
-    await expect(share).toHaveAttribute('aria-disabled', 'true')
-    await pressComingSoon(share)
-    await expect(
-      articles(page).first().getByRole('status').filter({ hasText: 'Coming soon' }),
-    ).toBeVisible()
+    // The composer box's Image (Share works since specs/comment-threads).
+    const image = page.getByRole('button', { name: 'Image' })
+    await expect(image).toHaveAttribute('aria-disabled', 'true')
+    await pressComingSoon(image)
+    await expect(page.getByRole('status').filter({ hasText: 'Coming soon' })).toBeVisible()
   })
 
   test('"Coming soon" bubbles stay on screen at 360px, at the edges too (H-26)', async ({
@@ -159,8 +158,9 @@ test.describe('Home feed', () => {
       expect(box.x + box.width).toBeLessThanOrEqual(360)
       expect(box.y + box.height).toBeLessThanOrEqual(800)
     }
-    const post = articles(page).first()
-    await inside(post.getByRole('button', { name: 'Share' }), post)
+    // Against the right edge: the top bar's search (the cards' Share works now).
+    const top = page.getByRole('banner')
+    await inside(top.getByRole('button', { name: 'Search' }), top)
     const bar = page.getByRole('navigation', { name: 'Main navigation' })
     await inside(bar.getByRole('button', { name: 'Profile' }), bar)
   })

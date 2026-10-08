@@ -95,7 +95,7 @@ test.describe('Mention autocomplete', () => {
   test('the list floats over everything, even inside a folded thread (MA-08)', async ({ page }) => {
     await page.goto(FED_PATH)
     const section = page.getByRole('region', { name: /comments/i })
-    await section.getByRole('button', { name: 'See 2 replies' }).click()
+    await section.getByRole('button', { name: '2 more replies' }).click()
     const deep = section.getByRole('listitem').filter({ hasText: 'He always does' }).first()
     await deep.getByRole('button', { name: 'Reply' }).first().click()
     const reply = deep.getByRole('textbox', { name: 'Your reply' })

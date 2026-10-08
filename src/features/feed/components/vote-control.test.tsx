@@ -174,4 +174,11 @@ describe('VoteControl on a comment (specs/post-create-detail PC-16)', () => {
     expect(action.votePost).not.toHaveBeenCalled()
     expect(await screen.findByText('4 points, you upvoted')).toBeInTheDocument()
   })
+
+  it("comes without the pill in the post page's comments (specs/comment-threads CT-03)", () => {
+    renderWithIntl(<VoteControl kind="comment" id={ID} size="plain" score={3} viewerVote={null} />)
+    const upvote = screen.getByRole('button', { name: 'Upvote' })
+    expect(upvote).toHaveClass('size-8')
+    expect(upvote.parentElement).toHaveClass('bg-transparent')
+  })
 })
