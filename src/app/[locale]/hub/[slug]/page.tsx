@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { PageColumns } from '@/components/organisms/app-shell'
 import { communityMetadata, CommunityTop, resolveCommunityRoute } from '@/features/communities'
 import { ComposeScope } from '@/features/composer'
-import { CommunityFeed } from '@/features/feed'
+// By its path, not the feature's index: the index also brings the post page's client parts (seo.md).
+import { CommunityFeed } from '@/features/feed/components/community-feed'
 
 // A group's page: /hub/{slug} in every locale (specs/community-pages CP-01). Outside (main) and
 // without loading.tsx: the community resolves before anything streams, so a redirect is a real 308

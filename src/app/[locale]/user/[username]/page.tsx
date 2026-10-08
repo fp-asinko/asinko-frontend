@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { PageColumns } from '@/components/organisms/app-shell'
 import { communityMetadata, CommunityTop, resolveProfileRoute } from '@/features/communities'
 import { ComposeScope } from '@/features/composer'
-import { CommunityFeed } from '@/features/feed'
+// By its path, not the feature's index: the index also brings the post page's client parts (seo.md).
+import { CommunityFeed } from '@/features/feed/components/community-feed'
 
 // A user's page: /user/{username} in every locale (specs/community-pages § 12). Outside (main) and
 // without loading.tsx, as /hub: real 308 redirects and 404s.

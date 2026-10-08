@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { PageColumns } from '@/components/organisms/app-shell'
 import { env } from '@/env'
-import { HomeFeed } from '@/features/feed'
+// By its path, not the feature's index: the index also brings the post page's client parts (seo.md).
+import { HomeFeed } from '@/features/feed/components/home-feed'
 import { buildAlternates } from '@/i18n/alternates'
 import { routing } from '@/i18n/routing'
 

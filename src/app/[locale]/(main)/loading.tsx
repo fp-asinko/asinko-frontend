@@ -1,6 +1,7 @@
 import { PageColumns } from '@/components/organisms/app-shell'
 import { Skeleton } from '@/components/ui/skeleton'
-import { FeedListSkeleton } from '@/features/feed'
+// By its path, not the feature's index: the index also brings the post page's client parts (seo.md).
+import { FeedListSkeleton } from '@/features/feed/components/feed-list-skeleton'
 
 // Skeleton of the Home with the feed's real proportions (composer, tabs, filters and cards): no CLS.
 // Lives in the (main) group, not in [locale]: a loading boundary above [...rest] would stream a 200

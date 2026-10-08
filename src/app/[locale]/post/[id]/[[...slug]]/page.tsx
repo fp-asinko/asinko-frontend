@@ -1,6 +1,11 @@
 import type { Metadata } from 'next'
 import { PageColumns } from '@/components/organisms/app-shell'
-import { PostDetail, postMetadata, resolvePostRoute } from '@/features/feed'
+// By its path, not the feature's index: the index also brings the feeds' client parts (seo.md).
+import {
+  PostDetail,
+  postMetadata,
+  resolvePostRoute,
+} from '@/features/feed/components/post-route-page'
 
 // A post's page: /post/{id}/{slug} in every locale, as Reddit (specs/post-create-detail § 1).
 // Outside (main) and without loading.tsx, as /hub: real 308 redirects and 404s.
