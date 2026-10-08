@@ -18,6 +18,7 @@ import { CommentAd } from './comment-ad'
 import { CommentThread } from './comment-thread'
 import { PostCard } from './post-card'
 import { PostComments } from './post-comments'
+import { RecordView } from './record-view'
 
 function safeLocale(locale: string): Locale {
   return routing.locales.find((each) => each === locale) ?? routing.defaultLocale
@@ -83,6 +84,8 @@ export function PostDetail({
   return (
     <CommentThread>
       <PostCard post={post} variant="detail" leading={<BackButton variant="plain" />} />
+      {/* Into the right column's "Recently viewed" (specs/recently-viewed); a deleted post, no. */}
+      {!post.deleted && <RecordView item={recentItem(post)} />}
       <Suspense fallback={null}>
         <PostAd />
       </Suspense>
@@ -110,4 +113,22 @@ async function PostAd() {
       <CommentAd ad={ad} />
     </div>
   )
+}
+
+/** What "Recently viewed" keeps of a post: where it was published (or its author), title, numbers. */
+function recentItem(post: PostItem) {
+  const community = post.community
+  const label =
+    community && !community.personal
+      ? community.handle
+      : (post.author?.handle ?? community?.handle ?? '')
+  return {
+    id: post.id,
+    href: post.path,
+    label,
+    title: post.title,
+    kind: 'post' as const,
+    score: post.score,
+    comments: post.commentCount,
+  }
 }

@@ -1,6 +1,6 @@
 # Visto recientemente — Requirements
 
-> **Estado:** borrador para el PO (2026-10-08), con sus decisiones (abajo) y una pregunta (Q1).
+> **Estado:** aprobado por el PO el 2026-10-08, con Q1 como se recomendó (por ahora solo posts).
 > **Fuente:** pedido del PO (2026-10-08), con una captura del prototipo: "vamos a trabajar en la columna derecha, para agregar el recently viewed". Ya estaba previsto en `specs/right-column` ("espera al detalle de post"), que hoy existe.
 
 ## Objetivo
@@ -14,7 +14,7 @@ Volver en un toque a lo que se estuvo leyendo: la columna derecha lista los últ
 
 ## Criterios de aceptación
 
-- [ ] **RV-01** En la columna derecha (desde 1024 px, donde existe), arriba de "Season tokens", un bloque "Visto recientemente" con un botón "Borrar".
+- [ ] **RV-01** En la columna derecha (desde 1024 px, donde existe), debajo de "Season tokens" como en el prototipo, un bloque "Visto recientemente" con un botón "Borrar". Debajo y no arriba: la lista llega después de que carga la página y así no empuja nada (sin saltos).
 - [ ] **RV-02** Cada ítem: la comunidad donde se publicó (`$BTC`, `#macro`; en un canal personal, `@autor`) y hace cuánto lo viste ("12 min"), el título (hasta 2 líneas), los votos y los comentarios, y el tipo ("Post"). Todo el ítem lleva al post.
 - [ ] **RV-03** Se registra al abrir la página de detalle de un post. El último abierto va primero; abrir uno que ya estaba lo sube y actualiza sus datos. Hasta 10. Un post borrado no se registra.
 - [ ] **RV-04** Los votos y comentarios son los de la última vez que lo abriste (sin pedidos extra al servidor).
@@ -35,9 +35,9 @@ Volver en un toque a lo que se estuvo leyendo: la columna derecha lista los últ
 
 - **Guardado:** en el navegador.
 - **Números:** los de cuando lo viste, actualizados al volver a abrirlo.
-- **Alcance:** posts y encuestas, los últimos 10.
+- **Alcance:** posts y encuestas, los últimos 10. Las encuestas, cuando tengan su página (Q1).
 - **Presupuesto:** diferir la lista y medir; si no entra, preguntar.
 
-## Pregunta para el PO
+## Pregunta resuelta (2026-10-08)
 
 - **Q1. Encuestas:** hoy una encuesta no tiene página de detalle (se vota y se comenta en el feed), así que no hay un "abrirla" que registrar ni un lugar adonde llevar desde la lista. Propuesta: **por ahora solo posts**; las encuestas entran cuando tengan su página (se arma en otra spec si la querés). **Recomendado.** Alternativa: registrar una encuesta al votarla o abrir sus comentarios, y que el ítem lleve al Home filtrado por su comunidad.

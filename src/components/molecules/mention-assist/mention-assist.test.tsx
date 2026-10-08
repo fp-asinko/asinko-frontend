@@ -56,7 +56,8 @@ describe('MentionAssist (specs/mention-autocomplete)', () => {
 
     await userEvent.type(body(), 'bi')
     const list = await screen.findByRole('listbox', { name: 'Suggestions' })
-    expect(search).toHaveBeenLastCalledWith({ kind: 'asset', q: 'bi' })
+    // A slow machine may search "b" first, as the pause passes between keys: then "bi".
+    await waitFor(() => expect(search).toHaveBeenLastCalledWith({ kind: 'asset', q: 'bi' }))
     // The avatar is decorative: each option reads as its handle and its name.
     expect(within(list).getByRole('option', { name: '$BTC Bitcoin' })).toBeInTheDocument()
     expect(within(list).getByRole('option', { name: '$BCH Bitcoin Cash' })).toBeInTheDocument()
@@ -69,7 +70,8 @@ describe('MentionAssist (specs/mention-autocomplete)', () => {
     const list = await screen.findByRole('listbox')
     const [first, second] = within(list).getAllByRole('option')
     expect(body()).toHaveAttribute('aria-autocomplete', 'list')
-    expect(body()).toHaveAttribute('aria-controls', list.id)
+    // Set in an effect right after the list shows: on a busy machine, a moment later.
+    await waitFor(() => expect(body()).toHaveAttribute('aria-controls', list.id))
     expect(body()).toHaveAttribute('aria-activedescendant', first!.id)
     expect(first).toHaveAttribute('aria-selected', 'true')
 

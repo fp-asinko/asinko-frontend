@@ -47,6 +47,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'mentions',
       'postDetail',
       'preview',
+      'rightColumn',
     ])
     expect(Object.keys(picked.feed as object).sort()).toEqual([
       'card',
@@ -61,6 +62,8 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
     expect(picked.errors).toEqual({ unexpected: en.errors.unexpected })
     // The order and the search of the comments; the rest of the post's page stays on the server.
     expect(Object.keys(picked.postDetail as object).sort()).toEqual(['search', 'sort'])
+    // Recently viewed only: the rest of the right column is drawn on the server.
+    expect(Object.keys(picked.rightColumn as object)).toEqual(['recent'])
     expect(picked).not.toHaveProperty('interests')
   })
 })

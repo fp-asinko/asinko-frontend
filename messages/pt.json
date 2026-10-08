@@ -197,6 +197,17 @@
         "press": "Imprensa"
       },
       "copyright": "Asinko, Inc. © {year}. Todos os direitos reservados."
+    },
+    "recent": {
+      "title": "Vistos recentemente",
+      "clear": "Limpar",
+      "clearLabel": "Limpar vistos recentemente",
+      "empty": "Nada visto recentemente",
+      "votes": "{count, plural, one {# voto} other {# votos}}",
+      "comments": "{count, plural, one {# comentário} other {# comentários}}",
+      "kinds": {
+        "post": "Post"
+      }
     }
   },
   "authGate": {

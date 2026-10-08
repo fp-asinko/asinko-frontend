@@ -197,6 +197,17 @@
         "press": "Press"
       },
       "copyright": "Asinko, Inc. © {year}. All rights reserved."
+    },
+    "recent": {
+      "title": "Recently viewed",
+      "clear": "Clear",
+      "clearLabel": "Clear recently viewed",
+      "empty": "Nothing viewed recently",
+      "votes": "{count, plural, one {# vote} other {# votes}}",
+      "comments": "{count, plural, one {# comment} other {# comments}}",
+      "kinds": {
+        "post": "Post"
+      }
     }
   },
   "authGate": {

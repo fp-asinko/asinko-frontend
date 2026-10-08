@@ -14,7 +14,7 @@ Que la tercera columna deje de estar vacía y siga el prototipo, sin prometer lo
 El Product Owner decidió, el 2026-10-04:
 
 - **Tokens:** se muestran como "Próximamente". Son de la fase 4 y requieren validación legal.
-- **"Recently viewed":** espera al detalle de post (`post-detail`).
+- **"Recently viewed":** espera al detalle de post (`post-detail`). **Hecho el 2026-10-08 en `specs/recently-viewed`.**
 - **Pie:** los links se muestran como "Próximamente" hasta que existan las páginas.
 
 ## User stories

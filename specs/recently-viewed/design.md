@@ -43,7 +43,7 @@ type RecentItem = {
 - En la primera carga de todas las páginas: solo `RecentlyViewedSlot` (unas 20 líneas) y su entrada en el manifiesto de chunks diferidos.
 - En el detalle de post, además `RecordView` (unas 15 líneas, comparte `lib/recently-viewed.ts`).
 - `RecentlyViewed` (lista, formato, eventos) en un chunk diferido que se baja con `requestIdleCallback` y `matchMedia('(min-width: 1024px)')`: en mobile nunca se descarga.
-- Se mide al cerrar contra 236,8 / 238,6 KB.
+- **Medido al cerrar (2026-10-08):** Home y detalle 237,7 KB (antes 236,8), páginas de comunidad 239,4 KB (antes 238,6), contra 240. Entra; quedan 0,6 KB.
 
 ## 5. Tests
 

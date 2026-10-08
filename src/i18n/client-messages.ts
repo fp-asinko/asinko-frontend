@@ -25,6 +25,7 @@ export const CLIENT_NAMESPACES = [
   'postDetail.search',
   'postDetail.sort',
   'preview',
+  'rightColumn.recent',
 ] as const
 
 /** The subset of `messages` under CLIENT_NAMESPACES, keeping their nesting. */
