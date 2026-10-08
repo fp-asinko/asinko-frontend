@@ -32,6 +32,11 @@ export const communitySchema = z.object({
   viewerMembership: membershipSchema.nullable(),
   /** null without a session (E02). */
   viewerIsFavorite: z.boolean().nullable(),
+  /**
+   * P-016 (proposal): the main post, the most voted of the last 7 days or else the newest. Absent
+   * until the backend sends it; null for a community with no posts.
+   */
+  topPost: z.object({ id: z.string(), title: z.string() }).nullable().optional(),
 })
 
 export type RawCommunity = z.infer<typeof communitySchema>

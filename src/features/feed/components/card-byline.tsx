@@ -7,14 +7,7 @@ import { joinCommunity } from '@/lib/communities/join-community.action'
 import { previewProps } from '@/lib/communities/preview'
 import { cn } from '@/lib/utils'
 import type { Author, CardCommunity } from '../feed.types'
-import { accuracyTier, type AccuracyTier } from '../lib/accuracy-tier'
-
-// FC-03: the chip is tinted by tier; the percentage stays visible, so color is never the only cue.
-const TIER_CLASSES: Record<AccuracyTier, string> = {
-  high: 'bg-accuracy-high text-accuracy-high-foreground',
-  mid: 'bg-accuracy-mid text-accuracy-mid-foreground',
-  low: 'bg-accuracy-low text-accuracy-low-foreground',
-}
+import { ACCURACY_CLASSES, accuracyTier } from '@/lib/accuracy-tier'
 
 /**
  * Header of a card, the group first as on Reddit (specs/community-first § 1):
@@ -64,7 +57,7 @@ export function CardByline({
       data-tier={accuracy.tier}
       className={cn(
         'shrink-0 rounded-sm px-1 text-[0.625rem] font-bold tabular-nums',
-        TIER_CLASSES[accuracy.tier],
+        ACCURACY_CLASSES[accuracy.tier],
       )}
     >
       <span aria-hidden>{accuracy.value}</span>

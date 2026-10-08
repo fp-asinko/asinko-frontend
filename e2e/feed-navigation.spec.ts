@@ -64,7 +64,7 @@ test.describe('Feed navigation with a slow backend', () => {
     // From here on the backend is slow: only the cache can make the way back instant.
     await page.setExtraHTTPHeaders({ 'x-mock-delay': String(DELAY_MS) })
     const started = Date.now()
-    await page.getByRole('link', { name: 'New' }).click()
+    await page.getByRole('link', { name: 'New', exact: true }).click()
     await expect(page.getByRole('article').filter({ hasText: 'Whales accumulated' })).toBeVisible()
     expect(Date.now() - started).toBeLessThan(DELAY_MS)
   })

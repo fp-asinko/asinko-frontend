@@ -6,7 +6,7 @@
 
 ## Pendientes
 
-En orden de prioridad para el front: P-012, P-001, P-014, P-013, P-011, P-015, P-003 y P-005.
+En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P-015, P-003 y P-005.
 
 ### P-012: Todo lo que publica un usuario
 
@@ -111,6 +111,22 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-013, P-011, P-015, P
 ```
 
 Las imágenes, en el mismo Storage que los avatares. Medir impresiones y clics queda para después.
+
+### P-016: El post principal de cada comunidad
+
+**Estado:** propuesta (2026-10-08), mockeada en el front (`specs/interests-refresh`).
+
+**Endpoint:** `GET /api/v1/communities` (con y sin `?mine=true`) y `GET /api/v1/communities/{slug}`: el recurso `Community` suma un campo.
+
+**Motivo:** en la columna "Tus intereses", debajo de cada grupo y de cada comunidad sugerida va de qué se está hablando ahí, como en el prototipo: el título de su post principal. Hoy se muestra la descripción, y en el seed casi ninguna comunidad la tiene. Pedirlo con `/feed/explore?community=` por cada comunidad serían varios pedidos de 20 ítems por página para usar uno.
+
+**Cambio:**
+
+```json
+"topPost": { "id": "uuid", "title": "0DTE SPY calls into FOMC — degenerate or genius?" } | null
+```
+
+El más votado de los últimos 7 días; si no hubo, el más reciente; `null` si la comunidad no tiene posts. Solo posts visibles para quien pide (sin borrados). Mientras no esté, el front muestra la descripción.
 
 ## Pedidos operativos
 

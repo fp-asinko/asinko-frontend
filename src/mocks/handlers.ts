@@ -25,6 +25,7 @@ import { POLLS, pollById } from './fixtures/polls'
 import { POSTS } from './fixtures/posts'
 import { PROFILES, summary } from './fixtures/users'
 import { commentTree, searchComments } from './comment-tree'
+import { withTopPost } from './top-post'
 import { ADS } from './fixtures/ads'
 import { paginate } from './paginate'
 import type { MockContext, MockRoute } from './types'
@@ -133,7 +134,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
           (!query.type || each.type === query.type) &&
           (!search || each.name.toLowerCase().includes(search) || each.slug.includes(search)),
       ).sort((a, b) => b.memberCount - a.memberCount)
-      return { status: 200, body: paginate(filtered, query.cursor) }
+      // P-016: each with its main post (the backend adds it later; optional in the contract).
+      return { status: 200, body: paginate(filtered.map(withTopPost), query.cursor) }
     },
   },
   {
@@ -145,7 +147,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     example: { ...noRequest, params: { slug: 'BTC' } },
     handler: ({ params }) => {
       const community = params.slug ? communityBySlug(params.slug) : undefined
-      return community ? { status: 200, body: community } : notFound
+      return community ? { status: 200, body: withTopPost(community) } : notFound
     },
   },
 

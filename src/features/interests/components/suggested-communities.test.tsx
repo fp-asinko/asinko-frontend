@@ -17,8 +17,25 @@ const nft = {
   path: '/hub/nft',
   name: 'NFT',
   memberCount: 1200,
+  description: null as string | null,
+  topPostTitle: null as string | null,
   avatarUrl: null,
 }
+
+describe('SuggestedCommunities, what it is about (specs/interests-refresh IR-02)', () => {
+  it('says its main post, else its description, else its members', () => {
+    const { rerender } = renderWithIntl(
+      <SuggestedCommunities
+        suggestions={[{ ...nft, topPostTitle: 'Floor prices this week', description: 'Art' }]}
+      />,
+    )
+    expect(screen.getByRole('link')).toHaveAccessibleName('#nft Floor prices this week')
+    rerender(<SuggestedCommunities suggestions={[{ ...nft, description: 'Digital art' }]} />)
+    expect(screen.getByRole('link')).toHaveAccessibleName('#nft Digital art')
+    rerender(<SuggestedCommunities suggestions={[nft]} />)
+    expect(screen.getByRole('link')).toHaveAccessibleName('#nft 1,200 members')
+  })
+})
 
 describe('SuggestedCommunities (H-07)', () => {
   it('links each suggestion, named by its handle and member count', () => {

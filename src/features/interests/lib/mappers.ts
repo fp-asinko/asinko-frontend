@@ -47,6 +47,9 @@ export function toPerson(user: RawUserSummary): Person {
   }
 }
 
+/** A text that says something, or null: blanks are nothing (IR-01, IR-02). */
+const text = (value: string | null | undefined) => value?.trim() || null
+
 /** Non-asset communities the viewer belongs to, moderated ones first. */
 export function toGroups(communities: readonly RawCommunity[]): Group[] {
   return communities
@@ -56,7 +59,9 @@ export function toGroups(communities: readonly RawCommunity[]): Group[] {
       slug: c.slug,
       path: communityPath(kindOf(c.type), c.slug),
       name: c.name,
-      description: c.description,
+      description: text(c.description),
+      topPostTitle: text(c.topPost?.title),
+      memberCount: c.memberCount,
       avatarUrl: allowedImageUrl(c.avatarUrl),
       isModerator:
         c.viewerMembership === 'MODERATOR' || c.viewerMembership === 'PRINCIPAL_MODERATOR',
@@ -79,6 +84,8 @@ export function toSuggestions(
       path: communityPath(kindOf(c.type), c.slug),
       name: c.name,
       memberCount: c.memberCount,
+      description: text(c.description),
+      topPostTitle: text(c.topPost?.title),
       avatarUrl: allowedImageUrl(c.avatarUrl),
     }))
 }

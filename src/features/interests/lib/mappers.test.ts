@@ -80,3 +80,31 @@ describe('interests mappers', () => {
     expect(person(storage).avatarUrl).toBe(storage)
   })
 })
+
+describe('what each community is about (specs/interests-refresh IR-01, IR-02)', () => {
+  const group = COMMUNITIES.find(
+    (each) => each.viewerMembership && each.type === 'USER_PUBLIC',
+  ) as RawCommunity
+  const other = COMMUNITIES.find(
+    (each) => !each.viewerMembership && each.type !== 'PERSONAL_CHANNEL',
+  ) as RawCommunity
+
+  it('maps the main post title (P-016), and blanks as nothing', () => {
+    const topPost = { id: 'p1', title: '  0DTE SPY calls into FOMC  ' }
+    expect(toGroups([{ ...group, topPost }])[0]).toMatchObject({
+      topPostTitle: '0DTE SPY calls into FOMC',
+    })
+    expect(
+      toGroups([{ ...group, topPost: { id: 'p1', title: '  ' }, description: '' }])[0],
+    ).toMatchObject({ topPostTitle: null, description: null })
+    expect(toSuggestions([{ ...other, topPost: null, description: 'About it' }])[0]).toMatchObject({
+      topPostTitle: null,
+      description: 'About it',
+    })
+  })
+
+  it('works without the field, as the backend today', () => {
+    const { topPost: _absent, ...today } = { ...group, topPost: undefined }
+    expect(toGroups([today as RawCommunity])[0]).toMatchObject({ topPostTitle: null })
+  })
+})

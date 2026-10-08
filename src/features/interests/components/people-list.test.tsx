@@ -36,3 +36,25 @@ describe('PeopleList (H-07)', () => {
     expect(screen.getByRole('link', { name: /@maria/ })).toHaveAttribute('href', '/user/maria')
   })
 })
+
+describe('PeopleList, the accuracy in its tier (specs/interests-refresh IR-04)', () => {
+  const person = (id: string, accuracyRate: number) => ({
+    handle: `@${id}`,
+    path: `/user/${id}`,
+    id,
+    username: id,
+    avatarUrl: null,
+    accuracyRate,
+  })
+
+  it('tints it green from 70%, amber from 50% and red below, as the cards', () => {
+    renderWithIntl(
+      <PeopleList people={[person('high', 0.85), person('mid', 0.6), person('low', 0.3)]} />,
+    )
+    const tierOf = (text: string) =>
+      screen.getByText(text, { selector: '[aria-hidden]' }).parentElement!.dataset.tier
+    expect(tierOf('85%')).toBe('high')
+    expect(tierOf('60%')).toBe('mid')
+    expect(tierOf('30%')).toBe('low')
+  })
+})

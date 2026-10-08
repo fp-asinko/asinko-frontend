@@ -34,6 +34,10 @@ export type Group = {
   path: string
   name: string
   description: string | null
+  /** The title of its main post (P-016): what is being talked about there (IR-01). */
+  topPostTitle: string | null
+  /** The last line to say about it, when there is no post nor description. */
+  memberCount: number
   avatarUrl: string | null
   isModerator: boolean
 }
@@ -46,6 +50,9 @@ export type Suggestion = {
   path: string
   name: string
   memberCount: number
+  /** What it is about, for the line under its name (IR-02): its main post, else this. */
+  description: string | null
+  topPostTitle: string | null
   avatarUrl: string | null
 }
 
