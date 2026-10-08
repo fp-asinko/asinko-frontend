@@ -41,6 +41,7 @@ Que el detalle de un post se use como el de Reddit: volver con un toque, una caj
 - [ ] **PD-10** Un lector de pantalla oye que es un anuncio antes que su contenido.
 - [ ] **PD-15** **Dentro del post** (como Reddit): debajo de los votos y antes de la caja de comentario, un anuncio con la misma forma. Se suma a los de cada 10 comentarios, que siguen en los hilos largos; rotan sin repetir el de arriba.
 - [ ] **PD-16** **En los feeds**: en todos (Home Para vos y Siguiendo, y las páginas de comunidad, activo y perfil), un anuncio después de cada 10 posts o encuestas, contando los de las páginas que se cargan después. Se ve como una tarjeta de post: logo y anunciante con "Anuncio", el texto, la imagen grande si tiene y "Más información" con el dominio. Si los anuncios fallan, el feed se ve igual.
+- [ ] **PD-17** **Más aire en el detalle** (pedido del PO, 2026-10-08, con una captura de Reddit): el post de su página separa más que la tarjeta del feed: 14 px entre el encabezado y el título, 12 px hasta el cuerpo, 16 px entre párrafos y 24 px hasta los votos; los comentarios, 20 px entre el título, la caja, el orden y la lista. La tarjeta del feed no cambia.
 
 ### Calidad
 

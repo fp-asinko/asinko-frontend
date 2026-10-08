@@ -5,6 +5,7 @@ import Markdown, { type Components } from 'react-markdown'
 import { Link } from '@/i18n/navigation'
 import { communityPath } from '@/lib/communities/paths'
 import { previewProps } from '@/lib/communities/preview'
+import { cn } from '@/lib/utils'
 import { MENTION_SCHEME, parseMention } from '../lib/mentions'
 
 /**
@@ -97,9 +98,10 @@ const components: Components = {
   ),
 }
 
-export function PostMarkdown({ children }: { children: string }) {
+/** `className` adjusts the room between paragraphs: more on the post's own page. */
+export function PostMarkdown({ children, className }: { children: string; className?: string }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn('flex flex-col gap-2', className)}>
       <Markdown
         allowedElements={[...ALLOWED, ...HEADINGS]}
         unwrapDisallowed

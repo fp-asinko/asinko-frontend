@@ -39,7 +39,7 @@ export async function PostComments({
     <section
       id="comments"
       aria-labelledby="comments-title"
-      className="flex flex-col gap-4 border-t px-4 pt-4 pb-10 md:px-0"
+      className="flex flex-col gap-5 border-t px-4 pt-5 pb-10 md:px-0"
     >
       <h2 id="comments-title" className="type-ui font-bold">
         {t('title', { count })}

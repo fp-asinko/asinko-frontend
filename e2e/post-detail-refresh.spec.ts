@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 import { expectNoA11yViolations } from './fixtures/axe'
 
 // specs/post-detail-refresh against the production build with API_MOCKS=true. The ETH/BTC post
@@ -163,4 +163,29 @@ test.describe('Post detail refresh', () => {
       await expectNoA11yViolations(page)
     })
   }
+})
+
+test('the post page breathes more than the card: header, title, body and votes apart (PD-17)', async ({
+  page,
+}) => {
+  await page.goto(ETH_PATH)
+  const post = page.getByRole('article').first()
+  const title = post.getByRole('heading', { level: 1 })
+  const back = post.getByRole('button', { name: 'Back' })
+  const upvote = post.getByRole('button', { name: 'Upvote' })
+  const paragraphs = post.getByRole('paragraph')
+  const box = async (part: Locator) => {
+    const found = await part.boundingBox()
+    if (!found) throw new Error('not drawn')
+    return found
+  }
+  const backBox = await box(back)
+  const titleBox = await box(title)
+  const bodyTop = (await box(paragraphs.first())).y
+  const bodyEnd = await box(paragraphs.last())
+  const voteBox = await box(upvote)
+  // The gaps between them, as measured on Reddit's post page (14, 12 and 24px).
+  expect(titleBox.y - (backBox.y + backBox.height)).toBeGreaterThanOrEqual(13)
+  expect(bodyTop - (titleBox.y + titleBox.height)).toBeGreaterThanOrEqual(11)
+  expect(voteBox.y - (bodyEnd.y + bodyEnd.height)).toBeGreaterThanOrEqual(23)
 })

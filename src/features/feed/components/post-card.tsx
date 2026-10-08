@@ -4,6 +4,7 @@ import { useFormatter, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ComingSoon } from '@/components/molecules/coming-soon'
 import { Link } from '@/i18n/navigation'
+import { cn } from '@/lib/utils'
 import type { PostItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
@@ -63,7 +64,9 @@ export function PostCard({
       className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
       aria-labelledby={`post-${post.id}`}
     >
-      <div className="mb-2 flex items-center gap-2.5">
+      {/* The post's own page breathes more than a card, as Reddit's (specs/post-detail-refresh
+          PD-17): more room between the header, the title, the paragraphs and the votes. */}
+      <div className={cn('flex items-center gap-2.5', detail ? 'mb-3.5' : 'mb-2')}>
         {leading}
         <div className="min-w-0 flex-1">
           <CardByline
@@ -104,7 +107,7 @@ export function PostCard({
       </Title>
 
       {!post.deleted && post.body && (
-        <div className="group/body mt-1.5 type-post-body">
+        <div className={cn('group/body type-post-body', detail ? 'mt-3' : 'mt-1.5')}>
           {!detail && isLong(post.body) ? (
             <>
               <div className="line-clamp-6 group-has-[details[open]]/body:line-clamp-none">
@@ -118,13 +121,18 @@ export function PostCard({
               </details>
             </>
           ) : (
-            <PostMarkdown>{post.body}</PostMarkdown>
+            <PostMarkdown className={detail ? 'gap-4' : undefined}>{post.body}</PostMarkdown>
           )}
         </div>
       )}
 
       {post.media?.type === 'image' && (
-        <div className="relative mt-3 aspect-video overflow-hidden rounded-lg border bg-surface">
+        <div
+          className={cn(
+            'relative aspect-video overflow-hidden rounded-lg border bg-surface',
+            detail ? 'mt-4' : 'mt-3',
+          )}
+        >
           <PostImage
             src={post.media.url}
             alt={t('image')}
@@ -154,7 +162,7 @@ export function PostCard({
       {!post.deleted && (
         // Votes first, then comments, as Reddit (specs/feed-cards § 14). Share stays on the right in
         // mobile and joins the group from md.
-        <div className="mt-3 flex flex-wrap items-center gap-3">
+        <div className={cn('flex flex-wrap items-center gap-3', detail ? 'mt-6' : 'mt-3')}>
           <VoteControl id={post.id} score={post.score} viewerVote={post.viewerVote} />
           {detail ? (
             <a
