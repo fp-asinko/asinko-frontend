@@ -1,4 +1,4 @@
-import type { CommentAd, CommentNode } from '../feed.types'
+import type { HouseAd, CommentNode } from '../feed.types'
 import { FOLD_DEPTH } from './comment-fold'
 
 /** One ad after every this many comments (PO, specs/post-detail-refresh PD-07). */
@@ -12,12 +12,14 @@ export const AD_EVERY = 10
  */
 export function withAds(
   comments: readonly CommentNode[],
-  ads: readonly CommentAd[],
+  ads: readonly HouseAd[],
   every = AD_EVERY,
+  /** The first ad to use: 1 when the post already shows ads[0] (PD-15). */
+  first = 0,
 ): CommentNode[] {
   if (ads.length === 0) return [...comments]
   let read = 0
-  let shown = 0
+  let shown = first
 
   function walk(list: readonly CommentNode[], depth: number): CommentNode[] {
     return list.map((comment) => {

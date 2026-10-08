@@ -83,8 +83,8 @@ test.describe('Post detail refresh', () => {
       '2 results for “BLOBS”',
     )
     await expect(comments(page).locator('mark')).toHaveText(['blobs', 'blobs'])
-    // No ads among the results.
-    await expect(page.getByRole('region', { name: /^Ad: / })).toHaveCount(0)
+    // No ads among the results (the one inside the post stays, PD-15).
+    await expect(comments(page).getByRole('region', { name: /^Ad: / })).toHaveCount(0)
 
     await search.fill('nothing like this')
     await search.press('Enter')
@@ -102,13 +102,42 @@ test.describe('Post detail refresh', () => {
   }) => {
     await page.goto(ETH_PATH)
     const ads = page.getByRole('region', { name: /^Ad: / })
-    // ~30 comments in reading order: 3 ads.
-    await expect(ads).toHaveCount(3)
+    // One inside the post (PD-15) and ~30 comments in reading order: 3 more.
+    await expect(ads).toHaveCount(4)
     const link = ads.first().getByRole('link', { name: /^Learn more/ })
     await expect(link).toHaveAttribute('target', '_blank')
     await expect(link).toHaveAttribute('rel', 'sponsored noopener noreferrer')
     await expect(link).toHaveAttribute('href', /^https:\/\//)
     await expect(ads.first().getByText('example.com')).toBeVisible()
+  })
+
+  test('shows an ad inside the post, before the comments, even with few of them (PD-15)', async ({
+    page,
+  }) => {
+    // The DOGE post: 2 comments, and no test adds more (the Fed's grow during a run).
+    await page.goto('/en/post/00000000-0000-4000-8000-000000004004')
+    const ads = page.getByRole('region', { name: /^Ad: / })
+    await expect(ads).toHaveCount(1)
+    // Above the comments: before their heading.
+    const adBox = (await ads.first().boundingBox())!
+    const heading = (await page.getByRole('heading', { name: /comments/ }).boundingBox())!
+    expect(adBox.y).toBeLessThan(heading.y)
+  })
+
+  test('the feeds show an ad every 10 cards, also after loading more (PD-16)', async ({ page }) => {
+    await page.goto('/en')
+    const ads = page.getByRole('main').getByRole('region', { name: /^Ad: / })
+    // First page: 20 cards, ads after the 10th and the 20th.
+    await expect(ads).toHaveCount(2)
+    // The next page (cards 21 to 25 in the mocks) keeps counting: no ad at its start.
+    const cards = page.getByRole('main').getByRole('article')
+    const before = await cards.count()
+    await page.getByRole('button', { name: 'Load more' }).click()
+    await expect.poll(() => cards.count()).toBeGreaterThan(before)
+    await expect(ads).toHaveCount(2)
+
+    await page.goto('/en/hub/defi')
+    await expect(page.getByRole('main').getByRole('article').first()).toBeVisible()
   })
 
   for (const theme of ['light', 'dark'] as const) {
@@ -129,7 +158,8 @@ test.describe('Post detail refresh', () => {
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
       )
       expect(overflow).toBeLessThanOrEqual(0)
-      await page.getByRole('region', { name: /^Ad: / }).first().scrollIntoViewIfNeeded()
+      // An ad among the comments, far from the top: nothing left under the sticky bar.
+      await page.getByRole('region', { name: /^Ad: / }).last().scrollIntoViewIfNeeded()
       await expectNoA11yViolations(page)
     })
   }

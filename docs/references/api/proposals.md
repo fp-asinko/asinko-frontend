@@ -87,9 +87,9 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-013, P-011, P-015, P
 
 **Estado:** propuesta (2026-10-08), mockeada en el front (`specs/post-detail-refresh`).
 
-**Endpoint:** nuevo, `GET /api/v1/ads?placement=comments` (público).
+**Endpoint:** nuevo, `GET /api/v1/ads?placement=comments|feed` (público). `comments`: el anuncio dentro de un post y los de sus comentarios; `feed`: los de los feeds.
 
-**Motivo:** el detalle de un post muestra un anuncio cada 10 comentarios, como Reddit. Por decisión del PO son anuncios propios (de la casa o cargados por Asinko), sin redes de anuncios ni scripts de terceros.
+**Motivo:** como Reddit, el detalle de un post muestra un anuncio debajo del post y uno cada 10 comentarios, y los feeds uno cada 10 posts (ampliada el 2026-10-08). Por decisión del PO son anuncios propios (de la casa o cargados por Asinko), sin redes de anuncios ni scripts de terceros.
 
 **Cambio:** una lista `{ "items": Ad[] }`, en el orden en que se muestran (el front los rota):
 

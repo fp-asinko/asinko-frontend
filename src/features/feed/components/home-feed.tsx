@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import { Suspense } from 'react'
 import { getOrThrow, mockDelay } from '@/lib/api'
 import { getViewer, type Viewer } from '@/lib/session'
+import { getAds } from '../lib/ads-api'
 import { getFeed, getFilteredCommunity } from '../lib/feed-api'
 import { parseFeedParams, type FeedParams } from '../schemas/feed-params.schema'
 import { CommunityChip, CommunityChipSkeleton } from './community-chip'
@@ -72,14 +73,20 @@ async function FeedList({
   // A slow backend on demand, for the e2e of the streaming (mocks only, never production).
   await mockDelay()
   // The chip resolves the community (and its not-found): the list does not ask for it again.
-  const result = await getFeed(params, undefined, {
-    communityResolved: filtered,
-    signedIn: viewer !== null,
-  })
+  const [result, ads] = await Promise.all([
+    getFeed(params, undefined, { communityResolved: filtered, signedIn: viewer !== null }),
+    // Secondary: without them, the feed shows the same (PD-16).
+    getAds('feed'),
+  ])
   // Any failure but a missing account throws: the feed is the main content.
   if (!result.ok && result.code !== 'UNAUTHENTICATED') getOrThrow(result)
   const state: FeedState = result.ok
-    ? { status: 'ok', items: result.data.items, nextCursor: result.data.nextCursor }
+    ? {
+        status: 'ok',
+        items: result.data.items,
+        nextCursor: result.data.nextCursor,
+        ads: ads.ok ? ads.data : [],
+      }
     : { status: 'needs-account' }
 
   return <FeedListView params={params} state={state} />

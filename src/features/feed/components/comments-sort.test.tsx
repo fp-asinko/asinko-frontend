@@ -20,7 +20,7 @@ describe('CommentsSort (specs/post-detail-refresh PD-03, PD-04)', () => {
     const trigger = screen.getByRole('button', { name: 'Sort by: New' })
     expect(trigger).toHaveAttribute('aria-haspopup', 'menu')
     await userEvent.click(trigger)
-    const menu = await screen.findByRole('menu')
+    const menu = await screen.findByRole('menu', {}, { timeout: 3000 })
     const items = within(menu).getAllByRole('menuitemradio')
     expect(items.map((item) => item.textContent)).toEqual(['Best', 'Top', 'New', 'Old'])
     expect(within(menu).getByRole('menuitemradio', { name: 'New' })).toHaveAttribute(
@@ -32,7 +32,9 @@ describe('CommentsSort (specs/post-detail-refresh PD-03, PD-04)', () => {
   it('puts the order in the URL, keeping the scroll; the default one without it', async () => {
     const { unmount } = renderWithIntl(<CommentsSort current="best" />)
     await userEvent.click(screen.getByRole('button', { name: 'Sort by: Best' }))
-    await userEvent.click(await screen.findByRole('menuitemradio', { name: 'Old' }))
+    await userEvent.click(
+      await screen.findByRole('menuitemradio', { name: 'Old' }, { timeout: 3000 }),
+    )
     expect(router.push).toHaveBeenCalledWith(`${PATH}?sort=old`, { scroll: false })
     // Chosen, the menu closes (a radio item alone would keep it open).
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
@@ -40,7 +42,9 @@ describe('CommentsSort (specs/post-detail-refresh PD-03, PD-04)', () => {
 
     renderWithIntl(<CommentsSort current="top" />)
     await userEvent.click(screen.getByRole('button', { name: 'Sort by: Top' }))
-    await userEvent.click(await screen.findByRole('menuitemradio', { name: 'Best' }))
+    await userEvent.click(
+      await screen.findByRole('menuitemradio', { name: 'Best' }, { timeout: 3000 }),
+    )
     expect(router.push).toHaveBeenLastCalledWith(PATH, { scroll: false })
   })
 

@@ -57,6 +57,13 @@ type Ad = {
 - Una `<section>` con nombre "Anuncio: {anunciante}" (dentro de un `<li>` cuando va al nivel del comentario): el lector de pantalla dice que es un anuncio antes que el contenido (PD-10), y cada anuncio tiene su nombre. No un `<aside>`: varios landmarks "complementary" anidados en `main` y con el mismo nombre son ruido (axe, `landmark-complementary-is-top-level` y `landmark-unique`).
 - Link: `target="_blank"`, `rel="sponsored noopener noreferrer"`; la imagen con `next/image` desde el dominio de imágenes permitido (`allowedImageUrl`), o sin imagen.
 
+### Dentro del post y en los feeds (PD-15, PD-16)
+
+- `getAds(placement)` (`lib/ads-api.ts`, `cache` de React: el post y sus comentarios comparten un pedido). La propuesta P-015 suma `placement=feed`.
+- **Dentro del post:** `PostAd` (servidor, en su `Suspense` sin fallback) entre la tarjeta del detalle y los comentarios, con `CommentAd` y el primer anuncio. `withAds` arranca la rotación de los comentarios en el segundo (`first = 1`), así no se repite el de arriba.
+- **Feeds:** `FeedItems` recibe los anuncios y su `offset` (cuántos posts hubo antes) y suma un `<li>` con `FeedAd` después de cada posición múltiplo de 10. La primera página la piden `HomeFeed` y `CommunityFeed` (con los anuncios en paralelo); "Cargar más" le pasa a su action el total ya mostrado (`offset`, validado) y la action pide los anuncios y arma la página igual. El anuncio `n` del feed es `ads[n % ads.length]`.
+- **`FeedAd`** (servidor): la tarjeta de un post. Logo de 40 px (como el avatar de grupo), anunciante en negrita · "Anuncio", el texto (`type-post-body`), la imagen a todo el ancho con borde y radio 16 (como la de un post) y la fila con "Más información" (píldora con borde) y el dominio. Una `section` con nombre "Anuncio: {anunciante}", el link con `rel="sponsored noopener noreferrer"` en otra pestaña.
+
 ## 5. Mensajes
 
 `postDetail.back`, `postDetail.join` ("Únete a la conversación"), `postDetail.sort.*` (etiqueta y las cuatro opciones), `postDetail.search.*` (etiqueta, resultados con plural, sin resultados, ver todos) y `postDetail.ad.*` ("Anuncio", "Más información"). Lo que usa el cliente (orden, caja) en `CLIENT_NAMESPACES`.

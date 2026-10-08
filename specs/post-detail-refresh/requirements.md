@@ -39,6 +39,8 @@ Que el detalle de un post se use como el de Reddit: volver con un toque, una caj
 - [ ] **PD-08** Los anuncios son propios (de la casa): salen de un endpoint que se le propone al backend (mockeado hasta que exista). Sin redes de anuncios, scripts ni cookies de terceros.
 - [ ] **PD-09** El link de un anuncio abre en otra pestaña, con `rel="sponsored noopener noreferrer"`, solo `http(s)` y el dominio real a la vista (`security.md § 1`). Si los anuncios no cargan, los comentarios se ven igual, sin huecos.
 - [ ] **PD-10** Un lector de pantalla oye que es un anuncio antes que su contenido.
+- [ ] **PD-15** **Dentro del post** (como Reddit): debajo de los votos y antes de la caja de comentario, un anuncio con la misma forma. Se suma a los de cada 10 comentarios, que siguen en los hilos largos; rotan sin repetir el de arriba.
+- [ ] **PD-16** **En los feeds**: en todos (Home Para vos y Siguiendo, y las páginas de comunidad, activo y perfil), un anuncio después de cada 10 posts o encuestas, contando los de las páginas que se cargan después. Se ve como una tarjeta de post: logo y anunciante con "Anuncio", el texto, la imagen grande si tiene y "Más información" con el dominio. Si los anuncios fallan, el feed se ve igual.
 
 ### Calidad
 
@@ -59,6 +61,10 @@ Que el detalle de un post se use como el de Reddit: volver con un toque, una caj
 - **Propuesta al backend P-014:** `GET /posts/:id/comments?sort=best|top|new|old&q=` (orden y búsqueda).
 - **Propuesta al backend P-015:** `GET /api/v1/ads?placement=comments` (anuncios de la casa).
 - `BackButton` hoy vive en `features/communities`: pasa a `components/` para que lo use el feed.
+
+## Cambio de alcance con el PO (2026-10-08, al no ver anuncios)
+
+Con una captura de Reddit: "en el detalle se tiene que mostrar dentro del post, como hace Reddit" y "en la Home se tienen que ver cada 10". Decisiones: el del post **se suma** a los de los comentarios; cada 10 en **todos los feeds**; en el feed, **como una tarjeta de post** (PD-15, PD-16).
 
 ## Decisiones del PO (2026-10-08)
 

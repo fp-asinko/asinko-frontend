@@ -13,7 +13,16 @@ import type { FeedParams } from '../schemas/feed-params.schema'
  * Focus (WCAG 2.4.3): after a load the person asked for (click or keyboard), focus moves to the
  * first new card, so it is not left behind the new content nor lost when the button goes away.
  */
-export function LoadMore({ params, cursor }: { params: FeedParams; cursor: string }) {
+export function LoadMore({
+  params,
+  cursor,
+  offset,
+}: {
+  params: FeedParams
+  cursor: string
+  /** The cards already shown: the ads keep counting every 10 (PD-16). */
+  offset: number
+}) {
   const t = useTranslations('feed.loadMore')
   const locale = useLocale()
   const [pages, setPages] = useState<ReactNode[]>([])
@@ -24,17 +33,19 @@ export function LoadMore({ params, cursor }: { params: FeedParams; cursor: strin
   const button = useRef<HTMLButtonElement>(null)
   const lastPage = useRef<HTMLUListElement>(null)
   const focusNewPage = useRef(false)
+  const shown = useRef(offset)
 
   function load(byHand: boolean) {
     if (!next || pending) return
     setFailed(false)
     focusNewPage.current = byHand
     startTransition(async () => {
-      const result = await loadMoreFeed({ ...params, cursor: next, locale })
+      const result = await loadMoreFeed({ ...params, cursor: next, locale, offset: shown.current })
       if (!result.ok) {
         setFailed(true)
         return
       }
+      shown.current += result.data.count
       setPages((loaded) => [...loaded, result.data.items])
       setNext(result.data.nextCursor)
       setAnnouncement(t('loaded', { count: result.data.count }))

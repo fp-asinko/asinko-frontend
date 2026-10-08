@@ -8,6 +8,8 @@ const deps = vi.hoisted(() => ({
   getViewer: vi.fn(async () => null as { id: string } | null),
 }))
 vi.mock('../lib/feed-api', () => ({ getFeed: deps.getFeed }))
+// The ads of the page are their own tests (ads-api): none here.
+vi.mock('../lib/ads-api', () => ({ getAds: async () => ({ ok: true, data: [] }) }))
 vi.mock('next-intl/server', () => ({ setRequestLocale: deps.setRequestLocale }))
 vi.mock('@/lib/session', () => ({ getViewer: deps.getViewer }))
 // The cards have their own tests; here only validation and paging matter.

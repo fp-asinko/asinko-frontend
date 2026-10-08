@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { getCommentAds } from '../lib/ads-api'
+import { getAds } from '../lib/ads-api'
 import { getCommentTree, searchComments } from '../lib/comments-api'
 import { withAds } from '../lib/with-ads'
 import type { CommentsQuery } from '../schemas/comments-query.schema'
@@ -67,12 +67,16 @@ export async function PostComments({
  */
 async function LoadedComments({ postId, sort }: { postId: string; sort: CommentsQuery['sort'] }) {
   const t = await getTranslations('postDetail')
-  const [result, ads] = await Promise.all([getCommentTree(postId, sort), getCommentAds()])
+  const [result, ads] = await Promise.all([getCommentTree(postId, sort), getAds('comments')])
   if (!result.ok) return <Failed message={t('error')} />
   return (
     <>
       {result.data.length === 0 && <p className="type-small text-muted-foreground">{t('empty')}</p>}
-      <CommentTree postId={postId} comments={withAds(result.data, ads.ok ? ads.data : [])} />
+      <CommentTree
+        postId={postId}
+        // The post already shows the first ad (PD-15): the comments start from the second.
+        comments={withAds(result.data, ads.ok ? ads.data : [], undefined, 1)}
+      />
     </>
   )
 }

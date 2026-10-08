@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 import { getTranslations } from 'next-intl/server'
 import { BackButton } from '@/components/molecules/back-button'
 import { env } from '@/env'
@@ -10,8 +11,10 @@ import { getOrThrow } from '@/lib/api'
 import { postPath, postSlug } from '@/lib/posts/paths'
 import type { PostItem } from '../feed.types'
 import { getPost } from '../lib/post-api'
+import { getAds } from '../lib/ads-api'
 import { postExcerpt } from '../lib/post-excerpt'
 import { commentsQuerySchema } from '../schemas/comments-query.schema'
+import { CommentAd } from './comment-ad'
 import { CommentThread } from './comment-thread'
 import { PostCard } from './post-card'
 import { PostComments } from './post-comments'
@@ -80,6 +83,9 @@ export function PostDetail({
   return (
     <CommentThread>
       <PostCard post={post} variant="detail" leading={<BackButton variant="plain" />} />
+      <Suspense fallback={null}>
+        <PostAd />
+      </Suspense>
       <PostComments
         postId={post.id}
         path={post.path}
@@ -88,5 +94,20 @@ export function PostDetail({
         query={commentsQuerySchema.parse(searchParams)}
       />
     </CommentThread>
+  )
+}
+
+/**
+ * The ad inside a post, under its votes and before the comments, as Reddit's (specs/post-detail-
+ * refresh PD-15): the first house ad; the comments' ads start from the second. Without ads, nothing.
+ */
+async function PostAd() {
+  const ads = await getAds('comments')
+  const ad = ads.ok ? ads.data[0] : undefined
+  if (!ad) return null
+  return (
+    <div className="px-4 pb-5 md:px-0">
+      <CommentAd ad={ad} />
+    </div>
   )
 }

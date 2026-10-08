@@ -478,7 +478,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     },
   },
 
-  // P-015 (proposal): house ads, rotated by the front.
+  // P-015 (proposal): house ads for a post and its comments, or a feed; rotated by the front.
   {
     method: 'GET',
     path: '/api/v1/ads',
@@ -488,7 +488,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     example: { ...noRequest, query: { placement: 'comments' } },
     handler: ({ query }) => ({
       status: 200,
-      body: { items: query.placement === 'comments' ? ADS : [] },
+      body: { items: query.placement === 'comments' || query.placement === 'feed' ? ADS : [] },
     }),
   },
 ]

@@ -126,11 +126,11 @@ export type CommentNode = {
   viewerVote: 1 | -1 | null
   replies: CommentNode[]
   /** The ad read right after this comment (specs/post-detail-refresh PD-07), set by withAds. */
-  ad?: CommentAd
+  ad?: HouseAd
 }
 
-/** A house ad between the comments (P-015, PD-07 to PD-09): only what it shows. */
-export type CommentAd = {
+/** A house ad, between the comments, in a post or in a feed (P-015, PD-07 to PD-09, PD-15, PD-16). */
+export type HouseAd = {
   id: string
   advertiser: string
   logoUrl: string | null

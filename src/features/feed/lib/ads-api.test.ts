@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { MockRoute } from '@/mocks/types'
 import { ADS } from '@/mocks/fixtures/ads'
 import { MOCK_ROUTES } from '@/mocks/handlers'
-import { getCommentAds } from './ads-api'
+import { getAds } from './ads-api'
 
 const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[], dropped: vi.fn() }))
 
@@ -29,14 +29,14 @@ function serving(items: unknown[]) {
   )
 }
 
-describe('getCommentAds (specs/post-detail-refresh PD-08, PD-09)', () => {
+describe('getAds (specs/post-detail-refresh PD-08, PD-09)', () => {
   beforeEach(() => {
     state.routes = MOCK_ROUTES
     state.dropped.mockReset()
   })
 
   it('maps the house ads, with the real domain and the allowed images', async () => {
-    const result = await getCommentAds()
+    const result = await getAds('comments')
     if (!result.ok) throw new Error('expected ok')
     expect(result.data).toHaveLength(ADS.length)
     expect(result.data[0]).toMatchObject({
@@ -53,7 +53,7 @@ describe('getCommentAds (specs/post-detail-refresh PD-08, PD-09)', () => {
       { ...ADS[1], body: '' },
       { ...ADS[2], url: 'https://www.example.org/x', imageUrl: 'https://evil.example/x.png' },
     ])
-    const result = await getCommentAds()
+    const result = await getAds('comments')
     if (!result.ok) throw new Error('expected ok')
     expect(result.data).toEqual([
       expect.objectContaining({ domain: 'example.org', imageUrl: null }),
@@ -65,6 +65,6 @@ describe('getCommentAds (specs/post-detail-refresh PD-08, PD-09)', () => {
     state.routes = MOCK_ROUTES.map((route) =>
       route.path === '/api/v1/ads' ? { ...route, handler: () => ({ status: 503 }) } : route,
     )
-    expect(await getCommentAds()).toMatchObject({ ok: false })
+    expect(await getAds('comments')).toMatchObject({ ok: false })
   })
 })

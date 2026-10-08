@@ -1,7 +1,7 @@
 import { screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
-import type { CommentAd as Ad } from '../feed.types'
+import type { HouseAd as Ad } from '../feed.types'
 import { CommentAd } from './comment-ad'
 
 const ad = (overrides: Partial<Ad> = {}): Ad => ({

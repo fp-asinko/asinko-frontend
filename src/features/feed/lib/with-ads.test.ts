@@ -1,10 +1,10 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
 import { commentNode } from '../feed-items.fixture'
-import type { CommentAd, CommentNode } from '../feed.types'
+import type { HouseAd, CommentNode } from '../feed.types'
 import { withAds } from './with-ads'
 
-const ad = (id: string): CommentAd => ({
+const ad = (id: string): HouseAd => ({
   id,
   advertiser: id,
   logoUrl: null,
@@ -72,6 +72,13 @@ describe('withAds (specs/post-detail-refresh PD-07)', () => {
     expect(withAds(tree, ADS)[0]!.replies[0]!.replies[0]!.replies.some((each) => each.ad)).toBe(
       false,
     )
+  })
+
+  it('starts from a later ad when the post already shows the first (PD-15)', () => {
+    expect(read(withAds(flat(20), ADS, 10, 1)).filter((each) => each.startsWith('['))).toEqual([
+      '[b]',
+      '[a]',
+    ])
   })
 
   it('leaves the comments as they were without ads', () => {

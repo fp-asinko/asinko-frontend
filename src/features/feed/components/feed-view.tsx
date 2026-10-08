@@ -3,7 +3,7 @@ import { GateButtons } from '@/components/organisms/auth-gate'
 import { EmptyState } from '@/components/organisms/empty-state'
 import { Link } from '@/i18n/navigation'
 import type { ReactNode } from 'react'
-import type { FeedItem } from '../feed.types'
+import type { FeedItem, HouseAd } from '../feed.types'
 import { feedHref } from '../lib/feed-href'
 import type { FeedParams } from '../schemas/feed-params.schema'
 import { ComposerPlaceholder } from './composer-placeholder'
@@ -13,7 +13,14 @@ import { FeedItems } from './feed-items'
 import { LoadMore } from './load-more'
 
 export type FeedState =
-  { status: 'ok'; items: FeedItem[]; nextCursor: string | null } | { status: 'needs-account' }
+  | {
+      status: 'ok'
+      items: FeedItem[]
+      nextCursor: string | null
+      /** The house ads, one every 10 cards (specs/post-detail-refresh PD-16). */
+      ads?: readonly HouseAd[]
+    }
+  | { status: 'needs-account' }
 
 /**
  * The top of the center column as in the prototype (specs/home/design.md § 5): composer, tabs and
@@ -69,10 +76,14 @@ export function FeedListView({
         ) : (
           <>
             <ul className="divide-y">
-              <FeedItems items={items} feedCommunity={params.community} />
+              <FeedItems
+                items={items}
+                feedCommunity={params.community}
+                ads={state.status === 'ok' ? state.ads : undefined}
+              />
             </ul>
             {state.status === 'ok' && state.nextCursor && (
-              <LoadMore params={params} cursor={state.nextCursor} />
+              <LoadMore params={params} cursor={state.nextCursor} offset={items.length} />
             )}
           </>
         )}

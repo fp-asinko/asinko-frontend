@@ -132,11 +132,12 @@ describe('mock handlers behave like the contract', () => {
     })
   })
 
-  it('serves the house ads for the comments, and nothing for other places (P-015)', async () => {
+  it('serves the house ads for posts and feeds, and nothing for other places (P-015)', async () => {
     const ads = async (query: Record<string, string>) =>
       ((await call('GET', '/api/v1/ads', { query })).body as { items: unknown[] }).items
     expect((await ads({ placement: 'comments' })).length).toBeGreaterThan(1)
-    expect(await ads({ placement: 'feed' })).toEqual([])
+    expect((await ads({ placement: 'feed' })).length).toBeGreaterThan(1)
+    expect(await ads({ placement: 'sidebar' })).toEqual([])
   })
 
   it('searches public users by username, never private ones (specs/mention-autocomplete)', async () => {

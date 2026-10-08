@@ -9,5 +9,6 @@
 - [x] **T-05 (M)** Búsqueda: `searchComments`, `CommentsSearch` y `CommentSearchResults`. Tests. → PD-05, PD-06
 - [x] **T-06 (M)** Anuncios: mapper, `withAds`, `CommentAd` en el árbol. Tests. → PD-07 a PD-10
 - [x] **T-07 (S)** Textos en en, es y pt; e2e (mobile y desktop, axe en los dos temas, 360 px) y presupuesto de JS; `ui-reviewer`. → PD-12 a PD-14
+- [x] **T-08 (M)** Cambio de alcance (2026-10-08): `getAds` con `placement` y `cache`, el anuncio dentro del post y `FeedAd` cada 10 en todos los feeds, con el `offset` en "Cargar más". Mock y P-015 con `placement=feed`. Tests unitarios y e2e. → PD-15, PD-16
 
 Orden: T-01 → T-02 → T-03 → T-04 → T-05 → T-06 → T-07.

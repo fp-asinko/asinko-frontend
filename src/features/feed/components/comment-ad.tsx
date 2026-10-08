@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { UserAvatar } from '@/components/molecules/user-avatar'
-import type { CommentAd as Ad } from '../feed.types'
+import type { HouseAd as Ad } from '../feed.types'
 
 /**
  * A house ad between the comments, shaped as a comment (specs/post-detail-refresh PD-07 to
