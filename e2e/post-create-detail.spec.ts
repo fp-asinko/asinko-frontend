@@ -75,10 +75,10 @@ test.describe('Post detail comments', () => {
     await page.goto(FED_PATH)
     const section = comments(page)
 
-    await section.getByRole('textbox', { name: 'Your comment' }).fill(mine)
+    await section.getByRole('textbox', { name: 'Join the conversation' }).fill(mine)
     await section.getByRole('button', { name: 'Comment' }).click()
     // First the box empties: while it holds the text, its blue copy (MA-12) shows it too.
-    await expect(section.getByRole('textbox', { name: 'Your comment' })).toHaveValue('')
+    await expect(section.getByRole('textbox', { name: 'Join the conversation' })).toHaveValue('')
     await expect(section.getByText(mine)).toBeVisible()
     await expect(section.getByText('Sending…')).toHaveCount(0)
 
@@ -121,7 +121,7 @@ test.describe('Post detail comments', () => {
     await context.addCookies([{ name: 'asinko-mock-guest', value: '1', url: baseURL! }])
     await page.goto(FED_PATH)
     const section = comments(page)
-    await section.getByRole('textbox', { name: 'Your comment' }).fill('Hello')
+    await section.getByRole('textbox', { name: 'Join the conversation' }).fill('Hello')
     await section.getByRole('button', { name: 'Comment' }).click()
     await expect(page.getByRole('dialog', { name: 'Join Asinko to comment' })).toBeVisible()
   })

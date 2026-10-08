@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { router, setPathname } from '@/test/navigation-mock'
@@ -34,6 +34,8 @@ describe('CommentsSort (specs/post-detail-refresh PD-03, PD-04)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Sort by: Best' }))
     await userEvent.click(await screen.findByRole('menuitemradio', { name: 'Old' }))
     expect(router.push).toHaveBeenCalledWith(`${PATH}?sort=old`, { scroll: false })
+    // Chosen, the menu closes (a radio item alone would keep it open).
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
     unmount()
 
     renderWithIntl(<CommentsSort current="top" />)

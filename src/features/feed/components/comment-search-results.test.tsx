@@ -11,11 +11,15 @@ const PATH = '/post/abc/eth-btc'
 describe('CommentSearchResults (specs/post-detail-refresh PD-05)', () => {
   it('counts the results, links back to all, and marks what was searched in the plain text', () => {
     renderWithIntl(
-      <CommentSearchResults
-        query="blobs"
-        allHref={PATH}
-        comments={[commentNode({ body: 'The **blobs** pay [ETH](https://ethereum.org).' })]}
-      />,
+      <>
+        <p id="live" role="status" />
+        <CommentSearchResults
+          query="blobs"
+          allHref={PATH}
+          announcer="live"
+          comments={[commentNode({ body: 'The **blobs** pay [ETH](https://ethereum.org).' })]}
+        />
+      </>,
     )
     expect(screen.getByRole('status')).toHaveTextContent('1 result for “blobs”')
     expect(screen.getByRole('link', { name: 'See all comments' })).toHaveAttribute('href', PATH)
@@ -30,7 +34,12 @@ describe('CommentSearchResults (specs/post-detail-refresh PD-05)', () => {
   })
 
   it('says when nothing matches', () => {
-    renderWithIntl(<CommentSearchResults query="zz" allHref={PATH} comments={[]} />)
+    renderWithIntl(
+      <>
+        <p id="live" role="status" />
+        <CommentSearchResults query="zz" allHref={PATH} comments={[]} announcer="live" />
+      </>,
+    )
     expect(screen.getByRole('status')).toHaveTextContent('No results for “zz”')
     expect(screen.queryByRole('list')).not.toBeInTheDocument()
   })

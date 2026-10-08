@@ -64,3 +64,30 @@ describe('CommentTree (specs/post-create-detail PC-14)', () => {
     expect(toggle).toHaveTextContent('Hide replies')
   })
 })
+
+describe('CommentTree with ads (specs/post-detail-refresh PD-07)', () => {
+  const ad = {
+    id: 'ad1',
+    advertiser: 'Asinko',
+    logoUrl: null,
+    body: 'Publish your first thesis.',
+    url: 'https://example.com',
+    domain: 'example.com',
+    imageUrl: null,
+  }
+
+  it('reads the ad before the replies of its comment', () => {
+    renderTree([node({ body: 'Parent', ad }, [node({ body: 'Child' })]), node({ body: 'Next' })])
+    const text = document.body.textContent ?? ''
+    expect(text.indexOf('Parent')).toBeLessThan(text.indexOf('Publish your first thesis.'))
+    expect(text.indexOf('Publish your first thesis.')).toBeLessThan(text.indexOf('Child'))
+    expect(screen.getAllByRole('region', { name: /^Ad: / })).toHaveLength(1)
+  })
+
+  it('reads the ad after a comment without replies, at its level', () => {
+    renderTree([node({ body: 'First', ad }), node({ body: 'Second' })])
+    const aside = screen.getByRole('region', { name: /^Ad: / })
+    const items = screen.getAllByRole('listitem')
+    expect(items.map((item) => item.contains(aside))).toEqual([false, true, false])
+  })
+})

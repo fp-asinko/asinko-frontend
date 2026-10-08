@@ -1,4 +1,5 @@
 import { useFormatter, useNow, useTranslations } from 'next-intl'
+import { Announce } from '@/components/molecules/announce'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import { Link } from '@/i18n/navigation'
 import { previewProps } from '@/lib/communities/preview'
@@ -15,22 +16,25 @@ export function CommentSearchResults({
   query,
   comments,
   allHref,
+  announcer,
 }: {
   query: string
   comments: CommentNode[]
   /** The same page without the search. */
   allHref: string
+  /** The live region that stays on the page, outside this list's Suspense (WCAG 4.1.3). */
+  announcer: string
 }) {
   const t = useTranslations('postDetail.search')
   const format = useFormatter()
   const now = useNow()
+  const summary = t('results', { count: comments.length, q: query })
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <p role="status" className="type-small text-muted-foreground">
-          {t('results', { count: comments.length, q: query })}
-        </p>
+        <p className="type-small text-muted-foreground">{summary}</p>
+        <Announce regionId={announcer} text={summary} />
         <Link
           href={allHref}
           scroll={false}

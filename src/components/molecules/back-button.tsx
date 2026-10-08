@@ -15,7 +15,7 @@ const button = cva(
         overlay:
           'h-7 gap-1 rounded-full border border-white/20 bg-black/45 px-3 type-meta font-semibold text-white hover:bg-black/60',
         // On the page itself, as Reddit's post: a gray circle with the arrow only (44px target).
-        plain: 'size-10 shrink-0 rounded-full bg-muted text-foreground hover:bg-muted-hover',
+        plain: 'size-11 shrink-0 rounded-full bg-muted text-foreground hover:bg-muted-hover',
       },
     },
     defaultVariants: { variant: 'overlay' },

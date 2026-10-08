@@ -38,6 +38,8 @@ export function CommentsSortMenu({
           value={current}
           onValueChange={(value) => {
             const sort = value as CommentSort
+            // A radio item keeps a Base UI menu open: choosing an order is done with it.
+            onOpenChange(false)
             router.push(sort === 'best' ? pathname : `${pathname}?sort=${sort}`, { scroll: false })
           }}
         >

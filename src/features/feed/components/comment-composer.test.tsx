@@ -25,7 +25,7 @@ function renderComposer({ signedIn = true } = {}) {
   )
 }
 
-const box = () => screen.getByRole('textbox', { name: 'Your comment' })
+const box = () => screen.getByRole('textbox', { name: 'Join the conversation' })
 const send = () => screen.getByRole('button', { name: 'Comment' })
 
 describe('CommentComposer (specs/post-create-detail PC-15)', () => {

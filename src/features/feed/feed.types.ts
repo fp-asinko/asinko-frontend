@@ -125,4 +125,20 @@ export type CommentNode = {
   score: number
   viewerVote: 1 | -1 | null
   replies: CommentNode[]
+  /** The ad read right after this comment (specs/post-detail-refresh PD-07), set by withAds. */
+  ad?: CommentAd
+}
+
+/** A house ad between the comments (P-015, PD-07 to PD-09): only what it shows. */
+export type CommentAd = {
+  id: string
+  advertiser: string
+  logoUrl: string | null
+  /** Plain text. */
+  body: string
+  /** Always http(s) (security.md § 1). */
+  url: string
+  /** The real destination, shown next to the button. */
+  domain: string
+  imageUrl: string | null
 }

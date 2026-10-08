@@ -76,7 +76,7 @@ test.describe('Mention autocomplete', () => {
     await page.goto(FED_PATH)
     const section = page.getByRole('region', { name: /comments/i })
 
-    const comment = section.getByRole('textbox', { name: 'Your comment' })
+    const comment = section.getByRole('textbox', { name: 'Join the conversation' })
     await comment.click()
     await suggest(page, comment, 'Agree @mar')
     await expect(page.getByRole('option', { name: /^@maria/ })).toBeVisible()
@@ -155,7 +155,7 @@ test.describe('Mention autocomplete', () => {
     await page.goto(FED_PATH)
     const comment = page
       .getByRole('region', { name: /comments/i })
-      .getByRole('textbox', { name: 'Your comment' })
+      .getByRole('textbox', { name: 'Join the conversation' })
     await comment.click()
     await comment.pressSequentially('Agree with @maria')
     const layer = page.locator('[data-mention-highlight]')

@@ -124,7 +124,8 @@ export function CommentComposer({
           onKeyDown={onKeyDown}
           onClick={() => setHeld(false)}
           aria-label={t(reply ? 'replyLabel' : 'label')}
-          placeholder={t(reply ? 'replyPlaceholder' : 'join')}
+          // The box of the post is named what it shows (WCAG 2.5.3): "Join the conversation".
+          placeholder={t(reply ? 'replyPlaceholder' : 'label')}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
           ref={field}

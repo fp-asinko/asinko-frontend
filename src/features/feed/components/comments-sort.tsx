@@ -42,8 +42,12 @@ export function CommentsSort({ current }: { current: CommentSort }) {
         }}
         className="inline-flex h-11 tap items-center gap-1.5 rounded-full px-3 type-small outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 md:h-9"
       >
-        <span className="text-muted-foreground">{t('label')}:</span>{' '}
-        <span className="font-bold">{t(current)}</span>
+        <span className="text-muted-foreground">
+          {t.rich('trigger', {
+            sort: t(current),
+            b: (chunks) => <span className="font-bold text-foreground">{chunks}</span>,
+          })}
+        </span>
         <ChevronDownIcon aria-hidden className="size-4 text-muted-foreground" />
       </button>
       {requested && (

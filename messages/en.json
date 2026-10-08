@@ -301,20 +301,26 @@
     "seeReplies": "{count, plural, one {See # reply} other {See # replies}}",
     "hideReplies": "Hide replies",
     "sort": {
-      "label": "Sort by",
       "best": "Best",
       "top": "Top",
       "new": "New",
-      "old": "Old"
+      "old": "Old",
+      "trigger": "Sort by: <b>{sort}</b>"
     },
     "search": {
       "label": "Search comments",
       "results": "{count, plural, =0 {No results for “{q}”} one {# result for “{q}”} other {# results for “{q}”}}",
       "all": "See all comments"
+    },
+    "ad": {
+      "label": "Ad",
+      "cta": "Learn more",
+      "ctaLabel": "Learn more about {advertiser} (opens in a new tab)",
+      "region": "Ad: {advertiser}"
     }
   },
   "comments": {
-    "label": "Your comment",
+    "label": "Join the conversation",
     "replyPlaceholder": "Write a reply",
     "submit": "Comment",
     "reply": "Reply",
@@ -324,8 +330,7 @@
     "error": "Could not post your comment. Try again.",
     "replyLabel": "Your reply",
     "sendReply": "Send reply",
-    "sent": "Comment posted.",
-    "join": "Join the conversation"
+    "sent": "Comment posted."
   },
   "composer": {
     "title": "Create post",

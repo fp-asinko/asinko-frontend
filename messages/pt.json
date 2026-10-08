@@ -301,20 +301,26 @@
     "seeReplies": "{count, plural, one {Ver # resposta} other {Ver # respostas}}",
     "hideReplies": "Ocultar respostas",
     "sort": {
-      "label": "Ordenar por",
       "best": "Melhores",
       "top": "Top",
       "new": "Novos",
-      "old": "Antigos"
+      "old": "Antigos",
+      "trigger": "Ordenar por: <b>{sort}</b>"
     },
     "search": {
       "label": "Buscar comentários",
       "results": "{count, plural, =0 {Nenhum resultado para “{q}”} one {# resultado para “{q}”} other {# resultados para “{q}”}}",
       "all": "Ver todos os comentários"
+    },
+    "ad": {
+      "label": "Anúncio",
+      "cta": "Saiba mais",
+      "ctaLabel": "Saiba mais sobre {advertiser} (abre em outra aba)",
+      "region": "Anúncio: {advertiser}"
     }
   },
   "comments": {
-    "label": "Seu comentário",
+    "label": "Participe da conversa",
     "replyPlaceholder": "Escreva uma resposta",
     "submit": "Comentar",
     "reply": "Responder",
@@ -324,8 +330,7 @@
     "error": "Não foi possível publicar seu comentário. Tente de novo.",
     "replyLabel": "Sua resposta",
     "sendReply": "Enviar resposta",
-    "sent": "Comentário publicado.",
-    "join": "Participe da conversa"
+    "sent": "Comentário publicado."
   },
   "composer": {
     "title": "Criar post",

@@ -2,7 +2,7 @@
 
 ## 1. Volver (PD-01)
 
-- `BackButton` pasa de `features/communities/components` a `components/molecules/back-button` (lo usan las páginas de comunidad y el detalle; los features no se importan entre sí). Dos variantes con `cva`: `overlay` (la de hoy, sobre el banner) y `plain` (nueva: círculo de 40 px `bg-muted`, solo la flecha, `aria-label` "Volver").
+- `BackButton` pasa de `features/communities/components` a `components/molecules/back-button` (lo usan las páginas de comunidad y el detalle; los features no se importan entre sí). Dos variantes con `cva`: `overlay` (la de hoy, sobre el banner) y `plain` (nueva: círculo de 44 px `bg-muted`, solo la flecha, `aria-label` "Volver").
 - En el detalle, a la izquierda de la cabecera del post (`PostCard` variante `detail`, que recibe el botón como `leading`).
 
 ## 2. La caja de comentario (PD-02)
@@ -26,7 +26,7 @@
 - La página lee `searchParams` y se los pasa a `PostComments`. Cambiar el orden o buscar navega (el servidor renderiza la lista): el título y la caja se quedan y la lista muestra su esqueleto en su `Suspense` (con `key` por orden y búsqueda).
 - **Ordenar** (`CommentsSort`, cliente): "Ordenar por: Mejores ▾". El botón es liviano y el `DropdownMenu` de shadcn (Base UI) se descarga al primer uso, como el menú "⋯" (`comments-sort-menu.tsx`). Cada opción (`DropdownMenuRadioItem`, la actual con ✓ y `aria-checked`) navega con el router a `?sort=` (Mejores, sin parámetro), sin mover el scroll y sin `?q=`.
 - **Buscar** (`CommentsSearch`, cliente): un `<form role="search">` que al enviarse navega con el router localizado a `?q=` (sin `next/form`: el router ya está en el sitio y no suma JS), `input type="search"` con lupa, `name="q"`, `aria-label` "Buscar comentarios", píldora de 44 px en mobile. Vacío, vuelve a todos los comentarios. Mientras hay una búsqueda, "Ordenar por" no se muestra: los resultados van por relevancia.
-- **Resultados** (`CommentSearchResults`, servidor): "N resultados para «texto»", un link "Ver todos los comentarios" (la misma página sin `?q=`) y cada coincidencia como un comentario sin respuestas ni botón de responder. El cuerpo va como texto plano (el Markdown reducido a texto, como los extractos de las tarjetas) y cada aparición de lo buscado en `<mark>` con `font-bold` y sin fondo de color (monocromo, `design-system.md`).
+- **Resultados** (`CommentSearchResults`, servidor): "N resultados para «texto»", un link "Ver todos los comentarios" (la misma página sin `?q=`) y cada coincidencia como un comentario sin respuestas ni botón de responder. El cuerpo va como texto plano (el Markdown reducido a texto, como los extractos de las tarjetas) y cada aparición de lo buscado en `<mark>` con `font-bold` y sin fondo de color (monocromo, `design-system.md`). La cantidad se anuncia en una región `role="status"` que queda en la sección, fuera del `Suspense` (`Announce`): una región que llega ya con su texto no siempre se lee.
 
 ## 4. Anuncios (PD-07 a PD-10)
 
@@ -53,8 +53,8 @@ type Ad = {
 
 ### Cómo se ve (`CommentAd`, servidor)
 
-- La estructura del comentario: el logo (avatar redondo de 20 px), "**Anunciante** · Anuncio", el texto, y una fila con la píldora con borde "Más información" (link) y el dominio en gris. La imagen, si hay, a la derecha desde `sm` (128 px de ancho) y debajo en mobile.
-- `<li>` con un `<aside aria-label="Anuncio">`: el lector de pantalla lo dice antes que el contenido (PD-10).
+- La estructura del comentario: el logo (avatar redondo de 20 px), "**Anunciante** · Anuncio", el texto, y una fila con la píldora con borde "Más información" (link) y el dominio en gris. La imagen, si hay, a la derecha del texto: 96 px de ancho en mobile y 128 px desde `sm` (a todo el ancho, en un teléfono, pesaba más que los comentarios).
+- Una `<section>` con nombre "Anuncio: {anunciante}" (dentro de un `<li>` cuando va al nivel del comentario): el lector de pantalla dice que es un anuncio antes que el contenido (PD-10), y cada anuncio tiene su nombre. No un `<aside>`: varios landmarks "complementary" anidados en `main` y con el mismo nombre son ruido (axe, `landmark-complementary-is-top-level` y `landmark-unique`).
 - Link: `target="_blank"`, `rel="sponsored noopener noreferrer"`; la imagen con `next/image` desde el dominio de imágenes permitido (`allowedImageUrl`), o sin imagen.
 
 ## 5. Mensajes
@@ -63,7 +63,7 @@ type Ad = {
 
 ## 6. Performance
 
-- Nuevo en el cliente: el menú de orden (Base UI `Menu`, ya cargado por el menú "⋯"; si no comparte chunk, se difiere al primer toque) y `next/form`. Búsqueda, resultados y anuncios son del servidor. Se mide al cerrar contra 234,6 KB.
+- Nuevo en el cliente: el botón de orden (el menú de Base UI se descarga al primer toque), el campo de búsqueda, la caja que se pliega y `Announce`. Resultados y anuncios son del servidor. **Medido al cerrar (2026-10-08):** Home y detalle 236,0 KB (antes 234,6), páginas de comunidad, activo y perfil 237,7 KB (antes 236,1), contra 240.
 
 ## 7. Tests
 
