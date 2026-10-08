@@ -43,7 +43,7 @@ Que el detalle de un post se use como el de Reddit: volver con un toque, una caj
 ### Calidad
 
 - [ ] **PD-11** El navegador no llama a la API: orden, búsqueda y anuncios llegan del servidor (`api-integration.md`). El front no ordena ni filtra: lo hace el backend (propuesto y mockeado).
-- [ ] **PD-12** A 360 px todo entra sin scroll horizontal; áreas táctiles de 44 px en el botón de volver, la caja, el orden y la búsqueda.
+- [ ] **PD-12** A 360 px todo entra sin scroll horizontal; áreas táctiles de 44 px en el botón de volver, la caja y el orden. La búsqueda es más chica (40 px de alto, hasta 240 px de ancho, al lado del orden; pedido del PO, 2026-10-08).
 - [ ] **PD-13** Textos nuevos en en, es y pt; axe sin violaciones en claro y oscuro.
 - [ ] **PD-14** Primera carga dentro del presupuesto de JS (`seo.md`, 240 KB).
 

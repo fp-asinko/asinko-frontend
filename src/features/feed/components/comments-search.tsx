@@ -22,11 +22,12 @@ export function CommentsSearch({ query }: { query?: string }) {
         const q = String(new FormData(event.currentTarget).get('q') ?? '').trim()
         router.push(q ? `${pathname}?q=${encodeURIComponent(q)}` : pathname, { scroll: false })
       }}
-      className="relative min-w-0 flex-1 basis-full sm:max-w-72 sm:basis-auto"
+      // Beside "Sort by", as Reddit: as wide as the words it takes, not the whole column.
+      className="relative max-w-60 min-w-0 flex-1 basis-40"
     >
       <SearchIcon
         aria-hidden
-        className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground"
+        className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
       />
       <input
         // A new search (or back to all) starts from what the URL says.
@@ -39,7 +40,7 @@ export function CommentsSearch({ query }: { query?: string }) {
         minLength={2}
         maxLength={100}
         // 16px in phones: iOS zooms into smaller fields (design-system.md § Mobile first).
-        className="h-11 w-full rounded-full border border-input bg-background pr-4 pl-10 text-base outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:h-9 md:text-sm"
+        className="h-10 w-full rounded-full border border-input bg-background pr-3 pl-9 text-base outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:h-8 md:text-sm"
       />
     </form>
   )
