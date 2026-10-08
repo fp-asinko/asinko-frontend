@@ -41,7 +41,8 @@ Que una persona con cuenta publique un post (texto o link) desde cualquier parte
 
 - [ ] **PC-01** **Desktop:** un botón **"+ Crear"** fijo en la barra superior, junto a las notificaciones, en todas las páginas. Abre el editor en una ventana sobre la página, como el "Post" de X, sin mover la página, en cualquier página (con caja o sin ella).
 - [ ] **PC-02** **Mobile:** el "Crear" de la barra inferior deja de ser Próximamente y abre el editor a pantalla completa.
-- [ ] **PC-03** **La caja de arriba** (Home y páginas de grupo, activo y tu perfil) **es** el editor: en desktop se expande en el lugar; en mobile abre la pantalla completa. Sus atajos Post / Tesis / Live: Post abre el editor; Tesis y Live siguen como Próximamente (fuera de esta etapa).
+- [ ] **PC-03** **Cambio con el PO (2026-10-08):** en las páginas de grupo, activo y tu perfil ya no hay caja: el encabezado tiene "+ Crear post" junto a Unirse, como Reddit, que abre el editor con la comunidad elegida (ventana en desktop, pantalla completa en mobile). La caja quedaba como un segundo encabezado, con dos líneas divisorias seguidas. En el Home sigue la caja.
+- [ ] **PC-03 (antes)** **La caja de arriba** (Home y páginas de grupo, activo y tu perfil) **es** el editor: en desktop se expande en el lugar; en mobile abre la pantalla completa. Sus atajos Post / Tesis / Live: Post abre el editor; Tesis y Live siguen como Próximamente (fuera de esta etapa).
 - [ ] **PC-04** **Sin sesión**, cualquier acceso abre el modal de cuenta con el texto de publicar (acción `post`, ya existente).
 
 ### Editor

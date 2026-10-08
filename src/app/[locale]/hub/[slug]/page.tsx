@@ -27,7 +27,6 @@ export default async function HubPage({ params, searchParams }: PageProps<'/[loc
         handle={page.handle}
         pagePath={path}
         searchParams={searchParams}
-        canPost
       />
     </PageColumns>
   )

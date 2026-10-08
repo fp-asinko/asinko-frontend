@@ -303,7 +303,8 @@
       },
       "ask": "Perguntar para {name}",
       "rulesTitle": "Regras de {name}"
-    }
+    },
+    "createPost": "Criar post"
   },
   "postDetail": {
     "title": "{count, plural, =0 {Comentários} one {# comentário} other {# comentários}}",

@@ -68,3 +68,14 @@ describe('CommunityDetails (specs/community-pages CP-08, CP-10)', () => {
     expect(screen.queryByText(/\$\d|%/)).toBeNull()
   })
 })
+
+describe('CommunityHeader, Create post (specs/post-create-detail PC-03)', () => {
+  it('offers "Create post" beside Join, as Reddit, in a group and an asset', () => {
+    renderWithIntl(<CommunityHeader page={communityPage()} />)
+    expect(screen.getByRole('button', { name: 'Create post' })).toHaveAttribute(
+      'aria-haspopup',
+      'dialog',
+    )
+    expect(screen.getByRole('button', { name: 'Join #macro' })).toBeInTheDocument()
+  })
+})

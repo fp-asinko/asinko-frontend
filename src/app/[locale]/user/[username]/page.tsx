@@ -29,7 +29,6 @@ export default async function UserPage({
         handle={page.handle}
         pagePath={path}
         searchParams={searchParams}
-        canPost={profile.isSelf}
       />
     </PageColumns>
   )

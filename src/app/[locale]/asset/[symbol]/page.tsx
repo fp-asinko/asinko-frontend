@@ -28,7 +28,6 @@ export default async function AssetPage({
         handle={page.handle}
         pagePath={path}
         searchParams={searchParams}
-        canPost
       />
     </PageColumns>
   )

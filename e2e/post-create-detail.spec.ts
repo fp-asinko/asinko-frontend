@@ -208,14 +208,14 @@ test.describe('Create post', () => {
     await expect(page.getByRole('main').getByText('paying')).toHaveCSS('font-weight', '700')
   })
 
-  test("a group's page preselects it and says so in its box (PC-03, PC-06)", async ({
+  test("a group's page offers Create post in its header, with the group chosen (PC-03, PC-06)", async ({
     page,
-    isMobile,
   }, testInfo) => {
     const title = `Yields on the move (${testInfo.project.name} ${Date.now()})`
     await page.goto('/en/hub/defi')
-    await page.getByRole('button', { name: 'Post in #defi' }).click()
-    const editor = editorOf(page, isMobile)
+    await page.getByRole('main').getByRole('button', { name: 'Create post' }).click()
+    // A window in desktop, the full screen in phones: a dialog either way.
+    const editor = page.getByRole('dialog', { name: 'Create post' })
     await expect(editor.getByRole('combobox', { name: 'Community' })).toHaveText('#defi')
     await expect(editor.getByRole('textbox', { name: 'Title' })).toBeFocused()
 
@@ -304,11 +304,14 @@ test.describe('Create post', () => {
     await expect(prompt).toBeHidden()
   })
 
-  test('your own profile offers the box, and someone else does not (PC-03)', async ({ page }) => {
+  test('your own profile offers Create post, and someone else does not (PC-03)', async ({
+    page,
+  }) => {
+    const create = page.getByRole('main').getByRole('button', { name: 'Create post' })
     await page.goto('/en/user/demo')
-    await expect(page.getByRole('button', { name: 'Post in @demo' })).toBeVisible()
+    await expect(create).toBeVisible()
     await page.goto('/en/user/federico')
-    await expect(page.getByRole('button', { name: /^Post in/ })).toHaveCount(0)
+    await expect(create).toHaveCount(0)
   })
 
   test('asks before discarding, and gives the focus back (PC-05, PC-18)', async ({

@@ -1,8 +1,9 @@
-import { CircleHelpIcon } from 'lucide-react'
+import { CircleHelpIcon, PlusIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { BackButton } from '@/components/molecules/back-button'
 import { ComingSoon } from '@/components/molecules/coming-soon'
 import { IdentityBanner } from '@/components/molecules/identity-banner'
+import { ComposeTrigger } from '@/components/organisms/compose'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import { cn } from '@/lib/utils'
 import type { CommunityPage, ProfileDetails } from '../communities.types'
@@ -29,6 +30,8 @@ export function CommunityHeader({
   const title = profile?.displayName ?? page.handle
   const subtitle = profile ? (profile.displayName ? page.handle : null) : page.subtitle
   const description = profile ? profile.bio : page.description
+  // Anyone posts in a group or an asset; in a profile, only its owner (PC-03).
+  const canPost = !profile || profile.isSelf
 
   return (
     <header className="border-b px-4 pb-4 sm:px-0">
@@ -56,15 +59,28 @@ export function CommunityHeader({
           </div>
           {subtitle && <p className="type-meta text-muted-foreground">{subtitle}</p>}
         </div>
-        {!profile?.isSelf && (
-          <CommunityActions
-            slug={page.slug}
-            handle={page.handle}
-            membership={page.viewerMembership}
-            favorite={page.viewerIsFavorite}
-            variant={profile ? 'user' : 'community'}
-          />
-        )}
+        <div className="flex items-center gap-2">
+          {canPost && (
+            // As Reddit's "Create post": the editor, with this page's community already chosen
+            // (ComposeScope). A window in desktop, the full screen in phones (specs/post-create-detail).
+            <ComposeTrigger
+              view="modal"
+              className="inline-flex h-8 tap items-center gap-1.5 rounded-full bg-muted px-3.5 type-action outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              <PlusIcon aria-hidden className="size-4" />
+              {t('createPost')}
+            </ComposeTrigger>
+          )}
+          {!profile?.isSelf && (
+            <CommunityActions
+              slug={page.slug}
+              handle={page.handle}
+              membership={page.viewerMembership}
+              favorite={page.viewerIsFavorite}
+              variant={profile ? 'user' : 'community'}
+            />
+          )}
+        </div>
       </div>
       {description && <p className="mt-2 type-ui text-muted-foreground">{description}</p>}
       {profile ? (
