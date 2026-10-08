@@ -139,6 +139,9 @@ export function CommentComposer({
           rows={1}
           className={cn(
             'bg-background transition-[min-height,border-radius] duration-200 ease-out',
+            // Focused, as Reddit's: one 1px border, darker, without the 3px halo (the PO: the
+            // border and the halo together read as a thick double border).
+            'focus-visible:border-foreground/60 focus-visible:ring-0',
             open
               ? 'min-h-20 rounded-2xl'
               : // The pill: one line, 44px (PD-02), the text of the placeholder centered on it.
