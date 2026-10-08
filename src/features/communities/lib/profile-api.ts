@@ -16,13 +16,18 @@ const BADGES = {
 
 export function toProfileDetails(profile: RawProfile, viewerName: string | null): ProfileDetails {
   return {
+    id: profile.id,
     username: profile.username,
     displayName: profile.displayName?.trim() || null,
     badge: BADGES[profile.badgeStatus],
     bio: profile.bio?.trim() || null,
     avatarUrl: allowedImageUrl(profile.avatarUrl),
     followerCount: profile.followerCount,
+    followingCount: profile.followingCount,
     accuracyRate: profile.accuracyRate,
+    correctCount: profile.correctCount,
+    incorrectCount: profile.incorrectCount,
+    cancelledCount: profile.cancelledCount,
     currentStreak: profile.currentStreak,
     joinedAt: profile.createdAt,
     isSelf: viewerName === profile.username,

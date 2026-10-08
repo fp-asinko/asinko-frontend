@@ -44,7 +44,7 @@ Que el perfil cuente el historial de la persona, que es lo que distingue a Asink
 - [ ] **PT-09** A 360 px nada genera scroll horizontal; pestañas de 44 px de alto.
 - [ ] **PT-10** Pestañas accesibles (links con `aria-current`, como los filtros del feed); textos en en, es y pt; axe sin violaciones en claro y oscuro.
 - [ ] **PT-11** Presupuesto de JS (`seo.md`): la pestaña Tesis se dibuja en el servidor; solo "Cargar más" es cliente, y ya existe.
-- [ ] **PT-12** Mocks: tesis de ejemplo para los usuarios del mock (abiertas y resueltas de cada estado), con el contrato de `Thesis` (E11) validado en `fixtures.test.ts` y su `liveExample` para `pnpm api:smoke`.
+- [ ] **PT-12** Mocks: tesis de ejemplo para los usuarios del mock (abiertas y resueltas de cada estado), con el contrato de `Thesis` (E11) validado en `fixtures.test.ts`. Sin `liveExample` para `pnpm api:smoke`: la ruta pide un `userId` y los ids del seed no se conocen desde el front.
 
 ## Fuera de alcance
 

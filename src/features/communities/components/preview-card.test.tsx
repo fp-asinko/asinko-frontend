@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import type { Preview, PreviewCommunity, ProfileDetails } from '../communities.types'
 import { PreviewCard } from './preview-card'
+import { profileDetails } from '../profile.fixture'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 vi.mock('@/lib/communities/join-community.action', () => ({ joinCommunity: vi.fn() }))
@@ -21,18 +22,14 @@ const macro: PreviewCommunity = {
   createdAt: null,
   viewerMembership: null,
 }
-const maria: ProfileDetails = {
-  username: 'maria',
+const maria = profileDetails({
   displayName: 'María Ruiz',
   badge: 'verified',
   bio: 'On-chain analyst.',
-  avatarUrl: null,
   followerCount: 12400,
   accuracyRate: 0.74,
   currentStreak: 4,
-  joinedAt: '2026-03-02T10:00:00.000Z',
-  isSelf: false,
-}
+})
 const person = (profile: Partial<ProfileDetails> = {}): Preview => ({
   community: { ...macro, slug: 'maria', handle: '@maria', kind: 'user', description: null },
   profile: { ...maria, ...profile },

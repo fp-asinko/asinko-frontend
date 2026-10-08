@@ -8,6 +8,7 @@ import type { ProfileDetails } from '../communities.types'
 import { communityPage } from '../communities.fixture'
 import { CommunityDetails } from './community-details'
 import { CommunityHeader } from './community-header'
+import { profileDetails } from '../profile.fixture'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 const actions = vi.hoisted(() => ({ joinCommunity: vi.fn(), leaveCommunity: vi.fn() }))
@@ -25,19 +26,16 @@ const channel = communityPage({
   rules: 'Data first.',
 })
 
-const profile = (overrides: Partial<ProfileDetails> = {}): ProfileDetails => ({
-  username: 'federico',
-  displayName: 'Federico Piva',
-  badge: null,
-  bio: 'Macro + crypto.',
-  avatarUrl: null,
-  followerCount: 3200,
-  accuracyRate: 0.68,
-  currentStreak: 2,
-  joinedAt: '2026-03-02T10:00:00.000Z',
-  isSelf: false,
-  ...overrides,
-})
+const profile = (overrides: Partial<ProfileDetails> = {}): ProfileDetails =>
+  profileDetails({
+    username: 'federico',
+    displayName: 'Federico Piva',
+    bio: 'Macro + crypto.',
+    followerCount: 3200,
+    accuracyRate: 0.68,
+    currentStreak: 2,
+    ...overrides,
+  })
 
 function renderHeader(details: ProfileDetails, membership: 'MEMBER' | null = null) {
   renderWithIntl(
@@ -66,7 +64,8 @@ describe('Profile header (specs/community-pages CP-11, CP-12)', () => {
 
   it('shows followers, accuracy and streak, each number with its word', () => {
     renderHeader(profile())
-    const stats = screen.getByText('3,200').closest('p')!
+    // Two lines since specs/profile-track-record: who follows, then the track record.
+    const stats = screen.getByText('3,200').closest('div')!
     expect(stats).toHaveTextContent('3,200 followers')
     expect(stats).toHaveTextContent('68% accuracy')
     expect(stats).toHaveTextContent('2 streak')

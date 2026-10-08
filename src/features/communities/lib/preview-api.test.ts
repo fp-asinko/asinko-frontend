@@ -1,24 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { communityPage } from '../communities.fixture'
-import type { ProfileDetails } from '../communities.types'
 import { getPreviewData } from './preview-api'
+import { profileDetails } from '../profile.fixture'
 
 const deps = vi.hoisted(() => ({ getCommunityPage: vi.fn(), getProfileDetails: vi.fn() }))
 vi.mock('./community-api', () => ({ getCommunityPage: deps.getCommunityPage }))
 vi.mock('./profile-api', () => ({ getProfileDetails: deps.getProfileDetails }))
 
-const maria: ProfileDetails = {
-  username: 'maria',
+const maria = profileDetails({
   displayName: 'María',
-  badge: null,
   bio: 'Macro and rates.',
-  avatarUrl: null,
   followerCount: 120,
   accuracyRate: 0.7,
   currentStreak: 3,
-  joinedAt: '2026-03-02T10:00:00.000Z',
-  isSelf: false,
-}
+})
 const notFound = {
   ok: false,
   kind: 'expected',

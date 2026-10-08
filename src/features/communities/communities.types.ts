@@ -7,6 +7,8 @@ export type { CommunityKind }
 
 /** The profile part of a /user page (specs/community-pages § 12). */
 export type ProfileDetails = {
+  /** The user's id: their theses are asked by it (specs/profile-track-record). */
+  id: string
   username: string
   /** P-011: null until the backend sends it; the title is then @username. */
   displayName: string | null
@@ -14,7 +16,12 @@ export type ProfileDetails = {
   bio: string | null
   avatarUrl: string | null
   followerCount: number
+  followingCount: number
   accuracyRate: number | null
+  /** The track record (PT-02): theses resolved right, wrong, and cancelled. */
+  correctCount: number
+  incorrectCount: number
+  cancelledCount: number
   currentStreak: number
   /** When they joined Asinko ("Member since", specs/mention-preview MP-05). */
   joinedAt: string
@@ -61,3 +68,22 @@ export type PreviewCommunity = Pick<
 
 /** A hover card: a group or an asset, or a person with their personal channel. */
 export type Preview = { community: PreviewCommunity; profile: ProfileDetails | null }
+
+/** A thesis of a person's "Theses" tab (specs/profile-track-record PT-07). */
+export type ThesisItem = {
+  id: string
+  /** The asset it is about, linked to its page; null for a qualitative thesis. */
+  asset: { symbol: string; path: string } | null
+  claim: string
+  state: 'open' | 'correct' | 'incorrect' | 'expired' | 'disputed' | 'cancelled'
+  /** What it bets on; null for a qualitative thesis (no asset, no price). */
+  target: { direction: 'above' | 'below' | 'equals'; price: number } | null
+  deadline: string
+  /** LOW … EXTREME as 1 … 4 bars. */
+  conviction: 1 | 2 | 3 | 4
+  resolutionPrice: number | null
+  cancellationReason: string | null
+  publishedAt: string
+}
+
+export type ThesesPage = { items: ThesisItem[]; nextCursor: string | null }

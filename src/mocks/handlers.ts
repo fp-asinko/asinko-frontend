@@ -12,6 +12,7 @@ import {
   postSchema,
   profileSchema,
   searchResultSchema,
+  thesisSchema,
   userSummarySchema,
   voteResultSchema,
   type RawFeedItem,
@@ -27,6 +28,7 @@ import { PROFILES, summary } from './fixtures/users'
 import { commentTree, searchComments } from './comment-tree'
 import { withTopPost } from './top-post'
 import { ADS } from './fixtures/ads'
+import { thesesBy } from './fixtures/theses'
 import { paginate } from './paginate'
 import type { MockContext, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
@@ -112,6 +114,21 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
         accuracyRate,
       }))
       return { status: 200, body: paginate(items, query.cursor) }
+    },
+  },
+
+  // E12: a person's theses, the newest first (specs/profile-track-record). No liveExample: the
+  // route takes a userId, and the seed's ids are not known here.
+  {
+    method: 'GET',
+    path: '/api/v1/users/:userId/theses',
+    kind: 'contract',
+    implemented: true,
+    schema: paginatedSchema(thesisSchema),
+    example: { ...noRequest, params: { userId: PROFILES[1]!.id } },
+    handler: ({ params, query }) => {
+      if (!PROFILES.some((each) => each.id === params.userId)) return notFound
+      return { status: 200, body: paginate(thesesBy(params.userId ?? ''), query.cursor) }
     },
   },
 

@@ -302,7 +302,12 @@
         "institutional": "Institucional"
       },
       "ask": "Perguntar para {name}",
-      "rulesTitle": "Regras de {name}"
+      "rulesTitle": "Regras de {name}",
+      "following": "<b>{count}</b> seguindo",
+      "correct": "<b>{count}</b> {count, plural, one {certa} other {certas}}",
+      "incorrect": "<b>{count}</b> {count, plural, one {errada} other {erradas}}",
+      "cancelled": "<b>{count}</b> {count, plural, one {cancelada} other {canceladas}}",
+      "noResolved": "Ainda sem teses resolvidas"
     },
     "createPost": "Criar post"
   },

@@ -302,7 +302,12 @@
         "institutional": "Institutional"
       },
       "ask": "Ask {name}",
-      "rulesTitle": "Rules of {name}"
+      "rulesTitle": "Rules of {name}",
+      "following": "<b>{count}</b> following",
+      "correct": "<b>{count}</b> correct",
+      "incorrect": "<b>{count}</b> incorrect",
+      "cancelled": "<b>{count}</b> cancelled",
+      "noResolved": "No resolved theses yet"
     },
     "createPost": "Create post"
   },
