@@ -1,6 +1,6 @@
 import {
+  assetCatalogSchema,
   assetPageSchema,
-  assetSchema,
   commentListSchema,
   commentSchema,
   communitySchema,
@@ -10,6 +10,7 @@ import {
   pollSchema,
   postSchema,
   profileSchema,
+  searchResultSchema,
   userSummarySchema,
   voteResultSchema,
   type RawFeedItem,
@@ -21,7 +22,7 @@ import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { COMMUNITIES, communityBySlug } from './fixtures/communities'
 import { POLLS, pollById } from './fixtures/polls'
 import { POSTS } from './fixtures/posts'
-import { PROFILES } from './fixtures/users'
+import { PROFILES, summary } from './fixtures/users'
 import { commentTree } from './comment-tree'
 import { paginate } from './paginate'
 import type { MockContext, MockRoute } from './types'
@@ -377,15 +378,50 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
         : notFound,
   },
 
-  // E14 (the catalog's response shape is not in the contract: the standard list is assumed)
+  // E04: simple search, used for @ in mentions (specs/mention-autocomplete). Private profiles
+  // never show (the backend hides them). Content is not searched by the mocks.
+  {
+    method: 'GET',
+    path: '/api/v1/search',
+    kind: 'contract',
+    implemented: true,
+    schema: searchResultSchema,
+    example: { ...noRequest, query: { q: 'mar', type: 'user' } },
+    liveExample: { ...noRequest, query: { q: 'a', type: 'user' } },
+    handler: ({ query }) => {
+      const q = query.q?.trim().toLowerCase() ?? ''
+      const wants = (type: string) => q !== '' && (!query.type || query.type === type)
+      const users = wants('user')
+        ? PROFILES.filter((each) => each.isPublic && each.username.toLowerCase().includes(q))
+            .slice(0, 10)
+            .map((each) => summary(each.username))
+        : []
+      const communities = wants('community')
+        ? COMMUNITIES.filter(
+            (each) => each.slug.toLowerCase().includes(q) || each.name.toLowerCase().includes(q),
+          )
+            .slice(0, 10)
+            .map(({ id, slug, name, avatarUrl, memberCount }) => ({
+              id,
+              slug,
+              name,
+              avatarUrl,
+              memberCount,
+            }))
+        : []
+      return { status: 200, body: { users, communities, content: [] } }
+    },
+  },
+  // E14: the catalog and autocomplete of $ (specs/mention-autocomplete). In the backend's dev,
+  // without a cursor.
   {
     method: 'GET',
     path: '/api/v1/assets',
     kind: 'contract',
-    // E14 is postponed in the backend: the asset tiles stay on mocks.
-    implemented: false,
-    schema: paginatedSchema(assetSchema),
+    implemented: true,
+    schema: assetCatalogSchema,
     example: { ...noRequest, query: { q: 'b' } },
+    liveExample: { ...noRequest, query: { q: 'b' } },
     handler: ({ query }) => {
       const q = query.q?.toLowerCase() ?? ''
       const matches = ASSETS.filter(

@@ -3,4 +3,5 @@
 export * from './assets'
 export * from './communities'
 export * from './content'
+export * from './search'
 export * from './users'

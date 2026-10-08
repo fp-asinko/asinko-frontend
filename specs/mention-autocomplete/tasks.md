@@ -1,6 +1,6 @@
 # Autocompletar menciones — Tasks
 
-- [ ] **T-01 (S)** Contrato y mocks:
+- [x] **T-01 (S)** Contrato y mocks:
   - Esquema de `/assets` con `nextCursor` opcional y su mock `implemented: true`.
   - Mock de `GET /search` (usuarios y comunidades).
   - P-001 ampliada en `proposals.md` (E3-06).

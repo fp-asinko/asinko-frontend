@@ -18,11 +18,14 @@ En orden de prioridad para el front: P-012, P-001, P-013, P-011, P-003 y P-005.
 
 **Cambio:** una lista estándar (`{ "items": FeedItem[], "nextCursor": string | null }`) con el contenido que creó el usuario, en cualquier comunidad, del más nuevo al más viejo, con el mismo `FeedItem` y el mismo filtro `kind` que el feed. Respeta `isPublic` del perfil, igual que el resto de E01.
 
-### P-001: Menciones resueltas en la lectura de posts
+### P-001: Menciones detectadas al publicar y resueltas al leer
 
-**Estado:** propuesta. La detección se postergó en el backend (21/09). Sigue pendiente: `GET /posts/{id}` y el feed no traen `entities`.
+**Estado:** propuesta. La detección se postergó en el backend (E3-06, 21/09): `POST /posts` devuelve `entities: []`, y `GET /posts/{id}` y el feed no traen `entities`. **Ampliada el 2026-10-08:** el front ya autocompleta `$`, `#` y `@` al escribir posts y comentarios (`specs/mention-autocomplete`); sin la detección, esas menciones se publican como texto.
 
-**Endpoint:** `GET /posts/{id}`, `GET /feed/following`, `GET /feed/explore` (y los comentarios, si van a tener menciones).
+**Endpoint:**
+
+- Al escribir: `POST /posts`, `PATCH /posts/{id}` y `POST /posts/{id}/comments` detectan las menciones del cuerpo (`$TICKER` del catálogo, `#slug` de comunidad, `@username`) y guardan las que resuelven.
+- Al leer: `GET /posts/{id}`, `GET /feed/following`, `GET /feed/explore` y los comentarios las devuelven.
 
 **Motivo:** las menciones `$ # @` son links a las páginas de activo, grupo y perfil (`specs/community-pages`). Sin `entities`, se ven como texto plano. El front no reparsea el texto para adivinar a qué apunta cada mención.
 

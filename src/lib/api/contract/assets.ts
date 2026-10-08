@@ -31,3 +31,12 @@ export const assetPageSchema = assetSchema.extend({
 })
 
 export type RawAsset = z.infer<typeof assetSchema>
+
+/**
+ * GET /api/v1/assets?q= (E14, catalog and autocomplete). The backend returns at most a short
+ * list, without a cursor: `nextCursor` is optional.
+ */
+export const assetCatalogSchema = z.object({
+  items: z.array(assetSchema),
+  nextCursor: z.string().nullable().optional(),
+})

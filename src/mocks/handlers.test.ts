@@ -3,6 +3,7 @@ import { DEMO_USER } from './demo-user'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { COMMUNITIES, PERSONAL_CHANNELS } from './fixtures/communities'
 import { POSTS } from './fixtures/posts'
+import { PROFILES } from './fixtures/users'
 import { MOCK_ROUTES } from './handlers'
 import type { MockContext } from './types'
 
@@ -64,9 +65,37 @@ describe('mock handlers behave like the contract', () => {
     expect(page.items.every((each) => each.viewerMembership !== null)).toBe(true)
   })
 
-  it('marks as missing only the routes the backend does not have (assets, E14)', () => {
+  it('marks as missing only the routes the backend does not have (the asset page, E14)', () => {
     const missing = MOCK_ROUTES.filter((route) => !route.implemented).map((route) => route.path)
-    expect(missing).toEqual(['/api/v1/assets', '/api/v1/assets/:symbol'])
+    expect(missing).toEqual(['/api/v1/assets/:symbol'])
+  })
+
+  it('searches public users by username, never private ones (specs/mention-autocomplete)', async () => {
+    const result = (await call('GET', '/api/v1/search', { query: { q: 'MAR', type: 'user' } }))
+      .body as { users: Array<{ username: string }>; communities: unknown[]; content: unknown[] }
+    expect(result.users.map((each) => each.username)).toContain('maria')
+    expect(result.communities).toEqual([])
+    const privates = PROFILES.filter((each) => !each.isPublic).map((each) => each.username)
+    for (const username of privates) {
+      const found = (await call('GET', '/api/v1/search', { query: { q: username, type: 'user' } }))
+        .body as { users: Array<{ username: string }> }
+      expect(found.users.map((each) => each.username)).not.toContain(username)
+    }
+  })
+
+  it('answers empty lists for an empty search, as the backend', async () => {
+    expect((await call('GET', '/api/v1/search', { query: { q: ' ' } })).body).toEqual({
+      users: [],
+      communities: [],
+      content: [],
+    })
+  })
+
+  it('lists the asset catalog by symbol or name (specs/mention-autocomplete)', async () => {
+    const page = (await call('GET', '/api/v1/assets', { query: { q: 'bitc' } })).body as {
+      items: Array<{ symbol: string }>
+    }
+    expect(page.items.map((each) => each.symbol)).toContain('BTC')
   })
 
   it('builds the following feed from the communities the viewer belongs to', async () => {
