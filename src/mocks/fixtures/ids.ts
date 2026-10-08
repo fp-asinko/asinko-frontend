@@ -1,6 +1,6 @@
 // Deterministic ids and timestamps, so fixtures and tests never change between runs.
 
-/** Valid v4-shaped UUID from a number: ns 1 users · 2 communities · 3 assets · 4 posts · 5 polls · 6 comments · 7 poll options. */
+/** Valid v4-shaped UUID from a number: ns 1 users · 2 communities · 3 assets · 4 posts · 5 polls · 6 comments · 7 poll options · 8 ads. */
 export function mockId(namespace: number, n: number): string {
   return `00000000-0000-4000-8000-${String(namespace * 1000 + n).padStart(12, '0')}`
 }

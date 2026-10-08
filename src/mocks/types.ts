@@ -25,6 +25,12 @@ export type MockRoute = {
    * with `implemented: false` are mocked.
    */
   implemented: boolean
+  /**
+   * Only requests with this query (a proposal that adds a parameter to an implemented endpoint,
+   * e.g. ?q= on the comments, P-014): the rest of the endpoint still goes to the backend. The
+   * first route that matches wins, so it goes before the route of the whole endpoint.
+   */
+  when?: (query: Record<string, string>) => boolean
   schema: z.ZodType
   /** Sample request the fixtures test runs against the handler. */
   example: MockContext

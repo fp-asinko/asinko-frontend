@@ -13,7 +13,11 @@ type Page = {
 }
 
 function call(method: string, path: string, context: Partial<MockContext> = {}) {
-  const route = MOCK_ROUTES.find((each) => each.method === method && each.path === path)
+  // As the client: the first route that matches, `when` included.
+  const query = context.query ?? {}
+  const route = MOCK_ROUTES.find(
+    (each) => each.method === method && each.path === path && (!each.when || each.when(query)),
+  )
   if (!route) throw new Error(`No mock for ${method} ${path}`)
   return route.handler({ params: {}, query: {}, body: undefined, ...context })
 }
@@ -65,9 +69,74 @@ describe('mock handlers behave like the contract', () => {
     expect(page.items.every((each) => each.viewerMembership !== null)).toBe(true)
   })
 
-  it('marks as missing only the routes the backend does not have (the asset page, E14)', () => {
+  it('marks as missing only what the backend does not have: the asset page and the proposals', () => {
     const missing = MOCK_ROUTES.filter((route) => !route.implemented).map((route) => route.path)
-    expect(missing).toEqual(['/api/v1/assets/:symbol'])
+    // Searching comments (P-014) goes alone: the rest of that endpoint is the backend's.
+    expect(missing).toEqual(['/api/v1/posts/:id/comments', '/api/v1/assets/:symbol', '/api/v1/ads'])
+  })
+
+  describe('comments sorted and searched (P-014, specs/post-detail-refresh)', () => {
+    const debate = { id: POSTS[2]!.id }
+    type Item = { body: string; score: number; createdAt: string; replies: Item[] }
+    const list = async (query: Record<string, string>) =>
+      (
+        (await call('GET', '/api/v1/posts/:id/comments', { params: debate, query })).body as {
+          items: Item[]
+        }
+      ).items
+
+    it('orders every level by top, new or old, and keeps the backend order without sort', async () => {
+      const top = await list({ sort: 'top' })
+      const scores = top.map((each) => each.score)
+      expect(scores).toEqual([...scores].sort((a, b) => b - a))
+      const replies = top.find((each) => each.replies.length > 1)!.replies.map((r) => r.score)
+      expect(replies).toEqual([...replies].sort((a, b) => b - a))
+
+      const dates = (items: Item[]) => items.map((each) => Date.parse(each.createdAt))
+      expect(dates(await list({ sort: 'new' }))).toEqual(
+        dates(await list({ sort: 'new' })).sort((a, b) => b - a),
+      )
+      expect(dates(await list({ sort: 'old' }))).toEqual(dates(await list({})))
+    })
+
+    it('ranks a newer comment above an older, more voted one in best (decay by age)', async () => {
+      const newer = 'Final take: opportunity for the patient, capitulation for the leveraged.' // 48, 1.2 h
+      const older =
+        'I ran the ratio against funding rates. Capitulation needs negative funding for a week. Not there yet.' // 63, 2.35 h
+      const position = (items: Item[], body: string) =>
+        items.findIndex((each) => each.body === body)
+      const best = await list({ sort: 'best' })
+      const top = await list({ sort: 'top' })
+      expect(position(best, newer)).toBeLessThan(position(best, older))
+      expect(position(top, newer)).toBeGreaterThan(position(top, older))
+    })
+
+    it('finds a text at any level, without case or accents, in a flat list', async () => {
+      const found = await list({ q: 'BLÖBS' })
+      expect(found.map((each) => each.body)).toEqual([
+        'Rhymes, but the supply story is different now. Burn is lower since the blobs.',
+        'And the L2s pay ETH for blobs, so some of it comes back. Small, though.',
+      ])
+      expect(found.every((each) => each.replies.length === 0)).toBe(true)
+      expect(await list({ q: 'zzzz' })).toEqual([])
+    })
+
+    it('rejects a search too short or too long', async () => {
+      for (const q of ['a', 'x'.repeat(101)]) {
+        const { status } = await call('GET', '/api/v1/posts/:id/comments', {
+          params: debate,
+          query: { q },
+        })
+        expect(status).toBe(422)
+      }
+    })
+  })
+
+  it('serves the house ads for the comments, and nothing for other places (P-015)', async () => {
+    const ads = async (query: Record<string, string>) =>
+      ((await call('GET', '/api/v1/ads', { query })).body as { items: unknown[] }).items
+    expect((await ads({ placement: 'comments' })).length).toBeGreaterThan(1)
+    expect(await ads({ placement: 'feed' })).toEqual([])
   })
 
   it('searches public users by username, never private ones (specs/mention-autocomplete)', async () => {

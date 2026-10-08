@@ -39,6 +39,202 @@ const thread = (...roots: Array<(parentId?: string | null) => RawComment>) =>
 
 const [whales, fed, ethBtc, dogeMeme, stableYields, cnv] = POSTS
 
+// The ETH/BTC post's debate: 20 more comments with replies, ~30 in all (ads every 10).
+const ETH_BTC_DEBATE = [
+  comment(
+    {
+      author: 'maria',
+      body: 'ETH/BTC at 0.035 is where it bounced in 2019. History rhymes.',
+      ago: hoursAgo(2.4),
+      score: 41,
+    },
+    [
+      comment({
+        author: 'quantsimula',
+        body: 'Rhymes, but the supply story is different now. Burn is lower since the blobs.',
+        ago: hoursAgo(2.3),
+        score: 22,
+      }),
+      comment({
+        author: 'maria',
+        body: 'True, the fee burn barely covers issuance on quiet days.',
+        ago: hoursAgo(2.2),
+        score: 12,
+      }),
+    ],
+  ),
+  comment({
+    author: 'quantsimula',
+    body: 'I ran the ratio against funding rates. Capitulation needs negative funding for a week. Not there yet.',
+    ago: hoursAgo(2.35),
+    score: 63,
+  }),
+  comment(
+    {
+      author: 'macropilar',
+      body: 'Rates matter more than the ratio. If the Fed keeps cutting, ETH outperforms risk-on.',
+      ago: hoursAgo(2.3),
+      score: 18,
+    },
+    [
+      comment({
+        author: 'federico',
+        body: 'Only if the ETF flows follow. They have been flat for a month.',
+        ago: hoursAgo(2.25),
+        score: 7,
+      }),
+    ],
+  ),
+  comment({
+    author: 'esmev',
+    body: 'I keep stacking ETH every Friday. The ratio is noise for me.',
+    ago: hoursAgo(2.2),
+    score: 25,
+  }),
+  comment(
+    {
+      author: 'diamondgrandma',
+      body: 'Sold half my ETH for BTC in 2022 and never looked back.',
+      ago: hoursAgo(2.15),
+      score: 3,
+    },
+    [
+      comment({
+        author: 'jeppe',
+        body: 'Best trade of the cycle so far, honestly.',
+        ago: hoursAgo(2.1),
+        score: 14,
+      }),
+    ],
+  ),
+  comment({
+    author: 'capitalprudente',
+    body: 'For a retail investor in Argentina, BTC is the simpler savings story. ETH is a tech bet.',
+    ago: hoursAgo(2.1),
+    score: 30,
+  }),
+  comment({
+    author: 'jeppe',
+    body: 'Opportunity, but sized small. Ratios can trend for years.',
+    ago: hoursAgo(2.05),
+    score: 19,
+  }),
+  comment(
+    {
+      author: 'federico',
+      body: 'The L2s took the fees. That is the whole thesis against ETH right now.',
+      ago: hoursAgo(2),
+      score: 52,
+    },
+    [
+      comment({
+        author: 'quantsimula',
+        body: 'And the L2s pay ETH for blobs, so some of it comes back. Small, though.',
+        ago: hoursAgo(1.95),
+        score: 16,
+      }),
+      comment({
+        author: 'macropilar',
+        body: 'Small is the key word there.',
+        ago: hoursAgo(1.9),
+        score: 4,
+      }),
+    ],
+  ),
+  comment({
+    author: 'maria',
+    body: 'Watching staking yields: if they drop under T-bills, more selling.',
+    ago: hoursAgo(1.85),
+    score: 27,
+  }),
+  comment({
+    author: 'esmev',
+    body: 'Every cycle someone calls ETH dead at the bottom.',
+    ago: hoursAgo(1.8),
+    score: 44,
+  }),
+  comment(
+    {
+      author: 'quantsimula',
+      body: 'Backtest: buying ETH/BTC after a 4-year low returned 2x in 3 of 4 cases. Small sample.',
+      ago: hoursAgo(1.75),
+      score: 71,
+    },
+    [
+      comment({
+        author: 'capitalprudente',
+        body: 'Three of four is not a strategy, it is an anecdote.',
+        ago: hoursAgo(1.7),
+        score: 9,
+      }),
+    ],
+  ),
+  comment({
+    author: 'macropilar',
+    body: 'DXY breaking down would help both. The ratio follows liquidity.',
+    ago: hoursAgo(1.65),
+    score: 11,
+  }),
+  comment({
+    author: 'diamondgrandma',
+    body: 'I just want my grandson to stop texting me about the merge.',
+    ago: hoursAgo(1.6),
+    score: 38,
+  }),
+  comment({
+    author: 'jeppe',
+    body: 'Solana ate the retail activity. That is the part nobody prices.',
+    ago: hoursAgo(1.55),
+    score: 21,
+  }),
+  comment(
+    {
+      author: 'federico',
+      body: 'I will write a thesis on this: ETH/BTC above 0.05 by mid 2027.',
+      ago: hoursAgo(1.5),
+      score: 33,
+    },
+    [
+      comment({
+        author: 'maria',
+        body: 'I would take the other side. Post it and we see who is right.',
+        ago: hoursAgo(1.45),
+        score: 17,
+      }),
+    ],
+  ),
+  comment({
+    author: 'capitalprudente',
+    body: 'Is there a clean way to track the ratio here? The chart widget would help.',
+    ago: hoursAgo(1.4),
+    score: 2,
+  }),
+  comment({
+    author: 'esmev',
+    body: 'Gas is cheap, apps are cheap, nobody is using them. That is the problem.',
+    ago: hoursAgo(1.35),
+    score: 8,
+  }),
+  comment({
+    author: 'quantsimula',
+    body: 'Correlation with Nasdaq is higher for ETH than BTC this year. That explains most of it.',
+    ago: hoursAgo(1.3),
+    score: 29,
+  }),
+  comment({
+    author: 'macropilar',
+    body: 'Patience. Cuts take 6 to 9 months to reach risk assets.',
+    ago: hoursAgo(1.25),
+    score: 6,
+  }),
+  comment({
+    author: 'maria',
+    body: 'Final take: opportunity for the patient, capitulation for the leveraged.',
+    ago: hoursAgo(1.2),
+    score: 48,
+  }),
+]
+
 // Comments by content id (posts and polls share the same endpoint shape).
 export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
   [whales!.id]: thread(
@@ -176,6 +372,8 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
         }),
       ],
     ),
+    // A long discussion: enough comments for the ads between them (specs/post-detail-refresh).
+    ...ETH_BTC_DEBATE,
   ),
   [dogeMeme!.id]: thread(
     comment({ author: 'jeppe', body: 'Pain. Pure pain.', ago: hoursAgo(3.5), score: 120 }),

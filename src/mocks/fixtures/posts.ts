@@ -66,7 +66,7 @@ export const POSTS: RawPost[] = [
     title: 'ETH/BTC at a 4-year low. Capitulation or opportunity?',
     body: 'The $ETH/$BTC ratio just printed its lowest weekly close since 2021. Staking yield barely beats T-bills now, and L2s capture most of the activity. I am not bearish on Ethereum the network, I am bearish on $ETH the asset vs $BTC. Change my mind, @federico.',
     score: 389,
-    commentCount: 2,
+    commentCount: 30,
     viewerVote: -1,
     publishedAt: hoursAgo(3),
   }),

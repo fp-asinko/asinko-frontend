@@ -233,6 +233,16 @@ describe('mocks (F-36)', () => {
     expect(fetchMock).toHaveBeenCalledOnce()
   })
 
+  it('mocks a route only for the query its `when` accepts (a proposed parameter)', async () => {
+    const fetchMock = respond(200, { id: 'u3', username: 'real' })
+    const searchOnly = { ...profileMock, when: (query: Record<string, string>) => 'q' in query }
+    const api = createApiClient({ baseUrl: BASE_URL, fetch: fetchMock, mocks: [searchOnly] })
+    await api({ ...getProfile, query: { q: 'x' } })
+    expect(fetchMock).not.toHaveBeenCalled()
+    await api(getProfile)
+    expect(fetchMock).toHaveBeenCalledOnce()
+  })
+
   it('applies the same error mapping to mocked errors', async () => {
     const api = createApiClient({ baseUrl: BASE_URL, fetch: respond(500), mocks: [profileMock] })
     expect(await api({ ...getProfile, params: { identifier: 'nobody' } })).toMatchObject({

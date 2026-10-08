@@ -1,4 +1,5 @@
 import {
+  adListSchema,
   assetCatalogSchema,
   assetPageSchema,
   commentListSchema,
@@ -23,7 +24,8 @@ import { COMMUNITIES, communityBySlug } from './fixtures/communities'
 import { POLLS, pollById } from './fixtures/polls'
 import { POSTS } from './fixtures/posts'
 import { PROFILES, summary } from './fixtures/users'
-import { commentTree } from './comment-tree'
+import { commentTree, searchComments } from './comment-tree'
+import { ADS } from './fixtures/ads'
 import { paginate } from './paginate'
 import type { MockContext, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
@@ -38,6 +40,10 @@ import {
 import { removePostVote, votePoll, votePost } from './votes'
 
 const notFound = { status: 404, body: { error: { code: 'NOT_FOUND', message: 'mock' } } }
+const validationError = {
+  status: 422,
+  body: { error: { code: 'VALIDATION_ERROR', message: 'mock' } },
+}
 
 const noRequest: MockContext = { params: {}, query: {}, body: undefined }
 
@@ -307,6 +313,23 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
 
   // E05: comments
   {
+    // P-014 (proposal): searching. A post the mocks do not know (a real one, API_MOCKS=missing)
+    // has no results: the mock cannot search the backend's comments.
+    method: 'GET',
+    path: '/api/v1/posts/:id/comments',
+    kind: 'proposal',
+    implemented: false,
+    when: (query) => query.q !== undefined,
+    schema: commentListSchema,
+    example: { ...noRequest, params: { id: POSTS[2]!.id }, query: { q: 'eth' } },
+    handler: ({ params, query }) => {
+      const q = (query.q ?? '').trim()
+      if (q.length < 2 || q.length > 100) return validationError
+      const items = params.id && findPost(params.id) ? searchComments(commentsOf(params.id), q) : []
+      return { status: 200, body: { items } }
+    },
+  },
+  {
     method: 'GET',
     path: '/api/v1/posts/:id/comments',
     kind: 'contract',
@@ -453,5 +476,19 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
         },
       }
     },
+  },
+
+  // P-015 (proposal): house ads, rotated by the front.
+  {
+    method: 'GET',
+    path: '/api/v1/ads',
+    kind: 'proposal',
+    implemented: false,
+    schema: adListSchema,
+    example: { ...noRequest, query: { placement: 'comments' } },
+    handler: ({ query }) => ({
+      status: 200,
+      body: { items: query.placement === 'comments' ? ADS : [] },
+    }),
   },
 ]

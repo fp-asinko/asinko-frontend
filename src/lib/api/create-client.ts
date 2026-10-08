@@ -101,7 +101,10 @@ export function createApiClient({
 
     // Same handling below for mocked and real responses: a mock exercises validation and errors too.
     const mock = mocks?.find(
-      (route) => route.method === request.method && route.path === request.path,
+      (route) =>
+        route.method === request.method &&
+        route.path === request.path &&
+        (!route.when || route.when(request.query ?? {})),
     )
 
     let raw: RawResponse
