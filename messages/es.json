@@ -369,6 +369,7 @@
     "count": "{count, plural, one {# sugerencia} other {# sugerencias}}",
     "empty": "Sin coincidencias",
     "error": "No se pudieron cargar las sugerencias",
-    "added": "Se agregó {handle}"
+    "added": "Se agregó {handle}",
+    "loading": "Buscando…"
   }
 }

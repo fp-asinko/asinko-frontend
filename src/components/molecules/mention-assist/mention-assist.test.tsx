@@ -32,6 +32,9 @@ function Harness({ search, onKey }: { search: MentionSearch; onKey?: () => void 
       />
       {field && <MentionAssist field={field} search={search} />}
       <p data-testid="value">{text}</p>
+      <button type="button" onClick={() => setText('')}>
+        Clear
+      </button>
     </div>
   )
 }
@@ -156,5 +159,72 @@ describe('MentionAssist (specs/mention-autocomplete)', () => {
     await waitFor(() => expect(search).toHaveBeenLastCalledWith({ kind: 'community', q: 'de' }))
     await userEvent.type(body(), ' @ma')
     await waitFor(() => expect(search).toHaveBeenLastCalledWith({ kind: 'user', q: 'ma' }))
+  })
+})
+
+describe('MentionAssist: speed (specs/mention-autocomplete § 3)', () => {
+  beforeEach(() => {
+    search.mockReset()
+  })
+
+  it('says "Searching…" at once, before the answer', async () => {
+    let answer!: (value: Awaited<ReturnType<MentionSearch>>) => void
+    search.mockReturnValue(new Promise((done) => (answer = done)))
+    renderWithIntl(<Harness search={search} />)
+    await userEvent.type(body(), '$bi')
+    expect(screen.getByText('Searching…')).toBeInTheDocument()
+    answer({ ok: true, data: [BTC] })
+    expect(await screen.findByRole('option', { name: /\$BTC/ })).toBeInTheDocument()
+  })
+
+  it('shows what a shorter query found while the longer one travels', async () => {
+    search.mockResolvedValueOnce({ ok: true, data: [BTC, BCH] })
+    search.mockReturnValueOnce(new Promise(() => {}))
+    renderWithIntl(<Harness search={search} />)
+    await userEvent.type(body(), '$b')
+    await screen.findByRole('option', { name: /\$BCH/ })
+    // "bc": only $BCH still matches, shown before the server answers.
+    await userEvent.type(body(), 'c')
+    expect(screen.getByRole('option', { name: /\$BCH/ })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: /\$BTC/ })).not.toBeInTheDocument()
+  })
+
+  it('answers a query already asked at once, without asking again', async () => {
+    search.mockResolvedValue({ ok: true, data: [BTC] })
+    renderWithIntl(<Harness search={search} />)
+    await userEvent.type(body(), '$bi')
+    await screen.findByRole('option', { name: /\$BTC/ })
+    await userEvent.type(body(), 't{Backspace}')
+    await screen.findByRole('option', { name: /\$BTC/ })
+    const calls = search.mock.calls.filter(([input]) => input.q === 'bi')
+    expect(calls).toHaveLength(1)
+  })
+})
+
+describe('MentionAssist: mentions in blue while writing (MA-12)', () => {
+  beforeEach(() => {
+    search.mockReset()
+    search.mockResolvedValue({ ok: true, data: [] })
+  })
+
+  const layer = () => document.querySelector<HTMLElement>('[data-mention-highlight]')
+
+  it('paints each mention over the textarea, which keeps only its caret', async () => {
+    renderWithIntl(<Harness search={search} />)
+    await userEvent.type(body(), 'Long $BTC with @maria')
+    expect(layer()).toHaveAttribute('aria-hidden', 'true')
+    expect(layer()).toHaveTextContent('Long $BTC with @maria')
+    const painted = [...layer()!.querySelectorAll('.text-mention')].map((each) => each.textContent)
+    expect(painted).toEqual(['$BTC', '@maria'])
+    expect(body()).toHaveAttribute('data-mention-painted')
+  })
+
+  it('follows a value set by code, as a comment box emptied after sending', async () => {
+    renderWithIntl(<Harness search={search} />)
+    await userEvent.type(body(), '#defi')
+    await userEvent.click(screen.getByRole('button', { name: 'Clear' }))
+    expect(body()).toHaveValue('')
+    expect(layer()!.querySelector('.text-mention')).toBeNull()
+    expect(layer()!.textContent).toBe('​')
   })
 })

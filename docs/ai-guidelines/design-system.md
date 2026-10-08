@@ -51,7 +51,7 @@ shadcn define el tema con variables semánticas en `globals.css`:
 
 El sistema visual sale del prototipo (`docs/references/prototype.html`), medido en el navegador. Valores y motivos en `specs/home/design.md § 2`.
 
-- **Monocromático**: `--primary` es casi negro (`#17181A`) en claro y casi blanco en oscuro. El único azul es el punto del logo (`--brand-dot`).
+- **Monocromático**: `--primary` es casi negro (`#17181A`) en claro y casi blanco en oscuro. El único azul es el punto del logo (`--brand-dot`), con una excepción: las menciones mientras se escriben (`--mention`, `specs/mention-autocomplete` MA-12).
 - **Grises fríos** (los de Reddit, `specs/header-refresh`; antes eran cálidos):
   - `--surface` (`#F6F8F9`): buscador, caja para publicar, comentarios, tarjetas de la columna y hovers.
   - `--muted` (`#EEF1F3`): chips y píldoras grises.

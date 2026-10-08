@@ -1,6 +1,7 @@
 # Autocompletar menciones — Requirements
 
 > **Estado:** aprobado por el PO el 2026-10-08, con las preguntas resueltas: también en comentarios (Q1) y la lista aparece con la primera letra (Q2).
+> **Cambio con el PO (2026-10-08, al probarlo):** las sugerencias tardaban en aparecer, y las menciones tienen que verse en azul mientras se escriben (MA-12, con un token nuevo `--mention`). Las tarjetas al pasar el mouse sobre una mención van en su propio spec.
 > **Fuente:** pedido del PO (2026-10-07): "que aparezcan usuarios cuando pongo @, comunidades cuando pongo # o assets cuando pongo $". Las menciones están definidas en `docs/product/overview.md § Menciones`.
 
 ## Objetivo
@@ -31,6 +32,8 @@ Que escribir una mención sea rápido y exacto: al tipear `$`, `#` o `@` en el e
 - [ ] **MA-06** La lista se cierra sola al escribir un espacio, al borrar el símbolo o al mover el cursor fuera de la mención. Escribir sin elegir deja el texto tal cual: elegir es una ayuda, no una obligación.
 - [ ] **MA-07** **Accesibilidad:** el campo anuncia que tiene sugerencias (patrón combobox con `aria-activedescendant`), cada sugerencia es una opción y la elegida se anuncia. axe sin violaciones, en claro y oscuro.
 - [ ] **MA-08** **Mobile first:** a 360 px la lista entra en pantalla, también con el teclado del teléfono abierto, y cada opción mide al menos 44 px.
+- [ ] **MA-12** **Menciones en azul mientras se escribe:** en el cuerpo del editor y en las cajas de comentar y responder, cada mención (`$BTC`, `#defi`, `@maria`, también la que se está escribiendo) se ve en el color `--mention`, con contraste 4,5:1 en claro y oscuro. Un precio (`$100`) no es una mención. El cursor, la selección y el texto de ayuda siguen igual.
+- [ ] **MA-13** **Rapidez:** la lista aparece enseguida: "Buscando…" mientras llega la respuesta, lo que una búsqueda más corta ya encontró filtrado en el momento, y una búsqueda ya hecha sin volver a pedirla.
 
 ### Calidad
 

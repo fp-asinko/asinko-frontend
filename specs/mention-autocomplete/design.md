@@ -22,7 +22,8 @@ Lo usan dos features que no se importan entre sí (el editor de posts y los come
 
 ## 3. Buscar
 
-- Una Server Action `searchMentions({ kind, q })`, validada con zod (`q` de 1 a 32 caracteres), con una pausa de 150 ms y descartando respuestas viejas (como el selector de comunidad).
+- Una Server Action `searchMentions({ kind, q })`, validada con zod (`q` de 1 a 32 caracteres), con una pausa de 100 ms y descartando respuestas viejas (como el selector de comunidad).
+- **Rapidez (MA-13):** cada campo guarda las respuestas por símbolo y texto. Una búsqueda ya hecha se muestra sin pedirla; mientras viaja una nueva se muestra lo que encontró la más larga de las anteriores que sea su prefijo, filtrado por handle o nombre ("bit" mientras viaja "bitc"), y si no hay nada, "Buscando…". La respuesta reemplaza a ese adelanto.
 - Por símbolo, en `lib/mentions/mentions-api.ts`:
 
   | Símbolo | Endpoint                               | Filtro                                   | Inserta                    |
@@ -41,6 +42,15 @@ Lo usan dos features que no se importan entre sí (el editor de posts y los come
 - Cada opción: `UserAvatar` chico (persona: redondo; comunidad o activo: cuadrado redondeado, como en las tarjetas), el handle en negrita y el nombre en gris si dice algo más.
 - A 360 px: ancho de la columna menos los márgenes; si no entra debajo, se abre arriba del cursor.
 
+## 4 bis. Menciones en azul (MA-12)
+
+- Un `textarea` tiene un solo color. Encima va una **copia de su texto** (`MentionHighlight`, en el mismo chunk diferido), con la misma caja y la misma tipografía (las propiedades del espejo del cursor, más alto, ancho, posición y scroll, alineadas con un `ResizeObserver` y el evento `scroll`). La copia dibuja el texto en `foreground` y las menciones en `--mention`; sin eventos de puntero y con `aria-hidden` (los lectores leen el campo).
+- El campo lleva `data-mention-painted`: su texto pasa a transparente y el cursor sigue con `foreground` (`globals.css`, en la capa de utilidades para ganarle al color del propio campo). La selección usa un tinte de `--mention` al 25 % y texto transparente: la copia se lee encima.
+- El texto de la copia sigue al campo con el evento `input` y con un envoltorio del setter de `value` en ese elemento (encadenado al rastreador de React y restaurado al desmontar): una caja de comentarios que se vacía al enviar cambia el valor sin evento.
+- **Colores forzados** (alto contraste de Windows): el navegador devuelve el texto al campo y pinta la copia de un solo color; la copia se oculta (`forced-colors: active`) para no duplicarlo.
+- Qué se pinta (`mention-segments.ts`): el símbolo al principio o después de un espacio y hasta 32 letras, dígitos, `_` o `-` que terminan la palabra; `$` seguido de un dígito es un precio.
+- Antes de enfocarlo por primera vez el campo no tiene menciones escritas por la persona: la copia llega con el resto de la molécula, sin sumar a la primera carga (MA-09).
+
 ## 5. Teclado y accesibilidad
 
 - Un `textarea` no admite `role="combobox"` ni `aria-expanded` (ARIA in HTML; axe lo marca). Queda como campo de texto con `aria-autocomplete="list"` y, mientras hay lista, `aria-controls` y `aria-activedescendant` hacia la opción marcada. La lista es un `listbox` con sus `option`, y cada opción se lee "$BTC Bitcoin" (un espacio entre las partes).
@@ -55,7 +65,7 @@ Lo usan dos features que no se importan entre sí (el editor de posts y los come
 
 ## 7. Mensajes
 
-`mentions.*` (cliente): etiqueta de la lista, "N sugerencias", sin coincidencias, error y "Mención agregada". Se suma a `CLIENT_NAMESPACES`.
+`mentions.*` (cliente): etiqueta de la lista, "Buscando…", "N sugerencias", sin coincidencias, error y "Mención agregada". Se suma a `CLIENT_NAMESPACES`.
 
 ## 8. Performance
 

@@ -111,6 +111,60 @@ test.describe('Mention autocomplete', () => {
     expect(onTop).toContain('@maria')
   })
 
+  test('mentions turn blue while writing, over the same text (MA-12)', async ({
+    page,
+    isMobile,
+  }) => {
+    const { body } = await openBody(page, isMobile)
+    await body.pressSequentially(
+      'Long $BTC with @maria and #defi, a thesis that wraps to more lines',
+    )
+    await body.press('Shift+Enter')
+    await body.pressSequentially('$eth')
+
+    const layer = page.locator('[data-mention-highlight]')
+    await expect(layer.locator('.text-mention')).toHaveText(['$BTC', '@maria', '#defi', '$eth'])
+    const color = await layer
+      .locator('.text-mention')
+      .first()
+      .evaluate((element) => getComputedStyle(element).color)
+    expect(color).toBe('rgb(21, 93, 233)') // --mention, light theme
+    await expect(body).toHaveCSS('color', 'rgba(0, 0, 0, 0)')
+
+    // The copy lies exactly over the field and wraps the same lines.
+    const [field, copy] = [(await body.boundingBox())!, (await layer.boundingBox())!]
+    expect(copy).toEqual(field)
+    const heights = await Promise.all(
+      [body, layer].map((each) => each.evaluate((element) => element.scrollHeight)),
+    )
+    expect(heights[1]).toBe(heights[0])
+  })
+
+  test('in forced colors the field shows its own text, without the copy (MA-12)', async ({
+    page,
+    isMobile,
+  }) => {
+    await page.emulateMedia({ forcedColors: 'active' })
+    const { body } = await openBody(page, isMobile)
+    await body.pressSequentially('Long $BTC')
+    await expect(page.locator('[data-mention-highlight]')).toBeHidden()
+    await expect(body).toHaveValue('Long $BTC')
+  })
+
+  test('a comment box empties its blue copy after sending (MA-12)', async ({ page }) => {
+    await page.goto(FED_PATH)
+    const comment = page
+      .getByRole('region', { name: /comments/i })
+      .getByRole('textbox', { name: 'Your comment' })
+    await comment.click()
+    await comment.pressSequentially('Agree with @maria')
+    const layer = page.locator('[data-mention-highlight]')
+    await expect(layer.locator('.text-mention')).toHaveText('@maria')
+    await page.getByRole('button', { name: 'Comment', exact: true }).click()
+    await expect(comment).toHaveValue('')
+    await expect(layer.locator('.text-mention')).toHaveCount(0)
+  })
+
   for (const theme of ['light', 'dark'] as const) {
     test(`the list fits 360px and stays accessible in ${theme} (MA-07, MA-08)`, async ({
       page,

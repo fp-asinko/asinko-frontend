@@ -1,5 +1,5 @@
 /** The styles that decide where the text wraps and lands inside a textarea. */
-const COPIED = [
+export const COPIED = [
   'boxSizing',
   'width',
   'borderTopWidth',

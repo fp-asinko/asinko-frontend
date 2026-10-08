@@ -10,5 +10,7 @@
 - [x] **T-04 (M)** `MentionAssist` y `MentionField` (molécula): lista junto al cursor, teclado, combobox ARIA, inserción y carga diferida al enfocar. Tests. → MA-01 a MA-09
 - [x] **T-05 (S)** El cuerpo del editor y las cajas de comentar y responder usan `MentionField`; textos en en, es y pt. → MA-01, MA-11
 - [x] **T-06 (S)** E2E y presupuesto de JS (la primera carga no cambia). → MA-07 a MA-09
+- [x] **T-07 (S)** Rapidez: caché por campo, adelanto con la búsqueda más corta y "Buscando…". Tests. → MA-13
+- [x] **T-08 (M)** Menciones en azul: token `--mention` (con su contraste), la copia del texto sobre el campo, y e2e de alineación. → MA-12
 
 Orden: T-01 → T-02 → T-03 → T-04 → T-05 → T-06.

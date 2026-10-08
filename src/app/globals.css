@@ -40,6 +40,7 @@
   --bearish: var(--destructive);
   --interesting: #8b5cf6;
   --brand-dot: #155de9; /* only the logo dot */
+  --mention: #155de9; /* mentions while writing (specs/mention-autocomplete MA-12) */
   --border: #e5e8eb;
   --border-strong: #d5dadf;
   /* Border of ACTIVE inputs: 3:1 against the background (WCAG 1.4.11). */
@@ -128,6 +129,7 @@
   --success: #3dbe6a;
   --interesting: #a78bfa;
   --brand-dot: #4c8dff;
+  --mention: #6fa3ff;
   --border: #2e2f33;
   --border-strong: #3d3e43;
   --input: #77787b;
@@ -203,6 +205,7 @@
   --color-bearish: var(--bearish);
   --color-interesting: var(--interesting);
   --color-brand-dot: var(--brand-dot);
+  --color-mention: var(--mention);
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-input: var(--input);
@@ -450,5 +453,28 @@
   }
   body {
     @apply bg-background type-ui text-foreground antialiased;
+  }
+}
+
+/* A field with mentions painted in blue (MA-12): the layer over it draws the text, the field keeps
+   the caret, the selection and the placeholder. Among the utilities, so it beats the field's own
+   text color (element + attribute outweighs one class). */
+@layer utilities {
+  textarea[data-mention-painted] {
+    color: transparent;
+    caret-color: var(--foreground);
+  }
+  /* The copy draws over the selection too: a light tint keeps its colors readable. */
+  textarea[data-mention-painted]::selection {
+    color: transparent;
+    background: color-mix(in oklab, var(--mention) 25%, transparent);
+  }
+}
+
+/* Forced colors (Windows high contrast) bring the field's own text back and repaint the copy in
+   one color: the copy only doubles it there. */
+@media (forced-colors: active) {
+  [data-mention-highlight] {
+    display: none;
   }
 }

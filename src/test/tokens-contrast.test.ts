@@ -84,6 +84,10 @@ const TEXT_PAIRS: Array<[string, string]> = [
   ['success', 'card'],
   ['bearish', 'card'],
   ['sidebar-foreground', 'sidebar'],
+  // Mentions in blue while writing (MA-12): in the box (card) and in the window (popover).
+  ['mention', 'background'],
+  ['mention', 'card'],
+  ['mention', 'popover'],
   // Feed cards (FC-12): initials on the lighter stop of each avatar gradient, and accuracy.
   ...AVATARS.map((n): [string, string] => [`avatar-${n}-foreground`, `avatar-${n}`]),
   ...AVATARS.map((n): [string, string] => [`avatar-${n}-foreground`, `avatar-${n}-to`]),

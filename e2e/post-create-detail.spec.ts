@@ -77,8 +77,9 @@ test.describe('Post detail comments', () => {
 
     await section.getByRole('textbox', { name: 'Your comment' }).fill(mine)
     await section.getByRole('button', { name: 'Comment' }).click()
-    await expect(section.getByText(mine)).toBeVisible()
+    // First the box empties: while it holds the text, its blue copy (MA-12) shows it too.
     await expect(section.getByRole('textbox', { name: 'Your comment' })).toHaveValue('')
+    await expect(section.getByText(mine)).toBeVisible()
     await expect(section.getByText('Sending…')).toHaveCount(0)
 
     const thread = section.getByRole('listitem').filter({ hasText: mine }).first()
@@ -87,8 +88,8 @@ test.describe('Post detail comments', () => {
     await expect(box).toBeFocused()
     await box.fill(reply)
     await thread.getByRole('button', { name: 'Send reply' }).click()
-    await expect(thread.getByText(reply)).toBeVisible()
     await expect(thread.getByRole('textbox')).toHaveCount(0)
+    await expect(thread.getByText(reply)).toBeVisible()
 
     await page.reload()
     await expect(comments(page).getByText(reply)).toBeVisible()

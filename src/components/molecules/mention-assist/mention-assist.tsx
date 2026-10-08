@@ -9,9 +9,10 @@ import type { MentionOption } from '@/lib/mentions/mentions.types'
 import type { ActionResult } from '@/lib/result'
 import { cn } from '@/lib/utils'
 import { caretPosition } from './caret'
+import { MentionHighlight } from './mention-highlight'
 
-/** A pause before searching while the person types (specs/mention-autocomplete § 3). */
-const SEARCH_DELAY = 150
+/** A short pause before searching while the person types (specs/mention-autocomplete § 3). */
+const SEARCH_DELAY = 100
 /** One option's height (44px, MA-08) plus the panel's padding: to decide above or below. */
 const OPTION_HEIGHT = 44
 const PANEL_WIDTH = 288
@@ -23,7 +24,16 @@ export type MentionSearch = (input: {
   q: string
 }) => Promise<ActionResult<MentionOption[]>>
 
-type Status = 'idle' | 'ready' | 'empty' | 'error'
+type Status = 'idle' | 'loading' | 'ready' | 'empty' | 'error'
+
+/** Whether an option matches what was typed after the symbol (to filter what is already known). */
+function matches(option: MentionOption, query: string) {
+  const q = query.toLowerCase()
+  return (
+    option.handle.slice(1).toLowerCase().includes(q) ||
+    Boolean(option.label?.toLowerCase().includes(q))
+  )
+}
 
 /** Writes a value as if typed: React and react-hook-form see a normal change. */
 function typeValue(field: HTMLTextAreaElement, value: string) {
@@ -61,6 +71,8 @@ export function MentionAssist({
   const [announcement, setAnnouncement] = useState('')
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const asked = useRef<string | null>(null)
+  // Every answer of this field, by symbol and query: asked again, it shows at once.
+  const cache = useRef(new Map<string, MentionOption[]>())
 
   const open = mention !== null && status !== 'idle'
 
@@ -108,19 +120,41 @@ export function MentionAssist({
     if (asked.current === key) return
     asked.current = key
     clearTimeout(timer.current)
-    timer.current = setTimeout(async () => {
-      const result = await search({ kind: found.kind, q: found.query })
-      // A newer search went out meanwhile: this answer is stale.
-      if (asked.current !== key) return
-      const next = result.ok ? result.data : []
+
+    function show(next: MentionOption[], failed = false) {
       setOptions(next)
       setActive(0)
-      setStatus(!result.ok ? 'error' : next.length === 0 ? 'empty' : 'ready')
-      setPlace(where(found, next.length))
+      setStatus(failed ? 'error' : next.length === 0 ? 'empty' : 'ready')
+      setPlace(where(found!, next.length))
       // Every outcome is announced, not only the suggestions (WCAG 4.1.3).
       setAnnouncement(
-        !result.ok ? t('error') : next.length > 0 ? t('count', { count: next.length }) : t('empty'),
+        failed ? t('error') : next.length > 0 ? t('count', { count: next.length }) : t('empty'),
       )
+    }
+
+    // Asked before: at once, no request.
+    const known = cache.current.get(key)
+    if (known) return show(known)
+    // Meanwhile, what a shorter query already found ("bit" while "bitc" travels), or "Searching…".
+    const shorter = [...cache.current.entries()]
+      .filter(([each]) => each.startsWith(`${found.kind}:`) && key.startsWith(each))
+      .sort(([a], [b]) => b.length - a.length)[0]
+    const interim = shorter?.[1].filter((option) => matches(option, found.query)) ?? []
+    if (interim.length > 0) {
+      setOptions(interim)
+      setStatus('ready')
+      setPlace(where(found, interim.length))
+    } else {
+      setStatus('loading')
+      setPlace(where(found, 1))
+    }
+
+    timer.current = setTimeout(async () => {
+      const result = await search({ kind: found.kind, q: found.query })
+      if (result.ok) cache.current.set(key, result.data)
+      // A newer search went out meanwhile: this answer is stale.
+      if (asked.current !== key) return
+      show(result.ok ? result.data : [], !result.ok)
     }, SEARCH_DELAY)
   })
 
@@ -209,6 +243,7 @@ export function MentionAssist({
 
   return (
     <>
+      <MentionHighlight field={field} />
       <span role="status" className="sr-only">
         {announcement}
       </span>
@@ -257,7 +292,7 @@ export function MentionAssist({
               </ul>
             ) : (
               <p className="px-2.5 py-2 type-meta text-muted-foreground">
-                {status === 'error' ? t('error') : t('empty')}
+                {status === 'error' ? t('error') : status === 'loading' ? t('loading') : t('empty')}
               </p>
             )}
           </div>,
