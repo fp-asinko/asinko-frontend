@@ -23,6 +23,8 @@ type Compose = {
   registerSlot: (element: HTMLElement | null) => void
   /** The editor is open inside the box: the box hides its prompt. */
   expanded: boolean
+  /** The person is about to open it (hover, focus, touch): start downloading the editor. */
+  prepare: () => void
 }
 
 // Without a provider (isolated component tests) nothing happens.
@@ -31,6 +33,7 @@ export const ComposeContext = createContext<Compose>({
   setScope: () => {},
   registerSlot: () => {},
   expanded: false,
+  prepare: () => {},
 })
 
 /**
@@ -56,12 +59,16 @@ export function ComposeTrigger({
   children: ReactNode
   'aria-label'?: string
 }) {
-  const { openCompose } = useCompose()
+  const { openCompose, prepare } = useCompose()
   return (
     <button
       type="button"
       aria-label={ariaLabel}
       aria-haspopup="dialog"
+      // Intent before the click: by the time it lands, the editor is usually there.
+      onPointerEnter={prepare}
+      onPointerDown={prepare}
+      onFocus={prepare}
       onClick={() => openCompose({ type })}
       className={className}
     >

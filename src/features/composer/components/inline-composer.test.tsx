@@ -23,14 +23,20 @@ describe('InlineComposer (specs/post-create-detail PC-03, PC-05)', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('is a region with the focus on the first field to fill', async () => {
-    renderWithIntl(<InlineComposer session={SESSION} onClose={vi.fn()} />)
+    renderWithIntl(<InlineComposer session={SESSION} onShown={vi.fn()} onClose={vi.fn()} />)
     expect(screen.getByRole('region', { name: 'Create post' })).toBeInTheDocument()
     await waitFor(() => expect(screen.getByRole('textbox', { name: 'Title' })).toHaveFocus())
   })
 
+  it('tells once it is drawn, so the box swaps its prompt in the same frame', () => {
+    const onShown = vi.fn()
+    renderWithIntl(<InlineComposer session={SESSION} onShown={onShown} onClose={vi.fn()} />)
+    expect(onShown).toHaveBeenCalledOnce()
+  })
+
   it('closes at once with Esc or Cancel when nothing is written', async () => {
     const onClose = vi.fn()
-    renderWithIntl(<InlineComposer session={SESSION} onClose={onClose} />)
+    renderWithIntl(<InlineComposer session={SESSION} onShown={vi.fn()} onClose={onClose} />)
     await userEvent.keyboard('{Escape}')
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(onClose).toHaveBeenCalledTimes(2)
@@ -38,7 +44,7 @@ describe('InlineComposer (specs/post-create-detail PC-03, PC-05)', () => {
 
   it('asks before discarding what was written', async () => {
     const onClose = vi.fn()
-    renderWithIntl(<InlineComposer session={SESSION} onClose={onClose} />)
+    renderWithIntl(<InlineComposer session={SESSION} onShown={vi.fn()} onClose={onClose} />)
     await userEvent.type(screen.getByRole('textbox', { name: 'Title' }), 'Half')
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     await userEvent.click(await screen.findByRole('button', { name: 'Discard' }))
@@ -48,7 +54,7 @@ describe('InlineComposer (specs/post-create-detail PC-03, PC-05)', () => {
   it("closes and opens the new post's page once published", async () => {
     actions.createPost.mockResolvedValue({ ok: true, data: { id: 'abc', title: 'Hi' } })
     const onClose = vi.fn()
-    renderWithIntl(<InlineComposer session={SESSION} onClose={onClose} />)
+    renderWithIntl(<InlineComposer session={SESSION} onShown={vi.fn()} onClose={onClose} />)
     await userEvent.type(screen.getByRole('textbox', { name: 'Title' }), 'Hi')
     await userEvent.type(screen.getByRole('textbox', { name: 'Body' }), 'Body')
     await userEvent.click(screen.getByRole('button', { name: 'Publish' }))

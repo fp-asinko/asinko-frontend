@@ -15,6 +15,7 @@ export function ComposerView({
   slot,
   session,
   sheetUsed,
+  onShown,
   onClose,
 }: {
   mode: 'closed' | 'inline' | 'sheet'
@@ -22,6 +23,8 @@ export function ComposerView({
   session: ComposeSession
   /** The full screen stays mounted once used, so closing can animate. */
   sheetUsed: boolean
+  /** The editor is drawn in the box: it may take the prompt's place. */
+  onShown: (key: number) => void
   onClose: () => void
 }) {
   return (
@@ -29,7 +32,12 @@ export function ComposerView({
       {mode === 'inline' &&
         slot &&
         createPortal(
-          <InlineComposer key={session.key} session={session} onClose={onClose} />,
+          <InlineComposer
+            key={session.key}
+            session={session}
+            onShown={() => onShown(session.key)}
+            onClose={onClose}
+          />,
           slot,
         )}
       {sheetUsed && <ComposerSheet open={mode === 'sheet'} onClose={onClose} session={session} />}

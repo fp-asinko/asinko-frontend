@@ -24,7 +24,8 @@ layout (servidor)
 - **`components/organisms/compose/`:** contexto sin negocio. Expone `openCompose(defaults?)` y `setScope(community | null)`, y `ComposeSlot`: la caja de arriba se registra como el lugar del editor y, abierta, le cede su espacio. Sin provider (tests aislados), no hace nada.
 - **`features/composer/`:** implementa el provider (`ComposerRoot`):
   - Pide cuenta con `requireAccount('post')`.
-  - Carga el editor con `next/dynamic` la primera vez (PC-19).
+  - Carga el editor con `next/dynamic` con la primera intención de abrirlo (PC-19): pasar el mouse, enfocar o tocar un acceso empieza la descarga, así al terminar el clic suele estar.
+  - La caja nunca queda vacía: oculta su texto recién cuando el editor ya está dibujado adentro, en el mismo cuadro (`useLayoutEffect`). Si la descarga tarda, se ve el texto hasta que llega.
   - **Desktop (desde `md`), con caja en la página:** el editor se dibuja dentro de la caja (portal al `ComposeSlot`), que se expande con una animación de alto y los controles entran con un fundido escalonado (`specs/home-motion`). La página sube hasta la caja.
   - **Desktop sin caja:** navega al Home y la caja se abre apenas se registra (sin parámetro en la URL).
   - **Mobile:** un `Dialog` a pantalla completa que sube desde abajo, como X: "← Cancelar" y el título arriba, Publicar abajo. Es la única forma en mobile, también desde la caja.
@@ -113,11 +114,11 @@ layout (servidor)
   | Antes de la spec         | 230,7 | 232,1                      | —       |
   | Con el detalle (parte 1) | 232,4 | 233,9                      | —       |
   | Con crear (parte 2)      | 233,0 | 234,6                      | 233,0   |
-  | Con la caja como X       | 233,2 | 234,8                      | 233,2   |
+  | Con la caja como X       | 233,3 | 234,9                      | 233,3   |
   - La parte 2 suma 0,6 KB, como se estimó. El editor, el combobox, las pestañas y `react-hook-form` no llegan a la primera carga.
   - La parte 1 suma 1,7 KB: "Ver todos los comentarios" pasó al cliente (link o Próximamente, en `CommentsToggle`) y el control de votos ahora vota también comentarios.
   - La caja como X sumó el lugar del editor (`ComposeSlot`) y la lógica de desktop o mobile. Para entrar se recortó: un solo import diferido para las dos vistas, y "Ver todos los comentarios" se arma en el servidor (`SeeAllComments`) y llega al cliente como nodo.
-  - **En las páginas de comunidad queda 0,2 KB.** Lo próximo que sume JS ahí necesita recortar antes o una decisión del PO.
+  - **En las páginas de comunidad queda 0,1 KB.** Lo próximo que sume JS ahí necesita recortar antes o una decisión del PO.
 
 ## 9. Tests
 

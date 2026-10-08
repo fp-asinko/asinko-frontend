@@ -67,9 +67,13 @@ describe('ComposerRoot in desktop: the box expands in place, as X (PC-01, PC-03)
   })
   afterEach(() => vi.restoreAllMocks())
 
-  it('expands the box, hiding its prompt, with the focus in the form', async () => {
+  it('expands the box, hiding its prompt only once the editor is there, with the focus in the form', async () => {
     renderRoot()
     await userEvent.click(screen.getByRole('button', { name: 'What are you thinking?' }))
+    // Still downloading the first time: the box keeps its prompt, never empty.
+    if (!screen.queryByRole('region', { name: 'Create post' })) {
+      expect(screen.getByRole('button', { name: 'What are you thinking?' })).toBeVisible()
+    }
     const editor = await screen.findByRole('region', { name: 'Create post' }, SLOW)
     expect(
       screen.getByRole('button', { name: 'What are you thinking?', hidden: true }),

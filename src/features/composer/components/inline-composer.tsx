@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useEffect, useEffectEvent, useId, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useId, useLayoutEffect, useRef, useState } from 'react'
 import { useRouter } from '@/i18n/navigation'
 import type { ComposeSession } from './composer-root'
 import { DiscardDialog } from './discard-dialog'
@@ -14,9 +14,12 @@ import { PostEditor } from './post-editor'
  */
 export function InlineComposer({
   session,
+  onShown,
   onClose,
 }: {
   session: ComposeSession
+  /** Drawn: the box swaps its prompt for this in the same frame, never empty in between. */
+  onShown: () => void
   onClose: () => void
 }) {
   const t = useTranslations('composer')
@@ -38,6 +41,10 @@ export function InlineComposer({
     event.stopPropagation()
     requestClose()
   })
+
+  // Before paint: the prompt hides and the editor shows in the same frame.
+  const shown = useEffectEvent(onShown)
+  useLayoutEffect(() => shown(), [])
 
   useEffect(() => {
     const section = root.current

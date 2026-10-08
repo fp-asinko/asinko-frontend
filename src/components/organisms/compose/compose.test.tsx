@@ -8,7 +8,13 @@ describe('ComposeTrigger (specs/post-create-detail § 2)', () => {
     const openCompose = vi.fn()
     render(
       <ComposeContext
-        value={{ openCompose, setScope: vi.fn(), registerSlot: vi.fn(), expanded: false }}
+        value={{
+          openCompose,
+          setScope: vi.fn(),
+          registerSlot: vi.fn(),
+          expanded: false,
+          prepare: vi.fn(),
+        }}
       >
         <ComposeTrigger type="TEXT">Post</ComposeTrigger>
         <ComposeTrigger aria-label="Create">+</ComposeTrigger>
@@ -24,6 +30,28 @@ describe('ComposeTrigger (specs/post-create-detail § 2)', () => {
     )
   })
 
+  it('prepares the editor on hover, touch or focus, before the click', async () => {
+    const prepare = vi.fn()
+    render(
+      <ComposeContext
+        value={{
+          openCompose: vi.fn(),
+          setScope: vi.fn(),
+          registerSlot: vi.fn(),
+          expanded: false,
+          prepare,
+        }}
+      >
+        <ComposeTrigger>Post</ComposeTrigger>
+      </ComposeContext>,
+    )
+    await userEvent.hover(screen.getByRole('button', { name: 'Post' }))
+    expect(prepare).toHaveBeenCalled()
+    prepare.mockClear()
+    await userEvent.tab()
+    expect(prepare).toHaveBeenCalled()
+  })
+
   it('does nothing without a provider', async () => {
     render(<ComposeTrigger>Post</ComposeTrigger>)
     await userEvent.click(screen.getByRole('button', { name: 'Post' }))
@@ -34,7 +62,15 @@ describe('ComposeTrigger (specs/post-create-detail § 2)', () => {
 describe('ComposeSlot (specs/post-create-detail PC-03)', () => {
   const slot = (expanded: boolean, registerSlot = vi.fn()) =>
     render(
-      <ComposeContext value={{ openCompose: vi.fn(), setScope: vi.fn(), registerSlot, expanded }}>
+      <ComposeContext
+        value={{
+          openCompose: vi.fn(),
+          setScope: vi.fn(),
+          registerSlot,
+          expanded,
+          prepare: vi.fn(),
+        }}
+      >
         <ComposeSlot
           avatar={<span>avatar</span>}
           prompt={<button type="button">What are you thinking?</button>}

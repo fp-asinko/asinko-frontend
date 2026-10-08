@@ -247,6 +247,26 @@ test.describe('Create post', () => {
     await expect(page.getByRole('button', { name: 'What are you thinking?' })).toBeHidden()
   })
 
+  test('the box never goes blank while the editor arrives, even on a slow network (PC-19)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'Mobile opens the full screen once loaded: nothing to keep')
+    await page.goto('/en')
+    const prompt = page.getByRole('button', { name: 'What are you thinking?' })
+    await expect(prompt).toBeVisible()
+    // From now on every script arrives late, the editor's included.
+    await page.route('**/_next/static/chunks/**', async (route) => {
+      await new Promise((done) => setTimeout(done, 800))
+      await route.continue()
+    })
+    await prompt.click()
+    // While it downloads, the box keeps its prompt; then the editor takes its place.
+    await expect(prompt).toBeVisible()
+    await expect(editorOf(page, false)).toBeVisible()
+    await expect(prompt).toBeHidden()
+  })
+
   test('your own profile offers the box, and someone else does not (PC-03)', async ({ page }) => {
     await page.goto('/en/user/demo')
     await expect(page.getByRole('button', { name: 'Post in @demo' })).toBeVisible()

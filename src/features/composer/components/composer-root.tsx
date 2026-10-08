@@ -22,11 +22,10 @@ type Mode = 'closed' | 'inline' | 'sheet'
 /** From md the editor expands in the page's box; below, it takes the whole screen (as X). */
 const DESKTOP = '(min-width: 48rem)'
 
-// Loaded the first time it opens (PC-19): readers who never post never download the editor.
-// One loader for both views, the box and the full screen (JS budget, seo.md).
-const ComposerView = dynamic(() => import('./composer-view').then((mod) => mod.ComposerView), {
-  ssr: false,
-})
+// Loaded on the first intent to open it (PC-19): readers who never post never download the
+// editor. One loader for both views, the box and the full screen (JS budget, seo.md).
+const loadView = () => import('./composer-view').then((mod) => mod.ComposerView)
+const ComposerView = dynamic(loadView, { ssr: false })
 
 /**
  * The post editor behind every "Create" (specs/post-create-detail § 2). Without a session, the
@@ -39,7 +38,7 @@ const ComposerView = dynamic(() => import('./composer-view').then((mod) => mod.C
  * - Mobile: full screen.
  */
 export function ComposerRoot({ children }: { children: ReactNode }) {
-  const { requireAccount } = useAuthGate()
+  const { requireAccount, signedIn } = useAuthGate()
   const router = useRouter()
   const [scope, setScope] = useState<ComposeCommunity | null>(null)
   const [slot, setSlot] = useState<HTMLElement | null>(null)
@@ -56,6 +55,9 @@ export function ComposerRoot({ children }: { children: ReactNode }) {
   }, [])
   // The full screen only exists once used: desktop never downloads it.
   const [sheetUsed, setSheetUsed] = useState(false)
+  // The session whose editor is already drawn in the box. Until then the box keeps its prompt:
+  // the first time, the editor is still downloading, and the box would be empty meanwhile.
+  const [shown, setShown] = useState<number | null>(null)
 
   const start = useCallback(
     (request: ComposeRequest, next: Mode, community: ComposeCommunity | null) => {
@@ -110,9 +112,14 @@ export function ComposerRoot({ children }: { children: ReactNode }) {
     }
   }
 
+  const expanded = inline && session !== null && shown === session.key
+  const prepare = useCallback(() => {
+    if (signedIn) void loadView()
+  }, [signedIn])
+
   const value = useMemo(
-    () => ({ openCompose, setScope: changeScope, registerSlot, expanded: inline }),
-    [openCompose, changeScope, registerSlot, inline],
+    () => ({ openCompose, setScope: changeScope, registerSlot, expanded, prepare }),
+    [openCompose, changeScope, registerSlot, expanded, prepare],
   )
 
   return (
@@ -124,6 +131,7 @@ export function ComposerRoot({ children }: { children: ReactNode }) {
           slot={slot}
           session={session}
           sheetUsed={sheetUsed}
+          onShown={setShown}
           onClose={close}
         />
       )}

@@ -8,7 +8,13 @@ describe('ComposeScope (specs/post-create-detail PC-06)', () => {
     const setScope = vi.fn()
     const { unmount, container } = render(
       <ComposeContext
-        value={{ openCompose: vi.fn(), setScope, registerSlot: vi.fn(), expanded: false }}
+        value={{
+          openCompose: vi.fn(),
+          setScope,
+          registerSlot: vi.fn(),
+          expanded: false,
+          prepare: vi.fn(),
+        }}
       >
         <ComposeScope id="me" handle="@demo" name="demo" own />
       </ComposeContext>,

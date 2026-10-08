@@ -22,6 +22,7 @@ describe('ComposerView (specs/post-create-detail § 2)', () => {
         slot={slot}
         session={SESSION}
         sheetUsed={false}
+        onShown={vi.fn()}
         onClose={vi.fn()}
       />,
     )
@@ -32,11 +33,25 @@ describe('ComposerView (specs/post-create-detail § 2)', () => {
 
   it('keeps the full screen mounted once used, open only in its mode', () => {
     const { rerender } = render(
-      <ComposerView mode="sheet" slot={null} session={SESSION} sheetUsed onClose={vi.fn()} />,
+      <ComposerView
+        mode="sheet"
+        slot={null}
+        session={SESSION}
+        sheetUsed
+        onShown={vi.fn()}
+        onClose={vi.fn()}
+      />,
     )
     expect(screen.getByText('sheet open')).toBeInTheDocument()
     rerender(
-      <ComposerView mode="closed" slot={null} session={SESSION} sheetUsed onClose={vi.fn()} />,
+      <ComposerView
+        mode="closed"
+        slot={null}
+        session={SESSION}
+        sheetUsed
+        onShown={vi.fn()}
+        onClose={vi.fn()}
+      />,
     )
     expect(screen.getByText('sheet closed')).toBeInTheDocument()
   })

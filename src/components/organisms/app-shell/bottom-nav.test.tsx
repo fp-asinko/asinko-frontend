@@ -32,7 +32,13 @@ describe('BottomNav', () => {
     const openCompose = vi.fn()
     renderWithIntl(
       <ComposeContext
-        value={{ openCompose, setScope: vi.fn(), registerSlot: vi.fn(), expanded: false }}
+        value={{
+          openCompose,
+          setScope: vi.fn(),
+          registerSlot: vi.fn(),
+          expanded: false,
+          prepare: vi.fn(),
+        }}
       >
         <BottomNav items={ITEMS} />
       </ComposeContext>,

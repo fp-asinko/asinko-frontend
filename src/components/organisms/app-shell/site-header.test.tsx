@@ -69,7 +69,13 @@ describe('SiteHeader: Create (specs/post-create-detail PC-01)', () => {
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <AuthGateProvider signedIn={signedIn}>
             <ComposeContext
-              value={{ openCompose, setScope: vi.fn(), registerSlot: vi.fn(), expanded: false }}
+              value={{
+                openCompose,
+                setScope: vi.fn(),
+                registerSlot: vi.fn(),
+                expanded: false,
+                prepare: vi.fn(),
+              }}
             >
               <SiteHeader menu={<button type="button">menu</button>} />
             </ComposeContext>
