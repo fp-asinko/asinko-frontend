@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { router } from '@/test/navigation-mock'
 import { renderWithIntl } from '@/test/render-with-intl'
-import { ComposerSheet } from './composer-sheet'
+import { ComposerWindow } from './composer-window'
 import type { ComposeSession } from './composer-root'
 
 const actions = vi.hoisted(() => ({ createPost: vi.fn(), searchCommunities: vi.fn() }))
@@ -18,11 +18,11 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 const SESSION: ComposeSession = { key: 1, type: 'LINK', community: null }
 
-describe('ComposerSheet (specs/post-create-detail PC-02, PC-05)', () => {
+describe('ComposerWindow, full screen (specs/post-create-detail PC-02, PC-05)', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('takes the screen, titled, on the asked format, with the focus on the community', async () => {
-    renderWithIntl(<ComposerSheet open onClose={vi.fn()} session={SESSION} />)
+    renderWithIntl(<ComposerWindow layout="sheet" open onClose={vi.fn()} session={SESSION} />)
     expect(screen.getByRole('dialog', { name: 'Create post' })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Link' })).toHaveAttribute('aria-selected', 'true')
     // One Cancel, at the top: the footer has only Publish.
@@ -32,7 +32,7 @@ describe('ComposerSheet (specs/post-create-detail PC-02, PC-05)', () => {
 
   it('closes with Cancel, asking first if something is written', async () => {
     const onClose = vi.fn()
-    renderWithIntl(<ComposerSheet open onClose={onClose} session={SESSION} />)
+    renderWithIntl(<ComposerWindow layout="sheet" open onClose={onClose} session={SESSION} />)
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(onClose).toHaveBeenCalledOnce()
 
@@ -48,7 +48,8 @@ describe('ComposerSheet (specs/post-create-detail PC-02, PC-05)', () => {
     actions.createPost.mockResolvedValue({ ok: true, data: { id: 'abc', title: 'A link' } })
     const onClose = vi.fn()
     renderWithIntl(
-      <ComposerSheet
+      <ComposerWindow
+        layout="sheet"
         open
         onClose={onClose}
         session={{
@@ -63,5 +64,15 @@ describe('ComposerSheet (specs/post-create-detail PC-02, PC-05)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Publish' }))
     expect(onClose).toHaveBeenCalledOnce()
     expect(router.push).toHaveBeenCalledWith('/post/abc/a-link')
+  })
+})
+
+describe('ComposerWindow, modal (specs/post-create-detail PC-01)', () => {
+  it('is a window titled for screen readers, with a × that closes it', async () => {
+    const onClose = vi.fn()
+    renderWithIntl(<ComposerWindow layout="modal" open onClose={onClose} session={SESSION} />)
+    expect(screen.getByRole('dialog', { name: 'Create post' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(onClose).toHaveBeenCalledOnce()
   })
 })

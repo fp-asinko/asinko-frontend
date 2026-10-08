@@ -94,3 +94,36 @@ describe('ComposeSlot (specs/post-create-detail PC-03)', () => {
     expect(screen.getByText('avatar')).toBeVisible()
   })
 })
+
+describe('ComposeSlot: focus (specs/post-create-detail PC-05)', () => {
+  const value = (expanded: boolean) => ({
+    openCompose: vi.fn(),
+    setScope: vi.fn(),
+    registerSlot: vi.fn(),
+    expanded,
+    prepare: vi.fn(),
+  })
+  const box = (expanded: boolean) => (
+    <ComposeContext value={value(expanded)}>
+      <ComposeSlot
+        avatar={<span>avatar</span>}
+        prompt={<button type="button">What are you thinking?</button>}
+        actions={<button type="button">Post</button>}
+      />
+      <button type="button">Elsewhere</button>
+    </ComposeContext>
+  )
+
+  it('gives the focus back to the prompt when the editor folds away with it', () => {
+    const { rerender } = render(box(true))
+    rerender(box(false))
+    expect(screen.getByRole('button', { name: 'What are you thinking?' })).toHaveFocus()
+  })
+
+  it('leaves the focus alone if the person already moved it', () => {
+    const { rerender } = render(box(true))
+    screen.getByRole('button', { name: 'Elsewhere' }).focus()
+    rerender(box(false))
+    expect(screen.getByRole('button', { name: 'Elsewhere' })).toHaveFocus()
+  })
+})

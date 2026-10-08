@@ -10,7 +10,8 @@ import { PostEditor } from './post-editor'
 /**
  * The editor expanded inside the page's composer box, as X (specs/post-create-detail PC-03,
  * PC-05): it fades in, takes the focus, and closes with Cancel or Esc, asking first if something
- * is written. Published, it closes and opens the new post's page.
+ * is written. Closing, it folds back into the closed box before giving it its place. Published, it
+ * closes and opens the new post's page.
  */
 export function InlineComposer({
   session,
@@ -28,10 +29,38 @@ export function InlineComposer({
   const root = useRef<HTMLElement>(null)
   const draftRef = useRef<(() => boolean) | null>(null)
   const [confirming, setConfirming] = useState(false)
+  const leaving = useRef(false)
+
+  /**
+   * Folds back to the closed box's height (43px) while fading, then closes: no jump when the
+   * prompt comes back (specs/home-motion: closing in 150ms, ease-out). With reduced motion the
+   * global rule ends the transition at once.
+   */
+  function leave() {
+    const section = root.current
+    if (!section || leaving.current) return
+    leaving.current = true
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      onClose()
+    }
+    section.style.height = `${section.offsetHeight}px`
+    // Cut only at the bottom: the fields reach 52px to the left, under the avatar.
+    section.style.clipPath = 'inset(0 0 0 -3.25rem)'
+    void section.offsetHeight
+    section.style.transition = 'height 150ms var(--ease-out), opacity 150ms var(--ease-out)'
+    section.style.height = '2.6875rem'
+    section.style.opacity = '0'
+    section.addEventListener('transitionend', finish, { once: true })
+    // In case no transition runs (reduced motion, a hidden tab).
+    setTimeout(finish, 200)
+  }
 
   function requestClose() {
     if (draftRef.current?.()) setConfirming(true)
-    else onClose()
+    else leave()
   }
   // Esc closes, as Cancel. A list or a dialog inside handles its own Esc first. Handled here, it
   // goes no further: the confirmation opens within this same event, and the Esc reaching the
@@ -78,7 +107,7 @@ export function InlineComposer({
         onOpenChange={setConfirming}
         onDiscard={() => {
           setConfirming(false)
-          onClose()
+          leave()
         }}
       />
     </section>

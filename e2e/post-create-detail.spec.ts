@@ -171,9 +171,10 @@ function createButton(page: Page, isMobile: boolean) {
   return bar.getByRole('button', { name: 'Create' })
 }
 
+/** "Create" opens a window: the modal in desktop (as X), the full screen in mobile. */
 async function openEditor(page: Page, isMobile: boolean) {
   await createButton(page, isMobile).click()
-  return editorOf(page, isMobile)
+  return page.getByRole('dialog', { name: 'Create post' })
 }
 
 test.describe('Create post', () => {
@@ -233,18 +234,51 @@ test.describe('Create post', () => {
     await expect(page.getByRole('main').getByRole('link', { name: 'example.com' })).toBeVisible()
   })
 
-  test('in desktop the box expands in place, and Create without a box goes to the Home (PC-01, PC-03)', async ({
+  test('in desktop "+ Create" opens a window over the page, anywhere, without moving it (PC-01)', async ({
     page,
     isMobile,
   }) => {
     test.skip(isMobile, 'Mobile always uses the full screen')
     await page.goto(`/en${WHALES_PATH}`)
+    await page.mouse.wheel(0, 600)
+    const scrolled = await page.evaluate(() => window.scrollY)
     await createButton(page, false).click()
-    await expect(page).toHaveURL(/\/en$/)
-    await expect(editorOf(page, false)).toBeVisible()
+    await expect(page.getByRole('dialog', { name: 'Create post' })).toBeVisible()
+    await expect(page).toHaveURL(new RegExp(`/en${WHALES_PATH}$`))
+    expect(await page.evaluate(() => window.scrollY)).toBe(scrolled)
+  })
+
+  test('focusing the top bar from the keyboard never moves the page (WCAG 2.4.11 without the jump)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'The top bar has no Create in mobile')
+    await page.goto(`/en${WHALES_PATH}`)
+    await page.mouse.wheel(0, 600)
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0)
+    const scrolled = await page.evaluate(() => window.scrollY)
+    await createButton(page, false).focus()
+    expect(await page.evaluate(() => window.scrollY)).toBe(scrolled)
+  })
+
+  test('in desktop the box expands in place and folds back when cancelled (PC-03, PC-05)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'Mobile always uses the full screen')
+    await page.goto('/en')
+    const prompt = page.getByRole('button', { name: 'What are you thinking?' })
+    await prompt.click()
+    const editor = editorOf(page, false)
+    await expect(editor).toBeVisible()
     // Inside the feed's box, not over the page: there is no dialog.
     await expect(page.getByRole('dialog')).toHaveCount(0)
-    await expect(page.getByRole('button', { name: 'What are you thinking?' })).toBeHidden()
+    await expect(prompt).toBeHidden()
+
+    await editor.getByRole('button', { name: 'Cancel' }).click()
+    await expect(editor).toBeHidden()
+    await expect(prompt).toBeVisible()
+    await expect(prompt).toBeFocused()
   })
 
   test('the box never goes blank while the editor arrives, even on a slow network (PC-19)', async ({
@@ -289,12 +323,8 @@ test.describe('Create post', () => {
     await editor.getByRole('button', { name: 'Cancel' }).click()
     await confirm.getByRole('button', { name: 'Discard' }).click()
     await expect(editor).toBeHidden()
-    // Desktop: back to the box's prompt, which shows again. Mobile: back to Create.
-    await expect(
-      isMobile
-        ? createButton(page, true)
-        : page.getByRole('button', { name: 'What are you thinking?' }),
-    ).toBeFocused()
+    // The focus goes back to the button that opened the window.
+    await expect(createButton(page, isMobile)).toBeFocused()
   })
 
   test('without a session, Create asks for an account (PC-04)', async ({
@@ -307,7 +337,7 @@ test.describe('Create post', () => {
     await page.goto('/en')
     await openEditor(page, isMobile)
     await expect(page.getByRole('dialog', { name: 'Join Asinko to post' })).toBeVisible()
-    await expect(editorOf(page, isMobile)).toHaveCount(0)
+    await expect(page.getByRole('dialog', { name: 'Create post' })).toHaveCount(0)
   })
 
   for (const theme of ['light', 'dark'] as const) {

@@ -442,6 +442,12 @@
       scroll-padding-bottom: 0;
     }
   }
+  /* The sticky top bar sits inside that padding: focusing one of its controls made the browser
+     scroll the page to "reveal" it (360px up, e.g. clicking "+ Create"). Its controls are always
+     in view, so they cancel the padding. */
+  [data-site-header] * {
+    scroll-margin-top: calc(-1 * (3.75rem + env(safe-area-inset-top)));
+  }
   body {
     @apply bg-background type-ui text-foreground antialiased;
   }

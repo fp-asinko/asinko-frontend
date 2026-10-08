@@ -6,53 +6,45 @@ import { ComposerView } from './composer-view'
 vi.mock('./inline-composer', () => ({
   InlineComposer: () => <p>inline editor</p>,
 }))
-vi.mock('./composer-sheet', () => ({
-  ComposerSheet: ({ open }: { open: boolean }) => <p>{open ? 'sheet open' : 'sheet closed'}</p>,
+vi.mock('./composer-window', () => ({
+  ComposerWindow: ({ layout, open }: { layout: string; open: boolean }) => (
+    <p>{`${layout} ${open ? 'open' : 'closed'}`}</p>
+  ),
 }))
 
 const SESSION: ComposeSession = { key: 1, type: 'TEXT', community: null }
+
+function view(props: Partial<Parameters<typeof ComposerView>[0]>) {
+  return (
+    <ComposerView
+      mode="closed"
+      windowLayout="modal"
+      slot={null}
+      session={SESSION}
+      dialogUsed={false}
+      onShown={vi.fn()}
+      onClose={vi.fn()}
+      {...props}
+    />
+  )
+}
 
 describe('ComposerView (specs/post-create-detail § 2)', () => {
   it('draws the editor inside the page box when inline', () => {
     const slot = document.createElement('div')
     document.body.append(slot)
-    render(
-      <ComposerView
-        mode="inline"
-        slot={slot}
-        session={SESSION}
-        sheetUsed={false}
-        onShown={vi.fn()}
-        onClose={vi.fn()}
-      />,
-    )
+    render(view({ mode: 'inline', slot }))
     expect(slot).toHaveTextContent('inline editor')
-    expect(screen.queryByText(/sheet/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/modal|sheet/)).not.toBeInTheDocument()
     slot.remove()
   })
 
-  it('keeps the full screen mounted once used, open only in its mode', () => {
-    const { rerender } = render(
-      <ComposerView
-        mode="sheet"
-        slot={null}
-        session={SESSION}
-        sheetUsed
-        onShown={vi.fn()}
-        onClose={vi.fn()}
-      />,
-    )
+  it('opens the window in its layout, and keeps it mounted with that layout once closed', () => {
+    const { rerender } = render(view({ mode: 'modal', dialogUsed: true }))
+    expect(screen.getByText('modal open')).toBeInTheDocument()
+    rerender(view({ mode: 'closed', dialogUsed: true }))
+    expect(screen.getByText('modal closed')).toBeInTheDocument()
+    rerender(view({ mode: 'sheet', windowLayout: 'sheet', dialogUsed: true }))
     expect(screen.getByText('sheet open')).toBeInTheDocument()
-    rerender(
-      <ComposerView
-        mode="closed"
-        slot={null}
-        session={SESSION}
-        sheetUsed
-        onShown={vi.fn()}
-        onClose={vi.fn()}
-      />,
-    )
-    expect(screen.getByText('sheet closed')).toBeInTheDocument()
   })
 })

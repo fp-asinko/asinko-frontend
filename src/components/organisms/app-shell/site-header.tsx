@@ -19,14 +19,18 @@ const ICON_BUTTON =
  * so the search shrinks instead of running into the actions.
  * Language and dark mode live in "⋯" (HR-03). Search, notifications and profile are not in the
  * MVP: disabled (H-26). Without a session the actions are Sign up and Log in (G-02, HR-02).
- * "+ Create" stays at hand from md, at every scroll (specs/post-create-detail PC-01); without a
- * session it opens the account modal.
+ * "+ Create" stays at hand from md, at every scroll, and opens the editor in a window over the page,
+ * as X's "Post" (specs/post-create-detail PC-01); without a session it opens the account modal.
  */
 export function SiteHeader({ menu, devTools }: { menu: ReactNode; devTools?: ReactNode }) {
   const t = useTranslations('common')
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-header/92 pt-[env(safe-area-inset-top)] backdrop-blur-xl reduced-transparency:bg-header reduced-transparency:backdrop-blur-none">
+    <header
+      // Its controls never scroll the page when focused (globals.css: scroll-padding).
+      data-site-header
+      className="sticky top-0 z-40 border-b bg-header/92 pt-[env(safe-area-inset-top)] backdrop-blur-xl reduced-transparency:bg-header reduced-transparency:backdrop-blur-none"
+    >
       <div className="flex h-15 items-center gap-1 px-2 md:gap-2 md:px-4 lg:relative lg:grid lg:grid-cols-[16.25rem_minmax(0,1fr)] lg:gap-0 lg:px-0">
         <div className="flex shrink-0 items-center md:w-60 lg:w-auto lg:px-4">
           {menu}
@@ -62,7 +66,10 @@ export function SiteHeader({ menu, devTools }: { menu: ReactNode; devTools?: Rea
             </ComingSoon>
           </span>
           {devTools}
-          <ComposeTrigger className="hidden h-10 tap items-center gap-1.5 rounded-full bg-muted pr-4 pl-3 type-action text-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex">
+          <ComposeTrigger
+            view="modal"
+            className="hidden h-10 tap items-center gap-1.5 rounded-full bg-muted pr-4 pl-3 type-action text-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex"
+          >
             <PlusIcon aria-hidden className="size-4.5" />
             {t('nav.create')}
           </ComposeTrigger>

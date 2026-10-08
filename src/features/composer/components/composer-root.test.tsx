@@ -1,6 +1,5 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { ComposeSlot, ComposeTrigger } from '@/components/organisms/compose'
@@ -44,7 +43,8 @@ function Page({ box, scope }: { box: boolean; scope: boolean }) {
           actions={<ComposeTrigger type="TEXT">Post</ComposeTrigger>}
         />
       )}
-      <ComposeTrigger>Create</ComposeTrigger>
+      {/* "+ Create" in the top bar: a window over the page, as X. */}
+      <ComposeTrigger view="modal">Create</ComposeTrigger>
     </>
   )
 }
@@ -60,6 +60,7 @@ function renderRoot({ signedIn = true, scope = false, box = true } = {}) {
 }
 
 const create = () => screen.getByRole('button', { name: 'Create' })
+const prompt = () => screen.getByRole('button', { name: 'What are you thinking?' })
 // The first import of a deferred part is slow in jsdom.
 const SLOW = { timeout: 10_000 }
 
@@ -92,7 +93,7 @@ describe('ComposerRoot in desktop: the box expands in place, as X (PC-01, PC-03)
 
   it("comes with the page's community chosen, and the focus on the title", async () => {
     renderRoot({ scope: true })
-    await userEvent.click(create())
+    await userEvent.click(prompt())
     const editor = await screen.findByRole('region', { name: 'Create post' }, SLOW)
     expect(within(editor).getByRole('combobox', { name: 'Community' })).toHaveTextContent('#defi')
     await waitFor(() =>
@@ -100,15 +101,19 @@ describe('ComposerRoot in desktop: the box expands in place, as X (PC-01, PC-03)
     )
   })
 
-  it('closes with Cancel back to the prompt, and asks first if something is written', async () => {
+  it('folds back to the prompt with Cancel, and asks first if something is written', async () => {
     renderRoot()
-    await userEvent.click(create())
+    await userEvent.click(prompt())
     const editor = await screen.findByRole('region', { name: 'Create post' }, SLOW)
     await userEvent.click(within(editor).getByRole('button', { name: 'Cancel' }))
-    expect(screen.queryByRole('region', { name: 'Create post' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'What are you thinking?' })).toBeVisible()
+    // It folds to the closed box's height before giving it its place.
+    expect(editor.style.height).toBe('2.6875rem')
+    await waitFor(() =>
+      expect(screen.queryByRole('region', { name: 'Create post' })).not.toBeInTheDocument(),
+    )
+    expect(prompt()).toBeVisible()
 
-    await userEvent.click(create())
+    await userEvent.click(prompt())
     await userEvent.type(await screen.findByRole('textbox', { name: 'Title' }), 'Half a thought')
     await userEvent.keyboard('{Escape}')
     const confirm = await screen.findByRole('alertdialog', { name: 'Discard this post?' })
@@ -119,46 +124,39 @@ describe('ComposerRoot in desktop: the box expands in place, as X (PC-01, PC-03)
     await userEvent.click(
       within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Discard' }),
     )
-    expect(screen.queryByRole('region', { name: 'Create post' })).not.toBeInTheDocument()
-  })
-
-  it('brings the box into view from "+ Create" (PC-01)', async () => {
-    renderRoot()
-    await userEvent.click(create())
-    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'nearest' })
-  })
-
-  it('keeps what is written when Create is pressed again', async () => {
-    renderRoot()
-    await userEvent.click(create())
-    await userEvent.type(await screen.findByRole('textbox', { name: 'Title' }, SLOW), 'Kept')
-    await userEvent.click(create())
-    expect(screen.getByRole('textbox', { name: 'Title' })).toHaveValue('Kept')
-  })
-
-  it('goes to the Home from a page without a box, and opens there (PC-01)', async () => {
-    function Navigating() {
-      const [home, setHome] = useState(false)
-      router.push.mockImplementation(() => setHome(true))
-      return <Page box={home} scope={false} />
-    }
-    renderWithIntl(
-      <AuthGateProvider signedIn>
-        <ComposerRoot>
-          <Navigating />
-        </ComposerRoot>
-      </AuthGateProvider>,
+    await waitFor(() =>
+      expect(screen.queryByRole('region', { name: 'Create post' })).not.toBeInTheDocument(),
     )
+  })
+
+  it('opens "+ Create" in a window over the page, as X, without moving it (PC-01)', async () => {
+    renderRoot({ scope: true })
     await userEvent.click(create())
-    expect(router.push).toHaveBeenCalledWith('/')
-    expect(await screen.findByRole('region', { name: 'Create post' }, SLOW)).toBeInTheDocument()
-    router.push.mockReset()
+    const window = await screen.findByRole('dialog', { name: 'Create post' }, SLOW)
+    expect(screen.queryByRole('region', { name: 'Create post' })).not.toBeInTheDocument()
+    expect(scrollIntoView).not.toHaveBeenCalled()
+    // The page's community comes chosen there too.
+    expect(within(window).getByRole('combobox', { name: 'Community' })).toHaveTextContent('#defi')
+  })
+
+  it('opens the window too on a page without a box (PC-01)', async () => {
+    renderRoot({ box: false })
+    await userEvent.click(create())
+    expect(await screen.findByRole('dialog', { name: 'Create post' }, SLOW)).toBeInTheDocument()
+  })
+
+  it('keeps what is written when the box is touched again', async () => {
+    renderRoot()
+    await userEvent.click(prompt())
+    await userEvent.type(await screen.findByRole('textbox', { name: 'Title' }, SLOW), 'Kept')
+    await userEvent.click(screen.getByRole('button', { name: 'Post', hidden: true }))
+    expect(screen.getByRole('textbox', { name: 'Title' })).toHaveValue('Kept')
   })
 
   it("closes and opens the new post's page once published (PC-10)", async () => {
     actions.createPost.mockResolvedValue({ ok: true, data: { id: 'abc', title: 'Hello world' } })
     renderRoot({ scope: true })
-    await userEvent.click(create())
+    await userEvent.click(prompt())
     await userEvent.type(await screen.findByRole('textbox', { name: 'Title' }, SLOW), 'Hello world')
     await userEvent.type(screen.getByRole('textbox', { name: 'Body' }), 'Body')
     await userEvent.click(screen.getByRole('button', { name: 'Publish' }))

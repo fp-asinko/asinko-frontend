@@ -26,8 +26,9 @@ layout (servidor)
   - Pide cuenta con `requireAccount('post')`.
   - Carga el editor con `next/dynamic` con la primera intención de abrirlo (PC-19): pasar el mouse, enfocar o tocar un acceso empieza la descarga, así al terminar el clic suele estar.
   - La caja nunca queda vacía: oculta su texto recién cuando el editor ya está dibujado adentro, en el mismo cuadro (`useLayoutEffect`). Si la descarga tarda, se ve el texto hasta que llega.
-  - **Desktop (desde `md`), con caja en la página:** el editor se dibuja dentro de la caja (portal al `ComposeSlot`), que se expande con una animación de alto y los controles entran con un fundido escalonado (`specs/home-motion`). La página sube hasta la caja.
-  - **Desktop sin caja:** navega al Home y la caja se abre apenas se registra (sin parámetro en la URL).
+  - **Desktop, la caja:** tocarla dibuja el editor dentro (portal al `ComposeSlot`), con un fundido escalonado (`specs/home-motion`). Al cerrarse se pliega: el alto baja hasta el de la caja cerrada (43 px) mientras se desvanece, en 150 ms, y recién ahí vuelve el texto, con un fundido; la caja le devuelve el foco.
+  - **Desktop, "+ Crear"** (`view: 'modal'`), o una página sin caja: una ventana cerca de arriba, como la de X (una × y el título solo para lectores de pantalla), con el mismo editor. No mueve la página.
+  - **La barra superior y el foco:** el `scroll-padding-top` de `html` (WCAG 2.4.11) hacía que enfocar un botón de la barra `sticky` moviera la página 360 px para "mostrarlo". Sus controles lo cancelan con un `scroll-margin-top` negativo (`globals.css`, `[data-site-header]`).
   - **Mobile:** un `Dialog` a pantalla completa que sube desde abajo, como X: "← Cancelar" y el título arriba, Publicar abajo. Es la única forma en mobile, también desde la caja.
 - **`ComposeScope`:** un componente de cliente sin markup que las páginas de grupo, activo y tu perfil ponen con su comunidad. Así "+ Crear" sabe qué comunidad precargar (PC-06).
 
@@ -79,7 +80,7 @@ layout (servidor)
 
 ## 5. Accesos
 
-- **"+ Crear" en `SiteHeader`:** visible desde `md`, píldora gris con `PlusIcon`, antes de las notificaciones. Abre la caja de la página (o la del Home), con el alcance de la página.
+- **"+ Crear" en `SiteHeader`:** visible desde `md`, píldora gris con `PlusIcon`, antes de las notificaciones. Abre la ventana, con el alcance de la página.
 - **"Crear" en `BottomNav`:** deja de ser `ComingSoon` y abre el editor a pantalla completa.
 - **`ComposerPlaceholder`:** como la de X, cerrada se ve como la primera línea del editor abierto.
   - El avatar y el texto ("What are you thinking?") sin caja, del tamaño del título que se va a escribir.

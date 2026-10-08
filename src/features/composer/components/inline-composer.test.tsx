@@ -37,12 +37,24 @@ describe('InlineComposer (specs/post-create-detail PC-03, PC-05)', () => {
     expect(onShown).toHaveBeenCalledOnce()
   })
 
-  it('closes at once with Esc or Cancel when nothing is written', async () => {
+  it('folds back to the closed box with Esc when nothing is written, then closes', async () => {
     const onClose = vi.fn()
     renderWithIntl(<InlineComposer session={SESSION} onShown={vi.fn()} onClose={onClose} />)
     await userEvent.keyboard('{Escape}')
+    const editor = screen.getByRole('region', { name: 'Create post' })
+    expect(editor.style.height).toBe('2.6875rem')
+    expect(editor.style.opacity).toBe('0')
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
+  })
+
+  it('folds and closes with Cancel too, only once', async () => {
+    const onClose = vi.fn()
+    renderWithIntl(<InlineComposer session={SESSION} onShown={vi.fn()} onClose={onClose} />)
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-    expect(onClose).toHaveBeenCalledTimes(2)
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
+    await new Promise((done) => setTimeout(done, 250))
+    expect(onClose).toHaveBeenCalledOnce()
   })
 
   it('asks before discarding what was written', async () => {
@@ -51,7 +63,7 @@ describe('InlineComposer (specs/post-create-detail PC-03, PC-05)', () => {
     await userEvent.type(screen.getByRole('textbox', { name: 'Title' }), 'Half')
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     await userEvent.click(await screen.findByRole('button', { name: 'Discard' }))
-    expect(onClose).toHaveBeenCalledOnce()
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
   })
 
   it("closes and opens the new post's page once published", async () => {
