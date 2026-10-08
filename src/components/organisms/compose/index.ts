@@ -1,5 +1,6 @@
 export {
   ComposeContext,
+  ComposeSlot,
   ComposeTrigger,
   useCompose,
   type ComposeCommunity,

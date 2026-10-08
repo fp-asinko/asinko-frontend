@@ -103,7 +103,10 @@
       "post": "Post",
       "thesis": "Tese",
       "live": "Live",
-      "postIn": "Publicar em {handle}"
+      "postIn": "Publicar em {handle}",
+      "link": "Link",
+      "image": "Imagem",
+      "publish": "Publicar"
     },
     "tabs": {
       "label": "Feed",
@@ -314,14 +317,14 @@
   },
   "composer": {
     "title": "Criar post",
-    "close": "Fechar",
     "community": {
       "label": "Comunidade",
       "placeholder": "Escolha uma comunidade",
       "yourProfile": "Seu perfil",
       "loading": "Buscando…",
       "empty": "Nenhuma comunidade encontrada",
-      "error": "Não foi possível carregar as comunidades. Digite para tentar de novo."
+      "error": "Não foi possível carregar as comunidades. Digite para tentar de novo.",
+      "search": "Buscar comunidades"
     },
     "type": {
       "label": "Tipo de post",
@@ -336,7 +339,9 @@
       "body": "Corpo",
       "bodyHelp": "Aceita Markdown",
       "counter": "{count}/{max}",
-      "urlPlaceholder": "https://"
+      "urlPlaceholder": "https://",
+      "titlePlaceholder": "Título",
+      "bodyPlaceholder": "Compartilhe sua análise, ideia ou pergunta..."
     },
     "submit": "Publicar",
     "submitting": "Publicando…",
@@ -356,6 +361,7 @@
       "invalidCommunity": "Você não pode publicar nessa comunidade",
       "invalid": "Revise os campos e tente de novo",
       "general": "Não foi possível publicar seu post. Tente de novo."
-    }
+    },
+    "cancel": "Cancelar"
   }
 }

@@ -68,7 +68,9 @@ describe('SiteHeader: Create (specs/post-create-detail PC-01)', () => {
       const { unmount } = renderWithIntl(
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <AuthGateProvider signedIn={signedIn}>
-            <ComposeContext value={{ openCompose, setScope: vi.fn() }}>
+            <ComposeContext
+              value={{ openCompose, setScope: vi.fn(), registerSlot: vi.fn(), expanded: false }}
+            >
               <SiteHeader menu={<button type="button">menu</button>} />
             </ComposeContext>
           </AuthGateProvider>

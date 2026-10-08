@@ -8,6 +8,8 @@
 > - Un solo editor: modal en desktop y pantalla completa en mobile.
 > - Texto y Link; Imagen cuando se defina la subida.
 > - Una spec con el detalle y crear.
+>
+> **Cambio con el PO (2026-10-07, al ver el modal):** el modal se ve antiestético. Como X, el editor vive **en la caja de arriba**, que se expande en el lugar, minimalista y con animación. En mobile, pantalla completa. La comunidad se elige con un chip que abre una lista corta animada.
 
 ## Referencias: cómo lo resuelven otras apps
 
@@ -35,14 +37,14 @@ Que una persona con cuenta publique un post (texto o link) desde cualquier parte
 
 ### Acceso a crear
 
-- [ ] **PC-01** **Desktop:** un botón **"+ Crear"** fijo en la barra superior, junto a las notificaciones, en todas las páginas.
-- [ ] **PC-02** **Mobile:** el "Crear" de la barra inferior deja de ser Próximamente y abre el editor.
-- [ ] **PC-03** **La caja de arriba** (Home y páginas de grupo, activo y tu perfil) abre el mismo editor. Sus atajos Post / Tesis / Live: Post abre el editor; Tesis y Live siguen como Próximamente (fuera de esta etapa).
+- [ ] **PC-01** **Desktop:** un botón **"+ Crear"** fijo en la barra superior, junto a las notificaciones, en todas las páginas. Sube hasta la caja de arriba y la abre; en una página sin caja (el detalle de un post, el perfil de otra persona) lleva al Home con la caja abierta.
+- [ ] **PC-02** **Mobile:** el "Crear" de la barra inferior deja de ser Próximamente y abre el editor a pantalla completa.
+- [ ] **PC-03** **La caja de arriba** (Home y páginas de grupo, activo y tu perfil) **es** el editor: en desktop se expande en el lugar; en mobile abre la pantalla completa. Sus atajos Post / Tesis / Live: Post abre el editor; Tesis y Live siguen como Próximamente (fuera de esta etapa).
 - [ ] **PC-04** **Sin sesión**, cualquier acceso abre el modal de cuenta con el texto de publicar (acción `post`, ya existente).
 
 ### Editor
 
-- [ ] **PC-05** **Un solo editor:** modal centrado en desktop, pantalla completa en mobile. Se cierra con Esc, ×, o tocando afuera en desktop. Si tiene texto escrito, pide confirmar antes de descartarlo.
+- [ ] **PC-05** **Un solo editor:** la caja expandida en desktop, pantalla completa en mobile. Se cierra con Cancelar o Esc (y la flecha atrás en mobile). Si tiene texto escrito, pide confirmar antes de descartarlo.
 - [ ] **PC-06** **Comunidad:**
   - En la página de un grupo o un activo viene elegida esa comunidad; en tu perfil, tu canal personal.
   - En el resto, se elige con un buscador de comunidades: las tuyas primero y tu canal personal como "Tu perfil".

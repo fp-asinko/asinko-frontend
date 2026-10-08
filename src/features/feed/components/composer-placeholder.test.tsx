@@ -8,25 +8,33 @@ import { ComposerPlaceholder } from './composer-placeholder'
 
 function renderWithCompose(ui: React.ReactNode) {
   const openCompose = vi.fn()
-  renderWithIntl(<ComposeContext value={{ openCompose, setScope: vi.fn() }}>{ui}</ComposeContext>)
+  renderWithIntl(
+    <ComposeContext
+      value={{ openCompose, setScope: vi.fn(), registerSlot: vi.fn(), expanded: false }}
+    >
+      {ui}
+    </ComposeContext>,
+  )
   return openCompose
 }
 
-describe('ComposerPlaceholder (H-09)', () => {
-  it('opens the post editor from the box and from Post, on Text (specs/post-create-detail PC-03)', async () => {
+describe('ComposerPlaceholder (H-09, as X: specs/post-create-detail PC-03)', () => {
+  it('opens the editor from the prompt, from Publish (Text) and from the link icon (Link)', async () => {
     const openCompose = renderWithCompose(<ComposerPlaceholder viewerName="demo" />)
     await userEvent.click(screen.getByRole('button', { name: 'What are you thinking?' }))
     expect(openCompose).toHaveBeenLastCalledWith({ type: undefined })
-    await userEvent.click(screen.getByRole('button', { name: 'Post' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Publish' }))
     expect(openCompose).toHaveBeenLastCalledWith({ type: 'TEXT' })
+    await userEvent.click(screen.getByRole('button', { name: 'Link' }))
+    expect(openCompose).toHaveBeenLastCalledWith({ type: 'LINK' })
   })
 
-  it('keeps Thesis and Live as coming soon', () => {
+  it('keeps Image, Thesis and Live as coming soon', () => {
     renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
-    for (const name of ['Thesis', 'Live']) {
+    for (const name of ['Image', 'Thesis', 'Live']) {
       expect(screen.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
     }
-    for (const name of ['What are you thinking?', 'Post']) {
+    for (const name of ['What are you thinking?', 'Link', 'Publish']) {
       expect(screen.getByRole('button', { name })).not.toHaveAttribute('aria-disabled')
     }
   })
@@ -44,7 +52,7 @@ describe('ComposerPlaceholder (H-09)', () => {
     expect(screen.getByTestId('user-avatar')).not.toHaveAttribute('data-color')
   })
 
-  it.each(['Thesis', 'Live'])(
+  it.each(['Image', 'Thesis', 'Live'])(
     'opens the account modal from %s without a session (G-04)',
     async (name) => {
       renderWithIntl(

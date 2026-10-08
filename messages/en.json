@@ -103,7 +103,10 @@
       "post": "Post",
       "thesis": "Thesis",
       "live": "Live",
-      "postIn": "Post in {handle}"
+      "postIn": "Post in {handle}",
+      "link": "Link",
+      "image": "Image",
+      "publish": "Publish"
     },
     "tabs": {
       "label": "Feed",
@@ -314,14 +317,14 @@
   },
   "composer": {
     "title": "Create post",
-    "close": "Close",
     "community": {
       "label": "Community",
       "placeholder": "Choose a community",
       "yourProfile": "Your profile",
       "loading": "Searching…",
       "empty": "No communities found",
-      "error": "Could not load the communities. Type to try again."
+      "error": "Could not load the communities. Type to try again.",
+      "search": "Search communities"
     },
     "type": {
       "label": "Post type",
@@ -336,9 +339,11 @@
       "body": "Body",
       "bodyHelp": "Supports Markdown",
       "counter": "{count}/{max}",
-      "urlPlaceholder": "https://"
+      "urlPlaceholder": "https://",
+      "titlePlaceholder": "Title",
+      "bodyPlaceholder": "Share your analysis, idea or question..."
     },
-    "submit": "Post",
+    "submit": "Publish",
     "submitting": "Posting…",
     "discard": {
       "title": "Discard this post?",
@@ -356,6 +361,7 @@
       "invalidCommunity": "You cannot post in that community",
       "invalid": "Check the fields and try again",
       "general": "Could not publish your post. Try again."
-    }
+    },
+    "cancel": "Cancel"
   }
 }

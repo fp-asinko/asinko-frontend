@@ -25,25 +25,33 @@ function renderEditor({
   signedIn = true,
 } = {}) {
   const onPublished = vi.fn()
+  const onCancel = vi.fn()
   const draftRef: { current: (() => boolean) | null } = { current: null }
   renderWithIntl(
     <AuthGateProvider signedIn={signedIn}>
-      <PostEditor type={type} community={community} draftRef={draftRef} onPublished={onPublished} />
+      <PostEditor
+        variant="inline"
+        type={type}
+        community={community}
+        draftRef={draftRef}
+        onCancel={onCancel}
+        onPublished={onPublished}
+      />
     </AuthGateProvider>,
   )
-  return { onPublished, draftRef }
+  return { onPublished, draftRef, onCancel }
 }
 
 const title = () => screen.getByRole('textbox', { name: 'Title' })
 const body = () => screen.getByRole('textbox', { name: 'Body' })
-const publish = () => screen.getByRole('button', { name: 'Post' })
+const publish = () => screen.getByRole('button', { name: 'Publish' })
 
 describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it("comes with the page's community chosen and opens on the asked tab", () => {
     renderEditor({ type: 'LINK' })
-    expect(screen.getByRole('combobox', { name: 'Community' })).toHaveValue('#defi')
+    expect(screen.getByRole('combobox', { name: 'Community' })).toHaveTextContent('#defi')
     expect(screen.getByRole('tab', { name: 'Link' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('textbox', { name: 'Link' })).toBeInTheDocument()
   })
@@ -72,7 +80,7 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
     expect(publish()).not.toHaveAttribute('aria-disabled')
   })
 
-  it('counts the title near its limit and explains each field next to it', async () => {
+  it('counts the title near its limit, and explains each field once Publish is pressed', async () => {
     renderEditor({ type: 'LINK' })
     await userEvent.click(title())
     await userEvent.paste('x'.repeat(301))
@@ -80,19 +88,28 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
     await userEvent.type(screen.getByRole('textbox', { name: 'Link' }), 'javascript:alert(1)')
     await userEvent.click(body())
     await userEvent.tab()
+    // As X: nothing is flagged while writing; Publish says what is missing.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    await userEvent.click(publish())
     expect(await screen.findByText('Keep the title within 300 characters')).toBeInTheDocument()
     expect(
       screen.getByText('Enter a link that starts with http:// or https://'),
     ).toBeInTheDocument()
     expect(screen.getByText('Write something in the body')).toBeInTheDocument()
     expect(title()).toHaveAttribute('aria-invalid', 'true')
+    // Then the errors follow the typing.
+    await userEvent.type(body(), 'Now there is a body')
+    expect(screen.queryByText('Write something in the body')).not.toBeInTheDocument()
   })
 
   it('says what is missing when Post is pressed too early (WCAG 3.3.1)', async () => {
     renderEditor({ community: null })
     await userEvent.click(publish())
     expect(actions.createPost).not.toHaveBeenCalled()
-    expect(await screen.findByText('Choose a community')).toBeInTheDocument()
+    // The chip says it too (its placeholder); the error is the alert next to it.
+    expect((await screen.findAllByRole('alert')).map((alert) => alert.textContent)).toContain(
+      'Choose a community',
+    )
     expect(screen.getByText('Add a title')).toBeInTheDocument()
     expect(screen.getByText('Write something in the body')).toBeInTheDocument()
     expect(title()).toHaveAccessibleDescription(/Add a title/)

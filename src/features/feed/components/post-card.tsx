@@ -9,6 +9,7 @@ import { CardByline } from './card-byline'
 import { FadeImage } from '@/components/ui/fade-image'
 import { CommentsToggle } from './comments-toggle'
 import { PostMarkdown } from './post-markdown'
+import { SeeAllComments } from './see-all-comments'
 import { VoteControl } from './vote-control'
 
 /** Bodies longer than this get "See more" (6 lines at 15px in the 748px column, roughly). */
@@ -156,7 +157,7 @@ export function PostCard({
               {commentCount}
             </a>
           ) : (
-            <CommentsToggle kind="post" id={post.id} href={post.path}>
+            <CommentsToggle kind="post" id={post.id} seeAll={<SeeAllComments href={post.path} />}>
               {commentCount}
             </CommentsToggle>
           )}

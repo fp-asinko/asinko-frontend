@@ -24,6 +24,8 @@ type Props = Pick<
   closing: string | null
   /** Content of the comments button (icon and count), rendered by the card. */
   commentsLabel: ReactNode
+  /** "See all comments" under them, rendered by the card (SeeAllComments). */
+  seeAll?: ReactNode
 }
 
 /**
@@ -46,6 +48,7 @@ export function PollVoting({
   allowVoteChange,
   closing,
   commentsLabel,
+  seeAll,
   ...initial
 }: Props) {
   const t = useTranslations('feed.poll')
@@ -286,7 +289,7 @@ export function PollVoting({
       )}
 
       <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <CommentsToggle kind="poll" id={id} openRequest={commentsRequest}>
+        <CommentsToggle kind="poll" id={id} openRequest={commentsRequest} seeAll={seeAll}>
           {commentsLabel}
         </CommentsToggle>
         {/* Each part is a whole message (no string concatenation); the dots are decorative. */}

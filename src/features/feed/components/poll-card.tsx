@@ -4,6 +4,7 @@ import type { PollItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
 import { PollVoting } from './poll-voting'
+import { SeeAllComments } from './see-all-comments'
 
 /**
  * Poll card of the prototype (H-13): byline, question and the POLL badge on the server; options,
@@ -67,6 +68,8 @@ export function PollCard({
         isClosed={poll.isClosed}
         allowVoteChange={poll.allowVoteChange}
         closing={closing}
+        // Polls have no page yet: "Coming soon".
+        seeAll={<SeeAllComments />}
         commentsLabel={
           // Same as a post's (P-006): the compact count, and the full sentence for screen readers.
           <>

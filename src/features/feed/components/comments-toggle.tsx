@@ -1,11 +1,9 @@
 'use client'
 
-import { ArrowRightIcon, ChevronDownIcon } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useEffectEvent, useId, useState, useTransition, type ReactNode } from 'react'
-import { ComingSoon } from '@/components/molecules/coming-soon'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 import { loadCommentsPreview } from '../actions/load-comments-preview.action'
 
@@ -13,20 +11,20 @@ import { loadCommentsPreview } from '../actions/load-comments-preview.action'
  * The 💬 button of a card (H-28). The first time it opens, it asks the server for the comments
  * preview, already rendered; later toggles reuse it. A failure can be retried by closing and
  * opening again. The panel spans the card's full width under the actions row (prototype).
- * Under the comments, "See all comments" goes to the post's page (specs/post-create-detail PC-17);
- * without `href` (polls, no page yet) it is "Coming soon".
+ * Under the comments goes `seeAll`, rendered by the card on the server (SeeAllComments,
+ * specs/post-create-detail PC-17).
  */
 export function CommentsToggle({
   kind,
   id,
   openRequest = 0,
-  href,
+  seeAll,
   children,
 }: {
   kind: 'post' | 'poll'
   id: string
-  /** The page with every comment. */
-  href?: string
+  /** "See all comments", already rendered. */
+  seeAll?: ReactNode
   /** Each time it goes up, the panel opens (and loads): the poll note's "Tell us why" (FC-27). */
   openRequest?: number
   /** Button content rendered by the card: icon and count. */
@@ -121,36 +119,11 @@ export function CommentsToggle({
               ) : (
                 preview
               )}
-              {!pending && <SeeAll href={href} />}
+              {!pending && seeAll}
             </div>
           </div>
         </div>
       )}
     </>
-  )
-}
-
-const SEE_ALL =
-  'group inline-flex min-h-6 w-fit tap items-center gap-1 rounded-sm type-meta font-bold text-foreground outline-none focus-visible:ring-3 focus-visible:ring-ring/50'
-
-function SeeAll({ href }: { href?: string }) {
-  const t = useTranslations('feed.comments')
-  const content = (
-    <>
-      {t('seeAll')}
-      <ArrowRightIcon
-        aria-hidden
-        className="size-3.5 transition-[translate] duration-150 ease-out group-hover:translate-x-0.5 group-focus-visible:translate-x-0.5"
-      />
-    </>
-  )
-  return href ? (
-    <Link href={href} className={SEE_ALL}>
-      {content}
-    </Link>
-  ) : (
-    <ComingSoon label={t('seeAll')} className={SEE_ALL}>
-      {content}
-    </ComingSoon>
   )
 }

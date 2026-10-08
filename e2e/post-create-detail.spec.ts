@@ -153,13 +153,27 @@ test.describe('From the feed', () => {
   })
 })
 
+/**
+ * The open editor: the expanded composer box in desktop, the full screen in mobile (as X,
+ * specs/post-create-detail PC-02, PC-03).
+ */
+function editorOf(page: Page, isMobile: boolean) {
+  return isMobile
+    ? page.getByRole('dialog', { name: 'Create post' })
+    : page.getByRole('region', { name: 'Create post' })
+}
+
 /** "+ Create" in the top bar from md; "Create" in the bottom bar in mobile (PC-01, PC-02). */
-async function openEditor(page: Page, isMobile: boolean) {
+function createButton(page: Page, isMobile: boolean) {
   const bar = isMobile
     ? page.getByRole('navigation', { name: 'Main navigation' })
     : page.getByRole('banner')
-  await bar.getByRole('button', { name: 'Create' }).click()
-  return page.getByRole('dialog', { name: 'Create post' })
+  return bar.getByRole('button', { name: 'Create' })
+}
+
+async function openEditor(page: Page, isMobile: boolean) {
+  await createButton(page, isMobile).click()
+  return editorOf(page, isMobile)
 }
 
 test.describe('Create post', () => {
@@ -172,18 +186,20 @@ test.describe('Create post', () => {
     const editor = await openEditor(page, isMobile)
     await expect(editor).toBeVisible()
     // The focus enters the form, on the first thing to fill (PC-18).
-    await expect(editor.getByRole('combobox', { name: 'Community' })).toBeFocused()
-    await expect(editor.getByRole('button', { name: 'Post' })).toHaveAttribute(
+    const community = editor.getByRole('combobox', { name: 'Community' })
+    await expect(community).toBeFocused()
+    await expect(editor.getByRole('button', { name: 'Publish' })).toHaveAttribute(
       'aria-disabled',
       'true',
     )
 
-    await editor.getByRole('combobox', { name: 'Community' }).click()
+    await community.click()
     await expect(page.getByRole('option').first()).toContainText('Your profile')
     await page.getByRole('option', { name: /#defi/ }).click()
+    await expect(community).toHaveText('#defi')
     await editor.getByRole('textbox', { name: 'Title' }).fill(title)
     await editor.getByRole('textbox', { name: 'Body' }).fill('Longs are **paying** again.')
-    await editor.getByRole('button', { name: 'Post' }).click()
+    await editor.getByRole('button', { name: 'Publish' }).click()
 
     await expect(page).toHaveURL(/\/en\/post\/[0-9a-f-]+\/funding-rates-flipped-/)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(title)
@@ -192,29 +208,46 @@ test.describe('Create post', () => {
 
   test("a group's page preselects it and says so in its box (PC-03, PC-06)", async ({
     page,
+    isMobile,
   }, testInfo) => {
     const title = `Yields on the move (${testInfo.project.name} ${Date.now()})`
     await page.goto('/en/hub/defi')
     await page.getByRole('button', { name: 'Post in #defi' }).click()
-    const editor = page.getByRole('dialog', { name: 'Create post' })
-    await expect(editor.getByRole('combobox', { name: 'Community' })).toHaveValue('#defi')
+    const editor = editorOf(page, isMobile)
+    await expect(editor.getByRole('combobox', { name: 'Community' })).toHaveText('#defi')
     await expect(editor.getByRole('textbox', { name: 'Title' })).toBeFocused()
 
     await editor.getByRole('tab', { name: 'Link' }).click()
     await editor.getByRole('textbox', { name: 'Link' }).fill('javascript:alert(1)')
     await editor.getByRole('textbox', { name: 'Title' }).fill(title)
     await editor.getByRole('textbox', { name: 'Body' }).fill('Worth a read.')
+    // Publish says what is wrong (as X, nothing is flagged while writing).
+    await editor.getByRole('button', { name: 'Publish' }).click()
     await expect(
       editor.getByText('Enter a link that starts with http:// or https://'),
     ).toBeVisible()
     await editor.getByRole('textbox', { name: 'Link' }).fill('https://example.com/yields')
-    await editor.getByRole('button', { name: 'Post' }).click()
+    await editor.getByRole('button', { name: 'Publish' }).click()
 
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(title)
     await expect(page.getByRole('main').getByRole('link', { name: 'example.com' })).toBeVisible()
   })
 
-  test('your own profile offers the box; someone else’s does not (PC-03)', async ({ page }) => {
+  test('in desktop the box expands in place, and Create without a box goes to the Home (PC-01, PC-03)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'Mobile always uses the full screen')
+    await page.goto(`/en${WHALES_PATH}`)
+    await createButton(page, false).click()
+    await expect(page).toHaveURL(/\/en$/)
+    await expect(editorOf(page, false)).toBeVisible()
+    // Inside the feed's box, not over the page: there is no dialog.
+    await expect(page.getByRole('dialog')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'What are you thinking?' })).toBeHidden()
+  })
+
+  test('your own profile offers the box, and someone else does not (PC-03)', async ({ page }) => {
     await page.goto('/en/user/demo')
     await expect(page.getByRole('button', { name: 'Post in @demo' })).toBeVisible()
     await page.goto('/en/user/federico')
@@ -233,13 +266,15 @@ test.describe('Create post', () => {
     await confirm.getByRole('button', { name: 'Keep editing' }).click()
     await expect(editor.getByRole('textbox', { name: 'Title' })).toHaveValue('Half a thought')
 
-    await editor.getByRole('button', { name: 'Close' }).click()
+    await editor.getByRole('button', { name: 'Cancel' }).click()
     await confirm.getByRole('button', { name: 'Discard' }).click()
     await expect(editor).toBeHidden()
-    const bar = isMobile
-      ? page.getByRole('navigation', { name: 'Main navigation' })
-      : page.getByRole('banner')
-    await expect(bar.getByRole('button', { name: 'Create' })).toBeFocused()
+    // Desktop: back to the box's prompt, which shows again. Mobile: back to Create.
+    await expect(
+      isMobile
+        ? createButton(page, true)
+        : page.getByRole('button', { name: 'What are you thinking?' }),
+    ).toBeFocused()
   })
 
   test('without a session, Create asks for an account (PC-04)', async ({
@@ -252,7 +287,7 @@ test.describe('Create post', () => {
     await page.goto('/en')
     await openEditor(page, isMobile)
     await expect(page.getByRole('dialog', { name: 'Join Asinko to post' })).toBeVisible()
-    await expect(page.getByRole('dialog', { name: 'Create post' })).toHaveCount(0)
+    await expect(editorOf(page, isMobile)).toHaveCount(0)
   })
 
   for (const theme of ['light', 'dark'] as const) {
@@ -272,6 +307,10 @@ test.describe('Create post', () => {
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
       )
       expect(overflow).toBeLessThanOrEqual(0)
+      await expectNoA11yViolations(page)
+      // The community list too, open (it once showed white on white, without an edge).
+      await editor.getByRole('combobox', { name: 'Community' }).click()
+      await expect(page.getByRole('option').first()).toBeVisible()
       await expectNoA11yViolations(page)
     })
   }

@@ -31,7 +31,9 @@ describe('BottomNav', () => {
   it('opens the post editor from Create, between Search and Notif (specs/post-create-detail PC-02)', async () => {
     const openCompose = vi.fn()
     renderWithIntl(
-      <ComposeContext value={{ openCompose, setScope: vi.fn() }}>
+      <ComposeContext
+        value={{ openCompose, setScope: vi.fn(), registerSlot: vi.fn(), expanded: false }}
+      >
         <BottomNav items={ITEMS} />
       </ComposeContext>,
     )

@@ -7,7 +7,9 @@ describe('ComposeScope (specs/post-create-detail PC-06)', () => {
   it("sets the page's community while the page is open, and clears it after", () => {
     const setScope = vi.fn()
     const { unmount, container } = render(
-      <ComposeContext value={{ openCompose: vi.fn(), setScope }}>
+      <ComposeContext
+        value={{ openCompose: vi.fn(), setScope, registerSlot: vi.fn(), expanded: false }}
+      >
         <ComposeScope id="me" handle="@demo" name="demo" own />
       </ComposeContext>,
     )

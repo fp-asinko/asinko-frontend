@@ -17,15 +17,17 @@ layout (servidor)
 └── ComposerRoot (features/composer, cliente)    ← registra openCompose y carga el editor diferido
     ├── SiteHeader → "+ Crear"        (organismo) ─┐
     ├── BottomNav  → "Crear"          (organismo)  ├─ useCompose() de components/organisms/compose
-    ├── ComposerPlaceholder (feed)                 │
+    ├── ComposerPlaceholder (feed) → ComposeSlot   │  la caja: el lugar donde se expande
     └── ComposeScope (páginas de comunidad) ───────┘  fija la comunidad de la página
 ```
 
-- **`components/organisms/compose/`:** contexto sin negocio. Expone `openCompose(defaults?)` y `setScope(community | null)`. Sin provider (tests aislados), no hace nada.
+- **`components/organisms/compose/`:** contexto sin negocio. Expone `openCompose(defaults?)` y `setScope(community | null)`, y `ComposeSlot`: la caja de arriba se registra como el lugar del editor y, abierta, le cede su espacio. Sin provider (tests aislados), no hace nada.
 - **`features/composer/`:** implementa el provider (`ComposerRoot`):
   - Pide cuenta con `requireAccount('post')`.
   - Carga el editor con `next/dynamic` la primera vez (PC-19).
-  - Lo monta en un solo `Dialog`: pantalla completa en mobile y centrado desde `md` (sin `Sheet`: un componente menos y el mismo foco y Esc).
+  - **Desktop (desde `md`), con caja en la página:** el editor se dibuja dentro de la caja (portal al `ComposeSlot`), que se expande con una animación de alto y los controles entran con un fundido escalonado (`specs/home-motion`). La página sube hasta la caja.
+  - **Desktop sin caja:** navega al Home y la caja se abre apenas se registra (sin parámetro en la URL).
+  - **Mobile:** un `Dialog` a pantalla completa que sube desde abajo, como X: "← Cancelar" y el título arriba, Publicar abajo. Es la única forma en mobile, también desde la caja.
 - **`ComposeScope`:** un componente de cliente sin markup que las páginas de grupo, activo y tu perfil ponen con su comunidad. Así "+ Crear" sabe qué comunidad precargar (PC-06).
 
 ## 3. El editor
@@ -36,15 +38,15 @@ layout (servidor)
   - `title` (1 a 300 caracteres, recortado), `body` (no vacío);
   - `url` (`http(s)`, solo si es `LINK`).
   - Los mensajes de error son claves de traducción (`i18n.md`).
-- **Comunidad:** un `Combobox`.
+- **Comunidad:** un chip ("#defi ▾" o "Elige una comunidad ▾") que abre debajo una lista corta (`Combobox` de Base UI con el buscador adentro), con fundido y un leve desplazamiento al abrir.
   - Al abrir muestra tus comunidades (`GET /communities?mine=true`) con "Tu perfil" primero. Tu canal se pide aparte por su slug (`GET /communities/{username}`): `?mine=true` también trae los canales de la gente que seguís, donde no se puede publicar, y esos se filtran.
-  - Se abre tocando el campo; sin el botón de flecha de shadcn, que no tiene nombre accesible (axe).
   - Al escribir busca (`GET /communities?search=`), con una pausa de 250 ms.
   - Las dos búsquedas son Server Actions (el navegador no llama a la API).
 - **Tipo:** `Tabs`: Texto, Link e Imagen. Imagen es Próximamente (P-013).
   - El panel de Link solo agrega la URL. Título y cuerpo quedan fuera de los paneles, montados en todas las pestañas: un campo que se vuelve a montar al cambiar de pestaña puede perder lo que se acaba de escribir (lo encontró el e2e).
 - **Cuerpo:** `textarea` que crece con el texto, con la ayuda "Admite Markdown".
-- **Descartar** (PC-05): con algo escrito, Esc, × o afuera abren una confirmación ("¿Descartar el post?", `AlertDialog` de shadcn).
+- **Errores:** como X, nada se marca mientras se escribe. Publicar dice qué falta (con un campo vacío el esquema falla) y desde ahí los errores siguen lo que se escribe (`reValidateMode: onChange`). Validar al salir de un campo además movía la fila de formatos bajo el puntero.
+- **Descartar** (PC-05): con algo escrito, Cancelar o Esc abren una confirmación ("¿Descartar el post?", `AlertDialog` de shadcn). El Esc que maneja la caja no sigue hasta el documento: la confirmación se abre en ese mismo evento y se cerraba con él.
   - Si hay algo escrito se le pregunta al formulario en el momento de cerrar (`getValues`), no a un estado que el editor avisa en un efecto: ese aviso podía llegar después de un Esc rápido.
 - **Publicar:** `createPost` (Server Action). Valida, toma el `userId` de la sesión y llama a `POST /posts`.
   - Si sale bien, devuelve el `id` y el `title`: el cliente cierra el editor y navega a `postPath`.
@@ -76,12 +78,12 @@ layout (servidor)
 
 ## 5. Accesos
 
-- **"+ Crear" en `SiteHeader`:** visible desde `md`, píldora gris con `PlusIcon`, antes de las notificaciones. Abre el editor con el alcance de la página.
-- **"Crear" en `BottomNav`:** deja de ser `ComingSoon` y abre el editor.
-- **`ComposerPlaceholder`:**
-  - La caja abre el editor.
-  - "Post" lo abre en Texto.
-  - Tesis y Live siguen como Próximamente.
+- **"+ Crear" en `SiteHeader`:** visible desde `md`, píldora gris con `PlusIcon`, antes de las notificaciones. Abre la caja de la página (o la del Home), con el alcance de la página.
+- **"Crear" en `BottomNav`:** deja de ser `ComingSoon` y abre el editor a pantalla completa.
+- **`ComposerPlaceholder`:** como la de X, cerrada se ve como la primera línea del editor abierto.
+  - El avatar y el texto ("What are you thinking?") sin caja, del tamaño del título que se va a escribir.
+  - Abajo, pasando el avatar: íconos de Link (abre el editor en Link), Imagen, Tesis y Live (Próximamente), y "Publicar" a la derecha en la píldora gris (abre el editor en Texto).
+  - La caja es el editor: tocarla la expande (desktop) o abre la pantalla completa (mobile).
   - En las páginas de comunidad se muestra con el texto "Publicar en #defi" (como el prototipo).
 
 ## 6. Contrato y mocks
@@ -111,9 +113,11 @@ layout (servidor)
   | Antes de la spec         | 230,7 | 232,1                      | —       |
   | Con el detalle (parte 1) | 232,4 | 233,9                      | —       |
   | Con crear (parte 2)      | 233,0 | 234,6                      | 233,0   |
+  | Con la caja como X       | 233,2 | 234,8                      | 233,2   |
   - La parte 2 suma 0,6 KB, como se estimó. El editor, el combobox, las pestañas y `react-hook-form` no llegan a la primera carga.
   - La parte 1 suma 1,7 KB: "Ver todos los comentarios" pasó al cliente (link o Próximamente, en `CommentsToggle`) y el control de votos ahora vota también comentarios.
-  - **En las páginas de comunidad queda 0,4 KB.** Lo próximo que sume JS ahí necesita recortar antes o una decisión del PO.
+  - La caja como X sumó el lugar del editor (`ComposeSlot`) y la lógica de desktop o mobile. Para entrar se recortó: un solo import diferido para las dos vistas, y "Ver todos los comentarios" se arma en el servidor (`SeeAllComments`) y llega al cliente como nodo.
+  - **En las páginas de comunidad queda 0,2 KB.** Lo próximo que sume JS ahí necesita recortar antes o una decisión del PO.
 
 ## 9. Tests
 

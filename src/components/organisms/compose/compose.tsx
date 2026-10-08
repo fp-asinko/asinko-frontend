@@ -19,10 +19,19 @@ type Compose = {
   openCompose: (request?: ComposeRequest) => void
   /** The page's community while the page is open (ComposeScope); null when it leaves. */
   setScope: (community: ComposeCommunity | null) => void
+  /** Where the editor expands in place: the page's composer box (ComposeSlot). */
+  registerSlot: (element: HTMLElement | null) => void
+  /** The editor is open inside the box: the box hides its prompt. */
+  expanded: boolean
 }
 
 // Without a provider (isolated component tests) nothing happens.
-export const ComposeContext = createContext<Compose>({ openCompose: () => {}, setScope: () => {} })
+export const ComposeContext = createContext<Compose>({
+  openCompose: () => {},
+  setScope: () => {},
+  registerSlot: () => {},
+  expanded: false,
+})
 
 /**
  * Opening the post editor from anywhere (specs/post-create-detail § 2). No business here: the
@@ -58,5 +67,36 @@ export function ComposeTrigger({
     >
       {children}
     </button>
+  )
+}
+
+/**
+ * The composer box of a page, as X (PC-03): the editor expands inside it, next to the avatar.
+ * Closed, it shows the prompt and the actions row; open, both give their place to the editor.
+ */
+export function ComposeSlot({
+  avatar,
+  prompt,
+  actions,
+}: {
+  avatar: ReactNode
+  prompt: ReactNode
+  actions: ReactNode
+}) {
+  const { registerSlot, expanded } = useCompose()
+  return (
+    <div data-compose-box>
+      <div className="flex items-start gap-3">
+        {/* As tall as the closed prompt (43px): centered with it, at the top when open. */}
+        <div className="flex h-10.75 shrink-0 items-center">{avatar}</div>
+        <div className="min-w-0 flex-1">
+          <div hidden={expanded} className="flex">
+            {prompt}
+          </div>
+          <div ref={registerSlot} />
+        </div>
+      </div>
+      <div hidden={expanded}>{actions}</div>
+    </div>
   )
 }
