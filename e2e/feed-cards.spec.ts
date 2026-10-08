@@ -52,7 +52,7 @@ test.describe('Feed cards', () => {
     )
   })
 
-  test('comments enter one after another and avatars answer the hover (FC-10)', async ({
+  test('comments enter one after another and their avatars answer the hover (FC-10)', async ({
     page,
     isMobile,
   }) => {
@@ -66,9 +66,13 @@ test.describe('Feed cards', () => {
 
     // Hover exists only with a pointer that hovers (Tailwind 4 hover: variant).
     test.skip(isMobile, 'no hover on touch devices')
-    const avatar = whales.getByTestId('user-avatar').first()
+    const avatar = rows.first().getByTestId('user-avatar')
     await avatar.hover()
     await expect.poll(() => avatar.evaluate((el) => getComputedStyle(el).scale)).toBe('1.05')
+    // The card's header stays still (PO, 2026-10-08).
+    const header = whales.getByTestId('user-avatar').first()
+    await header.hover()
+    expect(await header.evaluate((el) => getComputedStyle(el).scale)).toBe('none')
   })
 
   for (const theme of ['light', 'dark'] as const) {
@@ -86,6 +90,8 @@ test.describe('Feed cards', () => {
       await poll.getByRole('button', { name: '1–10%' }).click()
       await expect(noteOf(poll)).toBeVisible()
 
+      // From the top: a link that the scroll leaves under the sticky bar counts as obscured.
+      await page.evaluate(() => window.scrollTo(0, 0))
       await expectNoA11yViolations(page)
     })
   }

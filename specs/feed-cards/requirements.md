@@ -37,7 +37,7 @@ Que cada tarjeta del feed transmita identidad (quién, dónde) y que votar o lee
 ### Movimiento
 
 - [ ] **FC-09** Las barras de color crecen al revelarse los resultados y el mensaje de consenso aparece después de las barras.
-- [ ] **FC-10** Los avatares y el chip de reputación responden al hover de su fila o tarjeta; el panel de comentarios entra con sus comentarios escalonados.
+- [ ] **FC-10** Los avatares de los comentarios responden al hover de su fila; el panel de comentarios entra con sus comentarios escalonados. **Cambio con el PO (2026-10-08):** la cabecera de la tarjeta (avatar del grupo y chip de precisión) ya no reacciona al hover.
 - [ ] **FC-11** Todo respeta "reducir movimiento" y los tokens de `specs/home-motion` (≤ 300 ms salvo las barras).
 
 ### Generales

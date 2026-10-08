@@ -63,7 +63,7 @@ export function CardByline({
     <span
       data-tier={accuracy.tier}
       className={cn(
-        'shrink-0 rounded-sm px-1 text-[0.625rem] font-bold tabular-nums ring-1 ring-current/0 transition-shadow duration-150 ease-out group-hover/byline:ring-current/40',
+        'shrink-0 rounded-sm px-1 text-[0.625rem] font-bold tabular-nums',
         TIER_CLASSES[accuracy.tier],
       )}
     >
@@ -73,16 +73,14 @@ export function CardByline({
   )
 
   return (
-    <div className="group/byline flex min-w-0 items-center gap-2">
+    <div className="flex min-w-0 items-center gap-2">
       <UserAvatar
         name={group ? group.handle : authorName}
         colorKey={group ? group.slug : authorName}
         imageUrl={group ? group.avatarUrl : author?.avatarUrl}
-        className={cn(
-          // With the first line, not centered on both (the header is centered for the right side).
-          'size-6 self-start text-[0.5625rem] transition-[scale] duration-150 ease-out motion-safe:group-hover/byline:scale-105',
-          group && 'rounded-md',
-        )}
+        // A group's avatar takes the height of both lines (group and author), as Reddit's: 40px.
+        size={group ? 'lg' : 'sm'}
+        className={cn(group ? 'size-10 rounded-lg text-xs' : 'size-6 self-start text-[0.5625rem]')}
       />
       <div className="min-w-0 flex-1">
         <div className="flex min-h-6 min-w-0 items-center gap-x-1.25 type-meta text-muted-foreground">

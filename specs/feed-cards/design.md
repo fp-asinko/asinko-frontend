@@ -111,7 +111,7 @@ export function identityIndex(key: string): number {
 - **Tramo:** se calcula con `accuracyTier(rate)` en `features/feed/lib/accuracy-tier.ts`: `high` ≥ 0,70, `mid` ≥ 0,50 y `low` debajo (Q1). El chip pasa a `bg-accuracy-{tier} text-accuracy-{tier}-foreground`, con las clases en un mapa estático.
 - **Texto accesible:** el sr-only actual se reemplaza por `feed.card.accuracy`: `"Accuracy {value}, {tier, select, high {high} mid {medium} other {low}}"`.
 - **Hover (FC-10):**
-  - La byline es `group/byline`. Al pasar el mouse, el avatar hace `scale-105` y el chip suma `ring-1 ring-current`. Las dos son transiciones de 150 ms con `--ease-out`.
+  - ~~La byline es `group/byline`. Al pasar el mouse, el avatar hace `scale-105` y el chip suma `ring-1 ring-current`.~~ Sacado por pedido del PO (2026-10-08): la cabecera queda quieta.
   - No se agregan tokens de "tinte fuerte": el anillo toma el color del texto del chip.
   - Con reducir movimiento se quita la escala y queda el anillo, que es un cambio de color.
 
@@ -247,7 +247,7 @@ Surgieron al implementar o en las revisiones de cierre (`ui-reviewer` y una revi
   - Lectores de pantalla: la región viva dice "Vote saved." junto con el consenso, como dos oraciones completas (WCAG 4.1.3). El texto insertado no se anunciaba solo.
 - **El ✓** late al tocar, con el estado optimista, y no cuando responde el servidor: la respuesta es inmediata. El marcador votado no hace fade al revelar: ya estaba visible y cambia de color.
 - **Opciones bloqueadas:** no se hunden al tocarlas (`aria-disabled:active:scale-100`).
-- **Hover de avatares:** `scale-105` solo con `motion-safe`. Con reducir movimiento no hay escala, y en la byline queda el anillo del chip, que solo cambia de color: el ancho es fijo y la opacidad va de 0 a 40 %.
+- **Hover de avatares:** en los comentarios, `scale-105` solo con `motion-safe`. La cabecera de la tarjeta ya no reacciona al hover (PO, 2026-10-08).
 - **Chevron de comentarios:** 200 ms al abrir y 150 ms al cerrar, igual que el panel.
 - **Copy:** "You are in the minority" y "It is a tie", sin contracciones. Se suma un punto a "Vote saved.", en los tres idiomas, para que las dos oraciones se lean separadas.
 - **Mientras carga:** un esqueleto de dos comentarios, como pedía el diseño.

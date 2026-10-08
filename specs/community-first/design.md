@@ -10,7 +10,7 @@
 ```
 
 - **Línea 1:**
-  - `UserAvatar` del grupo: `size="sm"` ajustado a `size-6 rounded-md`, con `colorKey = slug`.
+  - `UserAvatar` del grupo: `size="lg"` ajustado a `size-10 rounded-lg`, a la altura de las dos líneas (PO, 2026-10-08), con `colorKey = slug`.
   - El handle en `type-ui font-bold text-foreground` (14 px desde el 2026-10-05) con `truncate`.
   - `· tiempo` en `type-meta text-muted-foreground`.
   - El botón con `ml-auto shrink-0`.
@@ -18,7 +18,7 @@
   - Va con `pl-8`, alineada con el texto de la línea 1.
   - Lleva `@usuario` en `type-meta` gris, sin negrita, más el chip de accuracy actual (FC-03).
 - **Canal personal:** una línea con el `UserAvatar` del autor (`size-6 rounded-full`), `@usuario` en negrita, accuracy y tiempo.
-- **Movimiento:** se mantiene el hover del byline (FC-10). El avatar del grupo es el que se agranda.
+- **Movimiento:** la cabecera no reacciona al hover (PO, 2026-10-08; antes el avatar del grupo se agrandaba, FC-10).
 
 ## 2. Datos
 

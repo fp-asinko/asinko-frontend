@@ -24,7 +24,7 @@ Que cada tarjeta del feed muestre primero **de qué grupo es** y deje unirse con
 ### Cabecera de la tarjeta (posts y encuestas)
 
 - [ ] **CF-01** **Línea 1:**
-  - El avatar del grupo (24 px, cuadrado redondeado como en la columna izquierda) y su handle (`#acciones`, `$BTC`) en negrita y color de texto principal. El handle es un link al Home filtrado.
+  - El avatar del grupo (40 px, el alto de las dos líneas como Reddit; cuadrado redondeado como en la columna izquierda. Era de 24 px hasta el 2026-10-08) y su handle (`#acciones`, `$BTC`) en negrita y color de texto principal. El handle es un link al Home filtrado.
   - Después, `·` y el tiempo relativo (y "editado" si corresponde).
 - [ ] **CF-02** **Línea 2:** `@usuario`, más chico y en gris, **sin foto**, con su chip de accuracy. Un post del sistema muestra "Asinko".
 - [ ] **CF-03** **Canal personal:** un post en el canal personal de un usuario no tiene grupo. Su cabecera es de una línea con la foto del usuario, `@usuario`, accuracy y tiempo, sin línea 2 ni botón Unirse.
