@@ -47,6 +47,16 @@ describe('InlineComposer (specs/post-create-detail PC-03, PC-05)', () => {
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
   })
 
+  it('folds back to the whole closed box, actions row included, so nothing below jumps', async () => {
+    renderWithIntl(
+      <div data-compose-box data-closed-height="102">
+        <InlineComposer session={SESSION} onShown={vi.fn()} onClose={vi.fn()} />
+      </div>,
+    )
+    await userEvent.keyboard('{Escape}')
+    expect(screen.getByRole('region', { name: 'Create post' }).style.height).toBe('102px')
+  })
+
   it('folds and closes with Cancel too, only once', async () => {
     const onClose = vi.fn()
     renderWithIntl(<InlineComposer session={SESSION} onShown={vi.fn()} onClose={onClose} />)

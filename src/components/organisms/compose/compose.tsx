@@ -1,6 +1,14 @@
 'use client'
 
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import { cn } from '@/lib/utils'
 
 /** The community a page is about, to preselect it in the editor (specs/post-create-detail PC-06). */
@@ -103,7 +111,14 @@ export function ComposeSlot({
   if (expanded && !opened) setOpened(true)
   const back = opened && !expanded ? 'animate-fade-in' : undefined
   const prompted = useRef<HTMLDivElement>(null)
+  const box = useRef<HTMLDivElement>(null)
   const wasExpanded = useRef(false)
+  // The closed box's height (prompt and actions row), for the editor to fold back to exactly that:
+  // the feed below does not jump when the actions return.
+  useLayoutEffect(() => {
+    if (!expanded && box.current)
+      box.current.dataset.closedHeight = String(box.current.offsetHeight)
+  }, [expanded])
   // Folded away with the focus inside it (Cancel, Esc): the focus goes back to the prompt, once
   // it shows again. Not when the person has already moved the focus elsewhere.
   useEffect(() => {
@@ -114,7 +129,7 @@ export function ComposeSlot({
     wasExpanded.current = expanded
   }, [expanded])
   return (
-    <div data-compose-box>
+    <div ref={box} data-compose-box>
       <div className="flex items-start gap-3">
         {/* As tall as the closed prompt (43px): centered with it, at the top when open. */}
         <div className="flex h-10.75 shrink-0 items-center">{avatar}</div>

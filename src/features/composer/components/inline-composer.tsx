@@ -32,9 +32,10 @@ export function InlineComposer({
   const leaving = useRef(false)
 
   /**
-   * Folds back to the closed box's height (43px) while fading, then closes: no jump when the
-   * prompt comes back (specs/home-motion: closing in 150ms, ease-out). With reduced motion the
-   * global rule ends the transition at once.
+   * Folds back to the closed box's height (the prompt and the actions row, measured by the box)
+   * while fading, then closes: nothing below jumps when the prompt and the actions come back
+   * (specs/home-motion: closing in 150ms, ease-out). With reduced motion the global rule ends the
+   * transition at once.
    */
   function leave() {
     const section = root.current
@@ -51,7 +52,7 @@ export function InlineComposer({
     section.style.clipPath = 'inset(0 0 0 -3.25rem)'
     void section.offsetHeight
     section.style.transition = 'height 150ms var(--ease-out), opacity 150ms var(--ease-out)'
-    section.style.height = '2.6875rem'
+    section.style.height = foldedHeight(section)
     section.style.opacity = '0'
     section.addEventListener('transitionend', finish, { once: true })
     // In case no transition runs (reduced motion, a hidden tab).
@@ -112,4 +113,13 @@ export function InlineComposer({
       />
     </section>
   )
+}
+
+/** The closed box's height from where the editor starts; the prompt's 43px without a box. */
+function foldedHeight(section: HTMLElement): string {
+  const box = section.closest<HTMLElement>('[data-compose-box]')
+  const closed = Number(box?.dataset.closedHeight)
+  if (!box || !closed) return '2.6875rem'
+  const top = section.getBoundingClientRect().top - box.getBoundingClientRect().top
+  return `${Math.max(0, closed - top)}px`
 }

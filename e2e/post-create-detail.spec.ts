@@ -271,6 +271,8 @@ test.describe('Create post', () => {
     test.skip(isMobile, 'Mobile always uses the full screen')
     await page.goto('/en')
     const prompt = page.getByRole('button', { name: 'What are you thinking?' })
+    const box = page.locator('[data-compose-box]')
+    const closed = (await box.boundingBox())?.height
     await prompt.click()
     const editor = editorOf(page, false)
     await expect(editor).toBeVisible()
@@ -278,8 +280,19 @@ test.describe('Create post', () => {
     await expect(page.getByRole('dialog')).toHaveCount(0)
     await expect(prompt).toBeHidden()
 
+    // It folds to the whole closed box, actions row included: the feed below does not jump after.
+    const folded = editor.evaluate(
+      (section) =>
+        new Promise<number>((done) =>
+          new MutationObserver(() => {
+            if (section.style.opacity === '0') done(parseFloat(section.style.height))
+          }).observe(section, { attributeFilter: ['style'] }),
+        ),
+    )
     await editor.getByRole('button', { name: 'Cancel' }).click()
+    expect(await folded).toBeCloseTo(closed ?? 0, 0)
     await expect(editor).toBeHidden()
+    expect((await box.boundingBox())?.height).toBeCloseTo(closed ?? 0, 0)
     await expect(prompt).toBeVisible()
     await expect(prompt).toBeFocused()
   })
