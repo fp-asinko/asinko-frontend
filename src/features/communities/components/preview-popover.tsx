@@ -70,17 +70,18 @@ export function PreviewPopover({
         alignOffset={0}
         sideOffset={8}
         data-preview-card
-        // The panels of the system: border, no shadow (design-system.md § Tokens).
-        className="w-80 overflow-hidden rounded-2xl border p-0 shadow-none ring-0"
+        // Border and the one shadow of the system: it floats over the page (design-system.md).
+        // Important: shadcn's shadow-md (none here) stays in the classes and comes later in the CSS.
+        className="w-90 max-w-[calc(100vw-1rem)] overflow-hidden rounded-2xl border p-0 shadow-float! ring-0"
       >
         {preview ? (
           <PreviewCard preview={preview} summaryId={summaryId} />
         ) : (
           <div role="status">
             <span className="sr-only">{t('loading')}</span>
-            <Skeleton className="h-16 rounded-none" />
-            <div className="space-y-2 px-4 pb-4">
-              <Skeleton className="-mt-6 size-12 rounded-xl border-3 border-popover" />
+            <Skeleton className="h-24 rounded-none" />
+            <div className="space-y-2 p-4">
+              <Skeleton className="size-14 rounded-xl" />
               <Skeleton className="h-4 w-32" />
               <Skeleton className="h-3 w-full" />
               <Skeleton className="h-3 w-24" />

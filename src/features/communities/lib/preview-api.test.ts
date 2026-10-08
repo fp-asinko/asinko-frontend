@@ -16,6 +16,7 @@ const maria: ProfileDetails = {
   followerCount: 120,
   accuracyRate: 0.7,
   currentStreak: 3,
+  joinedAt: '2026-03-02T10:00:00.000Z',
   isSelf: false,
 }
 const notFound = {
@@ -47,6 +48,7 @@ describe('getPreviewData (specs/mention-preview § 3)', () => {
           bannerUrl: null,
           kind: 'group',
           memberCount: 1204,
+          createdAt: null,
           viewerMembership: null,
         },
         profile: null,

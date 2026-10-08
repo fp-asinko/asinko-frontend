@@ -54,8 +54,8 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'vote',
     ])
     // Only the client part of the namespace: the page texts stay on the server.
-    // (members and profile: the hover cards, specs/mention-preview).
-    expect(Object.keys(picked.communities as object)).toEqual(['actions', 'members', 'profile'])
+    // (profile: the badge of the hover cards, specs/mention-preview).
+    expect(Object.keys(picked.communities as object)).toEqual(['actions', 'profile'])
     expect(picked.errors).toEqual({ unexpected: en.errors.unexpected })
     expect(picked).not.toHaveProperty('interests')
   })

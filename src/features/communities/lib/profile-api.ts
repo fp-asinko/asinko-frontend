@@ -24,6 +24,7 @@ export function toProfileDetails(profile: RawProfile, viewerName: string | null)
     followerCount: profile.followerCount,
     accuracyRate: profile.accuracyRate,
     currentStreak: profile.currentStreak,
+    joinedAt: profile.createdAt,
     isSelf: viewerName === profile.username,
   }
 }

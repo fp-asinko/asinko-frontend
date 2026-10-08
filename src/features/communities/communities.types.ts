@@ -16,6 +16,8 @@ export type ProfileDetails = {
   followerCount: number
   accuracyRate: number | null
   currentStreak: number
+  /** When they joined Asinko ("Member since", specs/mention-preview MP-05). */
+  joinedAt: string
   /** The viewer is this user: no follow actions (CP-12). */
   isSelf: boolean
 }
@@ -33,6 +35,8 @@ export type CommunityPage = {
   bannerUrl: string | null
   kind: CommunityKind
   memberCount: number
+  /** When a person created it; null for the system's (assets, regions, categories). */
+  createdAt: string | null
   rules: string | null
   /** Only http(s), with the real domain to show (security.md § 1). */
   mainUrl: { url: string; domain: string } | null
@@ -51,6 +55,7 @@ export type PreviewCommunity = Pick<
   | 'bannerUrl'
   | 'kind'
   | 'memberCount'
+  | 'createdAt'
   | 'viewerMembership'
 >
 

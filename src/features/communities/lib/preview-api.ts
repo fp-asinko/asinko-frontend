@@ -30,6 +30,7 @@ export async function getPreviewData({ kind, slug }: PreviewTarget): Promise<Api
         bannerUrl: page.bannerUrl,
         kind: page.kind,
         memberCount: page.memberCount,
+        createdAt: page.createdAt,
         viewerMembership: page.viewerMembership,
       },
       // A personal channel asked as a group (an old link) still shows as a community.

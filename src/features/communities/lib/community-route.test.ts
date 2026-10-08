@@ -31,6 +31,7 @@ const page = (overrides: Partial<CommunityPage>): CommunityPage => ({
   bannerUrl: null,
   kind: 'group',
   memberCount: 5,
+  createdAt: null,
   rules: null,
   mainUrl: null,
   viewerMembership: null,

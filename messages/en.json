@@ -373,6 +373,14 @@
     "loading": "Searching…"
   },
   "preview": {
-    "loading": "Loading preview"
+    "loading": "Loading preview",
+    "stats": {
+      "members": "Members",
+      "created": "Created",
+      "followers": "Followers",
+      "accuracy": "Accuracy",
+      "streak": "Streak",
+      "since": "Member since"
+    }
   }
 }

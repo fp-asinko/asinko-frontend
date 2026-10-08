@@ -30,6 +30,8 @@ describe('profile details (specs/community-pages § 12)', () => {
     expect(toProfileDetails(federico, null)).toMatchObject({
       displayName: 'Federico Piva',
       isSelf: false,
+      // "Member since" in the hover card (specs/mention-preview MP-05).
+      joinedAt: federico.createdAt,
     })
     expect(toProfileDetails({ ...federico, badgeStatus: 'INSTITUTIONAL' }, null).badge).toBe(
       'institutional',

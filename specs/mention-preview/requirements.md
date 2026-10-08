@@ -1,6 +1,8 @@
 # Vista previa de menciones — Requirements
 
 > **Estado:** aprobado por el PO el 2026-10-08, con las opciones recomendadas en Q1 a Q4.
+>
+> **Cambio con el PO (2026-10-08, al verla, con una captura de Reddit):** tarjetas más grandes, distintas para grupos y personas, con sombra para separarlas de la página, el botón al lado del nombre (no pegado a la portada) y más datos en columnas.
 > **Fuente:** pedido del PO (2026-10-08), con una captura de Reddit: "estaría bueno que tuviesen un hover con un mini detalle del perfil como hace Reddit, lo podríamos poner en los post también". Para grupos (`#`), personas (`@`) y activos (`$`).
 
 ## Objetivo
@@ -25,15 +27,16 @@ Que pasar el mouse sobre un grupo, una persona o un activo muestre quién o qué
 
 ### Qué muestra
 
-- [ ] **MP-03** **Grupo:** banner (su imagen o el degradé de su tono), avatar, `#handle`, el nombre si dice algo más, la descripción (hasta 3 líneas), los miembros y el botón **Unirse** (o "Unido").
+- [ ] **MP-03** **Grupo:** banner (su imagen o el degradé de su tono) y, debajo, avatar, `#handle` y el nombre si dice algo más, con **Unirse** (o "Unido") al lado; la descripción (hasta 3 líneas) y, bajo una línea, los números en columnas: miembros y, si lo creó una persona, desde cuándo existe.
 - [ ] **MP-04** **Activo:** lo mismo que el grupo, con `$SÍMBOLO` y su nombre. Sin precio hasta que exista (P-003).
-- [ ] **MP-05** **Persona:** avatar, `@username`, el nombre si existe (P-011), la insignia, la bio (hasta 3 líneas), seguidores, precisión y racha, y **Seguir** (o "Siguiendo"). Sin botón si es uno mismo.
+- [ ] **MP-05** **Persona:** sin banner, con un avatar más grande; el nombre si existe (P-011), `@username`, la insignia y **Seguir** (o "Siguiendo") al lado; la bio (hasta 3 líneas) y, bajo una línea, seguidores, precisión, racha y desde cuándo está en Asinko. Sin botón si es uno mismo.
 - [ ] **MP-06** Toda la tarjeta lleva a la página (el handle es el link); el botón de unirse o seguir funciona sin salir, con las mismas reglas que en la página (sin sesión pide cuenta; salir de un grupo pide confirmación).
 
 ### Comportamiento
 
 - [ ] **MP-07** Aparece después de una pausa breve con el mouse quieto encima (no al pasar de largo) y se va al sacarlo, con un margen para poder llevar el mouse a la tarjeta y usar el botón.
 - [ ] **MP-08** Mientras llegan los datos, un esqueleto con la forma de la tarjeta; si fallan, la tarjeta no aparece (el link sigue funcionando). Una tarjeta ya vista vuelve al instante.
+- [ ] **MP-14** Flota sobre la página: borde y la única sombra del sistema (`shadow-float`, en claro y oscuro).
 - [ ] **MP-09** Entra en pantalla: se ubica arriba o abajo del link según el lugar, sin tapar el link.
 - [ ] **MP-10** **Accesibilidad (WCAG 1.4.13):** se cierra con Esc sin mover el foco, se puede pasar el mouse sobre ella sin que se cierre, y se queda hasta que se saca el mouse. No reemplaza el nombre accesible del link. Ver Q1 para el teclado.
 

@@ -373,6 +373,14 @@
     "loading": "Buscando…"
   },
   "preview": {
-    "loading": "Cargando vista previa"
+    "loading": "Cargando vista previa",
+    "stats": {
+      "members": "Miembros",
+      "created": "Creado",
+      "followers": "Seguidores",
+      "accuracy": "Precisión",
+      "streak": "Racha",
+      "since": "Miembro desde"
+    }
   }
 }

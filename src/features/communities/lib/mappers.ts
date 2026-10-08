@@ -39,6 +39,7 @@ export function toCommunityPage(community: RawCommunity, signedIn = true): Commu
     bannerUrl: allowedImageUrl(community.bannerUrl),
     kind,
     memberCount: community.memberCount,
+    createdAt: community.createdByProfileId ? community.createdAt : null,
     rules: community.rules?.trim() || null,
     mainUrl: safeLink(community.mainUrl),
     viewerMembership: signedIn ? community.viewerMembership : null,

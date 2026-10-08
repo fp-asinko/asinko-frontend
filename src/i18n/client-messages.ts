@@ -11,7 +11,6 @@ export const CLIENT_NAMESPACES = [
   'comments',
   'composer',
   'communities.actions',
-  'communities.members',
   'communities.profile',
   'devLogin',
   'errors.unexpected',

@@ -32,7 +32,7 @@ test.describe('Mention previews', () => {
     await group.hover()
     await expect(card(page)).toBeVisible()
     await expect(card(page).getByRole('link', { name })).toBeVisible()
-    await expect(card(page).getByText(/members?$/)).toBeVisible()
+    await expect(card(page).getByText('Members', { exact: true })).toBeVisible()
     // The link is described by the card's summary (Q1).
     await expect(group).toHaveAttribute('aria-describedby', /.+/)
 
@@ -59,7 +59,7 @@ test.describe('Mention previews', () => {
 
     await person.hover()
     await expect(card(page)).toBeVisible()
-    await expect(card(page).getByText(/followers?/)).toBeVisible()
+    await expect(card(page).getByText('Followers', { exact: true })).toBeVisible()
     await page.keyboard.press('Escape')
     await expect(card(page)).toBeHidden()
   })
@@ -115,7 +115,7 @@ test.describe('Mention previews', () => {
       await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
       await page.goto('/en')
       await feedLinks(page).person.hover()
-      await expect(card(page).getByText(/followers?/)).toBeVisible()
+      await expect(card(page).getByText('Followers', { exact: true })).toBeVisible()
       await expectNoA11yViolations(page)
     })
   }

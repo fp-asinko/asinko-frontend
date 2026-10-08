@@ -34,6 +34,7 @@ const profile = (overrides: Partial<ProfileDetails> = {}): ProfileDetails => ({
   followerCount: 3200,
   accuracyRate: 0.68,
   currentStreak: 2,
+  joinedAt: '2026-03-02T10:00:00.000Z',
   isSelf: false,
   ...overrides,
 })

@@ -12,6 +12,7 @@ export function communityPage(overrides: Partial<CommunityPage> = {}): Community
     bannerUrl: null,
     kind: 'group',
     memberCount: 1204,
+    createdAt: null,
     rules: null,
     mainUrl: null,
     viewerMembership: null,

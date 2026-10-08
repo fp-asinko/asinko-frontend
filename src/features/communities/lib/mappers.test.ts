@@ -56,4 +56,16 @@ describe('community page mappers (specs/community-pages)', () => {
     expect(toCommunityPage({ ...defi, viewerIsFavorite: null }).viewerIsFavorite).toBe(false)
     expect(toCommunityPage({ ...defi, viewerIsFavorite: true }).viewerIsFavorite).toBe(true)
   })
+
+  it('dates only the groups a person created (specs/mention-preview MP-03)', () => {
+    const at = '2025-11-20T10:00:00.000Z'
+    const system = { ...defi, createdByProfileId: null, createdAt: at }
+    const people = {
+      ...defi,
+      createdByProfileId: '00000000-0000-4000-8000-000000000001',
+      createdAt: at,
+    }
+    expect(toCommunityPage(system).createdAt).toBeNull()
+    expect(toCommunityPage(people).createdAt).toBe(at)
+  })
 })

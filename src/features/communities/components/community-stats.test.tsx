@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { MemberCount, ProfileStats } from './community-stats'
 
-describe('community stats (specs/community-pages CP-11, specs/mention-preview)', () => {
+describe('community stats (specs/community-pages CP-11)', () => {
   it('counts members, the number in bold', () => {
     renderWithIntl(<MemberCount count={1204} />)
     expect(screen.getByText('1,204').tagName).toBe('STRONG')

@@ -3,8 +3,8 @@ import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import type { ProfileDetails } from '../communities.types'
 
-// The numbers under a community's or a person's name: in its page header and in its hover card
-// (specs/community-pages CP-11, specs/mention-preview MP-03, MP-05).
+// The numbers under a community's or a person's name in its page header
+// (specs/community-pages CP-11).
 
 /** "1,204 members", the number in bold. */
 export function MemberCount({ count, className }: { count: number; className?: string }) {

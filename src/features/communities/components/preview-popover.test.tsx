@@ -21,6 +21,7 @@ const preview = (slug: string): Preview => ({
     bannerUrl: null,
     kind: 'group',
     memberCount: 3,
+    createdAt: null,
     viewerMembership: null,
   },
   profile: null,
