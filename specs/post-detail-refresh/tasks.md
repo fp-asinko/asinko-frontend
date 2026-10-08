@@ -1,6 +1,6 @@
 # Detalle de post, segunda vuelta — Tasks
 
-> Se empiezan cuando el PO apruebe `requirements.md` (Q1 y Q2).
+> Aprobado por el PO el 2026-10-08.
 
 - [ ] **T-01 (S)** `BackButton` a `components/molecules` con las variantes `overlay` y `plain`; el detalle lo usa. Tests. → PD-01, PD-12
 - [ ] **T-02 (S)** La caja de comentario cerrada y abierta. Tests. → PD-02, PD-12

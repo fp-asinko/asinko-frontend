@@ -6,7 +6,7 @@
 
 ## Pendientes
 
-En orden de prioridad para el front: P-012, P-001, P-013, P-011, P-003 y P-005.
+En orden de prioridad para el front: P-012, P-001, P-014, P-013, P-011, P-015, P-003 y P-005.
 
 ### P-012: Todo lo que publica un usuario
 
@@ -69,6 +69,41 @@ En orden de prioridad para el front: P-012, P-001, P-013, P-011, P-003 y P-005.
 ### P-005: Orden del feed
 
 **Estado:** el filtro por tipo (`?kind=POST,POLL`) ya está y está en el contrato. **Falta:** `sort=hot|new|top`, para los filtros _Hot_ y _Top_ del prototipo. ¿Cuándo?
+
+### P-014: Ordenar y buscar comentarios
+
+**Estado:** propuesta (2026-10-08), mockeada en el front (`specs/post-detail-refresh`).
+
+**Endpoint:** `GET /api/v1/{posts|polls}/{id}/comments`, dos parámetros nuevos:
+
+- `?sort=best|top|new|old` (por defecto `best`): ordena el primer nivel y las respuestas de cada comentario. `top`: por `score`, de mayor a menor. `new` y `old`: por `createdAt`.
+- `?q=texto` (2 a 100 caracteres, sin distinguir mayúsculas ni acentos): los comentarios que contienen el texto, de cualquier nivel, en una lista plana (`replies: []`, con `parentCommentId`), del que más coincide al que menos. Sin borrados.
+
+**Motivo:** el detalle de un post ordena los comentarios (Mejores, Top, Nuevos, Antiguos) y los busca, como Reddit. El front no ordena ni filtra el árbol: en un post con miles de comentarios tiene que hacerlo la base.
+
+**Para revisar (decisión del PO, 2026-10-08): cómo se calcula `best`.** Reddit usa el intervalo de Wilson sobre votos a favor y en contra por separado, y el contrato solo tiene `score`. Propuesta, la de Hacker News: `score / (horas desde createdAt + 2) ^ 1,5`, de mayor a menor; un comentario nuevo y votado sube, y uno viejo baja de a poco. El mock usa esta fórmula. Si el backend prefiere otra (o guardar votos a favor y en contra para usar Wilson), el front no cambia: solo manda `sort=best`.
+
+### P-015: Anuncios de la casa
+
+**Estado:** propuesta (2026-10-08), mockeada en el front (`specs/post-detail-refresh`).
+
+**Endpoint:** nuevo, `GET /api/v1/ads?placement=comments` (público).
+
+**Motivo:** el detalle de un post muestra un anuncio cada 10 comentarios, como Reddit. Por decisión del PO son anuncios propios (de la casa o cargados por Asinko), sin redes de anuncios ni scripts de terceros.
+
+**Cambio:** una lista `{ "items": Ad[] }`, en el orden en que se muestran (el front los rota):
+
+```json
+{
+  "id": "uuid",
+  "advertiser": { "name": "string", "logoUrl": "string | null" },
+  "body": "string (texto plano, hasta 280)",
+  "url": "https://…",
+  "imageUrl": "string | null"
+}
+```
+
+Las imágenes, en el mismo Storage que los avatares. Medir impresiones y clics queda para después.
 
 ## Pedidos operativos
 

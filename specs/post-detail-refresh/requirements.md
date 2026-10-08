@@ -1,6 +1,6 @@
 # Detalle de post, segunda vuelta — Requirements
 
-> **Estado:** borrador para el PO (2026-10-08), con las decisiones que ya tomó (abajo).
+> **Estado:** aprobado por el PO el 2026-10-08, con Q1 y Q2 como se recomendaron. La fórmula de Mejores (Q1) va en la propuesta P-014 para que el backend la revise.
 > **Fuente:** pedido del PO (2026-10-08), con una captura de un post de Reddit: "no tenemos botón para volver, no tenemos opciones para ordenar los comentarios como hace Reddit o buscar comentarios, y también me gustaría ir implementando la lógica de que cada 10 comentarios se muestre un anuncio, con una estructura y estilo similar. El campo de agregar un comentario ('Únete a la conversación') es mucho más angosto, no es tan alto."
 
 ## Objetivo
@@ -67,7 +67,7 @@ Que el detalle de un post se use como el de Reddit: volver con un toque, una caj
 - **Backend:** orden y búsqueda se proponen al backend y se mockean; el front no calcula.
 - **Frecuencia:** cada 10 comentarios contando las respuestas.
 
-## Preguntas para el PO
+## Preguntas resueltas (2026-10-08)
 
 - **Q1. Mejores** sin votos a favor y en contra por separado no puede ser el de Reddit (Wilson). Propuesta para el mock y la propuesta al backend: puntaje con decaimiento por antigüedad (`score / (horas + 2)^1,5`, como Hacker News). **Recomendado.** Alternativa: igual a Top hasta que el backend lo defina.
 - **Q2. Anuncios de ejemplo:** los mocks necesitan anunciantes. Propuesta: anuncios de la casa de Asinko ("Publicá tu primera tesis", "Invitá a un amigo") y dos anunciantes de ejemplo inventados y marcados como tales. **Recomendado.**
