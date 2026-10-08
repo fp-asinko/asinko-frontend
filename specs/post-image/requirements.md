@@ -1,6 +1,6 @@
 # Posts con imagen — Requirements
 
-> **Estado:** borrador para el PO (2026-10-08). Preguntas abiertas al final.
+> **Estado:** aprobado por el PO el 2026-10-08, con Q1 a Q3 como se recomendaron.
 > **Fuente:** documento de entregables (`docs/references/ASINKO-requirements.pdf`, "Crear post": `type` TEXT, LINK o **IMAGE**, `imageUrl` si `type = IMAGE`), elegido por el PO el 2026-10-08 (punto A), con X e Instagram de inspiración.
 > **Desbloqueo:** el backend decidió el 01/10/2026 que **la app sube directo** al bucket `post-images` de Supabase Storage con la sesión del usuario y manda la URL a `POST /posts`, que rechaza (422) cualquier `imageUrl` de otro origen (`asinko-app`, `INFRA-PENDIENTES.md § Storage`). Esto responde P-013.
 
@@ -57,7 +57,7 @@ Publicar un post con una imagen, con la comodidad de X: elegirla, pegarla o arra
 - **Bucket `post-images` creado en el Supabase de `dev`**, público, 5 MB, JPEG/PNG/WebP y las políticas de carpeta propia (`INFRA-PENDIENTES.md`). No pude verificar desde acá si ya existe: **se le pregunta al backend** (Q3).
 - Con `API_MOCKS=true` (CI), la subida se mockea: devuelve una imagen de los fixtures.
 
-## Preguntas abiertas
+## Preguntas resueltas (2026-10-08)
 
 - **Q1. Imágenes que quedan sin usar:** si alguien sube una imagen y después la quita o descarta el post, el archivo queda en el bucket. ¿La borramos desde la app al quitarla o descartar (**recomendado**, la política "borrar lo propio" ya lo permite)? Alternativa: que el backend limpie los huérfanos.
 - **Q2. Texto alternativo:** X deja escribir una descripción de la imagen para lectores de pantalla. ¿Lo proponemos al backend como `imageAlt` (P-013) para una próxima versión (**recomendado**)? Mientras tanto la imagen usa "Imagen del post", como hoy.

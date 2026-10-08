@@ -44,18 +44,15 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P
 
 ### P-013: Subida de imágenes de posts
 
-**Estado:** propuesta (2026-10-07). Bloquea los posts de tipo Imagen (`specs/post-create-detail`).
+**Estado:** respondida por el backend (decisión del 01/10/2026, `INFRA-PENDIENTES.md § Storage`): la app sube directo al bucket `post-images` con la sesión del usuario y manda la URL a `POST /posts`. El front lo implementa en `specs/post-image` (2026-10-08).
 
-**Endpoint:** `POST /posts` con `type: "IMAGE"` ya existe y exige que `imageUrl` sea un archivo del bucket `post-images` de Supabase Storage. Falta definir **quién sube el archivo**.
+**Cómo lo hace el front:** la sesión del front es un Bearer en una cookie `HttpOnly` del servidor, así que sube **el servidor de la app** con el token del usuario (`PUT /storage/v1/object/post-images/{userId}/{uuid}.webp`): la política "subir en la carpeta propia" aplica igual y el token no llega al navegador. Antes, el navegador achica la imagen a 2048 px en WebP, lo que borra los metadatos EXIF.
 
-**Motivo:** el editor de posts del front ya tiene Texto y Link. Imagen queda como "Próximamente" hasta saber cómo llega el archivo al bucket. El front no llama a la API desde el navegador: todo pasa por su servidor (`api-integration.md`).
+**Preguntas al backend:**
 
-**Opciones** (a elegir con el backend):
-
-1. **URL firmada desde el backend (preferida por el front):** un endpoint, por ejemplo `POST /api/v1/uploads/post-image` con `{ userId, contentType, size }`, que valida tipo (JPEG, PNG, WebP o GIF; nunca SVG) y tamaño, y devuelve `{ uploadUrl, imageUrl }` firmada y de un solo uso (`createSignedUploadUrl` de Supabase). El servidor del front la pide en una Server Action, el navegador sube el archivo directo a esa URL y después se publica el post con `imageUrl`. Las reglas quedan en el backend.
-2. **Subida directa del navegador a Storage** con la sesión del usuario y una política de RLS en `post-images` (solo su propia carpeta, tipos y tamaño máximo). No suma un endpoint, pero las reglas viven en las políticas de Storage, y hoy la sesión del front es un Bearer del servidor, no una sesión de Supabase en el navegador.
-
-**También:** borrar los metadatos EXIF (pueden incluir la ubicación, `security.md § 6`) y el tamaño máximo aceptado.
+- **¿Está creado el bucket `post-images` en el Supabase de `dev`** (público, 5 MB, JPEG/PNG/WebP, con las dos políticas)? Sin él, la subida contra el backend real falla.
+- **Texto alternativo (para una próxima versión):** un campo `imageAlt` (string, ≤ 1000, opcional) en `POST /posts` y en el `Post`, para que la persona describa la imagen a quien usa lector de pantalla, como X. Hoy el front usa "Imagen del post".
+- El front borra la imagen si la persona la quita o descarta el post (política "borrar lo propio"); las que queden huérfanas por otros motivos (cerrar la pestaña) quedarían para una limpieza del backend.
 
 ### P-011: Nombre visible en el perfil
 

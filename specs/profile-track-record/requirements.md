@@ -1,6 +1,6 @@
 # Perfil con track record — Requirements
 
-> **Estado:** borrador para el PO (2026-10-08). Preguntas abiertas al final.
+> **Estado:** aprobado por el PO el 2026-10-08, con Q1 a Q3 como se recomendaron.
 > **Fuente:** documento de entregables (`docs/references/ASINKO-requirements.pdf`, "Página de perfil": `GET /profiles/{identifier}` con "contadores de correctas/incorrectas/canceladas, seguidores/seguidos" e "Historial de tesis del usuario: `GET /users/{userId}/theses`"), elegido por el PO el 2026-10-08 (punto B), con X e Instagram de inspiración.
 > **Backend:** los dos endpoints existen en `dev` (`asinko-app`, E01 y E12). El contrato de `Profile` ya trae los contadores; hoy el front solo muestra seguidores, precisión y racha.
 
@@ -53,7 +53,7 @@ Que el perfil cuente el historial de la persona, que es lo que distingue a Asink
 - Página de detalle de una tesis (la tarjeta no es un link).
 - Rating AAA…D y tiers (P-011: después del MVP).
 
-## Preguntas abiertas
+## Preguntas resueltas (2026-10-08)
 
 - **Q1. Los números:** ¿dos líneas de texto como X (**recomendado**: liviano, entra a 360 px) o una grilla de 4 números grandes como Instagram (Seguidores, Siguiendo, Precisión, Racha) con el detalle de acertadas/erradas debajo?
 - **Q2. Filtro en Tesis:** el endpoint filtra por estado. ¿Lo dejamos para después (**recomendado**, YAGNI) o sumamos chips "Todas · Abiertas · Resueltas"?

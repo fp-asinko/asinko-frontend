@@ -1,6 +1,6 @@
 # Perfil con track record — Tasks
 
-> Borrador: se aprueba junto con `requirements.md`.
+> Aprobado por el PO el 2026-10-08.
 
 - [ ] **T-01 (S)** Perfil: `id` y contadores en el mapper y `ProfileStats` con las dos líneas. Tests. → PT-01 a PT-03, PT-08
 - [ ] **T-02 (M)** Contrato `Thesis`, fixtures y ruta mock con cursor; `getUserTheses` con su mapper. Tests y `fixtures.test.ts`. → PT-05, PT-12

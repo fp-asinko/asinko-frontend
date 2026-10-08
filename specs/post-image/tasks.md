@@ -1,6 +1,6 @@
 # Posts con imagen — Tasks
 
-> Borrador: se aprueba junto con `requirements.md`.
+> Aprobado por el PO el 2026-10-08.
 
 - [ ] **T-01 (S)** `prepareImage` en `src/lib/images/`, con tests. → PI-03, PI-05
 - [ ] **T-02 (M)** `lib/storage/post-images.ts`, `uploadPostImage` y `removePostImage`, `bodySizeLimit`, mock. Tests. P-013 actualizada en `proposals.md`. → PI-06, PI-07
