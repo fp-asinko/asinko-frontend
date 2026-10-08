@@ -2,7 +2,7 @@
 
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla. Cuando el backend la implementa, sale de este archivo (queda en el historial de git) y pasa al snapshot del contrato.
 
-**Revisado el 2026-10-07** contra el deploy de `asinko-app` en Vercel (`https://asinko-app-web.vercel.app`, rama `dev` en `bd91e4b`), con `pnpm api:smoke`, llamadas directas y la respuesta del backend del mismo día.
+**Revisado el 2026-10-08** contra el deploy de `asinko-app` en Vercel (`https://asinko-app-web.vercel.app`) y el código de la rama `dev` (sigue en `bd91e4b`, sin cambios desde el 2026-10-07), con `pnpm api:smoke` (sin diferencias con el contrato) y llamadas directas. Ninguna propuesta pendiente está implementada todavía; las que sí lo estaban (P-002, P-004, P-007, P-008 y P-010) ya salieron de este archivo.
 
 ## Pendientes
 
@@ -62,9 +62,9 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-013, P-011, P-015, P
 
 ### P-003: Precios de los activos
 
-**Estado:** el endpoint está (`GET /assets`, `GET /assets/{symbol}`, con logo y sentimiento), pero **sin precios**: `price`, `priceChangePct` y `priceUpdatedAt` llegan en `null` y `priceStale` en `true`. Falta el proveedor de precios, que es una decisión abierta del producto.
+**Estado:** el endpoint está (`GET /assets`, `GET /assets/{symbol}`, con logo y sentimiento). **Novedad (2026-10-08):** los 10 activos ya traen `price` y `priceChangePct` reales, todos con `priceUpdatedAt` de 2026-10-08 17:15 UTC, pero llegan con `priceStale: true` y en `dev` no hay un proveedor que los actualice: parecen cargados a mano, una vez.
 
-**Efecto:** la columna de activos sigue con precios de prueba, y la página de activo muestra "Sin datos de mercado todavía". **Pedido:** avisar cuando haya precios.
+**Efecto:** la columna de activos sigue con precios de prueba, y la página de activo muestra "Sin datos de mercado todavía": el front no muestra un precio marcado como viejo. **Pregunta:** ¿de dónde salen esos precios y cada cuánto se van a actualizar? Con un proveedor que los mantenga frescos (`priceStale: false`), el front los muestra.
 
 ### P-005: Orden del feed
 
@@ -107,11 +107,11 @@ Las imágenes, en el mismo Storage que los avatares. Medir impresiones y clics q
 
 ## Pedidos operativos
 
-- **Datos de las páginas en el seed:** las páginas de grupo, activo y perfil ya muestran banner, avatar, descripción, reglas y bio, pero el seed casi no los tiene. De los 7 grupos y activos de la primera página, ninguno tiene avatar, banner ni reglas, y solo uno tiene descripción. Ningún usuario tiene bio ni verificado. **Pedido:** sumar al seed avatar y banner (en Storage, como los avatares de usuario), descripción y reglas para los grupos, logo para todos los activos y bio para los usuarios, así las páginas se pueden probar con datos reales. Si se acepta P-011, también `displayName`.
-
+- **Datos de las páginas en el seed:** las páginas de grupo, activo y perfil ya muestran banner, avatar, descripción, reglas y bio, pero el seed casi no los tiene. Revisado el 2026-10-08: de las 20 comunidades de la primera página de `GET /communities`, ninguna tiene avatar, banner ni reglas, y solo una tiene descripción; 6 de los 10 activos tienen logo. Ningún usuario tiene bio ni verificado. **Pedido:** sumar al seed avatar y banner (en Storage, como los avatares de usuario), descripción y reglas para los grupos, logo para todos los activos y bio para los usuarios, así las páginas se pueden probar con datos reales. Si se acepta P-011, también `displayName`.
 
 ## Preguntas sobre el contrato
 
+- **Acciones y ETFs en el catálogo (2026-10-08):** `GET /assets` ya devuelve AAPL, NVDA, GME y VOO junto a las criptos. El producto dice "por ahora, solo criptomonedas" y deja las acciones para después (`docs/product/overview.md`). El front las sugiere al escribir `$` y les arma página. ¿Entran ya en el MVP o se filtran del catálogo por ahora?
 - **Tesis en el feed:** el feed ya devuelve `kind: "THESIS"`. El front las muestra en la fase 2 y mientras tanto pide `?kind=POST,POLL`. ¿OK?
 - **Documentos del contrato:** queda pedido el acceso al repo `financeshowoff-design-docs`, para refrescar `docs/references/api/` sin depender de copias.
 
