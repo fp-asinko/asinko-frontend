@@ -9,6 +9,7 @@ import {
   createCommentAs,
   getCommentTree,
   getCommentsPreview,
+  searchComments,
   PREVIEW_FETCH,
   PREVIEW_SIZE,
 } from './comments-api'
@@ -126,6 +127,28 @@ describe('getCommentTree (specs/post-create-detail PC-14)', () => {
         : route,
     )
     expect(await getCommentTree(post.id)).toEqual({ ok: true, data: [] })
+  })
+})
+
+describe('sorted and searched (specs/post-detail-refresh P-014)', () => {
+  beforeEach(() => {
+    state.routes = MOCK_ROUTES
+  })
+  const debate = POSTS[2]!.id
+
+  it('asks the backend for the order: every level comes sorted', async () => {
+    const result = await getCommentTree(debate, 'top')
+    if (!result.ok) throw new Error('expected ok')
+    const scores = result.data.map((each) => each.score)
+    expect(scores).toEqual([...scores].sort((a, b) => b - a))
+  })
+
+  it('finds comments of any level in a flat list, without replies', async () => {
+    const result = await searchComments(debate, 'blobs')
+    if (!result.ok) throw new Error('expected ok')
+    expect(result.data).toHaveLength(2)
+    expect(result.data.every((each) => each.replies.length === 0)).toBe(true)
+    expect(result.data[0]!.author?.handle).toBe('@quantsimula')
   })
 })
 

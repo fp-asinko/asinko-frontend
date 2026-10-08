@@ -11,6 +11,7 @@ import { postPath, postSlug } from '@/lib/posts/paths'
 import type { PostItem } from '../feed.types'
 import { getPost } from '../lib/post-api'
 import { postExcerpt } from '../lib/post-excerpt'
+import { commentsQuerySchema } from '../schemas/comments-query.schema'
 import { CommentThread } from './comment-thread'
 import { PostCard } from './post-card'
 import { PostComments } from './post-comments'
@@ -65,12 +66,27 @@ export async function resolvePostRoute(
   return post
 }
 
-/** The post of its own page, whole (PC-13), and its comments (PC-14 to PC-16). */
-export function PostDetail({ post }: { post: PostItem }) {
+/**
+ * The post of its own page, whole (PC-13), and its comments (PC-14 to PC-16), in the order and
+ * with the search of the URL: user input, validated here (specs/post-detail-refresh PD-04, PD-06).
+ */
+export function PostDetail({
+  post,
+  searchParams,
+}: {
+  post: PostItem
+  searchParams: Record<string, string | string[] | undefined>
+}) {
   return (
     <CommentThread>
       <PostCard post={post} variant="detail" leading={<BackButton variant="plain" />} />
-      <PostComments postId={post.id} count={post.commentCount} closed={post.deleted} />
+      <PostComments
+        postId={post.id}
+        path={post.path}
+        count={post.commentCount}
+        closed={post.deleted}
+        query={commentsQuerySchema.parse(searchParams)}
+      />
     </CommentThread>
   )
 }

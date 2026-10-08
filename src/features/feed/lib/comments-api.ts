@@ -3,6 +3,7 @@ import { apiRequest, type ApiResult } from '@/lib/api'
 import { commentListSchema, commentSchema, type RawComment } from '@/lib/api/contract'
 import type { CommentNode, CommentPreview } from '../feed.types'
 import type { CreateCommentInput } from '../schemas/comment.schema'
+import type { CommentSort } from '../schemas/comments-query.schema'
 import type { CommentsTarget } from '../schemas/comments-preview.schema'
 import { toAuthor } from './mappers'
 import { communityPath } from '@/lib/communities/paths'
@@ -87,16 +88,42 @@ function toCommentNode(comment: RawComment): CommentNode | null {
   }
 }
 
-/** Every comment of a post, nested, oldest first as the backend sends them (PC-14). */
-export async function getCommentTree(postId: string): Promise<ApiResult<CommentNode[]>> {
+/**
+ * Every comment of a post, nested (PC-14), in the order asked (P-014, specs/post-detail-refresh
+ * PD-03): the backend sorts every level. Without an order, the backend's (oldest first).
+ */
+export async function getCommentTree(
+  postId: string,
+  sort?: CommentSort,
+): Promise<ApiResult<CommentNode[]>> {
   const result = await apiRequest({
     method: 'GET',
     path: '/api/v1/posts/:id/comments',
     params: { id: postId },
+    query: sort ? { sort } : undefined,
     schema: commentListSchema,
   })
   if (!result.ok) return result
   return { ok: true, data: result.data.items.flatMap((comment) => toCommentNode(comment) ?? []) }
+}
+
+/**
+ * The comments of a post that contain a text (P-014, PD-05): any level, in a flat list, the best
+ * match first, without replies. The text comes validated (commentsQuerySchema).
+ */
+export async function searchComments(postId: string, q: string): Promise<ApiResult<CommentNode[]>> {
+  const result = await apiRequest({
+    method: 'GET',
+    path: '/api/v1/posts/:id/comments',
+    params: { id: postId },
+    query: { q },
+    schema: commentListSchema,
+  })
+  if (!result.ok) return result
+  const found = result.data.items
+    .filter((comment) => !comment.deleted)
+    .map((comment) => toCommentNode({ ...comment, replies: [] }))
+  return { ok: true, data: found.filter((node) => node !== null) }
 }
 
 /**

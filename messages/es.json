@@ -299,7 +299,19 @@
     "empty": "Todavía no hay comentarios. Empieza la conversación.",
     "error": "No se pudieron cargar los comentarios. Recarga la página para reintentar.",
     "seeReplies": "{count, plural, one {Ver # respuesta} other {Ver # respuestas}}",
-    "hideReplies": "Ocultar respuestas"
+    "hideReplies": "Ocultar respuestas",
+    "sort": {
+      "label": "Ordenar por",
+      "best": "Mejores",
+      "top": "Top",
+      "new": "Nuevos",
+      "old": "Antiguos"
+    },
+    "search": {
+      "label": "Buscar comentarios",
+      "results": "{count, plural, =0 {Sin resultados para «{q}»} one {# resultado para «{q}»} other {# resultados para «{q}»}}",
+      "all": "Ver todos los comentarios"
+    }
   },
   "comments": {
     "label": "Tu comentario",

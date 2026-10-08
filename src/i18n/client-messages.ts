@@ -21,6 +21,8 @@ export const CLIENT_NAMESPACES = [
   'feed.vote',
   'join',
   'mentions',
+  'postDetail.search',
+  'postDetail.sort',
   'preview',
 ] as const
 

@@ -43,8 +43,15 @@ function toUrl(href: Href) {
 export function Link({
   href,
   children,
+  // Router options, not attributes of the anchor.
+  scroll: _scroll,
+  prefetch: _prefetch,
   ...props
-}: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & { href: Href }) {
+}: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
+  href: Href
+  scroll?: boolean
+  prefetch?: boolean | null
+}) {
   return (
     <a href={toUrl(href)} {...props}>
       {children}

@@ -11,12 +11,15 @@ export async function generateMetadata({
   return postMetadata(id, locale)
 }
 
-export default async function PostPage({ params }: PageProps<'/[locale]/post/[id]/[[...slug]]'>) {
-  const { locale, id, slug } = await params
+export default async function PostPage({
+  params,
+  searchParams,
+}: PageProps<'/[locale]/post/[id]/[[...slug]]'>) {
+  const [{ locale, id, slug }, query] = await Promise.all([params, searchParams])
   const post = await resolvePostRoute(id, slug, locale)
   return (
     <PageColumns>
-      <PostDetail post={post} />
+      <PostDetail post={post} searchParams={query} />
     </PageColumns>
   )
 }
