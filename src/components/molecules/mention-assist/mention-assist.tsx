@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useEffectEvent, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { UserAvatar } from '@/components/molecules/user-avatar'
+import { insertText } from '@/lib/insert-text'
 import { activeMention, type ActiveMention, type MentionKind } from '@/lib/mentions/active-mention'
 import type { MentionOption } from '@/lib/mentions/mentions.types'
 import type { ActionResult } from '@/lib/result'
@@ -33,13 +34,6 @@ function matches(option: MentionOption, query: string) {
     option.handle.slice(1).toLowerCase().includes(q) ||
     Boolean(option.label?.toLowerCase().includes(q))
   )
-}
-
-/** Writes a value as if typed: React and react-hook-form see a normal change. */
-function typeValue(field: HTMLTextAreaElement, value: string) {
-  const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set
-  setter?.call(field, value)
-  field.dispatchEvent(new Event('input', { bubbles: true }))
 }
 
 /**
@@ -160,11 +154,8 @@ export function MentionAssist({
 
   function choose(option: MentionOption) {
     if (!mention) return
-    const end = field.selectionStart
-    const text = `${option.handle} `
-    typeValue(field, field.value.slice(0, mention.start) + text + field.value.slice(end))
-    const caret = mention.start + text.length
-    field.setSelectionRange(caret, caret)
+    // From the symbol to the caret: the mention as typed so far.
+    insertText(field, `${option.handle} `, { start: mention.start, end: field.selectionStart })
     close()
     setAnnouncement(t('added', { handle: option.handle }))
   }

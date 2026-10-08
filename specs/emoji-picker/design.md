@@ -10,12 +10,11 @@ emoji-picker/
 ├── emoji-panel.tsx       # Diferido: Popover, buscador, grilla, teclado
 ├── emoji-data.ts         # Diferido: ~280 emojis por categoría, con nombres en en, es y pt
 ├── recent-emojis.ts      # Recientes en localStorage (con try/catch)
-├── insert-text.ts        # Inserta en el cursor de un textarea (compartido con mention-assist)
 └── index.ts
 ```
 
 - `EmojiButton({ fieldRef })`: un botón de 32 px (`SmilePlusIcon` de lucide), `aria-label` "Agregar emoji", `aria-haspopup="dialog"`. Descarga el panel al pasar el mouse o enfocar (como el menú "⋯") y lo abre al tocar.
-- `insertText(field, text)`: reemplaza la selección por el texto, escribe con el setter nativo y un evento `input` (lo ven React y `react-hook-form`) y deja el cursor después. Hoy esa lógica vive en `mention-assist` (`typeValue`); pasa a este archivo y la usan los dos.
+- `insertText(field, text, range?)` en `lib/insert-text.ts`: reemplaza la selección (o el tramo dado) por el texto, escribe con el setter nativo y un evento `input` (lo ven React y `react-hook-form`) y deja el cursor después. Hoy esa lógica vive en `mention-assist` (`typeValue`); pasa a `lib` (una molécula no importa de otra) y la usan los dos.
 
 ## 2. El panel
 

@@ -1,8 +1,8 @@
 # Selector de emojis — Tasks
 
-> Se empiezan cuando el PO apruebe `requirements.md`.
+> Aprobado por el PO el 2026-10-08.
 
-- [ ] **T-01 (S)** `insertText` sale de `mention-assist` a la molécula nueva, la usan los dos. Tests. → EP-03
+- [x] **T-01 (S)** `insertText` sale de `mention-assist` a `lib/insert-text.ts`, la usan los dos. Tests. → EP-03
 - [ ] **T-02 (M)** `emoji-data.ts` (~280 emojis, categorías, nombres en en, es y pt) y la búsqueda; `recent-emojis.ts`. Tests. → EP-04 a EP-06
 - [ ] **T-03 (M)** `Popover` de shadcn; `EmojiPanel` (buscador, categorías, grilla con teclado, resultados anunciados) y `EmojiButton` con la carga diferida; textos en en, es y pt. Tests. → EP-02, EP-03, EP-07 a EP-09, EP-11
 - [ ] **T-04 (S)** El botón en el editor de posts y en comentar y responder. Tests. → EP-01

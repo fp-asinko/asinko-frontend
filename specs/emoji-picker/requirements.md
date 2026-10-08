@@ -1,6 +1,6 @@
 # Selector de emojis — Requirements
 
-> **Estado:** borrador para el PO (2026-10-08), con sus decisiones (abajo).
+> **Estado:** aprobado por el PO el 2026-10-08.
 > **Fuente:** pedido del PO (2026-10-08): "en la parte de creación de post, podríamos agregar un botón para agregar emojis nativos del sistema".
 
 ## Objetivo
