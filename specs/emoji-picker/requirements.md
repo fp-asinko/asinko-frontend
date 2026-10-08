@@ -19,7 +19,7 @@ Poner emojis en un post o un comentario sin saber el atajo del sistema operativo
 
 ### Dónde
 
-- [ ] **EP-01** Un botón con una carita en la fila de abajo del editor de posts (junto a Texto, Link e Imagen) y en las cajas de comentar y responder, con nombre accesible "Agregar emoji".
+- [ ] **EP-01** Un botón con una carita en la fila de abajo del editor de posts (junto a Texto, Link e Imagen) y en las cajas de comentar y responder, con nombre accesible "Agregar emoji". En el editor de posts, el emoji va al último campo usado, el título o el cuerpo (el cuerpo si todavía no se tocó ninguno; pedido del PO, 2026-10-08).
 
 ### El panel
 
@@ -27,7 +27,7 @@ Poner emojis en un post o un comentario sin saber el atajo del sistema operativo
 - [ ] **EP-03** Elegir un emoji lo inserta donde está el cursor del campo (o reemplaza lo seleccionado), cierra el panel y devuelve el foco al campo con el cursor después del emoji. Lo escrito no se pierde ni salta.
 - [ ] **EP-04** **Buscar por nombre**, sin mayúsculas ni acentos, en el idioma de la página y en inglés ("fuego", "fire" → 🔥). Sin resultados, lo dice.
 - [ ] **EP-05** **Recientes:** los últimos 16 elegidos, primero el más reciente, guardados en el navegador. Sin recientes, la sección no aparece.
-- [ ] **EP-06** Solo emojis que los sistemas actuales muestran bien (hasta Emoji 13), sin banderas (Windows no las dibuja), con los de finanzas a mano (📈 📉 💰 💸 🚀 🐂 🐻 💎 🔥 ⚠️).
+- [ ] **EP-06** Solo emojis que los sistemas actuales muestran bien (hasta Emoji 12: Windows 10 dibuja los de Emoji 13 como una caja vacía, visto por el PO el 2026-10-08), sin banderas (Windows no las dibuja), con los de finanzas a mano (📈 📉 💰 💸 🚀 🐂 🐻 💎 🔥 ⚠️).
 
 ### Interacción y accesibilidad
 

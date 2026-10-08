@@ -1,5 +1,5 @@
-// The emojis of the picker (specs/emoji-picker § 3): ~280, up to Emoji 13, without flags (Windows
-// does not draw them) nor skin tones. Each row: the emoji and its keywords in en, es and pt,
+// The emojis of the picker (specs/emoji-picker § 3): ~280, up to Emoji 12 (Windows 10 draws no
+// newer ones: an empty box), without flags (Windows does not draw them) nor skin tones. Each row: the emoji and its keywords in en, es and pt,
 // space-separated, the first ones its name (from CLDR's short names). Downloaded with the panel.
 
 export type EmojiRow = readonly [emoji: string, en: string, es: string, pt: string]
@@ -141,7 +141,6 @@ export const EMOJI_CATEGORIES: readonly EmojiCategory[] = [
       ['🤟', 'love you gesture', 'te quiero gesto', 'te amo gesto'],
       ['🤘', 'horns rock', 'cuernos rock', 'chifres rock'],
       ['👌', 'ok perfect', 'ok perfecto', 'ok perfeito'],
-      ['🤌', 'pinched fingers', 'dedos juntos', 'dedos juntos'],
       ['👈', 'pointing left', 'señalar izquierda', 'apontando esquerda'],
       ['👉', 'pointing right', 'señalar derecha', 'apontando direita'],
       ['👆', 'pointing up', 'señalar arriba', 'apontando para cima'],
@@ -159,7 +158,6 @@ export const EMOJI_CATEGORIES: readonly EmojiCategory[] = [
       ['🧑‍💻', 'technologist developer coder', 'programador tecnología', 'programador tecnologia'],
       ['🧑‍💼', 'office worker business', 'oficinista negocios', 'funcionário de escritório negócios'],
       ['🕵️', 'detective', 'detective', 'detetive'],
-      ['🥷', 'ninja', 'ninja', 'ninja'],
       ['🧙', 'mage wizard', 'mago', 'mago'],
       ['🤷', 'shrug', 'encogerse de hombros', 'dar de ombros'],
       ['🤦', 'facepalm', 'mano en la cara', 'mão na testa'],
@@ -377,7 +375,6 @@ export const EMOJI_CATEGORIES: readonly EmojiCategory[] = [
       ['💶', 'euro banknote', 'billete euro', 'nota de euro'],
       ['💴', 'yen banknote', 'billete yen', 'nota de iene'],
       ['💷', 'pound banknote', 'billete libra', 'nota de libra'],
-      ['🪙', 'coin crypto', 'moneda cripto', 'moeda cripto'],
       ['💳', 'credit card', 'tarjeta de crédito', 'cartão de crédito'],
       ['🧾', 'receipt', 'recibo factura', 'recibo nota'],
       ['💎', 'gem diamond hands', 'diamante gema', 'diamante gema'],
@@ -429,7 +426,6 @@ export const EMOJI_CATEGORIES: readonly EmojiCategory[] = [
       ['🔍', 'magnifying glass search', 'lupa buscar', 'lupa buscar'],
       ['🧭', 'compass', 'brújula', 'bússola'],
       ['🕯️', 'candle', 'vela', 'vela'],
-      ['🪄', 'magic wand', 'varita mágica', 'varinha mágica'],
     ],
   },
   {

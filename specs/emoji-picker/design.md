@@ -37,12 +37,12 @@ type Category = {
 }
 ```
 
-- Escrita a mano a partir de los nombres cortos de CLDR, ~280 emojis hasta Emoji 13, sin banderas ni tonos de piel. Los de finanzas al principio de sus categorías.
+- Escrita a mano a partir de los nombres cortos de CLDR, ~280 emojis hasta Emoji 12 (Windows 10 no dibuja los de Emoji 13), sin banderas ni tonos de piel. Los de finanzas al principio de sus categorías.
 - Los nombres de las categorías y los textos del panel van en `messages/` (`emoji.*`, cliente). Los nombres de los emojis son datos y viajan en el chunk diferido.
 
 ## 4. Dónde se usa
 
-- **Editor de posts** (`PostEditor`): en la fila de formatos, después de Imagen, apuntando al cuerpo.
+- **Editor de posts** (`PostEditor`): en la fila de formatos, después de Imagen, apuntando al último campo enfocado, título o cuerpo (`emojiTarget`; `insertText` acepta un `input` también).
 - **Comentar y responder** (`CommentComposer`): a la izquierda de Cancelar y Comentar, cuando la caja está abierta.
 
 ## 5. Performance

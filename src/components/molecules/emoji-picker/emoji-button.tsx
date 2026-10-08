@@ -4,7 +4,7 @@ import { SmilePlusIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { useRef, useState, type RefObject } from 'react'
-import { insertText } from '@/lib/insert-text'
+import { insertText, type TextField } from '@/lib/insert-text'
 import { cn } from '@/lib/utils'
 import { rememberEmoji } from './recent-emojis'
 
@@ -14,14 +14,15 @@ const loadPanel = () => import('./emoji-panel')
 const EmojiPanel = dynamic(() => loadPanel().then((mod) => mod.EmojiPanel), { ssr: false })
 
 /**
- * "Add emoji" for a textarea (specs/emoji-picker § 1): opens the panel, and the emoji picked goes
+ * "Add emoji" for a text field (specs/emoji-picker § 1): opens the panel, and the emoji picked goes
  * where the caret was (or over the selection), the focus back in the field right after it.
  */
 export function EmojiButton({
   fieldRef,
   className,
 }: {
-  fieldRef: RefObject<HTMLTextAreaElement | null>
+  /** Where the emoji goes: a body, or whichever field the editor last used (title or body). */
+  fieldRef: RefObject<TextField | null>
   className?: string
 }) {
   const t = useTranslations('emoji')

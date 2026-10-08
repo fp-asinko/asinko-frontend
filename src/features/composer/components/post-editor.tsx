@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { searchMentions } from '@/lib/mentions/search-mentions.action'
 import { postPath } from '@/lib/posts/paths'
+import type { TextField } from '@/lib/insert-text'
 import { cn } from '@/lib/utils'
 import { createPost } from '../actions/create-post.action'
 import type { CommunityOption } from '../composer.types'
@@ -156,6 +157,8 @@ export function PostEditor({
   const invalid = (name: (typeof FIELDS)[number]) => Boolean(formState.errors[name])
   const bodyField = register('body')
   const bodyRef = useRef<HTMLTextAreaElement | null>(null)
+  // Where an emoji goes: the last field used, title or body; the body until one is focused.
+  const emojiTarget = useRef<TextField | null>(null)
   // In the box, the editor starts next to the avatar (40px + 12px). Only the community chip stays
   // there; the fields and the footer reach back under it, to the column's edge, as the posts.
   const wide = variant === 'inline' ? '-ml-13' : undefined
@@ -221,6 +224,7 @@ export function PostEditor({
               id={`${ids}-title`}
               placeholder={t('fields.titlePlaceholder')}
               {...register('title')}
+              onFocus={(event) => (emojiTarget.current = event.currentTarget)}
               aria-invalid={invalid('title') || undefined}
               aria-describedby={`${ids}-title-count ${ids}-title-error`}
               data-autofocus={chosen ? true : undefined}
@@ -276,7 +280,9 @@ export function PostEditor({
                 ref={(element) => {
                   bodyField.ref(element)
                   bodyRef.current = element
+                  emojiTarget.current ??= element
                 }}
+                onFocus={(event) => (emojiTarget.current = event.currentTarget)}
                 aria-invalid={invalid('body') || undefined}
                 aria-describedby={`${ids}-body-help ${ids}-body-error`}
                 className={cn(BARE, 'min-h-24 resize-none leading-[1.55]')}
@@ -331,8 +337,8 @@ export function PostEditor({
               </span>
             </TabsTrigger>
           </TabsList>
-          {/* Emojis go into the body, at its caret (specs/emoji-picker EP-01). */}
-          <EmojiButton fieldRef={bodyRef} />
+          {/* Emojis go into the title or the body, the last one used, at its caret (EP-01). */}
+          <EmojiButton fieldRef={emojiTarget} />
           <div className="ml-auto flex items-center gap-1.5">
             {variant === 'inline' && (
               <button

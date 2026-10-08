@@ -28,6 +28,16 @@ describe('insertText (specs/emoji-picker EP-03)', () => {
     expect(ranged.selectionStart).toBe(10)
   })
 
+  it('writes into a title (an input) too', () => {
+    const title = document.createElement('input')
+    title.value = 'BTC to the moon'
+    document.body.append(title)
+    title.setSelectionRange(3, 3)
+    insertText(title, ' 🚀')
+    expect(title.value).toBe('BTC 🚀 to the moon')
+    expect(title.selectionStart).toBe(3 + ' 🚀'.length)
+  })
+
   it('tells the page with an input event, as typing does', () => {
     const element = field('', 0)
     const onInput = vi.fn()

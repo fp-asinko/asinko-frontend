@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
@@ -57,6 +57,17 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
     expect(screen.getByRole('combobox', { name: 'Community' })).toHaveTextContent('#defi')
     expect(screen.getByRole('tab', { name: 'Link' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('textbox', { name: 'Link' })).toBeInTheDocument()
+  })
+
+  it('puts the emoji in the last field used, the title too (specs/emoji-picker EP-01)', async () => {
+    renderEditor()
+    const title = screen.getByRole('textbox', { name: 'Title' })
+    await userEvent.type(title, 'Moon')
+    await userEvent.click(screen.getByRole('button', { name: 'Add emoji' }))
+    const panel = await screen.findByRole('dialog', { name: 'Emojis' })
+    await userEvent.click(within(panel).getByRole('button', { name: /^rocket/ }))
+    expect(title).toHaveValue('Moon🚀')
+    expect(screen.getByRole('textbox', { name: 'Body' })).toHaveValue('')
   })
 
   it('offers emojis for the body (specs/emoji-picker EP-01)', () => {

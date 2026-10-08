@@ -44,6 +44,38 @@ test.describe('Emoji picker', () => {
     await expect(panel(page)).toBeHidden()
   })
 
+  test('goes into the title when that was the last field used (EP-01)', async ({
+    page,
+    isMobile,
+  }) => {
+    const { editor } = await openBody(page, isMobile)
+    const title = editor.getByRole('textbox', { name: 'Title' })
+    await title.fill('To the moon')
+    await editor.getByRole('button', { name: 'Add emoji' }).click()
+    await expect(panel(page).getByRole('searchbox', { name: 'Search emoji' })).toBeFocused()
+    await page.keyboard.type('rocket')
+    await page.keyboard.press('Enter')
+    await expect(title).toHaveValue('To the moon🚀')
+    await expect(title).toBeFocused()
+  })
+
+  test('a category scrolls only the panel, never the page (EP-02)', async ({ page, isMobile }) => {
+    // A short screen, as a laptop with the editor open: the panel fits in what is left.
+    await page.setViewportSize({ width: isMobile ? 360 : 1280, height: 560 })
+    const { editor, body } = await openBody(page, isMobile)
+    await body.click()
+    await editor.getByRole('button', { name: 'Add emoji' }).click()
+    await expect(panel(page).getByRole('searchbox', { name: 'Search emoji' })).toBeFocused()
+    const box = (await panel(page).boundingBox())!
+    expect(box.y + box.height).toBeLessThanOrEqual(560)
+
+    const before = await page.evaluate(() => window.scrollY)
+    await panel(page).getByRole('button', { name: 'Symbols' }).click()
+    await expect(panel(page).getByRole('button', { name: /^red heart/ })).toBeFocused()
+    await expect(panel(page).getByRole('heading', { name: 'Symbols' })).toBeInViewport()
+    expect(await page.evaluate(() => window.scrollY)).toBe(before)
+  })
+
   test('Esc closes only the panel, also inside the full-screen editor (EP-07)', async ({
     page,
     isMobile,
