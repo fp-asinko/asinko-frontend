@@ -461,6 +461,37 @@
   body {
     @apply bg-background type-ui text-foreground antialiased;
   }
+  /* Everything you click shows the hand (the PO, 2026-10-08): Tailwind 4 left buttons with the
+     arrow. In the base layer, so a utility (cursor-wait while pending) still wins. Text fields keep
+     the text cursor; "Coming soon" controls (aria-disabled) keep the hand, they show their notice. */
+  button,
+  summary,
+  select,
+  label[for],
+  input:is(
+    [type='button'],
+    [type='checkbox'],
+    [type='file'],
+    [type='radio'],
+    [type='range'],
+    [type='reset'],
+    [type='submit']
+  ),
+  [role='button'],
+  [role='checkbox'],
+  [role='menuitem'],
+  [role='menuitemcheckbox'],
+  [role='menuitemradio'],
+  [role='option'],
+  [role='radio'],
+  [role='switch'],
+  [role='tab'] {
+    cursor: pointer;
+  }
+  :disabled,
+  [data-disabled] {
+    cursor: not-allowed;
+  }
 }
 
 /* A field with mentions painted in blue (MA-12): the layer over it draws the text, the field keeps

@@ -157,6 +157,7 @@ El diseño y el código arrancan por la pantalla más chica y **se agregan** est
 - **Links con varias partes** (handle, etiqueta, descripción): el nombre accesible sale del contenido, sin `aria-label` que lo tape, y con un espacio (`{' '}`) entre `<span>` para que no se lea todo junto.
 - **Globo "Próximamente"**: `ComingSoon` tiene `placement` (`below`, `below-end`, `above`, `above-end`). Contra el borde derecho se usa `-end`; en la barra inferior, `above`. Si igual lo cortaría una columna con scroll o la pantalla, el globo se corre hacia adentro solo, por ejemplo en los links del pie, donde cada idioma corta las filas en otro lugar.
 - **Nada solo con hover**: toda interacción debe funcionar con tap y teclado.
+- **Cursor de mano** en todo lo que se toca: una regla de `globals.css` (`@layer base`) lo pone en botones, `summary`, `select`, checkboxes y roles de menú, opción, pestaña y switch. Los campos de texto mantienen el cursor de texto; lo deshabilitado (`:disabled`) muestra `not-allowed`; un control "Próximamente" (`aria-disabled`) mantiene la mano porque muestra su aviso. Los ítems de menú de shadcn traían `cursor-default` y se cambiaron (`asinko:`). Lo verifica `e2e/cursor.spec.ts`.
 - **Inputs con `text-base` (16px) o más**: evita el zoom automático de iOS al enfocar.
 - **Imágenes** con `next/image` y `sizes` definido según el layout mobile.
 - **Patrones adaptativos**: por ejemplo, `Dialog` en desktop y `Drawer` en mobile (patrón de shadcn).
