@@ -1,10 +1,11 @@
 import { gzipSync } from 'node:zlib'
 import { expect, test } from '@playwright/test'
 
-// F-41 / seo.md § Performance: first-load JS per route ≤ 235 KB gzip, measured as the sum of every
+// F-41 / seo.md § Performance: first-load JS per route ≤ 240 KB gzip, measured as the sum of every
 // <script src> in the initial HTML, gzipped.
-// 230 until 2026-10-07; raised by the PO with specs/community-pages (seo.md § Performance).
-const BUDGET_KB = 235
+// 230 until 2026-10-07 (raised by the PO with specs/community-pages), 235 until 2026-10-08 (raised
+// by the PO with specs/mention-autocomplete). History in seo.md § Performance.
+const BUDGET_KB = 240
 
 test.describe('JavaScript budget', () => {
   test.skip(({ isMobile }) => isMobile, 'Same bundle on every device')

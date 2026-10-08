@@ -43,23 +43,30 @@ Lo usan dos features que no se importan entre sí (el editor de posts y los come
 
 ## 5. Teclado y accesibilidad
 
-- El `textarea` hace de combobox mientras hay lista: `role="combobox"`, `aria-autocomplete="list"`, `aria-expanded`, `aria-controls` y `aria-activedescendant` hacia la opción marcada. Sin lista, vuelve a ser un campo común.
-- ↑ ↓ mueven la marca, Enter y Tab eligen, Esc cierra la lista. Esc con la lista abierta llama a `preventDefault()`: el editor ya ignora un Esc con `defaultPrevented`, así que no se cierra.
+- Un `textarea` no admite `role="combobox"` ni `aria-expanded` (ARIA in HTML; axe lo marca). Queda como campo de texto con `aria-autocomplete="list"` y, mientras hay lista, `aria-controls` y `aria-activedescendant` hacia la opción marcada. La lista es un `listbox` con sus `option`, y cada opción se lee "$BTC Bitcoin" (un espacio entre las partes).
+- ↑ ↓ mueven la marca, Enter y Tab eligen, Esc cierra la lista. Con la lista abierta esas teclas no siguen (`preventDefault` y `stopPropagation`): ni el formulario ni el Esc del editor o de la respuesta las ven. Las opciones no reciben foco: el teclado vive en el campo, y tocar una opción no le saca el foco.
 - Una región `aria-live` anuncia "N sugerencias" al abrir y la mención elegida.
 
 ## 6. Insertar
 
-- Reemplaza desde el símbolo hasta el cursor por la mención y un espacio, avisa a `react-hook-form` (`setValue('body', …, { shouldDirty: true })`) y deja el cursor después del espacio.
+- Reemplaza desde el símbolo hasta el cursor por la mención y un espacio y deja el cursor después.
+- Escribe el valor como si se tipeara: el setter nativo de `value` y un evento `input`. Así lo ven igual `react-hook-form` (el editor) y un estado propio (los comentarios), sin que la molécula sepa cuál es.
 
 ## 7. Mensajes
 
 `mentions.*` (cliente): etiqueta de la lista, "N sugerencias", sin coincidencias, error y "Mención agregada". Se suma a `CLIENT_NAMESPACES`.
 
-## 8. Propuesta al backend
+## 8. Performance
+
+- Medido al cerrar (2026-10-08): Home y detalle 233,6 KB, páginas de comunidad 235,1 KB (antes: 233,3 y 234,9).
+- El costo en las páginas que no usan menciones viene del manifiesto de chunks diferidos de Turbopack, que carga toda página, y de la referencia a la acción. Diferir también la acción (`import()`) lo empeoró: sumó otra entrada al manifiesto (235,5 KB). Se descartó.
+- Pasaba el tope de 235 por 0,1 KB: el PO lo subió a 240 (`seo.md`).
+
+## 9. Propuesta al backend
 
 - P-001 ampliada en `proposals.md`: que `POST /posts` (y `PATCH`) detecten las menciones del cuerpo y devuelvan `entities` (E3-06). Sin eso, la mención se publica como texto.
 
-## 9. Tests
+## 10. Tests
 
 | Qué                                                                            | Dónde                                    |
 | ------------------------------------------------------------------------------ | ---------------------------------------- |
