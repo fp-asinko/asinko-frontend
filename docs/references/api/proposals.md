@@ -35,6 +35,13 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-013, P-011, P-015, P
 "entities": [{ "type": "TICKER | MENTION | COMMUNITY", "raw": "$BTC", "resolvedId": "…", "position": [5, 9] }]
 ```
 
+**Ampliada el 2026-10-08: el feed de lo que menciona algo.** La página de un activo, de una comunidad o de un perfil muestra hoy solo lo publicado **dentro** de esa comunidad (`GET /feed/explore?community=BTC`). El producto pide que muestre **todo el contenido que lo menciona** (`docs/product/overview.md § Menciones` y `§ Seguir`: seguir `$BTC` suma "todo el contenido que menciona el activo"). Caso real del 2026-10-08: un post de `@qa_uno` en su canal personal que dice `$BTC` no aparece en `/asset/BTC`.
+
+- **Endpoint:** un filtro en el feed, por ejemplo `GET /feed/explore?mentions=BTC` (el `slug` de la comunidad del activo, de la comunidad o el canal de la persona), con el mismo `FeedItem`, cursor y `kind` que hoy. Responde lo publicado en esa comunidad **más** lo que la menciona en cualquier otra, sin repetidos, del más nuevo al más viejo.
+- **Alternativa:** que `?community=` ya sume las menciones, si el backend prefiere no agregar un parámetro (el front no cambia nada).
+- **Depende de** la detección de arriba: sin `entities` guardadas no hay a qué filtrar.
+- **El feed "Siguiendo"** (`GET /feed/following`) también tendría que sumar lo que menciona a los activos y personas que sigue el usuario (`overview.md § Seguir`).
+
 ### P-013: Subida de imágenes de posts
 
 **Estado:** propuesta (2026-10-07). Bloquea los posts de tipo Imagen (`specs/post-create-detail`).
