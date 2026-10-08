@@ -363,5 +363,12 @@
       "general": "Could not publish your post. Try again."
     },
     "cancel": "Cancel"
+  },
+  "mentions": {
+    "label": "Suggestions",
+    "count": "{count, plural, one {# suggestion} other {# suggestions}}",
+    "empty": "No matches",
+    "error": "Could not load the suggestions",
+    "added": "{handle} added"
   }
 }

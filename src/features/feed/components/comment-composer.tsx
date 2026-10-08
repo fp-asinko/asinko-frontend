@@ -10,9 +10,11 @@ import {
   type FormEvent,
   type KeyboardEvent,
 } from 'react'
+import { MentionField } from '@/components/molecules/mention-assist'
 import { useAuthGate } from '@/components/organisms/auth-gate'
 import { cn } from '@/lib/utils'
 import { Textarea } from '@/components/ui/textarea'
+import { searchMentions } from '@/lib/mentions/search-mentions.action'
 import { createComment } from '../actions/create-comment.action'
 import { useThread } from './comment-thread'
 
@@ -88,17 +90,21 @@ export function CommentComposer({
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-2">
-      <Textarea
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-        onKeyDown={onKeyDown}
-        aria-label={t(reply ? 'replyLabel' : 'label')}
-        placeholder={t(reply ? 'replyPlaceholder' : 'placeholder')}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? errorId : undefined}
-        ref={field}
-        className="min-h-20 bg-background"
-      />
+      {/* $ # @ suggest assets, communities and people (specs/mention-autocomplete). */}
+      <div className="relative">
+        <Textarea
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          onKeyDown={onKeyDown}
+          aria-label={t(reply ? 'replyLabel' : 'label')}
+          placeholder={t(reply ? 'replyPlaceholder' : 'placeholder')}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
+          ref={field}
+          className="min-h-20 bg-background"
+        />
+        <MentionField fieldRef={field} search={searchMentions} />
+      </div>
       <span role="status" className="sr-only">
         {announcement}
       </span>

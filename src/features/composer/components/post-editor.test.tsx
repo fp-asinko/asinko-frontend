@@ -7,6 +7,9 @@ import type { CommunityOption } from '../composer.types'
 import { PostEditor } from './post-editor'
 
 const actions = vi.hoisted(() => ({ createPost: vi.fn(), searchCommunities: vi.fn() }))
+// Mentions have their own tests (specs/mention-autocomplete): out of this component's.
+vi.mock('@/lib/mentions/search-mentions.action', () => ({ searchMentions: vi.fn() }))
+vi.mock('@/components/molecules/mention-assist', () => ({ MentionField: () => null }))
 vi.mock('../actions/create-post.action', () => ({ createPost: actions.createPost }))
 vi.mock('../actions/search-communities.action', () => ({
   searchCommunities: actions.searchCommunities,

@@ -3,13 +3,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlignLeftIcon, ImageIcon, LinkIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useId, useState, type RefObject } from 'react'
+import { useEffect, useId, useRef, useState, type RefObject } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
+import { MentionField } from '@/components/molecules/mention-assist'
 import { useAuthGate } from '@/components/organisms/auth-gate'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
+import { searchMentions } from '@/lib/mentions/search-mentions.action'
 import { postPath } from '@/lib/posts/paths'
 import { cn } from '@/lib/utils'
 import { createPost } from '../actions/create-post.action'
@@ -151,6 +153,8 @@ export function PostEditor({
     ]
   }
   const invalid = (name: (typeof FIELDS)[number]) => Boolean(formState.errors[name])
+  const bodyField = register('body')
+  const bodyRef = useRef<HTMLTextAreaElement | null>(null)
   // In the box, the editor starts next to the avatar (40px + 12px). Only the community chip stays
   // there; the fields and the footer reach back under it, to the column's edge, as the posts.
   const wide = variant === 'inline' ? '-ml-13' : undefined
@@ -262,14 +266,22 @@ export function PostEditor({
             <FieldLabel htmlFor={`${ids}-body`} className="sr-only">
               {t('fields.body')}
             </FieldLabel>
-            <Textarea
-              id={`${ids}-body`}
-              placeholder={t('fields.bodyPlaceholder')}
-              {...register('body')}
-              aria-invalid={invalid('body') || undefined}
-              aria-describedby={`${ids}-body-help ${ids}-body-error`}
-              className={cn(BARE, 'min-h-24 resize-none leading-[1.55]')}
-            />
+            {/* $ # @ suggest assets, communities and people (specs/mention-autocomplete). */}
+            <div className="relative">
+              <Textarea
+                id={`${ids}-body`}
+                placeholder={t('fields.bodyPlaceholder')}
+                {...bodyField}
+                ref={(element) => {
+                  bodyField.ref(element)
+                  bodyRef.current = element
+                }}
+                aria-invalid={invalid('body') || undefined}
+                aria-describedby={`${ids}-body-help ${ids}-body-error`}
+                className={cn(BARE, 'min-h-24 resize-none leading-[1.55]')}
+              />
+              <MentionField fieldRef={bodyRef} search={searchMentions} />
+            </div>
             <FieldError
               id={`${ids}-body-error`}
               errors={fieldError('body')}

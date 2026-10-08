@@ -7,6 +7,9 @@ import type { CommentNode } from '../feed.types'
 import { CommentThread } from './comment-thread'
 import { CommentTree } from './comment-tree'
 
+// Mentions have their own tests (specs/mention-autocomplete): out of this component's.
+vi.mock('@/lib/mentions/search-mentions.action', () => ({ searchMentions: vi.fn() }))
+vi.mock('@/components/molecules/mention-assist', () => ({ MentionField: () => null }))
 vi.mock('../actions/create-comment.action', () => ({ createComment: vi.fn() }))
 vi.mock('../actions/vote-comment.action', () => ({ voteComment: vi.fn() }))
 vi.mock('../actions/vote-post.action', () => ({ votePost: vi.fn() }))

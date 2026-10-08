@@ -43,6 +43,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'errors',
       'feed',
       'join',
+      'mentions',
     ])
     expect(Object.keys(picked.feed as object).sort()).toEqual([
       'card',

@@ -19,6 +19,7 @@ export const CLIENT_NAMESPACES = [
   'feed.poll',
   'feed.vote',
   'join',
+  'mentions',
 ] as const
 
 /** The subset of `messages` under CLIENT_NAMESPACES, keeping their nesting. */

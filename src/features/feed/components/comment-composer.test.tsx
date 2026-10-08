@@ -7,6 +7,9 @@ import { CommentComposer } from './comment-composer'
 import { CommentThread, PendingComments } from './comment-thread'
 
 const actions = vi.hoisted(() => ({ createComment: vi.fn() }))
+// Mentions have their own tests (specs/mention-autocomplete): out of this component's.
+vi.mock('@/lib/mentions/search-mentions.action', () => ({ searchMentions: vi.fn() }))
+vi.mock('@/components/molecules/mention-assist', () => ({ MentionField: () => null }))
 vi.mock('../actions/create-comment.action', () => actions)
 
 const POST = '00000000-0000-4000-8000-000000000999'
