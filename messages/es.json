@@ -309,7 +309,47 @@
       "cancelled": "<b>{count}</b> {count, plural, one {cancelada} other {canceladas}}",
       "noResolved": "Todavía sin tesis resueltas"
     },
-    "createPost": "Crear post"
+    "createPost": "Crear post",
+    "tabs": {
+      "label": "Secciones del perfil",
+      "posts": "Posts",
+      "theses": "Tesis"
+    },
+    "theses": {
+      "title": "Tesis",
+      "empty": "{handle} todavía no publicó tesis.",
+      "emptySelf": "Todavía no publicaste tesis.",
+      "error": "No se pudieron cargar las tesis. Probá más tarde.",
+      "state": {
+        "open": "Abierta",
+        "correct": "Acertada",
+        "incorrect": "Errada",
+        "expired": "Vencida",
+        "disputed": "En disputa",
+        "cancelled": "Cancelada"
+      },
+      "target": {
+        "above": "Por encima de {price} antes del {date}",
+        "below": "Por debajo de {price} antes del {date}",
+        "equals": "En {price} el {date}",
+        "none": "Antes del {date}"
+      },
+      "resolved": "Resuelta en {price}",
+      "cancelledReason": "Cancelada: {reason}",
+      "conviction": {
+        "1": "Baja",
+        "2": "Media",
+        "3": "Alta",
+        "4": "Extrema",
+        "label": "Convicción"
+      },
+      "more": {
+        "button": "Cargar más",
+        "loading": "Cargando…",
+        "loaded": "{count, plural, one {Se cargó # tesis más} other {Se cargaron # tesis más}}",
+        "error": "No se pudieron cargar más. Probá de nuevo."
+      }
+    }
   },
   "postDetail": {
     "title": "{count, plural, =0 {Comentarios} one {# comentario} other {# comentarios}}",

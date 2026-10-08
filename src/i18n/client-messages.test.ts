@@ -59,7 +59,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
     ])
     // Only the client part of the namespace: the page texts stay on the server.
     // (profile: the badge of the hover cards, specs/mention-preview).
-    expect(Object.keys(picked.communities as object)).toEqual(['actions', 'profile'])
+    expect(Object.keys(picked.communities as object)).toEqual(['actions', 'profile', 'theses'])
     expect(picked.errors).toEqual({ unexpected: en.errors.unexpected })
     // The order and the search of the comments; the rest of the post's page stays on the server.
     expect(Object.keys(picked.postDetail as object).sort()).toEqual(['search', 'sort'])

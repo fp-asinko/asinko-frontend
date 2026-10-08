@@ -48,3 +48,12 @@ type ThesisItem = {
 
 - Unitarios: mapper y `getUserTheses` (validación antes de la red, `keepValidItems`), esquema de `tab`, `ProfileStats` (dos líneas, sin resueltas), `ThesisCard` (cada estado, convicción, resolución, cancelación), `ProfileTabs`, `loadMoreTheses`, `fixtures.test.ts` con la ruta nueva.
 - E2E (`e2e/profile-track-record.spec.ts`): contadores en el perfil de `federico`, pestaña Tesis con la URL, tarjetas y "Cargar más", estado vacío en otro usuario, atrás vuelve a Posts, 360 px, axe claro y oscuro, presupuesto de JS del perfil.
+
+## 6. Ajustes al implementar (2026-10-08)
+
+- **"Cargar más" propio** (`ThesesLoadMore`): el del feed está atado a su action y a los anuncios, y los features no se importan entre sí. Es la segunda copia (regla de tres): **la próxima lista que lo necesite lo sube a `components/`** como un `LoadMore` genérico, con los arreglos de anuncio de las dos copias.
+- El botón usa solo `communities.theses.more` en el cliente (`CLIENT_NAMESPACES`); la tarjeta se dibuja en el servidor.
+- Vacío y error con el organismo `EmptyState`, como el feed; el esqueleto en su archivo (`theses-list-skeleton.tsx`) con un `role="status"` de carga.
+- **Canceladas** se muestran siempre en la fila del track record, también en 0 (PT-02).
+- **Precios:** sin centavos desde $1.000 ("$150.000"), con centavos abajo ("$2,41").
+- La página importa las pestañas y la lista por su ruta (`seo.md`): los grupos y activos no cargan el botón. Perfil medido: 235,3 KB.

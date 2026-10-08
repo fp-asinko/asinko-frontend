@@ -69,7 +69,7 @@ export function ProfileStats({ profile, className }: { profile: Stats; className
               <XIcon aria-hidden className="inline size-3.5 text-destructive" />{' '}
               {t.rich('incorrect', { count: profile.incorrectCount, b })}
             </>,
-            profile.cancelledCount > 0 && t.rich('cancelled', { count: profile.cancelledCount, b }),
+            t.rich('cancelled', { count: profile.cancelledCount, b }),
           ]}
         />
       ) : (
@@ -86,6 +86,8 @@ function Line({ parts }: { parts: ReactNode[] }) {
       {parts.filter(Boolean).map((part, index) => (
         // Not flex inside: the bold number and its word keep a normal space between them.
         <span key={index}>
+          {/* A text space too: read aloud, the parts do not run together. */}
+          {index > 0 && ' '}
           {index > 0 && (
             <span aria-hidden className="mr-2">
               ·

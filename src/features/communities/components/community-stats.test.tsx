@@ -16,19 +16,20 @@ describe('community stats (specs/community-pages CP-11)', () => {
       <ProfileStats profile={profileDetails({ followerCount: 1, followingCount: 48 })} />,
     )
     const [people, record] = screen.getAllByRole('paragraph')
-    expect(people).toHaveTextContent('48 following·1 follower')
+    // The parts are read apart: a space between them, besides the "·".
+    expect(people).toHaveTextContent('48 following ·1 follower')
     expect(record).toHaveTextContent(
-      /75% accuracy·3 streak·\s*9 correct·\s*3 incorrect·1 cancelled/,
+      /75% accuracy ·3 streak ·\s*9 correct ·\s*3 incorrect ·1 cancelled/,
     )
     expect(screen.getByText('9').tagName).toBe('STRONG')
   })
 
-  it('leaves out an unknown accuracy and no cancelled theses', () => {
+  it('leaves out an unknown accuracy, and keeps the cancelled count even at zero (PT-02)', () => {
     renderWithIntl(
       <ProfileStats profile={profileDetails({ accuracyRate: null, cancelledCount: 0 })} />,
     )
     expect(screen.queryByText(/accuracy/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/cancelled/)).not.toBeInTheDocument()
+    expect(screen.getByText(/cancelled/)).toHaveTextContent('0 cancelled')
   })
 
   it('says there is no resolved thesis yet instead of zeros (PT-03)', () => {

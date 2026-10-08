@@ -259,6 +259,13 @@
   --color-accuracy-mid-foreground: var(--accuracy-mid-foreground);
   --color-accuracy-low: var(--accuracy-low);
   --color-accuracy-low-foreground: var(--accuracy-low-foreground);
+  /* A thesis's state (specs/profile-track-record PT-07): the accuracy tiers' tints, with ✓ / ✗. */
+  --color-thesis-correct: var(--accuracy-high);
+  --color-thesis-correct-foreground: var(--accuracy-high-foreground);
+  --color-thesis-incorrect: var(--accuracy-low);
+  --color-thesis-incorrect-foreground: var(--accuracy-low-foreground);
+  --color-thesis-disputed: var(--accuracy-mid);
+  --color-thesis-disputed-foreground: var(--accuracy-mid-foreground);
   /* Prototype radii: 4 / 8 / 12 / 16 px, plus rounded-full for pills. */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;

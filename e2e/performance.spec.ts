@@ -19,6 +19,7 @@ test.describe('JavaScript budget', () => {
     '/en/hub/defi',
     '/en/asset/BTC',
     '/en/user/federico',
+    '/en/user/maria?tab=theses',
     // specs/post-create-detail PC-19
     '/en/post/00000000-0000-4000-8000-000000004001/whales-accumulated-48-000-btc-in-two-weeks',
   ]) {

@@ -12,6 +12,7 @@ export const CLIENT_NAMESPACES = [
   'composer',
   'communities.actions',
   'communities.profile',
+  'communities.theses.more',
   'devLogin',
   'emoji',
   'errors.unexpected',
