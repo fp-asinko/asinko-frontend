@@ -371,6 +371,34 @@
         "confirm": "Descartar",
         "cancel": "Continuar editando"
       }
+    },
+    "follows": {
+      "close": "Fechar",
+      "tabsLabel": "Seguidores e seguindo",
+      "tabs": {
+        "followers": "Seguidores",
+        "following": "Seguindo"
+      },
+      "listLabel": {
+        "followers": "Seguidores de {handle}",
+        "following": "Quem {handle} segue"
+      },
+      "empty": {
+        "followers": "{handle} ainda não tem seguidores.",
+        "following": "{handle} ainda não segue ninguém."
+      },
+      "emptySelf": {
+        "followers": "Você ainda não tem seguidores.",
+        "following": "Você ainda não segue ninguém."
+      },
+      "loading": "Carregando…",
+      "error": "Não foi possível carregar a lista.",
+      "retry": "Tentar de novo",
+      "loadMore": "Carregar mais",
+      "loadingMore": "Carregando…",
+      "loadError": "Não foi possível carregar mais. Tente de novo.",
+      "accuracy": "{value} de precisão",
+      "loaded": "{count, plural, one {Mais # carregado} other {Mais # carregados}}"
     }
   },
   "postDetail": {

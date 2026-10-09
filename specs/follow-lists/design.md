@@ -37,3 +37,11 @@ type FollowItem = {
 
 - Unitarios: `follow-api` contra el mock (paginación, 404, validación), action, `FollowCounts` (abre con la pestaña), `FollowListDialog` (pestañas con teclado, foco), `FollowList` (estados, cargar más), `FollowRow` (botón según `followed`, sin botón propio).
 - E2E (`e2e/follow-lists.spec.ts`): abrir seguidores de `@maria`, paginar, cambiar a Siguiendo, ir a un perfil desde la lista, seguir desde una fila, 360 px, axe claro y oscuro, presupuesto.
+
+## 5. Ajustes al implementar (2026-10-09)
+
+- **Datos de los mocks:** @maria tiene 22 seguidores de ejemplo (`FAN_NAMES` en `fixtures/users.ts`, con su canal personal, así se pueden seguir) más los habituales: 25 en total, para paginar. Las relaciones viven en `fixtures/follows.ts`.
+- **Cada página una sola vez:** el scroll y un clic podían pedir la misma página a la vez (llegaba duplicada); `FollowList` recuerda los cursores pedidos.
+- **Pestañas:** las de línea de shadcn (`variant="line"`), con `activateOnFocus` (las flechas eligen), y los paneles quedan montados al cambiar (`keepMounted`): no se pierden las páginas ni el scroll.
+- **Foco y avisos:** una región `status` siempre montada anuncia "Cargando…", el error y "N más"; al reintentar el foco va a la lista, al cargar la última página va a la primera fila nueva, y al seguir a alguien va a su link (`focusFallbackId`, como las tarjetas).
+- **Precisión** se lee "74% de precisión", como en la columna izquierda.

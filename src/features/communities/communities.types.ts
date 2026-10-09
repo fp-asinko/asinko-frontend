@@ -87,3 +87,19 @@ export type ThesisItem = {
 }
 
 export type ThesesPage = { items: ThesisItem[]; nextCursor: string | null }
+
+/** Which list of a person (specs/follow-lists). */
+export type FollowKind = 'followers' | 'following'
+
+/** A person in a followers or following list (FL-02, FL-05). */
+export type FollowItem = {
+  username: string
+  /** Their page: /user/maria. */
+  path: string
+  avatarUrl: string | null
+  accuracyRate: number | null
+  /** Whether the viewer follows them; null when unknown (no session, or P-017 not there yet). */
+  followed: boolean | null
+  /** The viewer themself: no button. */
+  isSelf: boolean
+}

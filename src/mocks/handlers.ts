@@ -29,6 +29,7 @@ import { PROFILES, summary } from './fixtures/users'
 import { commentTree, searchComments } from './comment-tree'
 import { withTopPost } from './top-post'
 import { ADS } from './fixtures/ads'
+import { followersOf, followingOf, listItem } from './fixtures/follows'
 import { thesesBy } from './fixtures/theses'
 import { updateUser } from './profile-edit'
 import { paginate } from './paginate'
@@ -99,6 +100,19 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
 
   {
     method: 'GET',
+    path: '/api/v1/users/:userId/followers',
+    kind: 'contract',
+    implemented: true,
+    schema: paginatedSchema(userSummarySchema),
+    example: { ...noRequest, params: { userId: PROFILES[1]!.id } },
+    handler: ({ params, query }) => {
+      if (!PROFILES.some((each) => each.id === params.userId)) return notFound
+      const items = followersOf(params.userId ?? '').map(listItem)
+      return { status: 200, body: paginate(items, query.cursor) }
+    },
+  },
+  {
+    method: 'GET',
     path: '/api/v1/users/:userId/following',
     kind: 'contract',
     implemented: true,
@@ -106,15 +120,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     example: { ...noRequest, params: { userId: DEMO_USER.id } },
     handler: ({ params, query }) => {
       if (!PROFILES.some((each) => each.id === params.userId)) return notFound
-      // Only the demo viewer's follows are modeled (isFollowedByViewer).
-      const followed =
-        params.userId === DEMO_USER.id ? PROFILES.filter((p) => p.isFollowedByViewer) : []
-      const items = followed.map(({ id, username, avatarUrl, accuracyRate }) => ({
-        id,
-        username,
-        avatarUrl,
-        accuracyRate,
-      }))
+      const items = followingOf(params.userId ?? '').map(listItem)
       return { status: 200, body: paginate(items, query.cursor) }
     },
   },

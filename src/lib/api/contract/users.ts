@@ -8,6 +8,8 @@ export const userSummarySchema = z.object({
   username: z.string(),
   avatarUrl: z.string().nullable(),
   accuracyRate: z.number().nullable().optional(),
+  /** P-017 (proposal): in the followers and following lists; null without a session. */
+  isFollowedByViewer: z.boolean().nullable().optional(),
 })
 
 export const userSchema = z.object({

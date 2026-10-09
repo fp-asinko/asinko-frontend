@@ -109,6 +109,16 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P
 
 Las imágenes, en el mismo Storage que los avatares. Medir impresiones y clics queda para después.
 
+### P-017: Si seguís a cada persona de una lista
+
+**Estado:** propuesta (2026-10-09), mockeada. La usan las listas de seguidores y seguidos del perfil (`specs/follow-lists`).
+
+**Endpoints:** `GET /api/v1/users/{userId}/followers` y `GET /api/v1/users/{userId}/following`.
+
+**Motivo:** cada fila de las listas lleva "Seguir" o "Siguiendo", como Instagram y X. Hoy los ítems traen solo `id`, `username`, `avatarUrl` y `accuracyRate`: el front no sabe si el viewer ya sigue a cada persona, y sin ese dato no muestra el botón.
+
+**Cambio:** sumar a cada ítem `"isFollowedByViewer": boolean | null`, igual que en el `Profile`: `null` sin sesión o en la fila del propio viewer. El front ya lo lee como opcional: mientras no llegue, las listas se ven sin botones.
+
 ### P-016: El post principal de cada comunidad
 
 **Estado:** propuesta (2026-10-08), mockeada en el front (`specs/interests-refresh`).

@@ -28,6 +28,32 @@ function profile(n: number, seed: Seed): RawProfile {
   }
 }
 
+/** @maria's quieter followers (specs/follow-lists). */
+export const FAN_NAMES = [
+  'satoshi_nights',
+  'gwei_watcher',
+  'ledger_lucia',
+  'basis_point',
+  'cold_wallet_tom',
+  'halving_hank',
+  'onchain_olga',
+  'yield_yusuf',
+  'mempool_mia',
+  'delta_neutral',
+  'rate_cut_rita',
+  'stack_sats_sam',
+  'curve_carla',
+  'fomc_fran',
+  'perp_pablo',
+  'staking_sofi',
+  'dca_diego',
+  'macro_mateo',
+  'alt_season_ana',
+  'bid_ask_bruno',
+  'liquidity_lu',
+  'whale_alert_wes',
+]
+
 export const PROFILES: RawProfile[] = [
   {
     ...profile(0, {
@@ -144,6 +170,16 @@ export const PROFILES: RawProfile[] = [
     followerCount: 23,
     isPublic: false,
   }),
+  // @maria's quieter followers (specs/follow-lists): enough of them to page the list.
+  ...FAN_NAMES.map((username, index) =>
+    profile(20 + index, {
+      username,
+      bio: null,
+      accuracyRate: index % 3 === 0 ? null : 0.4 + (index % 5) * 0.1,
+      points: 10 + index,
+      badgeStatus: 'NONE',
+    }),
+  ),
 ]
 
 export function userByUsername(username: string) {

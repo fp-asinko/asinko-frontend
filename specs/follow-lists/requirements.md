@@ -1,6 +1,6 @@
 # Listas de seguidores y seguidos — Requirements
 
-> **Estado:** borrador para el PO (2026-10-09). Preguntas abiertas al final.
+> **Estado:** aprobado por el PO el 2026-10-09: Q1, una ventana; Q2, se propone P-017 y se mockea.
 > **Fuente:** pedido del PO (2026-10-09), punto B de las opciones del perfil: "hagamos la lista de seguidores y seguidos". El documento de entregables pide los contadores en el perfil (ya están); las listas son una mejora sobre la misma página.
 > **Backend:** `GET /api/v1/users/{userId}/followers` y `/following` existen en `dev` (E01): públicos, paginados por cursor, con la forma resumida de `User` (`id`, `username`, `avatarUrl`, `accuracyRate`).
 
@@ -30,7 +30,7 @@ Que los números "1.204 seguidores · 180 siguiendo" lleven a quiénes son, como
 - Buscar dentro de la lista, "seguidos en común", sacar a un seguidor.
 - Listas de miembros de un grupo (otra página, otro endpoint).
 
-## Preguntas abiertas
+## Preguntas resueltas (2026-10-09)
 
 - **Q1. ¿Ventana o página?** ¿Una ventana con pestañas, como Instagram (**recomendado**: no saca al usuario del perfil y es más liviano), o páginas propias `/user/maria/followers` y `/following`, como X (se pueden compartir)?
 - **Q2. Botón Seguir en cada fila:** el backend no dice, para cada persona de la lista, si ya la seguís. ¿Lo proponemos (**P-017**: `isFollowedByViewer` en cada ítem, como en el perfil) y lo mockeamos para mostrar los botones (**recomendado**, como Instagram y X)? Alternativa: listas sin botones hasta que el backend lo tenga.

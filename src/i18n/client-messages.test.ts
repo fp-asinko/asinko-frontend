@@ -62,6 +62,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
     expect(Object.keys(picked.communities as object)).toEqual([
       'actions',
       'edit',
+      'follows',
       'profile',
       'theses',
     ])

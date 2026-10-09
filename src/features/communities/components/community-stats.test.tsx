@@ -18,6 +18,12 @@ describe('community stats (specs/community-pages CP-11)', () => {
     const line = screen.getByRole('paragraph')
     expect(line).toHaveTextContent('1 follower 48 following 75% accuracy 3 streak')
     expect(screen.getByText('48').tagName).toBe('STRONG')
+    // Followers and following open their lists (specs/follow-lists FL-01).
+    expect(screen.getByRole('button', { name: '48 following' })).toHaveAttribute(
+      'aria-haspopup',
+      'dialog',
+    )
+    expect(screen.getByRole('button', { name: '1 follower' })).toBeInTheDocument()
   })
 
   it('leaves out an unknown accuracy', () => {

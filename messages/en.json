@@ -371,6 +371,34 @@
         "confirm": "Discard",
         "cancel": "Keep editing"
       }
+    },
+    "follows": {
+      "close": "Close",
+      "tabsLabel": "Followers and following",
+      "tabs": {
+        "followers": "Followers",
+        "following": "Following"
+      },
+      "listLabel": {
+        "followers": "Followers of {handle}",
+        "following": "People {handle} follows"
+      },
+      "empty": {
+        "followers": "{handle} has no followers yet.",
+        "following": "{handle} does not follow anyone yet."
+      },
+      "emptySelf": {
+        "followers": "You have no followers yet.",
+        "following": "You do not follow anyone yet."
+      },
+      "loading": "Loading…",
+      "error": "Could not load the list.",
+      "retry": "Retry",
+      "loadMore": "Load more",
+      "loadingMore": "Loading…",
+      "loadError": "Could not load more. Try again.",
+      "accuracy": "{value} accuracy",
+      "loaded": "{count, plural, one {# more loaded} other {# more loaded}}"
     }
   },
   "postDetail": {

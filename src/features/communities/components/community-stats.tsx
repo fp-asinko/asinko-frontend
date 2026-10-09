@@ -2,6 +2,7 @@ import { CheckIcon, XIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { FollowCounts } from './follow-counts'
 import type { ProfileDetails } from '../communities.types'
 
 // The numbers under a community's or a person's name in its page header
@@ -33,7 +34,13 @@ export function ProfileStats({
 }: {
   profile: Pick<
     ProfileDetails,
-    'followerCount' | 'followingCount' | 'accuracyRate' | 'currentStreak'
+    | 'id'
+    | 'username'
+    | 'isSelf'
+    | 'followerCount'
+    | 'followingCount'
+    | 'accuracyRate'
+    | 'currentStreak'
   >
   className?: string
 }) {
@@ -41,8 +48,6 @@ export function ProfileStats({
   const format = useFormatter()
   const b = (chunks: ReactNode) => <Strong>{chunks}</Strong>
   const parts = [
-    t.rich('followers', { count: profile.followerCount, b }),
-    t.rich('following', { count: profile.followingCount, b }),
     profile.accuracyRate !== null &&
       t.rich('accuracy', {
         value: format.number(profile.accuracyRate, { style: 'percent' }),
@@ -53,12 +58,17 @@ export function ProfileStats({
 
   return (
     <p className={cn('flex flex-wrap gap-x-5 gap-y-1 type-meta text-muted-foreground', className)}>
+      {/* Followers and following open their lists (specs/follow-lists FL-01). */}
+      <FollowCounts
+        userId={profile.id}
+        handle={`@${profile.username}`}
+        isSelf={profile.isSelf}
+        followers={t.rich('followers', { count: profile.followerCount, b })}
+        following={t.rich('following', { count: profile.followingCount, b })}
+      />
       {parts.map((part, index) => (
         // A text space too: read aloud, the parts do not run together.
-        <span key={index}>
-          {index > 0 && ' '}
-          {part}
-        </span>
+        <span key={index}> {part}</span>
       ))}
     </p>
   )
