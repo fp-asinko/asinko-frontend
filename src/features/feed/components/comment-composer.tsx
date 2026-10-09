@@ -18,6 +18,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { searchMentions } from '@/lib/mentions/search-mentions.action'
 import { createComment } from '../actions/create-comment.action'
 import { useThread } from './comment-thread'
+import { COMMENT_BOX } from './comment-box'
 
 // 44px in mobile (the main action, design-system.md § Mobile first), 32px from md.
 const PILL =
@@ -126,6 +127,7 @@ export function CommentComposer({
       {/* $ # @ suggest assets, communities and people (specs/mention-autocomplete). */}
       <div className="relative">
         <Textarea
+          id={reply ? undefined : COMMENT_BOX}
           value={text}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={onKeyDown}
@@ -138,14 +140,17 @@ export function CommentComposer({
           ref={field}
           rows={1}
           className={cn(
-            'bg-background transition-[min-height,border-radius] duration-200 ease-out',
+            // The same padding open and closed: the text and its blue copy (mentions) never move
+            // while the box grows. The pill's radius is half its height (22px), not "full": from
+            // 9999px the corners would bulge all through the animation.
+            'bg-background px-4 py-2.5 transition-[min-height,border-radius] duration-200 ease-out',
             // Focused, as Reddit's: one 1px border, darker, without the 3px halo (the PO: the
             // border and the halo together read as a thick double border).
             'focus-visible:border-foreground/60 focus-visible:ring-0',
             open
               ? 'min-h-20 rounded-2xl'
               : // The pill: one line, 44px (PD-02), the text of the placeholder centered on it.
-                'min-h-11 resize-none rounded-full px-4 py-2.5',
+                'min-h-11 resize-none rounded-[1.375rem]',
           )}
         />
         <MentionField fieldRef={field} search={searchMentions} />
