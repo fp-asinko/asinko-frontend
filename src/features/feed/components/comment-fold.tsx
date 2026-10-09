@@ -2,6 +2,7 @@
 
 import { CircleMinusIcon, CirclePlusIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { flushSync } from 'react-dom'
 import {
   createContext,
   useContext,
@@ -61,20 +62,17 @@ export function CommentFold({
   const [open, setOpen] = useState(true)
   const row = useRef<HTMLDivElement>(null)
   const expand = useRef<HTMLButtonElement>(null)
-  const closed = useRef(false)
   useReveal(
     (id) => Boolean(row.current?.closest('li')?.contains(document.getElementById(id))),
     () => setOpen(true),
   )
 
-  // Closed by the person: the focus goes to ⊕, where the comment can be opened again.
-  useEffect(() => {
-    if (!open && closed.current) expand.current?.focus()
-    closed.current = false
-  }, [open])
+  // Closed by the person: the focus goes to ⊕, where the comment can be opened again. Rendered
+  // at once (flushSync) and focused within the same event: an effect could run after the tap's
+  // last events and leave the focus on nothing.
   function collapse() {
-    closed.current = true
-    setOpen(false)
+    flushSync(() => setOpen(false))
+    expand.current?.focus()
   }
 
   return (
