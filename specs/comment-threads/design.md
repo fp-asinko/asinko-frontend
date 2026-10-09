@@ -59,3 +59,10 @@ Nuestro gris para la línea es `--border` (`#E5E8EB`, casi el mismo); hover `--b
 
 - Unitarios: `CommentFold` (cierra, abre, foco en ⊕, `aria-expanded`, nombres), `ShareButton` (share nativo, copia, "Link copiado", fallo), `CommentAnchor` (abre el hilo plegado).
 - E2E (`e2e/comment-threads.spec.ts`): medidas (avatar 32 desde `sm`, cuerpo 14 px), codo hasta el avatar del hijo, cerrar y abrir con ⊖/⊕ y con la franja, "⊕ N respuestas más", compartir copia el link (permiso de portapapeles en Chromium) y el ancla abre el hilo, 360 px sin scroll, axe claro y oscuro.
+
+## Cambio de alcance (2026-10-09): cerrar cada hilo, con animación (CT-07, CT-16)
+
+- **⊖ en todo comentario:** `.thread-collapse` ya no se oculta en las hojas; la franja y la línea siguen dependiendo de `:has(> .thread-children > li)`.
+- **Animación con Web Animations** en `CommentFold`: se mide el alto del `<li>` antes y después del cambio y se anima `height` con `overflow: clip` (de "auto" a un número no se puede con una transición de CSS en todos los navegadores). Al cerrar, las partes siguen visibles (estado `closing`) mientras el hilo sube, y se ocultan al terminar; el foco va a ⊕ en el mismo evento, como antes. Reabrir a mitad de camino cancela la animación y crece desde el alto actual.
+- Abrir 200 ms, cerrar 150 ms, curva `--ease-out` leída del tema. La regla global de movimiento reducido no alcanza a Web Animations: `canAnimate` mira `prefers-reduced-motion` (y en jsdom no hay `animate`, así que los unitarios ven el cambio instantáneo).
+- `RepliesFold`: la lista crece desde el alto con el botón hasta el alto con las respuestas.

@@ -60,6 +60,29 @@ test.describe('Comment threads', () => {
     await expect(comments(page).getByText('Exactly. And Powell')).toBeVisible()
   })
 
+  test('a reply without replies closes too, and the thread slides (CT-07, CT-16)', async ({
+    page,
+  }) => {
+    await page.goto(FED_PATH)
+    // The deepest reply, behind "2 more replies": no replies of its own.
+    await comments(page).getByRole('button', { name: '2 more replies' }).click()
+    const collapse = comment(page, 'Until the next CPI').getByRole('button', {
+      name: "Collapse @jeppe's comment",
+    })
+    // Clicked and measured in the page, in the same task: the thread is sliding up.
+    const sliding = await collapse.evaluate((button: HTMLElement) => {
+      button.click()
+      return button.closest('li')!.getAnimations().length
+    })
+    expect(sliding).toBe(1)
+    await expect(comments(page).getByText('Until the next CPI')).toBeHidden()
+    await expect(
+      comments(page).getByRole('button', { name: "Expand @jeppe's comment" }),
+    ).toBeFocused()
+    // The comment it answers stays open.
+    await expect(comments(page).getByText(/He always does/)).toBeVisible()
+  })
+
   test("a click on the thread's line closes it too (CT-06)", async ({ page, isMobile }) => {
     test.skip(isMobile, 'The strip is for the mouse; phones use ⊖')
     await page.goto(FED_PATH)

@@ -33,6 +33,34 @@ function useReveal(holds: (id: string) => boolean, open: () => void) {
   }, [])
 }
 
+// Opening is slower than closing (design-system.md § Movimiento): what was asked for shows calmly.
+const OPEN_MS = 200
+const CLOSE_MS = 150
+
+/** Not in jsdom (no Web Animations) nor with reduced motion: then the change is instant. */
+function canAnimate(element: HTMLElement | null | undefined): element is HTMLElement {
+  return (
+    typeof element?.animate === 'function' &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+}
+
+/**
+ * Slides an element's height between two measures, its overflow clipped meanwhile: a thread that
+ * opens or closes (specs/comment-threads CT-16). Web Animations, because the height goes to and
+ * from "auto"; the global reduced-motion rule does not reach them, hence canAnimate.
+ */
+function slide(element: HTMLElement, from: number, to: number, duration: number) {
+  const easing = getComputedStyle(element).getPropertyValue('--ease-out').trim() || 'ease-out'
+  return element.animate(
+    [
+      { height: `${from}px`, overflow: 'clip' },
+      { height: `${to}px`, overflow: 'clip' },
+    ],
+    { duration, easing },
+  )
+}
+
 const ROUND =
   'z-2 size-6 items-center justify-center rounded-full bg-background text-foreground outline-none hover:text-muted-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-4'
 
@@ -60,20 +88,54 @@ export function CommentFold({
 }) {
   const t = useTranslations('comments')
   const [open, setOpen] = useState(true)
+  // Closed, but its parts still shown while the thread slides up over them.
+  const [closing, setClosing] = useState(false)
   const row = useRef<HTMLDivElement>(null)
   const expand = useRef<HTMLButtonElement>(null)
+  const motion = useRef<Animation | null>(null)
+  const item = () => row.current?.closest('li')
+  // A shared comment inside opens it at once: the page scrolls to it, nothing may move meanwhile.
   useReveal(
-    (id) => Boolean(row.current?.closest('li')?.contains(document.getElementById(id))),
-    () => setOpen(true),
+    (id) => Boolean(item()?.contains(document.getElementById(id))),
+    () => {
+      motion.current?.cancel()
+      setOpen(true)
+      setClosing(false)
+    },
   )
 
   // Closed by the person: the focus goes to ⊕, where the comment can be opened again. Rendered
   // at once (flushSync) and focused within the same event: an effect could run after the tap's
-  // last events and leave the focus on nothing.
+  // last events and leave the focus on nothing. Then the thread slides up to its author's row.
   function collapse() {
-    flushSync(() => setOpen(false))
+    const li = item()
+    const from = li?.getBoundingClientRect().height ?? 0
+    const animated = canAnimate(li)
+    motion.current?.cancel()
+    flushSync(() => {
+      setOpen(false)
+      setClosing(animated)
+    })
     expand.current?.focus()
+    if (!animated || !row.current) return
+    const animation = slide(li, from, row.current.getBoundingClientRect().height, CLOSE_MS)
+    animation.onfinish = () => setClosing(false)
+    motion.current = animation
   }
+
+  // Slides down from where it is: from the author's row, or midway if it was still closing.
+  function reopen() {
+    const li = item()
+    const from = li?.getBoundingClientRect().height ?? 0
+    motion.current?.cancel()
+    flushSync(() => {
+      setOpen(true)
+      setClosing(false)
+    })
+    if (!canAnimate(li)) return
+    motion.current = slide(li, from, li.getBoundingClientRect().height, OPEN_MS)
+  }
+  const shown = open || closing
 
   return (
     <FoldContext value={{ collapse, handle }}>
@@ -87,7 +149,7 @@ export function CommentFold({
               type="button"
               aria-expanded={false}
               aria-label={t('expand', { handle })}
-              onClick={() => setOpen(true)}
+              onClick={reopen}
               className={`inline-flex ${ROUND}`}
             >
               <CirclePlusIcon aria-hidden />
@@ -104,12 +166,12 @@ export function CommentFold({
           className="thread-strip absolute top-[calc(var(--av)+0.25rem)] bottom-0 left-0 z-1 w-(--av) cursor-pointer"
         />
       )}
-      <div hidden={!open} className="thread-body relative ml-(--av)">
+      <div hidden={!shown} className="thread-body relative ml-(--av)">
         {body}
       </div>
       {replies && (
         <ul
-          hidden={!open}
+          hidden={!shown}
           className="thread-children mt-1 ml-(--av) flex flex-col gap-1 empty:hidden"
         >
           {replies}
@@ -121,7 +183,8 @@ export function CommentFold({
 
 /**
  * ⊖ on the line, in the actions row (CT-06): centered on the line, over a white circle that
- * covers it. Shown only when the comment has replies (the wiring's CSS).
+ * covers it. Every comment has it, a reply without replies too (CT-07): there it stands alone,
+ * under the avatar's column.
  */
 export function CollapseButton() {
   const t = useTranslations('comments')
@@ -132,7 +195,7 @@ export function CollapseButton() {
       aria-expanded
       aria-label={t('collapse', { handle })}
       onClick={collapse}
-      className={`thread-collapse absolute top-1/2 left-[calc(var(--av)/-2_-_0.75rem)] -translate-y-1/2 ${ROUND}`}
+      className={`thread-collapse absolute top-1/2 left-[calc(var(--av)/-2_-_0.75rem)] inline-flex -translate-y-1/2 ${ROUND}`}
     >
       <CircleMinusIcon aria-hidden />
     </button>
@@ -156,6 +219,7 @@ export function RepliesFold({
 }) {
   const [open, setOpen] = useState(false)
   const opened = useRef(false)
+  const self = useRef<HTMLLIElement>(null)
   useReveal(
     (id) => ids.includes(id),
     () => setOpen(true),
@@ -167,13 +231,17 @@ export function RepliesFold({
 
   if (open) return children
   return (
-    <li className="thread-child thread-elbow flex h-(--av) items-center">
+    <li ref={self} className="thread-child thread-elbow flex h-(--av) items-center">
       <button
         type="button"
         aria-expanded={false}
         onClick={() => {
           opened.current = true
-          setOpen(true)
+          // The list grows from its height with the button to its height with the replies.
+          const list = self.current?.parentElement
+          const from = list?.getBoundingClientRect().height ?? 0
+          flushSync(() => setOpen(true))
+          if (canAnimate(list)) slide(list, from, list.getBoundingClientRect().height, OPEN_MS)
         }}
         className="ml-[calc((var(--av)-1.5rem)/2)] inline-flex h-6 items-center gap-2 rounded-full pr-2 type-meta font-semibold text-foreground outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
       >

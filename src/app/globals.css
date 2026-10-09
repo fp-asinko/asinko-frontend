@@ -547,8 +547,8 @@
    24px, 32px from sm. A comment (.thread-item) with replies draws a 1px line from under its avatar
    (.thread-body::before); each reply (.thread-child) continues it down to the next one, and joins
    it with an elbow (.thread-elbow::after) that curves into its avatar's center. The last reply
-   ends the line. The strip over the line (.thread-strip) and the collapse button show only when
-   there are replies; hovering the strip darkens this thread's lines. */
+   ends the line. The strip over the line (.thread-strip) shows only when there are replies;
+   hovering it darkens this thread's lines. The collapse button (⊖) is on every comment (CT-07). */
 @layer components {
   .thread-item {
     position: relative;
@@ -584,15 +584,11 @@
     border-left: 1px solid var(--border);
     border-bottom: 1px solid var(--border);
   }
-  .thread-strip,
-  .thread-collapse {
+  .thread-strip {
     display: none;
   }
   .thread-item:has(> .thread-children > li) > .thread-strip {
     display: block;
-  }
-  .thread-item:has(> .thread-children > li) > .thread-body .thread-collapse {
-    display: inline-flex;
   }
   .thread-item:has(> .thread-strip:hover) > .thread-body::before,
   .thread-item:has(> .thread-strip:hover) > .thread-children > .thread-child::before {

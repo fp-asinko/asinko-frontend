@@ -92,6 +92,20 @@ describe('CommentTree wired as Reddit (specs/comment-threads)', () => {
   })
 })
 
+describe('CommentTree: every thread closes (specs/comment-threads CT-07)', () => {
+  it('closes a reply without replies, and only that reply', async () => {
+    renderTree([node({ body: 'Top' }, [node({ body: 'Leaf one' }), node({ body: 'Leaf two' })])])
+    // ⊖ on the comment and on each of its two replies.
+    const collapse = screen.getAllByRole('button', { name: "Collapse @maria's comment" })
+    expect(collapse).toHaveLength(3)
+    await userEvent.click(collapse[1]!)
+    expect(screen.getByText('Leaf one')).not.toBeVisible()
+    expect(screen.getByText('Top')).toBeVisible()
+    expect(screen.getByText('Leaf two')).toBeVisible()
+    expect(screen.getByRole('button', { name: "Expand @maria's comment" })).toHaveFocus()
+  })
+})
+
 describe('CommentTree with ads (specs/post-detail-refresh PD-07)', () => {
   const ad = {
     id: 'ad1',
