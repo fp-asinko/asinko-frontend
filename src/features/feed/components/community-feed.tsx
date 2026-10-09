@@ -19,12 +19,15 @@ export async function CommunityFeed({
   handle,
   pagePath,
   searchParams,
+  filters = true,
 }: {
   slug: string
   handle: string
   /** The page itself (/hub/macro): where the filters link to. */
   pagePath: string
   searchParams: Promise<unknown>
+  /** The feed's filters (New · Polls); a profile goes without them, as the prototype's. */
+  filters?: boolean
 }) {
   const { filter } = parseFeedParams(await searchParams)
   const params: FeedParams = { feed: 'for-you', filter, community: slug }
@@ -32,9 +35,13 @@ export async function CommunityFeed({
   return (
     <>
       {/* Air after the header or its details box, as the prototype. */}
-      <div className="px-2 pt-3.5 sm:px-0">
-        <FeedFilters params={params} pagePath={pagePath} />
-      </div>
+      {filters ? (
+        <div className="px-2 pt-3.5 sm:px-0">
+          <FeedFilters params={params} pagePath={pagePath} />
+        </div>
+      ) : (
+        <div className="pt-1.5" />
+      )}
       <Suspense key={filter} fallback={<FeedListSkeleton />}>
         <CommunityFeedList params={params} handle={handle} />
       </Suspense>

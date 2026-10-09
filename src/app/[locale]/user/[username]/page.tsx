@@ -52,6 +52,8 @@ export default async function UserPage({
           handle={page.handle}
           pagePath={path}
           searchParams={searchParams}
+          // The profile's tabs are its only row of pills, as the prototype (2026-10-09).
+          filters={false}
         />
       )}
     </PageColumns>

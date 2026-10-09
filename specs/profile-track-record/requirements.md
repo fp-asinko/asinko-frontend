@@ -21,6 +21,7 @@ Que el perfil cuente el historial de la persona, que es lo que distingue a Asink
 - Los números van **en una sola línea**, como el prototipo: **N seguidores N siguiendo 74% precisión N racha**, separados por espacio y sin "·". El total de tesis del prototipo no existe en el contrato (las abiertas no se cuentan), así que va la precisión.
 - El detalle **✓ N acertadas ✗ N erradas N canceladas** (o "Todavía sin tesis resueltas") pasa **arriba de la pestaña Tesis**.
 - Las pestañas son **píldoras** (la elegida en negro), **Tesis · Posts**, en ese orden. Posts sigue siendo la de por defecto. "All" y "Replies" del prototipo esperan P-012.
+- **Segundo ajuste (2026-10-09):** las píldoras son las del prototipo, chicas y con borde (12 px semibold, fondo blanco; la elegida, negra), y el perfil no muestra los filtros del feed (New · Polls) debajo: una sola fila, como el prototipo.
 
 Los criterios de abajo quedan con este ajuste.
 

@@ -5,7 +5,8 @@ import type { ProfileTab } from '../schemas/profile-tab.schema'
 
 /**
  * Theses · Posts on a person's page, as the prototype's profile (specs/profile-track-record PT-04,
- * changed with the PO on 2026-10-09): pills, the current one in black. Links, not an ARIA tab
+ * changed with the PO on 2026-10-09): small outlined pills, the current one in black, as the
+ * prototype's (12px semibold, 5px × 14px). Links, not an ARIA tab
  * widget: they navigate, can be shared and need no JavaScript. Posts is the page itself and the
  * default; Theses adds ?tab=theses.
  */
@@ -17,7 +18,7 @@ export function ProfileTabs({ pagePath, current }: { pagePath: string; current: 
   ] as const
 
   return (
-    <nav aria-label={t('label')} className="flex gap-1.5 px-4 pt-3.5 md:px-0">
+    <nav aria-label={t('label')} className="flex gap-1.5 px-4 pt-3.5 pb-1 md:px-0">
       {tabs.map(({ tab, href }) => {
         const active = current === tab
         return (
@@ -28,10 +29,11 @@ export function ProfileTabs({ pagePath, current }: { pagePath: string; current: 
             scroll={false}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'inline-flex h-8 tap items-center rounded-full px-3.5 type-action outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+              // 30px tall, 24px+ target (WCAG 2.5.8).
+              'inline-flex h-7.5 tap items-center rounded-full border px-3.5 type-meta font-semibold outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
               active
-                ? 'bg-primary text-primary-foreground'
-                : 'bg-muted text-muted-foreground hover:bg-muted-hover hover:text-foreground',
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border-strong bg-background text-muted-foreground hover:border-foreground/40 hover:text-foreground',
             )}
           >
             {t(tab)}
