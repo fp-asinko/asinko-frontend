@@ -406,8 +406,7 @@
       "label": "Post type",
       "text": "Text",
       "link": "Link",
-      "image": "Image",
-      "soon": "Soon"
+      "image": "Image"
     },
     "fields": {
       "title": "Title",
@@ -436,9 +435,25 @@
       "ownProfileOnly": "You can only post on your own profile",
       "invalidCommunity": "You cannot post in that community",
       "invalid": "Check the fields and try again",
-      "general": "Could not publish your post. Try again."
+      "general": "Could not publish your post. Try again.",
+      "imageType": "Only JPEG, PNG or WebP images",
+      "imageUpload": "Could not upload the image",
+      "imageTooLarge": "The image is too large",
+      "imageUnreadable": "Could not read the image",
+      "imageRequired": "Add an image"
     },
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "image": {
+      "choose": "Choose image",
+      "drop": "or drag it here",
+      "change": "Change",
+      "remove": "Remove image",
+      "uploading": "Uploading…",
+      "retry": "Retry",
+      "alt": "The image of your post",
+      "ready": "Image ready",
+      "changeLabel": "Change image"
+    }
   },
   "mentions": {
     "label": "Suggestions",

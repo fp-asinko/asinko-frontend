@@ -28,9 +28,10 @@ export async function uploadPostImageAction(
   if (!viewer) return { ok: false, error: 'api.errors.UNAUTHENTICATED' }
 
   const file = form.get('file')
-  if (!(file instanceof Blob) || file.size === 0 || file.size > MAX_UPLOAD_BYTES) {
+  if (!(file instanceof Blob) || file.size === 0) {
     return { ok: false, error: 'composer.errors.imageType' }
   }
+  if (file.size > MAX_UPLOAD_BYTES) return { ok: false, error: 'composer.errors.imageTooLarge' }
   const contentType = sniff(new Uint8Array(await file.slice(0, 12).arrayBuffer()))
   if (!contentType) return { ok: false, error: 'composer.errors.imageType' }
 

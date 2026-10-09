@@ -63,16 +63,16 @@ describe('uploadPostImageAction (specs/post-image PI-06, PI-07)', () => {
   })
 
   it('refuses another file whatever type it claims, an empty one or one too large', async () => {
-    for (const data of [
-      form(PNG, 'image/webp'),
-      form([]),
-      form(WEBP, 'image/webp', 4 * 1024 * 1024),
-    ]) {
+    for (const data of [form(PNG, 'image/webp'), form([])]) {
       expect(await uploadPostImageAction(data)).toEqual({
         ok: false,
         error: 'composer.errors.imageType',
       })
     }
+    expect(await uploadPostImageAction(form(WEBP, 'image/webp', 4 * 1024 * 1024))).toEqual({
+      ok: false,
+      error: 'composer.errors.imageTooLarge',
+    })
     expect(await uploadPostImageAction(new FormData())).toMatchObject({ ok: false })
     expect(deps.uploadPostImage).not.toHaveBeenCalled()
   })

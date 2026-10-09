@@ -11,6 +11,11 @@ const actions = vi.hoisted(() => ({ createPost: vi.fn(), searchCommunities: vi.f
 vi.mock('@/lib/mentions/search-mentions.action', () => ({ searchMentions: vi.fn() }))
 vi.mock('@/components/molecules/mention-assist', () => ({ MentionField: () => null }))
 vi.mock('../actions/create-post.action', () => ({ createPost: actions.createPost }))
+// The image's upload has its own tests (specs/post-image): out of here.
+vi.mock('../actions/upload-post-image.action', () => ({
+  uploadPostImageAction: vi.fn(),
+  removePostImageAction: vi.fn(),
+}))
 vi.mock('../actions/search-communities.action', () => ({
   searchCommunities: actions.searchCommunities,
 }))

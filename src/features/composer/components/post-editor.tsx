@@ -17,6 +17,7 @@ import { postPath } from '@/lib/posts/paths'
 import type { TextField } from '@/lib/insert-text'
 import { cn } from '@/lib/utils'
 import { createPost } from '../actions/create-post.action'
+import { removePostImageAction } from '../actions/upload-post-image.action'
 import type { CommunityOption } from '../composer.types'
 import {
   createPostSchema,
@@ -25,6 +26,7 @@ import {
   type CreatePostInput,
 } from '../schemas/create-post.schema'
 import { CommunityPicker } from './community-picker'
+import { ImageField, type TakeImage } from './image-field'
 
 /** A field without its own box: the composer box around them is the box, as X. */
 const BARE =
@@ -49,6 +51,11 @@ const ERROR_NAMES = [
   'ownProfileOnly',
   'invalidCommunity',
   'invalid',
+  'imageRequired',
+  'imageType',
+  'imageUpload',
+  'imageTooLarge',
+  'imageUnreadable',
   'general',
 ] as const
 type ErrorName = (typeof ERROR_NAMES)[number]
@@ -59,12 +66,17 @@ function errorName(key: string | undefined): ErrorName {
   return ERROR_NAMES.find((each) => each === name) ?? 'general'
 }
 
-const FIELDS = ['communityId', 'title', 'body', 'url'] as const
+const FIELDS = ['communityId', 'title', 'body', 'url', 'imageUrl'] as const
+
+/** The first image file of a paste or a drop, if any (PI-02). */
+function imageFile(files: FileList | undefined): File | null {
+  return [...(files ?? [])].find((file) => file.type.startsWith('image/')) ?? null
+}
 
 /**
  * The post editor (specs/post-create-detail § 3), minimal as X: where it goes (a chip), the title
- * and the body without boxes, and a footer with the formats (Text, Link, Image soon) and the
- * actions. The same form in the expanded box (`inline`, with Cancel next to Publish) and in the
+ * and the body without boxes, and a footer with the formats (Text, Link, Image) and the
+ * actions. An image can be pasted or dropped anywhere on it too (specs/post-image PI-02). The same form in the expanded box (`inline`, with Cancel next to Publish) and in the
  * full screen of mobile (`sheet`, whose Cancel is at the top). The schema helps while typing and
  * decides in the Server Action; the server's answer shows next to each field, and the text is
  * never lost.
@@ -94,39 +106,63 @@ export function PostEditor({
   const ids = useId()
   const [chosen, setChosen] = useState<CommunityOption | null>(community)
   const [serverError, setServerError] = useState<ErrorName | null>(null)
+  // The image is uploading: Publish waits (PI-06).
+  const [uploading, setUploading] = useState(false)
+  const takeImage = useRef<TakeImage | null>(null)
+  // Published as what: an image left behind in another format is deleted too (Q1).
+  const published = useRef<string | null>(null)
   const form = useForm<CreatePostForm, unknown, CreatePostInput>({
     resolver: zodResolver(createPostSchema),
-    defaultValues: { communityId: community?.id ?? '', type, title: '', body: '', url: '' },
+    defaultValues: {
+      communityId: community?.id ?? '',
+      type,
+      title: '',
+      body: '',
+      url: '',
+      imageUrl: '',
+    },
     // As X: no errors while writing; Publish says what is missing, then they follow the typing.
     // (On blur, an error appearing above would also move the format row under the pointer.)
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   })
   const { register, control, handleSubmit, setValue, setError, getValues, formState } = form
-  const [title = '', body = '', url = '', current = type] = useWatch({
+  const [title = '', body = '', url = '', current = type, imageUrl = ''] = useWatch({
     control,
-    name: ['title', 'body', 'url', 'type'],
+    name: ['title', 'body', 'url', 'type', 'imageUrl'],
   })
 
   useEffect(() => {
     draftRef.current = () => {
       const values = getValues()
-      return Boolean(values.title.trim() || values.body.trim() || values.url?.trim())
+      return Boolean(
+        values.title.trim() || values.body.trim() || values.url?.trim() || values.imageUrl,
+      )
     }
     return () => {
       draftRef.current = null
+      // Closed without publishing: its uploaded image would be left in the bucket (Q1).
+      const left = getValues('imageUrl')
+      if (published.current !== 'IMAGE' && left?.startsWith('https://')) {
+        void removePostImageAction({ imageUrl: left })
+      }
     }
   }, [draftRef, getValues])
   // Publish waits until nothing is missing, and while sending (PC-10, no double posts).
   const complete = Boolean(
-    chosen && title.trim() && body.trim() && (current !== 'LINK' || url.trim()),
+    chosen &&
+    title.trim() &&
+    body.trim() &&
+    (current !== 'LINK' || url.trim()) &&
+    (current !== 'IMAGE' || imageUrl),
   )
-  const blocked = !complete || formState.isSubmitting
+  const blocked = !complete || uploading || formState.isSubmitting
 
   async function publish(values: CreatePostInput) {
     setServerError(null)
     const result = await createPost(values)
     if (result.ok) {
+      published.current = values.type
       onPublished(postPath(result.data.id, result.data.title))
       return
     }
@@ -170,15 +206,33 @@ export function PostEditor({
         // aria-disabled, not disabled: the focused button keeps the focus (WCAG 2.4.3). Pressed
         // with something missing, the schema fails and every field says what it needs (WCAG
         // 3.3.1); from then on the errors follow the typing. Never twice while sending.
-        if (formState.isSubmitting) return event.preventDefault()
+        if (formState.isSubmitting || uploading) return event.preventDefault()
         void handleSubmit(publish)(event)
+      }}
+      // A pasted or dropped image goes to the Image format (PI-02); text pastes as always.
+      onPaste={(event) => {
+        const file = imageFile(event.clipboardData?.files)
+        if (!file) return
+        event.preventDefault()
+        setValue('type', 'IMAGE')
+        takeImage.current?.(file)
+      }}
+      onDragOver={(event) => {
+        if ([...event.dataTransfer.types].includes('Files')) event.preventDefault()
+      }}
+      onDrop={(event) => {
+        const file = imageFile(event.dataTransfer.files)
+        if (!file) return
+        event.preventDefault()
+        setValue('type', 'IMAGE')
+        takeImage.current?.(file)
       }}
       className={cn('flex flex-col', variant === 'sheet' && 'min-h-full px-4')}
     >
       <Tabs
         value={current}
         onValueChange={(next) => {
-          if (next === 'TEXT' || next === 'LINK') setValue('type', next)
+          if (next === 'TEXT' || next === 'LINK' || next === 'IMAGE') setValue('type', next)
         }}
         className="flex flex-1 flex-col gap-0"
       >
@@ -267,6 +321,30 @@ export function PostEditor({
             </Field>
           </TabsContent>
 
+          {/* Always mounted: a paste or a drop hands it the file while it opens, and what was
+              uploaded stays across formats. */}
+          <TabsContent value="IMAGE" keepMounted className={wide}>
+            <Field data-invalid={invalid('imageUrl') || undefined} className="gap-1">
+              {/* No label: the button is named by what it says, "Choose image" (WCAG 2.5.3). */}
+              <ImageField
+                id={`${ids}-image`}
+                takeRef={takeImage}
+                onChange={(next) =>
+                  setValue('imageUrl', next, { shouldValidate: formState.isSubmitted })
+                }
+                onBusy={setUploading}
+                onUnauthenticated={() => openGate('post')}
+                invalid={invalid('imageUrl')}
+                describedBy={`${ids}-image-error`}
+              />
+              <FieldError
+                id={`${ids}-image-error`}
+                errors={fieldError('imageUrl')}
+                className="type-meta"
+              />
+            </Field>
+          </TabsContent>
+
           <Field data-invalid={invalid('body') || undefined} className={cn('gap-1', wide)}>
             <FieldLabel htmlFor={`${ids}-body`} className="sr-only">
               {t('fields.body')}
@@ -323,18 +401,18 @@ export function PostEditor({
           <TabsList aria-label={t('type.label')} className="h-auto gap-0.5 bg-transparent p-0">
             <TabsTrigger value="TEXT" className={FORMAT}>
               <AlignLeftIcon aria-hidden />
-              {t('type.text')}
+              {/* Icons only at 360px: the three names and Publish do not fit (PI-12). */}
+              <span className="sr-only sm:not-sr-only">{t('type.text')}</span>
             </TabsTrigger>
             <TabsTrigger value="LINK" className={FORMAT}>
               <LinkIcon aria-hidden />
-              {t('type.link')}
+              {/* Icons only at 360px: the three names and Publish do not fit (PI-12). */}
+              <span className="sr-only sm:not-sr-only">{t('type.link')}</span>
             </TabsTrigger>
-            {/* Image waits for uploads (P-013): visible, not selectable. */}
-            <TabsTrigger value="IMAGE" disabled className={FORMAT}>
+            <TabsTrigger value="IMAGE" className={FORMAT}>
               <ImageIcon aria-hidden />
-              <span className="sr-only">
-                {t('type.image')} {t('type.soon')}
-              </span>
+              {/* Icons only at 360px: the three names and Publish do not fit (PI-12). */}
+              <span className="sr-only sm:not-sr-only">{t('type.image')}</span>
             </TabsTrigger>
           </TabsList>
           {/* Emojis go into the title or the body, the last one used, at its caret (EP-01). */}

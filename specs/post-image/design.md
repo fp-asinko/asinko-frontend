@@ -46,3 +46,14 @@ Elegir / pegar / arrastrar
 
 - Unitarios: `prepareImage` (achica, WebP, rechaza tipos), `uploadPostImage` (sin sesión, firma inválida, tamaño, éxito con `fetch` falso), `post-images.ts` (URL y headers, mock), `ImageField` (elegir, subir, error y reintentar, quitar), `PostEditor` (pegar y soltar pasan a Imagen; Publicar espera), esquema.
 - E2E (`e2e/post-image.spec.ts`, con mocks): elegir un PNG de los fixtures, ver la vista previa, publicar y ver la imagen en el detalle; tipo rechazado; quitar; pegar en desktop; 360 px y axe.
+
+## 6. Ajustes al implementar (2026-10-09)
+
+- **El servidor sube con el token del usuario** desde una Server Action (`uploadPostImageAction`), que lee el tipo de los primeros bytes (WebP o JPEG; no cree el que dice el navegador) y corta en 4 MB con su propio error ("La imagen es demasiado grande").
+- **Sin WebP en el navegador** (Safari viejo), `prepareImage` entrega JPEG, que el bucket también acepta.
+- **Estados de `ImageField`:** `idle | preparing | uploading | ready | error`. Publicar espera desde que se toma el archivo. Cada archivo es un intento: si llega otro a mitad de subida, el anterior se borra al terminar; si el editor se cierra mientras sube, la subida se borra sola.
+- **Foco (WCAG 2.4.3):** al quedar lista va a "Cambiar imagen"; si falla, a Reintentar; al quitarla, a "Elegir imagen". "Imagen lista" se anuncia.
+- **Nombres:** la zona se nombra por lo que dice ("Elegir imagen o arrástrala aquí", WCAG 2.5.3), sin etiqueta oculta; "Cambiar" se lee "Cambiar imagen".
+- **Pie del editor a 360 px:** los formatos quedan solo con ícono hasta `sm` (el nombre sigue para lectores); con los tres nombres y Publicar no entraban en español.
+- **Pegar y soltar** llegan al campo por una función (`takeRef`), con el panel de Imagen siempre montado (`keepMounted`).
+- **Publicado en otro formato** con una imagen subida: la imagen se borra igual (Q1).

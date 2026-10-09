@@ -406,8 +406,7 @@
       "label": "Tipo de post",
       "text": "Texto",
       "link": "Link",
-      "image": "Imagem",
-      "soon": "Em breve"
+      "image": "Imagem"
     },
     "fields": {
       "title": "Título",
@@ -436,9 +435,25 @@
       "ownProfileOnly": "Você só pode publicar no seu próprio perfil",
       "invalidCommunity": "Você não pode publicar nessa comunidade",
       "invalid": "Revise os campos e tente de novo",
-      "general": "Não foi possível publicar seu post. Tente de novo."
+      "general": "Não foi possível publicar seu post. Tente de novo.",
+      "imageType": "Apenas imagens JPEG, PNG ou WebP",
+      "imageUpload": "Não foi possível enviar a imagem",
+      "imageTooLarge": "A imagem é grande demais",
+      "imageUnreadable": "Não foi possível ler a imagem",
+      "imageRequired": "Adicione uma imagem"
     },
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "image": {
+      "choose": "Escolher imagem",
+      "drop": "ou arraste-a aqui",
+      "change": "Trocar",
+      "remove": "Remover imagem",
+      "uploading": "Enviando…",
+      "retry": "Tentar de novo",
+      "alt": "A imagem do seu post",
+      "ready": "Imagem pronta",
+      "changeLabel": "Trocar imagem"
+    }
   },
   "mentions": {
     "label": "Sugestões",

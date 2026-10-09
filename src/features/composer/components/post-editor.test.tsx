@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
@@ -6,11 +6,26 @@ import { renderWithIntl } from '@/test/render-with-intl'
 import type { CommunityOption } from '../composer.types'
 import { PostEditor } from './post-editor'
 
-const actions = vi.hoisted(() => ({ createPost: vi.fn(), searchCommunities: vi.fn() }))
+const actions = vi.hoisted(() => ({
+  createPost: vi.fn(),
+  searchCommunities: vi.fn(),
+  uploadPostImageAction: vi.fn(),
+  removePostImageAction: vi.fn(),
+  prepareImage: vi.fn(),
+}))
 // Mentions have their own tests (specs/mention-autocomplete): out of this component's.
 vi.mock('@/lib/mentions/search-mentions.action', () => ({ searchMentions: vi.fn() }))
 vi.mock('@/components/molecules/mention-assist', () => ({ MentionField: () => null }))
 vi.mock('../actions/create-post.action', () => ({ createPost: actions.createPost }))
+vi.mock('../actions/upload-post-image.action', () => ({
+  uploadPostImageAction: actions.uploadPostImageAction,
+  removePostImageAction: actions.removePostImageAction,
+}))
+// Preparing the image has its own tests (prepare-image): here it answers a ready WebP.
+vi.mock('@/lib/prepare-image', async (original) => ({
+  ...(await original<typeof import('@/lib/prepare-image')>()),
+  prepareImage: actions.prepareImage,
+}))
 vi.mock('../actions/search-communities.action', () => ({
   searchCommunities: actions.searchCommunities,
 }))
@@ -30,7 +45,7 @@ function renderEditor({
   const onPublished = vi.fn()
   const onCancel = vi.fn()
   const draftRef: { current: (() => boolean) | null } = { current: null }
-  renderWithIntl(
+  const { unmount } = renderWithIntl(
     <AuthGateProvider signedIn={signedIn}>
       <PostEditor
         variant="inline"
@@ -42,7 +57,7 @@ function renderEditor({
       />
     </AuthGateProvider>,
   )
-  return { onPublished, draftRef, onCancel }
+  return { onPublished, draftRef, onCancel, unmount }
 }
 
 const title = () => screen.getByRole('textbox', { name: 'Title' })
@@ -78,10 +93,10 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
     )
   })
 
-  it('shows Text and Link, and Image as not yet available', async () => {
+  it('shows Text, Link and Image (specs/post-image PI-01), keeping the text between them', async () => {
     renderEditor()
     expect(screen.queryByRole('textbox', { name: 'Link' })).not.toBeInTheDocument()
-    expect(screen.getByRole('tab', { name: /Image/ })).toHaveAttribute('aria-disabled', 'true')
+    expect(screen.getByRole('tab', { name: 'Image' })).not.toHaveAttribute('aria-disabled', 'true')
     await userEvent.type(title(), 'Kept between tabs')
     await userEvent.click(screen.getByRole('tab', { name: 'Link' }))
     expect(screen.getByRole('textbox', { name: 'Link' })).toBeInTheDocument()
@@ -194,5 +209,118 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
     await userEvent.type(body(), 'A body')
     await userEvent.click(publish())
     expect(await screen.findByRole('dialog', { name: 'Join Asinko to post' })).toBeInTheDocument()
+  })
+})
+
+describe('PostEditor with an image (specs/post-image)', () => {
+  const IMAGE = 'https://project.supabase.co/storage/v1/object/public/post-images/u/a.webp'
+  const fileInput = () => document.querySelector<HTMLInputElement>('input[type="file"]')!
+  const preview = () => screen.findByRole('img', { name: 'The image of your post' })
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    URL.createObjectURL = vi.fn(() => 'blob:preview')
+    URL.revokeObjectURL = vi.fn()
+    actions.prepareImage.mockResolvedValue({
+      ok: true,
+      blob: new Blob(['webp'], { type: 'image/webp' }),
+      width: 800,
+      height: 600,
+    })
+    actions.uploadPostImageAction.mockResolvedValue({ ok: true, data: { imageUrl: IMAGE } })
+    actions.createPost.mockResolvedValue({ ok: true, data: { id: 'img', title: 'Chart' } })
+  })
+
+  const png = () => new File(['png'], 'chart.png', { type: 'image/png' })
+
+  it('uploads the chosen image, waits for it, and publishes it as an Image post (PI-06, PI-10)', async () => {
+    let finish!: (value: unknown) => void
+    actions.uploadPostImageAction.mockReturnValue(new Promise((resolve) => (finish = resolve)))
+    const { onPublished } = renderEditor()
+    await userEvent.click(screen.getByRole('tab', { name: 'Image' }))
+    await userEvent.type(title(), 'Chart')
+    await userEvent.type(body(), 'Look at this.')
+    await userEvent.upload(fileInput(), png())
+
+    expect(await screen.findByRole('status', { name: '' })).toBeInTheDocument()
+    expect(screen.getAllByRole('status').some((each) => each.textContent === 'Uploading…')).toBe(
+      true,
+    )
+    expect(publish()).toHaveAttribute('aria-disabled', 'true')
+    finish({ ok: true, data: { imageUrl: IMAGE } })
+    expect(await preview()).toBeInTheDocument()
+    expect(publish()).not.toHaveAttribute('aria-disabled')
+
+    await userEvent.click(publish())
+    expect(actions.createPost).toHaveBeenCalledWith({
+      communityId: DEFI.id,
+      type: 'IMAGE',
+      title: 'Chart',
+      body: 'Look at this.',
+      imageUrl: IMAGE,
+    })
+    expect(onPublished).toHaveBeenCalledWith('/post/img/chart')
+    expect(actions.removePostImageAction).not.toHaveBeenCalled()
+  })
+
+  it('takes a pasted image into the Image format (PI-02)', async () => {
+    renderEditor()
+    await userEvent.click(title())
+    await userEvent.paste({ files: [png()] } as unknown as DataTransfer)
+    expect(screen.getByRole('tab', { name: 'Image' })).toHaveAttribute('aria-selected', 'true')
+    expect(await preview()).toBeInTheDocument()
+    expect(actions.uploadPostImageAction).toHaveBeenCalledOnce()
+  })
+
+  it('takes an image dropped on the editor into the Image format (PI-02)', async () => {
+    renderEditor()
+    const data = { files: [png()], types: ['Files'] }
+    fireEvent.dragOver(title(), { dataTransfer: data })
+    fireEvent.drop(title(), { dataTransfer: data })
+    expect(screen.getByRole('tab', { name: 'Image' })).toHaveAttribute('aria-selected', 'true')
+    expect(await preview()).toBeInTheDocument()
+  })
+
+  it('says why an image is refused (PI-03)', async () => {
+    actions.prepareImage.mockResolvedValue({ ok: false, error: 'type' })
+    renderEditor()
+    await userEvent.click(screen.getByRole('tab', { name: 'Image' }))
+    await userEvent.upload(fileInput(), new File(['gif'], 'a.gif', { type: 'image/gif' }), {
+      applyAccept: false,
+    })
+    expect(await screen.findByRole('alert')).toHaveTextContent('Only JPEG, PNG or WebP images')
+    expect(actions.uploadPostImageAction).not.toHaveBeenCalled()
+  })
+
+  it('offers to retry a failed upload', async () => {
+    actions.uploadPostImageAction.mockResolvedValueOnce({
+      ok: false,
+      error: 'composer.errors.imageUpload',
+    })
+    renderEditor()
+    await userEvent.click(screen.getByRole('tab', { name: 'Image' }))
+    await userEvent.upload(fileInput(), png())
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not upload the image')
+    await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    expect(await preview()).toBeInTheDocument()
+  })
+
+  it('removes the image, deleting it from the bucket, and focuses where to choose another (Q1)', async () => {
+    renderEditor()
+    await userEvent.click(screen.getByRole('tab', { name: 'Image' }))
+    await userEvent.upload(fileInput(), png())
+    await userEvent.click(await screen.findByRole('button', { name: 'Remove image' }))
+    expect(actions.removePostImageAction).toHaveBeenCalledWith({ imageUrl: IMAGE })
+    expect(screen.getByRole('button', { name: /Choose image/ })).toHaveFocus()
+  })
+
+  it('counts an image as something written, and deletes it if the editor closes unpublished', async () => {
+    const view = renderEditor()
+    await userEvent.click(screen.getByRole('tab', { name: 'Image' }))
+    await userEvent.upload(fileInput(), png())
+    await preview()
+    expect(view.draftRef.current?.()).toBe(true)
+    view.unmount()
+    expect(actions.removePostImageAction).toHaveBeenCalledWith({ imageUrl: IMAGE })
   })
 })
