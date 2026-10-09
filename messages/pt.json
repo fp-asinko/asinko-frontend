@@ -349,6 +349,28 @@
         "loaded": "{count, plural, one {Mais # tese carregada} other {Mais # teses carregadas}}",
         "error": "Não foi possível carregar mais. Tente de novo."
       }
+    },
+    "edit": {
+      "button": "Editar perfil",
+      "title": "Editar perfil",
+      "bio": "Bio",
+      "bioPlaceholder": "Conte o que você analisa",
+      "counter": "{count}/{max}",
+      "save": "Salvar",
+      "saving": "Salvando…",
+      "cancel": "Cancelar",
+      "saved": "Perfil salvo.",
+      "errors": {
+        "bioTooLong": "Até 160 caracteres",
+        "general": "Não foi possível salvar. Tente de novo.",
+        "invalid": "Revise os campos"
+      },
+      "discard": {
+        "title": "Descartar as alterações?",
+        "body": "O que você mudou será perdido.",
+        "confirm": "Descartar",
+        "cancel": "Continuar editando"
+      }
     }
   },
   "postDetail": {

@@ -93,9 +93,15 @@ describe('Profile header (specs/community-pages CP-11, CP-12)', () => {
     expect(screen.getByRole('button', { name: 'Follow @federico' })).toBeInTheDocument()
   })
 
-  it('has no follow actions on your own profile', () => {
+  it('has no follow actions on your own profile, but Edit profile (specs/profile-edit PE-01)', () => {
     renderHeader(profile({ isSelf: true }))
     expect(screen.queryByRole('button', { name: /Follow/ })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Edit profile' })).toBeInTheDocument()
+  })
+
+  it("has no Edit profile on someone else's profile", () => {
+    renderHeader(profile())
+    expect(screen.queryByRole('button', { name: 'Edit profile' })).toBeNull()
   })
 
   it("titles the rules with the person's name", () => {

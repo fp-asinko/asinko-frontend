@@ -23,3 +23,11 @@
 
 - Unitarios: esquema, action (sin sesión, `userId` de la sesión, `BIO_TOO_LONG`, éxito), `profile-api` contra el mock, `EditProfileButton` (solo en el propio perfil), `EditProfileDialog` (contador, límite, guardar, cancelar con cambios, error del servidor).
 - E2E (`e2e/profile-edit.spec.ts`, con mocks): abrir en `/user/demo`, escribir, guardar y ver la bio en el encabezado sin recargar; no aparece en `/user/maria`; 161 caracteres; 360 px; axe claro y oscuro; presupuesto de JS del perfil.
+
+## 5. Ajustes al implementar (2026-10-09)
+
+- **Refresco:** en lugar de `revalidatePath` en la action, el botón hace `router.refresh()` al guardar: refresca solo la página que se ve, sin invalidar otras rutas.
+- **Confirmación de descarte propia:** el `DiscardDialog` del editor de posts vive en otro feature (los features no se importan entre sí). Es la segunda vez que hace falta: la tercera lo sube a `components/molecules/` con los textos por props.
+- **Foco:** al cerrar vuelve a "Editar perfil" (`finalFocus`), también en Safari, donde un clic no enfoca el botón.
+- **Borde del campo:** uno solo y fino, también cuando la bio es inválida (sin el halo de 3 px, pedido del PO); el error se ve en el borde rojo, el contador en negrita roja y el texto.
+- **Guardar** mide 44 px en el teléfono y 36 desde `md`, como Publicar.

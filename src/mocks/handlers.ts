@@ -13,6 +13,7 @@ import {
   profileSchema,
   searchResultSchema,
   thesisSchema,
+  userSchema,
   userSummarySchema,
   voteResultSchema,
   type RawFeedItem,
@@ -29,6 +30,7 @@ import { commentTree, searchComments } from './comment-tree'
 import { withTopPost } from './top-post'
 import { ADS } from './fixtures/ads'
 import { thesesBy } from './fixtures/theses'
+import { updateUser } from './profile-edit'
 import { paginate } from './paginate'
 import type { MockContext, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
@@ -115,6 +117,17 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       }))
       return { status: 200, body: paginate(items, query.cursor) }
     },
+  },
+
+  // E01: editing your own profile (specs/profile-edit), for the demo viewer.
+  {
+    method: 'PATCH',
+    path: '/api/v1/users/:userId',
+    kind: 'contract',
+    implemented: true,
+    schema: userSchema,
+    example: { ...noRequest, params: { userId: DEMO_USER.id }, body: { bio: 'Macro and rates.' } },
+    handler: ({ params, body }) => updateUser(params.userId ?? '', body),
   },
 
   // E12: a person's theses, the newest first (specs/profile-track-record). No liveExample: the

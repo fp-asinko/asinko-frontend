@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import { PROFILES } from '@/mocks/fixtures/users'
-import { getProfileDetails, toProfileDetails } from './profile-api'
+import { DEMO_USER } from '@/mocks/demo-user'
+import { getProfileDetails, toProfileDetails, updateProfileAs } from './profile-api'
 
 const state = vi.hoisted(() => ({ viewer: null as { id: string; username: string } | null }))
 vi.mock('@/lib/session', () => ({ getViewer: async () => state.viewer }))
@@ -59,5 +60,30 @@ describe('profile details (specs/community-pages § 12)', () => {
     expect(await getProfileDetails('federico')).toMatchObject({ ok: true, data: { isSelf: true } })
     expect(await getProfileDetails('nobody')).toMatchObject({ ok: false, code: 'NOT_FOUND' })
     expect(await getProfileDetails('../x')).toMatchObject({ ok: false, code: 'INVALID' })
+  })
+})
+
+describe('updateProfileAs (specs/profile-edit PE-03, PE-09)', () => {
+  it("saves the viewer's bio and answers it, null once removed", async () => {
+    expect(await updateProfileAs(DEMO_USER.id, { bio: 'Macro and rates.' })).toEqual({
+      ok: true,
+      data: { bio: 'Macro and rates.' },
+    })
+    expect(await getProfileDetails('demo')).toMatchObject({ data: { bio: 'Macro and rates.' } })
+    expect(await updateProfileAs(DEMO_USER.id, { bio: '' })).toEqual({
+      ok: true,
+      data: { bio: null },
+    })
+  })
+
+  it("refuses someone else's profile and a bio too long, as the backend", async () => {
+    expect(await updateProfileAs(federico.id, { bio: 'Hi' })).toMatchObject({
+      ok: false,
+      code: 'USER_MISMATCH',
+    })
+    expect(await updateProfileAs(DEMO_USER.id, { bio: 'x'.repeat(161) })).toMatchObject({
+      ok: false,
+      code: 'BIO_TOO_LONG',
+    })
   })
 })

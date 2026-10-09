@@ -349,6 +349,28 @@
         "loaded": "{count, plural, one {# more thesis loaded} other {# more theses loaded}}",
         "error": "Could not load more. Try again."
       }
+    },
+    "edit": {
+      "button": "Edit profile",
+      "title": "Edit profile",
+      "bio": "Bio",
+      "bioPlaceholder": "Tell people what you analyze",
+      "counter": "{count}/{max}",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "saved": "Profile saved.",
+      "errors": {
+        "bioTooLong": "Up to 160 characters",
+        "general": "Could not save. Try again.",
+        "invalid": "Check the fields"
+      },
+      "discard": {
+        "title": "Discard changes?",
+        "body": "What you changed will be lost.",
+        "confirm": "Discard",
+        "cancel": "Keep editing"
+      }
     }
   },
   "postDetail": {

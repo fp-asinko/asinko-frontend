@@ -1,6 +1,6 @@
 # Editar perfil — Requirements
 
-> **Estado:** borrador para el PO (2026-10-09). Preguntas abiertas al final.
+> **Estado:** aprobado por el PO el 2026-10-09: Q1, una ventana; Q2, "Preguntale a @…" queda como está hoy.
 > **Fuente:** pedido del PO (2026-10-09) al ver su perfil sin nombre ni descripción: "¿no hay nombre y descripción para poner?". Elegido entre las opciones del perfil (punto A).
 > **Alcance:** no está en el documento de entregables (ni adentro ni afuera): es una mejora chica sobre la página de perfil, que sí está. El backend ya la tiene: `PATCH /api/v1/users/{userId}` (E01), solo el propio usuario.
 
@@ -31,7 +31,7 @@ Que cada persona escriba su bio desde su perfil, como en X, sin depender del see
 - **Foto de perfil y banner:** esperan un bucket de avatares (y el de imágenes, P-013, todavía no existe en `dev`).
 - Cambiar el `@usuario`, perfil privado, idioma o país: tienen reglas propias en el backend (reserva de 1 año, etc.) y no se pidieron.
 
-## Preguntas abiertas
+## Preguntas resueltas (2026-10-09)
 
 - **Q1. ¿Ventana o en el lugar?** ¿Una ventana "Editar perfil" como X (**recomendado**: deja lugar para sumar el nombre y la foto después) o editar la bio ahí mismo, debajo del nombre?
 - **Q2. "Preguntale a @maria":** hoy es un botón que no hace nada. ¿Lo dejamos como "Próximamente" (**recomendado**, como el resto de lo que no existe) o lo sacamos hasta que exista?

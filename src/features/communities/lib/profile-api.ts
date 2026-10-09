@@ -1,6 +1,6 @@
 import 'server-only'
 import { apiRequest, invalidInput, type ApiResult } from '@/lib/api'
-import { profileSchema, type RawProfile } from '@/lib/api/contract'
+import { profileSchema, userSchema, type RawProfile } from '@/lib/api/contract'
 import { communitySlugSchema } from '@/lib/communities/community-slug.schema'
 import { allowedImageUrl } from '@/lib/images'
 import { getViewer } from '@/lib/session'
@@ -52,4 +52,22 @@ export async function getProfileDetails(username: string): Promise<ApiResult<Pro
   return result.ok
     ? { ok: true, data: toProfileDetails(result.data, viewer?.username ?? null) }
     : result
+}
+
+/**
+ * Edits the viewer's own profile (E01, specs/profile-edit). The userId always comes from the
+ * server session (api-integration.md). Answers the bio as saved, or null when it was removed.
+ */
+export async function updateProfileAs(
+  userId: string,
+  input: { bio: string },
+): Promise<ApiResult<{ bio: string | null }>> {
+  const result = await apiRequest({
+    method: 'PATCH',
+    path: '/api/v1/users/:userId',
+    params: { userId },
+    body: { bio: input.bio },
+    schema: userSchema,
+  })
+  return result.ok ? { ok: true, data: { bio: result.data.bio?.trim() || null } } : result
 }

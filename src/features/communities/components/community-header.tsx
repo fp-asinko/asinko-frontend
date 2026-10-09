@@ -10,6 +10,7 @@ import type { CommunityPage, ProfileDetails } from '../communities.types'
 import { CommunityActions } from './community-actions'
 import { MemberCount, ProfileStats } from './community-stats'
 import { ProfileMarks } from './profile-marks'
+import { EditProfileButton } from './edit-profile-button'
 
 /**
  * The top of a community page, as the prototype (specs/community-pages § 1, measured on its
@@ -71,6 +72,8 @@ export function CommunityHeader({
               {t('createPost')}
             </ComposeTrigger>
           )}
+          {/* Your own profile: edit it where others follow (specs/profile-edit PE-01). */}
+          {profile?.isSelf && <EditProfileButton bio={profile.bio} />}
           {!profile?.isSelf && (
             <CommunityActions
               slug={page.slug}
@@ -82,7 +85,12 @@ export function CommunityHeader({
           )}
         </div>
       </div>
-      {description && <p className="mt-2 type-ui text-muted-foreground">{description}</p>}
+      {description && (
+        // The user's own text: long words wrap at 360px and its line breaks stay (PE-07).
+        <p className="mt-2 type-ui wrap-anywhere whitespace-pre-line text-muted-foreground">
+          {description}
+        </p>
+      )}
       {profile ? (
         <ProfileStats profile={profile} className="mt-3" />
       ) : (

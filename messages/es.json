@@ -349,6 +349,28 @@
         "loaded": "{count, plural, one {Se cargó # tesis más} other {Se cargaron # tesis más}}",
         "error": "No se pudieron cargar más. Probá de nuevo."
       }
+    },
+    "edit": {
+      "button": "Editar perfil",
+      "title": "Editar perfil",
+      "bio": "Bio",
+      "bioPlaceholder": "Cuenta qué analizas",
+      "counter": "{count}/{max}",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "cancel": "Cancelar",
+      "saved": "Perfil guardado.",
+      "errors": {
+        "bioTooLong": "Hasta 160 caracteres",
+        "general": "No se pudo guardar. Inténtalo de nuevo.",
+        "invalid": "Revisa los campos"
+      },
+      "discard": {
+        "title": "¿Descartar los cambios?",
+        "body": "Se perderá lo que cambiaste.",
+        "confirm": "Descartar",
+        "cancel": "Seguir editando"
+      }
     }
   },
   "postDetail": {
