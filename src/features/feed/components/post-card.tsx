@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import type { PostItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
+import { CardLink } from './card-link'
 import { FadeImage } from '@/components/ui/fade-image'
 import { CommentsToggle } from './comments-toggle'
 import { PostMarkdown } from './post-markdown'
@@ -58,10 +59,27 @@ export function PostCard({
     </>
   )
 
+  // A card opens its post anywhere on it, with a background on hover, as Reddit's (CardLink); the
+  // post's own page is a plain article.
+  const Card = detail ? 'article' : CardLink
+  const cardProps = detail
+    ? {}
+    : {
+        href: post.path,
+        // A rounded box, as Reddit's: the text 12px inside it and 4px clear of the lines between
+        // cards (from md). Inside the column, not past it: the list clips what overflows.
+        className:
+          'transition-colors duration-150 ease-out hover:bg-surface sm:rounded-2xl md:my-1 md:px-3',
+      }
+
   return (
     // wrap-anywhere: a long word or URL from a user wraps instead of being cut off at 360px.
-    <article
-      className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
+    <Card
+      {...(cardProps as { href: string })}
+      className={cn(
+        'px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5',
+        'className' in cardProps && cardProps.className,
+      )}
       aria-labelledby={`post-${post.id}`}
     >
       {/* The post's own page breathes more than a card, as Reddit's (specs/post-detail-refresh
@@ -188,6 +206,6 @@ export function PostCard({
           </span>
         </div>
       )}
-    </article>
+    </Card>
   )
 }

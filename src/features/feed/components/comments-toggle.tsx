@@ -97,7 +97,11 @@ export function CommentsToggle({
           )}
         >
           <div className="min-h-0 overflow-hidden">
-            <div className="flex flex-col gap-3.5 rounded-lg border bg-surface px-3.5 py-3">
+            {/* Its own reading area: a click in it does not open the post (CardLink). */}
+            <div
+              data-card-own-click
+              className="flex cursor-auto flex-col gap-3.5 rounded-lg border bg-surface px-3.5 py-3"
+            >
               {pending ? (
                 // Two comments tall, like a typical preview: the box barely moves when they arrive.
                 // Decorative: the status above announces the loading.
