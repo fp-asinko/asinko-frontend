@@ -50,7 +50,7 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P
 
 **Preguntas al backend:**
 
-- **¿Está creado el bucket `post-images` en el Supabase de `dev`** (público, 5 MB, JPEG/PNG/WebP, con las dos políticas)? Sin él, la subida contra el backend real falla.
+- **Falta crear el bucket `post-images` en el Supabase de `dev`** (verificado el 2026-10-09: Storage responde `404 Bucket not found`). Público, 5 MB, JPEG/PNG/WebP y las dos políticas de `INFRA-PENDIENTES.md § Storage`. Sin él, publicar con imagen contra el backend real falla en la subida; con `API_MOCKS=true` funciona.
 - **Texto alternativo (para una próxima versión):** un campo `imageAlt` (string, ≤ 1000, opcional) en `POST /posts` y en el `Post`, para que la persona describa la imagen a quien usa lector de pantalla, como X. Hoy el front usa "Imagen del post".
 - El front borra la imagen si la persona la quita o descarta el post (política "borrar lo propio"); las que queden huérfanas por otros motivos (cerrar la pestaña) quedarían para una limpieza del backend.
 
