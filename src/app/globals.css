@@ -427,6 +427,12 @@
   font-size: 0.8125rem;
   line-height: 1.5;
 }
+/* The smallest text: the right column's small lists, as the prototype's (11px; it uses 9-10px,
+   raised to stay readable). Not for anything one has to read to act. */
+@utility type-caption {
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
 /* A comment's body, as Reddit's: 14px on a 20px line (specs/comment-threads CT-02). */
 @utility type-comment {
   font-size: 0.875rem;

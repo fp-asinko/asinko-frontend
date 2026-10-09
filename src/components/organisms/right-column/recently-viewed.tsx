@@ -66,9 +66,9 @@ export function RecentlyViewed() {
             <li key={item.id} className="border-b">
               <Link
                 href={item.href}
-                className="block rounded-md px-1 py-2.5 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
+                className="block rounded-md px-1 py-2 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
               >
-                <span className="mb-1 flex items-center gap-2 type-meta">
+                <span className="mb-1 flex items-center gap-1.5 type-caption">
                   <span className="truncate font-bold text-muted-foreground">{item.label}</span>
                   <span className="sr-only">:</span>{' '}
                   <span className="ml-auto shrink-0 text-muted-foreground">
@@ -76,21 +76,22 @@ export function RecentlyViewed() {
                   </span>
                 </span>
                 {/* A space between the parts: read as one sentence, not glued together. */}{' '}
-                <span className="line-clamp-2 type-small font-semibold wrap-anywhere">
+                {/* As the prototype's (measured): 12px semibold over 11px details. */}
+                <span className="line-clamp-2 type-meta font-semibold wrap-anywhere">
                   {item.title}
                 </span>{' '}
-                <span className="mt-1.5 flex items-center gap-3 type-meta text-muted-foreground">
+                <span className="mt-1 flex items-center gap-3 type-caption text-muted-foreground">
                   <span className="inline-flex items-center gap-1">
-                    <ArrowBigUpIcon aria-hidden className="size-3.5" />
+                    <ArrowBigUpIcon aria-hidden className="size-3" />
                     <span aria-hidden>{compact(item.score)}</span>
                     <span className="sr-only">{t('votes', { count: item.score })}</span>
                   </span>{' '}
                   <span className="inline-flex items-center gap-1">
-                    <MessageSquareIcon aria-hidden className="size-3.5" />
+                    <MessageSquareIcon aria-hidden className="size-3" />
                     <span aria-hidden>{compact(item.comments)}</span>
                     <span className="sr-only">{t('comments', { count: item.comments })}</span>
                   </span>{' '}
-                  <span className="ml-auto rounded-full bg-muted px-2 font-semibold uppercase">
+                  <span className="ml-auto rounded-full bg-muted px-1.5 font-bold tracking-wide uppercase">
                     {t(`kinds.${item.kind}`)}
                   </span>
                 </span>
