@@ -25,6 +25,9 @@ const nextConfig: NextConfig = {
     // Going back to a feed tab seen in the last 30 s is instant, from the router cache
     // (specs/feed-navigation FN-04). Accepted: a vote cast meanwhile shows on that tab after 30 s.
     staleTimes: { dynamic: 30 },
+    // A post image arrives already shrunk to WebP (at most 4 MB, src/lib/prepare-image.ts), under
+    // Vercel's 4.5 MB request limit (specs/post-image § 1). The default is 1 MB.
+    serverActions: { bodySizeLimit: '4.5mb' },
   },
   poweredByHeader: false,
   // The same allowlist the feed mappers use: an image from any other host is dropped before render.

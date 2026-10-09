@@ -55,7 +55,35 @@ describe('createPostSchema (specs/post-create-detail PC-08, PC-09)', () => {
     expect(errors({ ...valid, body: '' })).toEqual({ body: 'composer.errors.bodyRequired' })
   })
 
-  it('accepts only Text and Link (Image waits for uploads)', () => {
-    expect(createPostSchema.safeParse({ ...valid, type: 'IMAGE' }).success).toBe(false)
+  it('takes an Image post with its uploaded image, and leaves the url out (specs/post-image)', () => {
+    const image = 'https://project.supabase.co/storage/v1/object/public/post-images/u/a.webp'
+    expect(
+      createPostSchema.parse({ ...valid, type: 'IMAGE', url: 'https://x.com', imageUrl: image }),
+    ).toEqual({
+      communityId: COMMUNITY,
+      type: 'IMAGE',
+      title: 'A title',
+      body: 'A body',
+      imageUrl: image,
+    })
+    expect(
+      createPostSchema.safeParse({ ...valid, type: 'IMAGE', imageUrl: '/mocks/chart-btc.svg' })
+        .success,
+    ).toBe(true)
+  })
+
+  it('asks for the image of an Image post, and only an https one', () => {
+    expect(errors({ ...valid, type: 'IMAGE' })).toEqual({
+      imageUrl: 'composer.errors.imageRequired',
+    })
+    expect(errors({ ...valid, type: 'IMAGE', imageUrl: 'javascript:alert(1)' })).toEqual({
+      imageUrl: 'composer.errors.imageRequired',
+    })
+  })
+
+  it('leaves an image out of a Text post', () => {
+    expect(
+      createPostSchema.parse({ ...valid, imageUrl: 'https://x.com/a.webp' }),
+    ).not.toHaveProperty('imageUrl')
   })
 })

@@ -6,6 +6,7 @@ import { mockId } from './fixtures/ids'
 import { postById } from './fixtures/posts'
 import { summary } from './fixtures/users'
 import type { MockResponse } from './types'
+import { MOCK_POST_IMAGE } from './post-image'
 
 // Creating posts and comments, and voting comments (E03, E05), for the demo viewer
 // (specs/post-create-detail § 6). Validates as the backend does. Created posts and comments live
@@ -39,6 +40,10 @@ export function createPost(body: unknown): MockResponse {
   if (!title.trim() || title.length > TITLE_MAX) return error(422, 'VALIDATION_ERROR')
   if (typeof input.body !== 'string' || !input.body.trim()) return error(422, 'VALIDATION_ERROR')
   if (input.url !== undefined && type !== 'LINK') return error(422, 'VALIDATION_ERROR')
+  // As the backend: an image only with IMAGE, and only one of its bucket (here, the fixture the
+  // mocked upload answers, specs/post-image).
+  if (input.imageUrl !== undefined && type !== 'IMAGE') return error(422, 'VALIDATION_ERROR')
+  if (type === 'IMAGE' && input.imageUrl !== MOCK_POST_IMAGE) return error(422, 'VALIDATION_ERROR')
 
   created += 1
   const now = new Date().toISOString()
@@ -50,7 +55,7 @@ export function createPost(body: unknown): MockResponse {
     title,
     body: input.body,
     url: type === 'LINK' && typeof input.url === 'string' ? input.url : null,
-    imageUrl: null,
+    imageUrl: type === 'IMAGE' ? MOCK_POST_IMAGE : null,
     tag: null,
     creator: summary(DEMO_USER.username),
     creatorType: 'USER',
