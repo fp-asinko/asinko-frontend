@@ -4,19 +4,20 @@ import { cn } from '@/lib/utils'
 import type { ProfileTab } from '../schemas/profile-tab.schema'
 
 /**
- * Posts · Theses on a person's page, as X's profile tabs (specs/profile-track-record PT-04),
- * underlined like the feed's. Links, not an ARIA tab widget: they navigate, can be shared and need
- * no JavaScript. Posts is the page itself; Theses adds ?tab=theses.
+ * Theses · Posts on a person's page, as the prototype's profile (specs/profile-track-record PT-04,
+ * changed with the PO on 2026-10-09): pills, the current one in black. Links, not an ARIA tab
+ * widget: they navigate, can be shared and need no JavaScript. Posts is the page itself and the
+ * default; Theses adds ?tab=theses.
  */
 export function ProfileTabs({ pagePath, current }: { pagePath: string; current: ProfileTab }) {
   const t = useTranslations('communities.tabs')
   const tabs = [
-    { tab: 'posts', href: pagePath },
     { tab: 'theses', href: `${pagePath}?tab=theses` },
+    { tab: 'posts', href: pagePath },
   ] as const
 
   return (
-    <nav aria-label={t('label')} className="mt-3.5 flex border-b">
+    <nav aria-label={t('label')} className="flex gap-1.5 px-4 pt-3.5 md:px-0">
       {tabs.map(({ tab, href }) => {
         const active = current === tab
         return (
@@ -27,10 +28,10 @@ export function ProfileTabs({ pagePath, current }: { pagePath: string; current: 
             scroll={false}
             aria-current={active ? 'page' : undefined}
             className={cn(
-              'relative flex h-11 flex-1 items-center justify-center px-4 type-ui font-semibold transition-colors duration-150 ease-out outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:flex-none',
+              'inline-flex h-8 tap items-center rounded-full px-3.5 type-action outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
               active
-                ? "text-foreground after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:animate-underline-in after:bg-foreground after:content-['']"
-                : 'text-muted-foreground hover:text-foreground',
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground hover:bg-muted-hover hover:text-foreground',
             )}
           >
             {t(tab)}

@@ -64,8 +64,7 @@ describe('Profile header (specs/community-pages CP-11, CP-12)', () => {
 
   it('shows followers, accuracy and streak, each number with its word', () => {
     renderHeader(profile())
-    // Two lines since specs/profile-track-record: who follows, then the track record.
-    const stats = screen.getByText('3,200').closest('div')!
+    const stats = screen.getByText('3,200').closest('p')!
     expect(stats).toHaveTextContent('3,200 followers')
     expect(stats).toHaveTextContent('68% accuracy')
     expect(stats).toHaveTextContent('2 streak')

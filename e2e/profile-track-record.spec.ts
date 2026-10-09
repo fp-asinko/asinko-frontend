@@ -8,19 +8,25 @@ const tabs = (page: Page) => page.getByRole('navigation', { name: 'Profile secti
 const theses = (page: Page) => page.getByRole('region', { name: 'Theses' })
 
 test.describe('Profile track record', () => {
-  test('shows who they follow and their track record (PT-01, PT-02)', async ({ page }) => {
+  test('shows the numbers in one line, and the track record over the theses (PT-01, PT-02)', async ({
+    page,
+  }) => {
     await page.goto('/en/user/maria')
     const header = page.getByRole('main')
-    await expect(header.getByText(/180\s*following/)).toBeVisible()
     await expect(header.getByText(/12,400\s*followers/)).toBeVisible()
-    await expect(header.getByText(/115\s*correct/)).toBeVisible()
-    await expect(header.getByText(/41\s*incorrect/)).toBeVisible()
+    await expect(header.getByText(/180\s*following/)).toBeVisible()
+    await expect(header.getByText(/74%\s*accuracy/)).toBeVisible()
+    // The detail lives in the Theses tab (changed with the PO on 2026-10-09).
+    await expect(header.getByText(/115\s*correct/)).toHaveCount(0)
+    await page.goto('/en/user/maria?tab=theses')
+    await expect(theses(page).getByText(/115\s*correct/)).toBeVisible()
+    await expect(theses(page).getByText(/41\s*incorrect/)).toBeVisible()
   })
 
   test('says there is no resolved thesis yet instead of zeros (PT-03)', async ({ page }) => {
     // The demo viewer's own profile: no thesis at all.
-    await page.goto('/en/user/demo')
-    await expect(page.getByRole('main').getByText('No resolved theses yet')).toBeVisible()
+    await page.goto('/en/user/demo?tab=theses')
+    await expect(theses(page).getByText('No resolved theses yet')).toBeVisible()
   })
 
   test('switches to Theses in the URL, pages them, and back returns to Posts (PT-04, PT-05)', async ({

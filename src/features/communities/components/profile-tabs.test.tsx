@@ -6,7 +6,7 @@ import { ProfileTabs } from './profile-tabs'
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 describe('ProfileTabs (specs/profile-track-record PT-04, PT-10)', () => {
-  it('links Posts to the page and Theses to ?tab=theses, marking the current one', () => {
+  it('links Theses to ?tab=theses and Posts to the page, in that order, marking the current one', () => {
     renderWithIntl(<ProfileTabs pagePath="/user/maria" current="theses" />)
     const nav = screen.getByRole('navigation', { name: 'Profile sections' })
     expect(nav).toBeInTheDocument()
@@ -15,5 +15,6 @@ describe('ProfileTabs (specs/profile-track-record PT-04, PT-10)', () => {
     expect(theses).toHaveAttribute('href', '/user/maria?tab=theses')
     expect(theses).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: 'Posts' })).not.toHaveAttribute('aria-current')
+    expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual(['Theses', 'Posts'])
   })
 })

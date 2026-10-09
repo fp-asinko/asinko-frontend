@@ -39,7 +39,12 @@ export default async function UserPage({
       <ProfileTabs pagePath={path} current={tab} />
       {tab === 'theses' ? (
         <Suspense fallback={<ThesesListSkeleton />}>
-          <ThesesList userId={profile.id} handle={page.handle} isSelf={profile.isSelf} />
+          <ThesesList
+            userId={profile.id}
+            handle={page.handle}
+            isSelf={profile.isSelf}
+            record={profile}
+          />
         </Suspense>
       ) : (
         <CommunityFeed

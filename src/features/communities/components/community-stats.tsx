@@ -21,81 +21,77 @@ function Strong({ children }: { children: ReactNode }) {
   return <strong className="font-semibold text-foreground">{children}</strong>
 }
 
-type Stats = Pick<
-  ProfileDetails,
-  | 'followerCount'
-  | 'followingCount'
-  | 'accuracyRate'
-  | 'currentStreak'
-  | 'correctCount'
-  | 'incorrectCount'
-  | 'cancelledCount'
->
-
 /**
- * A person's numbers, as X's profile (specs/profile-track-record PT-01 to PT-03): who they follow
- * and who follows them, then their track record: accuracy, streak (correct theses in a row, not
- * days), and the theses resolved right (✓), wrong (✗) and cancelled. The marks say it, not only
- * the color. Without a resolved thesis, it says so instead of a row of zeros.
+ * A person's numbers in one line, as the prototype's profile (specs/profile-track-record PT-01,
+ * changed with the PO on 2026-10-09): followers, following, accuracy and streak (correct theses in
+ * a row, not days), apart without separators. The detail of the theses lives in their tab
+ * (TrackRecord).
  */
-export function ProfileStats({ profile, className }: { profile: Stats; className?: string }) {
+export function ProfileStats({
+  profile,
+  className,
+}: {
+  profile: Pick<
+    ProfileDetails,
+    'followerCount' | 'followingCount' | 'accuracyRate' | 'currentStreak'
+  >
+  className?: string
+}) {
   const t = useTranslations('communities.profile')
   const format = useFormatter()
   const b = (chunks: ReactNode) => <Strong>{chunks}</Strong>
-  const resolved = profile.correctCount + profile.incorrectCount > 0
+  const parts = [
+    t.rich('followers', { count: profile.followerCount, b }),
+    t.rich('following', { count: profile.followingCount, b }),
+    profile.accuracyRate !== null &&
+      t.rich('accuracy', {
+        value: format.number(profile.accuracyRate, { style: 'percent' }),
+        b,
+      }),
+    t.rich('streak', { count: profile.currentStreak, b }),
+  ].filter(Boolean)
 
   return (
-    <div className={cn('flex flex-col gap-1 type-meta text-muted-foreground', className)}>
-      <Line
-        parts={[
-          t.rich('following', { count: profile.followingCount, b }),
-          t.rich('followers', { count: profile.followerCount, b }),
-        ]}
-      />
-      {resolved ? (
-        <Line
-          parts={[
-            profile.accuracyRate !== null &&
-              t.rich('accuracy', {
-                value: format.number(profile.accuracyRate, { style: 'percent' }),
-                b,
-              }),
-            t.rich('streak', { count: profile.currentStreak, b }),
-            <>
-              <CheckIcon aria-hidden className="inline size-3.5 text-success" />{' '}
-              {t.rich('correct', { count: profile.correctCount, b })}
-            </>,
-            <>
-              <XIcon aria-hidden className="inline size-3.5 text-destructive" />{' '}
-              {t.rich('incorrect', { count: profile.incorrectCount, b })}
-            </>,
-            t.rich('cancelled', { count: profile.cancelledCount, b }),
-          ]}
-        />
-      ) : (
-        <p>{t('noResolved')}</p>
-      )}
-    </div>
-  )
-}
-
-/** Parts separated by "·", wrapping between them at 360px. */
-function Line({ parts }: { parts: ReactNode[] }) {
-  return (
-    <p className="flex flex-wrap gap-x-2">
-      {parts.filter(Boolean).map((part, index) => (
-        // Not flex inside: the bold number and its word keep a normal space between them.
+    <p className={cn('flex flex-wrap gap-x-5 gap-y-1 type-meta text-muted-foreground', className)}>
+      {parts.map((part, index) => (
+        // A text space too: read aloud, the parts do not run together.
         <span key={index}>
-          {/* A text space too: read aloud, the parts do not run together. */}
           {index > 0 && ' '}
-          {index > 0 && (
-            <span aria-hidden className="mr-2">
-              ·
-            </span>
-          )}
           {part}
         </span>
       ))}
+    </p>
+  )
+}
+
+/**
+ * The track record over a person's theses (PT-02, PT-03): resolved right (✓), wrong (✗) and
+ * cancelled; the marks say it, not only the color. Without a resolved thesis, it says so instead
+ * of a row of zeros.
+ */
+export function TrackRecord({
+  profile,
+  className,
+}: {
+  profile: Pick<ProfileDetails, 'correctCount' | 'incorrectCount' | 'cancelledCount'>
+  className?: string
+}) {
+  const t = useTranslations('communities.profile')
+  const b = (chunks: ReactNode) => <Strong>{chunks}</Strong>
+  if (profile.correctCount + profile.incorrectCount === 0) {
+    return <p className={cn('type-meta text-muted-foreground', className)}>{t('noResolved')}</p>
+  }
+  return (
+    <p className={cn('flex flex-wrap gap-x-4 gap-y-1 type-meta text-muted-foreground', className)}>
+      <span className="inline-flex items-center gap-1">
+        <CheckIcon aria-hidden className="size-3.5 text-success" />
+        <span>{t.rich('correct', { count: profile.correctCount, b })}</span>
+      </span>{' '}
+      <span className="inline-flex items-center gap-1">
+        <XIcon aria-hidden className="size-3.5 text-destructive" />
+        <span>{t.rich('incorrect', { count: profile.incorrectCount, b })}</span>
+      </span>{' '}
+      <span>{t.rich('cancelled', { count: profile.cancelledCount, b })}</span>
     </p>
   )
 }
