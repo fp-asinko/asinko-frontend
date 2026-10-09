@@ -13,7 +13,10 @@ function renderHeader(signedIn = true) {
   return renderWithIntl(
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
       <AuthGateProvider signedIn={signedIn}>
-        <SiteHeader menu={<button type="button">menu</button>} />
+        <SiteHeader
+          menu={<button type="button">menu</button>}
+          profileHref={signedIn ? '/user/maria' : null}
+        />
       </AuthGateProvider>
     </ThemeProvider>,
   )
@@ -27,15 +30,20 @@ describe('SiteHeader (H-05)', () => {
     expect(logo.closest('a')).toHaveAttribute('href', '/')
   })
 
-  it('shows search, notifications and profile as unavailable, without tokens (H-26, HR-02)', () => {
+  it('shows search and notifications as unavailable, without tokens (H-26, HR-02)', () => {
     renderHeader()
     expect(screen.queryByRole('button', { name: 'Tokens' })).toBeNull()
-    for (const name of ['Search', 'Notifications', 'Profile']) {
+    for (const name of ['Search', 'Notifications']) {
       for (const button of screen.getAllByRole('button', { name })) {
         expect(button).toHaveAttribute('aria-disabled', 'true')
       }
     }
     expect(screen.getByText('Search tickers, theses, creators…')).toBeInTheDocument()
+  })
+
+  it('takes you to your own profile (HR-02, since specs/profile-track-record)', () => {
+    renderHeader()
+    expect(screen.getByRole('link', { name: 'Profile' })).toHaveAttribute('href', '/user/maria')
   })
 
   it('groups language and dark mode in "⋯", and keeps the menu slot (HR-03)', () => {

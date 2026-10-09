@@ -1,6 +1,7 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { ComposeContext } from '@/components/organisms/compose'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { BottomNav } from './bottom-nav'
@@ -23,9 +24,24 @@ describe('BottomNav', () => {
 
   it('shows the future destinations as unavailable (H-26)', () => {
     renderWithIntl(<BottomNav items={ITEMS} />)
-    for (const name of ['Search', 'Notif', 'Profile']) {
+    for (const name of ['Search', 'Notif']) {
       expect(screen.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
     }
+  })
+
+  it('links Profile to your own page (specs/header-refresh HR-02)', () => {
+    renderWithIntl(<BottomNav items={ITEMS} profileHref="/user/maria" />)
+    expect(screen.getByRole('link', { name: 'Profile' })).toHaveAttribute('href', '/user/maria')
+  })
+
+  it('asks to log in from Profile without a session (HR-02)', async () => {
+    renderWithIntl(
+      <AuthGateProvider signedIn={false}>
+        <BottomNav items={ITEMS} />
+      </AuthGateProvider>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Profile' }))
+    expect(await screen.findByRole('dialog', { name: 'Log in to Asinko' })).toBeVisible()
   })
 
   it('opens the post editor from Create, between Search and Notif (specs/post-create-detail PC-02)', async () => {

@@ -162,7 +162,7 @@ test.describe('Home feed', () => {
     const top = page.getByRole('banner')
     await inside(top.getByRole('button', { name: 'Search' }), top)
     const bar = page.getByRole('navigation', { name: 'Main navigation' })
-    await inside(bar.getByRole('button', { name: 'Profile' }), bar)
+    await inside(bar.getByRole('button', { name: 'Notif' }), bar)
   })
 
   test('a focused control is not hidden under the bottom bar (WCAG 2.4.11)', async ({ page }) => {

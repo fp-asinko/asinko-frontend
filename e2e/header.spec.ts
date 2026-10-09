@@ -51,6 +51,14 @@ test.describe('Top bar', () => {
     await expect(banner.getByRole('button', { name: 'More options' })).toBeVisible()
   })
 
+  test('the profile icon takes you to your own page (HR-02)', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'Phones have it in the bottom bar')
+    await page.goto('/en')
+    await page.getByRole('banner').getByRole('link', { name: 'Profile' }).click()
+    await expect(page).toHaveURL(/\/en\/user\/demo$/)
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('demo')
+  })
+
   test('the "⋯" menu works with the keyboard alone (HR-03)', async ({ page }) => {
     await page.goto('/en')
     const trigger = page.getByRole('button', { name: 'More options' })

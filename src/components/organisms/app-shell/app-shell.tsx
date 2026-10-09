@@ -17,6 +17,7 @@ export function AppShell({
   sidebar,
   right,
   devTools,
+  profileHref = null,
   children,
 }: {
   navItems: NavItem[]
@@ -24,6 +25,8 @@ export function AppShell({
   right?: ReactNode
   /** Development tools for the top bar (specs/dev-login); never in production. */
   devTools?: ReactNode
+  /** The viewer's own page (/user/maria), or null without a session (specs/header-refresh HR-02). */
+  profileHref?: string | null
   children: ReactNode
 }) {
   const t = useTranslations('common')
@@ -37,7 +40,11 @@ export function AppShell({
       >
         {t('nav.skipToContent')}
       </a>
-      <SiteHeader devTools={devTools} menu={<MobileSidebar>{sidebar}</MobileSidebar>} />
+      <SiteHeader
+        devTools={devTools}
+        profileHref={profileHref}
+        menu={<MobileSidebar>{sidebar}</MobileSidebar>}
+      />
       <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)]">
         <div className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-2 py-2.5 md:block">
           {sidebar}
@@ -67,7 +74,7 @@ export function AppShell({
           )}
         </div>
       </div>
-      <BottomNav items={navItems} />
+      <BottomNav items={navItems} profileHref={profileHref} />
     </>
   )
 }

@@ -16,7 +16,7 @@ Una barra con lo mínimo, alineada con el contenido, y una paleta de grises más
 ### Barra
 
 - [x] **HR-01** **Buscador centrado sobre el feed:** desde `md`, el buscador queda centrado sobre la columna central (no sobre la página) y ocupa su ancho, hasta 560 px como en Reddit. Hoy está centrado en la página y mide 264 px.
-- [x] **HR-02** **Lo mínimo a la derecha.** Sin sesión, "Sign up" (píldora gris), "Log in" (píldora principal) y "⋯". Con sesión, la campana, el perfil y "⋯". Sale el botón "Tokens": la tarjeta de la columna derecha ya lo explica.
+- [x] **HR-02** **Lo mínimo a la derecha.** Sin sesión, "Sign up" (píldora gris), "Log in" (píldora principal) y "⋯". Con sesión, la campana, el perfil y "⋯". Sale el botón "Tokens": la tarjeta de la columna derecha ya lo explica. **Cambio con el PO (2026-10-09):** el perfil deja de ser "Próximamente": el ícono de la barra superior y "Perfil" de la barra inferior llevan a tu página (`/user/{tu-usuario}`); sin sesión, el de la barra inferior abre el aviso para entrar. Llegó la página de perfil (`specs/community-pages`, `specs/profile-track-record`).
 - [x] **HR-03** **Menú "⋯":** reúne el idioma y el modo oscuro en todos los tamaños. Se opera con teclado, como un menú accesible. En mobile, sin sesión, suma "Sign up", que no entra en la barra.
 - [x] **HR-04** **Mobile (360 px):** menú ☰, logo, buscar, "Log in" y "⋯", sin desbordar. El idioma y el tema salen del panel ☰ (vuelven al "⋯"), así el panel queda solo con las comunidades.
 

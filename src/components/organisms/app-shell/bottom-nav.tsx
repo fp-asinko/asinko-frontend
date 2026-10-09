@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ComingSoon } from '@/components/molecules/coming-soon'
 import { NavLink } from '@/components/molecules/nav-link'
+import { GatedComingSoon } from '@/components/organisms/auth-gate'
 import { ComposeTrigger } from '@/components/organisms/compose'
 import { cn } from '@/lib/utils'
 import type { NavItem } from './nav-item.types'
@@ -16,14 +17,21 @@ const SOON_ITEM =
 /*
  * Mobile only (< md), five items as in the prototype (Home · Search · Create · Notif · Profile).
  * Only the registered destinations work; the rest are shown disabled (H-26). Create opens the
- * post editor (specs/post-create-detail PC-02).
+ * post editor (specs/post-create-detail PC-02). Profile takes you to your own page, or without a
+ * session opens the log-in modal (specs/header-refresh HR-02).
  */
-export function BottomNav({ items }: { items: NavItem[] }) {
+export function BottomNav({
+  items,
+  profileHref = null,
+}: {
+  items: NavItem[]
+  profileHref?: string | null
+}) {
   const t = useTranslations('common.nav')
-  const soon = (label: string, icon: ReactNode, placement: 'above' | 'above-end' = 'above') => (
+  const soon = (label: string, icon: ReactNode) => (
     <li>
-      {/* At the bottom of the screen the bubble opens upwards; the last one aligns right. */}
-      <ComingSoon label={label} className={SOON_ITEM} placement={placement}>
+      {/* At the bottom of the screen the bubble opens upwards. */}
+      <ComingSoon label={label} className={SOON_ITEM} placement="above">
         <span aria-hidden className="[&_svg]:size-6">
           {icon}
         </span>
@@ -51,7 +59,16 @@ export function BottomNav({ items }: { items: NavItem[] }) {
           </ComposeTrigger>
         </li>
         {soon(t('notificationsShort'), <BellIcon />)}
-        {soon(t('profile'), <UserIcon />, 'above-end')}
+        <li>
+          {profileHref ? (
+            <NavLink href={profileHref} label={t('profile')} icon={<UserIcon />} variant="bar" />
+          ) : (
+            <GatedComingSoon action="login" label={t('profile')} className={cn(CREATE_ITEM, 'tap')}>
+              <UserIcon aria-hidden className="size-6" />
+              <span aria-hidden>{t('profile')}</span>
+            </GatedComingSoon>
+          )}
+        </li>
       </ul>
     </nav>
   )

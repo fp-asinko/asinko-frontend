@@ -21,6 +21,7 @@ import { OG_LOCALES } from '@/i18n/alternates'
 import { pickClientMessages } from '@/i18n/client-messages'
 import { routing } from '@/i18n/routing'
 import { isIndexable } from '@/lib/seo/robots'
+import { communityPath } from '@/lib/communities/paths'
 import { getViewer } from '@/lib/session'
 import { isDevLoginEnabled } from '@/lib/auth/dev-session'
 import { DevLoginButton } from '@/features/dev-login'
@@ -107,6 +108,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
                     }
                     right={<RightColumn />}
                     devTools={devTools}
+                    // Your own page, from the bars' "Profile" (specs/header-refresh HR-02).
+                    profileHref={viewer && communityPath('user', viewer.username)}
                   >
                     {children}
                   </AppShell>

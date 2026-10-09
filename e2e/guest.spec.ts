@@ -29,7 +29,20 @@ test.describe('Without a session', () => {
     await expect(banner.getByRole('button', { name: 'Log in' })).toBeVisible()
     if (isMobile) await expect(banner.getByRole('button', { name: 'Sign up' })).toBeHidden()
     else await expect(banner.getByRole('button', { name: 'Sign up' })).toBeVisible()
-    await expect(banner.getByRole('button', { name: 'Profile' })).toHaveCount(0)
+    await expect(banner.getByRole('link', { name: 'Profile' })).toHaveCount(0)
+  })
+
+  test('Profile in the bottom bar asks to log in (specs/header-refresh HR-02)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, 'The bottom bar is for phones')
+    await page.goto('/en')
+    await page
+      .getByRole('navigation', { name: 'Main navigation' })
+      .getByRole('button', { name: 'Profile' })
+      .click()
+    await expect(page.getByRole('dialog', { name: 'Log in to Asinko' })).toBeVisible()
   })
 
   test('the left column starts with the invitation, the right one no longer has it (specs/guest-sidebar GS-01, GS-05)', async ({

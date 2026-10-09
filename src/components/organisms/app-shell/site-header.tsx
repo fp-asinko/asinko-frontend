@@ -17,12 +17,21 @@ const ICON_BUTTON =
  * search sits right over the feed column at any width (HR-01); the actions stay at the window's
  * right edge, over the right column. Between md and lg (no right column) the row is a plain flex,
  * so the search shrinks instead of running into the actions.
- * Language and dark mode live in "⋯" (HR-03). Search, notifications and profile are not in the
- * MVP: disabled (H-26). Without a session the actions are Sign up and Log in (G-02, HR-02).
+ * Language and dark mode live in "⋯" (HR-03). Search and notifications are not in the MVP: disabled
+ * (H-26). Profile takes you to your own page (HR-02, since specs/profile-track-record). Without a session the actions are Sign up and Log in (G-02, HR-02).
  * "+ Create" stays at hand from md, at every scroll, and opens the editor in a window over the page,
  * as X's "Post" (specs/post-create-detail PC-01); without a session it opens the account modal.
  */
-export function SiteHeader({ menu, devTools }: { menu: ReactNode; devTools?: ReactNode }) {
+export function SiteHeader({
+  menu,
+  devTools,
+  profileHref = null,
+}: {
+  menu: ReactNode
+  devTools?: ReactNode
+  /** The viewer's own page; the profile icon only shows with a session (AccountButtons). */
+  profileHref?: string | null
+}) {
   const t = useTranslations('common')
 
   return (
@@ -79,9 +88,15 @@ export function SiteHeader({ menu, devTools }: { menu: ReactNode; devTools?: Rea
               <ComingSoon label={t('header.notifications')} className={ICON_BUTTON}>
                 <BellIcon aria-hidden className="size-5" />
               </ComingSoon>
-              <ComingSoon label={t('header.profile')} placement="below-end" className={ICON_BUTTON}>
-                <UserIcon aria-hidden className="size-5" />
-              </ComingSoon>
+              {profileHref && (
+                <Link
+                  href={profileHref}
+                  aria-label={t('header.profile')}
+                  className={`${ICON_BUTTON} tap outline-none focus-visible:ring-3 focus-visible:ring-ring/50`}
+                >
+                  <UserIcon aria-hidden className="size-5" />
+                </Link>
+              )}
             </span>
           </AccountButtons>
           <MoreMenu />

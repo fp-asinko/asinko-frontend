@@ -30,8 +30,13 @@ test.describe('app shell', () => {
     await page.goto('/en')
     if (isMobile) {
       const nav = page.getByRole('navigation', { name: 'Main navigation' })
-      await expect(nav.getByRole('link')).toHaveText(['Home'])
-      for (const name of ['Search', 'Notif', 'Profile']) {
+      // Profile goes to your own page since specs/profile-track-record (HR-02).
+      await expect(nav.getByRole('link')).toHaveText(['Home', 'Profile'])
+      await expect(nav.getByRole('link', { name: 'Profile' })).toHaveAttribute(
+        'href',
+        '/en/user/demo',
+      )
+      for (const name of ['Search', 'Notif']) {
         await expect(nav.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
       }
       // Create opens the post editor (specs/post-create-detail PC-02).
