@@ -5,6 +5,7 @@ import { getUserTheses } from '../lib/theses-api'
 import { TrackRecord } from './community-stats'
 import { ThesesLoadMore } from './theses-load-more'
 import { ThesisListItems } from './thesis-list-items'
+import { CloudOffIcon, ZapIcon } from 'lucide-react'
 
 /**
  * A person's "Theses" tab (specs/profile-track-record PT-05, PT-06): the first page from the
@@ -35,9 +36,9 @@ export async function ThesesList({
       <TrackRecord profile={record} className="px-4 pt-3 pb-1 md:px-0" />
       {/* Content that arrives streamed, not a change to announce: plain text, as the feed's. */}
       {!result.ok ? (
-        <EmptyState message={t('error')} />
+        <EmptyState icon={<CloudOffIcon />} title={t('error')} description={t('errorBody')} />
       ) : result.data.items.length === 0 ? (
-        <EmptyState message={isSelf ? t('emptySelf') : t('empty', { handle })} />
+        <EmptyState icon={<ZapIcon />} title={isSelf ? t('emptySelf') : t('empty', { handle })} />
       ) : (
         <>
           <ul className="divide-y">

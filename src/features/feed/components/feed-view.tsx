@@ -11,6 +11,15 @@ import { FeedFilters } from './feed-filters'
 import { FeedTabs } from './feed-tabs'
 import { FeedItems } from './feed-items'
 import { LoadMore } from './load-more'
+import {
+  ChartBarIcon,
+  PenLineIcon,
+  SparklesIcon,
+  UserPlusIcon,
+  UserRoundPlusIcon,
+} from 'lucide-react'
+import { ComposeTrigger } from '@/components/organisms/compose'
+import { ACTION_PILL } from '@/components/molecules/focus-button'
 
 export type FeedState =
   | {
@@ -68,7 +77,9 @@ export function FeedListView({
         {state.status === 'needs-account' ? (
           // A whole private page: it stays, with the ways in (specs/guest-experience Q2).
           <EmptyState
-            message={t('needAccount')}
+            icon={<UserRoundPlusIcon />}
+            title={t('needAccountTitle')}
+            description={t('needAccount')}
             action={<GateButtons className="justify-center" />}
           />
         ) : items.length === 0 ? (
@@ -92,19 +103,32 @@ export function FeedListView({
   )
 }
 
+const ACTION = ACTION_PILL
+
 function EmptyFeed({ params, communityHandle }: { params: FeedParams; communityHandle?: string }) {
   const t = useTranslations('feed.empty')
 
-  if (params.filter === 'polls') return <EmptyState message={t('polls')} />
+  if (params.filter === 'polls') {
+    return (
+      <EmptyState
+        icon={<ChartBarIcon />}
+        title={t('polls')}
+        action={
+          <Link href={feedHref({ ...params, filter: 'new' })} className={ACTION}>
+            {t('seeAll')}
+          </Link>
+        }
+      />
+    )
+  }
   if (params.feed === 'following') {
     return (
       <EmptyState
-        message={t('following')}
+        icon={<UserPlusIcon />}
+        title={t('following')}
+        description={t('followingBody')}
         action={
-          <Link
-            href={feedHref({ ...params, feed: 'for-you' })}
-            className="tap rounded-full bg-primary px-4 py-2 type-action text-primary-foreground hover:bg-primary-hover"
-          >
+          <Link href={feedHref({ ...params, feed: 'for-you' })} className={ACTION}>
             {t('goForYou')}
           </Link>
         }
@@ -112,9 +136,25 @@ function EmptyFeed({ params, communityHandle }: { params: FeedParams; communityH
     )
   }
   if (params.community) {
+    // No action here: the page's header has "Create post" where one can post (PC-03).
     return (
-      <EmptyState message={t('community', { handle: communityHandle ?? `#${params.community}` })} />
+      <EmptyState
+        icon={<PenLineIcon />}
+        title={t('community', { handle: communityHandle ?? `#${params.community}` })}
+        description={t('communityBody')}
+      />
     )
   }
-  return <EmptyState message={t('forYou')} />
+  return (
+    <EmptyState
+      icon={<SparklesIcon />}
+      title={t('forYou')}
+      description={t('forYouBody')}
+      action={
+        <ComposeTrigger view="modal" className={ACTION}>
+          {t('createPost')}
+        </ComposeTrigger>
+      }
+    />
+  )
 }

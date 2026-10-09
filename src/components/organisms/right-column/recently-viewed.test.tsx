@@ -39,7 +39,7 @@ describe('RecentlyViewed (specs/recently-viewed)', () => {
     renderWithIntl(<RecentlyViewed />)
     await userEvent.click(screen.getByRole('button', { name: 'Clear recently viewed' }))
     expect(screen.queryByRole('link')).not.toBeInTheDocument()
-    expect(screen.getByRole('status')).toHaveTextContent('Nothing viewed recently')
+    expect(screen.getByRole('status')).toHaveTextContent('Nothing viewed yet')
     expect(screen.getByRole('heading', { name: 'Recently viewed' })).toHaveFocus()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
@@ -68,12 +68,12 @@ describe('RecentlyViewed (specs/recently-viewed)', () => {
     )
     renderWithIntl(<RecentlyViewed />)
     expect(screen.queryByRole('link')).not.toBeInTheDocument()
-    expect(screen.getByText('Nothing viewed recently')).toBeInTheDocument()
+    expect(screen.getByText('Nothing viewed yet')).toBeInTheDocument()
   })
 
   it('follows a post opened meanwhile (RV-06)', () => {
     renderWithIntl(<RecentlyViewed />)
-    expect(screen.getByText('Nothing viewed recently')).toBeInTheDocument()
+    expect(screen.getByText('Nothing viewed yet')).toBeInTheDocument()
     act(() => recordRecent(post('c', 'Fresh one')))
     expect(screen.getByRole('link', { name: /Fresh one/ })).toBeInTheDocument()
   })
@@ -81,6 +81,6 @@ describe('RecentlyViewed (specs/recently-viewed)', () => {
   it('speaks Spanish', () => {
     renderWithIntl(<RecentlyViewed />, { locale: 'es' })
     expect(screen.getByRole('region', { name: 'Visto recientemente' })).toBeInTheDocument()
-    expect(screen.getByText('Nada visto recientemente')).toBeInTheDocument()
+    expect(screen.getByText('Nada visto todavía')).toBeInTheDocument()
   })
 })

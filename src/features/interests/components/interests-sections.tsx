@@ -8,6 +8,7 @@ import { GroupList } from './group-list'
 import { PeopleList } from './people-list'
 import { SidebarSection } from './sidebar-section'
 import { SuggestedCommunities } from './suggested-communities'
+import { CoinsIcon, HashIcon, UsersIcon } from 'lucide-react'
 
 const COLUMN_TITLE =
   'px-1 pt-1 pb-2 text-[0.6875rem] leading-[1.4] font-extrabold tracking-[0.08em] text-muted-foreground uppercase'
@@ -50,6 +51,7 @@ export function InterestsSections({ interests }: { interests: Interests }) {
         title={t('assets')}
         result={interests.assets}
         empty={t('empty.assets')}
+        emptyIcon={<CoinsIcon />}
         moreLabel={t('moreAssets')}
       >
         {(tiles) => <AssetTiles tiles={tiles} />}
@@ -58,6 +60,7 @@ export function InterestsSections({ interests }: { interests: Interests }) {
         title={t('people')}
         result={interests.people}
         empty={t('empty.people')}
+        emptyIcon={<UsersIcon />}
         moreLabel={t('morePeople')}
       >
         {(people) => <PeopleList people={people} />}
@@ -66,6 +69,7 @@ export function InterestsSections({ interests }: { interests: Interests }) {
         title={t('groups')}
         result={interests.groups}
         empty={t('empty.groups')}
+        emptyIcon={<HashIcon />}
         moreLabel={t('moreGroups')}
       >
         {(groups) => <GroupList groups={groups} />}

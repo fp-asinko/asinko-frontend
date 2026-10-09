@@ -5,6 +5,8 @@ import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { useId, useRef, useSyncExternalStore } from 'react'
 import { Link } from '@/i18n/navigation'
 import { clearRecent, readRecent, readRecentOnServer, subscribeRecent } from '@/lib/recently-viewed'
+import { HistoryIcon } from 'lucide-react'
+import { EmptyState } from '../empty-state'
 
 /** When it was seen; within the last minute, "now" (not "1s ago", which looks like a counter). */
 const seen = (viewedAt: string, now: Date) => {
@@ -57,9 +59,14 @@ export function RecentlyViewed() {
       </div>
       {items.length === 0 ? (
         // Said when the list empties (Clear), not only seen.
-        <p role="status" className="px-1 py-6 text-center type-meta text-muted-foreground">
-          {t('empty')}
-        </p>
+        <div role="status">
+          <EmptyState
+            icon={<HistoryIcon />}
+            title={t('empty')}
+            description={t('emptyBody')}
+            size="section"
+          />
+        </div>
       ) : (
         <ul>
           {items.map((item) => (

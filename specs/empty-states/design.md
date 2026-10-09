@@ -26,3 +26,12 @@ Cada lugar de la tabla de `requirements.md` pasa a `EmptyState` con su ícono, s
 - `empty-state.test.tsx`: los dos tamaños, imagen oculta para lectores, acción.
 - Los tests de cada lugar migrado verifican el título nuevo.
 - E2E: los existentes que buscan los textos viejos se actualizan; axe en el feed Siguiendo vacío y en los comentarios vacíos, claro y oscuro.
+
+## 4. Ajustes al implementar (2026-10-09)
+
+- **Tercer tamaño, `inline`:** el ícono (32 px) al lado del texto, para los lugares angostos: la columna izquierda y los comentarios dentro de una tarjeta (ES-01, "imagen chica al lado").
+- **`FocusButton`** es una molécula (`components/molecules/focus-button.tsx`) con la píldora negra de las acciones (`ACTION_PILL`: 44 px en el teléfono, 36 desde `md`, hover con el token `primary-hover`). El `id` de la caja de comentario vive en un módulo sin `'use client'` (`comment-box.ts`), así el servidor lo lee como texto.
+- **Post borrado:** sin caja de comentario, el vacío no ofrece "Comentar".
+- **Feed de comunidad vacío sin acción:** el encabezado de la página ya tiene "Crear post" donde se puede publicar (PC-03).
+- **Búsqueda sin resultados:** el resumen se dice una vez, como título del vacío.
+- Pendiente: Reintentar en los errores de tesis y de la columna izquierda (hoy solo lo tienen las listas de seguidores); los comentarios piden recargar la página.

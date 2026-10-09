@@ -153,12 +153,18 @@
       }
     },
     "empty": {
-      "forYou": "Nothing posted yet.",
-      "following": "You do not follow any communities yet.",
+      "forYou": "No posts yet",
+      "following": "You do not follow anything yet",
       "goForYou": "See For you",
-      "polls": "No polls in what is loaded so far.",
-      "community": "Nothing posted in {handle} yet.",
-      "needAccount": "You need an account to see the communities you follow."
+      "polls": "No polls here",
+      "community": "No posts in {handle} yet",
+      "needAccount": "You need an account to see the communities you follow.",
+      "forYouBody": "When the community posts, you will see it here.",
+      "createPost": "Create post",
+      "followingBody": "Follow communities, assets and people to build your feed.",
+      "needAccountTitle": "Your feed, your way",
+      "seeAll": "See all",
+      "communityBody": "Be the first to post."
     },
     "comments": {
       "loading": "Loading comments…",
@@ -202,12 +208,13 @@
       "title": "Recently viewed",
       "clear": "Clear",
       "clearLabel": "Clear recently viewed",
-      "empty": "Nothing viewed recently",
+      "empty": "Nothing viewed yet",
       "votes": "{count, plural, one {# vote} other {# votes}}",
       "comments": "{count, plural, one {# comment} other {# comments}}",
       "kinds": {
         "post": "Post"
-      }
+      },
+      "emptyBody": "The posts you open will show up here."
     }
   },
   "authGate": {
@@ -348,7 +355,8 @@
         "loading": "Loading…",
         "loaded": "{count, plural, one {# more thesis loaded} other {# more theses loaded}}",
         "error": "Could not load more. Try again."
-      }
+      },
+      "errorBody": "Try again in a moment."
     },
     "edit": {
       "button": "Edit profile",
@@ -398,12 +406,13 @@
       "loadingMore": "Loading…",
       "loadError": "Could not load more. Try again.",
       "accuracy": "{value} accuracy",
-      "loaded": "{count, plural, one {# more loaded} other {# more loaded}}"
+      "loaded": "{count, plural, one {# more loaded} other {# more loaded}}",
+      "errorBody": "Try again in a moment."
     }
   },
   "postDetail": {
     "title": "{count, plural, =0 {Comments} one {# comment} other {# comments}}",
-    "empty": "No comments yet. Start the conversation.",
+    "empty": "Be the first to comment",
     "error": "Could not load the comments. Reload the page to retry.",
     "sort": {
       "best": "Best",
@@ -415,7 +424,8 @@
     "search": {
       "label": "Search comments",
       "results": "{count, plural, =0 {No results for “{q}”} one {# result for “{q}”} other {# results for “{q}”}}",
-      "all": "See all comments"
+      "all": "See all comments",
+      "noneBody": "Try other words."
     },
     "ad": {
       "label": "Ad",
@@ -423,7 +433,11 @@
       "ctaLabel": "Learn more about {advertiser} (opens in a new tab)",
       "region": "Ad: {advertiser}"
     },
-    "moreReplies": "{count, plural, one {# more reply} other {# more replies}}"
+    "moreReplies": "{count, plural, one {# more reply} other {# more replies}}",
+    "emptyBody": "Nobody has replied yet. Share what you think and get the conversation going.",
+    "emptyAction": "Add a comment",
+    "errorTitle": "Could not load the comments",
+    "errorBody": "Reload the page to try again."
   },
   "comments": {
     "label": "Join the conversation",

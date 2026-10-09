@@ -5,6 +5,8 @@ import { Fragment, useEffect, useRef, useState, useTransition, type ReactNode } 
 import { Skeleton } from '@/components/ui/skeleton'
 import { loadFollowList } from '../actions/load-follow-list.action'
 import type { FollowKind } from '../communities.types'
+import { CloudOffIcon, UsersIcon } from 'lucide-react'
+import { EmptyState } from '@/components/organisms/empty-state'
 
 type State =
   | { status: 'loading' }
@@ -132,26 +134,31 @@ export function FollowList({
     )
   } else if (state.status === 'error') {
     body = (
-      <div className="flex flex-col items-center gap-3 px-6 py-10 text-center">
-        <p className="type-ui text-muted-foreground">{t('error')}</p>
-        <button
-          type="button"
-          onClick={() => {
-            pendingFocus.current = 'root'
-            setState({ status: 'loading' })
-            load()
-          }}
-          className="inline-flex h-9 tap items-center rounded-full bg-muted px-4 type-action outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          {t('retry')}
-        </button>
-      </div>
+      <EmptyState
+        icon={<CloudOffIcon />}
+        title={t('error')}
+        description={t('errorBody')}
+        action={
+          <button
+            type="button"
+            onClick={() => {
+              pendingFocus.current = 'root'
+              setState({ status: 'loading' })
+              load()
+            }}
+            className="inline-flex h-9 tap items-center rounded-full bg-muted px-4 type-action outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {t('retry')}
+          </button>
+        }
+      />
     )
   } else if (state.count === 0) {
     body = (
-      <p className="px-6 py-10 text-center type-ui text-muted-foreground">
-        {isSelf ? t(`emptySelf.${kind}`) : t(`empty.${kind}`, { handle })}
-      </p>
+      <EmptyState
+        icon={<UsersIcon />}
+        title={isSelf ? t(`emptySelf.${kind}`) : t(`empty.${kind}`, { handle })}
+      />
     )
   } else {
     body = (

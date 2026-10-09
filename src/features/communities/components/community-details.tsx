@@ -3,6 +3,7 @@ import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import type { CommunityPage, ProfileDetails } from '../communities.types'
+import { EmptyState } from '@/components/organisms/empty-state'
 
 /**
  * The row under the header (specs/community-pages § 5), the prototype's gray box, closed on
@@ -25,10 +26,12 @@ export function CommunityDetails({
         title={t('assetData.title')}
         icon={<ChartNoAxesColumnIcon aria-hidden className="size-4" />}
       >
-        <div className="flex flex-col items-center gap-1 py-4 text-center">
-          <p className="type-ui font-semibold">{t('assetData.empty')}</p>
-          <p className="type-meta text-muted-foreground">{t('assetData.soon')}</p>
-        </div>
+        <EmptyState
+          icon={<ChartNoAxesColumnIcon />}
+          title={t('assetData.empty')}
+          description={t('assetData.soon')}
+          size="section"
+        />
       </Details>
     )
   }

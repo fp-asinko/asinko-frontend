@@ -10,6 +10,11 @@ import { CommentSearchResults } from './comment-search-results'
 import { CommentTree } from './comment-tree'
 import { CommentsSearch } from './comments-search'
 import { CommentsSort } from './comments-sort'
+import { CloudOffIcon, MessageCircleIcon } from 'lucide-react'
+import { EmptyState } from '@/components/organisms/empty-state'
+import { COMMENT_BOX } from './comment-box'
+import { FocusButton } from '@/components/molecules/focus-button'
+import { useTranslations } from 'next-intl'
 
 /** The live region of the section: stays while the list changes, so a search is announced. */
 const ANNOUNCER = 'comments-announcer'
@@ -54,7 +59,7 @@ export async function PostComments({
         {query.q ? (
           <SearchedComments postId={postId} q={query.q} allHref={path} />
         ) : (
-          <LoadedComments postId={postId} sort={query.sort} />
+          <LoadedComments postId={postId} sort={query.sort} closed={closed} />
         )}
       </Suspense>
     </section>
@@ -65,13 +70,32 @@ export async function PostComments({
  * A secondary section: if the comments fail, the post stays and says so here. The ads come with
  * them, at once; if they fail, the comments show without ads (PD-09).
  */
-async function LoadedComments({ postId, sort }: { postId: string; sort: CommentsQuery['sort'] }) {
+async function LoadedComments({
+  postId,
+  sort,
+  closed,
+}: {
+  postId: string
+  sort: CommentsQuery['sort']
+  /** A deleted post has no comment box: nothing to invite to. */
+  closed: boolean
+}) {
   const t = await getTranslations('postDetail')
   const [result, ads] = await Promise.all([getCommentTree(postId, sort), getAds('comments')])
-  if (!result.ok) return <Failed message={t('error')} />
+  if (!result.ok) return <Failed />
   return (
     <>
-      {result.data.length === 0 && <p className="type-small text-muted-foreground">{t('empty')}</p>}
+      {result.data.length === 0 && (
+        <EmptyState
+          icon={<MessageCircleIcon />}
+          title={t('empty')}
+          description={t('emptyBody')}
+          // Into the comment box, which opens on focus (PD-02).
+          action={
+            closed ? undefined : <FocusButton target={COMMENT_BOX}>{t('emptyAction')}</FocusButton>
+          }
+        />
+      )}
       <CommentTree
         postId={postId}
         // The post already shows the first ad (PD-15): the comments start from the second.
@@ -90,9 +114,8 @@ async function SearchedComments({
   q: string
   allHref: string
 }) {
-  const t = await getTranslations('postDetail')
   const result = await searchComments(postId, q)
-  if (!result.ok) return <Failed message={t('error')} />
+  if (!result.ok) return <Failed />
   return (
     <CommentSearchResults
       query={q}
@@ -103,11 +126,17 @@ async function SearchedComments({
   )
 }
 
-function Failed({ message }: { message: string }) {
+function Failed() {
+  const t = useTranslations('postDetail')
   return (
-    <p role="status" className="type-small text-muted-foreground">
-      {message}
-    </p>
+    <div role="status">
+      <EmptyState
+        icon={<CloudOffIcon />}
+        title={t('errorTitle')}
+        description={t('errorBody')}
+        size="section"
+      />
+    </div>
   )
 }
 

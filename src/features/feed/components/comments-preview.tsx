@@ -2,6 +2,8 @@ import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import type { CommentPreview } from '../feed.types'
 import { PostMarkdown } from './post-markdown'
+import { MessageCircleIcon } from 'lucide-react'
+import { EmptyState } from '@/components/organisms/empty-state'
 
 /**
  * The first comments under a card (H-28), rendered on the server: the Markdown never reaches the
@@ -15,7 +17,7 @@ export function CommentsPreview({ comments }: { comments: CommentPreview[] }) {
   const now = useNow()
 
   return comments.length === 0 ? (
-    <p className="type-meta text-muted-foreground">{t('empty')}</p>
+    <EmptyState icon={<MessageCircleIcon />} title={t('empty')} size="inline" />
   ) : (
     <ul className="flex stagger flex-col gap-3.5">
       {comments.map((comment) => (

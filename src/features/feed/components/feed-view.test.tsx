@@ -104,7 +104,7 @@ describe('FeedTop and FeedListView, as the page composes them', () => {
         viewerName="demo"
       />,
     )
-    expect(screen.getByText('You do not follow any communities yet.')).toBeInTheDocument()
+    expect(screen.getByText('You do not follow anything yet')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'See For you' })).toHaveAttribute('href', '/')
   })
 
@@ -116,7 +116,7 @@ describe('FeedTop and FeedListView, as the page composes them', () => {
         viewerName={null}
       />,
     )
-    expect(screen.getByText('No polls in what is loaded so far.')).toBeInTheDocument()
+    expect(screen.getByText('No polls here')).toBeInTheDocument()
     unmount()
     renderWithIntl(
       <FeedView
@@ -125,7 +125,7 @@ describe('FeedTop and FeedListView, as the page composes them', () => {
         viewerName={null}
       />,
     )
-    expect(screen.getByText('Nothing posted in #defi yet.')).toBeInTheDocument()
+    expect(screen.getByText('No posts in #defi yet')).toBeInTheDocument()
   })
 
   it('names an asset community by its handle on its own page (specs/community-pages)', () => {
@@ -136,7 +136,7 @@ describe('FeedTop and FeedListView, as the page composes them', () => {
         communityHandle="$BTC"
       />,
     )
-    expect(screen.getByText('Nothing posted in $BTC yet.')).toBeInTheDocument()
+    expect(screen.getByText('No posts in $BTC yet')).toBeInTheDocument()
   })
 
   it('does not repeat the join button of the community the feed shows (CP-07)', () => {
@@ -168,7 +168,7 @@ describe('FeedTop and FeedListView, as the page composes them', () => {
         viewerName={null}
       />,
     )
-    expect(screen.getByText('Nothing posted yet.')).toBeInTheDocument()
+    expect(screen.getByText('No posts yet')).toBeInTheDocument()
   })
 
   it('asks for an account when Following needs one', () => {

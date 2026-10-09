@@ -5,6 +5,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { useId, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import type { SectionResult } from '../interests.types'
+import { CloudOffIcon } from 'lucide-react'
+import { EmptyState } from '@/components/organisms/empty-state'
 
 /**
  * Collapsible section of the column (prototype: 10px uppercase label + chevron, no dividers),
@@ -17,6 +19,7 @@ export function SidebarSection<T>({
   title,
   result,
   empty,
+  emptyIcon,
   moreLabel,
   className,
   children,
@@ -24,6 +27,8 @@ export function SidebarSection<T>({
   title: string
   result: SectionResult<T[]>
   empty?: string
+  /** The empty state's icon (specs/empty-states). */
+  emptyIcon?: ReactNode
   /** Accessible name of the section's "more" link (coming soon, H-26), e.g. "More assets". */
   moreLabel?: string
   className?: string
@@ -52,9 +57,14 @@ export function SidebarSection<T>({
         <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-[height] duration-200 ease-out data-ending-style:h-0 data-ending-style:duration-150 data-starting-style:h-0">
           <div className="py-1">
             {!result.ok ? (
-              <p className="px-1 type-meta text-muted-foreground">{t('error')}</p>
+              <EmptyState
+                icon={<CloudOffIcon />}
+                title={t('error')}
+                size="inline"
+                className="px-1"
+              />
             ) : result.data.length === 0 && empty ? (
-              <p className="px-1 type-meta text-muted-foreground">{empty}</p>
+              <EmptyState icon={emptyIcon} title={empty} size="inline" className="px-1" />
             ) : (
               <>
                 {children(result.data)}

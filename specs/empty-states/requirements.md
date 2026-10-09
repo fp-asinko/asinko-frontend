@@ -1,6 +1,6 @@
 # Estados vacíos con imagen — Requirements
 
-> **Estado:** borrador para el PO (2026-10-09). Preguntas abiertas al final.
+> **Estado:** aprobado por el PO el 2026-10-09: Q1, íconos en un círculo gris; Q2, los textos de la tabla.
 > **Fuente:** pedido del PO (2026-10-09), con una captura de los comentarios vacíos ("No comments yet. Start the conversation."): "deberíamos mejorar con alguna imagen y texto en todos los casos donde no haya cierta información". Inspiración: Reddit ("Be the first to comment", con su ilustración), X e Instagram.
 
 ## Objetivo
@@ -38,7 +38,7 @@ Los textos en español van con tú, como el resto de `es.json`; los de la tabla 
 - Página 404 y error general (ya tienen su diseño).
 - Listas de sugerencias (menciones, comunidades del editor): siguen con su línea de texto, porque son desplegables chicos.
 
-## Preguntas abiertas
+## Preguntas resueltas (2026-10-09)
 
 - **Q1. ¿Qué imagen?**
   - **Íconos de lucide en un círculo gris** (**recomendado**): coherente con el resto de la app (monocromática, mismos íconos), liviano, sin depender de diseño. Ej.: 💬 para comentarios, 🔍 para búsqueda, ✨ para el feed.

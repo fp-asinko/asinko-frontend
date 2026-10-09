@@ -153,12 +153,18 @@
       }
     },
     "empty": {
-      "forYou": "Ainda não há publicações.",
-      "following": "Você ainda não segue nenhuma comunidade.",
+      "forYou": "Ainda não há posts",
+      "following": "Você ainda não segue nada",
       "goForYou": "Ver Para você",
-      "polls": "Nenhuma enquete no que foi carregado até agora.",
-      "community": "Ainda não há publicações em {handle}.",
-      "needAccount": "Você precisa de uma conta para ver as comunidades que segue."
+      "polls": "Não há enquetes aqui",
+      "community": "Ainda não há posts em {handle}",
+      "needAccount": "Você precisa de uma conta para ver as comunidades que segue.",
+      "forYouBody": "Quando a comunidade publicar, você verá aqui.",
+      "createPost": "Criar post",
+      "followingBody": "Siga comunidades, ativos e pessoas para montar o seu feed.",
+      "needAccountTitle": "Seu feed, do seu jeito",
+      "seeAll": "Ver tudo",
+      "communityBody": "Seja o primeiro a publicar."
     },
     "comments": {
       "loading": "Carregando comentários…",
@@ -202,12 +208,13 @@
       "title": "Vistos recentemente",
       "clear": "Limpar",
       "clearLabel": "Limpar vistos recentemente",
-      "empty": "Nada visto recentemente",
+      "empty": "Nada visto ainda",
       "votes": "{count, plural, one {# voto} other {# votos}}",
       "comments": "{count, plural, one {# comentário} other {# comentários}}",
       "kinds": {
         "post": "Post"
-      }
+      },
+      "emptyBody": "Os posts que você abrir aparecerão aqui."
     }
   },
   "authGate": {
@@ -348,7 +355,8 @@
         "loading": "Carregando…",
         "loaded": "{count, plural, one {Mais # tese carregada} other {Mais # teses carregadas}}",
         "error": "Não foi possível carregar mais. Tente de novo."
-      }
+      },
+      "errorBody": "Tente de novo em um momento."
     },
     "edit": {
       "button": "Editar perfil",
@@ -398,12 +406,13 @@
       "loadingMore": "Carregando…",
       "loadError": "Não foi possível carregar mais. Tente de novo.",
       "accuracy": "{value} de precisão",
-      "loaded": "{count, plural, one {Mais # carregado} other {Mais # carregados}}"
+      "loaded": "{count, plural, one {Mais # carregado} other {Mais # carregados}}",
+      "errorBody": "Tente de novo em um momento."
     }
   },
   "postDetail": {
     "title": "{count, plural, =0 {Comentários} one {# comentário} other {# comentários}}",
-    "empty": "Ainda não há comentários. Comece a conversa.",
+    "empty": "Seja o primeiro a comentar",
     "error": "Não foi possível carregar os comentários. Recarregue a página para tentar de novo.",
     "sort": {
       "best": "Melhores",
@@ -415,7 +424,8 @@
     "search": {
       "label": "Buscar comentários",
       "results": "{count, plural, =0 {Nenhum resultado para “{q}”} one {# resultado para “{q}”} other {# resultados para “{q}”}}",
-      "all": "Ver todos os comentários"
+      "all": "Ver todos os comentários",
+      "noneBody": "Tente outras palavras."
     },
     "ad": {
       "label": "Anúncio",
@@ -423,7 +433,11 @@
       "ctaLabel": "Saiba mais sobre {advertiser} (abre em outra aba)",
       "region": "Anúncio: {advertiser}"
     },
-    "moreReplies": "{count, plural, one {Mais # resposta} other {Mais # respostas}}"
+    "moreReplies": "{count, plural, one {Mais # resposta} other {Mais # respostas}}",
+    "emptyBody": "Ninguém respondeu ainda. Compartilhe o que você pensa e comece a conversa.",
+    "emptyAction": "Comentar",
+    "errorTitle": "Não foi possível carregar os comentários",
+    "errorBody": "Recarregue a página para tentar de novo."
   },
   "comments": {
     "label": "Participe da conversa",

@@ -59,9 +59,9 @@ test.describe('Recently viewed', () => {
     await readTwoPosts(page)
     await recent(page).getByRole('button', { name: 'Clear recently viewed' }).click()
     await expect(recent(page).getByRole('link')).toHaveCount(0)
-    await expect(recent(page).getByText('Nothing viewed recently')).toBeVisible()
+    await expect(recent(page).getByText('Nothing viewed yet')).toBeVisible()
     await page.reload()
-    await expect(recent(page).getByText('Nothing viewed recently')).toBeVisible()
+    await expect(recent(page).getByText('Nothing viewed yet')).toBeVisible()
   })
 
   for (const theme of ['light', 'dark'] as const) {

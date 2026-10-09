@@ -6,6 +6,8 @@ import { previewProps } from '@/lib/communities/preview'
 import type { CommentNode } from '../feed.types'
 import { highlightMatches } from '../lib/highlight'
 import { markdownText } from '../lib/post-excerpt'
+import { SearchXIcon } from 'lucide-react'
+import { EmptyState } from '@/components/organisms/empty-state'
 
 /**
  * The comments that match a search (specs/post-detail-refresh PD-05): how many, the way back to
@@ -33,7 +35,8 @@ export function CommentSearchResults({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-        <p className="type-small text-muted-foreground">{summary}</p>
+        {/* Without results the empty state below says it: not twice. */}
+        {comments.length > 0 && <p className="type-small text-muted-foreground">{summary}</p>}
         <Announce regionId={announcer} text={summary} />
         <Link
           href={allHref}
@@ -43,6 +46,9 @@ export function CommentSearchResults({
           {t('all')}
         </Link>
       </div>
+      {comments.length === 0 && (
+        <EmptyState icon={<SearchXIcon />} title={summary} description={t('noneBody')} />
+      )}
       {comments.length > 0 && (
         <ul className="flex flex-col gap-4">
           {comments.map((comment) => (
