@@ -71,9 +71,10 @@ export function CardByline({
         name={group ? group.handle : authorName}
         colorKey={group ? group.slug : authorName}
         imageUrl={group ? group.avatarUrl : author?.avatarUrl}
-        // A group's avatar takes the height of both lines (group and author), as Reddit's: 40px.
-        size={group ? 'lg' : 'sm'}
-        className={cn(group ? 'size-10 rounded-lg text-xs' : 'size-6 self-start text-[0.5625rem]')}
+        // The same 32px for a group (square, beside its two lines) and a person (round, beside one),
+        // as Reddit's post header: no jump in size from one card to the next (PO, 2026-10-09).
+        size="md"
+        className={cn('size-8 text-[0.6875rem]', group && 'rounded-md')}
       />
       <div className="min-w-0 flex-1">
         <div className="flex min-h-6 min-w-0 items-center gap-x-1.25 type-meta text-muted-foreground">
