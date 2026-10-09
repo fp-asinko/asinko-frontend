@@ -46,18 +46,27 @@ function canAnimate(element: HTMLElement | null | undefined): element is HTMLEle
 }
 
 /**
- * Slides an element's height between two measures, its overflow clipped meanwhile: a thread that
- * opens or closes (specs/comment-threads CT-16). Web Animations, because the height goes to and
- * from "auto"; the global reduced-motion rule does not reach them, hence canAnimate.
+ * Slides an element's height between two measures: a thread that opens or closes (specs/
+ * comment-threads CT-16). Clipped meanwhile only below: the line, the elbow and ⊖ hang to its left,
+ * outside its box, and must not blink away (overflow-x stays visible, which "clip" on the other
+ * axis allows). Web Animations, because the height goes to and from "auto"; the global
+ * reduced-motion rule does not reach them, hence canAnimate.
  */
 function slide(element: HTMLElement, from: number, to: number, duration: number) {
   const easing = getComputedStyle(element).getPropertyValue('--ease-out').trim() || 'ease-out'
   return element.animate(
     [
-      { height: `${from}px`, overflow: 'clip' },
-      { height: `${to}px`, overflow: 'clip' },
+      { height: `${from}px`, overflowY: 'clip' },
+      { height: `${to}px`, overflowY: 'clip' },
     ],
     { duration, easing },
+  )
+}
+
+/** The body and the replies fade as the thread slides: no text cut in half while it moves. */
+function fade(elements: (HTMLElement | null)[], from: number, to: number, duration: number) {
+  return elements.flatMap((element) =>
+    element ? [element.animate([{ opacity: from }, { opacity: to }], { duration })] : [],
   )
 }
 
@@ -92,13 +101,20 @@ export function CommentFold({
   const [closing, setClosing] = useState(false)
   const row = useRef<HTMLDivElement>(null)
   const expand = useRef<HTMLButtonElement>(null)
-  const motion = useRef<Animation | null>(null)
+  const parts = useRef<HTMLDivElement>(null)
+  const children = useRef<HTMLUListElement>(null)
+  // The running animations: a new tap cancels them and starts from where the thread is.
+  const motion = useRef<Animation[]>([])
+  const stop = () => {
+    motion.current.forEach((animation) => animation.cancel())
+    motion.current = []
+  }
   const item = () => row.current?.closest('li')
   // A shared comment inside opens it at once: the page scrolls to it, nothing may move meanwhile.
   useReveal(
     (id) => Boolean(item()?.contains(document.getElementById(id))),
     () => {
-      motion.current?.cancel()
+      stop()
       setOpen(true)
       setClosing(false)
     },
@@ -111,7 +127,7 @@ export function CommentFold({
     const li = item()
     const from = li?.getBoundingClientRect().height ?? 0
     const animated = canAnimate(li)
-    motion.current?.cancel()
+    stop()
     flushSync(() => {
       setOpen(false)
       setClosing(animated)
@@ -120,20 +136,23 @@ export function CommentFold({
     if (!animated || !row.current) return
     const animation = slide(li, from, row.current.getBoundingClientRect().height, CLOSE_MS)
     animation.onfinish = () => setClosing(false)
-    motion.current = animation
+    motion.current = [animation, ...fade([parts.current, children.current], 1, 0, CLOSE_MS)]
   }
 
   // Slides down from where it is: from the author's row, or midway if it was still closing.
   function reopen() {
     const li = item()
     const from = li?.getBoundingClientRect().height ?? 0
-    motion.current?.cancel()
+    stop()
     flushSync(() => {
       setOpen(true)
       setClosing(false)
     })
     if (!canAnimate(li)) return
-    motion.current = slide(li, from, li.getBoundingClientRect().height, OPEN_MS)
+    motion.current = [
+      slide(li, from, li.getBoundingClientRect().height, OPEN_MS),
+      ...fade([parts.current, children.current], 0, 1, OPEN_MS),
+    ]
   }
   const shown = open || closing
 
@@ -166,11 +185,12 @@ export function CommentFold({
           className="thread-strip absolute top-[calc(var(--av)+0.25rem)] bottom-0 left-0 z-1 w-(--av) cursor-pointer"
         />
       )}
-      <div hidden={!shown} className="thread-body relative ml-(--av)">
+      <div ref={parts} hidden={!shown} className="thread-body relative ml-(--av)">
         {body}
       </div>
       {replies && (
         <ul
+          ref={children}
           hidden={!shown}
           className="thread-children mt-1 ml-(--av) flex flex-col gap-1 empty:hidden"
         >
