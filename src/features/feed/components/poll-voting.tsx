@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckIcon, MessageSquareIcon } from 'lucide-react'
+import { CheckIcon, MessageCircleIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { useOptimistic, useState, useTransition, type ReactNode } from 'react'
 import { useAuthGate } from '@/components/organisms/auth-gate'
@@ -146,7 +146,7 @@ export function PollVoting({
                 onClick={() => setCommentsRequest((count) => count + 1)}
                 className="mt-2.5 inline-flex h-8 tap items-center gap-1.5 rounded-full bg-muted px-3 type-action outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
               >
-                <MessageSquareIcon aria-hidden className="size-3.5" />
+                <MessageCircleIcon aria-hidden className="size-3.5" />
                 {t('note.cta')}
               </button>
             </div>

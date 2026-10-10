@@ -22,17 +22,29 @@ const BUTTON =
   'tap inline-flex items-center justify-center rounded-full outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-60'
 
 /**
- * The post's pill, the feed's comment previews' smaller one with 24px buttons (PC-16, WCAG 2.5.8),
- * and the post page's comments', as Reddit's: no pill, 32px arrows (specs/comment-threads CT-03).
+ * The post's pill as Reddit's (specs/feed-cards FC-30): 32px, the 32px arrows touching the number,
+ * 12px semibold black. The feed's comment previews' smaller one with 24px buttons (PC-16, WCAG
+ * 2.5.8), and the post page's comments', as Reddit's: no pill, 32px arrows (specs/comment-threads
+ * CT-03).
  */
 const SIZES = {
-  default: { pill: 'h-9.5 type-action', button: 'size-8', icon: 'size-4.5' },
-  sm: { pill: 'h-7 type-meta', button: 'size-6', icon: 'size-4' },
-  plain: { pill: 'h-8 type-meta bg-transparent p-0 gap-0', button: 'size-8', icon: 'size-4' },
+  default: {
+    pill: 'h-8 type-meta p-0 gap-0 text-foreground',
+    button: 'size-8',
+    icon: 'size-4',
+    number: 'font-semibold',
+  },
+  sm: { pill: 'h-7 type-meta', button: 'size-6', icon: 'size-4', number: 'font-bold' },
+  plain: {
+    pill: 'h-8 type-meta bg-transparent p-0 gap-0',
+    button: 'size-8',
+    icon: 'size-4',
+    number: 'font-bold',
+  },
 } as const
 
 /**
- * The prototype's vote pill (H-15): ▲ score ▼, 136×38 with 32px buttons. Pressing the active
+ * The vote pill (H-15): ▲ score ▼, with 32px buttons. Pressing the active
  * arrow removes the vote. The change shows at once (useOptimistic); if the Server Action fails,
  * React drops the optimistic value, the score goes back and the pill says why. Without a session
  * nothing is marked: the account modal opens instead (specs/guest-experience G-04). Comments use
@@ -121,7 +133,10 @@ export function VoteControl({
         </button>
         <span
           aria-live="polite"
-          className="min-w-6 overflow-hidden px-1 text-center font-bold text-foreground tabular-nums"
+          className={cn(
+            'min-w-6 overflow-hidden px-1 text-center text-foreground tabular-nums',
+            sizes.number,
+          )}
         >
           <span
             key={motion.key}

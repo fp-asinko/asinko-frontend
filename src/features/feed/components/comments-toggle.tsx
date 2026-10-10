@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useEffectEvent, useId, useState, useTransition, type ReactNode } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import { CARD_ACTION } from './card-action'
 import { loadCommentsPreview } from '../actions/load-comments-preview.action'
 
 /**
@@ -67,7 +68,7 @@ export function CommentsToggle({
         aria-controls={mounted ? panelId : undefined}
         onClick={toggle}
         // The gray pill of the card actions (HR-09), darker while open.
-        className="inline-flex h-9.5 tap items-center gap-1.5 rounded-full bg-muted px-3 type-action text-muted-foreground outline-none hover:bg-muted-hover hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 aria-expanded:bg-muted-hover aria-expanded:text-foreground"
+        className={cn(CARD_ACTION, 'aria-expanded:bg-muted-hover')}
       >
         {children}
         <ChevronDownIcon

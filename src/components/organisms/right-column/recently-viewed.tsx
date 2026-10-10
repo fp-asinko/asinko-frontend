@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowBigUpIcon, MessageSquareIcon } from 'lucide-react'
+import { ArrowBigUpIcon, MessageCircleIcon } from 'lucide-react'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { useId, useRef, useSyncExternalStore } from 'react'
 import { Link } from '@/i18n/navigation'
@@ -94,7 +94,7 @@ export function RecentlyViewed() {
                     <span className="sr-only">{t('votes', { count: item.score })}</span>
                   </span>{' '}
                   <span className="inline-flex items-center gap-1">
-                    <MessageSquareIcon aria-hidden className="size-3" />
+                    <MessageCircleIcon aria-hidden className="size-3" />
                     <span aria-hidden>{compact(item.comments)}</span>
                     <span className="sr-only">{t('comments', { count: item.comments })}</span>
                   </span>{' '}

@@ -20,7 +20,7 @@ export function FeedListSkeleton() {
             <Skeleton className="h-5 w-3/4" />
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-2/3" />
-            <Skeleton className="mt-1 h-9.5 w-36 rounded-full" />
+            <Skeleton className="mt-1 h-8 w-32 rounded-full" />
           </div>
         ))}
       </div>

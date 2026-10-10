@@ -1,4 +1,4 @@
-import { ChartBarIcon, MessageSquareIcon } from 'lucide-react'
+import { ChartBarIcon, MessageCircleIcon } from 'lucide-react'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
 import type { PollItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
@@ -73,7 +73,7 @@ export function PollCard({
         commentsLabel={
           // Same as a post's (P-006): the compact count, and the full sentence for screen readers.
           <>
-            <MessageSquareIcon aria-hidden className="size-4" />
+            <MessageCircleIcon aria-hidden className="size-4" />
             <span aria-hidden>
               {format.number(poll.commentCount, countFormat(poll.commentCount))}
             </span>

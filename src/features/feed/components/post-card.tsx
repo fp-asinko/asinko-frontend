@@ -1,10 +1,11 @@
-import { ArrowUpRightIcon, MessageSquareIcon, Share2Icon } from 'lucide-react'
+import { ArrowUpRightIcon, MessageCircleIcon, ForwardIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useFormatter, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ShareButton } from '@/components/molecules/share-button'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
+import { CARD_ACTION } from './card-action'
 import type { PostItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
@@ -53,7 +54,7 @@ export function PostCard({
   const Title = detail ? 'h1' : 'h2'
   const commentCount = (
     <>
-      <MessageSquareIcon aria-hidden className="size-4" />
+      <MessageCircleIcon aria-hidden className="size-4" />
       <span aria-hidden>{format.number(post.commentCount, countFormat(post.commentCount))}</span>
       <span className="sr-only">{t('comments', { count: post.commentCount })}</span>
     </>
@@ -183,10 +184,7 @@ export function PostCard({
         <div className={cn('flex flex-wrap items-center gap-3', detail ? 'mt-6' : 'mt-3')}>
           <VoteControl id={post.id} score={post.score} viewerVote={post.viewerVote} />
           {detail ? (
-            <a
-              href="#comments"
-              className="inline-flex h-9.5 tap items-center gap-1.5 rounded-full bg-muted px-3 type-action text-muted-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
+            <a href="#comments" className={CARD_ACTION}>
               {commentCount}
             </a>
           ) : (
@@ -195,11 +193,8 @@ export function PostCard({
             </CommentsToggle>
           )}
           <span className="ml-auto md:ml-0">
-            <ShareButton
-              href={post.path}
-              className="inline-flex h-9.5 min-w-9.5 tap items-center justify-center gap-1.5 rounded-full bg-muted px-3 type-action text-muted-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              <Share2Icon aria-hidden className="size-3.5" />
+            <ShareButton href={post.path} className={cn(CARD_ACTION, 'min-w-8 justify-center')}>
+              <ForwardIcon aria-hidden className="size-4" />
               {/* Its name in phones too, where only the icon shows. */}
               <span className="sr-only sm:not-sr-only">{t('share')}</span>
             </ShareButton>
