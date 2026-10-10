@@ -45,6 +45,9 @@ const CLOSE_MS = 150
  */
 let slack = 0
 let watching = false
+// Threads still sliding shut: their room is below the screen until they shrink, and a scroll
+// meanwhile (a phone's momentum) must not take it.
+let sliding = 0
 
 function setSlack(px: number) {
   slack = Math.max(0, Math.round(px))
@@ -53,7 +56,7 @@ function setSlack(px: number) {
 
 /** Drops the room below the screen: the page can be that much shorter without moving. */
 function trimSlack() {
-  if (slack === 0) return
+  if (slack === 0 || sliding > 0) return
   const root = document.documentElement
   const below = root.scrollHeight - (window.scrollY + window.innerHeight)
   if (below > 0) setSlack(slack - below)
@@ -186,7 +189,19 @@ export function CommentFold({
       stop()
     }
     const animation = slide(li, from, to, CLOSE_MS, 'forwards')
-    animation.onfinish = finish
+    sliding += 1
+    // Finished, or cancelled by a new tap: either way it is no longer sliding. Once: finishing
+    // cancels the held animation, which fires its cancel too.
+    let counted = true
+    const done = () => {
+      if (counted) sliding -= 1
+      counted = false
+    }
+    animation.onfinish = () => {
+      done()
+      finish()
+    }
+    animation.oncancel = done
     motion.current = [
       animation,
       ...fade([parts.current, children.current], 1, 0, CLOSE_MS, 'forwards'),
