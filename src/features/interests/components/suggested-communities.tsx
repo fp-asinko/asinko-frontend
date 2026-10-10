@@ -18,10 +18,11 @@ export function SuggestedCommunities({ suggestions }: { suggestions: Suggestion[
     <ul className="flex flex-col">
       {suggestions.map((suggestion) => (
         <HideWhenJoined key={suggestion.slug} slug={suggestion.slug}>
-          <li className="flex items-center gap-2 rounded-md px-0.5 py-1.5">
+          {/* The whole row is the hover and the current page, Join included (the PO, 2026-10-10). */}
+          <li className="group/row flex items-center gap-2 rounded-md px-1 py-1.5 transition-colors duration-150 ease-out hover:bg-surface has-aria-[current=page]:bg-muted">
             <CommunityLink
               href={suggestion.path}
-              className="group -mx-1 flex min-w-0 flex-1 tap items-center gap-2 rounded-md px-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted"
+              className="group flex min-w-0 flex-1 tap items-center gap-2 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               <UserAvatar
                 name={suggestion.name}
@@ -44,6 +45,8 @@ export function SuggestedCommunities({ suggestions }: { suggestions: Suggestion[
               handle={suggestion.handle}
               action={joinCommunity}
               variant="compact"
+              // On the gray row of the current page, the gray pill would vanish: white there.
+              className="group-has-aria-[current=page]/row:bg-background"
             />
           </li>
         </HideWhenJoined>
