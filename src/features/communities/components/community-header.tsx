@@ -94,7 +94,12 @@ export function CommunityHeader({
       {profile ? (
         <ProfileStats profile={profile} className="mt-3" />
       ) : (
-        <MemberCount count={page.memberCount} className="mt-3" />
+        <MemberCount
+          count={page.memberCount}
+          slug={page.slug}
+          handle={page.handle}
+          className="mt-3"
+        />
       )}
       {profile && (
         <div className="mt-3">

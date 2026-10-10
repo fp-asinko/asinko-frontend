@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { FollowListDialog } from './follow-list-dialog'
 
-const action = vi.hoisted(() => ({ loadFollowList: vi.fn() }))
-vi.mock('../actions/load-follow-list.action', () => action)
+const action = vi.hoisted(() => ({ loadPeople: vi.fn() }))
+vi.mock('../actions/load-people.action', () => action)
 
 const USER = '00000000-0000-4000-8000-000000000101'
 
@@ -14,6 +14,7 @@ function renderDialog(layout: 'sheet' | 'modal' = 'modal') {
   const onTabChange = vi.fn()
   renderWithIntl(
     <FollowListDialog
+      view="follows"
       layout={layout}
       open
       onOpenChange={onOpenChange}
@@ -30,7 +31,7 @@ function renderDialog(layout: 'sheet' | 'modal' = 'modal') {
 describe('FollowListDialog (specs/follow-lists FL-01, FL-06)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    action.loadFollowList.mockResolvedValue({
+    action.loadPeople.mockResolvedValue({
       ok: true,
       data: { items: <li>row</li>, count: 1, nextCursor: null },
     })
@@ -60,5 +61,24 @@ describe('FollowListDialog (specs/follow-lists FL-01, FL-06)', () => {
   it('says Close in words in the full screen of a phone', () => {
     renderDialog('sheet')
     expect(screen.getByRole('button', { name: 'Close' })).toHaveTextContent('Close')
+  })
+
+  it("shows a community's members as one list, titled by the community (specs/community-members CM-01)", async () => {
+    renderWithIntl(
+      <FollowListDialog
+        view="members"
+        slug="defi"
+        handle="#defi"
+        layout="modal"
+        open
+        onOpenChange={vi.fn()}
+      />,
+    )
+    const dialog = screen.getByRole('dialog', { name: 'Members of #defi' })
+    expect(within(dialog).queryByRole('tab')).toBeNull()
+    expect(await within(dialog).findByText('row')).toBeInTheDocument()
+    expect(action.loadPeople).toHaveBeenCalledWith(
+      expect.objectContaining({ source: { list: 'members', slug: 'defi' } }),
+    )
   })
 })

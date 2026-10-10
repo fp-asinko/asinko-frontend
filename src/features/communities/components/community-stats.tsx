@@ -3,17 +3,31 @@ import { useFormatter, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { FollowCounts } from './follow-counts'
+import { MembersButton } from './members-button'
 import type { ProfileDetails } from '../communities.types'
 
 // The numbers under a community's or a person's name in its page header
 // (specs/community-pages CP-11).
 
-/** "1,204 members", the number in bold. */
-export function MemberCount({ count, className }: { count: number; className?: string }) {
+/** "1,204 members", the number in bold: a button to the members (specs/community-members CM-01). */
+export function MemberCount({
+  count,
+  slug,
+  handle,
+  className,
+}: {
+  count: number
+  slug: string
+  /** #defi or $BTC. */
+  handle: string
+  className?: string
+}) {
   const t = useTranslations('communities')
   return (
     <p className={cn('type-meta text-muted-foreground', className)}>
-      {t.rich('members', { count, b: (chunks) => <Strong>{chunks}</Strong> })}
+      <MembersButton slug={slug} handle={handle}>
+        {t.rich('members', { count, b: (chunks) => <Strong>{chunks}</Strong> })}
+      </MembersButton>
     </p>
   )
 }

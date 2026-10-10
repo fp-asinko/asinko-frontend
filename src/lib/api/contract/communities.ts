@@ -48,4 +48,19 @@ export const joinResponseSchema = z.object({
 })
 
 /** PUT /api/v1/communities/{slug}/favorite (E02, 200). Needs membership (404 NOT_MEMBER). */
+/**
+ * GET /api/v1/communities/{slug}/members (E02): a member, newest first. `role` is read but not
+ * shown (specs/community-members Q3). P-017 (proposal, extended 2026-10-10): whether the viewer
+ * follows them; null without a session.
+ */
+export const communityMemberSchema = z.object({
+  id: z.uuid(),
+  username: z.string(),
+  avatarUrl: z.string().nullable(),
+  role: membershipSchema,
+  isFollowedByViewer: z.boolean().nullable().optional(),
+})
+
+export type RawCommunityMember = z.infer<typeof communityMemberSchema>
+
 export const favoriteResponseSchema = z.object({ viewerIsFavorite: z.literal(true) })

@@ -111,9 +111,9 @@ Las imágenes, en el mismo Storage que los avatares. Medir impresiones y clics q
 
 ### P-017: Si seguís a cada persona de una lista
 
-**Estado:** propuesta (2026-10-09), mockeada. La usan las listas de seguidores y seguidos del perfil (`specs/follow-lists`).
+**Estado:** propuesta (2026-10-09), mockeada. La usan las listas de seguidores y seguidos del perfil (`specs/follow-lists`). **Ampliada el 2026-10-10** a la lista de miembros de una comunidad (`specs/community-members`).
 
-**Endpoints:** `GET /api/v1/users/{userId}/followers` y `GET /api/v1/users/{userId}/following`.
+**Endpoints:** `GET /api/v1/users/{userId}/followers`, `GET /api/v1/users/{userId}/following` y `GET /api/v1/communities/{slug}/members`.
 
 **Motivo:** cada fila de las listas lleva "Seguir" o "Siguiendo", como Instagram y X. Hoy los ítems traen solo `id`, `username`, `avatarUrl` y `accuracyRate`: el front no sabe si el viewer ya sigue a cada persona, y sin ese dato no muestra el botón.
 

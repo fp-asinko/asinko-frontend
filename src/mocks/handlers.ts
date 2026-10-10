@@ -4,6 +4,7 @@ import {
   assetPageSchema,
   commentListSchema,
   commentSchema,
+  communityMemberSchema,
   communitySchema,
   favoriteResponseSchema,
   feedItemSchema,
@@ -30,6 +31,7 @@ import { commentTree, searchComments } from './comment-tree'
 import { withTopPost } from './top-post'
 import { ADS } from './fixtures/ads'
 import { followersOf, followingOf, listItem } from './fixtures/follows'
+import { membersOf } from './fixtures/members'
 import { thesesBy } from './fixtures/theses'
 import { updateUser } from './profile-edit'
 import { paginate } from './paginate'
@@ -302,6 +304,19 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       body: { userId: DEMO_USER.id, optionId: POLLS[1]!.options[1]!.id },
     },
     handler: ({ params, body }) => votePoll(params.id ?? '', body),
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/communities/:slug/members',
+    kind: 'contract',
+    implemented: true,
+    schema: paginatedSchema(communityMemberSchema),
+    example: { ...noRequest, params: { slug: 'defi' } },
+    // Public; a slug that does not exist is an empty list, as the backend (specs/community-members).
+    handler: ({ params, query }) => ({
+      status: 200,
+      body: paginate(membersOf(params.slug ?? ''), query.cursor),
+    }),
   },
   {
     method: 'PUT',

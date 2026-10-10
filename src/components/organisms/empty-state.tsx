@@ -58,7 +58,8 @@ export function EmptyState({
       )}
       <div
         className={cn(
-          'flex max-w-xs flex-col',
+          // wrap-anywhere: a title can carry a long handle with no place to break (#a_very_long_slug).
+          'flex max-w-xs flex-col wrap-anywhere',
           size === 'inline' ? 'min-h-8 justify-center gap-0.5' : 'gap-1',
         )}
       >

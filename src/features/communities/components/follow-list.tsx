@@ -3,8 +3,8 @@
 import { useLocale, useTranslations } from 'next-intl'
 import { Fragment, useEffect, useRef, useState, useTransition, type ReactNode } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { loadFollowList } from '../actions/load-follow-list.action'
-import type { FollowKind } from '../communities.types'
+import { loadPeople } from '../actions/load-people.action'
+import type { PeopleSource } from '../communities.types'
 import { CloudOffIcon, UsersIcon } from 'lucide-react'
 import { EmptyState } from '@/components/organisms/empty-state'
 
@@ -14,21 +14,20 @@ type State =
   | { status: 'ready'; pages: ReactNode[]; count: number; next: string | null }
 
 /**
- * One tab of the lists (specs/follow-lists FL-03, FL-04): asks its first page when it first shows,
+ * A list of people, a tab of a person's lists (specs/follow-lists FL-03, FL-04) or a community's
+ * members (specs/community-members CM-03, CM-04): asks its first page when it first shows,
  * then "Load more" (also when it scrolls into view). Skeleton rows while loading, an empty state
  * that speaks to you on your own profile, and a local error with Retry. A status region, always
  * there, says what happens (loading, failed, N more loaded); the focus never falls out of the
  * window when a button it was on goes away (WCAG 2.4.3).
  */
 export function FollowList({
-  userId,
-  kind,
+  source,
   handle,
   isSelf,
 }: {
-  userId: string
-  kind: FollowKind
-  /** @maria: the list's name and its empty state. */
+  source: PeopleSource
+  /** @maria or #defi: the list's name and its empty state. */
   handle: string
   isSelf: boolean
 }) {
@@ -57,7 +56,7 @@ export function FollowList({
     // Emptied first: the same text twice is announced twice.
     setAnnouncement(cursor ? '' : t('loading'))
     startTransition(async () => {
-      const result = await loadFollowList({ userId, kind, cursor, locale })
+      const result = await loadPeople({ source, cursor, locale })
       if (!result.ok) {
         if (cursor) {
           // Failed: the same page can be asked again.
@@ -157,13 +156,17 @@ export function FollowList({
     body = (
       <EmptyState
         icon={<UsersIcon />}
-        title={isSelf ? t(`emptySelf.${kind}`) : t(`empty.${kind}`, { handle })}
+        title={
+          isSelf && source.list !== 'members'
+            ? t(`emptySelf.${source.list}`)
+            : t(`empty.${source.list}`, { handle })
+        }
       />
     )
   } else {
     body = (
       <>
-        <ul ref={list} aria-label={t(`listLabel.${kind}`, { handle })}>
+        <ul ref={list} aria-label={t(`listLabel.${source.list}`, { handle })}>
           {state.pages.map((page, index) => (
             <Fragment key={index}>{page}</Fragment>
           ))}
@@ -197,7 +200,12 @@ export function FollowList({
 
   return (
     // Focusable only from code: where the focus lands when Retry goes away.
-    <div ref={root} tabIndex={-1} className="outline-none">
+    <div
+      ref={root}
+      tabIndex={-1}
+      // Seen where the focus lands after Retry (WCAG 2.4.7).
+      className="outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset"
+    >
       <p role="status" className="sr-only">
         {announcement}
       </p>

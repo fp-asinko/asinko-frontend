@@ -21,7 +21,7 @@ const person = (overrides: Partial<FollowItem> = {}): FollowItem => ({
 
 describe('FollowRow (specs/follow-lists FL-02, FL-05)', () => {
   it('links the person, shows their accuracy in its tier, and offers to follow', () => {
-    renderWithIntl(<FollowRow person={person()} kind="followers" />)
+    renderWithIntl(<FollowRow person={person()} list="followers" />)
     expect(screen.getByRole('link', { name: /@maria/ })).toHaveAttribute('href', '/user/maria')
     const chip = screen.getByText('74%').parentElement!
     expect(chip).toHaveAttribute('data-tier', 'high')
@@ -31,17 +31,17 @@ describe('FollowRow (specs/follow-lists FL-02, FL-05)', () => {
   })
 
   it('says Following for someone the viewer follows', () => {
-    renderWithIntl(<FollowRow person={person({ followed: true })} kind="followers" />)
+    renderWithIntl(<FollowRow person={person({ followed: true })} list="followers" />)
     expect(screen.getByRole('button', { name: /^Following/ })).toBeInTheDocument()
   })
 
   it('has no button for yourself, nor when it is unknown whether you follow them', () => {
     const { unmount } = renderWithIntl(
-      <FollowRow person={person({ isSelf: true, followed: null })} kind="followers" />,
+      <FollowRow person={person({ isSelf: true, followed: null })} list="followers" />,
     )
     expect(screen.queryByRole('button')).toBeNull()
     unmount()
-    renderWithIntl(<FollowRow person={person({ followed: null })} kind="followers" />)
+    renderWithIntl(<FollowRow person={person({ followed: null })} list="followers" />)
     expect(screen.queryByRole('button')).toBeNull()
   })
 })

@@ -389,11 +389,13 @@
       },
       "listLabel": {
         "followers": "Seguidores de {handle}",
-        "following": "Quem {handle} segue"
+        "following": "Quem {handle} segue",
+        "members": "Membros de {handle}"
       },
       "empty": {
         "followers": "{handle} ainda não tem seguidores.",
-        "following": "{handle} ainda não segue ninguém."
+        "following": "{handle} ainda não segue ninguém.",
+        "members": "{handle} ainda não tem membros."
       },
       "emptySelf": {
         "followers": "Você ainda não tem seguidores.",
@@ -407,7 +409,8 @@
       "loadError": "Não foi possível carregar mais. Tente de novo.",
       "accuracy": "{value} de precisão",
       "loaded": "{count, plural, one {Mais # carregado} other {Mais # carregados}}",
-      "errorBody": "Tente de novo em um momento."
+      "errorBody": "Tente de novo em um momento.",
+      "membersTitle": "Membros de {handle}"
     }
   },
   "postDetail": {

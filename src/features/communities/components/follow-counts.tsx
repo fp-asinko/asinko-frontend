@@ -10,8 +10,9 @@ const FollowListDialog = dynamic(loadDialog)
 
 const DESKTOP = '(min-width: 48rem)'
 
+// The touch area grows to 24px without moving the line (WCAG 2.5.8).
 const NUMBER =
-  '-mx-1 rounded-sm px-1 text-left outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50'
+  'relative -mx-1 rounded-sm px-1 text-left outline-none after:absolute after:inset-x-0 after:-inset-y-1 hover:underline focus-visible:ring-3 focus-visible:ring-ring/50'
 
 /**
  * "1,204 followers" and "180 following" as buttons (specs/follow-lists FL-01): each opens the
@@ -77,6 +78,7 @@ export function FollowCounts({
       </span>
       {opened && (
         <FollowListDialog
+          view="follows"
           layout={layout}
           open={open}
           onOpenChange={setOpen}

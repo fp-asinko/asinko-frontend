@@ -4,8 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { FollowCounts } from './follow-counts'
 
-const action = vi.hoisted(() => ({ loadFollowList: vi.fn() }))
-vi.mock('../actions/load-follow-list.action', () => action)
+const action = vi.hoisted(() => ({ loadPeople: vi.fn() }))
+vi.mock('../actions/load-people.action', () => action)
 
 const USER = '00000000-0000-4000-8000-000000000101'
 
@@ -24,9 +24,9 @@ function renderCounts() {
 describe('FollowCounts and FollowListDialog (specs/follow-lists FL-01, FL-06)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    action.loadFollowList.mockImplementation(async ({ kind }: { kind: string }) => ({
+    action.loadPeople.mockImplementation(async ({ source }: { source: { list: string } }) => ({
       ok: true,
-      data: { items: <li>{kind} row</li>, count: 1, nextCursor: null },
+      data: { items: <li>{source.list} row</li>, count: 1, nextCursor: null },
     }))
   })
 

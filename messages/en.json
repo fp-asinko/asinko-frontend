@@ -389,11 +389,13 @@
       },
       "listLabel": {
         "followers": "Followers of {handle}",
-        "following": "People {handle} follows"
+        "following": "People {handle} follows",
+        "members": "Members of {handle}"
       },
       "empty": {
         "followers": "{handle} has no followers yet.",
-        "following": "{handle} does not follow anyone yet."
+        "following": "{handle} does not follow anyone yet.",
+        "members": "{handle} has no members yet."
       },
       "emptySelf": {
         "followers": "You have no followers yet.",
@@ -407,7 +409,8 @@
       "loadError": "Could not load more. Try again.",
       "accuracy": "{value} accuracy",
       "loaded": "{count, plural, one {# more loaded} other {# more loaded}}",
-      "errorBody": "Try again in a moment."
+      "errorBody": "Try again in a moment.",
+      "membersTitle": "Members of {handle}"
     }
   },
   "postDetail": {

@@ -1,14 +1,20 @@
 import { screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { profileDetails } from '../profile.fixture'
 import { MemberCount, ProfileStats, TrackRecord } from './community-stats'
 
+vi.mock('../actions/load-people.action', () => ({ loadPeople: vi.fn() }))
+
 describe('community stats (specs/community-pages CP-11)', () => {
   it('counts members, the number in bold', () => {
-    renderWithIntl(<MemberCount count={1204} />)
+    renderWithIntl(<MemberCount count={1204} slug="macro" handle="#macro" />)
     expect(screen.getByText('1,204').tagName).toBe('STRONG')
-    expect(screen.getByText('1,204').closest('p')).toHaveTextContent('1,204 members')
+    // A button to the members (specs/community-members CM-01).
+    expect(screen.getByRole('button', { name: '1,204 members' })).toHaveAttribute(
+      'aria-haspopup',
+      'dialog',
+    )
   })
 
   it('shows followers, following, accuracy and streak in one line (specs/profile-track-record PT-01)', () => {

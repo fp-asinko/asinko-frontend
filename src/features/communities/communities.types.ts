@@ -91,6 +91,12 @@ export type ThesesPage = { items: ThesisItem[]; nextCursor: string | null }
 /** Which list of a person (specs/follow-lists). */
 export type FollowKind = 'followers' | 'following'
 
+/** Which list of people: a person's (specs/follow-lists) or a community's (specs/community-members). */
+export type PeopleList = FollowKind | 'members'
+
+/** Where a list of people comes from: a person's id, or a community's slug. */
+export type PeopleSource = { list: FollowKind; userId: string } | { list: 'members'; slug: string }
+
 /** A person in a followers or following list (FL-02, FL-05). */
 export type FollowItem = {
   username: string
