@@ -39,7 +39,7 @@ export function CommunityHeader({
       {/* -mx: the banner bleeds over the column's gutter (16px phones, the main's padding from sm). */}
       <div className="relative -mx-4">
         <IdentityBanner colorKey={page.slug} imageUrl={page.bannerUrl} className="h-24 md:h-30" />
-        <BackButton className="absolute top-2.5 left-3" />
+        <BackButton to="home" className="absolute top-2.5 left-3" />
       </div>
       <UserAvatar
         name={page.handle}

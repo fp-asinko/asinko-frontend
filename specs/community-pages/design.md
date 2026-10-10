@@ -22,7 +22,7 @@
 
 - **Banner sin imagen:** el gradiente del tono de identidad del slug (`--avatar-N` → `--avatar-N-to`), el mismo del avatar. No suma colores: son tokens existentes (`design-system.md § Color de las tarjetas`).
 - **Avatar:** `UserAvatar` en 64 px. Para grupos y activos es un cuadrado redondeado (`rounded-xl`), y su imagen si existe (el logo del activo). Para el perfil, `rounded-full`.
-- **"Volver":** `router.back()` si se llegó desde el sitio; si se entró directo, va al Home.
+- **"Volver":** un link al Home, siempre (CP-22, 2026-10-10; antes `router.back()` si se llegó desde el sitio).
 - **Mobile (360 px):** la misma columna. La fila de nombre y acciones se parte en dos si no entra: el nombre arriba y las acciones abajo, alineadas a la izquierda.
 - **Sin "posts" en los datos:** el prototipo muestra "18.432 posts", pero el backend no da esa cuenta. Solo se muestran los miembros.
 

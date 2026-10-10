@@ -7,6 +7,15 @@ import { expectNoA11yViolations } from './fixtures/axe'
 const heading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name })
 
 test.describe('Community pages', () => {
+  test('Back goes to the Home, not to the page before (CP-22)', async ({ page }) => {
+    // Coming from another page of the site: a group's.
+    await page.goto('/en/hub/defi')
+    await page.goto('/en/user/maria')
+    await expect(heading(page, 'María Ruiz')).toBeVisible()
+    await page.getByRole('link', { name: 'Back' }).click()
+    await expect(page).toHaveURL(/\/en$/)
+  })
+
   test("a group's page: header, members and its own feed, filters staying on it (CP-04, CP-07)", async ({
     page,
   }) => {

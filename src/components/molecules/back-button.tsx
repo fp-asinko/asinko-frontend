@@ -3,7 +3,7 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import { ArrowLeftIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useRouter } from '@/i18n/navigation'
+import { Link, useRouter } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 
 const button = cva(
@@ -24,13 +24,15 @@ const button = cva(
 
 /**
  * "Back": to the previous page when the visit came from the site, to the Home when the page was
- * opened directly (a shared link). Over a banner (community pages) or on the page (a post's,
- * specs/post-detail-refresh PD-01).
+ * opened directly (a shared link): a post's (specs/post-detail-refresh PD-01). With `to="home"`,
+ * always to the Home, as a link: the community, asset and profile pages (specs/community-pages
+ * CP-22). Over a banner or on the page.
  */
 export function BackButton({
   variant,
+  to = 'previous',
   className,
-}: VariantProps<typeof button> & { className?: string }) {
+}: VariantProps<typeof button> & { to?: 'previous' | 'home'; className?: string }) {
   const t = useTranslations('common')
   const router = useRouter()
   const plain = variant === 'plain'
@@ -41,6 +43,25 @@ export function BackButton({
     else router.push('/')
   }
 
+  const content = (
+    <>
+      <ArrowLeftIcon aria-hidden className={plain ? 'size-5' : 'size-3.5'} />
+      {!plain && t('back')}
+    </>
+  )
+
+  if (to === 'home') {
+    return (
+      <Link
+        href="/"
+        aria-label={plain ? t('back') : undefined}
+        className={cn(button({ variant }), className)}
+      >
+        {content}
+      </Link>
+    )
+  }
+
   return (
     <button
       type="button"
@@ -48,8 +69,7 @@ export function BackButton({
       aria-label={plain ? t('back') : undefined}
       className={cn(button({ variant }), className)}
     >
-      <ArrowLeftIcon aria-hidden className={plain ? 'size-5' : 'size-3.5'} />
-      {!plain && t('back')}
+      {content}
     </button>
   )
 }

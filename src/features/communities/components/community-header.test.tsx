@@ -18,7 +18,8 @@ describe('CommunityHeader (specs/community-pages CP-04)', () => {
     expect(screen.getByText('Rates, inflation and central banks.')).toBeInTheDocument()
     // The number in bold, the label gray (prototype): one sentence for screen readers.
     expect(screen.getByText('1,204').closest('p')).toHaveTextContent('1,204 members')
-    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument()
+    // Always to the Home, whichever page came before (CP-22).
+    expect(screen.getByRole('link', { name: 'Back' })).toHaveAttribute('href', '/')
     expect(screen.getByRole('button', { name: 'Join #macro' })).toBeInTheDocument()
   })
 

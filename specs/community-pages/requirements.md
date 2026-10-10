@@ -96,6 +96,7 @@ El PDF asigna `/hub` a `USER_PUBLIC`, pero en la base de dev los grupos del sist
 - [x] **CP-17** Cada sección secundaria (miembros, reglas) degrada sola si su request falla. Si falla la comunidad, la página muestra `error.tsx` (`engineering-principles.md § Manejo de errores`).
 - [x] **CP-18** El JS de primera carga de cada ruta nueva queda dentro del presupuesto y se suma a `e2e/performance.spec.ts`. El PO subió el presupuesto de 230 a 235 KB el 2026-10-07 (`seo.md`): el Home quedó en 230,6 KB y estas páginas en 232,0 KB.
 - [x] **CP-19** Textos nuevos en en, es y pt.
+- [x] **CP-22** **"Volver" lleva siempre al Home** (cambio de alcance, pedido del PO el 2026-10-10): en las páginas de comunidad, activo y perfil, "Volver" es un link al Home, vengas de donde vengas (antes volvía a la página anterior). El detalle de un post sigue volviendo a donde estabas (PD-01).
 
 ## Fuera de alcance
 

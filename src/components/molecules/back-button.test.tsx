@@ -41,6 +41,13 @@ describe('BackButton (specs/community-pages, specs/post-detail-refresh PD-01)', 
     expect(router.back).not.toHaveBeenCalled()
   })
 
+  it('goes to the Home always with to="home", as a link, even coming from the site (CP-22)', () => {
+    cameFrom(`${location.origin}/en/post/1`)
+    renderWithIntl(<BackButton to="home" />)
+    expect(screen.getByRole('link', { name: 'Back' })).toHaveAttribute('href', '/')
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+
   it('says "Volver" in Spanish', () => {
     renderWithIntl(<BackButton variant="plain" />, { locale: 'es' })
     expect(screen.getByRole('button', { name: 'Volver' })).toBeInTheDocument()
