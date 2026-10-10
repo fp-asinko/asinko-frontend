@@ -45,6 +45,8 @@ export function CommentTree({ postId, comments }: { postId: string; comments: Co
         ))}
         <PendingComments parentId={null} itemClassName="thread-item" />
       </ul>
+      {/* The room a closed thread leaves at the bottom of the page (CommentFold, CT-16). */}
+      <div aria-hidden className="h-(--thread-slack,0px)" />
       <CommentAnchor />
     </>
   )

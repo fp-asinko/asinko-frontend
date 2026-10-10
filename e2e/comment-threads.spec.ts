@@ -83,6 +83,44 @@ test.describe('Comment threads', () => {
     await expect(comments(page).getByText(/He always does/)).toBeVisible()
   })
 
+  test('closing at the bottom of the page keeps the author under the finger, no frame at full height (CT-16)', async ({
+    page,
+  }) => {
+    await page.goto(FED_PATH)
+    const collapse = comment(page, 'Exactly. And Powell')
+      .getByRole('button', { name: "Collapse @macropilar's comment" })
+      .first()
+    await collapse.scrollIntoViewIfNeeded()
+    // At the very bottom: a shorter page would pull the scroll up.
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+    // Every frame of the slide, measured in the page: the scroll, the author's row, the height.
+    const frames = await collapse.evaluate(async (button: HTMLElement) => {
+      const li = button.closest('li')!
+      const row = li.firstElementChild!
+      const measure = () => ({
+        scroll: Math.round(window.scrollY),
+        row: Math.round(row.getBoundingClientRect().top),
+        height: Math.round(li.getBoundingClientRect().height),
+      })
+      const first = measure()
+      button.click()
+      const out = [first]
+      for (let i = 0; i < 20; i++) {
+        await new Promise((done) => requestAnimationFrame(done))
+        out.push(measure())
+      }
+      return out
+    })
+    const [first, ...rest] = frames
+    for (const frame of rest) {
+      expect(frame.scroll).toBe(first!.scroll)
+      expect(frame.row).toBe(first!.row)
+    }
+    // It only shrinks: never back to its open height once it started closing.
+    const heights = rest.map((frame) => frame.height)
+    expect(heights).toEqual([...heights].sort((a, b) => b - a))
+  })
+
   test("a click on the thread's line closes it too (CT-06)", async ({ page, isMobile }) => {
     test.skip(isMobile, 'The strip is for the mouse; phones use ⊖')
     await page.goto(FED_PATH)

@@ -37,6 +37,36 @@ function useReveal(holds: (id: string) => boolean, open: () => void) {
 const OPEN_MS = 200
 const CLOSE_MS = 150
 
+/**
+ * The room a closed thread leaves, kept at the end of the comments (CommentTree's spacer, through
+ * --thread-slack): at the bottom of the page, a page that got shorter would pull the scroll up and
+ * the closed comment would slide away from under the finger. The room goes away as it leaves the
+ * screen, on scroll, and when a thread opens again.
+ */
+let slack = 0
+let watching = false
+
+function setSlack(px: number) {
+  slack = Math.max(0, Math.round(px))
+  document.documentElement.style.setProperty('--thread-slack', `${slack}px`)
+}
+
+/** Drops the room below the screen: the page can be that much shorter without moving. */
+function trimSlack() {
+  if (slack === 0) return
+  const root = document.documentElement
+  const below = root.scrollHeight - (window.scrollY + window.innerHeight)
+  if (below > 0) setSlack(slack - below)
+}
+
+function holdRoom(lost: number) {
+  if (lost <= 0) return
+  setSlack(slack + lost)
+  if (watching) return
+  watching = true
+  window.addEventListener('scroll', trimSlack, { passive: true })
+}
+
 /** Not in jsdom (no Web Animations) nor with reduced motion: then the change is instant. */
 function canAnimate(element: HTMLElement | null | undefined): element is HTMLElement {
   return (
@@ -52,21 +82,33 @@ function canAnimate(element: HTMLElement | null | undefined): element is HTMLEle
  * axis allows). Web Animations, because the height goes to and from "auto"; the global
  * reduced-motion rule does not reach them, hence canAnimate.
  */
-function slide(element: HTMLElement, from: number, to: number, duration: number) {
+function slide(
+  element: HTMLElement,
+  from: number,
+  to: number,
+  duration: number,
+  fill: FillMode = 'none',
+) {
   const easing = getComputedStyle(element).getPropertyValue('--ease-out').trim() || 'ease-out'
   return element.animate(
     [
       { height: `${from}px`, overflowY: 'clip' },
       { height: `${to}px`, overflowY: 'clip' },
     ],
-    { duration, easing },
+    { duration, easing, fill },
   )
 }
 
 /** The body and the replies fade as the thread slides: no text cut in half while it moves. */
-function fade(elements: (HTMLElement | null)[], from: number, to: number, duration: number) {
+function fade(
+  elements: (HTMLElement | null)[],
+  from: number,
+  to: number,
+  duration: number,
+  fill: FillMode = 'none',
+) {
   return elements.flatMap((element) =>
-    element ? [element.animate([{ opacity: from }, { opacity: to }], { duration })] : [],
+    element ? [element.animate([{ opacity: from }, { opacity: to }], { duration, fill })] : [],
   )
 }
 
@@ -133,10 +175,22 @@ export function CommentFold({
       setClosing(animated)
     })
     expand.current?.focus()
-    if (!animated || !row.current) return
-    const animation = slide(li, from, row.current.getBoundingClientRect().height, CLOSE_MS)
-    animation.onfinish = () => setClosing(false)
-    motion.current = [animation, ...fade([parts.current, children.current], 1, 0, CLOSE_MS)]
+    // Closed, the comment is its author's row.
+    const to = row.current?.getBoundingClientRect().height ?? 0
+    holdRoom(from - to)
+    if (!animated) return
+    // Held at its last frame until the parts are hidden: without it the thread would show at
+    // its full height for a frame before React hides them.
+    const finish = () => {
+      flushSync(() => setClosing(false))
+      stop()
+    }
+    const animation = slide(li, from, to, CLOSE_MS, 'forwards')
+    animation.onfinish = finish
+    motion.current = [
+      animation,
+      ...fade([parts.current, children.current], 1, 0, CLOSE_MS, 'forwards'),
+    ]
   }
 
   // Slides down from where it is: from the author's row, or midway if it was still closing.
@@ -148,12 +202,16 @@ export function CommentFold({
       setOpen(true)
       setClosing(false)
     })
-    if (!canAnimate(li)) return
-    motion.current = [
-      slide(li, from, li.getBoundingClientRect().height, OPEN_MS),
-      ...fade([parts.current, children.current], 0, 1, OPEN_MS),
-    ]
+    const to = li?.getBoundingClientRect().height ?? 0
+    // The room it left is its own again: the page grows by as much as the room shrinks.
+    const reclaim = () => setSlack(slack - (to - from))
+    if (!canAnimate(li)) return reclaim()
+    const animation = slide(li, from, to, OPEN_MS)
+    animation.onfinish = reclaim
+    motion.current = [animation, ...fade([parts.current, children.current], 0, 1, OPEN_MS)]
   }
+  // Leaving the page (or a new order of the comments): the room it held is gone.
+  useEffect(() => () => setSlack(0), [])
   const shown = open || closing
 
   return (
