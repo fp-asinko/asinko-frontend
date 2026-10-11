@@ -91,8 +91,18 @@ test.describe('Comment threads', () => {
       .getByRole('button', { name: "Collapse @macropilar's comment" })
       .first()
     await collapse.scrollIntoViewIfNeeded()
-    // At the very bottom: a shorter page would pull the scroll up.
-    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+    // At the very bottom (a shorter page would pull the scroll up), with the author's row on the
+    // screen: other tests add comments to this post (the mocks keep them), and with the row above
+    // the screen the focus on ⊕ rightly scrolls to it. The window grows until the row shows.
+    for (let tries = 0; tries < 5; tries++) {
+      const top = await collapse.evaluate((button) => {
+        window.scrollTo(0, document.documentElement.scrollHeight)
+        return button.closest('li')!.getBoundingClientRect().top
+      })
+      if (top >= 0) break
+      const size = page.viewportSize()!
+      await page.setViewportSize({ width: size.width, height: Math.ceil(size.height - top + 80) })
+    }
     // Every frame of the slide, measured in the page: the scroll, the author's row, the height.
     const frames = await collapse.evaluate(async (button: HTMLElement) => {
       const li = button.closest('li')!

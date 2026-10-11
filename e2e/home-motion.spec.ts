@@ -108,9 +108,10 @@ test.describe('Home motion', () => {
 
   test('stays accessible with the new states (G-06)', async ({ page }) => {
     await page.goto('/en?community=BTC')
-    await card(page, 'Whales accumulated 48,000 $BTC')
-      .getByRole('button', { name: /comments/ })
-      .click()
+    const whales = card(page, 'Whales accumulated 48,000 $BTC')
+    await whales.getByRole('button', { name: /comments/ }).click()
+    // The comments come from the server: measured once they are in, not while they fade in.
+    await expect(whales.getByRole('link', { name: 'See all comments' })).toBeVisible()
     await expectNoA11yViolations(page)
   })
 })

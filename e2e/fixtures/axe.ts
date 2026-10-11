@@ -5,14 +5,30 @@ import { expect, type Page } from '@playwright/test'
 export async function expectNoA11yViolations(page: Page) {
   // Entrances fade in (stagger, consensus): measured mid-fade, text looks low-contrast. Wait for
   // every finite animation to end; infinite ones (the Live pulse) never would.
-  await page.evaluate(() =>
-    Promise.all(
+  // Until none is left: content that arrives late (a server action, a hydrated column) starts its
+  // own entrance after the first wait. Bounded, so a page that keeps animating still gets measured.
+  await page.evaluate(async () => {
+    const finite = () =>
       document
         .getAnimations()
-        .filter((animation) => animation.effect?.getComputedTiming().iterations !== Infinity)
-        .map((animation) => animation.finished.catch(() => undefined)),
-    ),
-  )
+        .filter(
+          (animation) =>
+            animation.playState === 'running' &&
+            animation.effect?.getComputedTiming().iterations !== Infinity,
+        )
+    const frame = () => new Promise((done) => requestAnimationFrame(() => done(undefined)))
+    for (let round = 0; round < 10; round++) {
+      const running = finite()
+      if (running.length === 0) {
+        // Two quiet frames: nothing started right after the last one ended.
+        await frame()
+        await frame()
+        if (finite().length === 0) return
+        continue
+      }
+      await Promise.all(running.map((animation) => animation.finished.catch(() => undefined)))
+    }
+  })
   // The sticky top bar covers whatever the scroll leaves under it, and axe's target-size counts
   // that link as obscured: a result of where the test scrolled, not of the page (the bar's own
   // scroll padding keeps a focused link out from under it). While measuring, the bar stays where
