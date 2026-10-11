@@ -6,7 +6,8 @@ import { BackButton } from '@/components/molecules/back-button'
 import { env } from '@/env'
 import { buildAlternates, OG_LOCALES } from '@/i18n/alternates'
 import { permanentRedirect } from '@/i18n/navigation'
-import { routing, type Locale } from '@/i18n/routing'
+import { safeLocale } from '@/i18n/safe-locale'
+import { postImagePath, shareImage } from '@/lib/share-image/share-metadata'
 import { getOrThrow } from '@/lib/api'
 import { postPath, postSlug } from '@/lib/posts/paths'
 import type { PostItem } from '../feed.types'
@@ -19,10 +20,6 @@ import { CommentThread } from './comment-thread'
 import { PostCard } from './post-card'
 import { PostComments } from './post-comments'
 import { RecordView } from './record-view'
-
-function safeLocale(locale: string): Locale {
-  return routing.locales.find((each) => each === locale) ?? routing.defaultLocale
-}
 
 /**
  * Title, description, canonical and hreflang of a post's page (PC-12). A deleted post keeps its
@@ -43,11 +40,23 @@ export async function postMetadata(id: string, rawLocale: string): Promise<Metad
     return { title: t('deleted'), alternates, robots: { index: false } }
   }
   const description = postExcerpt(post.body) || undefined
+  // The page's openGraph replaces the layout's: the site's name goes again (specs/share-preview).
+  const site = await getTranslations({ locale, namespace: 'metadata' })
+  // Its own image, named here: the page's openGraph would drop one from the parent segment.
+  const image = shareImage(postImagePath(locale, post.id), post.title)
   return {
     title: post.title,
     description,
     alternates,
-    openGraph: { title: post.title, description, locale: OG_LOCALES[locale], type: 'article' },
+    openGraph: {
+      title: post.title,
+      description,
+      siteName: site('title'),
+      locale: OG_LOCALES[locale],
+      type: 'article',
+      ...image.openGraph,
+    },
+    twitter: image.twitter,
   }
 }
 

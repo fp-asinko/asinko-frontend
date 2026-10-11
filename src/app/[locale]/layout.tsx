@@ -53,7 +53,8 @@ export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Pr
       type: 'website',
       locale: hasLocale(routing.locales, locale) ? OG_LOCALES[locale] : undefined,
     },
-    twitter: { card: 'summary' },
+    // The share images are 1200×630 (specs/share-preview SP-05): the large card on X.
+    twitter: { card: 'summary_large_image' },
     // Outside production nothing is indexable (F-31, security.md).
     robots: isIndexable(env.APP_ENV) ? undefined : { index: false, follow: false },
   }

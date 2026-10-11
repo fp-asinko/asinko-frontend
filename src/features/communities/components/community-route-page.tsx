@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { env } from '@/env'
 import { buildAlternates, OG_LOCALES } from '@/i18n/alternates'
-import { routing, type Locale } from '@/i18n/routing'
+import { safeLocale } from '@/i18n/safe-locale'
+import { brandImagePath, shareImage } from '@/lib/share-image/share-metadata'
 import { communityPath, type CommunityKind } from '@/lib/communities/paths'
 import { notFound } from 'next/navigation'
 import { getOrThrow } from '@/lib/api'
@@ -12,10 +13,6 @@ import { resolveCommunityPage } from '../lib/community-route'
 import { getProfileDetails } from '../lib/profile-api'
 import { CommunityDetails } from './community-details'
 import { CommunityHeader } from './community-header'
-
-function safeLocale(locale: string): Locale {
-  return routing.locales.find((each) => each === locale) ?? routing.defaultLocale
-}
 
 /**
  * Title, description, canonical and hreflang of a community page (CP-03). A community that does
@@ -38,11 +35,22 @@ export async function communityMetadata(
     (profile?.ok && profile.data.bio) ||
     page.description ||
     t('description', { handle: page.handle })
+  // The page's openGraph replaces the layout's: the site's name and the brand's image go again
+  // (specs/share-preview SP-04).
+  const site = await getTranslations({ locale, namespace: 'metadata' })
+  const image = shareImage(brandImagePath(locale), site('description'))
   return {
     title,
     description,
     alternates: buildAlternates(env.NEXT_PUBLIC_SITE_URL, locale, communityPath(kind, page.slug)),
-    openGraph: { title, description, locale: OG_LOCALES[locale] },
+    openGraph: {
+      title,
+      description,
+      siteName: site('title'),
+      locale: OG_LOCALES[locale],
+      ...image.openGraph,
+    },
+    twitter: image.twitter,
   }
 }
 

@@ -562,5 +562,8 @@
   "share": {
     "copied": "Link copiado",
     "failed": "No se pudo copiar"
+  },
+  "shareImage": {
+    "stats": "{votes, plural, one {{votesLabel} voto} other {{votesLabel} votos}} · {comments, plural, one {{commentsLabel} comentario} other {{commentsLabel} comentarios}}"
   }
 }
