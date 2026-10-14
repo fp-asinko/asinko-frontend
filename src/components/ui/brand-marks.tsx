@@ -4,10 +4,11 @@ import type { SVGProps } from 'react'
  * Brand marks for the social logins of the account modal (specs/guest-experience G-13): Reddit,
  * Instagram and X, from Simple Icons (CC0), one color (currentColor) like the rest of the UI. The
  * marks belong to their companies: used only to say "continue with". Decorative: the button says it.
+ * The share window's marks live apart (share-marks.tsx): this module ships with the account modal.
  */
-type BrandProps = Omit<SVGProps<SVGSVGElement>, 'children'>
+export type BrandProps = Omit<SVGProps<SVGSVGElement>, 'children'>
 
-function Brand({ d, ...props }: BrandProps & { d: string }) {
+export function Brand({ d, ...props }: BrandProps & { d: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden focusable="false" {...props}>
       <path d={d} />

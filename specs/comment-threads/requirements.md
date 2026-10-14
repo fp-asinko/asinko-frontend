@@ -35,7 +35,7 @@ Que los comentarios de un post se lean como los de Reddit: avatares y texto del 
 
 ### Compartir
 
-- [ ] **CT-11** "Compartir" en cada comentario (Q1): en un teléfono abre el menú de compartir del sistema; en desktop copia el link al comentario y el botón dice "Link copiado" por 2 segundos (anunciado a lectores de pantalla).
+- [ ] **CT-11** "Compartir" en cada comentario (Q1): en un teléfono abre el menú de compartir del sistema; en desktop copia el link al comentario y el botón dice "Link copiado" por 2 segundos (anunciado a lectores de pantalla). **Cambio de alcance (2026-10-14):** en desktop, el Compartir de un post abre la ventana de `specs/share-menu`; el de un comentario sigue copiando.
 - [ ] **CT-12** El link es la página del post con el ancla del comentario (`/post/{id}/{slug}#comment-{id}`). Abrirlo lleva a ese comentario y lo resalta un momento. Si está dentro de un hilo plegado, se abre el hilo.
 
 ### Calidad

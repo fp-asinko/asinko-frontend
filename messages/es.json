@@ -561,7 +561,17 @@
   },
   "share": {
     "copied": "Link copiado",
-    "failed": "No se pudo copiar"
+    "failed": "No se pudo copiar",
+    "title": "Compartir post",
+    "close": "Cerrar",
+    "copy": "Copiar link",
+    "newTab": "(se abre en una pestaña nueva)",
+    "targets": {
+      "x": "X",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "email": "Email"
+    }
   },
   "shareImage": {
     "stats": "{votes, plural, one {{votesLabel} voto} other {{votesLabel} votos}} · {comments, plural, one {{commentsLabel} comentario} other {{commentsLabel} comentarios}}"

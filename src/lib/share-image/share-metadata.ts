@@ -20,6 +20,8 @@ export function shareImage(
 /** The brand's image of a language (SP-04). */
 export const brandImagePath = (locale: string) => `/${locale}/opengraph-image/brand`
 
-/** A post's own image (SP-01). */
-export const postImagePath = (locale: string, id: string) =>
-  `/${locale}/post/${id}/opengraph-image/card`
+/** A post's own image, without the locale (SP-01): what the share window shows (specs/share-menu). */
+export const postImageRoute = (id: string) => `/post/${id}/opengraph-image/card`
+
+/** A post's own image in a language (SP-01). */
+export const postImagePath = (locale: string, id: string) => `/${locale}${postImageRoute(id)}`

@@ -4,6 +4,7 @@ import { useFormatter, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ShareButton } from '@/components/molecules/share-button'
 import { Link } from '@/i18n/navigation'
+import { postImageRoute } from '@/lib/share-image/share-metadata'
 import { cn } from '@/lib/utils'
 import { CARD_ACTION } from './card-action'
 import type { PostItem } from '../feed.types'
@@ -193,7 +194,12 @@ export function PostCard({
             </CommentsToggle>
           )}
           <span className="ml-auto md:ml-0">
-            <ShareButton href={post.path} className={cn(CARD_ACTION, 'min-w-8 justify-center')}>
+            <ShareButton
+              href={post.path}
+              // The share window, with the image other apps will show (specs/share-menu).
+              post={{ title: post.title, preview: postImageRoute(post.id) }}
+              className={cn(CARD_ACTION, 'min-w-8 justify-center')}
+            >
               <ForwardIcon aria-hidden className="size-4" />
               {/* Its name in phones too, where only the icon shows. */}
               <span className="sr-only sm:not-sr-only">{t('share')}</span>
