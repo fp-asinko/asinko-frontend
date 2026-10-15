@@ -4,13 +4,33 @@
 
 **Revisado el 2026-10-08** contra el deploy de `asinko-app` en Vercel (`https://asinko-app-web.vercel.app`) y el código de la rama `dev` (sigue en `bd91e4b`, sin cambios desde el 2026-10-07), con `pnpm api:smoke` (sin diferencias con el contrato) y llamadas directas. Ninguna propuesta pendiente está implementada todavía; las que sí lo estaban (P-002, P-004, P-007, P-008 y P-010) ya salieron de este archivo.
 
+## Respuesta del backend (2026-10-13)
+
+Respondida en [`responses/2026-10-13-backend.md`](responses/2026-10-13-backend.md) (copia del documento del backend). Lo implementado está en `dev` y en el deploy de Vercel; el contrato al día, en `financeshowoff-design-docs/api/` (`openapi.yaml`, `CHANGELOG.md`). **Todavía no se verificó contra el deploy** (`pnpm api:smoke`), ni se actualizó el snapshot de `docs/references/api/`: cada propuesta sale de este archivo cuando el front la adopta.
+
+| Propuesta                       | Backend                                                                   | Qué cambia en el front                                                                         |
+| ------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| P-012 contenido de un usuario   | Implementado: `GET /users/{userId}/content`                               | La pestaña Posts del perfil pasa a ese endpoint (hoy usa el canal personal)                    |
+| P-012 comentarios de un usuario | Implementado: `GET /users/{userId}/comments`                              | Pestaña nueva "Respuestas" en el perfil (spec nueva)                                           |
+| P-001 menciones                 | Implementado, en posts **y comentarios**                                  | Verificar el render con datos reales; los comentarios también las traen                        |
+| P-001 feed de menciones         | No se hace                                                                | `overview.md` actualizado (2026-10-14)                                                         |
+| P-011 nombre visible            | Implementado, opcional                                                    | Apagar el mock; editarlo en "Editar perfil"                                                    |
+| Catálogo                        | Acciones, ETFs, índices, commodities y monedas                            | Símbolos con `.` y `/` (`BRK.B`, `XAU/USD`): hoy la ruta y las menciones no los aceptan        |
+| P-014 orden y búsqueda          | Implementado; `best` es cronológico por ahora                             | Apagar el mock de `?q=`                                                                        |
+| P-005 `hot` y `top` del feed    | Pendiente                                                                 | Nada todavía                                                                                   |
+| P-016 post principal            | Implementado                                                              | Apagar el mock                                                                                 |
+| P-013 imágenes                  | **URL firmada** (`POST /uploads/post-image`), no subida directa; `imageAlt` | Cambiar la subida (hoy va directo al bucket) y sumar el texto alternativo                      |
+| P-015 anuncios                  | **Vendrán dentro del feed; no habrá `GET /ads`**                          | Sacar el intercalado de anuncios del front; ignorar los `kind` desconocidos                    |
+| P-003 precios                   | Twelve Data; 61 de 100 activos con precio viejo                           | Mostrar el precio, "desactualizado" y la fecha; "Sin datos de mercado" si es `null`            |
+| P-017 "lo seguís" en listas     | **Sin respuesta**                                                         | Sigue mockeado                                                                                 |
+
 ## Pendientes
 
 En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P-015, P-003 y P-005.
 
 ### P-012: Todo lo que publica un usuario
 
-**Estado:** propuesta (2026-10-07).
+**Estado:** implementada (backend, 2026-10-13): `GET /users/{userId}/content`, más `GET /users/{userId}/comments` para la pestaña de respuestas. Falta adoptarla en el front.
 
 **Endpoint:** nuevo, por ejemplo `GET /api/v1/users/{userId}/content?kind=POST,POLL&cursor=`, o un filtro `?creator={userId}` en `GET /feed/explore`.
 
@@ -20,7 +40,7 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P
 
 ### P-001: Menciones detectadas al publicar y resueltas al leer
 
-**Estado:** propuesta. La detección se postergó en el backend (E3-06, 21/09): `POST /posts` devuelve `entities: []`, y `GET /posts/{id}` y el feed no traen `entities`. **Ampliada el 2026-10-08:** el front ya autocompleta `$`, `#` y `@` al escribir posts y comentarios (`specs/mention-autocomplete`); sin la detección, esas menciones se publican como texto.
+**Estado:** implementada en posts y comentarios (backend, 2026-10-13); el feed de lo que menciona algo **no se hace**. Antes: la detección se postergó en el backend (E3-06, 21/09): `POST /posts` devuelve `entities: []`, y `GET /posts/{id}` y el feed no traen `entities`. **Ampliada el 2026-10-08:** el front ya autocompleta `$`, `#` y `@` al escribir posts y comentarios (`specs/mention-autocomplete`); sin la detección, esas menciones se publican como texto.
 
 **Endpoint:**
 
@@ -44,7 +64,7 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P
 
 ### P-013: Subida de imágenes de posts
 
-**Estado:** respondida por el backend (decisión del 01/10/2026, `INFRA-PENDIENTES.md § Storage`): la app sube directo al bucket `post-images` con la sesión del usuario y manda la URL a `POST /posts`. El front lo implementa en `specs/post-image` (2026-10-08).
+**Estado:** implementada con **URL firmada** (backend, 2026-10-13): `POST /uploads/post-image`, después el `PUT` del navegador, después `POST /posts` con el `imageUrl` limpio (sin EXIF) que devuelve la respuesta; `imageAlt` opcional. Reemplaza la decisión del 01/10/2026 (subida directa al bucket con la sesión del usuario), que es lo que hoy hace `specs/post-image`.
 
 **Cómo lo hace el front:** la sesión del front es un Bearer en una cookie `HttpOnly` del servidor, así que sube **el servidor de la app** con el token del usuario (`PUT /storage/v1/object/post-images/{userId}/{uuid}.webp`): la política "subir en la carpeta propia" aplica igual y el token no llega al navegador. Antes, el navegador achica la imagen a 2048 px en WebP, lo que borra los metadatos EXIF.
 
@@ -56,7 +76,7 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P
 
 ### P-011: Nombre visible en el perfil
 
-**Estado:** propuesta (2026-10-07), mockeada. **Tier y rating quedan para después del MVP** (respuesta del backend, 2026-10-07): el front no los muestra.
+**Estado:** implementada, opcional (backend, 2026-10-13); se edita con `PATCH /users/{userId}`. **Tier y rating quedan para después del MVP** (respuesta del backend, 2026-10-07): el front no los muestra.
 
 **Endpoint:** `GET /profiles/{identifier}`.
 
@@ -66,17 +86,17 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P
 
 ### P-003: Precios de los activos
 
-**Estado:** el endpoint está (`GET /assets`, `GET /assets/{symbol}`, con logo y sentimiento). **Novedad (2026-10-08):** los 10 activos ya traen `price` y `priceChangePct` reales, todos con `priceUpdatedAt` de 2026-10-08 17:15 UTC, pero llegan con `priceStale: true` y en `dev` no hay un proveedor que los actualice: parecen cargados a mano, una vez.
+**Estado (2026-10-13):** proveedor Twelve Data; 61 de los 100 activos tienen precio de una corrida manual (viejo hasta el plan pago); los de Santiago, índices y commodities, sin precio. Mostrar el precio siempre, marcado si `priceStale`, con `priceUpdatedAt`; `null` da "Sin datos de mercado todavía". **Antes:** el endpoint está (`GET /assets`, `GET /assets/{symbol}`, con logo y sentimiento). **Novedad (2026-10-08):** los 10 activos ya traen `price` y `priceChangePct` reales, todos con `priceUpdatedAt` de 2026-10-08 17:15 UTC, pero llegan con `priceStale: true` y en `dev` no hay un proveedor que los actualice: parecen cargados a mano, una vez.
 
 **Efecto:** la columna de activos sigue con precios de prueba, y la página de activo muestra "Sin datos de mercado todavía": el front no muestra un precio marcado como viejo. **Pregunta:** ¿de dónde salen esos precios y cada cuánto se van a actualizar? Con un proveedor que los mantenga frescos (`priceStale: false`), el front los muestra.
 
 ### P-005: Orden del feed
 
-**Estado:** el filtro por tipo (`?kind=POST,POLL`) ya está y está en el contrato. **Falta:** `sort=hot|new|top`, para los filtros _Hot_ y _Top_ del prototipo. ¿Cuándo?
+**Estado:** pendiente (backend, 2026-10-13: fórmulas en definición; hoy los feeds son `new`). El filtro por tipo (`?kind=POST,POLL`) ya está y está en el contrato. **Falta:** `sort=hot|new|top`, para los filtros _Hot_ y _Top_ del prototipo. ¿Cuándo?
 
 ### P-014: Ordenar y buscar comentarios
 
-**Estado:** propuesta (2026-10-08), mockeada en el front (`specs/post-detail-refresh`).
+**Estado:** implementada salvo `best`, que por ahora es cronológico (backend, 2026-10-13). El mock de `?q=` se apaga cuando el front la adopte.
 
 **Endpoint:** `GET /api/v1/{posts|polls}/{id}/comments`, dos parámetros nuevos:
 
@@ -89,7 +109,7 @@ En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P
 
 ### P-015: Anuncios de la casa
 
-**Estado:** propuesta (2026-10-08), mockeada en el front (`specs/post-detail-refresh`).
+**Estado:** decidida distinto (backend, 2026-10-13): los anuncios **vendrán dentro de la lista del feed**, cuando exista su algoritmo; no habrá `GET /ads` y el front no decide dónde va cada uno. Por ahora no hay anuncios. El intercalado que hace el front (`specs/post-detail-refresh` PD-07 a PD-16) hay que sacarlo, y el feed tiene que ignorar los `kind` que no conoce.
 
 **Endpoint:** nuevo, `GET /api/v1/ads?placement=comments|feed` (público). `comments`: el anuncio dentro de un post y los de sus comentarios; `feed`: los de los feeds.
 
@@ -111,7 +131,7 @@ Las imágenes, en el mismo Storage que los avatares. Medir impresiones y clics q
 
 ### P-017: Si seguís a cada persona de una lista
 
-**Estado:** propuesta (2026-10-09), mockeada. La usan las listas de seguidores y seguidos del perfil (`specs/follow-lists`). **Ampliada el 2026-10-10** a la lista de miembros de una comunidad (`specs/community-members`).
+**Estado:** propuesta (2026-10-09), mockeada; **sin respuesta** en la del 2026-10-13. La usan las listas de seguidores y seguidos del perfil (`specs/follow-lists`). **Ampliada el 2026-10-10** a la lista de miembros de una comunidad (`specs/community-members`).
 
 **Endpoints:** `GET /api/v1/users/{userId}/followers`, `GET /api/v1/users/{userId}/following` y `GET /api/v1/communities/{slug}/members`.
 
@@ -121,7 +141,7 @@ Las imágenes, en el mismo Storage que los avatares. Medir impresiones y clics q
 
 ### P-016: El post principal de cada comunidad
 
-**Estado:** propuesta (2026-10-08), mockeada en el front (`specs/interests-refresh`).
+**Estado:** implementada (backend, 2026-10-13): `topPost: { id, title } | null` en `GET /communities` y `GET /communities/{slug}`. El mock se apaga cuando el front la adopte.
 
 **Endpoint:** `GET /api/v1/communities` (con y sin `?mine=true`) y `GET /api/v1/communities/{slug}`: el recurso `Community` suma un campo.
 
@@ -137,13 +157,13 @@ El más votado de los últimos 7 días; si no hubo, el más reciente; `null` si 
 
 ## Pedidos operativos
 
-- **Datos de las páginas en el seed:** las páginas de grupo, activo y perfil ya muestran banner, avatar, descripción, reglas y bio, pero el seed casi no los tiene. Revisado el 2026-10-08: de las 20 comunidades de la primera página de `GET /communities`, ninguna tiene avatar, banner ni reglas, y solo una tiene descripción; 6 de los 10 activos tienen logo. Ningún usuario tiene bio ni verificado. **Pedido:** sumar al seed avatar y banner (en Storage, como los avatares de usuario), descripción y reglas para los grupos, logo para todos los activos y bio para los usuarios, así las páginas se pueden probar con datos reales. Si se acepta P-011, también `displayName`.
+- **Hecho (backend, 2026-10-13): todas las comunidades con avatar, banner, descripción y reglas; los 100 activos con logo; bio en 9 de 10 perfiles, verificado en 2 y nombre visible en 5.** Antes: **Datos de las páginas en el seed:** las páginas de grupo, activo y perfil ya muestran banner, avatar, descripción, reglas y bio, pero el seed casi no los tiene. Revisado el 2026-10-08: de las 20 comunidades de la primera página de `GET /communities`, ninguna tiene avatar, banner ni reglas, y solo una tiene descripción; 6 de los 10 activos tienen logo. Ningún usuario tiene bio ni verificado. **Pedido:** sumar al seed avatar y banner (en Storage, como los avatares de usuario), descripción y reglas para los grupos, logo para todos los activos y bio para los usuarios, así las páginas se pueden probar con datos reales. Si se acepta P-011, también `displayName`.
 
 ## Preguntas sobre el contrato
 
-- **Acciones y ETFs en el catálogo (2026-10-08):** `GET /assets` ya devuelve AAPL, NVDA, GME y VOO junto a las criptos. El producto dice "por ahora, solo criptomonedas" y deja las acciones para después (`docs/product/overview.md`). El front las sugiere al escribir `$` y les arma página. ¿Entran ya en el MVP o se filtran del catálogo por ahora?
-- **Tesis en el feed:** el feed ya devuelve `kind: "THESIS"`. El front las muestra en la fase 2 y mientras tanto pide `?kind=POST,POLL`. ¿OK?
-- **Documentos del contrato:** queda pedido el acceso al repo `financeshowoff-design-docs`, para refrescar `docs/references/api/` sin depender de copias.
+- **Respondida (2026-10-13): entran en el MVP, sin filtrar el catálogo.** Antes: **Acciones y ETFs en el catálogo (2026-10-08):** `GET /assets` ya devuelve AAPL, NVDA, GME y VOO junto a las criptos. El producto dice "por ahora, solo criptomonedas" y deja las acciones para después (`docs/product/overview.md`). El front las sugiere al escribir `$` y les arma página. ¿Entran ya en el MVP o se filtran del catálogo por ahora?
+- **Respondida (2026-10-13): OK; cuando se muestren, sumar `THESIS` al `kind`.** Antes: **Tesis en el feed:** el feed ya devuelve `kind: "THESIS"`. El front las muestra en la fase 2 y mientras tanto pide `?kind=POST,POLL`. ¿OK?
+- **Respondida (2026-10-13): ya hay acceso a `financeshowoff-design-docs`.** Antes: **Documentos del contrato:** queda pedido el acceso al repo `financeshowoff-design-docs`, para refrescar `docs/references/api/` sin depender de copias.
 
 ## Formato de una propuesta
 

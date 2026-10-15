@@ -24,16 +24,16 @@ La interfaz sigue el **prototipo** (`docs/references/prototype.html`), fuente de
 
 Tres símbolos conectan el contenido con entidades. Funcionan en **todo** el contenido: posts, tesis, comentarios y lives. Se guardan como referencias por ID, no como texto, para que un cambio de nombre no rompa menciones viejas.
 
-| Símbolo | Referencia a                           | Ejemplo           | Autocompleta desde                    |
-| ------- | -------------------------------------- | ----------------- | ------------------------------------- |
-| `$`     | Activo (por ahora, solo criptomonedas) | `$BTC`, `$ETH`    | Catálogo curado de activos soportados |
-| `#`     | Comunidad                              | `#macro`, `#defi` | Comunidades existentes                |
-| `@`     | Usuario                                | `@federicopiva`   | Usuarios                              |
+| Símbolo | Referencia a                                                   | Ejemplo           | Autocompleta desde                    |
+| ------- | -------------------------------------------------------------- | ----------------- | ------------------------------------- |
+| `$`     | Activo: acciones, ETFs, cripto, índices, commodities y monedas | `$AAPL`, `$BTC`   | Catálogo curado de activos soportados |
+| `#`     | Comunidad                                                      | `#macro`, `#defi` | Comunidades existentes                |
+| `@`     | Usuario                                                        | `@federicopiva`   | Usuarios                              |
 
-- Cada activo y cada comunidad tiene su página con todo el contenido que lo menciona.
+- Cada activo y cada comunidad tiene su página con lo que se **publica ahí**, no con lo que lo menciona (decisión del backend, 2026-10-13: las menciones sirven para los links del texto y las notificaciones, no para armar feeds). La página de `$BTC` muestra lo publicado en la comunidad de BTC.
 - Mencionar a un `@usuario` le envía una notificación.
 - El catálogo de activos es **cerrado**: solo se puede mencionar lo que Asinko soporta. Así cada ticker significa siempre lo mismo (hay varios tokens distintos llamados igual) y se evita promocionar tokens falsos.
-- Las **acciones** se suman al catálogo más adelante (ver roadmap).
+- **Acciones y ETFs entran en el MVP**, y son incluso más importantes que las cripto (decisión del 2026-10-13). El catálogo de lanzamiento tiene 100 activos: 30 acciones de EE.UU., 20 de la Bolsa de Santiago, 10 ETFs, 10 cripto, 11 índices, 8 commodities y 11 pares de monedas. Hay símbolos con punto o barra (`BRK.B`, `XAU/USD`).
 
 ## Tipos de contenido
 
@@ -83,11 +83,13 @@ Una comunidad es un **grupo**: se menciona con `#` y tiene miembros, reglas, mod
 
 Un usuario puede seguir tres cosas. Lo que sigue alimenta su feed "Siguiendo":
 
-| Qué       | Mención        | Qué suma al feed                         |
-| --------- | -------------- | ---------------------------------------- |
-| Comunidad | `#defi`        | Los posts publicados en la comunidad     |
-| Activo    | `$BTC`         | Todo el contenido que menciona el activo |
-| Usuario   | `@quantsimula` | Todo lo que publica el usuario           |
+| Qué       | Mención        | Qué suma al feed                            |
+| --------- | -------------- | ------------------------------------------- |
+| Comunidad | `#defi`        | Los posts publicados en la comunidad        |
+| Activo    | `$BTC`         | Los posts publicados en la comunidad de BTC |
+| Usuario   | `@quantsimula` | Lo que publica en su canal personal         |
+
+"Siguiendo" muestra solo lo publicado en las comunidades que seguís; no suma lo que las menciona (2026-10-13).
 
 Solo las comunidades son grupos. La página de un activo y el perfil de un usuario se siguen, pero no tienen miembros ni moderación.
 
@@ -99,17 +101,16 @@ Solo las comunidades son grupos. La página de un activo y el perfil de un usuar
 | **2. Tesis y reputación** | Tesis con resolución automática, accuracy, racha, rating, perfil con track record, página de activo, búsqueda, formatos Thought y Portfolio                                                                                                                                                                                                                                                                                                                                                                                                        |
 | **3. Tiempo real**        | Lives, alertas de mercado, notificaciones                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | **4. Economía**           | Tokens, stakes en tesis, Finance Duel, propinas, avatar, monetización de creadores. **Requiere validación legal antes del spec**                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| **Posterior**             | Acciones en el catálogo de `$`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| **Posterior**             | Feed de lo que menciona un activo, grupo o persona (descartado para el MVP el 2026-10-13)                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
 ## Fuera de alcance (por ahora)
 
-- Acciones, ETFs y divisas como activos mencionables.
 - Ejecutar operaciones o conectar exchanges y brokers.
 - Recomendaciones personalizadas de inversión.
 
 ## Decisiones abiertas
 
-- [ ] Proveedor de precios de cripto para resolver tesis.
+- [x] Proveedor de precios: **Twelve Data** (2026-10-13). Los precios se actualizan solos cuando se contrate el plan pago; mientras tanto hay datos viejos en 61 de los 100 activos.
 - [ ] Mercado inicial.
 - [ ] Cuándo llegan el login y las escrituras reales (a definir con backend).
 - [x] En el MVP no hay página de activo ni perfil: ¿a dónde lleva hacer clic en una mención `$` o `@`? **Decidido en `specs/home` (Q4):** `$` y `#` llevan al Home filtrado por la comunidad; `@` se destaca sin link hasta que exista el perfil.
