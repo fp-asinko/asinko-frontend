@@ -28,7 +28,13 @@ function crypto(n: number, seed: Seed): RawAsset {
   }
 }
 
-// MVP catalog: crypto only (overview.md). Prices are fictional.
+/** An asset of another class (backend 2026-10-13: stocks, ETFs, commodities…), no community. */
+function other(n: number, seed: Seed & Pick<RawAsset, 'assetClass' | 'exchange'>): RawAsset {
+  return { ...crypto(n, seed), assetClass: seed.assetClass, exchange: seed.exchange }
+}
+
+// The catalog's crypto (prices fictional), and three of the other classes, with "." and "/" in
+// their symbols and no community yet (specs/backend-answer-1013 BA-08, BA-09).
 export const ASSETS: RawAsset[] = [
   crypto(1, {
     symbol: 'BTC',
@@ -93,6 +99,39 @@ export const ASSETS: RawAsset[] = [
     priceChangePct: -0.62,
     bullishPct: 51.0,
     totalVotes: 288,
+    stale: true,
+  }),
+  other(20, {
+    symbol: 'TSLA',
+    name: 'Tesla, Inc.',
+    assetClass: 'EQUITY',
+    exchange: 'XNAS',
+    price: 376.43,
+    priceChangePct: 1.2,
+    bullishPct: 52,
+    totalVotes: 140,
+    stale: true,
+  }),
+  other(21, {
+    symbol: 'BRK.B',
+    name: 'Berkshire Hathaway Inc. Class B',
+    assetClass: 'EQUITY',
+    exchange: 'XNYS',
+    price: 471.2,
+    priceChangePct: -0.3,
+    bullishPct: 61,
+    totalVotes: 35,
+    stale: true,
+  }),
+  other(22, {
+    symbol: 'XAU/USD',
+    name: 'Gold Spot / US Dollar',
+    assetClass: 'COMMODITY',
+    exchange: null,
+    price: null,
+    priceChangePct: null,
+    bullishPct: 50,
+    totalVotes: 0,
     stale: true,
   }),
 ]

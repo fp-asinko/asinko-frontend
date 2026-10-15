@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
-import { createPostSchema, TITLE_MAX } from './create-post.schema'
+import { createPostSchema, IMAGE_ALT_MAX, TITLE_MAX } from './create-post.schema'
 
 const COMMUNITY = '00000000-0000-4000-8000-000000001001'
 const valid = {
@@ -85,5 +85,18 @@ describe('createPostSchema (specs/post-create-detail PC-08, PC-09)', () => {
     expect(
       createPostSchema.parse({ ...valid, imageUrl: 'https://x.com/a.webp' }),
     ).not.toHaveProperty('imageUrl')
+  })
+
+  it('sends the image description only with an image, trimmed, up to 300 (BA-04)', () => {
+    const image = { ...valid, type: 'IMAGE', imageUrl: '/mocks/chart-btc.svg' }
+    expect(createPostSchema.parse({ ...image, imageAlt: '  BTC since 2020 ' })).toMatchObject({
+      imageAlt: 'BTC since 2020',
+    })
+    // Not written: not sent.
+    expect(createPostSchema.parse({ ...image, imageAlt: '  ' })).not.toHaveProperty('imageAlt')
+    expect(createPostSchema.parse({ ...valid, imageAlt: 'A chart' })).not.toHaveProperty('imageAlt')
+    expect(errors({ ...image, imageAlt: 'a'.repeat(IMAGE_ALT_MAX + 1) })).toEqual({
+      imageAlt: 'composer.errors.imageAltTooLong',
+    })
   })
 })

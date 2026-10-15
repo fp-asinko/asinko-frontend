@@ -33,9 +33,7 @@ describe('LoadMore (H-16)', () => {
 
   it('appends the next page when pressed, with the feed state, cursor and locale', async () => {
     action.loadMoreFeed.mockResolvedValue(page('Card 21', 'c2'))
-    renderWithIntl(
-      <LoadMore params={parseFeedParams({ filter: 'polls' })} cursor="c1" offset={20} />,
-    )
+    renderWithIntl(<LoadMore params={parseFeedParams({ filter: 'polls' })} cursor="c1" />)
 
     await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
     expect(await screen.findByText('Card 21')).toBeInTheDocument()
@@ -45,8 +43,6 @@ describe('LoadMore (H-16)', () => {
       community: undefined,
       cursor: 'c1',
       locale: 'en',
-      // The cards already shown: the ads go on counting (specs/post-detail-refresh PD-16).
-      offset: 20,
     })
     expect(screen.getByRole('status')).toHaveTextContent('1 more item loaded')
   })
@@ -54,20 +50,18 @@ describe('LoadMore (H-16)', () => {
   it('loads by itself when the button scrolls into view, and follows the cursor', async () => {
     action.loadMoreFeed.mockResolvedValueOnce(page('Card 21', 'c2'))
     action.loadMoreFeed.mockResolvedValueOnce(page('Card 41', null))
-    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" offset={20} />)
+    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" />)
 
     await act(async () => observers.at(-1)!([{ isIntersecting: true }]))
     expect(await screen.findByText('Card 21')).toBeInTheDocument()
     await act(async () => observers.at(-1)!([{ isIntersecting: true }]))
     expect(await screen.findByText('Card 41')).toBeInTheDocument()
-    expect(action.loadMoreFeed).toHaveBeenLastCalledWith(
-      expect.objectContaining({ cursor: 'c2', offset: 21 }),
-    )
+    expect(action.loadMoreFeed).toHaveBeenLastCalledWith(expect.objectContaining({ cursor: 'c2' }))
   })
 
   it('disappears when there are no more pages', async () => {
     action.loadMoreFeed.mockResolvedValue(page('Last card', null))
-    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" offset={20} />)
+    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" />)
 
     await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
     await screen.findByText('Last card')
@@ -78,7 +72,7 @@ describe('LoadMore (H-16)', () => {
     action.loadMoreFeed
       .mockResolvedValueOnce({ ok: false, error: 'api.errors.UNAVAILABLE' })
       .mockResolvedValueOnce(page('Card 21', null))
-    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" offset={20} />)
+    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" />)
 
     await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not load more')
@@ -88,7 +82,7 @@ describe('LoadMore (H-16)', () => {
 
   it('is reachable with the keyboard', async () => {
     action.loadMoreFeed.mockResolvedValue(page('Card 21', null))
-    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" offset={20} />)
+    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" />)
 
     await userEvent.tab()
     expect(screen.getByRole('button', { name: 'Load more' })).toHaveFocus()
@@ -109,7 +103,7 @@ describe('LoadMore (H-16)', () => {
         nextCursor: null,
       },
     })
-    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" offset={20} />)
+    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" />)
 
     await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
     expect(await screen.findByRole('article', { name: 'Card 21' })).toHaveFocus()
@@ -128,7 +122,7 @@ describe('LoadMore (H-16)', () => {
         nextCursor: 'c2',
       },
     })
-    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" offset={20} />)
+    renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" />)
 
     await act(async () => observers.at(-1)!([{ isIntersecting: true }]))
     expect(await screen.findByRole('article', { name: 'Card 21' })).not.toHaveFocus()

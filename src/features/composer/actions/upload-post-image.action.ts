@@ -1,10 +1,9 @@
 'use server'
 
-import { z } from 'zod'
 import type { ActionResult } from '@/lib/result'
 import { MAX_UPLOAD_BYTES } from '@/lib/prepare-image'
-import { getAccessToken, getViewer } from '@/lib/session'
-import { removePostImage, uploadPostImage } from '@/lib/storage/post-images'
+import { getViewer } from '@/lib/session'
+import { uploadPostImage } from '../lib/post-image-upload'
 
 /**
  * What the bytes say they are: the type the browser sends is not trusted (security.md § 6). Only
@@ -18,8 +17,9 @@ function sniff(head: Uint8Array): 'image/webp' | 'image/jpeg' | null {
 }
 
 /**
- * Uploads a post's image (specs/post-image PI-06, PI-07). A public endpoint: checks the session
- * itself, the size and the bytes, and uploads into the viewer's own folder.
+ * Uploads a post's image (specs/post-image PI-06, PI-07) through the backend's signed URL
+ * (specs/backend-answer-1013 BA-01). A public endpoint: checks the session itself, the size and the
+ * bytes before asking the backend.
  */
 export async function uploadPostImageAction(
   form: FormData,
@@ -35,28 +35,12 @@ export async function uploadPostImageAction(
   const contentType = sniff(new Uint8Array(await file.slice(0, 12).arrayBuffer()))
   if (!contentType) return { ok: false, error: 'composer.errors.imageType' }
 
-  const result = await uploadPostImage({
-    userId: viewer.id,
-    token: (await getAccessToken()) ?? '',
-    body: file,
-    contentType,
-  })
-  return result.ok ? result : { ok: false, error: 'composer.errors.imageUpload' }
-}
-
-/**
- * Deletes an image the person took out of their post or left with a discarded one (Q1). Only from
- * their own folder (removePostImage checks it). Best effort: the editor does not wait for it.
- */
-export async function removePostImageAction(raw: unknown): Promise<ActionResult<null>> {
-  const parsed = z.object({ imageUrl: z.url({ protocol: /^https$/ }) }).safeParse(raw)
-  if (!parsed.success) return { ok: false, error: 'api.errors.INVALID' }
-  const viewer = await getViewer()
-  if (!viewer) return { ok: false, error: 'api.errors.UNAUTHENTICATED' }
-  await removePostImage({
-    userId: viewer.id,
-    token: (await getAccessToken()) ?? '',
-    imageUrl: parsed.data.imageUrl,
-  })
-  return { ok: true, data: null }
+  const result = await uploadPostImage({ userId: viewer.id, body: file, contentType })
+  if (result.ok) return result
+  const errors = {
+    type: 'composer.errors.imageType',
+    unauthenticated: 'api.errors.UNAUTHENTICATED',
+    upload: 'composer.errors.imageUpload',
+  } as const
+  return { ok: false, error: errors[result.error] }
 }

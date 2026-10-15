@@ -133,7 +133,6 @@
       "comments": "{count, plural, one {# comentário} other {# comentários}}",
       "score": "{score, plural, one {# ponto} other {# pontos}}{vote, select, up {, você votou a favor} down {, você votou contra} other {}}",
       "share": "Compartilhar",
-      "image": "Imagem anexada ao post",
       "newTab": "(abre em uma nova aba)",
       "linkDomain": "({domain})"
     },
@@ -411,6 +410,10 @@
       "loaded": "{count, plural, one {Mais # carregado} other {Mais # carregados}}",
       "errorBody": "Tente de novo em um momento.",
       "membersTitle": "Membros de {handle}"
+    },
+    "assetOnly": {
+      "title": "{handle} ainda não tem comunidade",
+      "body": "Em breve você vai poder segui-lo e publicar aqui."
     }
   },
   "postDetail": {
@@ -429,12 +432,6 @@
       "results": "{count, plural, =0 {Nenhum resultado para “{q}”} one {# resultado para “{q}”} other {# resultados para “{q}”}}",
       "all": "Ver todos os comentários",
       "noneBody": "Tente outras palavras."
-    },
-    "ad": {
-      "label": "Anúncio",
-      "cta": "Saiba mais",
-      "ctaLabel": "Saiba mais sobre {advertiser} (abre em outra aba)",
-      "region": "Anúncio: {advertiser}"
     },
     "moreReplies": "{count, plural, one {Mais # resposta} other {Mais # respostas}}",
     "emptyBody": "Ninguém respondeu ainda. Compartilhe o que você pensa e comece a conversa.",
@@ -483,7 +480,9 @@
       "counter": "{count}/{max}",
       "urlPlaceholder": "https://",
       "titlePlaceholder": "Título",
-      "bodyPlaceholder": "Compartilhe sua análise, ideia ou pergunta..."
+      "bodyPlaceholder": "Compartilhe sua análise, ideia ou pergunta...",
+      "imageAlt": "Descrição da imagem (opcional)",
+      "imageAltPlaceholder": "O que a imagem mostra, para quem não pode vê-la"
     },
     "submit": "Publicar",
     "submitting": "Publicando…",
@@ -507,7 +506,8 @@
       "imageUpload": "Não foi possível enviar a imagem",
       "imageTooLarge": "A imagem é grande demais",
       "imageUnreadable": "Não foi possível ler a imagem",
-      "imageRequired": "Adicione uma imagem"
+      "imageRequired": "Adicione uma imagem",
+      "imageAltTooLong": "Até 300 caracteres."
     },
     "cancel": "Cancelar",
     "image": {

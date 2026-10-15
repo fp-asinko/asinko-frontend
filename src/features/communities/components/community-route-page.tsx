@@ -9,7 +9,8 @@ import { notFound } from 'next/navigation'
 import { getOrThrow } from '@/lib/api'
 import type { CommunityPage, ProfileDetails } from '../communities.types'
 import { getCommunityPage } from '../lib/community-api'
-import { resolveCommunityPage } from '../lib/community-route'
+import { getAssetSummary } from '../lib/asset-api'
+import { resolveAssetPage, resolveCommunityPage } from '../lib/community-route'
 import { getProfileDetails } from '../lib/profile-api'
 import { CommunityDetails } from './community-details'
 import { CommunityHeader } from './community-header'
@@ -25,6 +26,7 @@ export async function communityMetadata(
 ): Promise<Metadata> {
   const locale = safeLocale(rawLocale)
   const result = await getCommunityPage(slug)
+  if (!result.ok && kind === 'asset') return assetMetadata(slug, locale)
   if (!result.ok || result.data.kind !== kind) return {}
   const page = result.data
   const t = await getTranslations({ locale, namespace: 'communities.meta' })
@@ -52,6 +54,46 @@ export async function communityMetadata(
     },
     twitter: image.twitter,
   }
+}
+
+/** An asset without a community (BA-09): its symbol and name, and the brand's share image. */
+async function assetMetadata(
+  symbol: string,
+  locale: ReturnType<typeof safeLocale>,
+): Promise<Metadata> {
+  const result = await getAssetSummary(symbol)
+  if (!result.ok) return {}
+  const asset = result.data
+  const site = await getTranslations({ locale, namespace: 'metadata' })
+  const image = shareImage(brandImagePath(locale), site('description'))
+  return {
+    title: asset.handle,
+    description: asset.name,
+    alternates: buildAlternates(
+      env.NEXT_PUBLIC_SITE_URL,
+      locale,
+      communityPath('asset', asset.symbol),
+    ),
+    openGraph: {
+      title: asset.handle,
+      description: asset.name,
+      siteName: site('title'),
+      locale: OG_LOCALES[locale],
+      ...image.openGraph,
+    },
+    twitter: image.twitter,
+  }
+}
+
+/**
+ * An /asset route (BA-09): its community with the page's own path, or the asset alone while it has
+ * none; a 404 or a redirect as any community (CP-02).
+ */
+export async function resolveAssetRoute(symbol: string, locale: string) {
+  const resolved = await resolveAssetPage(symbol, safeLocale(locale))
+  return resolved.kind === 'community'
+    ? { ...resolved, path: communityPath('asset', resolved.page.slug) }
+    : resolved
 }
 
 /** The community of a route, or its 404 or redirect (CP-02), with the page's own path. */

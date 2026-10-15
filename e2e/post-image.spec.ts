@@ -42,12 +42,16 @@ test.describe('Post with an image', () => {
 
     await editor.getByRole('textbox', { name: 'Title' }).fill(title)
     await editor.getByRole('textbox', { name: 'Body' }).fill('Funding flipped again.')
+    // What the image shows, for who cannot see it (specs/backend-answer-1013 BA-04).
+    await editor
+      .getByRole('textbox', { name: 'Image description (optional)' })
+      .fill('Funding rate chart, flipping negative')
     await editor.getByRole('button', { name: 'Publish' }).click()
 
     await expect(page).toHaveURL(/\/en\/post\/[0-9a-f-]+\/chart-of-the-week/)
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(title)
     await expect(
-      page.getByRole('main').getByRole('img', { name: 'Image attached to the post' }),
+      page.getByRole('main').getByRole('img', { name: 'Funding rate chart, flipping negative' }),
     ).toBeVisible()
   })
 

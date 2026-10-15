@@ -44,6 +44,11 @@ export function createPost(body: unknown): MockResponse {
   // mocked upload answers, specs/post-image).
   if (input.imageUrl !== undefined && type !== 'IMAGE') return error(422, 'VALIDATION_ERROR')
   if (type === 'IMAGE' && input.imageUrl !== MOCK_POST_IMAGE) return error(422, 'VALIDATION_ERROR')
+  // imageAlt: only with an image, up to 300 (P-013).
+  if (input.imageAlt !== undefined && type !== 'IMAGE') return error(422, 'VALIDATION_ERROR')
+  const imageAlt =
+    typeof input.imageAlt === 'string' && input.imageAlt.trim() ? input.imageAlt.trim() : null
+  if (imageAlt && imageAlt.length > 300) return error(422, 'VALIDATION_ERROR')
 
   created += 1
   const now = new Date().toISOString()
@@ -56,6 +61,7 @@ export function createPost(body: unknown): MockResponse {
     body: input.body,
     url: type === 'LINK' && typeof input.url === 'string' ? input.url : null,
     imageUrl: type === 'IMAGE' ? MOCK_POST_IMAGE : null,
+    imageAlt: type === 'IMAGE' ? imageAlt : null,
     tag: null,
     creator: summary(DEMO_USER.username),
     creatorType: 'USER',

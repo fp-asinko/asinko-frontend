@@ -12,6 +12,21 @@ import type { CommunityRef, FeedPage } from '../feed.types'
 import type { FeedParams } from '../schemas/feed-params.schema'
 import { indexCommunities, needsMentionLookup, toCommunityRef, toFeedItem } from './mappers'
 
+/** The kinds this front draws. THESIS waits for phase 2; ads will come as a kind of their own. */
+const KNOWN_KINDS = new Set(['POST', 'POLL'])
+
+/**
+ * Leaves out, in silence, the items of a kind this front does not know (P-015, specs/backend-answer-
+ * 1013 BA-07): the backend will send ads (and other things) inside the feed, which is not a broken
+ * contract. An item without a kind is broken: it stays, for keepValidItems to drop and report.
+ */
+export function knownKinds(items: readonly unknown[]): unknown[] {
+  return items.filter((item) => {
+    const kind = (item as { kind?: unknown } | null)?.kind
+    return typeof kind !== 'string' || KNOWN_KINDS.has(kind)
+  })
+}
+
 /** Items are validated one by one (keepValidItems), so the envelope accepts anything (H-20). */
 const looseListSchema = z.object({ items: z.array(z.unknown()), nextCursor: z.string().nullable() })
 
@@ -86,7 +101,7 @@ export async function getFeed(
   if (filtered && !filtered.ok && filtered.code === 'NOT_FOUND') return filtered
   if (!feed.ok) return feed
 
-  const valid = keepValidItems(feed.data.items, feedItemSchema, `GET ${endpoint}`)
+  const valid = keepValidItems(knownKinds(feed.data.items), feedItemSchema, `GET ${endpoint}`)
   const communities = needsMentionLookup(valid)
     ? await apiRequest({
         method: 'GET',

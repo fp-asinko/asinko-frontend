@@ -51,6 +51,17 @@ export type CommunityPage = {
   viewerIsFavorite: boolean
 }
 
+/** An asset of the catalog without a community yet: its page (specs/backend-answer-1013 BA-09). */
+export type AssetSummary = {
+  symbol: string
+  /** $TSLA */
+  handle: string
+  name: string
+  logoUrl: string | null
+  /** Its community's slug; null while it has none. */
+  communitySlug: string | null
+}
+
 /** The community part of a hover card (specs/mention-preview § 3): only what the card shows. */
 export type PreviewCommunity = Pick<
   CommunityPage,

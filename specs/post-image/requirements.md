@@ -1,6 +1,6 @@
 # Posts con imagen — Requirements
 
-> **Estado:** aprobado por el PO el 2026-10-08, con Q1 a Q3 como se recomendaron.
+> **Estado:** aprobado por el PO el 2026-10-08, con Q1 a Q3 como se recomendaron. **Cambio (2026-10-14, `specs/backend-answer-1013` BA-01, BA-05):** la subida pasa a la URL firmada del backend (`POST /uploads/post-image`) y el front ya no borra imágenes (Q1 queda sin efecto: el backend no ofrece borrar una subida).
 > **Fuente:** documento de entregables (`docs/references/ASINKO-requirements.pdf`, "Crear post": `type` TEXT, LINK o **IMAGE**, `imageUrl` si `type = IMAGE`), elegido por el PO el 2026-10-08 (punto A), con X e Instagram de inspiración.
 > **Desbloqueo:** el backend decidió el 01/10/2026 que **la app sube directo** al bucket `post-images` de Supabase Storage con la sesión del usuario y manda la URL a `POST /posts`, que rechaza (422) cualquier `imageUrl` de otro origen (`asinko-app`, `INFRA-PENDIENTES.md § Storage`). Esto responde P-013.
 

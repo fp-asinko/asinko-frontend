@@ -15,14 +15,22 @@ Respondida en [`responses/2026-10-13-backend.md`](responses/2026-10-13-backend.m
 | P-001 menciones                 | Implementado, en posts **y comentarios**                                  | Verificar el render con datos reales; los comentarios también las traen                        |
 | P-001 feed de menciones         | No se hace                                                                | `overview.md` actualizado (2026-10-14)                                                         |
 | P-011 nombre visible            | Implementado, opcional                                                    | Apagar el mock; editarlo en "Editar perfil"                                                    |
-| Catálogo                        | Acciones, ETFs, índices, commodities y monedas                            | Símbolos con `.` y `/` (`BRK.B`, `XAU/USD`): hoy la ruta y las menciones no los aceptan        |
+| Catálogo                        | Acciones, ETFs, índices, commodities y monedas                            | **Adoptado (2026-10-14, `specs/backend-answer-1013`)**: rutas y menciones con `.` y `/`; un activo sin comunidad tiene su página |
 | P-014 orden y búsqueda          | Implementado; `best` es cronológico por ahora                             | Apagar el mock de `?q=`                                                                        |
 | P-005 `hot` y `top` del feed    | Pendiente                                                                 | Nada todavía                                                                                   |
 | P-016 post principal            | Implementado                                                              | Apagar el mock                                                                                 |
-| P-013 imágenes                  | **URL firmada** (`POST /uploads/post-image`), no subida directa; `imageAlt` | Cambiar la subida (hoy va directo al bucket) y sumar el texto alternativo                      |
-| P-015 anuncios                  | **Vendrán dentro del feed; no habrá `GET /ads`**                          | Sacar el intercalado de anuncios del front; ignorar los `kind` desconocidos                    |
+| P-013 imágenes                  | **URL firmada** (`POST /uploads/post-image`), no subida directa; `imageAlt` | **Adoptado (2026-10-14, `specs/backend-answer-1013`)**: subida por URL firmada e `imageAlt` |
+| P-015 anuncios                  | **Vendrán dentro del feed; no habrá `GET /ads`**                          | **Adoptado (2026-10-14, `specs/backend-answer-1013`)**: sin intercalado; el feed ignora los `kind` desconocidos |
 | P-003 precios                   | Twelve Data; 61 de 100 activos con precio viejo                           | Mostrar el precio, "desactualizado" y la fecha; "Sin datos de mercado" si es `null`            |
 | P-017 "lo seguís" en listas     | **Sin respuesta**                                                         | Sigue mockeado                                                                                 |
+
+## Pedidos nuevos (2026-10-14)
+
+Encontrados al verificar contra el deploy (solo lecturas) mientras el front adoptaba la respuesta (`specs/backend-answer-1013`):
+
+- **Comunidades de los activos nuevos.** De los 100 activos, solo los del seed anterior (BTC, ETH, AAPL, NVDA, VOO) tienen su comunidad `SYSTEM_ASSET`: `GET /communities/TSLA` (y SPY, MSFT, EURUSD, SQM-B, BRK.B, XAU/USD…) da `404`, y `GET /assets/{symbol}` trae `linkedCommunity: null`. El documento de entregables define la página de activo como esa comunidad. **Pedido:** crear la comunidad de cada activo del catálogo (slug = símbolo). Mientras tanto, el front muestra la página del activo sin feed ni Unirse.
+- **`GET /assets` sin `?q=` devuelve 20, sin `nextCursor`:** el catálogo no se puede recorrer entero. No bloquea al front (busca con `?q=`), pero hace falta para un listado de activos.
+- **Imágenes huérfanas:** una imagen subida con la URL firmada y nunca publicada queda en Storage, y el backend no ofrece borrarla. ¿Se limpian del lado del backend?
 
 ## Pendientes
 

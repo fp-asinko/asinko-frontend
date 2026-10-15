@@ -133,7 +133,6 @@
       "comments": "{count, plural, one {# comment} other {# comments}}",
       "score": "{score, plural, one {# point} other {# points}}{vote, select, up {, you upvoted} down {, you downvoted} other {}}",
       "share": "Share",
-      "image": "Image attached to the post",
       "newTab": "(opens in a new tab)",
       "linkDomain": "({domain})"
     },
@@ -411,6 +410,10 @@
       "loaded": "{count, plural, one {# more loaded} other {# more loaded}}",
       "errorBody": "Try again in a moment.",
       "membersTitle": "Members of {handle}"
+    },
+    "assetOnly": {
+      "title": "{handle} does not have a community yet",
+      "body": "Soon you will be able to follow it and post here."
     }
   },
   "postDetail": {
@@ -429,12 +432,6 @@
       "results": "{count, plural, =0 {No results for “{q}”} one {# result for “{q}”} other {# results for “{q}”}}",
       "all": "See all comments",
       "noneBody": "Try other words."
-    },
-    "ad": {
-      "label": "Ad",
-      "cta": "Learn more",
-      "ctaLabel": "Learn more about {advertiser} (opens in a new tab)",
-      "region": "Ad: {advertiser}"
     },
     "moreReplies": "{count, plural, one {# more reply} other {# more replies}}",
     "emptyBody": "Nobody has replied yet. Share what you think and get the conversation going.",
@@ -483,7 +480,9 @@
       "counter": "{count}/{max}",
       "urlPlaceholder": "https://",
       "titlePlaceholder": "Title",
-      "bodyPlaceholder": "Share your analysis, idea or question..."
+      "bodyPlaceholder": "Share your analysis, idea or question...",
+      "imageAlt": "Image description (optional)",
+      "imageAltPlaceholder": "What the image shows, for those who cannot see it"
     },
     "submit": "Publish",
     "submitting": "Posting…",
@@ -507,7 +506,8 @@
       "imageUpload": "Could not upload the image",
       "imageTooLarge": "The image is too large",
       "imageUnreadable": "Could not read the image",
-      "imageRequired": "Add an image"
+      "imageRequired": "Add an image",
+      "imageAltTooLong": "Up to 300 characters."
     },
     "cancel": "Cancel",
     "image": {

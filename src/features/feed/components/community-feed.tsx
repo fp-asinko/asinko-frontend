@@ -1,7 +1,6 @@
 import { Suspense } from 'react'
 import { getOrThrow, mockDelay } from '@/lib/api'
 import { getViewer } from '@/lib/session'
-import { getAds } from '../lib/ads-api'
 import { getFeed } from '../lib/feed-api'
 import { parseFeedParams, type FeedParams } from '../schemas/feed-params.schema'
 import { FeedFilters } from './feed-filters'
@@ -53,10 +52,10 @@ async function CommunityFeedList({ params, handle }: { params: FeedParams; handl
   // A slow backend on demand, for the e2e of the streaming (mocks only, never production).
   await mockDelay()
   const viewer = await getViewer()
-  const [result, ads] = await Promise.all([
-    getFeed(params, undefined, { communityResolved: true, signedIn: viewer !== null }),
-    getAds('feed'),
-  ])
+  const result = await getFeed(params, undefined, {
+    communityResolved: true,
+    signedIn: viewer !== null,
+  })
   // The feed is the page's main content after its header: an unexpected failure goes to error.tsx.
   const page = getOrThrow(result)
   return (
@@ -66,7 +65,6 @@ async function CommunityFeedList({ params, handle }: { params: FeedParams; handl
         status: 'ok',
         items: page.items,
         nextCursor: page.nextCursor,
-        ads: ads.ok ? ads.data : [],
       }}
       communityHandle={handle}
     />

@@ -155,7 +155,8 @@ export function PostCard({
         >
           <PostImage
             src={post.media.url}
-            alt={t('image')}
+            // Its description (imageAlt), else the post's title (specs/backend-answer-1013 BA-04).
+            alt={post.media.alt ?? post.title}
             fill
             sizes="(min-width: 1024px) 732px, (min-width: 768px) calc(100vw - 300px), 100vw"
             className="object-cover"

@@ -1,5 +1,4 @@
 import {
-  adListSchema,
   assetCatalogSchema,
   assetPageSchema,
   commentListSchema,
@@ -10,6 +9,7 @@ import {
   feedItemSchema,
   joinResponseSchema,
   pollSchema,
+  postImageUploadSchema,
   postSchema,
   profileSchema,
   searchResultSchema,
@@ -29,12 +29,12 @@ import { POSTS } from './fixtures/posts'
 import { PROFILES, summary } from './fixtures/users'
 import { commentTree, searchComments } from './comment-tree'
 import { withTopPost } from './top-post'
-import { ADS } from './fixtures/ads'
 import { followersOf, followingOf, listItem } from './fixtures/follows'
 import { membersOf } from './fixtures/members'
 import { thesesBy } from './fixtures/theses'
 import { updateUser } from './profile-edit'
 import { paginate } from './paginate'
+import { signPostImageUpload } from './post-image'
 import type { MockContext, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
 import {
@@ -243,6 +243,20 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       },
     },
     handler: ({ body }) => createPost(body),
+  },
+  // P-013 (backend 2026-10-13): where to put a post image. With every route mocked nothing is
+  // sent (post-image-upload): the URL is a placeholder and the image, the fixture.
+  {
+    method: 'POST',
+    path: '/api/v1/uploads/post-image',
+    kind: 'contract',
+    implemented: true,
+    schema: postImageUploadSchema,
+    example: {
+      ...noRequest,
+      body: { userId: DEMO_USER.id, contentType: 'image/webp', size: 120_000 },
+    },
+    handler: ({ body }) => signPostImageUpload(body),
   },
   {
     method: 'GET',
@@ -510,8 +524,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     method: 'GET',
     path: '/api/v1/assets/:symbol',
     kind: 'contract',
-    // E14 is postponed in the backend: the asset tiles stay on mocks.
-    implemented: false,
+    // In the backend's dev since 2026-10-13, with the 100 assets of the catalog.
+    implemented: true,
     schema: assetPageSchema,
     example: { ...noRequest, params: { symbol: 'BTC' } },
     handler: ({ params }) => {
@@ -529,19 +543,5 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
         },
       }
     },
-  },
-
-  // P-015 (proposal): house ads for a post and its comments, or a feed; rotated by the front.
-  {
-    method: 'GET',
-    path: '/api/v1/ads',
-    kind: 'proposal',
-    implemented: false,
-    schema: adListSchema,
-    example: { ...noRequest, query: { placement: 'comments' } },
-    handler: ({ query }) => ({
-      status: 200,
-      body: { items: query.placement === 'comments' || query.placement === 'feed' ? ADS : [] },
-    }),
   },
 ]

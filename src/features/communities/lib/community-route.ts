@@ -4,7 +4,9 @@ import { getOrThrow } from '@/lib/api'
 import { permanentRedirect } from '@/i18n/navigation'
 import { communityPath, type CommunityKind } from '@/lib/communities/paths'
 import type { Locale } from '@/i18n/routing'
-import type { CommunityPage } from '../communities.types'
+import type { ApiResult } from '@/lib/api'
+import type { AssetSummary, CommunityPage } from '../communities.types'
+import { getAssetSummary } from './asset-api'
 import { getCommunityPage } from './community-api'
 
 /**
@@ -22,15 +24,7 @@ export async function resolveCommunityPage(
   kind: CommunityKind,
   locale: Locale,
 ): Promise<CommunityPage> {
-  let result = await getCommunityPage(slug)
-  if (
-    !result.ok &&
-    result.code === 'NOT_FOUND' &&
-    kind === 'asset' &&
-    slug !== slug.toUpperCase()
-  ) {
-    result = await getCommunityPage(slug.toUpperCase())
-  }
+  const result = await findCommunityPage(slug, kind)
   if (!result.ok && (result.code === 'NOT_FOUND' || result.code === 'INVALID')) notFound()
   const page = getOrThrow(result)
   // The asset found in upper case, or one asked with another casing: its canonical URL.
@@ -39,4 +33,50 @@ export async function resolveCommunityPage(
   }
   if (page.kind !== kind) permanentRedirect({ href: communityPath(page.kind, page.slug), locale })
   return page
+}
+
+/** The community of a slug; on /asset, a symbol in lower case is tried in upper case too. */
+async function findCommunityPage(slug: string, kind: CommunityKind) {
+  const result = await getCommunityPage(slug)
+  if (
+    !result.ok &&
+    result.code === 'NOT_FOUND' &&
+    kind === 'asset' &&
+    slug !== slug.toUpperCase()
+  ) {
+    return getCommunityPage(slug.toUpperCase())
+  }
+  return result
+}
+
+/** An asset of the catalog, as typed or in upper case. */
+async function findAsset(symbol: string): Promise<ApiResult<AssetSummary>> {
+  const result = await getAssetSummary(symbol)
+  if (!result.ok && result.code === 'NOT_FOUND' && symbol !== symbol.toUpperCase()) {
+    return getAssetSummary(symbol.toUpperCase())
+  }
+  return result
+}
+
+/**
+ * An /asset page (specs/backend-answer-1013 BA-09, Q4): its community, as resolveCommunityPage; or,
+ * when the asset has none yet, the asset alone (its canonical symbol redirects, 308). Not in the
+ * catalog either: the not-found page.
+ */
+export async function resolveAssetPage(
+  symbol: string,
+  locale: Locale,
+): Promise<{ kind: 'community'; page: CommunityPage } | { kind: 'asset'; asset: AssetSummary }> {
+  const community = await findCommunityPage(symbol, 'asset')
+  const missing = !community.ok && (community.code === 'NOT_FOUND' || community.code === 'INVALID')
+  if (!missing)
+    return { kind: 'community', page: await resolveCommunityPage(symbol, 'asset', locale) }
+
+  const asset = await findAsset(symbol)
+  if (!asset.ok && (asset.code === 'NOT_FOUND' || asset.code === 'INVALID')) notFound()
+  const found = getOrThrow(asset)
+  if (found.symbol !== symbol) {
+    permanentRedirect({ href: communityPath('asset', found.symbol), locale })
+  }
+  return { kind: 'asset', asset: found }
 }

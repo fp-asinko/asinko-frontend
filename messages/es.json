@@ -133,7 +133,6 @@
       "comments": "{count, plural, one {# comentario} other {# comentarios}}",
       "score": "{score, plural, one {# punto} other {# puntos}}{vote, select, up {, votaste a favor} down {, votaste en contra} other {}}",
       "share": "Compartir",
-      "image": "Imagen adjunta al post",
       "newTab": "(se abre en una pestaña nueva)",
       "linkDomain": "({domain})"
     },
@@ -411,6 +410,10 @@
       "loaded": "{count, plural, one {Se cargó # más} other {Se cargaron # más}}",
       "errorBody": "Inténtalo de nuevo en un momento.",
       "membersTitle": "Miembros de {handle}"
+    },
+    "assetOnly": {
+      "title": "{handle} todavía no tiene comunidad",
+      "body": "Pronto vas a poder seguirlo y publicar acá."
     }
   },
   "postDetail": {
@@ -429,12 +432,6 @@
       "results": "{count, plural, =0 {Sin resultados para «{q}»} one {# resultado para «{q}»} other {# resultados para «{q}»}}",
       "all": "Ver todos los comentarios",
       "noneBody": "Prueba con otras palabras."
-    },
-    "ad": {
-      "label": "Anuncio",
-      "cta": "Más información",
-      "ctaLabel": "Más información sobre {advertiser} (se abre en otra pestaña)",
-      "region": "Anuncio: {advertiser}"
     },
     "moreReplies": "{count, plural, one {# respuesta más} other {# respuestas más}}",
     "emptyBody": "Nadie respondió todavía. Comparte lo que piensas y arranca la conversación.",
@@ -483,7 +480,9 @@
       "counter": "{count}/{max}",
       "urlPlaceholder": "https://",
       "titlePlaceholder": "Título",
-      "bodyPlaceholder": "Comparte tu análisis, idea o pregunta..."
+      "bodyPlaceholder": "Comparte tu análisis, idea o pregunta...",
+      "imageAlt": "Descripción de la imagen (opcional)",
+      "imageAltPlaceholder": "Qué muestra la imagen, para quien no la puede ver"
     },
     "submit": "Publicar",
     "submitting": "Publicando…",
@@ -507,7 +506,8 @@
       "imageUpload": "No se pudo subir la imagen",
       "imageTooLarge": "La imagen es demasiado grande",
       "imageUnreadable": "No se pudo leer la imagen",
-      "imageRequired": "Agrega una imagen"
+      "imageRequired": "Agrega una imagen",
+      "imageAltTooLong": "Hasta 300 caracteres."
     },
     "cancel": "Cancelar",
     "image": {

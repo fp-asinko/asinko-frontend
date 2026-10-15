@@ -1,6 +1,6 @@
 # Mocks
 
-Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of them with the demo user; `API_MOCKS=missing` only the ones the backend does not have yet (`implemented: false`: today the asset page, E14, and the proposals P-014 search and P-015 ads). Handlers follow the backend's `dev` branch (`asinko-app` `0cdf243`): `?kind=` on the feeds, `?mine=true` on communities, an empty page for an unknown community. See `docs/ai-guidelines/api-integration.md § Mocks`.
+Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of them with the demo user; `API_MOCKS=missing` only the ones the backend does not have yet (`implemented: false`: today the proposal P-014, searching comments). Handlers follow the backend's `dev` branch (`asinko-app` `0cdf243`): `?kind=` on the feeds, `?mine=true` on communities, an empty page for an unknown community. See `docs/ai-guidelines/api-integration.md § Mocks`.
 
 | Method | Path                              | Kind     | Notes                                                                                     |
 | ------ | --------------------------------- | -------- | ----------------------------------------------------------------------------------------- |
@@ -20,7 +20,6 @@ Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of 
 | GET    | `/api/v1/polls/:id/comments`      | contract | E05                                                                                       |
 | GET    | `/api/v1/assets`                  | contract | E14. Response shape assumed (proposal P-003). `q`, `cursor`                               |
 | GET    | `/api/v1/assets/:symbol`          | contract | E14. `openTheses` empty until phase 2                                                     |
-| GET    | `/api/v1/ads`                     | proposal | P-015. `placement=comments`: house ads and two samples (`fixtures/ads.ts`)                |
 
 - **contract**: in `docs/references/api/`. Every route but the assets is already implemented on the backend's `dev` branch; they stay here to work without the backend (CI, `API_MOCKS=true`).
 - **proposal**: the frontend needs it and it is not in the contract; described in `docs/references/api/proposals.md`.
@@ -35,7 +34,6 @@ Deterministic data (fixed ids and a fixed "now", `fixtures/ids.ts`) designed to 
 - **Communities** (`fixtures/communities.ts`): one of each type (asset, category, geo, user-created), with and without rules; the demo user is a member of five and moderates `trading-on-chain`.
 - **Posts** (`fixtures/posts.ts`): 22 in es, en and pt. TEXT, IMAGE (SVGs in `public/mocks/`) and LINK; short and very long bodies; `$ # @` mentions; positive and negative scores; upvoted and downvoted by the viewer; edited, deleted and a system post.
 - **Polls** (`fixtures/polls.ts`): open with results, results hidden until voting, and closed with the viewer's vote.
-- **Comments** (`fixtures/comments.ts`): nested up to 3 levels, a deleted comment with replies, an edited one, and a long debate (~30) on the ETH/BTC post for the ads between comments.
-- **Ads** (`fixtures/ads.ts`): two house ads of Asinko and two sample advertisers, marked "(sample)", links to `example.com`.
+- **Comments** (`fixtures/comments.ts`): nested up to 3 levels, a deleted comment with replies, an edited one, and a long debate (~30) on the ETH/BTC post.
 
 Adding a mock: register it in `handlers.ts` with its response `schema` (from `@/lib/api/contract`) and an `example`; add fixtures under `fixtures/` and a row here. `fixtures.test.ts` validates every fixture and handler against the contract and checks the data is consistent (unique ids, mention positions, comment counts). Remove the mock when the backend ships the endpoint.

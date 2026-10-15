@@ -6,7 +6,6 @@ import { ImageField, type TakeImage } from './image-field'
 
 const deps = vi.hoisted(() => ({
   uploadPostImageAction: vi.fn(),
-  removePostImageAction: vi.fn(),
   prepareImage: vi.fn(),
 }))
 vi.mock('../actions/upload-post-image.action', () => deps)
@@ -67,7 +66,7 @@ describe('ImageField (specs/post-image PI-01, PI-06, PI-08)', () => {
     )
   })
 
-  it('changes the image, deleting the one before (Q1)', async () => {
+  it('changes the image, uploading the new one (nothing is deleted from here, BA-05)', async () => {
     const { takeRef } = renderField()
     await act(async () => takeRef.current?.(png()))
     const input = document.querySelector<HTMLInputElement>('input[type="file"]')!
@@ -75,7 +74,7 @@ describe('ImageField (specs/post-image PI-01, PI-06, PI-08)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Change image' }))
     expect(click).toHaveBeenCalled()
     await userEvent.upload(input, png())
-    expect(deps.removePostImageAction).toHaveBeenCalledWith({ imageUrl: IMAGE })
+    expect(deps.uploadPostImageAction).toHaveBeenCalledTimes(2)
   })
 
   it('opens the log-in modal when the session ended meanwhile', async () => {
@@ -120,7 +119,17 @@ describe('ImageField (specs/post-image PI-01, PI-06, PI-08)', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('The image is too large')
   })
 
-  it('keeps only the newest of two images, deleting the older one when it arrives (Q1)', async () => {
+  it('says which types it takes when the backend refuses the file (BA-02)', async () => {
+    deps.uploadPostImageAction.mockResolvedValueOnce({
+      ok: false,
+      error: 'composer.errors.imageType',
+    })
+    const { takeRef } = renderField()
+    await act(async () => takeRef.current?.(png()))
+    expect(screen.getByRole('alert')).toHaveTextContent('Only JPEG, PNG or WebP images')
+  })
+
+  it('keeps only the newest of two images when the older one arrives late', async () => {
     let first!: (value: unknown) => void
     deps.uploadPostImageAction
       .mockReturnValueOnce(new Promise((resolve) => (first = resolve)))
@@ -133,19 +142,19 @@ describe('ImageField (specs/post-image PI-01, PI-06, PI-08)', () => {
     await act(async () => takeRef.current?.(png()))
     await act(async () => first({ ok: true, data: { imageUrl: IMAGE } }))
     expect(onChange).toHaveBeenLastCalledWith(IMAGE.replace('a.webp', 'b.webp'))
-    expect(deps.removePostImageAction).toHaveBeenCalledWith({ imageUrl: IMAGE })
+    expect(onChange).not.toHaveBeenCalledWith(IMAGE)
   })
 
-  it('deletes an upload that ends after the editor closed (Q1)', async () => {
+  it('changes nothing when an upload ends after the editor closed', async () => {
     let finish!: (value: unknown) => void
     deps.uploadPostImageAction.mockReturnValueOnce(new Promise((resolve) => (finish = resolve)))
-    const { takeRef, unmount } = renderField()
+    const { takeRef, unmount, onChange } = renderField()
     await act(async () => {
       takeRef.current?.(png())
       await Promise.resolve()
     })
     unmount()
     await act(async () => finish({ ok: true, data: { imageUrl: IMAGE } }))
-    expect(deps.removePostImageAction).toHaveBeenCalledWith({ imageUrl: IMAGE })
+    expect(onChange).not.toHaveBeenCalledWith(IMAGE)
   })
 })

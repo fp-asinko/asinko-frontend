@@ -2,6 +2,7 @@ import 'server-only'
 import { cache } from 'react'
 import { apiRequest, invalidInput, type ApiResult } from '@/lib/api'
 import { communitySchema } from '@/lib/api/contract'
+import { assetSymbolSchema } from '@/lib/communities/asset-symbol.schema'
 import { communitySlugSchema } from '@/lib/communities/community-slug.schema'
 import { getViewer } from '@/lib/session'
 import type { CommunityPage } from '../communities.types'
@@ -18,7 +19,10 @@ const ENDPOINT = 'GET /api/v1/communities/:slug'
 export const getCommunityPage = cache(async function getCommunityPage(
   slug: string,
 ): Promise<ApiResult<CommunityPage>> {
-  if (!communitySlugSchema.safeParse(slug).success) return invalidInput(ENDPOINT)
+  // A slug, or an asset's symbol with "." or "/" (BRK.B, XAU/USD: specs/backend-answer-1013 BA-08).
+  if (!communitySlugSchema.or(assetSymbolSchema).safeParse(slug).success) {
+    return invalidInput(ENDPOINT)
+  }
   const [result, viewer] = await Promise.all([
     apiRequest({
       method: 'GET',

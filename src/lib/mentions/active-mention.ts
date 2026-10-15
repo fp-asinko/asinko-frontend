@@ -7,8 +7,12 @@ const KINDS: Record<string, MentionKind> = { $: 'asset', '#': 'community', '@': 
 const QUERY_MAX = 32
 
 // A symbol at the start or after whitespace, then at least one letter (Q2: no list for the bare
-// symbol), up to the caret. Letters of any language, digits, "_" and "-".
-const ACTIVE = new RegExp(`(?:^|\\s)([$#@])([\\p{L}\\p{N}_-]{1,${QUERY_MAX}})$`, 'u')
+// symbol), up to the caret. Letters of any language, digits, "_" and "-"; after a $, also "." and
+// "/" inside the symbol (BRK.B, XAU/USD: specs/backend-answer-1013 BA-10).
+const ACTIVE = new RegExp(
+  `(?:^|\\s)(?:(\\$)([\\p{L}\\p{N}][\\p{L}\\p{N}_./-]{0,${QUERY_MAX - 1}})|([#@])([\\p{L}\\p{N}_-]{1,${QUERY_MAX}}))$`,
+  'u',
+)
 
 export type ActiveMention = {
   kind: MentionKind
@@ -26,7 +30,8 @@ export type ActiveMention = {
 export function activeMention(text: string, caret: number): ActiveMention | null {
   const match = ACTIVE.exec(text.slice(0, caret))
   if (!match) return null
-  const [, symbol = '', query = ''] = match
+  const symbol = match[1] ?? match[3] ?? ''
+  const query = match[2] ?? match[4] ?? ''
   const kind = KINDS[symbol]
   if (!kind) return null
   return { kind, query, start: caret - query.length - 1 }

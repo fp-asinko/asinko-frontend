@@ -3,7 +3,7 @@ import { GateButtons } from '@/components/organisms/auth-gate'
 import { EmptyState } from '@/components/organisms/empty-state'
 import { Link } from '@/i18n/navigation'
 import type { ReactNode } from 'react'
-import type { FeedItem, HouseAd } from '../feed.types'
+import type { FeedItem } from '../feed.types'
 import { feedHref } from '../lib/feed-href'
 import type { FeedParams } from '../schemas/feed-params.schema'
 import { ComposerPlaceholder } from './composer-placeholder'
@@ -26,8 +26,6 @@ export type FeedState =
       status: 'ok'
       items: FeedItem[]
       nextCursor: string | null
-      /** The house ads, one every 10 cards (specs/post-detail-refresh PD-16). */
-      ads?: readonly HouseAd[]
     }
   | { status: 'needs-account' }
 
@@ -87,14 +85,10 @@ export function FeedListView({
         ) : (
           <>
             <ul className="divide-y">
-              <FeedItems
-                items={items}
-                feedCommunity={params.community}
-                ads={state.status === 'ok' ? state.ads : undefined}
-              />
+              <FeedItems items={items} feedCommunity={params.community} />
             </ul>
             {state.status === 'ok' && state.nextCursor && (
-              <LoadMore params={params} cursor={state.nextCursor} offset={items.length} />
+              <LoadMore params={params} cursor={state.nextCursor} />
             )}
           </>
         )}

@@ -7,6 +7,39 @@ import { expectNoA11yViolations } from './fixtures/axe'
 const heading = (page: Page, name: string) => page.getByRole('heading', { level: 1, name })
 
 test.describe('Community pages', () => {
+  test('an asset of the catalog without a community has its page, symbols with . and / too (BA-08, BA-09)', async ({
+    page,
+    request,
+  }) => {
+    for (const [path, handle, name] of [
+      ['/en/asset/TSLA', '$TSLA', 'Tesla, Inc.'],
+      ['/en/asset/BRK.B', '$BRK.B', 'Berkshire Hathaway Inc. Class B'],
+      ['/en/asset/XAU%2FUSD', '$XAU/USD', 'Gold Spot / US Dollar'],
+    ] as const) {
+      await page.goto(path)
+      await expect(heading(page, handle)).toBeVisible()
+      await expect(page.getByRole('main').getByText(name)).toBeVisible()
+      await expect(page.getByText(`${handle} does not have a community yet`)).toBeVisible()
+      await expect(page.getByRole('main').getByRole('button', { name: /^Join/ })).toHaveCount(0)
+    }
+    // Its canonical symbol, as any community (CP-02).
+    const lower = await request.get('/en/asset/tsla', { maxRedirects: 0 })
+    expect(lower.status()).toBe(308)
+    expect(lower.headers().location).toMatch(/\/en\/asset\/TSLA$/)
+    expect((await request.get('/en/asset/NOPE')).status()).toBe(404)
+
+    // At 360px, without horizontal scroll, and accessible.
+    await page.setViewportSize({ width: 360, height: 740 })
+    await page.goto('/en/asset/XAU%2FUSD')
+    await expect(heading(page, '$XAU/USD')).toBeVisible()
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(0)
+    await expectNoA11yViolations(page)
+  })
+
   test('Back goes to the Home, not to the page before (CP-22)', async ({ page }) => {
     // Coming from another page of the site: a group's.
     await page.goto('/en/hub/defi')

@@ -10,6 +10,4 @@ import { feedParamsSchema } from './feed-params.schema'
 export const loadMoreSchema = feedParamsSchema.extend({
   cursor: z.string().min(1).max(512),
   locale: z.enum(routing.locales),
-  /** The cards the feed showed before: where the ads go (PD-16). Odd values start over. */
-  offset: z.number().int().min(0).max(100_000).catch(0),
 })

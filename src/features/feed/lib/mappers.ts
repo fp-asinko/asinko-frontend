@@ -93,7 +93,7 @@ function toMedia(post: RawPost): PostMedia | null {
   if (post.deleted) return null
   if (post.type === 'IMAGE') {
     const url = allowedImageUrl(post.imageUrl)
-    return url ? { type: 'image', url } : null
+    return url ? { type: 'image', url, alt: post.imageAlt?.trim() || null } : null
   }
   if (post.type === 'LINK') return safeLink(post.url)
   return null

@@ -2,7 +2,7 @@ import { expect, test, type Locator, type Page } from '@playwright/test'
 import { expectNoA11yViolations } from './fixtures/axe'
 
 // specs/post-detail-refresh against the production build with API_MOCKS=true. The ETH/BTC post
-// has ~30 comments with replies (src/mocks/fixtures/comments.ts): enough for 3 ads.
+// has ~30 comments with replies (src/mocks/fixtures/comments.ts).
 
 const ETH_PATH =
   '/en/post/00000000-0000-4000-8000-000000004003/eth-btc-at-a-4-year-low-capitulation-or-opportunity'
@@ -87,8 +87,6 @@ test.describe('Post detail refresh', () => {
       '2 results for “BLOBS”',
     )
     await expect(comments(page).locator('mark')).toHaveText(['blobs', 'blobs'])
-    // No ads among the results (the one inside the post stays, PD-15).
-    await expect(comments(page).getByRole('region', { name: /^Ad: / })).toHaveCount(0)
 
     await search.fill('nothing like this')
     await search.press('Enter')
@@ -101,47 +99,15 @@ test.describe('Post detail refresh', () => {
     await expect(page.getByRole('button', { name: 'Sort by: Best' })).toBeVisible()
   })
 
-  test('shows an ad after every 10 comments, with a safe link (PD-07 to PD-10)', async ({
+  test('places no ads of its own: not in the feed, the post nor its comments (specs/backend-answer-1013 BA-06)', async ({
     page,
   }) => {
-    await page.goto(ETH_PATH)
-    const ads = page.getByRole('region', { name: /^Ad: / })
-    // One inside the post (PD-15) and ~30 comments in reading order: 3 more.
-    await expect(ads).toHaveCount(4)
-    const link = ads.first().getByRole('link', { name: /^Learn more/ })
-    await expect(link).toHaveAttribute('target', '_blank')
-    await expect(link).toHaveAttribute('rel', 'sponsored noopener noreferrer')
-    await expect(link).toHaveAttribute('href', /^https:\/\//)
-    await expect(ads.first().getByText('example.com')).toBeVisible()
-  })
-
-  test('shows an ad inside the post, before the comments, even with few of them (PD-15)', async ({
-    page,
-  }) => {
-    // The DOGE post: 2 comments, and no test adds more (the Fed's grow during a run).
-    await page.goto('/en/post/00000000-0000-4000-8000-000000004004')
-    const ads = page.getByRole('region', { name: /^Ad: / })
-    await expect(ads).toHaveCount(1)
-    // Above the comments: before their heading.
-    const adBox = (await ads.first().boundingBox())!
-    const heading = (await page.getByRole('heading', { name: /comments/ }).boundingBox())!
-    expect(adBox.y).toBeLessThan(heading.y)
-  })
-
-  test('the feeds show an ad every 10 cards, also after loading more (PD-16)', async ({ page }) => {
-    await page.goto('/en')
-    const ads = page.getByRole('main').getByRole('region', { name: /^Ad: / })
-    // First page: 20 cards, ads after the 10th and the 20th.
-    await expect(ads).toHaveCount(2)
-    // The next page (cards 21 to 25 in the mocks) keeps counting: no ad at its start.
-    const cards = page.getByRole('main').getByRole('article')
-    const before = await cards.count()
-    await page.getByRole('button', { name: 'Load more' }).click()
-    await expect.poll(() => cards.count()).toBeGreaterThan(before)
-    await expect(ads).toHaveCount(2)
-
-    await page.goto('/en/hub/defi')
-    await expect(page.getByRole('main').getByRole('article').first()).toBeVisible()
+    // The backend will send them inside the feed (P-015): the front does not place them.
+    for (const path of ['/en', ETH_PATH]) {
+      await page.goto(path)
+      await expect(page.getByRole('main').getByRole('article').first()).toBeVisible()
+      await expect(page.getByRole('region', { name: /^Ad: / })).toHaveCount(0)
+    }
   })
 
   for (const theme of ['light', 'dark'] as const) {
@@ -162,8 +128,8 @@ test.describe('Post detail refresh', () => {
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
       )
       expect(overflow).toBeLessThanOrEqual(0)
-      // An ad among the comments, far from the top: nothing left under the sticky bar.
-      await page.getByRole('region', { name: /^Ad: / }).last().scrollIntoViewIfNeeded()
+      // The last comment, far from the top: nothing left under the sticky bar.
+      await comments(page).getByRole('listitem').last().scrollIntoViewIfNeeded()
       await expectNoA11yViolations(page)
     })
   }

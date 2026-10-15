@@ -1,10 +1,11 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CommunityPage } from '../communities.types'
-import { resolveCommunityPage } from './community-route'
+import { resolveAssetPage, resolveCommunityPage } from './community-route'
 
-const deps = vi.hoisted(() => ({ getCommunityPage: vi.fn() }))
+const deps = vi.hoisted(() => ({ getCommunityPage: vi.fn(), getAssetSummary: vi.fn() }))
 vi.mock('./community-api', () => ({ getCommunityPage: deps.getCommunityPage }))
+vi.mock('./asset-api', () => ({ getAssetSummary: deps.getAssetSummary }))
 vi.mock('@/lib/api', async () => {
   const { getOrThrow } = await import('@/lib/api/helpers')
   return { getOrThrow }
@@ -86,5 +87,46 @@ describe('resolveCommunityPage (specs/community-pages CP-02)', () => {
   it('throws any other failure, for error.tsx', async () => {
     deps.getCommunityPage.mockResolvedValue({ ...missing, kind: 'unexpected', code: 'HTTP' })
     await expect(resolveCommunityPage('macro', 'group', 'es')).rejects.toThrow()
+  })
+})
+
+describe('resolveAssetPage (specs/backend-answer-1013 BA-09)', () => {
+  const TSLA = {
+    symbol: 'TSLA',
+    handle: '$TSLA',
+    name: 'Tesla, Inc.',
+    logoUrl: null,
+    communitySlug: null,
+  }
+
+  beforeEach(() => vi.clearAllMocks())
+
+  it('takes the community when the asset has one', async () => {
+    deps.getCommunityPage.mockResolvedValue(found(page({ slug: 'BTC', kind: 'asset' })))
+    expect(await resolveAssetPage('BTC', 'en')).toMatchObject({
+      kind: 'community',
+      page: { slug: 'BTC' },
+    })
+    expect(deps.getAssetSummary).not.toHaveBeenCalled()
+  })
+
+  it('shows the asset alone while it has no community', async () => {
+    deps.getCommunityPage.mockResolvedValue(missing)
+    deps.getAssetSummary.mockResolvedValue({ ok: true, data: TSLA })
+    expect(await resolveAssetPage('TSLA', 'en')).toEqual({ kind: 'asset', asset: TSLA })
+  })
+
+  it('redirects a lower-case symbol to its canonical page', async () => {
+    deps.getCommunityPage.mockResolvedValue(missing)
+    deps.getAssetSummary.mockImplementation(async (symbol: string) =>
+      symbol === 'TSLA' ? { ok: true, data: TSLA } : missing,
+    )
+    await expect(resolveAssetPage('tsla', 'es')).rejects.toThrow('REDIRECT es/asset/TSLA')
+  })
+
+  it('is the not-found page outside the catalog', async () => {
+    deps.getCommunityPage.mockResolvedValue(missing)
+    deps.getAssetSummary.mockResolvedValue(missing)
+    await expect(resolveAssetPage('NOPE', 'en')).rejects.toThrow('NOT_FOUND')
   })
 })

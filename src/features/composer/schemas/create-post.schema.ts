@@ -3,6 +3,9 @@ import { z } from 'zod'
 /** The backend's limit for a title (POST /posts, E03). */
 export const TITLE_MAX = 300
 
+/** The backend's limit for an image's description (imageAlt, P-013, 2026-10-13). */
+export const IMAGE_ALT_MAX = 300
+
 /** Only http(s) links (security.md § 1): javascript:, data: and the rest are rejected. */
 function isHttpUrl(value: string) {
   try {
@@ -31,6 +34,11 @@ export const createPostSchema = z
     body: z.string().trim().min(1, { message: 'composer.errors.bodyRequired' }),
     url: z.string().trim().optional(),
     imageUrl: z.string().trim().optional(),
+    imageAlt: z
+      .string()
+      .trim()
+      .max(IMAGE_ALT_MAX, { message: 'composer.errors.imageAltTooLong' })
+      .optional(),
   })
   .superRefine((post, ctx) => {
     if (post.type === 'LINK' && !(post.url && isHttpUrl(post.url))) {
@@ -42,8 +50,14 @@ export const createPostSchema = z
       ctx.addIssue({ code: 'custom', path: ['imageUrl'], message: 'composer.errors.imageRequired' })
     }
   })
-  .transform(({ url, imageUrl, ...post }) =>
-    post.type === 'LINK' ? { ...post, url } : post.type === 'IMAGE' ? { ...post, imageUrl } : post,
+  // The description only with an image, and only when written (the backend rejects it on other
+  // types, specs/backend-answer-1013 BA-04).
+  .transform(({ url, imageUrl, imageAlt, ...post }) =>
+    post.type === 'LINK'
+      ? { ...post, url }
+      : post.type === 'IMAGE'
+        ? { ...post, imageUrl, ...(imageAlt ? { imageAlt } : {}) }
+        : post,
   )
 
 /** What the form holds (strings, url always present). */

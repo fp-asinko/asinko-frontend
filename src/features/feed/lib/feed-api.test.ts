@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { POSTS } from '@/mocks/fixtures/posts'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
 import { parseFeedParams } from '../schemas/feed-params.schema'
@@ -92,15 +93,27 @@ describe('getFeed', () => {
 
   it('drops invalid items and reports them, keeping the rest (H-20)', async () => {
     state.routes = withRoute('/api/v1/feed/explore', {
-      items: [
-        { kind: 'POST', content: { id: 'broken' } },
-        { kind: 'THESIS', content: {} },
-      ],
+      items: [{ kind: 'POST', content: { id: 'broken' } }, { content: {} }],
       nextCursor: null,
     })
     const result = await getFeed(parseFeedParams({}))
     expect(result).toEqual({ ok: true, data: { items: [], nextCursor: null, community: null } })
     expect(state.dropped).toEqual([2])
+  })
+
+  it('leaves out, without reporting, the kinds it does not draw: theses, ads (BA-07)', async () => {
+    state.routes = withRoute('/api/v1/feed/explore', {
+      items: [
+        { kind: 'AD', content: { id: 'ad-1' } },
+        { kind: 'POST', content: POSTS[0] },
+        { kind: 'THESIS', content: {} },
+      ],
+      nextCursor: null,
+    })
+    const result = await getFeed(parseFeedParams({}))
+    if (!result.ok) throw new Error('expected ok')
+    expect(result.data.items).toHaveLength(1)
+    expect(state.dropped).toEqual([])
   })
 
   it('keeps every card named when communities fail: the content carries it (BC-01)', async () => {

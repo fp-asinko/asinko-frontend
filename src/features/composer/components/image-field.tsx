@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type RefObject } from 'react'
 import { IMAGE_TYPES, prepareImage } from '@/lib/prepare-image'
 import { cn } from '@/lib/utils'
-import { removePostImageAction, uploadPostImageAction } from '../actions/upload-post-image.action'
+import { uploadPostImageAction } from '../actions/upload-post-image.action'
 
 type Preview = { src: string; width: number; height: number }
 
@@ -38,8 +38,9 @@ type FocusTarget = 'choose' | 'change' | 'retry'
  * The image of a post (specs/post-image PI-01 to PI-08), as X: choose it (or the camera and the
  * gallery in a phone) or drop it here; it is prepared in the browser (2048px WebP, no metadata)
  * and uploaded at once, with "Uploading…" over its preview. Then ✕ takes it out and Change picks
- * another; the one left behind is deleted from the bucket (Q1), also when a newer one replaces it
- * mid-upload or the editor closes meanwhile. The uploaded URL goes up through `onChange`, and
+ * another; a newer one replaces it, also mid-upload. Nothing is deleted from here: the backend's
+ * signed upload has no delete (specs/backend-answer-1013 BA-05). The uploaded URL goes up through
+ * `onChange`, and
  * `onBusy` holds Publish from the moment a file is taken until it is up.
  */
 export function ImageField({
@@ -70,14 +71,9 @@ export function ImageField({
   const errorId = useId()
   const [state, setState] = useState<State>({ status: 'idle' })
   const [dragging, setDragging] = useState(false)
-  const uploaded = useRef<string | null>(null)
-  // Each file taken is an attempt: only the last one counts; an older one's upload is deleted.
+  // Each file taken is an attempt: only the last one counts.
   const attempt = useRef(0)
   const mounted = useRef(true)
-
-  function discard(url: string | null) {
-    if (url?.startsWith('https://')) void removePostImageAction({ imageUrl: url })
-  }
 
   /** Moves the focus after this step if it was in the field (or nowhere) when the step began. */
   function focusAfter(target: FocusTarget, wasHere: boolean) {
@@ -88,8 +84,6 @@ export function ImageField({
     const current = ++attempt.current
     const active = document.activeElement
     const wasHere = !active || active === document.body || Boolean(root.current?.contains(active))
-    discard(uploaded.current)
-    uploaded.current = null
     onChange('')
     onBusy(true)
     setState({ status: 'preparing' })
@@ -113,10 +107,7 @@ export function ImageField({
     const result = await uploadPostImageAction(form)
 
     // Replaced by a newer file, or the editor closed: this upload is not wanted anymore.
-    if (current !== attempt.current || !mounted.current) {
-      if (result.ok) discard(result.data.imageUrl)
-      return
-    }
+    if (current !== attempt.current || !mounted.current) return
     onBusy(false)
     if (!result.ok) {
       URL.revokeObjectURL(preview.src)
@@ -124,12 +115,16 @@ export function ImageField({
       focusAfter('retry', wasHere)
       setState({
         status: 'error',
-        error: result.error === 'composer.errors.imageTooLarge' ? 'imageTooLarge' : 'imageUpload',
+        error:
+          result.error === 'composer.errors.imageTooLarge'
+            ? 'imageTooLarge'
+            : result.error === 'composer.errors.imageType'
+              ? 'imageType'
+              : 'imageUpload',
         file,
       })
       return
     }
-    uploaded.current = result.data.imageUrl
     onChange(result.data.imageUrl)
     focusAfter('change', wasHere)
     setState({ status: 'ready', preview })
@@ -137,8 +132,6 @@ export function ImageField({
 
   function remove() {
     attempt.current += 1
-    discard(uploaded.current)
-    uploaded.current = null
     onChange('')
     onBusy(false)
     pendingFocus.current = 'choose'
@@ -164,7 +157,7 @@ export function ImageField({
     }
   })
 
-  // Closed mid-upload: the upload, when it ends, deletes itself (take reads `mounted`).
+  // Closed mid-upload: the upload, when it ends, changes nothing (take reads `mounted`).
   useEffect(() => {
     mounted.current = true
     return () => {

@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { removePostImageAction, uploadPostImageAction } from './upload-post-image.action'
+import { uploadPostImageAction } from './upload-post-image.action'
 
 const deps = vi.hoisted(() => ({
   viewer: { id: '00000000-0000-4000-8000-000000000101', username: 'maria' } as {
@@ -8,16 +8,9 @@ const deps = vi.hoisted(() => ({
     username: string
   } | null,
   uploadPostImage: vi.fn(),
-  removePostImage: vi.fn(),
 }))
-vi.mock('@/lib/session', () => ({
-  getViewer: async () => deps.viewer,
-  getAccessToken: async () => 'user-token',
-}))
-vi.mock('@/lib/storage/post-images', () => ({
-  uploadPostImage: deps.uploadPostImage,
-  removePostImage: deps.removePostImage,
-}))
+vi.mock('@/lib/session', () => ({ getViewer: async () => deps.viewer }))
+vi.mock('../lib/post-image-upload', () => ({ uploadPostImage: deps.uploadPostImage }))
 
 const WEBP = [...'RIFF']
   .map((c) => c.charCodeAt(0))
@@ -34,14 +27,14 @@ function form(bytes: number[], type = 'image/webp', extra = 0) {
   return data
 }
 
-describe('uploadPostImageAction (specs/post-image PI-06, PI-07)', () => {
+describe('uploadPostImageAction (specs/post-image PI-06, PI-07; specs/backend-answer-1013 BA-01)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     deps.viewer = { id: '00000000-0000-4000-8000-000000000101', username: 'maria' }
     deps.uploadPostImage.mockResolvedValue({ ok: true, data: { imageUrl: 'https://x/y.webp' } })
   })
 
-  it("uploads a WebP into the viewer's folder with their token, the type read from the bytes", async () => {
+  it('uploads a WebP for the viewer, the type read from the bytes', async () => {
     expect(await uploadPostImageAction(form(WEBP, 'image/png'))).toEqual({
       ok: true,
       data: { imageUrl: 'https://x/y.webp' },
@@ -49,7 +42,6 @@ describe('uploadPostImageAction (specs/post-image PI-06, PI-07)', () => {
     expect(deps.uploadPostImage).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: '00000000-0000-4000-8000-000000000101',
-        token: 'user-token',
         contentType: 'image/webp',
       }),
     )
@@ -77,45 +69,20 @@ describe('uploadPostImageAction (specs/post-image PI-06, PI-07)', () => {
     expect(deps.uploadPostImage).not.toHaveBeenCalled()
   })
 
-  it('asks for a session, and says when Storage fails', async () => {
+  it('asks for a session, and says what the backend refused or what failed', async () => {
     deps.viewer = null
     expect(await uploadPostImageAction(form(WEBP))).toEqual({
       ok: false,
       error: 'api.errors.UNAUTHENTICATED',
     })
     deps.viewer = { id: '00000000-0000-4000-8000-000000000101', username: 'maria' }
-    deps.uploadPostImage.mockResolvedValue({ ok: false })
-    expect(await uploadPostImageAction(form(WEBP))).toEqual({
-      ok: false,
-      error: 'composer.errors.imageUpload',
-    })
-  })
-})
-
-describe('removePostImageAction (Q1)', () => {
-  beforeEach(() => vi.clearAllMocks())
-
-  it("removes from the viewer's folder, and only a URL", async () => {
-    deps.viewer = { id: '00000000-0000-4000-8000-000000000101', username: 'maria' }
-    expect(await removePostImageAction({ imageUrl: 'https://x/y.webp' })).toEqual({
-      ok: true,
-      data: null,
-    })
-    expect(deps.removePostImage).toHaveBeenCalledWith({
-      userId: '00000000-0000-4000-8000-000000000101',
-      token: 'user-token',
-      imageUrl: 'https://x/y.webp',
-    })
-    expect(await removePostImageAction({ imageUrl: 'javascript:alert(1)' })).toMatchObject({
-      ok: false,
-    })
-  })
-
-  it('asks for a session', async () => {
-    deps.viewer = null
-    expect(await removePostImageAction({ imageUrl: 'https://x/y.webp' })).toEqual({
-      ok: false,
-      error: 'api.errors.UNAUTHENTICATED',
-    })
+    for (const [error, key] of [
+      ['upload', 'composer.errors.imageUpload'],
+      ['type', 'composer.errors.imageType'],
+      ['unauthenticated', 'api.errors.UNAUTHENTICATED'],
+    ]) {
+      deps.uploadPostImage.mockResolvedValue({ ok: false, error })
+      expect(await uploadPostImageAction(form(WEBP))).toEqual({ ok: false, error: key })
+    }
   })
 })

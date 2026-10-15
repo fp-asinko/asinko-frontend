@@ -48,11 +48,23 @@ describe('PostCard (H-12)', () => {
     expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/asset/BTC')
   })
 
-  it('shows an image post with next/image', () => {
-    renderWithIntl(
-      <PostCard post={postItem({ media: { type: 'image', url: '/mocks/chart.svg' } })} />,
+  it('shows an image post with next/image, named by its description (BA-04)', () => {
+    const { unmount } = renderWithIntl(
+      <PostCard
+        post={postItem({
+          media: { type: 'image', url: '/mocks/chart.svg', alt: 'BTC price since 2020' },
+        })}
+      />,
     )
-    expect(screen.getByRole('img', { name: 'Image attached to the post' })).toHaveAttribute(
+    expect(screen.getByRole('img', { name: 'BTC price since 2020' })).toBeInTheDocument()
+    unmount()
+    // Without a description, the post's title.
+    renderWithIntl(
+      <PostCard
+        post={postItem({ media: { type: 'image', url: '/mocks/chart.svg', alt: null } })}
+      />,
+    )
+    expect(screen.getByRole('img', { name: 'Whales accumulated 48,000 $BTC' })).toHaveAttribute(
       'src',
       '/mocks/chart.svg',
     )

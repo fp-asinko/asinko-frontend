@@ -10,6 +10,8 @@ export const assetSchema = z.object({
   exchange: z.string().nullable(),
   name: z.string(),
   assetClass: z.enum(['EQUITY', 'CRYPTO', 'ETF', 'FOREX', 'INDEX', 'COMMODITY', 'OTHER']),
+  /** Crypto with its logo, the rest a monogram, all from Storage (backend 2026-10-13). */
+  logoUrl: z.string().nullable().optional(),
   price: z.number().nullable(),
   priceChangePct: z.number().nullable(),
   priceUpdatedAt: z.iso.datetime().nullable(),

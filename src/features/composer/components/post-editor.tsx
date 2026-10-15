@@ -17,10 +17,10 @@ import { postPath } from '@/lib/posts/paths'
 import type { TextField } from '@/lib/insert-text'
 import { cn } from '@/lib/utils'
 import { createPost } from '../actions/create-post.action'
-import { removePostImageAction } from '../actions/upload-post-image.action'
 import type { CommunityOption } from '../composer.types'
 import {
   createPostSchema,
+  IMAGE_ALT_MAX,
   TITLE_MAX,
   type CreatePostForm,
   type CreatePostInput,
@@ -56,6 +56,7 @@ const ERROR_NAMES = [
   'imageUpload',
   'imageTooLarge',
   'imageUnreadable',
+  'imageAltTooLong',
   'general',
 ] as const
 type ErrorName = (typeof ERROR_NAMES)[number]
@@ -66,7 +67,7 @@ function errorName(key: string | undefined): ErrorName {
   return ERROR_NAMES.find((each) => each === name) ?? 'general'
 }
 
-const FIELDS = ['communityId', 'title', 'body', 'url', 'imageUrl'] as const
+const FIELDS = ['communityId', 'title', 'body', 'url', 'imageUrl', 'imageAlt'] as const
 
 /** The first image file of a paste or a drop, if any (PI-02). */
 function imageFile(files: FileList | undefined): File | null {
@@ -109,8 +110,6 @@ export function PostEditor({
   // The image is uploading: Publish waits (PI-06).
   const [uploading, setUploading] = useState(false)
   const takeImage = useRef<TakeImage | null>(null)
-  // Published as what: an image left behind in another format is deleted too (Q1).
-  const published = useRef<string | null>(null)
   const form = useForm<CreatePostForm, unknown, CreatePostInput>({
     resolver: zodResolver(createPostSchema),
     defaultValues: {
@@ -120,6 +119,7 @@ export function PostEditor({
       body: '',
       url: '',
       imageUrl: '',
+      imageAlt: '',
     },
     // As X: no errors while writing; Publish says what is missing, then they follow the typing.
     // (On blur, an error appearing above would also move the format row under the pointer.)
@@ -141,11 +141,6 @@ export function PostEditor({
     }
     return () => {
       draftRef.current = null
-      // Closed without publishing: its uploaded image would be left in the bucket (Q1).
-      const left = getValues('imageUrl')
-      if (published.current !== 'IMAGE' && left?.startsWith('https://')) {
-        void removePostImageAction({ imageUrl: left })
-      }
     }
   }, [draftRef, getValues])
   // Publish waits until nothing is missing, and while sending (PC-10, no double posts).
@@ -162,7 +157,6 @@ export function PostEditor({
     setServerError(null)
     const result = await createPost(values)
     if (result.ok) {
-      published.current = values.type
       onPublished(postPath(result.data.id, result.data.title))
       return
     }
@@ -329,9 +323,11 @@ export function PostEditor({
               <ImageField
                 id={`${ids}-image`}
                 takeRef={takeImage}
-                onChange={(next) =>
+                onChange={(next) => {
+                  // Another image (or none): the description said what the last one showed.
+                  if (next !== getValues('imageUrl')) setValue('imageAlt', '')
                   setValue('imageUrl', next, { shouldValidate: formState.isSubmitted })
-                }
+                }}
                 onBusy={setUploading}
                 onUnauthenticated={() => openGate('post')}
                 invalid={invalid('imageUrl')}
@@ -343,6 +339,28 @@ export function PostEditor({
                 className="type-meta"
               />
             </Field>
+            {/* Once there is an image: what it shows, for who cannot see it (BA-04). */}
+            {imageUrl && (
+              <Field data-invalid={invalid('imageAlt') || undefined} className="mt-2 gap-1">
+                <FieldLabel htmlFor={`${ids}-image-alt`} className="type-meta font-semibold">
+                  {t('fields.imageAlt')}
+                </FieldLabel>
+                <Input
+                  id={`${ids}-image-alt`}
+                  maxLength={IMAGE_ALT_MAX}
+                  placeholder={t('fields.imageAltPlaceholder')}
+                  {...register('imageAlt')}
+                  aria-invalid={invalid('imageAlt') || undefined}
+                  aria-describedby={`${ids}-image-alt-error`}
+                  className="h-11 rounded-lg bg-surface px-3 text-base md:h-10 md:text-sm"
+                />
+                <FieldError
+                  id={`${ids}-image-alt-error`}
+                  errors={fieldError('imageAlt')}
+                  className="type-meta"
+                />
+              </Field>
+            )}
           </TabsContent>
 
           <Field data-invalid={invalid('body') || undefined} className={cn('gap-1', wide)}>

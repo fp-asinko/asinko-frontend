@@ -7,7 +7,6 @@ import { previewProps } from '@/lib/communities/preview'
 import { cn } from '@/lib/utils'
 import type { CommentNode } from '../feed.types'
 import { FOLD_DEPTH } from '../lib/comment-fold'
-import { CommentAd } from './comment-ad'
 import { CommentAnchor } from './comment-anchor'
 import { CollapseButton, CommentFold, RepliesFold } from './comment-fold'
 import { COMMENT_ACTION, CommentReply } from './comment-reply'
@@ -72,9 +71,6 @@ function CommentItem({
     <CommentItem key={reply.id} postId={postId} comment={reply} depth={depth + 1} />
   ))
   const fold = depth + 1 === FOLD_DEPTH && comment.replies.length > 0
-  // The ad read next (withAds, PD-07): first in the thread when the replies show, else after it.
-  const adFirstInThread = comment.ad && replies.length > 0 && !fold ? comment.ad : undefined
-  const adAfter = comment.ad && !adFirstInThread ? comment.ad : undefined
 
   const avatar = comment.author ? (
     <UserAvatar
@@ -148,49 +144,37 @@ function CommentItem({
   )
 
   return (
-    <>
-      <li
-        id={id}
-        // Focused when opened from its link (CommentAnchor), not in the tab order.
-        tabIndex={-1}
-        className={cn(
-          depth === 0 ? 'thread-item' : REPLY,
-          // Focused from the keyboard (opening "N more replies", a shared link): a visible ring.
-          'rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-flash:animate-comment-flash',
-        )}
-      >
-        <CommentFold
-          handle={handle}
-          avatar={avatar}
-          meta={meta}
-          body={body}
-          replies={
-            <>
-              {adFirstInThread && (
-                <li className="thread-child pb-2 pl-2">
-                  <CommentAd ad={adFirstInThread} />
-                </li>
-              )}
-              {fold ? (
-                <RepliesFold
-                  label={t('moreReplies', { count: countReplies(comment) })}
-                  ids={replyIds(comment)}
-                >
-                  {replies}
-                </RepliesFold>
-              ) : (
-                replies
-              )}
-              <PendingComments parentId={comment.id} itemClassName={REPLY} />
-            </>
-          }
-        />
-      </li>
-      {adAfter && (
-        <li className={depth === 0 ? 'py-1' : 'thread-child py-1 pl-2'}>
-          <CommentAd ad={adAfter} />
-        </li>
+    <li
+      id={id}
+      // Focused when opened from its link (CommentAnchor), not in the tab order.
+      tabIndex={-1}
+      className={cn(
+        depth === 0 ? 'thread-item' : REPLY,
+        // Focused from the keyboard (opening "N more replies", a shared link): a visible ring.
+        'rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50 data-flash:animate-comment-flash',
       )}
-    </>
+    >
+      <CommentFold
+        handle={handle}
+        avatar={avatar}
+        meta={meta}
+        body={body}
+        replies={
+          <>
+            {fold ? (
+              <RepliesFold
+                label={t('moreReplies', { count: countReplies(comment) })}
+                ids={replyIds(comment)}
+              >
+                {replies}
+              </RepliesFold>
+            ) : (
+              replies
+            )}
+            <PendingComments parentId={comment.id} itemClassName={REPLY} />
+          </>
+        }
+      />
+    </li>
   )
 }

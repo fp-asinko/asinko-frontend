@@ -69,10 +69,10 @@ describe('mock handlers behave like the contract', () => {
     expect(page.items.every((each) => each.viewerMembership !== null)).toBe(true)
   })
 
-  it('marks as missing only what the backend does not have: the asset page and the proposals', () => {
+  it('marks as missing only what the backend does not have: the proposals', () => {
     const missing = MOCK_ROUTES.filter((route) => !route.implemented).map((route) => route.path)
     // Searching comments (P-014) goes alone: the rest of that endpoint is the backend's.
-    expect(missing).toEqual(['/api/v1/posts/:id/comments', '/api/v1/assets/:symbol', '/api/v1/ads'])
+    expect(missing).toEqual(['/api/v1/posts/:id/comments'])
   })
 
   describe('comments sorted and searched (P-014, specs/post-detail-refresh)', () => {
@@ -130,14 +130,6 @@ describe('mock handlers behave like the contract', () => {
         expect(status).toBe(422)
       }
     })
-  })
-
-  it('serves the house ads for posts and feeds, and nothing for other places (P-015)', async () => {
-    const ads = async (query: Record<string, string>) =>
-      ((await call('GET', '/api/v1/ads', { query })).body as { items: unknown[] }).items
-    expect((await ads({ placement: 'comments' })).length).toBeGreaterThan(1)
-    expect((await ads({ placement: 'feed' })).length).toBeGreaterThan(1)
-    expect(await ads({ placement: 'sidebar' })).toEqual([])
   })
 
   it('searches public users by username, never private ones (specs/mention-autocomplete)', async () => {

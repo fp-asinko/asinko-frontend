@@ -10,7 +10,6 @@ const actions = vi.hoisted(() => ({
   createPost: vi.fn(),
   searchCommunities: vi.fn(),
   uploadPostImageAction: vi.fn(),
-  removePostImageAction: vi.fn(),
   prepareImage: vi.fn(),
 }))
 // Mentions have their own tests (specs/mention-autocomplete): out of this component's.
@@ -19,7 +18,6 @@ vi.mock('@/components/molecules/mention-assist', () => ({ MentionField: () => nu
 vi.mock('../actions/create-post.action', () => ({ createPost: actions.createPost }))
 vi.mock('../actions/upload-post-image.action', () => ({
   uploadPostImageAction: actions.uploadPostImageAction,
-  removePostImageAction: actions.removePostImageAction,
 }))
 // Preparing the image has its own tests (prepare-image): here it answers a ready WebP.
 vi.mock('@/lib/prepare-image', async (original) => ({
@@ -260,7 +258,25 @@ describe('PostEditor with an image (specs/post-image)', () => {
       imageUrl: IMAGE,
     })
     expect(onPublished).toHaveBeenCalledWith('/post/img/chart')
-    expect(actions.removePostImageAction).not.toHaveBeenCalled()
+  })
+
+  it('publishes the image with its description when there is one (BA-04)', async () => {
+    renderEditor()
+    await userEvent.click(screen.getByRole('tab', { name: 'Image' }))
+    // The description shows once there is an image.
+    expect(screen.queryByRole('textbox', { name: 'Image description (optional)' })).toBeNull()
+    await userEvent.type(title(), 'Chart')
+    await userEvent.type(body(), 'Look at this.')
+    await userEvent.upload(fileInput(), png())
+    await preview()
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Image description (optional)' }),
+      'BTC price since 2020',
+    )
+    await userEvent.click(publish())
+    expect(actions.createPost).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'IMAGE', imageUrl: IMAGE, imageAlt: 'BTC price since 2020' }),
+    )
   })
 
   it('takes a pasted image into the Image format (PI-02)', async () => {
@@ -305,22 +321,19 @@ describe('PostEditor with an image (specs/post-image)', () => {
     expect(await preview()).toBeInTheDocument()
   })
 
-  it('removes the image, deleting it from the bucket, and focuses where to choose another (Q1)', async () => {
+  it('removes the image and focuses where to choose another', async () => {
     renderEditor()
     await userEvent.click(screen.getByRole('tab', { name: 'Image' }))
     await userEvent.upload(fileInput(), png())
     await userEvent.click(await screen.findByRole('button', { name: 'Remove image' }))
-    expect(actions.removePostImageAction).toHaveBeenCalledWith({ imageUrl: IMAGE })
     expect(screen.getByRole('button', { name: /Choose image/ })).toHaveFocus()
   })
 
-  it('counts an image as something written, and deletes it if the editor closes unpublished', async () => {
+  it('counts an image as something written', async () => {
     const view = renderEditor()
     await userEvent.click(screen.getByRole('tab', { name: 'Image' }))
     await userEvent.upload(fileInput(), png())
     await preview()
     expect(view.draftRef.current?.()).toBe(true)
-    view.unmount()
-    expect(actions.removePostImageAction).toHaveBeenCalledWith({ imageUrl: IMAGE })
   })
 })

@@ -37,6 +37,8 @@ export const postSchema = z.object({
   body: z.string(),
   url: z.string().nullable(),
   imageUrl: z.string().nullable(),
+  /** What the image shows (P-013, 2026-10-13): optional, only IMAGE posts. */
+  imageAlt: z.string().nullable().optional(),
   tag: z.string().nullable(),
   /** null when creatorType is SYSTEM. */
   creator: userSummarySchema.nullable(),

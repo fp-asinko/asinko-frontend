@@ -35,4 +35,13 @@ describe('activeMention (specs/mention-autocomplete MA-01, MA-06)', () => {
   it('stops looking past 32 characters', () => {
     expect(at(`@${'a'.repeat(33)}`)).toBeNull()
   })
+
+  it('keeps "." and "/" inside an asset symbol, not in a community nor a user (BA-10)', () => {
+    expect(activeMention('Long $BRK.B', 11)).toEqual({ kind: 'asset', query: 'BRK.B', start: 5 })
+    expect(activeMention('$XAU/USD', 8)).toEqual({ kind: 'asset', query: 'XAU/USD', start: 0 })
+    expect(activeMention('#macro.', 7)).toBeNull()
+    expect(activeMention('@maria/', 7)).toBeNull()
+    // Still a letter or a digit first.
+    expect(activeMention('$.B', 3)).toBeNull()
+  })
 })

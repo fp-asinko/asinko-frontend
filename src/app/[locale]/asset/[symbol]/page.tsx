@@ -1,6 +1,11 @@
 import type { Metadata } from 'next'
 import { PageColumns } from '@/components/organisms/app-shell'
-import { communityMetadata, CommunityTop, resolveCommunityRoute } from '@/features/communities'
+import {
+  AssetWithoutCommunity,
+  communityMetadata,
+  CommunityTop,
+  resolveAssetRoute,
+} from '@/features/communities'
 import { ComposeScope } from '@/features/composer'
 // By its path, not the feature's index: the index also brings the post page's client parts (seo.md).
 import { CommunityFeed } from '@/features/feed/components/community-feed'
@@ -19,7 +24,16 @@ export default async function AssetPage({
   searchParams,
 }: PageProps<'/[locale]/asset/[symbol]'>) {
   const { locale, symbol } = await params
-  const { page, path } = await resolveCommunityRoute('asset', decodeURIComponent(symbol), locale)
+  const route = await resolveAssetRoute(decodeURIComponent(symbol), locale)
+  // An asset of the catalog without its community yet (specs/backend-answer-1013 BA-09).
+  if (route.kind === 'asset') {
+    return (
+      <PageColumns>
+        <AssetWithoutCommunity asset={route.asset} />
+      </PageColumns>
+    )
+  }
+  const { page, path } = route
   return (
     <PageColumns>
       <ComposeScope id={page.id} handle={page.handle} name={page.subtitle ?? page.handle} />
