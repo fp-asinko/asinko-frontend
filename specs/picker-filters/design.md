@@ -18,6 +18,7 @@ Una función pura `readSearch(text)` en `features/composer/lib/picker-search.ts`
 - Al tocar un chip con un símbolo escrito, el símbolo se quita del input (el texto que queda es la búsqueda).
 - Cada vez que se abre, vuelve a **Todo** y pide la lista inicial (PF-01).
 - Cada cambio de chip o de búsqueda pide de nuevo (la clave de lo pedido pasa a ser `kind + search`), con el mismo retraso de 250 ms al escribir e inmediato al tocar un chip.
+- **Sin espera al cambiar de chip** (pedido del PO, 2026-10-16: "tiene lag"): las respuestas se guardan por `kind + search` mientras el selector vive, y volver a una es inmediato, sin pedir. Un chip sin respuesta todavía se muestra al instante filtrando la de **Todo** con la misma búsqueda (por el símbolo del handle) y la respuesta del servidor la completa.
 
 ## 3. UI
 

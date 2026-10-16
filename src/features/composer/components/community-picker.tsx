@@ -24,6 +24,14 @@ const KINDS: readonly CommunityKind[] = ['all', 'groups', 'assets']
 /** The empty list says what was missing (specs/picker-filters PF-05). */
 const EMPTY = { all: 'empty', groups: 'emptyGroups', assets: 'emptyAssets' } as const
 
+/** What a list of everything shows of one kind: its assets, or its groups. */
+function ofKind(options: CommunityOption[], kind: CommunityKind) {
+  if (kind === 'all') return options
+  return options.filter(
+    (option) => !option.own && option.handle.startsWith('$') === (kind === 'assets'),
+  )
+}
+
 /** The name under the handle, only when it says more than the handle (#Macro under #macro). */
 function subtitle(option: CommunityOption) {
   if (option.own) return option.handle
@@ -61,13 +69,28 @@ export function CommunityPicker({
   const asked = useRef<string | null>(null)
   /** The kind came from a symbol typed in the search: erasing it goes back to All (PF-03). */
   const bySymbol = useRef(false)
+  /** The answers of this picker, by kind and search: going back to one is instant. */
+  const answers = useRef(new Map<string, CommunityOption[]>())
 
   function load(search: string, of: CommunityKind) {
     const key = `${of}:${search}`
     if (asked.current === key) return
     asked.current = key
+    const known = answers.current.get(key)
+    if (known) {
+      setFailed(false)
+      setOptions(known)
+      return
+    }
+    // A chip answers at once with what everything already brought; the server completes it.
+    const all = of === 'all' ? undefined : answers.current.get(`all:${search}`)
+    if (all) {
+      setFailed(false)
+      setOptions(ofKind(all, of))
+    }
     startTransition(async () => {
       const result = await searchCommunities(search, of)
+      if (result.ok) answers.current.set(key, result.data)
       // A newer search went out meanwhile: this answer is stale.
       if (asked.current !== key) return
       setFailed(!result.ok)

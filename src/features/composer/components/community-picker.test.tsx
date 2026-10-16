@@ -168,6 +168,26 @@ describe('CommunityPicker filters (specs/picker-filters)', () => {
     vi.useRealTimers()
   })
 
+  it('a chip answers at once, before the server, and a known one asks nothing again', async () => {
+    action.searchCommunities.mockResolvedValueOnce({ ok: true, data: [OWN, DEFI, BTC] })
+    renderWithIntl(<Picker onChange={vi.fn()} />)
+    await open()
+    await screen.findByRole('option', { name: /#defi/ })
+
+    // The server has not answered Assets yet: the list is already filtered from All.
+    let answer: (value: unknown) => void = () => {}
+    action.searchCommunities.mockReturnValueOnce(new Promise((resolve) => (answer = resolve)))
+    await userEvent.click(kind('Assets'))
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      '$BTCBitcoin',
+    ])
+
+    await userEvent.click(kind('All'))
+    expect(screen.getAllByRole('option')).toHaveLength(3)
+    expect(action.searchCommunities).toHaveBeenCalledTimes(2) // All on open, then Assets
+    await act(async () => answer({ ok: true, data: [BTC] }))
+  })
+
   it('says what was missing (PF-05)', async () => {
     action.searchCommunities.mockResolvedValue({ ok: true, data: [] })
     renderWithIntl(<Picker onChange={vi.fn()} />)
