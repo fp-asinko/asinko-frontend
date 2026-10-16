@@ -22,15 +22,29 @@ describe('the page to create a post: its URL (specs/submit-page SU-01)', () => {
     expect(parseSubmitQuery({ community: 'defi', type: 'link' })).toEqual({
       community: 'defi',
       type: 'link',
+      related: [],
     })
     expect(parseSubmitQuery({ community: ['BTC', 'ETH'], type: 'video' })).toEqual({
       community: 'BTC',
       type: undefined,
+      related: [],
     })
     expect(parseSubmitQuery({ community: '', type: undefined })).toEqual({
       community: undefined,
       type: undefined,
+      related: [],
     })
+  })
+
+  it('reads up to three related ones, valid, without repeats or the main one (RA-04)', () => {
+    expect(parseSubmitQuery({ community: 'defi', related: 'BTC,macro' }).related).toEqual([
+      'BTC',
+      'macro',
+    ])
+    expect(
+      parseSubmitQuery({ community: 'defi', related: 'defi,BTC,BTC,,a b,XAU/USD,macro,eth' })
+        .related,
+    ).toEqual(['BTC', 'XAU/USD', 'macro'])
   })
 
   it("keeps each locale's word: the other one redirects with its query, or is a 404", () => {

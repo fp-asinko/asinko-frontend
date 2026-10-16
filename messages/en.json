@@ -615,6 +615,7 @@
       "FOREX": "Currency",
       "OTHER": "Asset"
     },
-    "loadError": "Could not load the community."
+    "loadError": "Could not load the community.",
+    "related": "Related ({count, number})"
   }
 }

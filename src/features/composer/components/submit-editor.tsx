@@ -10,22 +10,36 @@ import { clearDraft } from '../hooks/use-post-draft'
 import { DiscardDialog } from './discard-dialog'
 import { PostEditor } from './post-editor'
 
+/** A handle's slug: $BTC is BTC and #macro is macro. */
+const slugOf = (handle: string) => handle.slice(1)
+
 /**
- * The editor on its page (specs/submit-page SU-03 to SU-05): another community goes into the URL
- * (the page and its right column follow it, the form keeps what is written); Cancel with something
- * written asks first and, if confirmed, also drops the draft; publishing goes to the new post.
+ * The editor on its page (specs/submit-page SU-03 to SU-05): another community, or other related
+ * ones (specs/related-aside), go into the URL (the page and its right column follow them, the form
+ * keeps what is written); Cancel with something written asks first and, if confirmed, also drops
+ * the draft; publishing goes to the new post.
  */
+
 export function SubmitEditor({
   type,
   community,
   storageKey,
+  related = [],
 }: {
   type: 'TEXT' | 'LINK' | 'IMAGE'
   community: CommunityOption | null
   storageKey: string | null
+  /** The related ones of the URL, as handles (specs/related-aside RA-04). */
+  related?: string[]
 }) {
   const router = useRouter()
   const locale = useLocale() as Locale
+  // The URL carries both: changing one keeps the other (RA-04).
+  const where = useRef({ community: community?.slug ?? null, related: related.map(slugOf) })
+  function follow(next: Partial<typeof where.current>) {
+    where.current = { ...where.current, ...next }
+    router.replace(submitPath(locale, where.current), { scroll: false })
+  }
   const written = useRef<(() => boolean) | null>(null)
   const [discarding, setDiscarding] = useState(false)
 
@@ -46,9 +60,9 @@ export function SubmitEditor({
         draftRef={written}
         onCancel={() => (written.current?.() ? setDiscarding(true) : leave())}
         onPublished={(path) => router.push(path)}
-        onCommunityChange={(next) =>
-          router.replace(submitPath(locale, { community: next?.slug }), { scroll: false })
-        }
+        related={related}
+        onCommunityChange={(next) => follow({ community: next?.slug ?? null })}
+        onRelatedChange={(handles) => follow({ related: handles.map(slugOf) })}
       />
       <DiscardDialog
         open={discarding}

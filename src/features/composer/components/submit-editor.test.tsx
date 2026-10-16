@@ -44,6 +44,37 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12)', () => {
     expect(screen.getByRole('textbox', { name: 'Título' })).toHaveValue('Keep me')
   })
 
+  it('carries the related ones in the URL with the community, each keeping the other (specs/related-aside RA-04)', async () => {
+    const MACRO: CommunityOption = {
+      id: 'c3',
+      slug: 'macro',
+      handle: '#macro',
+      name: 'Macro',
+      own: false,
+    }
+    actions.searchCommunities.mockResolvedValue({ ok: true, data: [DEFI, BTC, MACRO] })
+    renderWithIntl(
+      <SubmitEditor type="TEXT" community={DEFI} storageKey={KEY} related={['$BTC']} />,
+    )
+    // From the URL, as pills.
+    expect(screen.getByRole('list', { name: 'Related' })).toHaveTextContent('$BTC')
+
+    screen.getByRole('combobox', { name: 'Add a related community or asset' }).focus()
+    await userEvent.keyboard('{ArrowDown}')
+    await userEvent.click(await screen.findByRole('option', { name: /#macro/ }))
+    expect(router.replace).toHaveBeenLastCalledWith('/submit?community=defi&related=BTC%2Cmacro', {
+      scroll: false,
+    })
+
+    screen.getByRole('combobox', { name: 'Community' }).focus()
+    await userEvent.keyboard('{ArrowDown}')
+    await userEvent.click(await screen.findByRole('option', { name: /#macro/ }))
+    // The new main one stops being related; the other stays.
+    expect(router.replace).toHaveBeenLastCalledWith('/submit?community=macro&related=BTC', {
+      scroll: false,
+    })
+  })
+
   it('offers a draft from before: Recover fills the form and its community', async () => {
     writeDraft(KEY, {
       community: BTC,

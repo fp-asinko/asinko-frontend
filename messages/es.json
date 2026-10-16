@@ -615,6 +615,7 @@
       "FOREX": "Moneda",
       "OTHER": "Activo"
     },
-    "loadError": "No se pudo cargar la comunidad."
+    "loadError": "No se pudo cargar la comunidad.",
+    "related": "Relacionados ({count, number})"
   }
 }

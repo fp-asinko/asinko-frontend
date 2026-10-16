@@ -18,4 +18,11 @@ describe('submitPath (specs/submit-page SU-01)', () => {
     )
     expect(submitPath('en', { community: null })).toBe('/submit')
   })
+
+  it('carries the related ones as slugs, comma separated (specs/related-aside RA-04)', () => {
+    expect(submitPath('en', { community: 'defi', related: ['BTC', 'macro'] })).toBe(
+      '/submit?community=defi&related=BTC%2Cmacro',
+    )
+    expect(submitPath('en', { community: 'defi', related: [] })).toBe('/submit?community=defi')
+  })
 })

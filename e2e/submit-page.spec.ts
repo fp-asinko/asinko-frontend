@@ -218,6 +218,40 @@ test.describe('Page to create a post', () => {
     await expect(page.getByRole('main').getByText('$BTC', { exact: false })).toBeVisible()
   })
 
+  for (const theme of ['light', 'dark'] as const) {
+    test(`the right column folds the related ones under "+", in ${theme} (specs/related-aside)`, async ({
+      page,
+      isMobile,
+    }) => {
+      test.skip(isMobile, 'There is no right column in phones')
+      await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
+      await page.goto('/en/submit?community=defi')
+      await addRelated(page, '$btc', /\$BTC/)
+      await addRelated(page, '#mac', /#macro/)
+      // In the URL, as the community (RA-04).
+      await expect(page).toHaveURL(/\/en\/submit\?community=defi&related=BTC%2Cmacro$/)
+
+      const column = page.getByRole('complementary', { name: 'Related' })
+      const fold = column.getByRole('button', { name: 'Related (2)' })
+      await expect(fold).toHaveAttribute('aria-expanded', 'false')
+      await fold.click()
+      await expect(column.getByText('$BTC', { exact: true })).toBeVisible()
+      await expect(column.getByText('#macro', { exact: true })).toBeVisible()
+      await expectNoA11yViolations(page)
+
+      // Open, it stays open when another one is added (RA-05).
+      await addRelated(page, '$eth', /\$ETH/)
+      const three = column.getByRole('button', { name: 'Related (3)' })
+      await expect(three).toHaveAttribute('aria-expanded', 'true')
+      await expect(column.getByText('$ETH', { exact: true })).toBeVisible()
+
+      // Reloaded, the pills and the card are still there.
+      await page.reload()
+      await expect(editor(page).getByRole('list', { name: 'Related' })).toContainText('$ETH')
+      await expect(column.getByRole('button', { name: 'Related (3)' })).toBeVisible()
+    })
+  }
+
   test('asks before discarding what is written (SU-05)', async ({ page }) => {
     await page.goto('/en')
     await page.goto('/en/submit')

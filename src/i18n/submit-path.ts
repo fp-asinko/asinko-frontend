@@ -15,15 +15,21 @@ export const SUBMIT_SEGMENT: Record<Locale, 'submit' | 'publicar'> = {
 export type SubmitType = 'text' | 'link' | 'image'
 
 /**
- * Where "Create" goes: the page of the locale, with the community (its slug) and the format. A
- * path without the locale: the localized Link adds it.
+ * Where "Create" goes: the page of the locale, with the community (its slug), the related ones
+ * (their slugs, specs/related-aside RA-04) and the format. A path without the locale: the
+ * localized Link adds it.
  */
 export function submitPath(
   locale: Locale,
-  { community, type }: { community?: string | null; type?: SubmitType } = {},
+  {
+    community,
+    type,
+    related = [],
+  }: { community?: string | null; type?: SubmitType; related?: readonly string[] } = {},
 ): string {
   const query = new URLSearchParams()
   if (community) query.set('community', community)
+  if (related.length) query.set('related', related.join(','))
   if (type && type !== 'text') query.set('type', type)
   const search = query.toString()
   return `/${SUBMIT_SEGMENT[locale]}${search ? `?${search}` : ''}`

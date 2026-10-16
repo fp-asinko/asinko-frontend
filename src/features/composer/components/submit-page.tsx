@@ -9,9 +9,12 @@ import { EmptyState } from '@/components/organisms/empty-state'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import type { Locale } from '@/i18n/routing'
 import { permanentRedirect } from '@/i18n/navigation'
+import { assetSymbolSchema } from '@/lib/communities/asset-symbol.schema'
+import { communitySlugSchema } from '@/lib/communities/community-slug.schema'
 import { getViewer } from '@/lib/session'
 import { SUBMIT_SEGMENT } from '@/i18n/submit-path'
 import { draftKey } from '../lib/draft-key'
+import { RELATED_MAX } from '../schemas/create-post.schema'
 import { getSubmitCommunity } from '../lib/submit-community'
 import { SubmitEditorLoader } from './submit-editor-loader'
 
@@ -23,12 +26,21 @@ const querySchema = z.object({
   type: z.enum(['text', 'link', 'image']).optional().catch(undefined),
 })
 
+/** A related one's slug (specs/related-aside RA-04): a group's or an asset's. */
+const isSlug = (slug: string) =>
+  communitySlugSchema.safeParse(slug).success || assetSymbolSchema.safeParse(slug).success
+
 export function parseSubmitQuery(searchParams: SearchParams) {
   const one = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value)
-  return querySchema.parse({
+  const query = querySchema.parse({
     community: one(searchParams.community),
     type: one(searchParams.type),
   })
+  // Up to three, valid, without repeats or the main community; anything else is left out.
+  const related = [...new Set((one(searchParams.related) ?? '').split(','))]
+    .filter((slug) => slug && slug !== query.community && isSlug(slug))
+    .slice(0, RELATED_MAX)
+  return { ...query, related }
 }
 
 /**
@@ -97,6 +109,12 @@ export async function SubmitPage({ searchParams }: { searchParams: SearchParams 
   const found = query.community ? await getSubmitCommunity(query.community, viewer.username) : null
   const community = found?.ok && found.data.postable ? found.data : null
   const type = query.type === 'link' ? 'LINK' : query.type === 'image' ? 'IMAGE' : 'TEXT'
+  // The related ones of the URL that exist and can be tagged: groups and assets (RA-04).
+  const related = (
+    await Promise.all(query.related.map((slug) => getSubmitCommunity(slug, viewer.username)))
+  )
+    .flatMap((each) => (each.ok && each.data.kind !== 'user' ? [each.data.option.handle] : []))
+    .filter((handle) => handle !== community?.option.handle)
 
   return (
     <PageColumns>
@@ -126,6 +144,7 @@ export async function SubmitPage({ searchParams }: { searchParams: SearchParams 
           type={type}
           community={community?.option ?? null}
           storageKey={draftKey(viewer.id)}
+          related={related}
         />
       </div>
     </PageColumns>

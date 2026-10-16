@@ -101,9 +101,15 @@ export function PostEditor({
   onCancel,
   onPublished,
   onCommunityChange,
+  related: initialRelated = [],
+  onRelatedChange,
 }: {
   type: 'TEXT' | 'LINK' | 'IMAGE'
   community: CommunityOption | null
+  /** The related ones on arrival, as handles (the page's URL, specs/related-aside RA-04). */
+  related?: string[]
+  /** The related ones changed: the page follows them in its URL. */
+  onRelatedChange?: (handles: string[]) => void
   /** Where the draft is kept (draftKey); null keeps nothing (no session). */
   storageKey?: string | null
   /**
@@ -141,7 +147,7 @@ export function PostEditor({
       url: '',
       imageUrl: '',
       imageAlt: '',
-      related: [],
+      related: initialRelated,
     },
     // As X: no errors while writing; Publish says what is missing, then they follow the typing.
     // (On blur, an error appearing above would also move the format row under the pointer.)
@@ -217,6 +223,7 @@ export function PostEditor({
     })
     setChosen(offered.community)
     onCommunityChange?.(offered.community)
+    onRelatedChange?.(offered.related)
     setAnswered(true)
     focusTitle()
   }
@@ -370,10 +377,9 @@ export function PostEditor({
                       field.onChange(next?.id ?? '')
                       // The new main one is no longer a related one (RT-05).
                       if (next && related.includes(next.handle)) {
-                        setValue(
-                          'related',
-                          related.filter((handle) => handle !== next.handle),
-                        )
+                        const rest = related.filter((handle) => handle !== next.handle)
+                        setValue('related', rest)
+                        onRelatedChange?.(rest)
                       }
                       onCommunityChange?.(next)
                     }}
@@ -384,7 +390,10 @@ export function PostEditor({
                     <RelatedPicker
                       main={chosen.handle}
                       value={related}
-                      onChange={(handles) => setValue('related', handles)}
+                      onChange={(handles) => {
+                        setValue('related', handles)
+                        onRelatedChange?.(handles)
+                      }}
                     />
                   )}
                 </div>
