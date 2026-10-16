@@ -16,50 +16,62 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
-import { Field, FieldError, FieldLabel } from '@/components/ui/field'
-import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { updateProfile } from '../actions/update-profile.action'
+import type { EditableProfile, EditProfileField } from '../communities.types'
 import {
   BIO_MAX,
+  CITY_MAX,
+  DISPLAY_NAME_MAX,
   editProfileSchema,
+  HEADLINE_MAX,
   type EditProfileForm,
   type EditProfileInput,
 } from '../schemas/edit-profile.schema'
+import { CountedField, CountryField } from './edit-profile-fields'
+import { LinksField } from './edit-profile-links'
 
 /** Phones: the whole screen, as the post editor (specs/post-create-detail PC-02). */
 const SHEET =
   'inset-0 flex h-dvh max-h-dvh w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none p-0 pt-[env(safe-area-inset-top)] sm:max-w-none data-open:slide-in-from-bottom-10 data-open:zoom-in-100 data-closed:slide-out-to-bottom-10 data-closed:zoom-out-100'
 
-/** Desktop: a window near the top, as X's "Edit profile". */
+/** Desktop: a window near the top, as LinkedIn's "Edit intro"; its body scrolls, not the page. */
 const MODAL =
-  'top-[10dvh] flex w-[calc(100%-2rem)] max-w-120 -translate-y-0 flex-col gap-0 rounded-2xl p-0 sm:max-w-120'
+  'top-[8dvh] flex max-h-[84dvh] w-[calc(100%-2rem)] max-w-140 -translate-y-0 flex-col gap-0 rounded-2xl p-0 sm:max-w-140'
 
 const PILL =
   'inline-flex h-11 tap items-center rounded-full px-4 type-action font-bold outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-50 aria-disabled:active:scale-100 md:h-9'
 
+/** The fields the window's sections hold, in their order. */
+type Name = Exclude<keyof EditProfileForm, 'links'>
+
 /**
- * "Edit profile", as X's (specs/profile-edit PE-02 to PE-05): the bio with what it says now and a
- * counter. Save sends it and closes; the page shows it after `onSaved` refreshes it. Cancel, × or
- * Esc close it, asking first if something changed. A window in desktop, the full screen in phones.
- * Loaded on first use (EditProfileButton).
+ * "Edit profile", as LinkedIn's "Edit intro" (specs/profile-edit, specs/profile-presentation PP-05
+ * to PP-09): one window with the name, the headline, the location, the bio and the links. Save
+ * sends only what changed and closes; the page shows it after `onSaved` refreshes it. A refusal
+ * about a field is said under it, and what is written stays. Cancel, × or Esc close, asking first
+ * if something changed. A window in desktop, the full screen in phones, Save always at hand on top.
+ * Loaded on first use (EditProfileProvider); opened on a field when a prompt asked (PP-04).
  */
 export function EditProfileDialog({
   layout,
   open,
   onOpenChange,
-  bio,
+  profile,
+  field,
   onSaved,
   returnFocusTo,
 }: {
   layout: 'sheet' | 'modal'
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** The bio it has now: the field starts with it. */
-  bio: string | null
+  /** What the profile has now: the fields start with it. */
+  profile: EditableProfile
+  /** Where the focus goes in: the field a prompt offered, or the name. */
+  field: EditProfileField | null
   onSaved: () => void
-  /** Where the focus goes back when it closes: the button that opened it (WCAG 2.4.3). */
-  returnFocusTo?: RefObject<HTMLButtonElement | null>
+  /** Where the focus goes back when it closes: what opened it (WCAG 2.4.3). */
+  returnFocusTo?: RefObject<HTMLElement | null>
 }) {
   const t = useTranslations('communities.edit')
   const ids = useId()
@@ -67,15 +79,31 @@ export function EditProfileDialog({
   const [serverError, setServerError] = useState<string | null>(null)
   const form = useForm<EditProfileForm, unknown, EditProfileInput>({
     resolver: zodResolver(editProfileSchema),
-    defaultValues: { bio: bio ?? '' },
+    defaultValues: {
+      displayName: profile.displayName ?? '',
+      headline: profile.headline ?? '',
+      countryCode: profile.countryCode ?? '',
+      city: profile.city ?? '',
+      bio: profile.bio ?? '',
+      links: profile.links.map((url) => ({ url })),
+      avatarUrl: profile.avatarUrl,
+      bannerUrl: profile.bannerUrl,
+    },
     mode: 'onChange',
   })
-  const { register, handleSubmit, formState, control } = form
-  const current = useWatch({ control, name: 'bio' }) ?? ''
-  const length = current.trim().length
-  const tooLong = length > BIO_MAX
-  const blocked = tooLong || formState.isSubmitting
+  const { register, handleSubmit, formState, control, setError } = form
+  const [displayName = '', headline = '', city = '', bio = ''] = useWatch({
+    control,
+    name: ['displayName', 'headline', 'city', 'bio'],
+  })
+  const blocked = !formState.isValid || formState.isSubmitting
   const modal = layout === 'modal'
+  const id = (name: string) => `${ids}-${name}`
+  // A schema key is the window's own: communities.edit.errors.x is errors.x.
+  const error = (name: Name) => {
+    const key = formState.errors[name]?.message?.replace(/^communities\.edit\./, '')
+    return key ? t(key as 'errors.general') : undefined
+  }
 
   function requestClose() {
     if (formState.isDirty) setConfirming(true)
@@ -84,40 +112,44 @@ export function EditProfileDialog({
 
   async function save(values: EditProfileInput) {
     setServerError(null)
-    const result = await updateProfile(values)
+    // Only what changed (PP-08): a removed link marks the list as changed too.
+    const dirty = formState.dirtyFields as Partial<Record<keyof EditProfileInput, unknown>>
+    const changes = Object.fromEntries(
+      Object.entries(values).filter(([key]) => dirty[key as keyof EditProfileInput]),
+    )
+    if (Object.keys(changes).length === 0) return onOpenChange(false)
+
+    const result = await updateProfile(changes)
     if (result.ok) {
       onSaved()
       onOpenChange(false)
       return
     }
-    setServerError(
-      result.error === 'communities.edit.errors.bioTooLong'
-        ? t('errors.bioTooLong')
-        : t('errors.general'),
-    )
+    const fields = Object.entries(result.fieldErrors ?? {})
+    for (const [name, messages] of fields) {
+      const message = messages?.[0]
+      if (message) setError(name as Name, { message })
+    }
+    if (fields.length === 0) setServerError(t('errors.general'))
   }
 
-  const saveButton = (
-    <button
-      type="submit"
-      form={`${ids}-form`}
-      aria-disabled={blocked || undefined}
-      className={cn(PILL, 'ml-auto bg-primary text-primary-foreground hover:bg-primary/85')}
-    >
-      {formState.isSubmitting ? t('saving') : t('save')}
-    </button>
-  )
+  // Into the field a prompt offered (PP-04), else the name.
+  function initialFocus() {
+    if (field === 'links') {
+      return document.getElementById(`${ids}-links`)?.querySelector<HTMLElement>('input, button')
+    }
+    return document.getElementById(id(field ?? 'displayName'))
+  }
 
   return (
     <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(true) : requestClose())}>
       <DialogContent
         showCloseButton={false}
-        // Into the bio, at its end, as X.
-        initialFocus={() => document.getElementById(`${ids}-bio`)}
+        initialFocus={initialFocus}
         finalFocus={returnFocusTo}
         className={modal ? MODAL : SHEET}
       >
-        <div className="flex h-14 shrink-0 items-center gap-2 px-2">
+        <div className="flex h-14 shrink-0 items-center gap-2 border-b px-2">
           {modal ? (
             <button
               type="button"
@@ -138,7 +170,16 @@ export function EditProfileDialog({
             </button>
           )}
           <DialogTitle className="type-post-title">{t('title')}</DialogTitle>
-          <div className="ml-auto pr-2">{saveButton}</div>
+          <div className="ml-auto pr-2">
+            <button
+              type="submit"
+              form={`${ids}-form`}
+              aria-disabled={blocked || undefined}
+              className={cn(PILL, 'bg-primary text-primary-foreground hover:bg-primary/85')}
+            >
+              {formState.isSubmitting ? t('saving') : t('save')}
+            </button>
+          </div>
         </div>
 
         <form
@@ -149,37 +190,51 @@ export function EditProfileDialog({
             if (blocked) return event.preventDefault()
             void handleSubmit(save)(event)
           }}
-          className="flex flex-col gap-1.5 px-4 pt-2 pb-5"
+          className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 pt-4 pb-6"
         >
-          <Field data-invalid={tooLong || undefined} className="gap-1.5">
-            <FieldLabel htmlFor={`${ids}-bio`} className="type-action">
-              {t('bio')}
-            </FieldLabel>
-            <Textarea
-              id={`${ids}-bio`}
-              placeholder={t('bioPlaceholder')}
-              {...register('bio')}
-              aria-invalid={tooLong || undefined}
-              aria-describedby={tooLong ? `${ids}-count ${ids}-error` : `${ids}-count`}
-              // One thin border, also when invalid: the PO does not want the 3px halo.
-              className="min-h-24 resize-none text-base focus-visible:border-foreground/60 focus-visible:ring-0 aria-invalid:ring-0 dark:aria-invalid:ring-0"
+          <CountedField
+            id={id('displayName')}
+            label={t('name')}
+            max={DISPLAY_NAME_MAX}
+            value={displayName}
+            field={register('displayName')}
+            error={error('displayName')}
+          />
+          <CountedField
+            id={id('headline')}
+            label={t('headline')}
+            placeholder={t('headlinePlaceholder')}
+            max={HEADLINE_MAX}
+            value={headline}
+            field={register('headline')}
+            error={error('headline')}
+          />
+          <fieldset className="grid gap-3 sm:grid-cols-2">
+            <legend className="mb-1.5 type-action">{t('location')}</legend>
+            <CountryField id={id('countryCode')} field={register('countryCode')} />
+            <CountedField
+              id={id('city')}
+              label={t('city')}
+              max={CITY_MAX}
+              value={city}
+              field={register('city')}
+              error={error('city')}
             />
-            <div className="flex justify-between gap-2 type-meta">
-              <FieldError
-                id={`${ids}-error`}
-                errors={tooLong ? [{ message: t('errors.bioTooLong') }] : undefined}
-              />
-              <span
-                id={`${ids}-count`}
-                className={cn(
-                  'ml-auto tabular-nums',
-                  tooLong ? 'font-bold text-destructive' : 'text-muted-foreground',
-                )}
-              >
-                {t('counter', { count: length, max: BIO_MAX })}
-              </span>
-            </div>
-          </Field>
+          </fieldset>
+          <CountedField
+            id={id('bio')}
+            label={t('bio')}
+            placeholder={t('bioPlaceholder')}
+            max={BIO_MAX}
+            value={bio}
+            field={register('bio')}
+            error={error('bio')}
+            multiline
+            alwaysCount
+          />
+          <div id={`${ids}-links`}>
+            <LinksField control={control} register={register} errors={formState.errors.links} />
+          </div>
           {serverError && (
             <p role="alert" className="type-small text-destructive">
               {serverError}

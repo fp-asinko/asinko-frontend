@@ -23,7 +23,7 @@ Que el perfil cuente quién es la persona de un vistazo, como LinkedIn: nombre, 
 - [ ] **PP-01** Debajo del nombre (el visible, o el `@usuario` si no tiene), en este orden: el **titular**; la **ubicación** en gris ("La Plata, Argentina", o solo el país); los **links** (PP-03); y después la bio, seguidores y seguidos, como hoy. Lo que no está cargado no ocupa lugar.
 - [ ] **PP-02** El banner y la foto son los que subió la persona; sin ellos, el degradé y las iniciales de hoy.
 - [ ] **PP-03** (Q-links) Hasta **5 links**, en una fila que pasa a la línea de abajo: el **ícono** del sitio (X, LinkedIn, YouTube, Instagram, GitHub, Substack, TradingView; un globo para el resto) y el **dominio real** (`substack.com`), para que no se pueda disfrazar a dónde lleva. Abren en otra pestaña con `rel="noopener noreferrer nofollow ugc"` (`security.md § 1`).
-- [ ] **PP-04** En tu perfil, lo que falta se ofrece donde iría, en gris: "Agregá un titular", "Agregá links" (abren la ventana en esa sección). En el de otra persona no aparece nada.
+- [ ] **PP-04** En tu perfil, lo que falta se ofrece donde iría, en gris: "Agrega un titular", "Agrega links" (abren la ventana en esa sección). En el de otra persona no aparece nada.
 
 ### La ventana "Editar perfil" (como "Editar presentación" de LinkedIn)
 

@@ -2,6 +2,7 @@
 // knows these, never the raw contract shapes.
 
 import type { CommunityKind } from '@/lib/communities/paths'
+import type { ProfileLink } from '@/lib/profile-links'
 
 export type { CommunityKind }
 
@@ -15,6 +16,15 @@ export type ProfileDetails = {
   badge: 'verified' | 'institutional' | null
   bio: string | null
   avatarUrl: string | null
+  /** The presentation, as LinkedIn's (specs/profile-presentation, P-019, P-020): null if unset. */
+  headline: string | null
+  city: string | null
+  /** ISO 3166-1 alpha-2; the name, in the page's language. */
+  countryCode: string | null
+  /** Up to five, only http(s), in the person's order. */
+  links: ProfileLink[]
+  /** Their own banner; null: the personal channel's, or the color of their identity. */
+  bannerUrl: string | null
   followerCount: number
   followingCount: number
   accuracyRate: number | null
@@ -28,6 +38,15 @@ export type ProfileDetails = {
   /** The viewer is this user: no follow actions (CP-12). */
   isSelf: boolean
 }
+
+/** What "Edit profile" starts with (specs/profile-presentation PP-05): what the profile has now. */
+export type EditableProfile = Pick<
+  ProfileDetails,
+  'displayName' | 'headline' | 'countryCode' | 'city' | 'bio' | 'avatarUrl' | 'bannerUrl'
+> & { links: string[] }
+
+/** A field "Edit profile" can open on (PP-04: "Add a headline" goes to the headline). */
+export type EditProfileField = 'headline' | 'links'
 
 export type CommunityPage = {
   /** Where a post from this page goes (specs/post-create-detail PC-06). */

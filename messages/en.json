@@ -313,7 +313,12 @@
       "correct": "<b>{count}</b> correct",
       "incorrect": "<b>{count}</b> incorrect",
       "cancelled": "<b>{count}</b> cancelled",
-      "noResolved": "No resolved theses yet"
+      "noResolved": "No resolved theses yet",
+      "location": "{city}, {country}",
+      "links": "Links",
+      "newTab": "(opens in a new tab)",
+      "addHeadline": "Add a headline",
+      "addLinks": "Add links"
     },
     "createPost": "Create post",
     "tabs": {
@@ -370,14 +375,32 @@
       "errors": {
         "bioTooLong": "Up to 160 characters",
         "general": "Could not save. Try again.",
-        "invalid": "Check the fields"
+        "invalid": "Check the fields",
+        "displayNameTooLong": "Up to 50 characters",
+        "headlineTooLong": "Up to 100 characters",
+        "cityTooLong": "Up to 60 characters",
+        "tooLong": "Up to {max} characters",
+        "link": "Enter a link that starts with http:// or https://",
+        "tooManyLinks": "Up to 5 links"
       },
       "discard": {
         "title": "Discard changes?",
         "body": "What you changed will be lost.",
         "confirm": "Discard",
         "cancel": "Keep editing"
-      }
+      },
+      "name": "Name",
+      "headline": "Headline",
+      "headlinePlaceholder": "What you analyze, in a line",
+      "location": "Location",
+      "country": "Country",
+      "noCountry": "No country",
+      "city": "City",
+      "links": "Links",
+      "linkPlaceholder": "https://",
+      "linkLabel": "Link {number}",
+      "addLink": "Add link",
+      "removeLink": "Remove link {number}"
     },
     "follows": {
       "close": "Close",

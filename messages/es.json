@@ -313,7 +313,12 @@
       "correct": "<b>{count}</b> {count, plural, one {acertada} other {acertadas}}",
       "incorrect": "<b>{count}</b> {count, plural, one {errada} other {erradas}}",
       "cancelled": "<b>{count}</b> {count, plural, one {cancelada} other {canceladas}}",
-      "noResolved": "Todavía sin tesis resueltas"
+      "noResolved": "Todavía sin tesis resueltas",
+      "location": "{city}, {country}",
+      "links": "Links",
+      "newTab": "(se abre en una pestaña nueva)",
+      "addHeadline": "Agrega un titular",
+      "addLinks": "Agrega links"
     },
     "createPost": "Crear post",
     "tabs": {
@@ -370,14 +375,32 @@
       "errors": {
         "bioTooLong": "Hasta 160 caracteres",
         "general": "No se pudo guardar. Inténtalo de nuevo.",
-        "invalid": "Revisa los campos"
+        "invalid": "Revisa los campos",
+        "displayNameTooLong": "Hasta 50 caracteres",
+        "headlineTooLong": "Hasta 100 caracteres",
+        "cityTooLong": "Hasta 60 caracteres",
+        "tooLong": "Hasta {max} caracteres",
+        "link": "Ingresa un link que empiece con http:// o https://",
+        "tooManyLinks": "Hasta 5 links"
       },
       "discard": {
         "title": "¿Descartar los cambios?",
         "body": "Se perderá lo que cambiaste.",
         "confirm": "Descartar",
         "cancel": "Seguir editando"
-      }
+      },
+      "name": "Nombre",
+      "headline": "Titular",
+      "headlinePlaceholder": "Qué analizas, en una línea",
+      "location": "Ubicación",
+      "country": "País",
+      "noCountry": "Sin país",
+      "city": "Ciudad",
+      "links": "Links",
+      "linkPlaceholder": "https://",
+      "linkLabel": "Link {number}",
+      "addLink": "Agregar link",
+      "removeLink": "Quitar el link {number}"
     },
     "follows": {
       "close": "Cerrar",

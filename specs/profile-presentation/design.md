@@ -20,7 +20,7 @@ Ya existe (E01): `displayName`, `bio`, `avatarUrl`, `countryCode` en `PATCH /use
 
 - `ProfileIntro` (organismo del feature, nuevo): titular, ubicación y links bajo el nombre en `CommunityHeader`. `ProfileLinks` con `components/ui/profile-marks` (los íconos que faltan, como `share-marks.tsx`).
 - `EditProfileDialog` crece por secciones (`fieldset` con `legend`); pasa a cargarse con `next/dynamic` si no lo está ya, y su cuerpo scrollea con el pie fijo.
-- PP-04: en tu perfil, "Agregá un titular" / "Agregá links" son botones que abren la ventana con el foco en ese campo.
+- PP-04: en tu perfil, "Agrega un titular" / "Agrega links" son botones que abren la ventana con el foco en ese campo.
 
 ## 4. Tests
 

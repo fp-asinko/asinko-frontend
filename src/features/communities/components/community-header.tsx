@@ -10,7 +10,8 @@ import type { CommunityPage, ProfileDetails } from '../communities.types'
 import { CommunityActions } from './community-actions'
 import { MemberCount, ProfileStats } from './community-stats'
 import { ProfileMarks } from './profile-marks'
-import { EditProfileButton } from './edit-profile-button'
+import { EditProfileButton, EditProfileProvider } from './edit-profile-button'
+import { ProfileIntro } from './profile-intro'
 
 /**
  * The top of a community page, as the prototype (specs/community-pages § 1, measured on its
@@ -18,7 +19,8 @@ import { EditProfileButton } from './edit-profile-button'
  * separator, square; the avatar (56px, white ring) sits on its bottom edge; title, name and
  * members go under it with the content's 16px gutter, then a divider. Mobile first: the actions
  * drop under the title when they do not fit. A profile (§ 12) titles with its display name, adds
- * its marks, stats and "Ask", and follows instead of joining (none on your own profile).
+ * its marks, its presentation (headline, location and links, specs/profile-presentation), stats and
+ * "Ask", and follows instead of joining (none on your own profile: there, "Edit profile").
  */
 export function CommunityHeader({
   page,
@@ -34,11 +36,15 @@ export function CommunityHeader({
   // Anyone posts in a group or an asset; in a profile, only its owner (PC-03).
   const canPost = !profile || profile.isSelf
 
-  return (
+  const header = (
     <header className="border-b px-4 pb-4 sm:px-0">
       {/* -mx: the banner bleeds over the column's gutter (16px phones, the main's padding from sm). */}
       <div className="relative -mx-4">
-        <IdentityBanner colorKey={page.slug} imageUrl={page.bannerUrl} className="h-24 md:h-30" />
+        <IdentityBanner
+          colorKey={page.slug}
+          imageUrl={profile?.bannerUrl ?? page.bannerUrl}
+          className="h-24 md:h-30"
+        />
         <BackButton to="home" className="absolute top-2.5 left-3" />
       </div>
       <UserAvatar
@@ -59,6 +65,7 @@ export function CommunityHeader({
             {profile && <ProfileMarks profile={profile} />}
           </div>
           {subtitle && <p className="type-meta text-muted-foreground">{subtitle}</p>}
+          {profile && <ProfileIntro profile={profile} />}
         </div>
         <div className="flex items-center gap-2">
           {canPost && (
@@ -73,7 +80,7 @@ export function CommunityHeader({
             </ComposeTrigger>
           )}
           {/* Your own profile: edit it where others follow (specs/profile-edit PE-01). */}
-          {profile?.isSelf && <EditProfileButton bio={profile.bio} />}
+          {profile?.isSelf && <EditProfileButton />}
           {!profile?.isSelf && (
             <CommunityActions
               slug={page.slug}
@@ -113,5 +120,23 @@ export function CommunityHeader({
         </div>
       )}
     </header>
+  )
+
+  if (!profile?.isSelf) return header
+  return (
+    <EditProfileProvider
+      profile={{
+        displayName: profile.displayName,
+        headline: profile.headline,
+        countryCode: profile.countryCode,
+        city: profile.city,
+        bio: profile.bio,
+        avatarUrl: profile.avatarUrl,
+        bannerUrl: profile.bannerUrl,
+        links: profile.links.map((link) => link.url),
+      }}
+    >
+      {header}
+    </EditProfileProvider>
   )
 }

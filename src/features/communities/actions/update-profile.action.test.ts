@@ -1,51 +1,97 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { editProfileSchema } from '../schemas/edit-profile.schema'
+import { editProfileChangesSchema, editProfileSchema } from '../schemas/edit-profile.schema'
 import { updateProfile } from './update-profile.action'
 
+const ME = '00000000-0000-4000-8000-000000000100'
 const deps = vi.hoisted(() => ({
-  viewer: { id: '00000000-0000-4000-8000-000000000100', username: 'demo' } as {
-    id: string
-    username: string
-  } | null,
+  viewer: null as { id: string; username: string } | null,
   updateProfileAs: vi.fn(),
 }))
 vi.mock('@/lib/session', () => ({ getViewer: async () => deps.viewer }))
 vi.mock('../lib/profile-api', () => ({ updateProfileAs: deps.updateProfileAs }))
 
-describe('editProfileSchema (specs/profile-edit PE-04)', () => {
-  it('trims the bio, takes an empty one and refuses more than 160 characters', () => {
-    expect(editProfileSchema.parse({ bio: '  Macro and rates.  ' })).toEqual({
+const VALID = {
+  displayName: ' Juan ',
+  headline: ' Macro | Rates ',
+  countryCode: 'AR',
+  city: ' La Plata ',
+  bio: '  Macro and rates.  ',
+  links: [{ url: ' https://x.com/juan ' }],
+  avatarUrl: null,
+  bannerUrl: null,
+}
+
+const issue = (input: unknown) => editProfileSchema.safeParse(input).error?.issues[0]?.message
+
+describe('editProfileSchema (specs/profile-edit PE-04, specs/profile-presentation PP-05, PP-06)', () => {
+  it('trims the texts and leaves the links as plain URLs', () => {
+    expect(editProfileSchema.parse(VALID)).toEqual({
+      displayName: 'Juan',
+      headline: 'Macro | Rates',
+      countryCode: 'AR',
+      city: 'La Plata',
       bio: 'Macro and rates.',
+      links: ['https://x.com/juan'],
+      avatarUrl: null,
+      bannerUrl: null,
     })
-    expect(editProfileSchema.parse({ bio: '' })).toEqual({ bio: '' })
-    expect(editProfileSchema.safeParse({ bio: 'x'.repeat(160) }).success).toBe(true)
-    const tooLong = editProfileSchema.safeParse({ bio: 'x'.repeat(161) })
-    expect(tooLong.success).toBe(false)
-    expect(tooLong.error?.issues[0]?.message).toBe('communities.edit.errors.bioTooLong')
+  })
+
+  it('takes empty texts and no country: they remove what there was', () => {
+    const empty = { ...VALID, displayName: '', headline: '', countryCode: '', city: '', bio: '' }
+    expect(editProfileSchema.safeParse({ ...empty, links: [] }).success).toBe(true)
+  })
+
+  it('refuses each text past its limit, with its message', () => {
+    expect(issue({ ...VALID, displayName: 'x'.repeat(51) })).toBe(
+      'communities.edit.errors.displayNameTooLong',
+    )
+    expect(issue({ ...VALID, headline: 'x'.repeat(101) })).toBe(
+      'communities.edit.errors.headlineTooLong',
+    )
+    expect(issue({ ...VALID, city: 'x'.repeat(61) })).toBe('communities.edit.errors.cityTooLong')
+    expect(issue({ ...VALID, bio: 'x'.repeat(161) })).toBe('communities.edit.errors.bioTooLong')
+    expect(editProfileSchema.safeParse({ ...VALID, bio: 'x'.repeat(160) }).success).toBe(true)
+  })
+
+  it('takes up to five http(s) links and a country code only', () => {
+    expect(issue({ ...VALID, links: [{ url: 'javascript:alert(1)' }] })).toBe(
+      'communities.edit.errors.link',
+    )
+    expect(issue({ ...VALID, links: Array(6).fill({ url: 'https://a.com' }) })).toBe(
+      'communities.edit.errors.tooManyLinks',
+    )
+    expect(editProfileSchema.safeParse({ ...VALID, countryCode: 'Argentina' }).success).toBe(false)
+  })
+
+  it('takes only what changed (PP-08)', () => {
+    expect(editProfileChangesSchema.parse({ headline: 'Rates' })).toEqual({ headline: 'Rates' })
   })
 })
 
-describe('updateProfile (PE-03 to PE-06)', () => {
+describe('updateProfile (PE-03 to PE-06, PP-08, PP-09)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    deps.viewer = { id: '00000000-0000-4000-8000-000000000100', username: 'demo' }
-    deps.updateProfileAs.mockResolvedValue({ ok: true, data: { bio: 'Macro and rates.' } })
+    deps.viewer = { id: ME, username: 'demo' }
+    deps.updateProfileAs.mockResolvedValue({ ok: true, data: null })
   })
 
-  it('saves the bio as the viewer of the session, never as someone the form says', async () => {
+  it('saves what changed as the viewer of the session, never as someone the form says', async () => {
     expect(
       await updateProfile({
         bio: ' Macro and rates. ',
+        links: [{ url: 'https://x.com/juan' }],
         userId: '00000000-0000-4000-8000-000000000999',
       }),
-    ).toEqual({ ok: true, data: { bio: 'Macro and rates.' } })
-    expect(deps.updateProfileAs).toHaveBeenCalledWith('00000000-0000-4000-8000-000000000100', {
+    ).toEqual({ ok: true, data: null })
+    expect(deps.updateProfileAs).toHaveBeenCalledWith(ME, {
       bio: 'Macro and rates.',
+      links: ['https://x.com/juan'],
     })
   })
 
-  it('refuses a bio too long before asking, with the field error', async () => {
+  it('refuses a field before asking, with its error', async () => {
     const result = await updateProfile({ bio: 'x'.repeat(161) })
     expect(result).toMatchObject({
       ok: false,
@@ -62,21 +108,20 @@ describe('updateProfile (PE-03 to PE-06)', () => {
     })
   })
 
-  it("says the backend's refusal with the editor's message", async () => {
-    deps.updateProfileAs.mockResolvedValue({
-      ok: false,
-      code: 'BIO_TOO_LONG',
-      errorKey: 'api.errors.UNKNOWN',
-    })
+  it('says which field the backend refused, or the general reason (PP-09)', async () => {
+    const refuse = (code: string, errorKey = 'api.errors.UNKNOWN') =>
+      deps.updateProfileAs.mockResolvedValue({ ok: false, code, errorKey })
+    refuse('BIO_TOO_LONG')
     expect(await updateProfile({ bio: 'Hi' })).toEqual({
       ok: false,
       error: 'communities.edit.errors.bioTooLong',
+      fieldErrors: { bio: ['communities.edit.errors.bioTooLong'] },
     })
-    deps.updateProfileAs.mockResolvedValue({
-      ok: false,
-      code: 'HTTP',
-      errorKey: 'api.errors.UNAVAILABLE',
+    refuse('INVALID_LINK')
+    expect(await updateProfile({ links: [] })).toMatchObject({
+      fieldErrors: { links: ['communities.edit.errors.link'] },
     })
+    refuse('HTTP', 'api.errors.UNAVAILABLE')
     expect(await updateProfile({ bio: 'Hi' })).toEqual({
       ok: false,
       error: 'api.errors.UNAVAILABLE',
