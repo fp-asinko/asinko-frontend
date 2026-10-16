@@ -1,6 +1,6 @@
 # Mocks
 
-Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of them with the demo user; `API_MOCKS=missing` only the ones the backend does not have yet (`implemented: false`: today the proposal P-014, searching comments). Handlers follow the backend's `dev` branch (`asinko-app` `0cdf243`): `?kind=` on the feeds, `?mine=true` on communities, an empty page for an unknown community. See `docs/ai-guidelines/api-integration.md § Mocks`.
+Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of them with the demo user; `API_MOCKS=missing` only the ones the backend does not have yet (`implemented: false`: today the proposals P-014, searching comments, and P-019 to P-021, the profile's headline, city, links, banner and image uploads). Handlers follow the backend's `dev` branch (`asinko-app` `0cdf243`): `?kind=` on the feeds, `?mine=true` on communities, an empty page for an unknown community. See `docs/ai-guidelines/api-integration.md § Mocks`.
 
 | Method | Path                              | Kind     | Notes                                                                                     |
 | ------ | --------------------------------- | -------- | ----------------------------------------------------------------------------------------- |
@@ -20,10 +20,13 @@ Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of 
 | GET    | `/api/v1/polls/:id/comments`      | contract | E05                                                                                       |
 | GET    | `/api/v1/assets`                  | contract | E14. Response shape assumed (proposal P-003). `q`, `cursor`                               |
 | GET    | `/api/v1/assets/:symbol`          | contract | E14. `openTheses` empty until phase 2                                                     |
+| PATCH  | `/api/v1/users/:userId`           | proposal | P-019, P-020, only with `headline`, `city`, `links` or `bannerUrl` in the body (`when`)   |
+| POST   | `/api/v1/uploads/avatar`          | proposal | P-021. Answers a fixture (`/mocks/avatar-demo.svg`), not the uploaded image               |
+| POST   | `/api/v1/uploads/profile-banner`  | proposal | P-021. Answers a fixture (`/mocks/banner-demo.svg`)                                       |
 
 - **contract**: in `docs/references/api/`. Every route but the assets is already implemented on the backend's `dev` branch; they stay here to work without the backend (CI, `API_MOCKS=true`).
 - **proposal**: the frontend needs it and it is not in the contract; described in `docs/references/api/proposals.md`.
-- **`when`**: a proposal that adds a parameter to an implemented endpoint is mocked only for the requests that carry it (`when: (query) => query.q !== undefined`), and goes before the route of the whole endpoint: the first match wins. With `API_MOCKS=missing` the rest still goes to the backend; a search on a real post answers no results.
+- **`when`**: a proposal that adds a parameter to an implemented endpoint is mocked only for the requests that carry it (`when: (query) => query.q !== undefined`), or a field to its body (`when: (query, body) => …`), and goes before the route of the whole endpoint: the first match wins. With `API_MOCKS=missing` the rest still goes to the backend; a search on a real post answers no results.
 
 ## Mock world
 

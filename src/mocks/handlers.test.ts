@@ -16,7 +16,10 @@ function call(method: string, path: string, context: Partial<MockContext> = {}) 
   // As the client: the first route that matches, `when` included.
   const query = context.query ?? {}
   const route = MOCK_ROUTES.find(
-    (each) => each.method === method && each.path === path && (!each.when || each.when(query)),
+    (each) =>
+      each.method === method &&
+      each.path === path &&
+      (!each.when || each.when(query, context.body)),
   )
   if (!route) throw new Error(`No mock for ${method} ${path}`)
   return route.handler({ params: {}, query: {}, body: undefined, ...context })
@@ -78,8 +81,70 @@ describe('mock handlers behave like the contract', () => {
 
   it('marks as missing only what the backend does not have: the proposals', () => {
     const missing = MOCK_ROUTES.filter((route) => !route.implemented).map((route) => route.path)
-    // Searching comments (P-014) goes alone: the rest of that endpoint is the backend's.
-    expect(missing).toEqual(['/api/v1/posts/:id/comments'])
+    // Searching comments (P-014) and the profile's new fields (P-019, P-020) go alone: the rest of
+    // those endpoints is the backend's.
+    expect(missing.toSorted()).toEqual(
+      [
+        '/api/v1/users/:userId',
+        '/api/v1/posts/:id/comments',
+        '/api/v1/uploads/avatar',
+        '/api/v1/uploads/profile-banner',
+      ].toSorted(),
+    )
+  })
+
+  describe("the profile's presentation (P-019 to P-021, specs/profile-presentation)", () => {
+    const me = { userId: DEMO_USER.id }
+    const patch = (body: Record<string, unknown>) =>
+      call('PATCH', '/api/v1/users/:userId', { params: me, body })
+    const code = async (body: Record<string, unknown>) =>
+      ((await patch(body)).body as { error?: { code: string } }).error?.code
+
+    it('mocks a PATCH only when it brings a proposed field', () => {
+      const proposal = MOCK_ROUTES.find((route) => route.kind === 'proposal' && route.when)!
+      expect(proposal.when!({}, { headline: 'x' })).toBe(true)
+      expect(proposal.when!({}, { links: [] })).toBe(true)
+      expect(proposal.when!({}, { bio: 'x', displayName: 'y' })).toBe(false)
+    })
+
+    it('saves the headline, city, links and banner, and removes them with ""', async () => {
+      const saved = await patch({
+        headline: 'Macro | Rates',
+        city: 'La Plata',
+        links: ['https://example.substack.com', 'https://x.com/demo'],
+        bannerUrl: '/mocks/banner-demo.svg',
+      })
+      expect(saved).toMatchObject({
+        status: 200,
+        body: { headline: 'Macro | Rates', city: 'La Plata' },
+      })
+      const profile = PROFILES.find((each) => each.id === DEMO_USER.id)!
+      expect(profile.bannerUrl).toBe('/mocks/banner-demo.svg')
+      await patch({ headline: '', city: null, links: [], bannerUrl: null })
+      expect(profile).toMatchObject({ headline: null, city: null, links: [], bannerUrl: null })
+    })
+
+    it('answers the errors P-019 proposes', async () => {
+      expect(await code({ headline: 'x'.repeat(101) })).toBe('HEADLINE_TOO_LONG')
+      expect(await code({ city: 'x'.repeat(61) })).toBe('CITY_TOO_LONG')
+      expect(await code({ links: ['javascript:alert(1)'] })).toBe('INVALID_LINK')
+      expect(await code({ links: Array(6).fill('https://a.com') })).toBe('TOO_MANY_LINKS')
+      expect(await code({ displayName: 'x'.repeat(51), headline: 'ok' })).toBe(
+        'DISPLAY_NAME_TOO_LONG',
+      )
+    })
+
+    it('signs a photo or banner upload as a post image, never an SVG', async () => {
+      const body = { userId: DEMO_USER.id, contentType: 'image/webp', size: 1000 }
+      expect(await call('POST', '/api/v1/uploads/avatar', { body })).toMatchObject({
+        status: 200,
+        body: { imageUrl: '/mocks/avatar-demo.svg' },
+      })
+      const svg = { ...body, contentType: 'image/svg+xml' }
+      expect(await call('POST', '/api/v1/uploads/profile-banner', { body: svg })).toMatchObject({
+        status: 422,
+      })
+    })
   })
 
   describe('comments sorted and searched (P-014, specs/post-detail-refresh)', () => {

@@ -1,6 +1,6 @@
 # Presentación del perfil — Tasks
 
-- [ ] **T-01 (M)** P-019 a P-021 en `proposals.md`; contrato y mocks (con errores y fixtures que los respetan). Tests. → PP-12
+- [x] **T-01 (M)** P-019 a P-021 en `proposals.md`; contrato y mocks (con errores y fixtures que los respetan). Tests. → PP-12
 - [ ] **T-02 (S)** `profile-links` (sitio y dominio) y los íconos que faltan. Tests. → PP-03
 - [ ] **T-03 (M)** `ProfileDetails` y mapper; `ProfileIntro` en `CommunityHeader` (titular, ubicación, links, banner y foto); PP-04. Tests. → PP-01 a PP-04, PP-11
 - [ ] **T-04 (L)** La ventana por secciones: nombre, titular, ubicación, bio y links; esquema y action. Tests. → PP-05, PP-06, PP-08, PP-09

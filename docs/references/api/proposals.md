@@ -34,7 +34,7 @@ Encontrados al verificar contra el deploy (solo lecturas) mientras el front adop
 
 ## Pendientes
 
-En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P-015, P-003, P-005 y P-018.
+En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P-015, P-003, P-005, P-018 y P-019 a P-021.
 
 ### P-012: Todo lo que publica un usuario
 
@@ -172,6 +172,44 @@ El más votado de los últimos 7 días; si no hubo, el más reciente; `null` si 
 **Motivo:** al crear un post (`specs/related-tags`), además de la comunidad donde se publica se pueden sumar hasta 3 comunidades o activos relacionados, como un post en `#argentina` sobre `$GGAL` y `#macro`. Hoy el front los agrega al final del cuerpo como menciones (`\n\n$GGAL #macro`): se ven como links y notifican, pero ensucian el cuerpo y el post no aparece en esos feeds (decisión del 2026-10-13).
 
 **Cambio:** un campo opcional `relatedCommunityIds: string[]` (hasta 3, distintos de `communityId`, sin canales personales; `422` si no se cumple) en el body de `POST /posts`, y `related: [{ id, slug, type, name }]` en el `Post`. Que el post aparezca también en el feed de cada relacionada (`GET /feed/explore?community=`). Si se acepta, el front deja de escribir la línea de menciones y muestra los relacionados en la tarjeta.
+
+### P-019: Titular, ciudad y links del perfil
+
+**Estado:** propuesta (2026-10-16), mockeada (`PATCH /users` con estos campos va al mock; el resto, al backend).
+
+**Endpoint:** `PATCH /api/v1/users/{userId}`, el `User` y el `Profile` (`GET /profiles/{identifier}`).
+
+**Motivo:** el perfil, como LinkedIn (`specs/profile-presentation`): un titular bajo el nombre ("Analista macro | Renta fija | LatAm"), la ciudad junto al país (`countryCode` ya existe) y hasta 5 links externos (Substack, X, YouTube…) con su ícono.
+
+**Cambio:** tres campos opcionales en el `User` y el `Profile`, editables como `bio`:
+
+```json
+{ "headline": "Analista macro | Renta fija" , "city": "La Plata", "links": ["https://example.substack.com"] }
+```
+
+- `headline`: hasta 100 caracteres; `""` o `null` lo borran. `422 HEADLINE_TOO_LONG`.
+- `city`: hasta 60, texto libre; `""` o `null` la borran. `422 CITY_TOO_LONG`.
+- `links`: hasta 5 URLs `http(s)`, en el orden del usuario; `[]` los borra. `422 INVALID_LINK` (otro esquema o mal formada), `422 TOO_MANY_LINKS`.
+
+### P-020: Banner del perfil
+
+**Estado:** propuesta (2026-10-16), mockeada.
+
+**Endpoint:** `PATCH /api/v1/users/{userId}` y el `Profile`.
+
+**Motivo:** hoy el banner del perfil es el de su canal personal (`Community.bannerUrl`), que el usuario no puede editar desde su perfil. `specs/profile-presentation` deja subir el banner como la foto.
+
+**Cambio:** `"bannerUrl": string | null` en el `Profile`, editable con `PATCH /users/{userId}` como `avatarUrl`. Si conviene que sea el mismo dato que el banner del canal personal, mejor: el front lo lee de los dos lados.
+
+### P-021: Subida de foto y banner del perfil
+
+**Estado:** propuesta (2026-10-16), mockeada.
+
+**Endpoint:** `POST /api/v1/uploads/avatar` y `POST /api/v1/uploads/profile-banner`.
+
+**Motivo:** `PATCH /users` acepta `avatarUrl`, pero no hay dónde subir la imagen. El front ya recorta y prepara la imagen (WebP, foto de 400×400 y banner de 1500×375).
+
+**Cambio:** el mismo flujo de URL firmada que `POST /uploads/post-image` (P-013): `{ userId, contentType, size }` → `{ uploadUrl, imageUrl, path }`, JPEG, PNG, WebP o GIF (nunca SVG), hasta 5 MB. El `imageUrl` es el que se manda en `PATCH /users` (`avatarUrl` o `bannerUrl`).
 
 ## Pedidos operativos
 

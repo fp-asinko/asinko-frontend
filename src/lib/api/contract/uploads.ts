@@ -11,4 +11,10 @@ export const postImageUploadSchema = z.object({
   path: z.string(),
 })
 
+/**
+ * POST /api/v1/uploads/avatar and /uploads/profile-banner (P-021, proposal, specs/profile-presentation):
+ * the same signed URL as a post image; `imageUrl` is what PATCH /users takes.
+ */
+export const profileImageUploadSchema = postImageUploadSchema
+
 export type RawPostImageUpload = z.infer<typeof postImageUploadSchema>

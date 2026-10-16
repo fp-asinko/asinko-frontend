@@ -71,6 +71,16 @@ export const PROFILES: RawProfile[] = [
     // P-011 (proposal): not in the backend yet; tier and rating come after the MVP.
     displayName: 'María Ruiz',
     bio: "On-chain analyst. If it's not on the blockchain, it didn't happen.",
+    // P-019 and P-020 (proposals, specs/profile-presentation).
+    headline: 'On-chain analyst | DeFi | LatAm',
+    city: 'Buenos Aires',
+    links: [
+      'https://maria.substack.com',
+      'https://x.com/maria_onchain',
+      'https://www.youtube.com/@mariaonchain',
+      'https://dune.com/maria',
+    ],
+    bannerUrl: '/mocks/banner-demo.svg',
     accuracyRate: 0.74,
     points: 12400,
     badgeStatus: 'IDENTITY_VERIFIED',

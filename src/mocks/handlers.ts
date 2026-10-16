@@ -10,6 +10,7 @@ import {
   joinResponseSchema,
   pollSchema,
   postImageUploadSchema,
+  profileImageUploadSchema,
   postSchema,
   profileSchema,
   searchResultSchema,
@@ -32,7 +33,8 @@ import { withTopPost } from './top-post'
 import { followersOf, followingOf, listItem } from './fixtures/follows'
 import { membersOf } from './fixtures/members'
 import { thesesBy } from './fixtures/theses'
-import { updateUser } from './profile-edit'
+import { PROPOSED_USER_FIELDS, updateUser } from './profile-edit'
+import { signProfileImageUpload } from './profile-image'
 import { paginate } from './paginate'
 import { signPostImageUpload } from './post-image'
 import type { MockContext, MockRoute } from './types'
@@ -127,6 +129,29 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     },
   },
 
+  // P-019 and P-020 (proposals, specs/profile-presentation): a PATCH with a headline, a city,
+  // links or a banner goes to the mock; the rest of the profile, to the backend.
+  {
+    method: 'PATCH',
+    path: '/api/v1/users/:userId',
+    kind: 'proposal',
+    implemented: false,
+    when: (_query, body) =>
+      typeof body === 'object' &&
+      body !== null &&
+      PROPOSED_USER_FIELDS.some((field) => field in body),
+    schema: userSchema,
+    example: {
+      ...noRequest,
+      params: { userId: DEMO_USER.id },
+      body: {
+        headline: 'Macro | Rates | LatAm',
+        city: 'La Plata',
+        links: ['https://example.substack.com'],
+      },
+    },
+    handler: ({ params, body }) => updateUser(params.userId ?? '', body),
+  },
   // E01: editing your own profile (specs/profile-edit), for the demo viewer.
   {
     method: 'PATCH',
@@ -259,6 +284,31 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       body: { userId: DEMO_USER.id, contentType: 'image/webp', size: 120_000 },
     },
     handler: ({ body }) => signPostImageUpload(body),
+  },
+  // P-021 (proposal, specs/profile-presentation): where to put a profile photo or banner.
+  {
+    method: 'POST',
+    path: '/api/v1/uploads/avatar',
+    kind: 'proposal',
+    implemented: false,
+    schema: profileImageUploadSchema,
+    example: {
+      ...noRequest,
+      body: { userId: DEMO_USER.id, contentType: 'image/webp', size: 40_000 },
+    },
+    handler: ({ body }) => signProfileImageUpload('avatar', body),
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/uploads/profile-banner',
+    kind: 'proposal',
+    implemented: false,
+    schema: profileImageUploadSchema,
+    example: {
+      ...noRequest,
+      body: { userId: DEMO_USER.id, contentType: 'image/webp', size: 120_000 },
+    },
+    handler: ({ body }) => signProfileImageUpload('banner', body),
   },
   {
     method: 'GET',

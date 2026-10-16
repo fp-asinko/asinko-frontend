@@ -104,7 +104,7 @@ export function createApiClient({
       (route) =>
         route.method === request.method &&
         route.path === request.path &&
-        (!route.when || route.when(request.query ?? {})),
+        (!route.when || route.when(request.query ?? {}, request.body)),
     )
 
     let raw: RawResponse

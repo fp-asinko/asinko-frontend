@@ -26,6 +26,10 @@ export const userSchema = z.object({
   isPublic: z.boolean(),
   status: z.enum(['ACTIVE', 'INACTIVE', 'BANNED', 'DELETED']),
   createdAt: z.iso.datetime(),
+  /** P-019 (proposal, specs/profile-presentation): optional until the backend sends them. */
+  headline: z.string().nullable().optional(),
+  city: z.string().nullable().optional(),
+  links: z.array(z.string()).nullable().optional(),
 })
 
 export const profileSchema = userSchema.extend({
@@ -42,6 +46,8 @@ export const profileSchema = userSchema.extend({
   isFollowedByViewer: z.boolean().nullable(),
   followerCount: z.number().int(),
   followingCount: z.number().int(),
+  /** P-020 (proposal, specs/profile-presentation): the user's own banner. */
+  bannerUrl: z.string().nullable().optional(),
 })
 
 export type RawUserSummary = z.infer<typeof userSummarySchema>
