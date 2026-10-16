@@ -52,7 +52,7 @@ describe('CommunityPicker (specs/post-create-detail PC-06)', () => {
     expect(chip()).toHaveTextContent('Choose a community')
 
     await open()
-    expect(action.searchCommunities).toHaveBeenCalledWith('')
+    expect(action.searchCommunities).toHaveBeenCalledWith('', 'all')
     const options = await screen.findAllByRole('option')
     // Your profile first; a name only when it says more than the handle.
     expect(options.map((option) => option.textContent)).toEqual([
@@ -73,10 +73,10 @@ describe('CommunityPicker (specs/post-create-detail PC-06)', () => {
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
     await open()
     await user.type(screen.getByRole('combobox', { name: 'Search communities' }), 'bit')
-    expect(action.searchCommunities).not.toHaveBeenCalledWith('bit')
+    expect(action.searchCommunities).not.toHaveBeenCalledWith('bit', 'all')
 
     await act(async () => vi.advanceTimersByTime(300))
-    expect(action.searchCommunities).toHaveBeenCalledWith('bit')
+    expect(action.searchCommunities).toHaveBeenCalledWith('bit', 'all')
     expect(action.searchCommunities).toHaveBeenCalledTimes(2) // '' on open, then 'bit'
     expect(await screen.findByRole('option', { name: /\$BTC/ })).toBeInTheDocument()
     vi.useRealTimers()
@@ -96,5 +96,85 @@ describe('CommunityPicker (specs/post-create-detail PC-06)', () => {
     expect(
       await screen.findByText('Could not load the communities. Type to try again.'),
     ).toBeInTheDocument()
+  })
+})
+
+describe('CommunityPicker filters (specs/picker-filters)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  const kind = (name: string) => screen.getByRole('button', { name })
+  const search = () => screen.getByRole('combobox', { name: 'Search communities' })
+
+  it('offers All, Communities and Assets, one pressed at a time (PF-01, PF-02, PF-06)', async () => {
+    action.searchCommunities.mockResolvedValue({ ok: true, data: [BTC] })
+    renderWithIntl(<Picker onChange={vi.fn()} />)
+    await open()
+    expect(screen.getByRole('group', { name: 'Filter by type' })).toBeInTheDocument()
+    expect(kind('All')).toHaveAttribute('aria-pressed', 'true')
+
+    await userEvent.click(kind('Assets'))
+    expect(action.searchCommunities).toHaveBeenLastCalledWith('', 'assets')
+    expect(kind('Assets')).toHaveAttribute('aria-pressed', 'true')
+    expect(kind('All')).toHaveAttribute('aria-pressed', 'false')
+    // The search keeps the focus: typing goes on (PF-06).
+    expect(search()).toHaveFocus()
+
+    await userEvent.click(kind('Communities'))
+    expect(action.searchCommunities).toHaveBeenLastCalledWith('', 'groups')
+  })
+
+  it('reads $ and # in the search, and erasing them goes back to All (PF-03)', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    action.searchCommunities.mockResolvedValue({ ok: true, data: [BTC] })
+    renderWithIntl(<Picker onChange={vi.fn()} />)
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    await open()
+
+    await user.type(search(), '$bt')
+    await act(async () => vi.advanceTimersByTime(300))
+    expect(kind('Assets')).toHaveAttribute('aria-pressed', 'true')
+    expect(action.searchCommunities).toHaveBeenLastCalledWith('bt', 'assets')
+
+    await user.clear(search())
+    await user.type(search(), 'bt')
+    await act(async () => vi.advanceTimersByTime(300))
+    expect(kind('All')).toHaveAttribute('aria-pressed', 'true')
+    expect(action.searchCommunities).toHaveBeenLastCalledWith('bt', 'all')
+
+    await user.clear(search())
+    await user.type(search(), '#ma')
+    await act(async () => vi.advanceTimersByTime(300))
+    expect(kind('Communities')).toHaveAttribute('aria-pressed', 'true')
+    expect(action.searchCommunities).toHaveBeenLastCalledWith('ma', 'groups')
+    vi.useRealTimers()
+  })
+
+  it('a chip chosen by hand takes the symbol out of the search (PF-03)', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    action.searchCommunities.mockResolvedValue({ ok: true, data: [BTC] })
+    renderWithIntl(<Picker onChange={vi.fn()} />)
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    await open()
+    await user.type(search(), '$bt')
+    await user.click(kind('Communities'))
+    expect(search()).toHaveValue('bt')
+    expect(action.searchCommunities).toHaveBeenLastCalledWith('bt', 'groups')
+
+    // A chip chosen by hand stays while typing without a symbol.
+    await user.type(search(), 'c')
+    await act(async () => vi.advanceTimersByTime(300))
+    expect(kind('Communities')).toHaveAttribute('aria-pressed', 'true')
+    expect(action.searchCommunities).toHaveBeenLastCalledWith('btc', 'groups')
+    vi.useRealTimers()
+  })
+
+  it('says what was missing (PF-05)', async () => {
+    action.searchCommunities.mockResolvedValue({ ok: true, data: [] })
+    renderWithIntl(<Picker onChange={vi.fn()} />)
+    await open()
+    await userEvent.click(kind('Assets'))
+    expect(await screen.findByText('No assets found')).toBeInTheDocument()
+    await userEvent.click(kind('Communities'))
+    expect(await screen.findByText('No communities found')).toBeInTheDocument()
   })
 })

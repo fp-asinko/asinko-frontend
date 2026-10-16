@@ -463,7 +463,15 @@
       "loading": "Buscando…",
       "empty": "No hay comunidades con ese nombre",
       "error": "No se pudieron cargar las comunidades. Escribe para reintentar.",
-      "search": "Buscar comunidades"
+      "search": "Buscar comunidades",
+      "filter": "Filtrar por tipo",
+      "kinds": {
+        "all": "Todo",
+        "groups": "Comunidades",
+        "assets": "Activos"
+      },
+      "emptyGroups": "No se encontraron comunidades",
+      "emptyAssets": "No se encontraron activos"
     },
     "type": {
       "label": "Tipo de post",

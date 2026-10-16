@@ -127,6 +127,58 @@ test.describe('Page to create a post', () => {
     await expect(community(page)).toBeFocused()
   })
 
+  test('the picker filters by kind, with chips or a leading symbol (specs/picker-filters)', async ({
+    page,
+  }) => {
+    await page.goto('/en/submit')
+    await community(page).click()
+    const options = page.getByRole('option')
+    await expect(options.first()).toContainText('Your profile')
+
+    const kinds = page.getByRole('group', { name: 'Filter by type' })
+    await kinds.getByRole('button', { name: 'Assets' }).click()
+    await expect(options.first()).toContainText('$')
+    for (const handle of await options.allTextContents()) expect(handle).toMatch(/^\$/)
+
+    // A leading # asks for groups, and the chip follows (PF-03).
+    const search = page.getByRole('combobox', { name: 'Search communities' })
+    await search.fill('#d')
+    await expect(kinds.getByRole('button', { name: 'Communities' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await expect(page.getByRole('option', { name: /#defi/ })).toBeVisible()
+    for (const handle of await options.allTextContents()) expect(handle).toMatch(/^#/)
+  })
+
+  test('the picker filters are reached with Tab from the search (picker-filters PF-06)', async ({
+    page,
+  }) => {
+    await page.goto('/en/submit')
+    await community(page).click()
+    const search = page.getByRole('combobox', { name: 'Search communities' })
+    await expect(search).toBeFocused()
+    const kinds = page.getByRole('group', { name: 'Filter by type' })
+    await page.keyboard.press('Tab')
+    await expect(kinds.getByRole('button', { name: 'All' })).toBeFocused()
+    await page.keyboard.press('Tab')
+    await page.keyboard.press('Tab')
+    await expect(kinds.getByRole('button', { name: 'Assets' })).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect(kinds.getByRole('button', { name: 'Assets' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    await expect(page.getByRole('listbox')).toBeVisible()
+    await expect(page.getByRole('option').first()).toContainText('$')
+
+    // Closed and opened again, it starts on All (PF-01).
+    await page.keyboard.press('Escape')
+    await community(page).click()
+    await expect(kinds.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByRole('option').first()).toContainText('Your profile')
+  })
+
   test('asks before discarding what is written (SU-05)', async ({ page }) => {
     await page.goto('/en')
     await page.goto('/en/submit')

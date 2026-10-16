@@ -82,11 +82,21 @@ describe('searchCommunities (PC-06)', () => {
   it("lists for the session's user, with the search trimmed", async () => {
     deps.listCommunityOptions.mockResolvedValue({ ok: true, data: [] })
     expect(await searchCommunities('  de ')).toEqual({ ok: true, data: [] })
-    expect(deps.listCommunityOptions).toHaveBeenCalledWith(DEMO_USER.username, 'de')
+    expect(deps.listCommunityOptions).toHaveBeenCalledWith(DEMO_USER.username, 'de', 'all')
+  })
+
+  it('passes the kind along (specs/picker-filters PF-02)', async () => {
+    deps.listCommunityOptions.mockResolvedValue({ ok: true, data: [] })
+    await searchCommunities('bt', 'assets')
+    expect(deps.listCommunityOptions).toHaveBeenCalledWith(DEMO_USER.username, 'bt', 'assets')
   })
 
   it('rejects odd input and missing sessions, and returns failures as keys', async () => {
     expect(await searchCommunities(42)).toEqual({ ok: false, error: 'api.errors.INVALID' })
+    expect(await searchCommunities('', 'people')).toEqual({
+      ok: false,
+      error: 'api.errors.INVALID',
+    })
     expect(await searchCommunities('x'.repeat(65))).toEqual({
       ok: false,
       error: 'api.errors.INVALID',

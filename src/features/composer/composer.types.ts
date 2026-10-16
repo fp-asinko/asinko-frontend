@@ -14,6 +14,9 @@ export type CommunityOption = {
   own: boolean
 }
 
+/** What the picker lists (specs/picker-filters PF-01): everything, only groups or only assets. */
+export type CommunityKind = 'all' | 'groups' | 'assets'
+
 /**
  * The community of the page to create a post (specs/submit-page SU-03, SU-07): the picker's option
  * and what the card on the right shows.

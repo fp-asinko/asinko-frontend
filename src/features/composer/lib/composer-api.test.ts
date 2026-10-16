@@ -58,6 +58,38 @@ describe('listCommunityOptions (specs/post-create-detail PC-06)', () => {
   })
 })
 
+describe('listCommunityOptions by kind (specs/picker-filters PF-02, PF-04)', () => {
+  beforeEach(() => {
+    state.routes = MOCK_ROUTES
+  })
+
+  it('lists only assets, without "Your profile"', async () => {
+    for (const search of ['', 'b']) {
+      const result = await listCommunityOptions(DEMO_USER.username, search, 'assets')
+      if (!result.ok) throw new Error('expected ok')
+      expect(result.data.length).toBeGreaterThan(0)
+      expect(result.data.every((each) => each.handle.startsWith('$'))).toBe(true)
+    }
+  })
+
+  it('lists only groups, without "Your profile"', async () => {
+    for (const search of ['', 'd']) {
+      const result = await listCommunityOptions(DEMO_USER.username, search, 'groups')
+      if (!result.ok) throw new Error('expected ok')
+      expect(result.data.length).toBeGreaterThan(0)
+      expect(result.data.every((each) => each.handle.startsWith('#'))).toBe(true)
+    }
+  })
+
+  it('mixes everything with "Your profile" first by default', async () => {
+    const result = await listCommunityOptions(DEMO_USER.username, '', 'all')
+    if (!result.ok) throw new Error('expected ok')
+    expect(result.data[0]?.own).toBe(true)
+    const handles = result.data.map((each) => each.handle[0])
+    expect(handles).toEqual(expect.arrayContaining(['#', '$']))
+  })
+})
+
 describe('createPostAs (PC-10)', () => {
   beforeEach(() => {
     state.routes = MOCK_ROUTES

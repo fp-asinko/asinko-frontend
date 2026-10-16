@@ -463,7 +463,15 @@
       "loading": "Searching…",
       "empty": "No communities found",
       "error": "Could not load the communities. Type to try again.",
-      "search": "Search communities"
+      "search": "Search communities",
+      "filter": "Filter by type",
+      "kinds": {
+        "all": "All",
+        "groups": "Communities",
+        "assets": "Assets"
+      },
+      "emptyGroups": "No communities found",
+      "emptyAssets": "No assets found"
     },
     "type": {
       "label": "Post type",
