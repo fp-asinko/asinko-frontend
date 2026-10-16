@@ -15,7 +15,7 @@ AppShell (organism)
 - **Por qué en el layout y no en la página:** en el prototipo la columna es parte del shell de todas las vistas de contenido, igual que la izquierda.
 - **Por qué en `components/organisms`:** no tienen lógica de negocio ni datos. Son textos y botones "Próximamente". Cuando lleguen los tokens reales (fase 4), la tarjeta pasa a un feature `economy` y recibe los datos por props.
 - **`AppShell`:**
-  - El `div` vacío pasa a ser `<aside aria-label={t('rightColumn.label')}>` ("More from Asinko").
+  - El `div` vacío pasa a ser `<aside aria-label={t('rightColumn.label')}>` ("Related").
   - Clases: `sticky top-15 hidden h-[calc(100dvh-3.75rem)] w-75 shrink-0 overflow-y-auto border-l lg:block`, como la columna izquierda: queda fija debajo de la barra de 60 px y tiene scroll propio si no entra.
   - Si no recibe `right`, se mantiene el `div` vacío actual, así la estructura no cambia en vistas sin columna.
 
@@ -43,7 +43,7 @@ AppShell (organism)
 
 | Clave                          | en                                                                                                                                                   |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `rightColumn.label`            | `More from Asinko`                                                                                                                                   |
+| `rightColumn.label`            | `Related`                                                                                                                                            |
 | `rightColumn.tokens.title`     | `Season tokens`                                                                                                                                      |
 | `rightColumn.tokens.badge`     | `Coming soon`                                                                                                                                        |
 | `rightColumn.tokens.body`      | `Earn by viewing ads, engagement and correct calls. Spend to post — hot cashtags cost more. Resets each season: <strong>use it or lose it.</strong>` |

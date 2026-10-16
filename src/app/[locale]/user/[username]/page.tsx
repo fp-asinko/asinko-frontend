@@ -33,7 +33,9 @@ export default async function UserPage({
   return (
     <PageColumns>
       {/* Only the owner posts on a profile (403 PERSONAL_CHANNEL_OWNER_ONLY). */}
-      {profile.isSelf && <ComposeScope id={page.id} handle={page.handle} name={page.handle} own />}
+      {profile.isSelf && (
+        <ComposeScope id={page.id} slug={page.slug} handle={page.handle} name={page.handle} own />
+      )}
       <CommunityTop page={page} profile={profile} />
       {/* Posts · Theses, as X (specs/profile-track-record PT-04). */}
       <ProfileTabs pagePath={path} current={tab} />

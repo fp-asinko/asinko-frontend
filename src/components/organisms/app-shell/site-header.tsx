@@ -75,10 +75,7 @@ export function SiteHeader({
             </ComingSoon>
           </span>
           {devTools}
-          <ComposeTrigger
-            view="modal"
-            className="hidden h-10 tap items-center gap-1.5 rounded-full bg-muted pr-4 pl-3 type-action text-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex"
-          >
+          <ComposeTrigger className="hidden h-10 tap items-center gap-1.5 rounded-full bg-muted pr-4 pl-3 type-action text-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex">
             <PlusIcon aria-hidden className="size-4.5" />
             {t('nav.create')}
           </ComposeTrigger>

@@ -9,17 +9,16 @@ const FED =
 /** The post editor's body: in the box (desktop) or the full screen (mobile). */
 async function openBody(page: Page, isMobile: boolean) {
   await page.goto('/en')
+  // "Create" goes to the page to create a post (specs/submit-page SU-02).
   if (isMobile) {
     await page
       .getByRole('navigation', { name: 'Main navigation' })
-      .getByRole('button', { name: 'Create' })
+      .getByRole('link', { name: 'Create' })
       .click()
   } else {
-    await page.getByRole('button', { name: 'What are you thinking?' }).click()
+    await page.getByRole('link', { name: 'What are you thinking?' }).click()
   }
-  const editor = isMobile
-    ? page.getByRole('dialog', { name: 'Create post' })
-    : page.getByRole('region', { name: 'Create post' })
+  const editor = page.getByRole('main')
   return { editor, body: editor.getByRole('textbox', { name: 'Body' }) }
 }
 

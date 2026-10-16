@@ -10,12 +10,11 @@ import { AppShell, type NavItem } from '@/components/organisms/app-shell'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { JoinedProvider } from '@/components/organisms/join'
-import { RightColumn } from '@/components/organisms/right-column'
 import { env } from '@/env'
 // Its own path, not the feature's index: the index also exports the community page, and every
 // client component reachable from the layout would load on every page (JS budget, seo.md).
 import { MentionPreviews } from '@/features/communities/components/mention-previews'
-import { ComposerRoot } from '@/features/composer'
+import { ComposeProvider } from '@/components/organisms/compose'
 import { InterestsSidebar, InterestsSkeleton } from '@/features/interests'
 import { OG_LOCALES } from '@/i18n/alternates'
 import { pickClientMessages } from '@/i18n/client-messages'
@@ -63,7 +62,7 @@ export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Pr
 // viewport-fit=cover exposes the iPhone safe areas (notch, home indicator) to env().
 export const viewport: Viewport = { viewportFit: 'cover' }
 
-export default async function LocaleLayout({ children, params }: LayoutProps<'/[locale]'>) {
+export default async function LocaleLayout({ children, right, params }: LayoutProps<'/[locale]'>) {
   const { locale } = await params
   if (!hasLocale(routing.locales, locale)) notFound()
 
@@ -96,8 +95,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
             >
               {/* Joined communities of this visit: every join button hides at once (specs/community-first). */}
               <JoinedProvider>
-                {/* The post editor behind every "Create" (specs/post-create-detail § 2). */}
-                <ComposerRoot>
+                {/* The page's community for every "Create" (specs/submit-page SU-02). */}
+                <ComposeProvider>
                   <AppShell
                     navItems={navItems}
                     sidebar={
@@ -107,7 +106,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
                         <InterestsSidebar />
                       </Suspense>
                     }
-                    right={<RightColumn />}
+                    // Each page's right column (the @right slot): the widgets, or its own (specs/submit-page).
+                    right={right}
                     devTools={devTools}
                     // Your own page, from the bars' "Profile" (specs/header-refresh HR-02).
                     profileHref={viewer && communityPath('user', viewer.username)}
@@ -116,7 +116,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
                   </AppShell>
                   {/* Hover cards of groups, people and assets (specs/mention-preview). */}
                   <MentionPreviews />
-                </ComposerRoot>
+                </ComposeProvider>
               </JoinedProvider>
             </AuthGateProvider>
           </Providers>

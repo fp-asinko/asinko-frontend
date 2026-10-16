@@ -31,7 +31,7 @@ test.describe('app shell', () => {
     if (isMobile) {
       const nav = page.getByRole('navigation', { name: 'Main navigation' })
       // Profile goes to your own page since specs/profile-track-record (HR-02).
-      await expect(nav.getByRole('link')).toHaveText(['Home', 'Profile'])
+      await expect(nav.getByRole('link')).toHaveText(['Home', 'Create', 'Profile'])
       await expect(nav.getByRole('link', { name: 'Profile' })).toHaveAttribute(
         'href',
         '/en/user/demo',
@@ -39,8 +39,8 @@ test.describe('app shell', () => {
       for (const name of ['Search', 'Notif']) {
         await expect(nav.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
       }
-      // Create opens the post editor (specs/post-create-detail PC-02).
-      await expect(nav.getByRole('button', { name: 'Create' })).not.toHaveAttribute('aria-disabled')
+      // Create goes to the page to create a post (specs/submit-page SU-02).
+      await expect(nav.getByRole('link', { name: 'Create' })).toHaveAttribute('href', '/en/submit')
     } else {
       await expect(page.getByRole('navigation', { name: 'Main navigation' })).toBeHidden()
       await expect(page.getByRole('banner').getByRole('link').first()).toHaveAttribute(

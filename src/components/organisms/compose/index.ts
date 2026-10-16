@@ -1,8 +1,7 @@
 export {
   ComposeContext,
-  ComposeSlot,
+  ComposeProvider,
   ComposeTrigger,
   useCompose,
   type ComposeCommunity,
-  type ComposeRequest,
 } from './compose'

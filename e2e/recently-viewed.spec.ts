@@ -10,7 +10,7 @@ const FED =
   '/en/post/00000000-0000-4000-8000-000000004002/the-fed-cuts-25-bps-what-it-means-for-crypto'
 
 const recent = (page: Page) =>
-  page.getByRole('complementary', { name: 'More from Asinko' }).getByRole('region', {
+  page.getByRole('complementary', { name: 'Related' }).getByRole('region', {
     name: 'Recently viewed',
   })
 

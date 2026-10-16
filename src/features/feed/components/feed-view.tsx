@@ -46,7 +46,8 @@ export function FeedTop({
 }) {
   return (
     <>
-      <ComposerPlaceholder viewerName={viewerName} />
+      {/* Filtered by a community (the chip): "Create" takes it along (specs/submit-page). */}
+      <ComposerPlaceholder viewerName={viewerName} communitySlug={params.community} />
       <div className="px-2 pt-4 sm:px-0">
         <FeedTabs params={params} />
         <FeedFilters params={params} chip={chip} />
@@ -144,11 +145,7 @@ function EmptyFeed({ params, communityHandle }: { params: FeedParams; communityH
       icon={<SparklesIcon />}
       title={t('forYou')}
       description={t('forYouBody')}
-      action={
-        <ComposeTrigger view="modal" className={ACTION}>
-          {t('createPost')}
-        </ComposeTrigger>
-      }
+      action={<ComposeTrigger className={ACTION}>{t('createPost')}</ComposeTrigger>}
     />
   )
 }

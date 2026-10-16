@@ -134,10 +134,10 @@ test.describe('Home feed', () => {
 
   test('features of later phases say "Coming soon" (H-26)', async ({ page }) => {
     await page.goto('/en')
-    // The composer box's Image (Share works since specs/comment-threads).
-    const image = page.getByRole('button', { name: 'Image' })
-    await expect(image).toHaveAttribute('aria-disabled', 'true')
-    await pressComingSoon(image)
+    // The composer box's Thesis (Link and Image go to the page to create a post, specs/submit-page).
+    const thesis = page.getByRole('button', { name: 'Thesis' })
+    await expect(thesis).toHaveAttribute('aria-disabled', 'true')
+    await pressComingSoon(thesis)
     await expect(page.getByRole('status').filter({ hasText: 'Coming soon' })).toBeVisible()
   })
 

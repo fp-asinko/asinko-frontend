@@ -25,8 +25,8 @@ test.describe('cursor', () => {
 
   test("the post editor's controls show the hand, its fields the text cursor", async ({ page }) => {
     await page.goto('/en')
-    await page.getByRole('banner').getByRole('button', { name: 'Create' }).click()
-    const editor = page.getByRole('dialog', { name: 'Create post' })
+    await page.getByRole('banner').getByRole('link', { name: 'Create' }).click()
+    const editor = page.getByRole('main')
     await expect(editor).toBeVisible()
 
     for (const control of [

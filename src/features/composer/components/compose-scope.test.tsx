@@ -3,25 +3,18 @@ import { describe, expect, it, vi } from 'vitest'
 import { ComposeContext } from '@/components/organisms/compose'
 import { ComposeScope } from './compose-scope'
 
-describe('ComposeScope (specs/post-create-detail PC-06)', () => {
+describe('ComposeScope (specs/post-create-detail PC-06, specs/submit-page SU-02)', () => {
   it("sets the page's community while the page is open, and clears it after", () => {
     const setScope = vi.fn()
     const { unmount, container } = render(
-      <ComposeContext
-        value={{
-          openCompose: vi.fn(),
-          setScope,
-          registerSlot: vi.fn(),
-          expanded: false,
-          prepare: vi.fn(),
-        }}
-      >
-        <ComposeScope id="me" handle="@demo" name="demo" own />
+      <ComposeContext value={{ scope: null, setScope }}>
+        <ComposeScope id="me" slug="demo" handle="@demo" name="demo" own />
       </ComposeContext>,
     )
     expect(container).toBeEmptyDOMElement()
     expect(setScope).toHaveBeenLastCalledWith({
       id: 'me',
+      slug: 'demo',
       handle: '@demo',
       name: 'demo',
       own: true,

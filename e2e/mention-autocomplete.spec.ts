@@ -7,20 +7,19 @@ import { expectNoA11yViolations } from './fixtures/axe'
 const FED_PATH =
   '/en/post/00000000-0000-4000-8000-000000004002/the-fed-cuts-25-bps-what-it-means-for-crypto'
 
-/** The editor's body: in the expanded box (desktop) or the full screen (mobile). */
+/** The editor's body, on the page to create a post. */
 async function openBody(page: Page, isMobile: boolean) {
   await page.goto('/en')
+  // "Create" goes to the page to create a post (specs/submit-page SU-02).
   if (isMobile) {
     await page
       .getByRole('navigation', { name: 'Main navigation' })
-      .getByRole('button', { name: 'Create' })
+      .getByRole('link', { name: 'Create' })
       .click()
   } else {
-    await page.getByRole('button', { name: 'What are you thinking?' }).click()
+    await page.getByRole('link', { name: 'What are you thinking?' }).click()
   }
-  const editor = isMobile
-    ? page.getByRole('dialog', { name: 'Create post' })
-    : page.getByRole('region', { name: 'Create post' })
+  const editor = page.getByRole('main')
   const body = editor.getByRole('textbox', { name: 'Body' })
   await body.click()
   return { editor, body }

@@ -1,0 +1,27 @@
+import type { Metadata } from 'next'
+// By their paths, not the feature's index: the index also brings what other pages use (seo.md).
+import {
+  checkSubmitSegment,
+  SubmitPage,
+  submitMetadata,
+} from '@/features/composer/components/submit-page'
+import { safeLocale } from '@/i18n/safe-locale'
+
+// The page to create a post (specs/submit-page): /publicar in Spanish and Portuguese; the other word redirects or is
+// a 404 (SU-01). Outside (main) and without loading.tsx: a real 308 and a real 404.
+export async function generateMetadata({
+  params,
+}: PageProps<'/[locale]/publicar'>): Promise<Metadata> {
+  const { locale } = await params
+  return submitMetadata(safeLocale(locale))
+}
+
+export default async function SubmitRoute({
+  params,
+  searchParams,
+}: PageProps<'/[locale]/publicar'>) {
+  const { locale } = await params
+  const query = await searchParams
+  checkSubmitSegment('publicar', safeLocale(locale), query)
+  return <SubmitPage searchParams={query} />
+}

@@ -37,15 +37,12 @@ export function CommunityPicker({
   onChange,
   invalid,
   describedBy,
-  firstFocus = false,
 }: {
   id: string
   value: CommunityOption | null
   onChange: (community: CommunityOption | null) => void
   invalid: boolean
   describedBy?: string
-  /** The editor's first focus when no community is chosen yet. */
-  firstFocus?: boolean
 }) {
   const t = useTranslations('composer.community')
   const [options, setOptions] = useState<CommunityOption[]>(value ? [value] : [])
@@ -95,7 +92,6 @@ export function CommunityPicker({
           id={id}
           aria-invalid={invalid || undefined}
           aria-describedby={describedBy}
-          data-autofocus={firstFocus || undefined}
           className={cn(
             'inline-flex h-8 max-w-full tap items-center gap-1 rounded-full bg-muted pr-2.5 pl-3 type-meta font-bold outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:ring-2 aria-invalid:ring-destructive/40 [&_svg]:size-3.5',
             value ? 'text-foreground' : 'text-muted-foreground',

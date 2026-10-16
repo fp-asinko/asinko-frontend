@@ -2,74 +2,54 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
-import { ComposeContext } from '@/components/organisms/compose'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { ComposerPlaceholder } from './composer-placeholder'
 
-function renderWithCompose(ui: React.ReactNode) {
-  const openCompose = vi.fn()
-  renderWithIntl(
-    <ComposeContext
-      value={{
-        openCompose,
-        setScope: vi.fn(),
-        registerSlot: vi.fn(),
-        expanded: false,
-        prepare: vi.fn(),
-      }}
-    >
-      {ui}
-    </ComposeContext>,
-  )
-  return openCompose
-}
+vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
-describe('ComposerPlaceholder (H-09, as X: specs/post-create-detail PC-03)', () => {
-  it('opens the editor from the prompt, from Publish (Text) and from the link icon (Link)', async () => {
-    const openCompose = renderWithCompose(<ComposerPlaceholder viewerName="demo" />)
-    await userEvent.click(screen.getByRole('button', { name: 'What are you thinking?' }))
-    expect(openCompose).toHaveBeenLastCalledWith({ type: undefined })
-    await userEvent.click(screen.getByRole('button', { name: 'Publish' }))
-    expect(openCompose).toHaveBeenLastCalledWith({ type: 'TEXT' })
-    await userEvent.click(screen.getByRole('button', { name: 'Link' }))
-    expect(openCompose).toHaveBeenLastCalledWith({ type: 'LINK' })
+describe('ComposerPlaceholder (H-09; specs/submit-page SU-02, Q1)', () => {
+  it('goes to the page to create a post: the prompt and Publish on Text, the icons on theirs', () => {
+    renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
+    expect(screen.getByRole('link', { name: 'What are you thinking?' })).toHaveAttribute(
+      'href',
+      '/submit',
+    )
+    // Publish is the prompt's twin: out of the reading order, the same place.
+    const publish = screen.getByText('Publish').closest('a')
+    expect(publish).toHaveAttribute('href', '/submit')
+    expect(publish).toHaveAttribute('aria-hidden', 'true')
+    expect(publish).toHaveAttribute('tabindex', '-1')
+    expect(screen.getByRole('link', { name: 'Link' })).toHaveAttribute('href', '/submit?type=link')
+    expect(screen.getByRole('link', { name: 'Image' })).toHaveAttribute(
+      'href',
+      '/submit?type=image',
+    )
   })
 
-  it('keeps Image, Thesis and Live as coming soon', () => {
+  it('says where the post goes on a community, and the page arrives with it chosen', () => {
+    renderWithIntl(
+      <ComposerPlaceholder viewerName="demo" communityHandle="#defi" communitySlug="defi" />,
+    )
+    expect(screen.getByRole('link', { name: 'Post in #defi' })).toHaveAttribute(
+      'href',
+      '/submit?community=defi',
+    )
+  })
+
+  it('keeps Thesis and Live as coming soon', () => {
     renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
-    for (const name of ['Image', 'Thesis', 'Live']) {
+    for (const name of ['Thesis', 'Live']) {
       expect(screen.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
     }
-    for (const name of ['What are you thinking?', 'Link', 'Publish']) {
-      expect(screen.getByRole('button', { name })).not.toHaveAttribute('aria-disabled')
-    }
   })
 
-  it("says where the post goes on a community's page", () => {
-    renderWithIntl(<ComposerPlaceholder viewerName="demo" communityHandle="#defi" />)
-    expect(screen.getByRole('button', { name: 'Post in #defi' })).toBeInTheDocument()
+  it('opens the account modal from Thesis without a session (G-04)', async () => {
+    renderWithIntl(
+      <AuthGateProvider signedIn={false}>
+        <ComposerPlaceholder viewerName={null} />
+      </AuthGateProvider>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Thesis' }))
+    expect(await screen.findByRole('dialog', { name: 'Join Asinko to post' })).toBeInTheDocument()
   })
-
-  it('colors the viewer avatar and keeps the guest placeholder neutral (FC-01)', () => {
-    const { unmount } = renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
-    expect(screen.getByTestId('user-avatar')).toHaveAttribute('data-color')
-    unmount()
-    renderWithIntl(<ComposerPlaceholder viewerName={null} />)
-    expect(screen.getByTestId('user-avatar')).not.toHaveAttribute('data-color')
-  })
-
-  it.each(['Image', 'Thesis', 'Live'])(
-    'opens the account modal from %s without a session (G-04)',
-    async (name) => {
-      renderWithIntl(
-        <AuthGateProvider signedIn={false}>
-          <ComposerPlaceholder viewerName={null} />
-        </AuthGateProvider>,
-      )
-      const control = screen.getByRole('button', { name })
-      expect(control).not.toHaveAttribute('aria-disabled')
-      await userEvent.click(control)
-      expect(await screen.findByRole('dialog', { name: 'Join Asinko to post' })).toBeInTheDocument()
-    },
-  )
 })

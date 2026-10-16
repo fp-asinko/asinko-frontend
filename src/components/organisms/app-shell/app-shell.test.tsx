@@ -53,7 +53,7 @@ describe('AppShell', () => {
 
   it('renders the right column as a named complementary region (RC-01, RC-04)', () => {
     renderShell(<p>Season tokens</p>)
-    const aside = screen.getByRole('complementary', { name: 'More from Asinko' })
+    const aside = screen.getByRole('complementary', { name: 'Related' })
     expect(aside).toContainElement(screen.getByText('Season tokens'))
   })
 

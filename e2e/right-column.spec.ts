@@ -11,7 +11,7 @@ test.describe('Right column', () => {
     test.skip(isMobile, 'The column only exists from 1024px (RC-05 has its own test)')
     await page.setViewportSize({ width: 1280, height: 900 })
     await page.goto('/en')
-    const column = page.getByRole('complementary', { name: 'More from Asinko' })
+    const column = page.getByRole('complementary', { name: 'Related' })
     await expect(column).toBeVisible()
     await expect(column.getByRole('heading', { name: 'Season tokens' })).toBeVisible()
 
@@ -38,7 +38,7 @@ test.describe('Right column', () => {
     test.skip(isMobile, 'The column only exists from 1024px')
     await page.setViewportSize({ width: 1280, height: 900 })
     await page.goto('/en')
-    const column = page.getByRole('complementary', { name: 'More from Asinko' })
+    const column = page.getByRole('complementary', { name: 'Related' })
     const terms = column.getByRole('button', { name: 'Terms' })
     await expect(terms).toHaveAttribute('aria-disabled', 'true')
     // Coming soon controls are aria-disabled: Playwright needs force (testing.md).

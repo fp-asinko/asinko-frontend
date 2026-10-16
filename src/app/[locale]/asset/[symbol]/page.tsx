@@ -36,7 +36,12 @@ export default async function AssetPage({
   const { page, path } = route
   return (
     <PageColumns>
-      <ComposeScope id={page.id} handle={page.handle} name={page.subtitle ?? page.handle} />
+      <ComposeScope
+        id={page.id}
+        slug={page.slug}
+        handle={page.handle}
+        name={page.subtitle ?? page.handle}
+      />
       <CommunityTop page={page} />
       <CommunityFeed
         slug={page.slug}

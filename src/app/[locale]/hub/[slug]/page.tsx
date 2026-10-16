@@ -21,7 +21,12 @@ export default async function HubPage({ params, searchParams }: PageProps<'/[loc
   const { page, path } = await resolveCommunityRoute('group', decodeURIComponent(slug), locale)
   return (
     <PageColumns>
-      <ComposeScope id={page.id} handle={page.handle} name={page.subtitle ?? page.handle} />
+      <ComposeScope
+        id={page.id}
+        slug={page.slug}
+        handle={page.handle}
+        name={page.subtitle ?? page.handle}
+      />
       <CommunityTop page={page} />
       <CommunityFeed
         slug={page.slug}

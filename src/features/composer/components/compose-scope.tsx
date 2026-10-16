@@ -9,19 +9,21 @@ import { useCompose } from '@/components/organisms/compose'
  */
 export function ComposeScope({
   id,
+  slug,
   handle,
   name,
   own = false,
 }: {
   id: string
+  slug: string
   handle: string
   name: string
   own?: boolean
 }) {
   const { setScope } = useCompose()
   useEffect(() => {
-    setScope({ id, handle, name, own })
+    setScope({ id, slug, handle, name, own })
     return () => setScope(null)
-  }, [setScope, id, handle, name, own])
+  }, [setScope, id, slug, handle, name, own])
   return null
 }

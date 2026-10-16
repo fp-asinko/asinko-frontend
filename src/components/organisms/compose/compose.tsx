@@ -1,148 +1,79 @@
 'use client'
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react'
-import { cn } from '@/lib/utils'
+import { useLocale } from 'next-intl'
+import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
+import type { Locale } from '@/i18n/routing'
+import { Link } from '@/i18n/navigation'
+import { submitPath, type SubmitType } from '@/i18n/submit-path'
 
-/** The community a page is about, to preselect it in the editor (specs/post-create-detail PC-06). */
+/** The community a page is about, to preselect it on the page to create a post (PC-06). */
 export type ComposeCommunity = {
   id: string
+  /** Its slug: "Create" carries it to the page to create a post (specs/submit-page). */
+  slug: string
   handle: string
   name: string
   /** The viewer's own channel: shown as "Your profile". */
   own?: boolean
 }
 
-/**
- * How the editor opens: on a tab (the composer's "Post" opens it on Text), and where. `box` (the
- * default) expands the page's composer box; `modal` opens a window over the page, as X's "Post"
- * button ("+ Create" in the top bar). In mobile it is always the full screen.
- */
-export type ComposeRequest = { type?: 'TEXT' | 'LINK'; view?: 'box' | 'modal' }
-
 type Compose = {
-  /** Opens the post editor; without a session, the account modal instead. */
-  openCompose: (request?: ComposeRequest) => void
-  /** The page's community while the page is open (ComposeScope); null when it leaves. */
+  /** The page's community while the page is open (ComposeScope); null elsewhere. */
+  scope: ComposeCommunity | null
   setScope: (community: ComposeCommunity | null) => void
-  /** Where the editor expands in place: the page's composer box (ComposeSlot). */
-  registerSlot: (element: HTMLElement | null) => void
-  /** The editor is open inside the box: the box hides its prompt. */
-  expanded: boolean
-  /** The person is about to open it (hover, focus, touch): start downloading the editor. */
-  prepare: () => void
 }
 
-// Without a provider (isolated component tests) nothing happens.
-export const ComposeContext = createContext<Compose>({
-  openCompose: () => {},
-  setScope: () => {},
-  registerSlot: () => {},
-  expanded: false,
-  prepare: () => {},
-})
+// Without a provider (isolated component tests) there is no community.
+export const ComposeContext = createContext<Compose>({ scope: null, setScope: () => {} })
 
-/**
- * Opening the post editor from anywhere (specs/post-create-detail § 2). No business here: the
- * composer feature provides it (ComposerRoot) and loads the editor the first time.
- */
+/** The community of the page being read: every "Create" takes it along (PC-06). */
 export function useCompose() {
   return useContext(ComposeContext)
 }
 
-/**
- * A button that opens the editor: "+ Create" in the top bar, "Create" in the bottom bar and the
- * feed's composer box. The look comes from where it sits.
- */
-export function ComposeTrigger({
-  type,
-  view,
-  className,
-  children,
-  'aria-label': ariaLabel,
-}: {
-  type?: ComposeRequest['type']
-  view?: ComposeRequest['view']
-  className?: string
-  children: ReactNode
-  'aria-label'?: string
-}) {
-  const { openCompose, prepare } = useCompose()
-  return (
-    <button
-      type="button"
-      aria-label={ariaLabel}
-      aria-haspopup="dialog"
-      // Intent before the click: by the time it lands, the editor is usually there.
-      onPointerEnter={prepare}
-      onPointerDown={prepare}
-      onFocus={prepare}
-      onClick={() => openCompose({ type, view })}
-      className={className}
-    >
-      {children}
-    </button>
-  )
+/** Holds the page's community for the "Create" links of the bars and the page. No business. */
+export function ComposeProvider({ children }: { children: ReactNode }) {
+  const [scope, setScope] = useState<ComposeCommunity | null>(null)
+  const value = useMemo(() => ({ scope, setScope }), [scope])
+  return <ComposeContext value={value}>{children}</ComposeContext>
 }
 
 /**
- * The composer box of a page, as X (PC-03): the editor expands inside it, next to the avatar.
- * Closed, it shows the prompt and the actions row; open, both give their place to the editor.
+ * "Create": a link to the page to create a post (specs/submit-page SU-02), with the page's
+ * community and the format to open on. The top bar, the bottom bar, a community's header and the
+ * feed's box. `community` names it when the server already knows it (a community's header), so the
+ * link is right before the page's scope arrives. The look comes from where it sits.
  */
-export function ComposeSlot({
-  avatar,
-  prompt,
-  actions,
+export function ComposeTrigger({
+  type,
+  community,
+  className,
+  children,
+  'aria-label': ariaLabel,
+  'aria-hidden': ariaHidden,
+  tabIndex,
 }: {
-  avatar: ReactNode
-  prompt: ReactNode
-  actions: ReactNode
+  type?: SubmitType
+  /** The community's slug; else the page's (ComposeScope). */
+  community?: string
+  className?: string
+  children: ReactNode
+  'aria-label'?: string
+  /** A twin of another link to the same place: out of the reading order. */
+  'aria-hidden'?: boolean
+  tabIndex?: number
 }) {
-  const { registerSlot, expanded } = useCompose()
-  // Once it has been open, the prompt fades back in when the editor leaves; never on first paint.
-  const [opened, setOpened] = useState(false)
-  if (expanded && !opened) setOpened(true)
-  const back = opened && !expanded ? 'animate-fade-in' : undefined
-  const prompted = useRef<HTMLDivElement>(null)
-  const box = useRef<HTMLDivElement>(null)
-  const wasExpanded = useRef(false)
-  // The closed box's height (prompt and actions row), for the editor to fold back to exactly that:
-  // the feed below does not jump when the actions return.
-  useLayoutEffect(() => {
-    if (!expanded && box.current)
-      box.current.dataset.closedHeight = String(box.current.offsetHeight)
-  }, [expanded])
-  // Folded away with the focus inside it (Cancel, Esc): the focus goes back to the prompt, once
-  // it shows again. Not when the person has already moved the focus elsewhere.
-  useEffect(() => {
-    if (wasExpanded.current && !expanded) {
-      const lost = document.activeElement === null || document.activeElement === document.body
-      if (lost) prompted.current?.querySelector<HTMLElement>('button')?.focus()
-    }
-    wasExpanded.current = expanded
-  }, [expanded])
+  const { scope } = useCompose()
+  const locale = useLocale() as Locale
   return (
-    <div ref={box} data-compose-box>
-      <div className="flex items-start gap-3">
-        {/* As tall as the closed prompt (43px): centered with it, at the top when open. */}
-        <div className="flex h-10.75 shrink-0 items-center">{avatar}</div>
-        <div className="min-w-0 flex-1">
-          <div ref={prompted} hidden={expanded} className={cn('flex', back)}>
-            {prompt}
-          </div>
-          <div ref={registerSlot} />
-        </div>
-      </div>
-      <div hidden={expanded} className={back}>
-        {actions}
-      </div>
-    </div>
+    <Link
+      href={submitPath(locale, { community: community ?? scope?.slug, type })}
+      aria-label={ariaLabel}
+      aria-hidden={ariaHidden}
+      tabIndex={tabIndex}
+      className={className}
+    >
+      {children}
+    </Link>
   )
 }

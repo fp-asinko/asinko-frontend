@@ -61,7 +61,7 @@ test.describe('Without a session', () => {
     // Above the communities.
     const communities = page.getByRole('region', { name: 'Communities' }).filter({ visible: true })
     expect((await invite.boundingBox())!.y).toBeLessThan((await communities.boundingBox())!.y)
-    const right = page.getByRole('complementary', { name: 'More from Asinko' })
+    const right = page.getByRole('complementary', { name: 'Related' })
     await expect(right.getByRole('region', { name: 'New to Asinko?' })).toHaveCount(0)
   })
 
@@ -122,8 +122,9 @@ test.describe('Without a session', () => {
     await page.getByRole('button', { name: 'Close' }).click()
     await expect(page.getByRole('dialog')).toBeHidden()
 
-    await page.getByRole('button', { name: 'What are you thinking?' }).click()
-    await expect(page.getByRole('dialog', { name: 'Join Asinko to post' })).toBeVisible()
+    // The page to create a post says how to get in (specs/submit-page SU-06).
+    await page.getByRole('link', { name: 'What are you thinking?' }).click()
+    await expect(page.getByText('Post with an account')).toBeVisible()
   })
 
   test('the modal is a bottom panel on phones and centered from md (G-07)', async ({

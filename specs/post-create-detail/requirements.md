@@ -9,6 +9,8 @@
 > - Texto y Link; Imagen cuando se defina la subida.
 > - Una spec con el detalle y crear.
 >
+> **Reemplazado (2026-10-15, `specs/submit-page`):** el editor ya no se abre en ventana, en la caja ni a pantalla completa: todo "Crear" y la caja del Home llevan a una página propia (`/en/submit`, `/es/publicar`), como Reddit. Lo que sigue sobre la ventana y la caja queda como historia; el formulario (formatos, título, cuerpo, Publicar) es el mismo. El código anterior está en la rama `backup/compose-modal-inline`.
+>
 > **Cambio con el PO (2026-10-08):** "+ Crear" de la barra superior abre una ventana sobre la página, como el "Post" de X, en vez de subir hasta la caja. Y la caja se pliega con una animación al cerrarse.
 >
 > **Cambio con el PO (2026-10-07, al ver el modal):** el modal se ve antiestético. Como X, el editor vive **en la caja de arriba**, que se expande en el lugar, minimalista y con animación. En mobile, pantalla completa. La comunidad se elige con un chip que abre una lista corta animada.

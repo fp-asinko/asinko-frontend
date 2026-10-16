@@ -44,25 +44,21 @@ describe('BottomNav', () => {
     expect(await screen.findByRole('dialog', { name: 'Log in to Asinko' })).toBeVisible()
   })
 
-  it('opens the post editor from Create, between Search and Notif (specs/post-create-detail PC-02)', async () => {
-    const openCompose = vi.fn()
+  it('goes to the page to create a post from Create, between Search and Notif (specs/submit-page SU-02)', () => {
     renderWithIntl(
       <ComposeContext
         value={{
-          openCompose,
+          scope: { id: 'd1', slug: 'defi', handle: '#defi', name: 'DeFi' },
           setScope: vi.fn(),
-          registerSlot: vi.fn(),
-          expanded: false,
-          prepare: vi.fn(),
         }}
       >
         <BottomNav items={ITEMS} />
       </ComposeContext>,
     )
-    const create = screen.getByRole('button', { name: 'Create' })
-    expect(create).not.toHaveAttribute('aria-disabled')
-    await userEvent.click(create)
-    expect(openCompose).toHaveBeenCalledOnce()
+    expect(screen.getByRole('link', { name: 'Create' })).toHaveAttribute(
+      'href',
+      '/submit?community=defi',
+    )
     const names = screen.getAllByRole('listitem').map((item) => item.textContent)
     expect(names.slice(1)).toEqual(['Search', 'Create', 'Notif', 'Profile'])
   })

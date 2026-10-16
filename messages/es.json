@@ -185,7 +185,7 @@
     }
   },
   "rightColumn": {
-    "label": "Más de Asinko",
+    "label": "Relacionado",
     "tokens": {
       "title": "Tokens de temporada",
       "badge": "Próximamente",
@@ -456,7 +456,6 @@
     "expand": "Abrir el comentario de {handle}"
   },
   "composer": {
-    "title": "Crear post",
     "community": {
       "label": "Comunidad",
       "placeholder": "Elige una comunidad",
@@ -520,6 +519,11 @@
       "alt": "La imagen de tu post",
       "ready": "Imagen lista",
       "changeLabel": "Cambiar imagen"
+    },
+    "draft": {
+      "notice": "Tenés un borrador sin publicar de {when}.",
+      "recover": "Recuperar",
+      "discard": "Descartar"
     }
   },
   "mentions": {
@@ -575,5 +579,29 @@
   },
   "shareImage": {
     "stats": "{votes, plural, one {{votesLabel} voto} other {{votesLabel} votos}} · {comments, plural, one {{commentsLabel} comentario} other {{commentsLabel} comentarios}}"
+  },
+  "submitPage": {
+    "title": "Crear post",
+    "gateTitle": "Publicá con una cuenta",
+    "gateBody": "Creá una cuenta o entrá para publicar en una comunidad.",
+    "rulesOf": "Reglas de {handle}",
+    "tipsTitle": "Consejos para publicar",
+    "tips": {
+      "title": "Un título claro dice de qué se trata el post.",
+      "mentions": "Mencioná activos con $, comunidades con # y personas con @.",
+      "rules": "Elegí la comunidad: sus reglas aparecen acá."
+    },
+    "members": "{count, plural, one {<b>#</b> miembro} other {<b>#</b> miembros}}",
+    "since": "Desde el {date}",
+    "assetClass": {
+      "EQUITY": "Acción",
+      "ETF": "ETF",
+      "CRYPTO": "Cripto",
+      "INDEX": "Índice",
+      "COMMODITY": "Commodity",
+      "FOREX": "Moneda",
+      "OTHER": "Activo"
+    },
+    "loadError": "No se pudo cargar la comunidad."
   }
 }

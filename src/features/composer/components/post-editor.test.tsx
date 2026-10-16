@@ -30,6 +30,7 @@ vi.mock('../actions/search-communities.action', () => ({
 
 const DEFI: CommunityOption = {
   id: '00000000-0000-4000-8000-000000001001',
+  slug: 'defi',
   handle: '#defi',
   name: 'DeFi',
   own: false,
@@ -46,7 +47,6 @@ function renderEditor({
   const { unmount } = renderWithIntl(
     <AuthGateProvider signedIn={signedIn}>
       <PostEditor
-        variant="inline"
         type={type}
         community={community}
         draftRef={draftRef}
@@ -240,7 +240,7 @@ describe('PostEditor with an image (specs/post-image)', () => {
     await userEvent.type(body(), 'Look at this.')
     await userEvent.upload(fileInput(), png())
 
-    expect(await screen.findByRole('status', { name: '' })).toBeInTheDocument()
+    expect((await screen.findAllByText('Uploading…')).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('status').some((each) => each.textContent === 'Uploading…')).toBe(
       true,
     )

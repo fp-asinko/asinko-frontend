@@ -185,7 +185,7 @@
     }
   },
   "rightColumn": {
-    "label": "More from Asinko",
+    "label": "Related",
     "tokens": {
       "title": "Season tokens",
       "badge": "Coming soon",
@@ -456,7 +456,6 @@
     "expand": "Expand {handle}'s comment"
   },
   "composer": {
-    "title": "Create post",
     "community": {
       "label": "Community",
       "placeholder": "Choose a community",
@@ -520,6 +519,11 @@
       "alt": "The image of your post",
       "ready": "Image ready",
       "changeLabel": "Change image"
+    },
+    "draft": {
+      "notice": "You have an unpublished draft from {when}.",
+      "recover": "Recover",
+      "discard": "Discard"
     }
   },
   "mentions": {
@@ -575,5 +579,29 @@
   },
   "shareImage": {
     "stats": "{votes, plural, one {{votesLabel} vote} other {{votesLabel} votes}} · {comments, plural, one {{commentsLabel} comment} other {{commentsLabel} comments}}"
+  },
+  "submitPage": {
+    "title": "Create post",
+    "gateTitle": "Post with an account",
+    "gateBody": "Create an account or log in to post in a community.",
+    "rulesOf": "Rules of {handle}",
+    "tipsTitle": "Tips to post",
+    "tips": {
+      "title": "A clear title says what the post is about.",
+      "mentions": "Mention assets with $, communities with # and people with @.",
+      "rules": "Choose the community: its rules show here."
+    },
+    "members": "{count, plural, one {<b>#</b> member} other {<b>#</b> members}}",
+    "since": "Since {date}",
+    "assetClass": {
+      "EQUITY": "Stock",
+      "ETF": "ETF",
+      "CRYPTO": "Crypto",
+      "INDEX": "Index",
+      "COMMODITY": "Commodity",
+      "FOREX": "Currency",
+      "OTHER": "Asset"
+    },
+    "loadError": "Could not load the community."
   }
 }

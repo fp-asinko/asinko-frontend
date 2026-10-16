@@ -70,12 +70,12 @@ describe('CommunityDetails (specs/community-pages CP-08, CP-10)', () => {
   })
 })
 
-describe('CommunityHeader, Create post (specs/post-create-detail PC-03)', () => {
-  it('offers "Create post" beside Join, as Reddit, in a group and an asset', () => {
+describe('CommunityHeader, Create post (specs/post-create-detail PC-03, specs/submit-page SU-02)', () => {
+  it('offers "Create post" beside Join, as Reddit, to the page with this community chosen', () => {
     renderWithIntl(<CommunityHeader page={communityPage()} />)
-    expect(screen.getByRole('button', { name: 'Create post' })).toHaveAttribute(
-      'aria-haspopup',
-      'dialog',
+    expect(screen.getByRole('link', { name: 'Create post' })).toHaveAttribute(
+      'href',
+      '/submit?community=macro',
     )
     expect(screen.getByRole('button', { name: 'Join #macro' })).toBeInTheDocument()
   })

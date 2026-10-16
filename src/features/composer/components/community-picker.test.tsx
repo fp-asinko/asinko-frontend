@@ -9,9 +9,15 @@ import { CommunityPicker } from './community-picker'
 const action = vi.hoisted(() => ({ searchCommunities: vi.fn() }))
 vi.mock('../actions/search-communities.action', () => action)
 
-const OWN: CommunityOption = { id: 'own', handle: '@demo', name: 'demo', own: true }
-const DEFI: CommunityOption = { id: 'defi', handle: '#defi', name: '#DeFi', own: false }
-const BTC: CommunityOption = { id: 'btc', handle: '$BTC', name: 'Bitcoin', own: false }
+const OWN: CommunityOption = { id: 'own', slug: 'demo', handle: '@demo', name: 'demo', own: true }
+const DEFI: CommunityOption = {
+  id: 'defi',
+  slug: 'defi',
+  handle: '#defi',
+  name: '#DeFi',
+  own: false,
+}
+const BTC: CommunityOption = { id: 'btc', slug: 'BTC', handle: '$BTC', name: 'Bitcoin', own: false }
 
 function Picker({ onChange }: { onChange: (value: CommunityOption | null) => void }) {
   const [value, setValue] = useState<CommunityOption | null>(null)

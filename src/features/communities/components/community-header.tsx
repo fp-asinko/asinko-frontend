@@ -62,10 +62,10 @@ export function CommunityHeader({
         </div>
         <div className="flex items-center gap-2">
           {canPost && (
-            // As Reddit's "Create post": the editor, with this page's community already chosen
-            // (ComposeScope). A window in desktop, the full screen in phones (specs/post-create-detail).
+            // As Reddit's "Create post": the page to create one, with this community chosen
+            // (specs/submit-page SU-02).
             <ComposeTrigger
-              view="modal"
+              community={page.slug}
               className="inline-flex h-8 tap items-center gap-1.5 rounded-full bg-muted px-3.5 type-action outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
             >
               <PlusIcon aria-hidden className="size-4" />

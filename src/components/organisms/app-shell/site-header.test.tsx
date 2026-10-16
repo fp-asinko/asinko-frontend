@@ -69,32 +69,20 @@ describe('SiteHeader (H-05)', () => {
   })
 })
 
-describe('SiteHeader: Create (specs/post-create-detail PC-01)', () => {
-  it('opens the post editor from "+ Create", with or without a session', async () => {
+describe('SiteHeader: Create (specs/submit-page SU-02)', () => {
+  it('goes to the page to create a post from "+ Create", with or without a session', () => {
     for (const signedIn of [true, false]) {
-      const openCompose = vi.fn()
       const { unmount } = renderWithIntl(
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <AuthGateProvider signedIn={signedIn}>
-            <ComposeContext
-              value={{
-                openCompose,
-                setScope: vi.fn(),
-                registerSlot: vi.fn(),
-                expanded: false,
-                prepare: vi.fn(),
-              }}
-            >
+            <ComposeContext value={{ scope: null, setScope: vi.fn() }}>
               <SiteHeader menu={<button type="button">menu</button>} />
             </ComposeContext>
           </AuthGateProvider>
         </ThemeProvider>,
       )
-      const create = screen.getByRole('button', { name: 'Create' })
-      expect(create).toHaveAttribute('aria-haspopup', 'dialog')
-      await userEvent.click(create)
-      // The root decides: the editor with a session, the account modal without.
-      expect(openCompose).toHaveBeenCalledOnce()
+      // Without a session the page itself says how to get in (SU-06).
+      expect(screen.getByRole('link', { name: 'Create' })).toHaveAttribute('href', '/submit')
       unmount()
     }
   })

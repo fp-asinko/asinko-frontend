@@ -16,8 +16,9 @@ async function openEditor(page: Page, isMobile: boolean) {
   const bar = isMobile
     ? page.getByRole('navigation', { name: 'Main navigation' })
     : page.getByRole('banner')
-  await bar.getByRole('button', { name: 'Create' }).click()
-  const editor = page.getByRole('dialog', { name: 'Create post' })
+  await bar.getByRole('link', { name: 'Create' }).click()
+  // The page to create a post (specs/submit-page).
+  const editor = page.getByRole('main')
   await expect(editor).toBeVisible()
   return editor
 }
@@ -90,9 +91,9 @@ test.describe('Post with an image', () => {
       await page.goto('/es')
       await page
         .getByRole('navigation', { name: 'Navegación principal' })
-        .getByRole('button', { name: 'Crear' })
+        .getByRole('link', { name: 'Crear' })
         .click()
-      const editor = page.getByRole('dialog', { name: 'Crear post' })
+      const editor = page.getByRole('main')
       await editor.getByRole('tab', { name: 'Imagen' }).click()
       // The hidden input behind "Elegir imagen": the only way to hand a file to the browser.
       await editor

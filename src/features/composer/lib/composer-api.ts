@@ -24,8 +24,14 @@ function handleOf(community: Pick<RawCommunity, 'type' | 'slug'>) {
   return `#${community.slug}`
 }
 
-function toOption(community: RawCommunity, own: boolean): CommunityOption {
-  return { id: community.id, handle: handleOf(community), name: community.name, own }
+export function toOption(community: RawCommunity, own: boolean): CommunityOption {
+  return {
+    id: community.id,
+    slug: community.slug,
+    handle: handleOf(community),
+    name: community.name,
+    own,
+  }
 }
 
 /**

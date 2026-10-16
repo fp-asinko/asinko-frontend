@@ -1,129 +1,44 @@
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { ComposeContext, ComposeSlot, ComposeTrigger } from './compose'
+import { renderWithIntl } from '@/test/render-with-intl'
+import { ComposeContext, ComposeTrigger } from './compose'
 
-describe('ComposeTrigger (specs/post-create-detail § 2)', () => {
-  it('opens the editor on the tab it asks for', async () => {
-    const openCompose = vi.fn()
-    render(
-      <ComposeContext
-        value={{
-          openCompose,
-          setScope: vi.fn(),
-          registerSlot: vi.fn(),
-          expanded: false,
-          prepare: vi.fn(),
-        }}
-      >
-        <ComposeTrigger type="TEXT">Post</ComposeTrigger>
-        <ComposeTrigger aria-label="Create">+</ComposeTrigger>
+vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
+
+const DEFI = { id: 'd1', slug: 'defi', handle: '#defi', name: 'DeFi' }
+
+describe('ComposeTrigger (specs/submit-page SU-02)', () => {
+  it('goes to the page to create a post, in the locale, on the format asked', () => {
+    renderWithIntl(
+      <>
+        <ComposeTrigger>Create</ComposeTrigger>
+        <ComposeTrigger type="link" aria-label="Link">
+          🔗
+        </ComposeTrigger>
+      </>,
+      { locale: 'es' },
+    )
+    expect(screen.getByRole('link', { name: 'Create' })).toHaveAttribute('href', '/publicar')
+    expect(screen.getByRole('link', { name: 'Link' })).toHaveAttribute(
+      'href',
+      '/publicar?type=link',
+    )
+  })
+
+  it("takes the page's community along, or the one it names", () => {
+    renderWithIntl(
+      <ComposeContext value={{ scope: DEFI, setScope: vi.fn() }}>
+        <ComposeTrigger>Create</ComposeTrigger>
+        <ComposeTrigger community="BTC">Create in BTC</ComposeTrigger>
       </ComposeContext>,
     )
-    await userEvent.click(screen.getByRole('button', { name: 'Post' }))
-    expect(openCompose).toHaveBeenLastCalledWith({ type: 'TEXT' })
-    await userEvent.click(screen.getByRole('button', { name: 'Create' }))
-    expect(openCompose).toHaveBeenLastCalledWith({ type: undefined })
-    expect(screen.getByRole('button', { name: 'Create' })).toHaveAttribute(
-      'aria-haspopup',
-      'dialog',
+    expect(screen.getByRole('link', { name: 'Create' })).toHaveAttribute(
+      'href',
+      '/submit?community=defi',
     )
-  })
-
-  it('prepares the editor on hover, touch or focus, before the click', async () => {
-    const prepare = vi.fn()
-    render(
-      <ComposeContext
-        value={{
-          openCompose: vi.fn(),
-          setScope: vi.fn(),
-          registerSlot: vi.fn(),
-          expanded: false,
-          prepare,
-        }}
-      >
-        <ComposeTrigger>Post</ComposeTrigger>
-      </ComposeContext>,
+    expect(screen.getByRole('link', { name: 'Create in BTC' })).toHaveAttribute(
+      'href',
+      '/submit?community=BTC',
     )
-    await userEvent.hover(screen.getByRole('button', { name: 'Post' }))
-    expect(prepare).toHaveBeenCalled()
-    prepare.mockClear()
-    await userEvent.tab()
-    expect(prepare).toHaveBeenCalled()
-  })
-
-  it('does nothing without a provider', async () => {
-    render(<ComposeTrigger>Post</ComposeTrigger>)
-    await userEvent.click(screen.getByRole('button', { name: 'Post' }))
-    expect(screen.getByRole('button', { name: 'Post' })).toBeInTheDocument()
-  })
-})
-
-describe('ComposeSlot (specs/post-create-detail PC-03)', () => {
-  const slot = (expanded: boolean, registerSlot = vi.fn()) =>
-    render(
-      <ComposeContext
-        value={{
-          openCompose: vi.fn(),
-          setScope: vi.fn(),
-          registerSlot,
-          expanded,
-          prepare: vi.fn(),
-        }}
-      >
-        <ComposeSlot
-          avatar={<span>avatar</span>}
-          prompt={<button type="button">What are you thinking?</button>}
-          actions={<button type="button">Post</button>}
-        />
-      </ComposeContext>,
-    )
-
-  it('registers its place for the editor and shows the prompt while closed', () => {
-    const registerSlot = vi.fn()
-    slot(false, registerSlot)
-    expect(registerSlot).toHaveBeenCalledWith(expect.any(HTMLElement))
-    expect(screen.getByRole('button', { name: 'What are you thinking?' })).toBeVisible()
-    expect(screen.getByRole('button', { name: 'Post' })).toBeVisible()
-  })
-
-  it('gives its place to the editor when open, keeping the avatar', () => {
-    slot(true)
-    expect(screen.queryByRole('button', { name: 'What are you thinking?' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Post' })).not.toBeInTheDocument()
-    expect(screen.getByText('avatar')).toBeVisible()
-  })
-})
-
-describe('ComposeSlot: focus (specs/post-create-detail PC-05)', () => {
-  const value = (expanded: boolean) => ({
-    openCompose: vi.fn(),
-    setScope: vi.fn(),
-    registerSlot: vi.fn(),
-    expanded,
-    prepare: vi.fn(),
-  })
-  const box = (expanded: boolean) => (
-    <ComposeContext value={value(expanded)}>
-      <ComposeSlot
-        avatar={<span>avatar</span>}
-        prompt={<button type="button">What are you thinking?</button>}
-        actions={<button type="button">Post</button>}
-      />
-      <button type="button">Elsewhere</button>
-    </ComposeContext>
-  )
-
-  it('gives the focus back to the prompt when the editor folds away with it', () => {
-    const { rerender } = render(box(true))
-    rerender(box(false))
-    expect(screen.getByRole('button', { name: 'What are you thinking?' })).toHaveFocus()
-  })
-
-  it('leaves the focus alone if the person already moved it', () => {
-    const { rerender } = render(box(true))
-    screen.getByRole('button', { name: 'Elsewhere' }).focus()
-    rerender(box(false))
-    expect(screen.getByRole('button', { name: 'Elsewhere' })).toHaveFocus()
   })
 })
