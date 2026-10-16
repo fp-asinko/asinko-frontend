@@ -198,3 +198,31 @@ describe('CommunityPicker filters (specs/picker-filters)', () => {
     expect(await screen.findByText('No communities found')).toBeInTheDocument()
   })
 })
+
+describe('CommunityPicker as "+" (specs/related-tags RT-01, RT-03)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('adds a related one, offering neither "Your profile" nor the excluded handles', async () => {
+    action.searchCommunities.mockResolvedValue({ ok: true, data: [OWN, DEFI, BTC] })
+    const onChange = vi.fn()
+    renderWithIntl(
+      <CommunityPicker
+        id="related"
+        value={null}
+        onChange={onChange}
+        variant="add"
+        exclude={['#defi']}
+      />,
+    )
+    const add = screen.getByRole('combobox', { name: 'Add a related community or asset' })
+    // Only the plus: the chevron of the combobox stays out (ui/combobox asinko: chevron).
+    expect(add.querySelectorAll('svg')).toHaveLength(1)
+    add.focus()
+    await userEvent.keyboard('{ArrowDown}')
+    const options = await screen.findAllByRole('option')
+    expect(options.map((option) => option.textContent)).toEqual(['$BTCBitcoin'])
+
+    await userEvent.click(options[0]!)
+    expect(onChange).toHaveBeenCalledWith(BTC)
+  })
+})

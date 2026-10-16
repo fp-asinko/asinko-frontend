@@ -471,7 +471,8 @@
         "assets": "Activos"
       },
       "emptyGroups": "No se encontraron comunidades",
-      "emptyAssets": "No se encontraron activos"
+      "emptyAssets": "No se encontraron activos",
+      "addRelated": "Sumar comunidad o activo relacionado"
     },
     "type": {
       "label": "Tipo de post",
@@ -532,6 +533,10 @@
       "notice": "Tenés un borrador sin publicar de {when}.",
       "recover": "Recuperar",
       "discard": "Descartar"
+    },
+    "related": {
+      "label": "Relacionados",
+      "remove": "Quitar {handle}"
     }
   },
   "mentions": {

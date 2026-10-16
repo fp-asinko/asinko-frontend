@@ -337,3 +337,58 @@ describe('PostEditor with an image (specs/post-image)', () => {
     expect(view.draftRef.current?.()).toBe(true)
   })
 })
+
+describe('PostEditor related ones (specs/related-tags)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  const option = (handle: string, id = handle): CommunityOption => ({
+    id,
+    slug: handle.slice(1),
+    handle,
+    name: handle,
+    own: false,
+  })
+
+  async function addRelated(handle: string) {
+    screen.getByRole('combobox', { name: 'Add a related community or asset' }).focus()
+    await userEvent.keyboard('{ArrowDown}')
+    await userEvent.click(await screen.findByRole('option', { name: handle }))
+  }
+
+  it('offers "+" only with a community, and publishes the related ones as mentions (RT-01, RT-04)', async () => {
+    renderEditor({ community: null })
+    expect(screen.queryByRole('combobox', { name: /Add a related/ })).toBeNull()
+    actions.searchCommunities.mockResolvedValue({
+      ok: true,
+      data: [DEFI, option('$GGAL'), option('#macro')],
+    })
+    screen.getByRole('combobox', { name: 'Community' }).focus()
+    await userEvent.keyboard('{ArrowDown}')
+    await userEvent.click(await screen.findByRole('option', { name: /#defi/ }))
+
+    await addRelated('$GGAL')
+    await addRelated('#macro')
+    actions.createPost.mockResolvedValue({ ok: true, data: { id: 'abc', title: 'Banks' } })
+    await userEvent.type(title(), 'Banks')
+    await userEvent.type(body(), 'Cheap.')
+    await userEvent.click(publish())
+    expect(actions.createPost).toHaveBeenCalledWith(
+      expect.objectContaining({ body: 'Cheap.\n\n$GGAL #macro' }),
+    )
+  })
+
+  it('a related one chosen as the main community stops being related (RT-05)', async () => {
+    actions.searchCommunities.mockResolvedValue({
+      ok: true,
+      data: [DEFI, option('$GGAL', '00000000-0000-4000-8000-000000009001')],
+    })
+    renderEditor()
+    await addRelated('$GGAL')
+    expect(screen.getByRole('list', { name: 'Related' })).toHaveTextContent('$GGAL')
+
+    screen.getByRole('combobox', { name: 'Community' }).focus()
+    await userEvent.keyboard('{ArrowDown}')
+    await userEvent.click(await screen.findByRole('option', { name: '$GGAL' }))
+    expect(screen.queryByRole('list', { name: 'Related' })).toBeNull()
+  })
+})

@@ -471,7 +471,8 @@
         "assets": "Assets"
       },
       "emptyGroups": "No communities found",
-      "emptyAssets": "No assets found"
+      "emptyAssets": "No assets found",
+      "addRelated": "Add a related community or asset"
     },
     "type": {
       "label": "Post type",
@@ -532,6 +533,10 @@
       "notice": "You have an unpublished draft from {when}.",
       "recover": "Recover",
       "discard": "Discard"
+    },
+    "related": {
+      "label": "Related",
+      "remove": "Remove {handle}"
     }
   },
   "mentions": {

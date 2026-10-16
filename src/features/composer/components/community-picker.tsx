@@ -1,5 +1,7 @@
 'use client'
 
+import { cva } from 'class-variance-authority'
+import { PlusIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import {
@@ -18,6 +20,19 @@ import { readSearch } from '../lib/picker-search'
 
 /** A pause before searching while the person types (specs/post-create-detail § 3). */
 const SEARCH_DELAY = 250
+
+/** The picker's trigger: the chosen community's chip, or the "+" that adds a related one. */
+const trigger = cva(
+  'inline-flex h-8 tap items-center rounded-full bg-muted outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50',
+  {
+    variants: {
+      variant: {
+        chip: 'max-w-full gap-1 pr-2.5 pl-3 type-meta font-bold aria-invalid:ring-2 aria-invalid:ring-destructive/40 [&_svg]:size-3.5',
+        add: 'w-8 justify-center text-foreground [&_svg]:size-4',
+      },
+    },
+  },
+)
 
 const KINDS: readonly CommunityKind[] = ['all', 'groups', 'assets']
 
@@ -44,20 +59,27 @@ function subtitle(option: CommunityOption) {
  * it, fading in with a small slide. A search on top; the viewer's communities on open, "Your
  * profile" first, and a server search while typing. The options come from a Server Action: the
  * browser never calls the API. Chips under the search keep only groups or only assets, and a
- * leading `#` or `$` in the search picks them too, as in mentions (specs/picker-filters).
+ * leading `#` or `$` in the search picks them too, as in mentions (specs/picker-filters). As "+"
+ * (`variant="add"`), it adds a related community or asset: no value, and neither "Your profile"
+ * nor the handles in `exclude` (specs/related-tags RT-01, RT-03).
  */
 export function CommunityPicker({
   id,
   value,
   onChange,
-  invalid,
+  invalid = false,
   describedBy,
+  variant = 'chip',
+  exclude = [],
 }: {
   id: string
   value: CommunityOption | null
   onChange: (community: CommunityOption | null) => void
-  invalid: boolean
+  invalid?: boolean
   describedBy?: string
+  variant?: 'chip' | 'add'
+  /** Handles not to offer: the main community and the related ones already added. */
+  exclude?: readonly string[]
 }) {
   const t = useTranslations('composer.community')
   const [options, setOptions] = useState<CommunityOption[]>(value ? [value] : [])
@@ -114,7 +136,9 @@ export function CommunityPicker({
 
   return (
     <Combobox<CommunityOption>
-      items={options}
+      items={options.filter(
+        (option) => !exclude.includes(option.handle) && !(variant === 'add' && option.own),
+      )}
       // The server filters: the list shows what it answers.
       filter={null}
       value={value}
@@ -149,17 +173,28 @@ export function CommunityPicker({
     >
       {/* Its own box: Field stretches its children, and the chip fits its text. */}
       <div>
-        <ComboboxTrigger
-          id={id}
-          aria-invalid={invalid || undefined}
-          aria-describedby={describedBy}
-          className={cn(
-            'inline-flex h-8 max-w-full tap items-center gap-1 rounded-full bg-muted pr-2.5 pl-3 type-meta font-bold outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:ring-2 aria-invalid:ring-destructive/40 [&_svg]:size-3.5',
-            value ? 'text-foreground' : 'text-muted-foreground',
-          )}
-        >
-          <span className="truncate">{label}</span>
-        </ComboboxTrigger>
+        {variant === 'add' ? (
+          <ComboboxTrigger
+            id={id}
+            chevron={false}
+            aria-label={t('addRelated')}
+            className={trigger({ variant })}
+          >
+            <PlusIcon aria-hidden />
+          </ComboboxTrigger>
+        ) : (
+          <ComboboxTrigger
+            id={id}
+            aria-invalid={invalid || undefined}
+            aria-describedby={describedBy}
+            className={cn(
+              trigger({ variant }),
+              value ? 'text-foreground' : 'text-muted-foreground',
+            )}
+          >
+            <span className="truncate">{label}</span>
+          </ComboboxTrigger>
+        )}
       </div>
       {/* A border, not shadcn's ring: with the system's shadows at none, the ring's shared
           box-shadow is invalid and the panel showed white on white, without an edge. */}

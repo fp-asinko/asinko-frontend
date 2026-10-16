@@ -30,7 +30,7 @@ test.describe('Post with an image', () => {
   }, testInfo) => {
     const title = `Chart of the week (${testInfo.project.name} ${Date.now()})`
     const editor = await openEditor(page, isMobile)
-    await editor.getByRole('combobox', { name: 'Community' }).click()
+    await editor.getByRole('combobox', { name: 'Community', exact: true }).click()
     await page.getByRole('option', { name: /#defi/ }).click()
     await editor.getByRole('tab', { name: 'Image' }).click()
     await editor.locator('input[type="file"]').setInputFiles({

@@ -19,7 +19,7 @@ for (const theme of ['light', 'dark'] as const) {
           : page.getByRole('banner')
       await bar.getByRole('link', { name: 'Create' }).click()
       const editor = page.getByRole('main')
-      await editor.getByRole('combobox', { name: 'Community' }).click()
+      await editor.getByRole('combobox', { name: 'Community', exact: true }).click()
       await page.getByRole('option').first().click()
       await editor.getByRole('textbox', { name: 'Title' }).fill(`Quiet one ${Date.now()}`)
       await editor.getByRole('textbox', { name: 'Body' }).fill('Nobody answers.')

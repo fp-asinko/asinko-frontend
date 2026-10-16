@@ -34,7 +34,7 @@ Encontrados al verificar contra el deploy (solo lecturas) mientras el front adop
 
 ## Pendientes
 
-En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P-015, P-003 y P-005.
+En orden de prioridad para el front: P-012, P-001, P-014, P-016, P-013, P-011, P-015, P-003, P-005 y P-018.
 
 ### P-012: Todo lo que publica un usuario
 
@@ -162,6 +162,16 @@ Las imágenes, en el mismo Storage que los avatares. Medir impresiones y clics q
 ```
 
 El más votado de los últimos 7 días; si no hubo, el más reciente; `null` si la comunidad no tiene posts. Solo posts visibles para quien pide (sin borrados). Mientras no esté, el front muestra la descripción.
+
+### P-018: Comunidades y activos relacionados de un post
+
+**Estado:** propuesta (2026-10-16). Sin mock: mientras tanto el front los manda como menciones.
+
+**Endpoint:** `POST /api/v1/posts` (y el recurso `Post`).
+
+**Motivo:** al crear un post (`specs/related-tags`), además de la comunidad donde se publica se pueden sumar hasta 3 comunidades o activos relacionados, como un post en `#argentina` sobre `$GGAL` y `#macro`. Hoy el front los agrega al final del cuerpo como menciones (`\n\n$GGAL #macro`): se ven como links y notifican, pero ensucian el cuerpo y el post no aparece en esos feeds (decisión del 2026-10-13).
+
+**Cambio:** un campo opcional `relatedCommunityIds: string[]` (hasta 3, distintos de `communityId`, sin canales personales; `422` si no se cumple) en el body de `POST /posts`, y `related: [{ id, slug, type, name }]` en el `Post`. Que el post aparezca también en el feed de cada relacionada (`GET /feed/explore?community=`). Si se acepta, el front deja de escribir la línea de menciones y muestra los relacionados en la tarjeta.
 
 ## Pedidos operativos
 

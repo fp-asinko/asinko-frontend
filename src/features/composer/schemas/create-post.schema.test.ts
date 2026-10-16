@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
-import { createPostSchema, IMAGE_ALT_MAX, TITLE_MAX } from './create-post.schema'
+import { createPostSchema, IMAGE_ALT_MAX, RELATED_MAX, TITLE_MAX } from './create-post.schema'
 
 const COMMUNITY = '00000000-0000-4000-8000-000000001001'
 const valid = {
@@ -98,5 +98,24 @@ describe('createPostSchema (specs/post-create-detail PC-08, PC-09)', () => {
     expect(errors({ ...image, imageAlt: 'a'.repeat(IMAGE_ALT_MAX + 1) })).toEqual({
       imageAlt: 'composer.errors.imageAltTooLong',
     })
+  })
+})
+
+describe('createPostSchema related (specs/related-tags RT-02, RT-04)', () => {
+  it('adds the related ones as mentions on a last line of the body', () => {
+    expect(
+      createPostSchema.parse({ ...valid, related: ['$GGAL', '#macro', '$BRK.B'] }),
+    ).toMatchObject({ body: 'A body\n\n$GGAL #macro $BRK.B' })
+    expect(createPostSchema.parse({ ...valid, related: [] })).toMatchObject({ body: 'A body' })
+    expect(createPostSchema.parse(valid)).not.toHaveProperty('related')
+  })
+
+  it(`takes up to ${RELATED_MAX}, mentions only, without repeats`, () => {
+    const four = ['#a', '#b', '#c', '#d']
+    expect(errors({ ...valid, related: four })).toHaveProperty('related')
+    expect(errors({ ...valid, related: ['macro'] })).toHaveProperty('related')
+    expect(errors({ ...valid, related: ['@maria'] })).toHaveProperty('related')
+    expect(errors({ ...valid, related: ['#macro x'] })).toHaveProperty('related')
+    expect(errors({ ...valid, related: ['#macro', '#macro'] })).toHaveProperty('related')
   })
 })

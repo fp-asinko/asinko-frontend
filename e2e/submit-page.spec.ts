@@ -13,9 +13,24 @@ function createLink(page: Page, isMobile: boolean) {
 }
 
 const editor = (page: Page) => page.getByRole('main')
-const community = (page: Page) => editor(page).getByRole('combobox', { name: 'Community' })
+const community = (page: Page) =>
+  editor(page).getByRole('combobox', { name: 'Community', exact: true })
 const title = (page: Page) => editor(page).getByRole('textbox', { name: 'Title' })
 const body = (page: Page) => editor(page).getByRole('textbox', { name: 'Body' })
+
+/** Adds a related community or asset with "+" (specs/related-tags). */
+async function addRelated(page: Page, search: string, option: RegExp) {
+  await editor(page).getByRole('combobox', { name: 'Add a related community or asset' }).click()
+  await page.getByRole('combobox', { name: 'Search communities' }).fill(search)
+  // The list is the search's answer (only its kind) before choosing: not one being replaced.
+  await expect
+    .poll(async () => {
+      const handles = await page.getByRole('option').allTextContents()
+      return handles.length > 0 && handles.every((handle) => handle.startsWith(search[0]!))
+    })
+    .toBe(true)
+  await page.getByRole('option', { name: option }).click()
+}
 
 test.describe('Page to create a post', () => {
   test('"Create" goes to the page; choosing the community and publishing lands on the post (SU-01 to SU-04)', async ({
@@ -179,6 +194,30 @@ test.describe('Page to create a post', () => {
     await expect(page.getByRole('option').first()).toContainText('Your profile')
   })
 
+  test('adds related ones with "+" and publishes them as mentions (specs/related-tags)', async ({
+    page,
+  }, testInfo) => {
+    const text = `Banks and the peso (${testInfo.project.name} ${Date.now()})`
+    await page.goto('/en/submit?community=defi')
+    await addRelated(page, '$btc', /\$BTC/)
+    await addRelated(page, '#mac', /#macro/)
+    const related = editor(page).getByRole('list', { name: 'Related' })
+    await expect(related).toContainText('$BTC')
+    await expect(related).toContainText('#macro')
+
+    // The × says what it removes; the focus goes to the one before (RT-07).
+    await editor(page).getByRole('button', { name: 'Remove #macro' }).click()
+    await expect(related).not.toContainText('#macro')
+    await expect(editor(page).getByRole('button', { name: 'Remove $BTC' })).toBeFocused()
+
+    await title(page).fill(text)
+    await body(page).fill('Cheap again.')
+    await editor(page).getByRole('button', { name: 'Publish' }).click()
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(text)
+    // With mocks the mention stays text; the backend makes it a link (P-001).
+    await expect(page.getByRole('main').getByText('$BTC', { exact: false })).toBeVisible()
+  })
+
   test('asks before discarding what is written (SU-05)', async ({ page }) => {
     await page.goto('/en')
     await page.goto('/en/submit')
@@ -245,6 +284,9 @@ test.describe('Page to create a post', () => {
       if (isMobile) await page.setViewportSize({ width: 360, height: 740 })
       await page.goto('/en/submit?community=defi')
       if (theme === 'dark') await expect(page.locator('html')).toHaveClass(/dark/)
+      // With related ones, the row is at its widest (specs/related-tags RT-07).
+      await addRelated(page, '$btc', /\$BTC/)
+      await addRelated(page, '#mac', /#macro/)
       await body(page).click()
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

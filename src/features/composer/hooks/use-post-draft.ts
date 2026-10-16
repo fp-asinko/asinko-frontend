@@ -2,10 +2,12 @@
 
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
 import { z } from 'zod'
+import { RELATED_MAX, relatedHandleSchema } from '../schemas/create-post.schema'
 
 /**
- * What a draft keeps (specs/submit-page SU-12): where, the format and the text. Not the image: its
- * upload is single-use and the field cannot rebuild its preview from a URL.
+ * What a draft keeps (specs/submit-page SU-12): where, the related ones (specs/related-tags RT-06),
+ * the format and the text. Not the image: its upload is single-use and the field cannot rebuild its
+ * preview from a URL. Older drafts have no related ones.
  */
 const draftSchema = z.object({
   community: z
@@ -17,6 +19,8 @@ const draftSchema = z.object({
       own: z.boolean(),
     })
     .nullable(),
+  // Checked as on Publish: a broken one would make it fail without saying why.
+  related: z.array(relatedHandleSchema).max(RELATED_MAX).default([]),
   type: z.enum(['TEXT', 'LINK', 'IMAGE']),
   title: z.string(),
   body: z.string(),
@@ -24,7 +28,10 @@ const draftSchema = z.object({
   savedAt: z.number(),
 })
 
-export type PostDraft = z.infer<typeof draftSchema>
+export type PostDraft = z.output<typeof draftSchema>
+
+/** What is written: a draft from before related ones existed has none. */
+type PostDraftInput = z.input<typeof draftSchema>
 
 // Storage can throw (private mode, blocked site data): then there is no draft and nothing breaks.
 function read(key: string): string | null {
@@ -35,7 +42,7 @@ function read(key: string): string | null {
   }
 }
 
-export function writeDraft(key: string, draft: PostDraft) {
+export function writeDraft(key: string, draft: PostDraftInput) {
   try {
     window.localStorage.setItem(key, JSON.stringify(draft))
   } catch {

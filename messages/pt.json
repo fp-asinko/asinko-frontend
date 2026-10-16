@@ -471,7 +471,8 @@
         "assets": "Ativos"
       },
       "emptyGroups": "Nenhuma comunidade encontrada",
-      "emptyAssets": "Nenhum ativo encontrado"
+      "emptyAssets": "Nenhum ativo encontrado",
+      "addRelated": "Adicionar comunidade ou ativo relacionado"
     },
     "type": {
       "label": "Tipo de post",
@@ -532,6 +533,10 @@
       "notice": "Você tem um rascunho não publicado de {when}.",
       "recover": "Recuperar",
       "discard": "Descartar"
+    },
+    "related": {
+      "label": "Relacionados",
+      "remove": "Remover {handle}"
     }
   },
   "mentions": {

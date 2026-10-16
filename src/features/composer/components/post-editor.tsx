@@ -34,6 +34,7 @@ import {
 } from '../hooks/use-post-draft'
 import { CommunityPicker } from './community-picker'
 import { ImageField, type TakeImage } from './image-field'
+import { RelatedPicker } from './related-picker'
 
 /** A field without its own box: the composer box around them is the box, as X. */
 const BARE =
@@ -140,6 +141,7 @@ export function PostEditor({
       url: '',
       imageUrl: '',
       imageAlt: '',
+      related: [],
     },
     // As X: no errors while writing; Publish says what is missing, then they follow the typing.
     // (On blur, an error appearing above would also move the format row under the pointer.)
@@ -147,9 +149,9 @@ export function PostEditor({
     reValidateMode: 'onChange',
   })
   const { register, control, handleSubmit, setValue, setError, getValues, formState } = form
-  const [title = '', body = '', url = '', current = type, imageUrl = ''] = useWatch({
+  const [title = '', body = '', url = '', current = type, imageUrl = '', related = []] = useWatch({
     control,
-    name: ['title', 'body', 'url', 'type', 'imageUrl'],
+    name: ['title', 'body', 'url', 'type', 'imageUrl', 'related'],
   })
 
   useEffect(() => {
@@ -169,7 +171,15 @@ export function PostEditor({
   useEffect(() => {
     if (!storageKey || offered) return
     const keep = () => {
-      const draft = { community: chosen, type: current, title, body, url, savedAt: Date.now() }
+      const draft = {
+        community: chosen,
+        related,
+        type: current,
+        title,
+        body,
+        url,
+        savedAt: Date.now(),
+      }
       if (hasText(draft)) writeDraft(storageKey, draft)
     }
     const timer = setTimeout(keep, SAVE_AFTER_MS)
@@ -178,7 +188,7 @@ export function PostEditor({
       clearTimeout(timer)
       window.removeEventListener('pagehide', keep)
     }
-  }, [storageKey, offered, chosen, current, title, body, url])
+  }, [storageKey, offered, chosen, related, current, title, body, url])
   useEffect(() => {
     if (!storageKey) return
     return () => forgetOpenedDraft(storageKey)
@@ -203,6 +213,7 @@ export function PostEditor({
       title: offered.title,
       body: offered.body,
       url: offered.url,
+      related: offered.related,
     })
     setChosen(offered.community)
     onCommunityChange?.(offered.community)
@@ -349,17 +360,34 @@ export function PostEditor({
               control={control}
               name="communityId"
               render={({ field }) => (
-                <CommunityPicker
-                  id={`${ids}-community`}
-                  value={chosen}
-                  onChange={(next) => {
-                    setChosen(next)
-                    field.onChange(next?.id ?? '')
-                    onCommunityChange?.(next)
-                  }}
-                  invalid={invalid('communityId')}
-                  describedBy={`${ids}-community-error`}
-                />
+                // Where the post goes, and beside it what else it is about (specs/related-tags).
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <CommunityPicker
+                    id={`${ids}-community`}
+                    value={chosen}
+                    onChange={(next) => {
+                      setChosen(next)
+                      field.onChange(next?.id ?? '')
+                      // The new main one is no longer a related one (RT-05).
+                      if (next && related.includes(next.handle)) {
+                        setValue(
+                          'related',
+                          related.filter((handle) => handle !== next.handle),
+                        )
+                      }
+                      onCommunityChange?.(next)
+                    }}
+                    invalid={invalid('communityId')}
+                    describedBy={`${ids}-community-error`}
+                  />
+                  {chosen && (
+                    <RelatedPicker
+                      main={chosen.handle}
+                      value={related}
+                      onChange={(handles) => setValue('related', handles)}
+                    />
+                  )}
+                </div>
               )}
             />
             <FieldError

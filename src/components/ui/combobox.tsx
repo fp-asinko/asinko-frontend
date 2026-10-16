@@ -19,7 +19,15 @@ function ComboboxValue({ ...props }: ComboboxPrimitive.Value.Props) {
   return <ComboboxPrimitive.Value data-slot="combobox-value" {...props} />
 }
 
-function ComboboxTrigger({ className, children, ...props }: ComboboxPrimitive.Trigger.Props) {
+function ComboboxTrigger({
+  className,
+  children,
+  chevron = true,
+  ...props
+}: ComboboxPrimitive.Trigger.Props & {
+  /** asinko: false leaves the chevron out, for an icon trigger ("+" of specs/related-tags). */
+  chevron?: boolean
+}) {
   return (
     <ComboboxPrimitive.Trigger
       data-slot="combobox-trigger"
@@ -27,7 +35,7 @@ function ComboboxTrigger({ className, children, ...props }: ComboboxPrimitive.Tr
       {...props}
     >
       {children}
-      <ChevronDownIcon className="pointer-events-none size-4 text-muted-foreground" />
+      {chevron && <ChevronDownIcon className="pointer-events-none size-4 text-muted-foreground" />}
     </ComboboxPrimitive.Trigger>
   )
 }

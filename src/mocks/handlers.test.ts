@@ -61,6 +61,13 @@ describe('mock handlers behave like the contract', () => {
     expect(unknown.items).toHaveLength(20)
   })
 
+  it('searches communities without minding case, an asset slug too', async () => {
+    const page = (
+      await call('GET', '/api/v1/communities', { query: { search: 'btc', type: 'SYSTEM_ASSET' } })
+    ).body as { items: Array<{ slug: string }> }
+    expect(page.items.map((each) => each.slug)).toContain('BTC')
+  })
+
   it('lists only the viewer communities with mine=true', async () => {
     const page = (await call('GET', '/api/v1/communities', { query: { mine: 'true' } })).body as {
       items: Array<{ viewerMembership: string | null }>

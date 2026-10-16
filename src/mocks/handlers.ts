@@ -170,7 +170,9 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
           each.type !== 'PERSONAL_CHANNEL' &&
           (!mine || each.viewerMembership !== null) &&
           (!query.type || each.type === query.type) &&
-          (!search || each.name.toLowerCase().includes(search) || each.slug.includes(search)),
+          (!search ||
+            each.name.toLowerCase().includes(search) ||
+            each.slug.toLowerCase().includes(search)),
       ).sort((a, b) => b.memberCount - a.memberCount)
       // P-016: each with its main post (the backend adds it later; optional in the contract).
       return { status: 200, body: paginate(filtered.map(withTopPost), query.cursor) }

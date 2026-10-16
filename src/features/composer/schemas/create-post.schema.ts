@@ -1,10 +1,24 @@
 import { z } from 'zod'
+import { assetSymbolSchema } from '@/lib/communities/asset-symbol.schema'
+import { communitySlugSchema } from '@/lib/communities/community-slug.schema'
 
 /** The backend's limit for a title (POST /posts, E03). */
 export const TITLE_MAX = 300
 
 /** The backend's limit for an image's description (imageAlt, P-013, 2026-10-13). */
 export const IMAGE_ALT_MAX = 300
+
+/** How many related communities or assets a post can name (specs/related-tags RT-02). */
+export const RELATED_MAX = 3
+
+/** A related community or asset, as a mention: #macro or $GGAL (specs/related-tags). */
+export const relatedHandleSchema = z
+  .string()
+  .refine(
+    (handle) =>
+      (handle.startsWith('#') && communitySlugSchema.safeParse(handle.slice(1)).success) ||
+      (handle.startsWith('$') && assetSymbolSchema.safeParse(handle.slice(1)).success),
+  )
 
 /** Only http(s) links (security.md § 1): javascript:, data: and the rest are rejected. */
 function isHttpUrl(value: string) {
@@ -39,6 +53,11 @@ export const createPostSchema = z
       .trim()
       .max(IMAGE_ALT_MAX, { message: 'composer.errors.imageAltTooLong' })
       .optional(),
+    related: z
+      .array(relatedHandleSchema)
+      .max(RELATED_MAX)
+      .refine((handles) => new Set(handles).size === handles.length)
+      .default([]),
   })
   .superRefine((post, ctx) => {
     if (post.type === 'LINK' && !(post.url && isHttpUrl(post.url))) {
@@ -50,15 +69,17 @@ export const createPostSchema = z
       ctx.addIssue({ code: 'custom', path: ['imageUrl'], message: 'composer.errors.imageRequired' })
     }
   })
-  // The description only with an image, and only when written (the backend rejects it on other
-  // types, specs/backend-answer-1013 BA-04).
-  .transform(({ url, imageUrl, imageAlt, ...post }) =>
-    post.type === 'LINK'
+  // The related communities and assets go as mentions on a last line of the body (specs/related-tags
+  // RT-04): the backend resolves them as any mention. The description only with an image, and only
+  // when written (the backend rejects it on other types, specs/backend-answer-1013 BA-04).
+  .transform(({ url, imageUrl, imageAlt, related, ...rest }) => {
+    const post = related.length ? { ...rest, body: `${rest.body}\n\n${related.join(' ')}` } : rest
+    return post.type === 'LINK'
       ? { ...post, url }
       : post.type === 'IMAGE'
         ? { ...post, imageUrl, ...(imageAlt ? { imageAlt } : {}) }
-        : post,
-  )
+        : post
+  })
 
 /** What the form holds (strings, url always present). */
 export type CreatePostForm = z.input<typeof createPostSchema>
