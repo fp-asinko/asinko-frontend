@@ -12,14 +12,15 @@ Ya existe (E01): `displayName`, `bio`, `avatarUrl`, `countryCode` en `PATCH /use
 
 - `ProfileDetails` suma `headline`, `city`, `countryCode`, `links: ProfileLink[]` y `bannerUrl`. `ProfileLink = { url, host, site }`, donde `site` es `'x' | 'linkedin' | 'youtube' | 'instagram' | 'github' | 'substack' | 'tradingview' | 'web'`, calculado en el mapper (`lib/profile-links.ts`, función pura); un link que no es `http(s)` se descarta al leer.
 - El nombre del país, con `Intl.DisplayNames` del idioma de la página (`getFormatter`/`useFormatter` no lo cubren); la lista de países del formulario, la misma fuente sobre los códigos ISO.
-- `editProfileSchema` crece con los campos nuevos (los límites como constantes); la action manda solo lo que cambió.
+- Dos esquemas sobre los mismos campos (`schemas/edit-profile.schema.ts`): `editProfileSchema`, el del formulario (los links como objetos para su lista, que salen como URLs), y `editProfileChangesSchema`, el de la action (lo que cambió, ya como lo deja el formulario). La ventana manda solo lo que cambió (`dirtyFields`) y `updateProfileAs` lo parte en dos `PATCH`: lo que el backend tiene y lo propuesto, que así llega al mock (`when` mira el cuerpo).
+- Países: `src/lib/countries.ts`, los códigos ISO (sin regiones como EU ni códigos viejos como UK o DY) y sus nombres con `Intl.DisplayNames`, ordenados con `Intl.Collator`. El selector es el `native-select` de shadcn (la lista propia del teléfono).
 - **Recorte (Q3): `react-easy-crop`** (MIT, TypeScript, sin dependencias, mantenido; se suma a `libraries.md`). Escribirlo a mano (arrastre, zoom con dos dedos y rueda, límites, teclado) pasa largo las ~50 líneas del criterio. Viaja solo con la ventana, que se carga diferida. El área elegida (`croppedAreaPixels`) se corta con un `canvas` (`lib/crop-image.ts`, función pura salvo el canvas) al tamaño final (foto 400×400, banner 1500×375) y pasa por `prepareImage`. Un `input type="range"` con nombre ("Zoom") acompaña al gesto: el teclado y los lectores de pantalla lo usan.
-- Imágenes: la preparación de `specs/post-image` (`prepareImage`) y una action `uploadProfileImage(kind)` que sigue el flujo de `post-image-upload.ts` (nuestro servidor hace el PUT, solo al origen de Supabase).
+- Imágenes: `cropImage` (en `lib/prepare-image.ts`, junto a `prepareImage`) y la action `uploadProfileImage`, que lee el tipo de los bytes y sube con `lib/uploads/signed-image-upload.ts`: la subida firmada de los posts pasó ahí con el endpoint como parámetro (nuestro servidor hace el PUT, solo al origen de Supabase; con mocks, nunca a la URL de mentira). `react-easy-crop` no inyecta su `<style>` (sin nonce, la CSP lo bloquea): su CSS se importa como hoja.
 
 ## 3. UI
 
-- `ProfileIntro` (organismo del feature, nuevo): titular, ubicación y links bajo el nombre en `CommunityHeader`. `ProfileLinks` con `components/ui/profile-marks` (los íconos que faltan, como `share-marks.tsx`).
-- `EditProfileDialog` crece por secciones (`fieldset` con `legend`); pasa a cargarse con `next/dynamic` si no lo está ya, y su cuerpo scrollea con el pie fijo.
+- `ProfileIntro` (organismo del feature, nuevo): titular, ubicación y links bajo el nombre y los botones en `CommunityHeader`, a todo el ancho. Los íconos, en `components/ui/link-marks.tsx` (Simple Icons; LinkedIn, que ya no está ahí, dibujado como su "in").
+- `EditProfileDialog` (diferida, como antes) crece por secciones: `ProfileImages`, `CountedField` y `CountryField` (`edit-profile-fields.tsx`), `LinksField` (`edit-profile-links.tsx`) e `ImageCropper` (diferido también, al elegir una imagen). El cuerpo scrollea y Guardar queda arriba. `EditProfileProvider` tiene la ventana para el botón y los avisos.
 - PP-04: en tu perfil, "Agrega un titular" / "Agrega links" son botones que abren la ventana con el foco en ese campo.
 
 ## 4. Tests

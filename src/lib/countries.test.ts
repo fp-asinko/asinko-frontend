@@ -5,10 +5,13 @@ import { COUNTRY_CODES, countryName, countryOptions } from './countries'
 describe('countries (specs/profile-presentation PP-05)', () => {
   it('lists countries by their ISO code, without unions or old codes', () => {
     expect(COUNTRY_CODES).toEqual(expect.arrayContaining(['AR', 'BR', 'CL', 'US', 'ES', 'XK']))
-    for (const notACountry of ['EU', 'UN', 'SU', 'ZZ', 'XA']) {
+    for (const notACountry of ['EU', 'UN', 'SU', 'ZZ', 'XA', 'UK', 'DY']) {
       expect(COUNTRY_CODES).not.toContain(notACountry)
     }
     expect(new Set(COUNTRY_CODES).size).toBe(COUNTRY_CODES.length)
+    // One name each: an old code would repeat a country (DY is Benin, as BJ).
+    const names = countryOptions('en').map((each) => each.name)
+    expect(new Set(names).size).toBe(names.length)
   })
 
   it("names each country in the page's language, and nothing for an unknown code", () => {

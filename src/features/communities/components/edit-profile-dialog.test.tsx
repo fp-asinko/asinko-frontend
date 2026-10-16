@@ -3,12 +3,41 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import type { EditableProfile, EditProfileField } from '../communities.types'
+import { editProfileChangesSchema } from '../schemas/edit-profile.schema'
 import { EditProfileDialog } from './edit-profile-dialog'
 
 const action = vi.hoisted(() => ({ updateProfile: vi.fn() }))
 vi.mock('../actions/update-profile.action', () => action)
+// The cropper has its own tests: here it applies or goes back at once.
+vi.mock('./image-cropper', () => ({
+  ImageCropper: ({
+    kind,
+    onApply,
+    onBack,
+  }: {
+    kind: string
+    onApply: (image: object) => void
+    onBack: () => void
+  }) => (
+    <div>
+      <p>Cropping {kind}</p>
+      <button
+        type="button"
+        onClick={() =>
+          onApply({ imageUrl: '/mocks/avatar-demo.svg', preview: '/mocks/avatar-demo.svg' })
+        }
+      >
+        Apply crop
+      </button>
+      <button type="button" onClick={onBack}>
+        Back from crop
+      </button>
+    </div>
+  ),
+}))
 
 const PROFILE: EditableProfile = {
+  username: 'demo',
   displayName: 'Juan',
   headline: null,
   countryCode: 'AR',
@@ -78,6 +107,15 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
     expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
+  it('sends what the action takes: links as plain URLs (a bug: they went as objects)', async () => {
+    renderDialog()
+    await userEvent.type(box('Link 1'), '/more')
+    await userEvent.click(save())
+    const sent = action.updateProfile.mock.calls[0]![0]
+    expect(sent).toEqual({ links: ['https://x.com/juan/more'] })
+    expect(editProfileChangesSchema.safeParse(sent).success).toBe(true)
+  })
+
   it('counts a text near its limit, and stops one past it (PP-05)', async () => {
     renderDialog()
     await userEvent.click(box('Headline'))
@@ -104,7 +142,8 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
 
     await userEvent.click(within(links).getByRole('button', { name: 'Remove link 3' }))
     expect(within(links).getAllByRole('textbox')).toHaveLength(4)
-    await vi.waitFor(() => expect(box('Link 2')).toHaveFocus())
+    // The focus goes to the link that takes its place.
+    await vi.waitFor(() => expect(box('Link 3')).toHaveFocus())
     expect(within(links).getByRole('button', { name: 'Add link' })).toBeInTheDocument()
   })
 
@@ -157,6 +196,52 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
     const confirm = await screen.findByRole('alertdialog', { name: 'Discard changes?' })
     await userEvent.click(within(confirm).getByRole('button', { name: 'Discard' }))
     expect(view.onOpenChange).toHaveBeenCalledWith(false)
+  })
+
+  it('crops a picked photo in the window, and Save sends it (PP-07)', async () => {
+    renderDialog({ bannerUrl: '/mocks/banner-demo.svg' })
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement
+    await userEvent.click(screen.getByRole('button', { name: 'Change photo' }))
+    await userEvent.upload(input, new File(['x'], 'me.png', { type: 'image/png' }))
+    expect(await screen.findByText('Cropping avatar')).toBeInTheDocument()
+    // The form waits behind: Save too.
+    expect(save()).toHaveAttribute('aria-disabled', 'true')
+    await userEvent.click(screen.getByRole('button', { name: 'Apply crop' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Remove banner' }))
+    await userEvent.click(save())
+    expect(action.updateProfile).toHaveBeenCalledWith({
+      avatarUrl: '/mocks/avatar-demo.svg',
+      bannerUrl: null,
+    })
+  })
+
+  it('takes the focus back to the Change that started cropping; Esc there is Back (WCAG 2.4.3)', async () => {
+    const { onOpenChange } = renderDialog()
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement
+    await userEvent.click(screen.getByRole('button', { name: 'Change banner' }))
+    await userEvent.upload(input, new File(['x'], 'me.png', { type: 'image/png' }))
+    await screen.findByText('Cropping banner')
+    await userEvent.keyboard('{Escape}')
+    expect(onOpenChange).not.toHaveBeenCalled()
+    await vi.waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Change banner' })).toHaveFocus(),
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: 'Change photo' }))
+    await userEvent.upload(input, new File(['x'], 'me.png', { type: 'image/png' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Apply crop' }))
+    await vi.waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Change photo' })).toHaveFocus(),
+    )
+  })
+
+  it('goes back from cropping with what was written', async () => {
+    renderDialog()
+    await userEvent.type(box('Headline'), 'Rates')
+    const input = document.querySelector('input[type="file"]') as HTMLInputElement
+    await userEvent.upload(input, new File(['x'], 'me.png', { type: 'image/png' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Back from crop' }))
+    expect(box('Headline')).toHaveValue('Rates')
   })
 
   it('says Saving… while it saves and never sends twice (PE-03)', async () => {

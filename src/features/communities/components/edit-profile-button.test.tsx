@@ -9,6 +9,7 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 vi.mock('../actions/update-profile.action', () => ({ updateProfile: vi.fn() }))
 
 const PROFILE: EditableProfile = {
+  username: 'demo',
   displayName: null,
   headline: null,
   countryCode: null,

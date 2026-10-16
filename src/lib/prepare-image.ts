@@ -46,6 +46,44 @@ export async function prepareImage(file: File): Promise<PreparedImage> {
   return { ok: true, blob, width, height }
 }
 
+/** A part of an image in its own pixels (react-easy-crop's croppedAreaPixels). */
+export type CropArea = { x: number; y: number; width: number; height: number }
+
+/**
+ * Cuts the chosen part of an image and draws it at the final size (specs/profile-presentation
+ * PP-07: a photo of 400x400, a banner of 1500x375), as prepareImage: only JPEG, PNG or WebP, the
+ * photo's orientation kept, its metadata dropped, WebP (or JPEG) under the upload limit. Never throws.
+ */
+export async function cropImage(
+  file: File,
+  area: CropArea,
+  size: { width: number; height: number },
+): Promise<PreparedImage> {
+  if (!(IMAGE_TYPES as readonly string[]).includes(file.type)) return { ok: false, error: 'type' }
+
+  let bitmap: ImageBitmap
+  try {
+    bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
+  } catch {
+    return { ok: false, error: 'unreadable' }
+  }
+
+  const canvas = document.createElement('canvas')
+  canvas.width = size.width
+  canvas.height = size.height
+  const context = canvas.getContext('2d')
+  if (!context) return { ok: false, error: 'unreadable' }
+  context.drawImage(bitmap, area.x, area.y, area.width, area.height, 0, 0, size.width, size.height)
+  bitmap.close()
+
+  const blob = await toBlob(canvas, 'image/webp').then((webp) =>
+    webp?.type === 'image/webp' ? webp : toBlob(canvas, 'image/jpeg'),
+  )
+  if (!blob) return { ok: false, error: 'unreadable' }
+  if (blob.size > MAX_UPLOAD_BYTES) return { ok: false, error: 'tooLarge' }
+  return { ok: true, blob, width: size.width, height: size.height }
+}
+
 function toBlob(canvas: HTMLCanvasElement, type: string): Promise<Blob | null> {
   return new Promise((resolve) => canvas.toBlob(resolve, type, 0.85))
 }

@@ -28,8 +28,9 @@ const own = (key: string | undefined) =>
 
 /**
  * The profile's links (specs/profile-presentation PP-06): up to five URLs, each with its site's
- * mark as soon as it is one, a × to take it out (the focus goes to the one before, or to "Add
- * link") and "Add link" while there is room. Only http(s): anything else says what is missing.
+ * mark as soon as it is one, a × to take it out (the focus goes to the link that takes its place,
+ * the one before, or "Add link") and "Add link" while there is room. Only http(s): anything
+ * else says what is missing.
  */
 export function LinksField({
   control,
@@ -48,11 +49,12 @@ export function LinksField({
   const inputId = (index: number) => `${ids}-link-${index}`
 
   function take(index: number) {
+    const left = fields.length - 1
     remove(index)
-    // After the list re-renders: the one before, or "Add link" (which is back if it was full).
-    requestAnimationFrame(() =>
-      document.getElementById(index > 0 ? inputId(index - 1) : addId)?.focus(),
-    )
+    // After the list re-renders: the link that takes its place, the one before, or "Add link"
+    // (which is back if the list was full).
+    const next = index < left ? inputId(index) : index > 0 ? inputId(index - 1) : addId
+    requestAnimationFrame(() => document.getElementById(next)?.focus())
   }
 
   const listError = own(errors?.message ?? errors?.root?.message)

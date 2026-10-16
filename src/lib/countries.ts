@@ -2,7 +2,7 @@
  * The countries a profile can say it is from (specs/profile-presentation PP-05): ISO 3166-1
  * alpha-2 codes, as the backend's countryCode. Their names come from the browser in the page's
  * language (Intl.DisplayNames), so the list carries codes only. Left out: what is not a country
- * (EU, UN, test codes) and old codes (SU, YU).
+ * (EU, UN, test codes) and old codes (SU, YU, UK for GB, DY for BJ…).
  */
 export const COUNTRY_CODES: readonly string[] = [
   'AD',
@@ -66,7 +66,7 @@ export const COUNTRY_CODES: readonly string[] = [
   'DK',
   'DM',
   'DO',
-  'DY',
+
   'DZ',
   'EC',
   'EE',
@@ -106,7 +106,7 @@ export const COUNTRY_CODES: readonly string[] = [
   'HR',
   'HT',
   'HU',
-  'HV',
+
   'ID',
   'IE',
   'IL',
@@ -171,7 +171,7 @@ export const COUNTRY_CODES: readonly string[] = [
   'NE',
   'NF',
   'NG',
-  'NH',
+
   'NI',
   'NL',
   'NO',
@@ -196,7 +196,7 @@ export const COUNTRY_CODES: readonly string[] = [
   'PY',
   'QA',
   'RE',
-  'RH',
+
   'RO',
   'RS',
   'RU',
@@ -240,14 +240,14 @@ export const COUNTRY_CODES: readonly string[] = [
   'TZ',
   'UA',
   'UG',
-  'UK',
+
   'UM',
   'US',
   'UY',
   'UZ',
   'VA',
   'VC',
-  'VD',
+
   'VE',
   'VG',
   'VI',

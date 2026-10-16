@@ -52,6 +52,7 @@ describe('ProfileIntro (specs/profile-presentation PP-01 to PP-04)', () => {
     renderWithIntl(
       <EditProfileProvider
         profile={{
+          username: 'demo',
           displayName: null,
           headline: null,
           countryCode: null,

@@ -20,24 +20,24 @@ Que el perfil cuente quién es la persona de un vistazo, como LinkedIn: nombre, 
 
 ### El perfil
 
-- [ ] **PP-01** Debajo del nombre (el visible, o el `@usuario` si no tiene), en este orden: el **titular**; la **ubicación** en gris ("La Plata, Argentina", o solo el país); los **links** (PP-03); y después la bio, seguidores y seguidos, como hoy. Lo que no está cargado no ocupa lugar.
-- [ ] **PP-02** El banner y la foto son los que subió la persona; sin ellos, el degradé y las iniciales de hoy.
-- [ ] **PP-03** (Q-links) Hasta **5 links**, en una fila que pasa a la línea de abajo: el **ícono** del sitio (X, LinkedIn, YouTube, Instagram, GitHub, Substack, TradingView; un globo para el resto) y el **dominio real** (`substack.com`), para que no se pueda disfrazar a dónde lleva. Abren en otra pestaña con `rel="noopener noreferrer nofollow ugc"` (`security.md § 1`).
-- [ ] **PP-04** En tu perfil, lo que falta se ofrece donde iría, en gris: "Agrega un titular", "Agrega links" (abren la ventana en esa sección). En el de otra persona no aparece nada.
+- [x] **PP-01** Debajo del nombre y de los botones, a todo el ancho (el visible, o el `@usuario` si no tiene), en este orden: el **titular**; la **ubicación** en gris ("La Plata, Argentina", o solo el país); los **links** (PP-03); y después la bio, seguidores y seguidos, como hoy. Lo que no está cargado no ocupa lugar.
+- [x] **PP-02** El banner y la foto son los que subió la persona; sin ellos, el degradé y las iniciales de hoy.
+- [x] **PP-03** (Q-links) Hasta **5 links**, en una fila que pasa a la línea de abajo: el **ícono** del sitio (X, LinkedIn, YouTube, Instagram, GitHub, Substack, TradingView; un globo para el resto) y el **dominio real** (`substack.com`), para que no se pueda disfrazar a dónde lleva. Abren en otra pestaña con `rel="noopener noreferrer nofollow ugc"` (`security.md § 1`).
+- [x] **PP-04** En tu perfil, lo que falta se ofrece donde iría, en gris: "Agrega un titular", "Agrega links" (abren la ventana en esa sección). En el de otra persona no aparece nada.
 
 ### La ventana "Editar perfil" (como "Editar presentación" de LinkedIn)
 
-- [ ] **PP-05** Una sola ventana con secciones, en este orden: **Foto y banner**, **Nombre** (≤50), **Titular** (Q1, ≤100), **Ubicación** (país de una lista y ciudad, Q2), **Bio** (≤160, como hoy) y **Links** (hasta 5). Contadores cerca del límite, como el título de un post. En el teléfono, a pantalla completa; el pie con Guardar queda fijo abajo.
-- [ ] **PP-06** **Links:** cada uno es una URL (`https://…`, solo `http(s)`); se suma con "Agregar link", se quita con su ×, y el ícono aparece al escribirla. Una URL inválida dice qué falta y no deja guardar.
-- [ ] **PP-07** **Foto y banner:** "Cambiar foto" y "Cambiar banner" eligen una imagen (JPEG, PNG, WebP; nunca SVG; hasta 5 MB) y la ventana pasa a un **recorte** (Q3): la imagen se arrastra y se acerca (con el dedo, el mouse, la rueda, las flechas o un control deslizante) dentro de un marco **redondo** (foto, 1:1) o **de 4:1** (banner). "Aplicar" corta esa parte, la prepara como las de los posts (`specs/post-image`: WebP, tamaño máximo) y la muestra en la ventana; "Volver" la descarta. "Quitar" vuelve al degradé o a las iniciales.
-- [ ] **PP-08** **Guardar** manda solo lo que cambió y cierra; el perfil lo muestra al instante. Mientras sube una imagen o guarda, Guardar espera y dice qué está haciendo. Cancelar o Esc con cambios piden confirmación (como hoy).
-- [ ] **PP-09** Si algo falla, el error dice qué campo y lo escrito no se pierde. El `userId` sale de la sesión (`api-integration.md`).
+- [x] **PP-05** Una sola ventana con secciones, en este orden: **Foto y banner**, **Nombre** (≤50), **Titular** (Q1, ≤100), **Ubicación** (país de una lista y ciudad, Q2), **Bio** (≤160, como hoy) y **Links** (hasta 5). Contadores cerca del límite, como el título de un post. En el teléfono, a pantalla completa. Guardar queda siempre a mano, fijo arriba con el título (como la ventana de hoy); el cuerpo scrollea.
+- [x] **PP-06** **Links:** cada uno es una URL (`https://…`, solo `http(s)`); se suma con "Agregar link", se quita con su ×, y el ícono aparece al escribirla. Una URL inválida dice qué falta y no deja guardar.
+- [x] **PP-07** **Foto y banner:** "Cambiar foto" y "Cambiar banner" eligen una imagen (JPEG, PNG, WebP; nunca SVG; hasta 5 MB) y la ventana pasa a un **recorte** (Q3): la imagen se arrastra y se acerca (con el dedo, el mouse, la rueda, las flechas o un control deslizante) dentro de un marco **redondo** (foto, 1:1) o **de 4:1** (banner). "Aplicar" corta esa parte, la prepara como las de los posts (`specs/post-image`: WebP, tamaño máximo) y la muestra en la ventana; "Volver" la descarta. "Quitar" vuelve al degradé o a las iniciales.
+- [x] **PP-08** **Guardar** manda solo lo que cambió y cierra; el perfil lo muestra al instante. Mientras sube una imagen o guarda, Guardar espera y dice qué está haciendo. Cancelar o Esc con cambios piden confirmación (como hoy).
+- [x] **PP-09** Si algo falla, el error dice qué campo y lo escrito no se pierde. El `userId` sale de la sesión (`api-integration.md`).
 
 ### Calidad
 
-- [ ] **PP-10** Mobile first a 360 px; axe sin violaciones en claro y oscuro; la ventana se carga al primer uso y la primera carga del perfil no pasa el presupuesto de JS (`seo.md`: quedan ~1,6 KB en el perfil).
-- [ ] **PP-11** Textos en en, es y pt; el titular, la ciudad y los links se muestran como texto plano (sin Markdown).
-- [ ] **PP-12** Mocks con la forma de P-019 a P-021, con sus errores (`422` por largo, URL inválida o más de 5 links).
+- [x] **PP-10** Mobile first a 360 px; axe sin violaciones en claro y oscuro; la ventana se carga al primer uso y la primera carga del perfil no pasa el presupuesto de JS (`seo.md`: quedan ~1,6 KB en el perfil).
+- [x] **PP-11** Textos en en, es y pt; el titular, la ciudad y los links se muestran como texto plano (sin Markdown).
+- [x] **PP-12** Mocks con la forma de P-019 a P-021, con sus errores (`422` por largo, URL inválida o más de 5 links).
 
 ## Fuera de alcance
 

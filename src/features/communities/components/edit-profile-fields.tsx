@@ -101,7 +101,12 @@ export function CountryField({ id, field }: { id: string; field: UseFormRegister
       <FieldLabel htmlFor={id} className="type-action">
         {t('country')}
       </FieldLabel>
-      <NativeSelect id={id} {...field} className="w-full [&_select]:h-10">
+      {/* The same thin border as the other fields when focused, without the halo. */}
+      <NativeSelect
+        id={id}
+        {...field}
+        className="w-full [&_select]:h-10 [&_select]:focus-visible:border-foreground/60 [&_select]:focus-visible:ring-0"
+      >
         <NativeSelectOption value="">{t('noCountry')}</NativeSelectOption>
         {options.map((option) => (
           <NativeSelectOption key={option.code} value={option.code}>

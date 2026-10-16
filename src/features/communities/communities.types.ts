@@ -42,7 +42,14 @@ export type ProfileDetails = {
 /** What "Edit profile" starts with (specs/profile-presentation PP-05): what the profile has now. */
 export type EditableProfile = Pick<
   ProfileDetails,
-  'displayName' | 'headline' | 'countryCode' | 'city' | 'bio' | 'avatarUrl' | 'bannerUrl'
+  | 'username'
+  | 'displayName'
+  | 'headline'
+  | 'countryCode'
+  | 'city'
+  | 'bio'
+  | 'avatarUrl'
+  | 'bannerUrl'
 > & { links: string[] }
 
 /** A field "Edit profile" can open on (PP-04: "Add a headline" goes to the headline). */

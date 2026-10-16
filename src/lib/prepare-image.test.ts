@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { MAX_UPLOAD_BYTES, prepareImage } from './prepare-image'
+import { cropImage, MAX_UPLOAD_BYTES, prepareImage } from './prepare-image'
 
 /** jsdom has no image decoding nor canvas: doubles that keep what they were asked. */
 const canvas = vi.hoisted(() => ({
@@ -20,8 +20,7 @@ beforeEach(() => {
   canvas.types = []
   canvas.result = (type) => new Blob(['x'], { type })
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
-    drawImage: (_: unknown, x: number, y: number, w: number, h: number) =>
-      canvas.drawn.push([x, y, w, h]),
+    drawImage: (_: unknown, ...numbers: number[]) => canvas.drawn.push(numbers),
   } as never)
   vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(function (callback, type) {
     canvas.types.push(type ?? '')
@@ -77,5 +76,39 @@ describe('prepareImage (specs/post-image PI-03, PI-05)', () => {
     stubBitmap(2048, 2048)
     canvas.result = (type) => new Blob([new Uint8Array(MAX_UPLOAD_BYTES + 1)], { type })
     expect(await prepareImage(file('image/png'))).toEqual({ ok: false, error: 'tooLarge' })
+  })
+})
+
+describe('cropImage (specs/profile-presentation PP-07)', () => {
+  it('draws the chosen part at the final size, as WebP', async () => {
+    stubBitmap(3000, 2000)
+    const area = { x: 100, y: 50, width: 800, height: 800 }
+    expect(await cropImage(file('image/jpeg'), area, { width: 400, height: 400 })).toMatchObject({
+      ok: true,
+      width: 400,
+      height: 400,
+    })
+    expect(canvas.drawn).toEqual([[100, 50, 800, 800, 0, 0, 400, 400]])
+    expect(canvas.types).toEqual(['image/webp'])
+    expect(createImageBitmap).toHaveBeenCalledWith(expect.anything(), {
+      imageOrientation: 'from-image',
+    })
+  })
+
+  it('refuses other types, and says when it cannot read it or it is too large', async () => {
+    const area = { x: 0, y: 0, width: 10, height: 10 }
+    const size = { width: 1500, height: 375 }
+    expect(await cropImage(file('image/svg+xml'), area, size)).toEqual({ ok: false, error: 'type' })
+    vi.stubGlobal(
+      'createImageBitmap',
+      vi.fn(async () => Promise.reject(new Error('x'))),
+    )
+    expect(await cropImage(file('image/png'), area, size)).toEqual({
+      ok: false,
+      error: 'unreadable',
+    })
+    stubBitmap(10, 10)
+    canvas.result = (type) => new Blob([new Uint8Array(MAX_UPLOAD_BYTES + 1)], { type })
+    expect(await cropImage(file('image/png'), area, size)).toEqual({ ok: false, error: 'tooLarge' })
   })
 })

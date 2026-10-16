@@ -65,8 +65,12 @@ describe('editProfileSchema (specs/profile-edit PE-04, specs/profile-presentatio
     expect(editProfileSchema.safeParse({ ...VALID, countryCode: 'Argentina' }).success).toBe(false)
   })
 
-  it('takes only what changed (PP-08)', () => {
+  it('takes only what changed, as the form leaves it: links as plain URLs (PP-08)', () => {
     expect(editProfileChangesSchema.parse({ headline: 'Rates' })).toEqual({ headline: 'Rates' })
+    expect(editProfileChangesSchema.parse({ links: [' https://x.com/juan '] })).toEqual({
+      links: ['https://x.com/juan'],
+    })
+    expect(editProfileChangesSchema.safeParse({ links: ['javascript:x'] }).success).toBe(false)
   })
 })
 
@@ -81,7 +85,7 @@ describe('updateProfile (PE-03 to PE-06, PP-08, PP-09)', () => {
     expect(
       await updateProfile({
         bio: ' Macro and rates. ',
-        links: [{ url: 'https://x.com/juan' }],
+        links: ['https://x.com/juan'],
         userId: '00000000-0000-4000-8000-000000000999',
       }),
     ).toEqual({ ok: true, data: null })

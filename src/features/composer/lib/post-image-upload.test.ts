@@ -96,12 +96,25 @@ describe('uploadPostImage (specs/backend-answer-1013 BA-01, BA-02)', () => {
     }
   })
 
-  it('sends nothing with every route mocked', async () => {
-    const { fetch, deps: d } = deps(new Response(null), true)
-    expect(await uploadPostImage({ userId: USER, body, contentType: 'image/webp' }, d)).toEqual({
+  it("sends nothing to a mocked route's placeholder, and refuses it without mocks", async () => {
+    api.apiRequest.mockResolvedValue({
       ok: true,
-      data: { imageUrl: IMAGE },
+      data: {
+        uploadUrl: 'https://storage.mock.invalid/upload/a.webp',
+        imageUrl: IMAGE,
+        path: 'a.webp',
+      },
     })
-    expect(fetch).not.toHaveBeenCalled()
+    const mocked = deps(new Response(null), true)
+    expect(
+      await uploadPostImage({ userId: USER, body, contentType: 'image/webp' }, mocked.deps),
+    ).toEqual({ ok: true, data: { imageUrl: IMAGE } })
+    expect(mocked.fetch).not.toHaveBeenCalled()
+
+    const real = deps(new Response(null))
+    expect(
+      await uploadPostImage({ userId: USER, body, contentType: 'image/webp' }, real.deps),
+    ).toEqual({ ok: false, error: 'upload' })
+    expect(real.fetch).not.toHaveBeenCalled()
   })
 })

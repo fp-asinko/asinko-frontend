@@ -104,6 +104,28 @@ describe('Profile header (specs/community-pages CP-11, CP-12)', () => {
     expect(screen.queryByRole('button', { name: 'Edit profile' })).toBeNull()
   })
 
+  it('shows their own banner and photo, and their presentation (specs/profile-presentation PP-01, PP-02)', () => {
+    renderHeader(
+      profile({
+        headline: 'Macro | Rates',
+        bannerUrl: '/mocks/banner-demo.svg',
+        avatarUrl: '/mocks/avatar-demo.svg',
+      }),
+    )
+    expect(screen.getByTestId('identity-banner').querySelector('img')).toHaveAttribute(
+      'src',
+      expect.stringContaining('banner-demo'),
+    )
+    expect(screen.getByText('Macro | Rates')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add links' })).toBeNull()
+  })
+
+  it('offers what your own profile is missing (PP-04)', () => {
+    renderHeader(profile({ isSelf: true }))
+    expect(screen.getByRole('button', { name: 'Add a headline' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add links' })).toBeInTheDocument()
+  })
+
   it("titles the rules with the person's name", () => {
     renderWithIntl(<CommunityDetails page={channel} profile={profile()} />)
     expect(screen.getByRole('button', { name: 'Rules of Federico Piva' })).toBeInTheDocument()

@@ -3,7 +3,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ArrowLeftIcon, XIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useId, useState, type RefObject } from 'react'
+import { useEffect, useId, useRef, useState, type RefObject } from 'react'
+import dynamic from 'next/dynamic'
 import { useForm, useWatch } from 'react-hook-form'
 import {
   AlertDialog,
@@ -16,6 +17,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { updateProfile } from '../actions/update-profile.action'
 import type { EditableProfile, EditProfileField } from '../communities.types'
@@ -29,7 +31,19 @@ import {
   type EditProfileInput,
 } from '../schemas/edit-profile.schema'
 import { CountedField, CountryField } from './edit-profile-fields'
+import { changeImageId, ProfileImages, type ProfileImageKind } from './edit-profile-images'
 import { LinksField } from './edit-profile-links'
+
+/** The cropper (and its library) comes when an image is picked (seo.md). */
+const ImageCropper = dynamic(
+  () => import('./image-cropper').then((module) => module.ImageCropper),
+  {
+    // Its place while it comes, the cropper's height: the window does not jump.
+    loading: () => <Skeleton className="h-72 rounded-lg sm:h-88" />,
+  },
+)
+
+const IMAGE_FIELD = { avatar: 'avatarUrl', banner: 'bannerUrl' } as const
 
 /** Phones: the whole screen, as the post editor (specs/post-create-detail PC-02). */
 const SHEET =
@@ -77,6 +91,14 @@ export function EditProfileDialog({
   const ids = useId()
   const [confirming, setConfirming] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
+  // An image being cropped (PP-07): the cropper takes the window's body until Apply or Back.
+  const [cropping, setCropping] = useState<{
+    kind: ProfileImageKind
+    file: File
+    source: string
+  } | null>(null)
+  // What was cut, shown at once (the uploaded URL may be the mocks' fixture).
+  const [previews, setPreviews] = useState<Partial<Record<ProfileImageKind, string | null>>>({})
   const form = useForm<EditProfileForm, unknown, EditProfileInput>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
@@ -91,12 +113,12 @@ export function EditProfileDialog({
     },
     mode: 'onChange',
   })
-  const { register, handleSubmit, formState, control, setError } = form
-  const [displayName = '', headline = '', city = '', bio = ''] = useWatch({
+  const { register, handleSubmit, formState, control, setError, setValue } = form
+  const [displayName = '', headline = '', city = '', bio = '', avatarUrl, bannerUrl] = useWatch({
     control,
-    name: ['displayName', 'headline', 'city', 'bio'],
+    name: ['displayName', 'headline', 'city', 'bio', 'avatarUrl', 'bannerUrl'],
   })
-  const blocked = !formState.isValid || formState.isSubmitting
+  const blocked = !formState.isValid || formState.isSubmitting || cropping !== null
   const modal = layout === 'modal'
   const id = (name: string) => `${ids}-${name}`
   // A schema key is the window's own: communities.edit.errors.x is errors.x.
@@ -125,12 +147,33 @@ export function EditProfileDialog({
       onOpenChange(false)
       return
     }
-    const fields = Object.entries(result.fieldErrors ?? {})
-    for (const [name, messages] of fields) {
-      const message = messages?.[0]
-      if (message) setError(name as Name, { message })
-    }
+    // Only the window's own messages go under a field; anything else is the general failure.
+    const fields = Object.entries(result.fieldErrors ?? {}).filter(([, messages]) =>
+      messages?.[0]?.startsWith('communities.edit.errors.'),
+    )
+    for (const [name, messages] of fields) setError(name as Name, { message: messages![0] })
     if (fields.length === 0) setServerError(t('errors.general'))
+  }
+
+  // Back from cropping, the focus goes to the "Change" that started it (WCAG 2.4.3), once the
+  // form shows again: a hidden button cannot take it.
+  const refocus = useRef<string | null>(null)
+  useEffect(() => {
+    if (cropping || !refocus.current) return
+    document.getElementById(refocus.current)?.focus()
+    refocus.current = null
+  }, [cropping])
+
+  function stopCropping() {
+    if (!cropping) return
+    URL.revokeObjectURL(cropping.source)
+    refocus.current = changeImageId(`${ids}-images`, cropping.kind)
+    setCropping(null)
+  }
+
+  function setImage(kind: ProfileImageKind, imageUrl: string | null, preview: string | null) {
+    setValue(IMAGE_FIELD[kind], imageUrl, { shouldDirty: true })
+    setPreviews((current) => ({ ...current, [kind]: preview }))
   }
 
   // Into the field a prompt offered (PP-04), else the name.
@@ -142,7 +185,13 @@ export function EditProfileDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(true) : requestClose())}>
+    <Dialog
+      open={open}
+      // Esc while cropping is Back: it leaves the cropper, not the window.
+      onOpenChange={(next) =>
+        next ? onOpenChange(true) : cropping ? stopCropping() : requestClose()
+      }
+    >
       <DialogContent
         showCloseButton={false}
         initialFocus={initialFocus}
@@ -169,7 +218,7 @@ export function EditProfileDialog({
               {t('cancel')}
             </button>
           )}
-          <DialogTitle className="type-post-title">{t('title')}</DialogTitle>
+          <DialogTitle className="min-w-0 truncate type-post-title">{t('title')}</DialogTitle>
           <div className="ml-auto pr-2">
             <button
               type="submit"
@@ -179,6 +228,10 @@ export function EditProfileDialog({
             >
               {formState.isSubmitting ? t('saving') : t('save')}
             </button>
+            {/* What the button says while saving, also announced (PP-08). */}
+            <span role="status" className="sr-only">
+              {formState.isSubmitting ? t('saving') : ''}
+            </span>
           </div>
         </div>
 
@@ -192,54 +245,79 @@ export function EditProfileDialog({
           }}
           className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 pt-4 pb-6"
         >
-          <CountedField
-            id={id('displayName')}
-            label={t('name')}
-            max={DISPLAY_NAME_MAX}
-            value={displayName}
-            field={register('displayName')}
-            error={error('displayName')}
-          />
-          <CountedField
-            id={id('headline')}
-            label={t('headline')}
-            placeholder={t('headlinePlaceholder')}
-            max={HEADLINE_MAX}
-            value={headline}
-            field={register('headline')}
-            error={error('headline')}
-          />
-          <fieldset className="grid gap-3 sm:grid-cols-2">
-            <legend className="mb-1.5 type-action">{t('location')}</legend>
-            <CountryField id={id('countryCode')} field={register('countryCode')} />
-            <CountedField
-              id={id('city')}
-              label={t('city')}
-              max={CITY_MAX}
-              value={city}
-              field={register('city')}
-              error={error('city')}
+          {cropping && (
+            <ImageCropper
+              kind={cropping.kind}
+              file={cropping.file}
+              source={cropping.source}
+              onBack={stopCropping}
+              onApply={({ imageUrl, preview }) => {
+                setImage(cropping.kind, imageUrl, preview)
+                stopCropping()
+              }}
             />
-          </fieldset>
-          <CountedField
-            id={id('bio')}
-            label={t('bio')}
-            placeholder={t('bioPlaceholder')}
-            max={BIO_MAX}
-            value={bio}
-            field={register('bio')}
-            error={error('bio')}
-            multiline
-            alwaysCount
-          />
-          <div id={`${ids}-links`}>
-            <LinksField control={control} register={register} errors={formState.errors.links} />
-          </div>
-          {serverError && (
-            <p role="alert" className="type-small text-destructive">
-              {serverError}
-            </p>
           )}
+          {/* Hidden, not gone, while cropping: what is written stays (PP-08). */}
+          <div hidden={cropping !== null} className="contents">
+            <ProfileImages
+              idPrefix={`${ids}-images`}
+              username={profile.username}
+              avatar={previews.avatar !== undefined ? previews.avatar : avatarUrl}
+              banner={previews.banner !== undefined ? previews.banner : bannerUrl}
+              onPick={(kind, file) =>
+                setCropping({ kind, file, source: URL.createObjectURL(file) })
+              }
+              onRemove={(kind) => setImage(kind, null, null)}
+            />
+            <CountedField
+              id={id('displayName')}
+              label={t('name')}
+              max={DISPLAY_NAME_MAX}
+              value={displayName}
+              field={register('displayName')}
+              error={error('displayName')}
+            />
+            <CountedField
+              id={id('headline')}
+              label={t('headline')}
+              placeholder={t('headlinePlaceholder')}
+              max={HEADLINE_MAX}
+              value={headline}
+              field={register('headline')}
+              error={error('headline')}
+            />
+            <fieldset className="grid gap-3 sm:grid-cols-2">
+              <legend className="mb-1.5 type-action">{t('location')}</legend>
+              <CountryField id={id('countryCode')} field={register('countryCode')} />
+              <CountedField
+                id={id('city')}
+                label={t('city')}
+                max={CITY_MAX}
+                value={city}
+                field={register('city')}
+                error={error('city')}
+              />
+            </fieldset>
+            <CountedField
+              id={id('bio')}
+              label={t('bio')}
+              placeholder={t('bioPlaceholder')}
+              max={BIO_MAX}
+              value={bio}
+              field={register('bio')}
+              error={error('bio')}
+              multiline
+              alwaysCount
+            />
+            <div id={`${ids}-links`}>
+              <LinksField control={control} register={register} errors={formState.errors.links} />
+            </div>
+            {serverError && (
+              <p role="alert" className="type-small text-destructive">
+                {serverError}
+              </p>
+            )}
+          </div>
         </form>
 
         <AlertDialog open={confirming} onOpenChange={setConfirming}>

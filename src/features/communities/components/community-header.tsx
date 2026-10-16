@@ -65,7 +65,6 @@ export function CommunityHeader({
             {profile && <ProfileMarks profile={profile} />}
           </div>
           {subtitle && <p className="type-meta text-muted-foreground">{subtitle}</p>}
-          {profile && <ProfileIntro profile={profile} />}
         </div>
         <div className="flex items-center gap-2">
           {canPost && (
@@ -92,6 +91,8 @@ export function CommunityHeader({
           )}
         </div>
       </div>
+      {/* Under the name and the actions, the whole width: a long headline never squeezes them. */}
+      {profile && <ProfileIntro profile={profile} />}
       {description && (
         // The user's own text: long words wrap at 360px and its line breaks stay (PE-07).
         <p className="mt-2 type-ui wrap-anywhere whitespace-pre-line text-muted-foreground">
@@ -126,6 +127,7 @@ export function CommunityHeader({
   return (
     <EditProfileProvider
       profile={{
+        username: profile.username,
         displayName: profile.displayName,
         headline: profile.headline,
         countryCode: profile.countryCode,

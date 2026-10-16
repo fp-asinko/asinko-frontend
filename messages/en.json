@@ -381,7 +381,11 @@
         "cityTooLong": "Up to 60 characters",
         "tooLong": "Up to {max} characters",
         "link": "Enter a link that starts with http:// or https://",
-        "tooManyLinks": "Up to 5 links"
+        "tooManyLinks": "Up to 5 links",
+        "imageType": "Only JPEG, PNG or WebP images",
+        "imageTooLarge": "The image is too large",
+        "imageUnreadable": "Could not read the image",
+        "imageUpload": "Could not upload the image"
       },
       "discard": {
         "title": "Discard changes?",
@@ -400,7 +404,19 @@
       "linkPlaceholder": "https://",
       "linkLabel": "Link {number}",
       "addLink": "Add link",
-      "removeLink": "Remove link {number}"
+      "removeLink": "Remove link {number}",
+      "images": "Photo and banner",
+      "changePhoto": "Change photo",
+      "removePhoto": "Remove photo",
+      "changeBanner": "Change banner",
+      "removeBanner": "Remove banner",
+      "cropPhoto": "Crop your photo",
+      "cropBanner": "Crop your banner",
+      "cropArea": "Image to crop. Drag it, or move it with the arrow keys.",
+      "zoom": "Zoom",
+      "back": "Back",
+      "apply": "Apply",
+      "uploading": "Uploading…"
     },
     "follows": {
       "close": "Close",

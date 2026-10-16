@@ -1,3 +1,4 @@
+import { MOCK_STORAGE_HOST } from '@/lib/uploads/mock-storage'
 import { DEMO_USER } from './demo-user'
 import { signPostImageUpload } from './post-image'
 import type { MockResponse } from './types'
@@ -23,7 +24,7 @@ export function signProfileImageUpload(
   return {
     status: 200,
     body: {
-      uploadUrl: `https://storage.mock.invalid/upload/${path}`,
+      uploadUrl: `https://${MOCK_STORAGE_HOST}/upload/${path}`,
       imageUrl: MOCK_PROFILE_IMAGES[kind],
       path,
     },
