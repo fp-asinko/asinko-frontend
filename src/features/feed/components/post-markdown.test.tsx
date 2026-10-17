@@ -67,9 +67,17 @@ describe('PostMarkdown', () => {
       </PostMarkdown>,
     )
     expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/asset/BTC')
-    expect(screen.getByRole('link', { name: '#defi' })).toHaveAttribute('href', '/hub/defi')
+    // People and groups by their name alone; an asset keeps its $ (PO, 2026-10-17).
+    expect(screen.getByRole('link', { name: 'defi' })).toHaveAttribute('href', '/hub/defi')
     // @maria goes to the profile (specs/community-pages CP-21).
-    expect(screen.getByRole('link', { name: '@maria' })).toHaveAttribute('href', '/user/maria')
+    expect(screen.getByRole('link', { name: 'maria' })).toHaveAttribute('href', '/user/maria')
     expect(screen.getByText('$XYZ').tagName).toBe('STRONG')
+  })
+
+  it('underlines a mention only on hover: the bold says it in a paragraph (PO, 2026-10-17)', () => {
+    renderWithIntl(<PostMarkdown>{'[@maria](asinko:user/maria)'}</PostMarkdown>)
+    const mention = screen.getByRole('link', { name: 'maria' })
+    expect(mention).toHaveClass('hover:underline')
+    expect(mention).not.toHaveClass('underline')
   })
 })

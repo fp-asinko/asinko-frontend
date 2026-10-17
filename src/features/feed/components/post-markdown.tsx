@@ -38,6 +38,15 @@ function domainOf(href: string) {
 
 const mentionClass = 'font-extrabold text-foreground'
 
+/**
+ * A person or a group is said by its name alone ("jordan", "acciones"): the bold already says it
+ * is a mention, and its card says the rest (PO, 2026-10-17). An asset keeps its $, as a ticker is
+ * written in finance ($BTC). Only the text of the link: the author wrote it with the symbol.
+ */
+function withoutSymbol(children: ReactNode): ReactNode {
+  return typeof children === 'string' && /^[@#]/.test(children) ? children.slice(1) : children
+}
+
 function Anchor({ href, children }: ComponentProps<'a'>) {
   const t = useTranslations('feed.card')
   const mention = parseMention(href)
@@ -49,9 +58,10 @@ function Anchor({ href, children }: ComponentProps<'a'>) {
         href={communityPath(kind, slug)}
         // Its hover card (specs/mention-preview MP-01).
         {...previewProps(kind, slug)}
-        className={`${mentionClass} underline underline-offset-2 hover:decoration-2`}
+        // The underline only on hover, as X and Reddit: in a paragraph the bold is enough.
+        className={`${mentionClass} underline-offset-2 hover:underline`}
       >
-        {children}
+        {mention.type === 'asset' ? children : withoutSymbol(children)}
       </Link>
     )
   }

@@ -175,7 +175,7 @@ Cuerpo (type-post-body, Markdown seguro, recortado a 6 líneas + "Ver más")
   - `$BTC`: si el activo tiene comunidad, link a `/?comunidad=btc`; si no, destacado sin link.
   - `#defi`: link a `/?comunidad=defi`.
   - `@maria`: destacado (negrita), sin link.
-- Estilo de mención del prototipo: negrita 800 y subrayado (`.post-inline-ticker`).
+- Estilo de mención del prototipo: negrita 800 y subrayado (`.post-inline-ticker`). **Cambio con el PO (2026-10-17):** el subrayado solo al pasar el mouse, y las personas y los grupos sin `@` ni `#` en el texto ("jordan", "acciones"): la negrita ya dice que es una mención y su tarjeta dice el resto. Los activos conservan el `$` (`$BTC`), como se escribe un ticker. El editor sigue mostrando los símbolos: así se escriben.
 
 > **D-H1 — ✅ aprobada:** sumar **`react-markdown`** a `libraries.md`. Motivo: el `body` del contrato es Markdown y parsearlo bien a mano supera largamente las ~50 líneas del criterio. Al usarse solo en Server Components **no suma JavaScript al navegador**. Alternativa descartada: un parser propio (riesgo de casos borde y de seguridad).
 
