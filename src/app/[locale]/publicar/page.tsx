@@ -5,6 +5,7 @@ import {
   SubmitPage,
   submitMetadata,
 } from '@/features/composer/components/submit-page'
+import { previewPost } from '@/features/feed/actions/preview-post.action'
 import { safeLocale } from '@/i18n/safe-locale'
 
 // The page to create a post (specs/submit-page): /publicar in Spanish and Portuguese; the other word redirects or is
@@ -23,5 +24,6 @@ export default async function SubmitRoute({
   const { locale } = await params
   const query = await searchParams
   checkSubmitSegment('publicar', safeLocale(locale), query)
-  return <SubmitPage searchParams={query} />
+  // The feed's card for the preview (specs/submit-tools ST-01): the page joins both features.
+  return <SubmitPage searchParams={query} preview={previewPost} />
 }

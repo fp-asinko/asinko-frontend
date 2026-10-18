@@ -45,9 +45,15 @@ export function AppShell({
         profileHref={profileHref}
         menu={<MobileSidebar>{sidebar}</MobileSidebar>}
       />
-      <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)]">
-        <div className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-2 py-2.5 md:block">
-          {sidebar}
+      {/* A page can fold the left column (LeftColumnFold, specs/submit-tools ST-08): while its
+          button says so, the column is a 56px strip and its content is hidden, by CSS alone, so
+          the other pages carry no code for it. */}
+      <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)] md:[html:has([data-left-fold=folded])_&]:grid-cols-[3.5rem_minmax(0,1fr)]">
+        <div
+          id="left-column"
+          className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-2 py-2.5 md:block [html:has([data-left-fold])_&]:pt-14"
+        >
+          <div className="[html:has([data-left-fold=folded])_&]:hidden">{sidebar}</div>
         </div>
         {/* Center (max 780px) and right (300px) travel together, centered in the remaining space,
             as in the prototype: at 1440px the right column sits next to the center, not at the edge. */}

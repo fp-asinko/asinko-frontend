@@ -392,3 +392,51 @@ describe('PostEditor related ones (specs/related-tags)', () => {
     expect(screen.queryByRole('list', { name: 'Related' })).toBeNull()
   })
 })
+
+describe('PostEditor tools (specs/submit-tools)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('previews what is written, with its community, and asks nothing while it is missing (ST-01, ST-03)', async () => {
+    const preview = vi.fn(async () => ({ ok: true as const, data: { card: <p>The card</p> } }))
+    renderWithIntl(
+      <AuthGateProvider signedIn>
+        <PostEditor
+          type="TEXT"
+          community={DEFI}
+          draftRef={{ current: null }}
+          onCancel={vi.fn()}
+          onPublished={vi.fn()}
+          preview={preview}
+        />
+      </AuthGateProvider>,
+    )
+    await userEvent.click(screen.getByRole('tab', { name: 'Preview' }))
+    expect(preview).not.toHaveBeenCalled()
+
+    await userEvent.click(screen.getByRole('tab', { name: 'Write' }))
+    await userEvent.type(title(), 'Rates')
+    await userEvent.type(body(), 'Up again.')
+    await userEvent.click(screen.getByRole('tab', { name: 'Preview' }))
+    expect(preview).toHaveBeenCalledWith({
+      title: 'Rates',
+      body: 'Up again.',
+      type: 'TEXT',
+      url: undefined,
+      imageUrl: undefined,
+      imageAlt: undefined,
+      community: { slug: 'defi', handle: '#defi', name: 'DeFi', own: false },
+      locale: 'en',
+    })
+    expect(await screen.findByText('The card')).toBeInTheDocument()
+  })
+
+  it('formats the body with its toolbar and with Ctrl+B (ST-04, ST-05)', async () => {
+    renderEditor()
+    await userEvent.type(body(), 'rates')
+    ;(body() as HTMLTextAreaElement).setSelectionRange(0, 5)
+    await userEvent.keyboard('{Control>}b{/Control}')
+    expect(body()).toHaveValue('**rates**')
+    await userEvent.click(screen.getByRole('button', { name: 'Quote' }))
+    expect(body()).toHaveValue('> **rates**')
+  })
+})

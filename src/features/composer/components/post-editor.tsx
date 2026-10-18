@@ -2,10 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlignLeftIcon, ImageIcon, LinkIcon } from 'lucide-react'
-import { useFormatter, useNow, useTranslations } from 'next-intl'
+import { useFormatter, useLocale, useNow, useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type RefObject } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { EmojiButton } from '@/components/molecules/emoji-picker'
+import { applyFormat, FormatToolbar, formatShortcut } from '@/components/molecules/format-toolbar'
 import { MentionField } from '@/components/molecules/mention-assist'
 import { useAuthGate } from '@/components/organisms/auth-gate'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
@@ -34,6 +35,7 @@ import {
 } from '../hooks/use-post-draft'
 import { CommunityPicker } from './community-picker'
 import { ImageField, type TakeImage } from './image-field'
+import { BodyTabs, type PreviewAction } from './body-tabs'
 import { RelatedPicker } from './related-picker'
 
 /** A field without its own box: the composer box around them is the box, as X. */
@@ -103,7 +105,10 @@ export function PostEditor({
   onCommunityChange,
   related: initialRelated = [],
   onRelatedChange,
+  preview,
 }: {
+  /** The feed's card for the post being written (specs/submit-tools ST-01): from the page. */
+  preview?: PreviewAction
   type: 'TEXT' | 'LINK' | 'IMAGE'
   community: CommunityOption | null
   /** The related ones on arrival, as handles (the page's URL, specs/related-aside RA-04). */
@@ -124,6 +129,7 @@ export function PostEditor({
   onCommunityChange?: (community: CommunityOption | null) => void
 }) {
   const t = useTranslations('composer')
+  const locale = useLocale()
   const format = useFormatter()
   const now = useNow()
   const stored = useStoredDraft(storageKey)
@@ -278,6 +284,24 @@ export function PostEditor({
   const invalid = (name: (typeof FIELDS)[number]) => Boolean(formState.errors[name])
   const bodyField = register('body')
   const bodyRef = useRef<HTMLTextAreaElement | null>(null)
+  // What the preview shows (ST-01): what is written now; null while the title or the body is
+  // missing, so the preview says so.
+  function draftForPreview() {
+    const values = getValues()
+    if (!values.title.trim() || !values.body.trim()) return null
+    return {
+      title: values.title,
+      body: values.body,
+      type: values.type,
+      url: values.url || undefined,
+      imageUrl: values.imageUrl || undefined,
+      imageAlt: values.imageAlt || undefined,
+      community: chosen
+        ? { slug: chosen.slug, handle: chosen.handle, name: chosen.name, own: chosen.own }
+        : null,
+      locale,
+    }
+  }
   // Where an emoji goes: the last field used, title or body; the body until one is focused.
   const emojiTarget = useRef<TextField | null>(null)
 
@@ -508,24 +532,38 @@ export function PostEditor({
             <FieldLabel htmlFor={`${ids}-body`} className="sr-only">
               {t('fields.body')}
             </FieldLabel>
-            {/* $ # @ suggest assets, communities and people (specs/mention-autocomplete). */}
-            <div className="relative">
-              <Textarea
-                id={`${ids}-body`}
-                placeholder={t('fields.bodyPlaceholder')}
-                {...bodyField}
-                ref={(element) => {
-                  bodyField.ref(element)
-                  bodyRef.current = element
-                  emojiTarget.current ??= element
-                }}
-                onFocus={(event) => (emojiTarget.current = event.currentTarget)}
-                aria-invalid={invalid('body') || undefined}
-                aria-describedby={`${ids}-body-help ${ids}-body-error`}
-                className={cn(BARE, 'min-h-24 resize-none leading-[1.55]')}
-              />
-              <MentionField fieldRef={bodyRef} search={searchMentions} />
-            </div>
+            {/* Write, with its format toolbar, and Preview (specs/submit-tools). */}
+            <BodyTabs
+              preview={preview}
+              draft={draftForPreview}
+              toolbar={<FormatToolbar fieldRef={bodyRef} />}
+            >
+              {/* $ # @ suggest assets, communities and people (specs/mention-autocomplete). */}
+              <div className="relative">
+                <Textarea
+                  id={`${ids}-body`}
+                  placeholder={t('fields.bodyPlaceholder')}
+                  {...bodyField}
+                  ref={(element) => {
+                    bodyField.ref(element)
+                    bodyRef.current = element
+                    emojiTarget.current ??= element
+                  }}
+                  onFocus={(event) => (emojiTarget.current = event.currentTarget)}
+                  // Ctrl/⌘ + B, I and K format the chosen text (ST-05).
+                  onKeyDown={(event) => {
+                    const kind = formatShortcut(event)
+                    if (!kind) return
+                    event.preventDefault()
+                    applyFormat(event.currentTarget, kind)
+                  }}
+                  aria-invalid={invalid('body') || undefined}
+                  aria-describedby={`${ids}-body-help ${ids}-body-error`}
+                  className={cn(BARE, 'min-h-24 resize-none leading-[1.55]')}
+                />
+                <MentionField fieldRef={bodyRef} search={searchMentions} />
+              </div>
+            </BodyTabs>
             <FieldError
               id={`${ids}-body-error`}
               errors={fieldError('body')}
@@ -549,7 +587,12 @@ export function PostEditor({
 
         {/* Formats on the left, actions on the right. */}
         {/* Tighter in phones: formats, emoji, Cancel and Publish fit 360px in every language. */}
-        <div className="mt-3 flex items-center gap-1 border-t pt-3 sm:gap-2">
+        {/* In phones it sticks over the bottom bar while a long post is written (specs/submit-tools
+            ST-07), edge to edge; from md, in its place. */}
+        <div
+          data-sticky-actions
+          className="sticky bottom-[calc(3.5625rem+env(safe-area-inset-bottom))] z-10 -mx-4 mt-3 flex items-center gap-1 border-t bg-background px-4 py-3 sm:gap-2 md:static md:mx-0 md:px-0 md:pb-0"
+        >
           <TabsList aria-label={t('type.label')} className="h-auto gap-0.5 bg-transparent p-0">
             <TabsTrigger value="TEXT" className={FORMAT}>
               <AlignLeftIcon aria-hidden />

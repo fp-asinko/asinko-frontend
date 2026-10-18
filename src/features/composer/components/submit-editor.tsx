@@ -8,6 +8,7 @@ import { submitPath } from '@/i18n/submit-path'
 import type { CommunityOption } from '../composer.types'
 import { clearDraft } from '../hooks/use-post-draft'
 import { DiscardDialog } from './discard-dialog'
+import type { PreviewAction } from './body-tabs'
 import { PostEditor } from './post-editor'
 
 /** A handle's slug: $BTC is BTC and #macro is macro. */
@@ -25,7 +26,10 @@ export function SubmitEditor({
   community,
   storageKey,
   related = [],
+  preview,
 }: {
+  /** The preview's Server Action (specs/submit-tools ST-01). */
+  preview?: PreviewAction
   type: 'TEXT' | 'LINK' | 'IMAGE'
   community: CommunityOption | null
   storageKey: string | null
@@ -61,6 +65,7 @@ export function SubmitEditor({
         onCancel={() => (written.current?.() ? setDiscarding(true) : leave())}
         onPublished={(path) => router.push(path)}
         related={related}
+        preview={preview}
         onCommunityChange={(next) => follow({ community: next?.slug ?? null })}
         onRelatedChange={(handles) => follow({ related: handles.map(slugOf) })}
       />

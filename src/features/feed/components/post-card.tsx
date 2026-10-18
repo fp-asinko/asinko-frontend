@@ -1,4 +1,4 @@
-import { ArrowUpRightIcon, MessageCircleIcon, ForwardIcon } from 'lucide-react'
+import { ArrowBigUpIcon, ArrowUpRightIcon, ForwardIcon, MessageCircleIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useFormatter, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
@@ -40,7 +40,8 @@ export function PostCard({
   leading,
 }: {
   post: PostItem
-  variant?: 'card' | 'detail'
+  /** `preview`: the post being written (specs/submit-tools ST-01): no links into it, no actions. */
+  variant?: 'card' | 'detail' | 'preview'
   /** Fade the image in once loaded: only cards loaded later (D-M1, protects LCP). */
   fadeImage?: boolean
   /** The community the feed is filtered by: no join button for it (CP-07). */
@@ -52,6 +53,7 @@ export function PostCard({
   const t = useTranslations('feed.card')
   const format = useFormatter()
   const detail = variant === 'detail'
+  const preview = variant === 'preview'
   const Title = detail ? 'h1' : 'h2'
   const commentCount = (
     <>
@@ -63,16 +65,17 @@ export function PostCard({
 
   // A card opens its post anywhere on it, with a background on hover, as Reddit's (CardLink); the
   // post's own page is a plain article.
-  const Card = detail ? 'article' : CardLink
-  const cardProps = detail
-    ? {}
-    : {
-        href: post.path,
-        // A rounded box, as Reddit's: the text 12px inside it and 4px clear of the lines between
-        // cards (from md). Inside the column, not past it: the list clips what overflows.
-        className:
-          'transition-colors duration-150 ease-out hover:bg-surface sm:rounded-2xl md:my-1 md:px-3',
-      }
+  const Card = detail || preview ? 'article' : CardLink
+  const cardProps =
+    detail || preview
+      ? {}
+      : {
+          href: post.path,
+          // A rounded box, as Reddit's: the text 12px inside it and 4px clear of the lines between
+          // cards (from md). Inside the column, not past it: the list clips what overflows.
+          className:
+            'transition-colors duration-150 ease-out hover:bg-surface sm:rounded-2xl md:my-1 md:px-3',
+        }
 
   return (
     // wrap-anywhere: a long word or URL from a user wraps instead of being cut off at 360px.
@@ -95,7 +98,7 @@ export function PostCard({
             publishedAt={post.publishedAt}
             edited={post.edited}
             titleId={`post-${post.id}`}
-            canJoin={!post.deleted && post.community?.slug !== feedCommunity}
+            canJoin={!preview && !post.deleted && post.community?.slug !== feedCommunity}
           />
         </div>
       </div>
@@ -112,7 +115,7 @@ export function PostCard({
       >
         {post.deleted ? (
           t('deleted')
-        ) : detail ? (
+        ) : detail || preview ? (
           post.title
         ) : (
           // The way into the post's page (PC-17). pb-0.5 -mb-0.5: a 24px target (WCAG 2.5.8) on the
@@ -180,7 +183,22 @@ export function PostCard({
         </a>
       )}
 
-      {!post.deleted && (
+      {preview && (
+        // As the card will show them, at zero: nothing to press in a post not published yet.
+        <div aria-hidden className="mt-3 flex items-center gap-3">
+          <span className={CARD_ACTION}>
+            <ArrowBigUpIcon className="size-4" />0
+          </span>
+          <span className={CARD_ACTION}>
+            <MessageCircleIcon className="size-4" />0
+          </span>
+          <span className={CARD_ACTION}>
+            <ForwardIcon className="size-4" />
+            <span className="sr-only sm:not-sr-only">{t('share')}</span>
+          </span>
+        </div>
+      )}
+      {!preview && !post.deleted && (
         // Votes first, then comments, as Reddit (specs/feed-cards § 14). Share stays on the right in
         // mobile and joins the group from md.
         <div className={cn('flex flex-wrap items-center gap-3', detail ? 'mt-6' : 'mt-3')}>

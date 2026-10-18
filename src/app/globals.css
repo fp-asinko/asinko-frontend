@@ -474,6 +474,14 @@
        sticky top bar (60px) and, on phones, the fixed bottom bar. */
     scroll-padding-top: calc(3.75rem + env(safe-area-inset-top));
     scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    /* The post editor's actions stick over the bottom bar on phones (specs/submit-tools ST-07):
+       what scrolls under them leaves their room too. */
+    &:has([data-sticky-actions]) {
+      scroll-padding-bottom: calc(8.5rem + env(safe-area-inset-bottom));
+      @variant md {
+        scroll-padding-bottom: 0;
+      }
+    }
     @variant md {
       scroll-padding-bottom: 0;
     }

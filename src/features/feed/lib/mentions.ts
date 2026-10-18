@@ -1,3 +1,4 @@
+import { mentionSegments } from '@/components/molecules/mention-assist/mention-segments'
 import type { RawEntity } from '@/lib/api/contract'
 import { SLUG_PATTERN } from '../schemas/feed-params.schema'
 
@@ -49,6 +50,31 @@ function hrefFor(entity: RawEntity, lookup: MentionLookup): string | null {
 /** Markdown-escapes the visible text of a mention. */
 function escapeLinkText(text: string) {
   return text.replace(/[\\[\]]/g, '\\$&')
+}
+
+/** Code, inline or fenced: what is in it is not a mention. */
+const CODE = /(```[\s\S]*?```|`[^`\n]*`)/
+
+/**
+ * A draft's mentions, before the backend resolves them (specs/submit-tools ST-02, D-1): each one
+ * the editor already paints (mentionSegments, MA-12) becomes a mention without a page, which the
+ * renderer shows in bold and without a link. Code is left as written.
+ */
+export function markDraftMentions(body: string): string {
+  return body
+    .split(CODE)
+    .map((part, index) =>
+      index % 2 === 1
+        ? part
+        : mentionSegments(part)
+            .map((segment) =>
+              segment.mention
+                ? `[${escapeLinkText(segment.text)}](${MENTION_SCHEME}ticker)`
+                : segment.text,
+            )
+            .join(''),
+    )
+    .join('')
 }
 
 /**

@@ -47,7 +47,10 @@
       "more": "Más opciones",
       "signup": "Registrarse"
     },
-    "back": "Volver"
+    "back": "Volver",
+    "leftColumn": {
+      "label": "Tus intereses"
+    }
   },
   "errors": {
     "notFound": {
@@ -576,6 +579,25 @@
     "related": {
       "label": "Relacionados",
       "remove": "Quitar {handle}"
+    },
+    "format": {
+      "label": "Formato del texto",
+      "bold": "Negrita",
+      "italic": "Cursiva",
+      "link": "Link",
+      "list": "Lista",
+      "quote": "Cita",
+      "code": "Código",
+      "withShortcut": "{name} (Ctrl+{key})"
+    },
+    "preview": {
+      "label": "Cuerpo",
+      "write": "Escribir",
+      "preview": "Vista previa",
+      "missing": "Escribe un título y un cuerpo para ver la vista previa.",
+      "failed": "No se pudo mostrar la vista previa. Puedes seguir escribiendo.",
+      "loading": "Cargando la vista previa…",
+      "ready": "Vista previa lista."
     }
   },
   "mentions": {

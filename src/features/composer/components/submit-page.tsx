@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { z } from 'zod'
 import { PageColumns } from '@/components/organisms/app-shell'
+// By its path: from the shell's index, every route would load it (seo.md).
+import { LeftColumnFold } from '@/components/organisms/app-shell/left-column-fold'
 import { GateButtons } from '@/components/organisms/auth-gate'
 import { EmptyState } from '@/components/organisms/empty-state'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -16,6 +18,7 @@ import { SUBMIT_SEGMENT } from '@/i18n/submit-path'
 import { draftKey } from '../lib/draft-key'
 import { RELATED_MAX } from '../schemas/create-post.schema'
 import { getSubmitCommunity } from '../lib/submit-community'
+import type { PreviewAction } from './body-tabs'
 import { SubmitEditorLoader } from './submit-editor-loader'
 
 type SearchParams = Record<string, string | string[] | undefined>
@@ -87,7 +90,14 @@ export async function submitMetadata(locale: Locale): Promise<Metadata> {
  * session, how to get in (SU-06). Someone else's personal channel cannot be posted to: it is left
  * out.
  */
-export async function SubmitPage({ searchParams }: { searchParams: SearchParams }) {
+export async function SubmitPage({
+  searchParams,
+  preview,
+}: {
+  searchParams: SearchParams
+  /** The preview's Server Action (specs/submit-tools ST-01), from the page. */
+  preview?: PreviewAction
+}) {
   const t = await getTranslations('submitPage')
   const query = parseSubmitQuery(searchParams)
   const viewer = await getViewer()
@@ -118,6 +128,8 @@ export async function SubmitPage({ searchParams }: { searchParams: SearchParams 
 
   return (
     <PageColumns>
+      {/* Writing with the left column folded (specs/submit-tools ST-08). */}
+      <LeftColumnFold />
       <h1 className="px-4 pt-4 type-page-title md:px-0">{t('title')}</h1>
       {community?.rules && (
         // Where there is no right column, the rules fold under the title (SU-08).
@@ -145,6 +157,7 @@ export async function SubmitPage({ searchParams }: { searchParams: SearchParams 
           community={community?.option ?? null}
           storageKey={draftKey(viewer.id)}
           related={related}
+          preview={preview}
         />
       </div>
     </PageColumns>

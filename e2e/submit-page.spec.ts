@@ -119,7 +119,9 @@ test.describe('Page to create a post', () => {
 
     await page.goto('/en/submit')
     // Announced (the live region holds only its words) and shown, with its buttons beside.
-    await expect(editor(page).getByRole('status')).toHaveText(/unpublished draft/)
+    await expect(
+      editor(page).getByRole('status').filter({ hasText: 'unpublished draft' }),
+    ).toBeAttached()
     await editor(page).getByRole('button', { name: 'Recover' }).click()
     await expect(title(page)).toHaveValue('A draft that survives')
     await expect(title(page)).toBeFocused()
@@ -332,4 +334,81 @@ test.describe('Page to create a post', () => {
       await expectNoA11yViolations(page)
     })
   }
+})
+
+test.describe('Tools of the page to create a post (specs/submit-tools)', () => {
+  test('formats with the toolbar and with Ctrl+B (ST-04 to ST-06)', async ({ page }) => {
+    await page.goto('/en/submit?community=defi')
+    await body(page).fill('rates are up')
+    await body(page).evaluate((field: HTMLTextAreaElement) => field.setSelectionRange(6, 9))
+    await editor(page).getByRole('button', { name: 'Bold' }).click()
+    await expect(body(page)).toHaveValue('rates **are** up')
+    // Undone as typing is (the browser's own history).
+    await page.keyboard.press('ControlOrMeta+z')
+    await expect(body(page)).toHaveValue('rates are up')
+
+    await body(page).evaluate((field: HTMLTextAreaElement) => field.setSelectionRange(0, 5))
+    await page.keyboard.press('Control+i')
+    await expect(body(page)).toHaveValue('_rates_ are up')
+  })
+
+  for (const theme of ['light', 'dark'] as const) {
+    test(`previews the post as the feed card and goes back with what is written, in ${theme} (ST-01 to ST-03)`, async ({
+      page,
+    }) => {
+      await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
+      await page.goto('/en/submit?community=defi')
+      await title(page).fill('Rates and the dollar')
+      await body(page).fill('Yields are **up**, ask @maria.')
+      await editor(page).getByRole('tab', { name: 'Preview' }).click()
+      const preview = editor(page).getByRole('tabpanel', { name: 'Preview' })
+      await expect(preview.getByRole('heading', { name: 'Rates and the dollar' })).toBeVisible()
+      await expect(preview.locator('strong', { hasText: 'up' })).toBeVisible()
+      // The mention in bold, without a link: the backend resolves it on publishing (D-1).
+      await expect(preview.locator('strong', { hasText: '@maria' })).toBeVisible()
+      await expect(preview.getByRole('link', { name: /maria/ })).toHaveCount(0)
+      await expectNoA11yViolations(page)
+
+      await editor(page).getByRole('tab', { name: 'Write' }).click()
+      await expect(body(page)).toHaveValue('Yields are **up**, ask @maria.')
+    })
+  }
+
+  test('keeps Publish at hand over the bottom bar in a long post (ST-07)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, 'Phones only: from md the row sits in its place')
+    await page.setViewportSize({ width: 360, height: 740 })
+    await page.goto('/en/submit?community=defi')
+    await body(page).fill(Array(20).fill('A long paragraph about rates.').join('\n\n'))
+    const publish = editor(page).getByRole('button', { name: 'Publish' })
+    await expect(publish).toBeInViewport()
+    const row = (await page.locator('[data-sticky-actions]').boundingBox())!
+    const bar = (await page.getByRole('navigation', { name: 'Main navigation' }).boundingBox())!
+    // Right over the bottom bar, nothing between.
+    expect(Math.abs(row.y + row.height - bar.y)).toBeLessThanOrEqual(1)
+  })
+
+  test('folds the left column to write, and remembers the choice (ST-08, ST-09)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'The left column exists from md')
+    await page.goto('/en/submit')
+    const fold = page.getByRole('button', { name: 'Your interests' })
+    await expect(fold).toHaveAttribute('aria-expanded', 'false')
+    await expect(page.getByText('Your interests', { exact: false }).first()).toBeHidden()
+    // The editor comes after the page: measured once it is there, not while it fades in.
+    await expect(community(page)).toBeFocused()
+    await expectNoA11yViolations(page)
+
+    await fold.click()
+    await expect(fold).toHaveAttribute('aria-expanded', 'true')
+    await page.reload()
+    await expect(fold).toHaveAttribute('aria-expanded', 'true')
+    // Elsewhere, as always.
+    await page.goto('/en')
+    await expect(page.getByRole('button', { name: 'Your interests' })).toHaveCount(0)
+  })
 })

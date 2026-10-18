@@ -170,3 +170,21 @@ describe('PostCard leading slot (specs/post-detail-refresh PD-01)', () => {
     expect(back.compareDocumentPosition(group) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 })
+
+describe('PostCard as a preview (specs/submit-tools ST-01, ST-02)', () => {
+  it('shows the post being written: no link into it, no join, the actions at zero and not pressable', () => {
+    renderWithIntl(
+      <PostCard
+        post={postItem({ body: 'Ask [@maria](asinko:ticker) about rates.' })}
+        variant="preview"
+      />,
+    )
+    const title = screen.getByRole('heading', { level: 2 })
+    expect(title.querySelector('a')).toBeNull()
+    expect(screen.queryByRole('button', { name: /Join/ })).toBeNull()
+    expect(screen.queryByRole('button', { name: /Upvote|Share/ })).toBeNull()
+    // A mention of a draft: in bold, without a link (D-1).
+    expect(screen.getByText('@maria', { selector: 'strong' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'maria' })).toBeNull()
+  })
+})

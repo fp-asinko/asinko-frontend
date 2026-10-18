@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
 import type { RawEntity } from '@/lib/api/contract'
-import { markMentions, parseMention, type MentionLookup } from './mentions'
+import { markDraftMentions, markMentions, parseMention, type MentionLookup } from './mentions'
 
 const lookup: MentionLookup = {
   communityOfAsset: (id) => ({ 'asset-btc': 'BTC' })[id],
@@ -79,5 +79,19 @@ describe('parseMention', () => {
     expect(parseMention('asinko:community/../admin')).toBeNull()
     expect(parseMention('asinko:other')).toBeNull()
     expect(parseMention(undefined)).toBeNull()
+  })
+})
+
+describe('markDraftMentions (specs/submit-tools ST-02)', () => {
+  it('turns each mention of a draft into one without a page: bold, no link', () => {
+    expect(markDraftMentions('Ask @maria about $BTC in #defi.')).toBe(
+      'Ask [@maria](asinko:ticker) about [$BTC](asinko:ticker) in [#defi](asinko:ticker).',
+    )
+    expect(parseMention('asinko:ticker')).toEqual({ type: 'ticker' })
+  })
+
+  it('leaves code as written, and prices are not assets', () => {
+    expect(markDraftMentions('Run `echo @maria` for $100')).toBe('Run `echo @maria` for $100')
+    expect(markDraftMentions('```\n#defi\n```')).toBe('```\n#defi\n```')
   })
 })
