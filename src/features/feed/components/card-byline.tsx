@@ -27,7 +27,10 @@ export function CardByline({
   edited = false,
   canJoin = true,
   badge,
+  linked = true,
 }: {
+  /** false in a preview (specs/submit-tools ST-01): the same names, as text; nothing leads away. */
+  linked?: boolean
   author: Author | null
   community: CardCommunity | null
   publishedAt: string
@@ -79,26 +82,13 @@ export function CardByline({
       <div className="min-w-0 flex-1">
         <div className="flex min-h-6 min-w-0 items-center gap-x-1.25 type-meta text-muted-foreground">
           {group ? (
-            <Link
-              href={group.path}
-              // Its hover card (specs/mention-preview MP-01).
-              {...previewProps(group.kind, group.slug)}
-              className="inline-flex min-h-6 min-w-0 items-center type-ui font-bold text-foreground hover:underline"
-            >
-              {/* The symbol (# or $) in gray: the name is the protagonist. Both inside one span: as
-                  two flex items the browser would name the link "# crypto", with a space. */}
-              <span className="truncate">
-                <span className="font-normal text-muted-foreground">
-                  {group.handle.slice(0, 1)}
-                </span>
-                {group.handle.slice(1)}
-              </span>
-            </Link>
+            <GroupName group={group} linked={linked} />
           ) : (
             <>
               <AuthorName
                 author={author}
                 fallback={authorName}
+                linked={linked}
                 className="font-bold text-foreground"
               />
               {chip}
@@ -118,7 +108,7 @@ export function CardByline({
         {group && (
           // CF-02: the author in second place, smaller (11px) and without a photo.
           <div className="flex min-w-0 items-center gap-x-1.25 text-[0.6875rem] leading-4 text-muted-foreground">
-            <AuthorName author={author} fallback={authorName} />
+            <AuthorName author={author} fallback={authorName} linked={linked} />
             {chip}
           </div>
         )}
@@ -139,17 +129,44 @@ export function CardByline({
   )
 }
 
+/** The group's handle, a link to its page with its hover card (specs/mention-preview MP-01). */
+function GroupName({ group, linked }: { group: CardCommunity; linked: boolean }) {
+  const className = 'inline-flex min-h-6 min-w-0 items-center type-ui font-bold text-foreground'
+  // The symbol (# or $) in gray: the name is the protagonist. Both inside one span: as two flex
+  // items the browser would name the link "# crypto", with a space.
+  const name = (
+    <span className="truncate">
+      <span className="font-normal text-muted-foreground">{group.handle.slice(0, 1)}</span>
+      {group.handle.slice(1)}
+    </span>
+  )
+  if (!linked) return <span className={className}>{name}</span>
+  return (
+    <Link
+      href={group.path}
+      {...previewProps(group.kind, group.slug)}
+      className={cn(className, 'hover:underline')}
+    >
+      {name}
+    </Link>
+  )
+}
+
 /** The author's @handle, a link to the profile; a system item ("Asinko") has none. */
 function AuthorName({
   author,
   fallback,
+  linked = true,
   className,
 }: {
   author: Author | null
   fallback: string
+  linked?: boolean
   className?: string
 }) {
-  if (!author) return <span className={cn('min-w-0 truncate', className)}>{fallback}</span>
+  if (!author || !linked) {
+    return <span className={cn('min-w-0 truncate', className)}>{author?.handle ?? fallback}</span>
+  }
   return (
     // pb-2 -mb-2: a 24px target (WCAG 2.5.8) on a 16px line, without moving it. Only downwards,
     // over the header's bottom margin: upwards it would overlap the group's link (axe).

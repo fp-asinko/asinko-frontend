@@ -405,6 +405,12 @@ test.describe('Tools of the page to create a post (specs/submit-tools)', () => {
 
     await fold.click()
     await expect(fold).toHaveAttribute('aria-expanded', 'true')
+    // Open, only what is under the button scrolls: nothing passes beneath it (WCAG 2.4.11).
+    const button = (await fold.boundingBox())!
+    const scroller = page.locator('#left-column > div')
+    await scroller.evaluate((element) => element.scrollTo(0, 400))
+    const top = await scroller.evaluate((element) => element.getBoundingClientRect().top)
+    expect(top).toBeGreaterThanOrEqual(button.y + button.height)
     await page.reload()
     await expect(fold).toHaveAttribute('aria-expanded', 'true')
     // Elsewhere, as always.

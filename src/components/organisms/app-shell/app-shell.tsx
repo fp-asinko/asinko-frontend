@@ -51,9 +51,13 @@ export function AppShell({
       <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)] md:[html:has([data-left-fold=folded])_&]:grid-cols-[3.5rem_minmax(0,1fr)]">
         <div
           id="left-column"
-          className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-2 py-2.5 md:block [html:has([data-left-fold])_&]:pt-14"
+          // With the fold button, the top 56px stay for it and only the content below scrolls:
+          // nothing passes under the button (WCAG 2.4.11).
+          className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-2 py-2.5 md:block [html:has([data-left-fold])_&]:overflow-hidden [html:has([data-left-fold])_&]:p-0 [html:has([data-left-fold])_&]:pt-14"
         >
-          <div className="[html:has([data-left-fold=folded])_&]:hidden">{sidebar}</div>
+          <div className="[html:has([data-left-fold=folded])_&]:hidden [html:has([data-left-fold])_&]:h-full [html:has([data-left-fold])_&]:overflow-y-auto [html:has([data-left-fold])_&]:px-2 [html:has([data-left-fold])_&]:pb-2.5">
+            {sidebar}
+          </div>
         </div>
         {/* Center (max 780px) and right (300px) travel together, centered in the remaining space,
             as in the prototype: at 1440px the right column sits next to the center, not at the edge. */}

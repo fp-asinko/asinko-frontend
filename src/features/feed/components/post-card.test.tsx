@@ -181,6 +181,8 @@ describe('PostCard as a preview (specs/submit-tools ST-01, ST-02)', () => {
     )
     const title = screen.getByRole('heading', { level: 2 })
     expect(title.querySelector('a')).toBeNull()
+    // Nothing leads away from the post being written: the group and the author as text.
+    expect(screen.queryAllByRole('link')).toEqual([])
     expect(screen.queryByRole('button', { name: /Join/ })).toBeNull()
     expect(screen.queryByRole('button', { name: /Upvote|Share/ })).toBeNull()
     // A mention of a draft: in bold, without a link (D-1).

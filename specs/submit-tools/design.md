@@ -11,7 +11,7 @@
 - En `PostEditor`, `Tabs` de shadcn ("Escribir" / "Vista previa") sobre el cuerpo. En Vista previa el cuerpo se oculta (no se desmonta: lo escrito queda) y la tarjeta ocupa su lugar.
 - `previewPost` (Server Action en `features/feed/actions/`, que es dueño de la tarjeta) valida con zod (`title`, `body`, `type`, `url`, `imageUrl`, `imageAlt`, `community` como slug), arma un `PostItem` con la sesión como autor y la comunidad resuelta (`getCommunityPage`), y devuelve la tarjeta **ya renderizada** (`PostCard variant="preview"`), como "Cargar más" del feed: `react-markdown` sigue solo en el servidor (ST-11).
 - D-1: antes de pasar el cuerpo a `PostMarkdown`, cada mención que el editor ya reconoce (`mentionSegments`, la misma de MA-12) se vuelve `[@x](asinko:ticker)`: el renderer la pinta en negrita sin link, como una mención sin resolver. Dentro de código no se toca.
-- `PostCard variant="preview"`: un `article` (no `CardLink`), el título sin link, sin "Unirse", y en lugar de votos, comentarios y compartir, la misma fila en cero, `aria-hidden` y sin botones.
+- `PostCard variant="preview"`: un `article` (no `CardLink`), el título, el grupo y el autor sin link (`CardByline linked={false}`: nada saca de la página a mitad de un borrador), sin "Unirse", y en lugar de votos, comentarios y compartir, la misma fila en cero, `aria-hidden` y sin botones.
 - El editor pide la vista previa al abrir la pestaña (y otra vez si cambió lo escrito), con `useTransition`; mientras, un `Skeleton` del tamaño de una tarjeta.
 
 ## 3. Publicar fijo en el teléfono (ST-07)
@@ -23,6 +23,7 @@
 - **Solo la página de crear post paga por esto.** Un primer intento con un organismo cliente en el shell sumaba 0,5 KB a todas las rutas (el detalle de post quedaba a 0,5 KB del tope). En su lugar:
   - `LeftColumnFold` (organismo cliente, `app-shell/left-column-fold.tsx`, importado por su ruta, no por el `index` del shell que importa el layout) es el botón. Lo dibuja `SubmitPage`, fijo sobre la parte de arriba de la columna (a su derecha cuando está abierta). Lleva `data-left-fold="folded" | "open"`, `aria-expanded` y `aria-controls="left-column"`.
   - `AppShell` se pliega **por CSS** mientras ese botón diga `folded`: `html:has([data-left-fold=folded])` angosta la grilla a `3.5rem` y oculta el contenido de la columna (no lo desmonta).
+- Con el botón, la franja de arriba (56 px) queda para él y solo scrollea el contenido de abajo: nada pasa por debajo del botón.
 - Arranca plegada también en el servidor (`useSyncExternalStore` con snapshot de servidor plegado): el primer dibujo no salta. La elección se guarda en `localStorage` (en `try/catch`).
 
 ## 5. Tests

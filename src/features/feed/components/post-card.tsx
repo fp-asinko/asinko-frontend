@@ -99,6 +99,8 @@ export function PostCard({
             edited={post.edited}
             titleId={`post-${post.id}`}
             canJoin={!preview && !post.deleted && post.community?.slug !== feedCommunity}
+            // A preview leads nowhere: leaving would interrupt the post being written.
+            linked={!preview}
           />
         </div>
       </div>
