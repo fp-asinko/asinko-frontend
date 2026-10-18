@@ -132,6 +132,31 @@ export const feedItemSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('POLL'), content: pollSchema }),
 ])
 
+/**
+ * GET /api/v1/users/{userId}/comments (P-012, backend 2026-10-13): a person's comments, newest
+ * first, each with where it is, as a profile shows it out of its thread.
+ */
+export const userCommentSchema = z.object({
+  id: z.uuid(),
+  author: userSummarySchema,
+  body: z.string(),
+  parentCommentId: z.uuid().nullable(),
+  score: z.number().int(),
+  viewerVote: z.union([z.literal(1), z.literal(-1)]).nullable(),
+  replyCount: z.number().int(),
+  editedAt: z.iso.datetime().nullable(),
+  deleted: z.boolean(),
+  createdAt: z.iso.datetime(),
+  /** The post, poll or thesis it is under: `title` is its title, question or claim. */
+  content: z.object({
+    kind: z.enum(['POST', 'POLL', 'THESIS']),
+    id: z.uuid(),
+    title: z.string(),
+    community: communitySummarySchema.nullable(),
+  }),
+})
+
+export type RawUserComment = z.infer<typeof userCommentSchema>
 export type RawPost = z.infer<typeof postSchema>
 export type RawPoll = z.infer<typeof pollSchema>
 export type RawEntity = z.infer<typeof entitySchema>

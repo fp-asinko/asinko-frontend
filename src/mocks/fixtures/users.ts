@@ -68,7 +68,7 @@ export const PROFILES: RawProfile[] = [
   },
   profile(1, {
     username: 'maria',
-    // P-011 (proposal): not in the backend yet; tier and rating come after the MVP.
+    // P-011 (backend, 2026-10-13); tier and rating come after the MVP.
     displayName: 'María Ruiz',
     bio: "On-chain analyst. If it's not on the blockchain, it didn't happen.",
     // P-019 and P-020 (proposals, specs/profile-presentation).
@@ -96,7 +96,7 @@ export const PROFILES: RawProfile[] = [
   }),
   profile(2, {
     username: 'federico',
-    // P-011 (proposal): not in the backend yet; tier and rating come after the MVP.
+    // P-011 (backend, 2026-10-13); tier and rating come after the MVP.
     displayName: 'Federico Piva',
     bio: 'Macro + crypto. I write long and I am wrong in public.',
     accuracyRate: 0.68,
@@ -111,7 +111,7 @@ export const PROFILES: RawProfile[] = [
   }),
   profile(3, {
     username: 'jeppe',
-    // P-011 (proposal): not in the backend yet; tier and rating come after the MVP.
+    // P-011 (backend, 2026-10-13); tier and rating come after the MVP.
     displayName: 'Jeppe Kirk',
     bio: 'Building a public track record. Long BTC, short narratives.',
     accuracyRate: 0.79,

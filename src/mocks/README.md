@@ -1,6 +1,6 @@
 # Mocks
 
-Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of them with the demo user; `API_MOCKS=missing` only the ones the backend does not have yet (`implemented: false`: today the proposals P-014, searching comments, and P-019 to P-021, the profile's headline, city, links, banner and image uploads). Handlers follow the backend's `dev` branch (`asinko-app` `0cdf243`): `?kind=` on the feeds, `?mine=true` on communities, an empty page for an unknown community. See `docs/ai-guidelines/api-integration.md § Mocks`.
+Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of them with the demo user; `API_MOCKS=missing` only the ones the backend does not have yet (`implemented: false`: today the proposals P-019 to P-021, the profile's headline, city, links, banner and image uploads). Handlers follow the backend's `dev` branch (`asinko-app` `0cdf243`): `?kind=` on the feeds, `?mine=true` on communities, an empty page for an unknown community. See `docs/ai-guidelines/api-integration.md § Mocks`.
 
 | Method | Path                              | Kind     | Notes                                                                                     |
 | ------ | --------------------------------- | -------- | ----------------------------------------------------------------------------------------- |
@@ -15,7 +15,7 @@ Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of 
 | PUT    | `/api/v1/posts/:id/vote`          | contract | E05. Stateless: computed from the fixtures (`votes.ts`)                                   |
 | DELETE | `/api/v1/posts/:id/vote`          | contract | E05                                                                                       |
 | PUT    | `/api/v1/polls/:id/vote`          | contract | E03. Reveals hidden results; `POLL_CLOSED`, `VOTE_LOCKED`                                 |
-| GET    | `/api/v1/posts/:id/comments`      | proposal | P-014, only with `?q=` (`when`): search, a flat list                                      |
+| GET    | `/api/v1/posts/:id/comments`      | contract | P-014 (backend 2026-10-13), only with `?q=` (`when`): search, a flat list                 |
 | GET    | `/api/v1/posts/:id/comments`      | contract | E05, replies nested. `sort` (P-014): every level; without it, oldest first as the backend |
 | GET    | `/api/v1/polls/:id/comments`      | contract | E05                                                                                       |
 | GET    | `/api/v1/assets`                  | contract | E14. Response shape assumed (proposal P-003). `q`, `cursor`                               |

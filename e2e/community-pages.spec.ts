@@ -68,11 +68,26 @@ test.describe('Community pages', () => {
     await expect(page).toHaveURL(/\/en\/hub\/defi\?filter=polls$/)
   })
 
-  test("an asset's page shows an explicit empty state for market data, no numbers (CP-09, CP-10)", async ({
+  test("an asset's page shows its price and change, open (specs/backend-adoption BK-05)", async ({
     page,
   }) => {
     await page.goto('/en/asset/BTC')
     await expect(heading(page, '$BTC')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Asset data' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    await expect(page.getByRole('main').getByText('$97,430.12')).toBeVisible()
+    await expect(page.getByRole('main').getByText('up 2.14%')).toBeAttached()
+  })
+
+  test('an old price says it is out of date; without one, an explicit empty state (BK-05, CP-10)', async ({
+    page,
+  }) => {
+    // AVAX's price in the mocks is older than 15 minutes; XAU/USD has none.
+    await page.goto('/en/asset/AVAX')
+    await expect(page.getByText(/Out of date · updated/)).toBeVisible()
+    await page.goto('/en/asset/XAU%2FUSD')
     await page.getByRole('button', { name: 'Asset data' }).click()
     await expect(page.getByText('No market data yet')).toBeVisible()
   })
@@ -148,10 +163,17 @@ test.describe('Quality (CP-16)', () => {
     test(`fits 360px and stays accessible in ${theme}`, async ({ page }) => {
       await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
       await page.setViewportSize({ width: 360, height: 800 })
-      for (const path of ['/en/hub/defi', '/en/asset/BTC']) {
+      // AVAX: an old price, its box on white (specs/backend-adoption BK-05, BK-08).
+      for (const path of ['/en/hub/defi', '/en/asset/BTC', '/en/asset/AVAX']) {
         await page.goto(path)
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
-        await expect(page.getByRole('main').getByRole('article').first()).toBeVisible()
+        // Each page as it ends up: the feed's first card, or the old price (AVAX has no
+        // community in the mocks, so no feed).
+        await expect(
+          path.endsWith('AVAX')
+            ? page.getByRole('main').getByText(/Out of date/)
+            : page.getByRole('main').getByRole('article').first(),
+        ).toBeVisible()
         const overflow = await page.evaluate(
           () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
         )

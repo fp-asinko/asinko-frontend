@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import type { ProfileTab } from '../schemas/profile-tab.schema'
 
 /**
- * Theses · Posts on a person's page, as the prototype's profile (specs/profile-track-record PT-04,
+ * Theses · Posts · Replies on a person's page, as the prototype's profile (specs/profile-track-record PT-04,
  * changed with the PO on 2026-10-09): small outlined pills, the current one in black, as the
  * prototype's (12px semibold, 5px × 14px). Links, not an ARIA tab
  * widget: they navigate, can be shared and need no JavaScript. Posts is the page itself and the
@@ -15,6 +15,8 @@ export function ProfileTabs({ pagePath, current }: { pagePath: string; current: 
   const tabs = [
     { tab: 'theses', href: `${pagePath}?tab=theses` },
     { tab: 'posts', href: pagePath },
+    // Their comments, out of their threads (specs/backend-adoption BK-03).
+    { tab: 'replies', href: `${pagePath}?tab=replies` },
   ] as const
 
   return (

@@ -2,13 +2,18 @@ import { ArrowUpRightIcon, ChartNoAxesColumnIcon, ChevronDownIcon, ListIcon } fr
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import type { CommunityPage, ProfileDetails } from '../communities.types'
-import { EmptyState } from '@/components/organisms/empty-state'
+import type {
+  AssetMarket as AssetMarketData,
+  CommunityPage,
+  ProfileDetails,
+} from '../communities.types'
+import { getAssetSummary } from '../lib/asset-api'
+import { AssetMarket } from './asset-market'
 
 /**
  * The row under the header (specs/community-pages § 5), the prototype's gray box, closed on
- * load: a group's rules and website; an asset's market data, with an explicit empty state until
- * there is a price provider (CP-10: never invented numbers). A group without rules nor website
+ * load: a group's rules and website; an asset's market data, open when it has a price
+ * (specs/backend-adoption BK-05). A group without rules nor website
  * shows nothing.
  */
 export function CommunityDetails({
@@ -20,21 +25,7 @@ export function CommunityDetails({
 }) {
   const t = useTranslations('communities')
 
-  if (page.kind === 'asset') {
-    return (
-      <Details
-        title={t('assetData.title')}
-        icon={<ChartNoAxesColumnIcon aria-hidden className="size-4" />}
-      >
-        <EmptyState
-          icon={<ChartNoAxesColumnIcon />}
-          title={t('assetData.empty')}
-          description={t('assetData.soon')}
-          size="section"
-        />
-      </Details>
-    )
-  }
+  if (page.kind === 'asset') return <AssetDetails symbol={page.slug} title={t('assetData.title')} />
 
   if (!page.rules && !page.mainUrl) return null
   return (
@@ -61,6 +52,35 @@ export function CommunityDetails({
           <span className="sr-only">{t('rules.newTab')}</span>
         </a>
       )}
+    </Details>
+  )
+}
+
+/**
+ * An asset's market data in its box (specs/backend-adoption BK-05, D-2): open when there is a
+ * price. The asset is asked by its symbol (cached per request: the page may have asked already).
+ * A secondary section: if it fails, the box says there is no data.
+ */
+export async function AssetDetails({ symbol, title }: { symbol: string; title: string }) {
+  const result = await getAssetSummary(symbol)
+  return <MarketDetails market={result.ok ? result.data.market : null} title={title} />
+}
+
+/** The box with the market data already at hand (an asset without a community has it). */
+export function MarketDetails({
+  market,
+  title,
+}: {
+  market: AssetMarketData | null
+  title: string
+}) {
+  return (
+    <Details
+      title={title}
+      icon={<ChartNoAxesColumnIcon aria-hidden className="size-4" />}
+      defaultOpen={market !== null}
+    >
+      <AssetMarket market={market} />
     </Details>
   )
 }

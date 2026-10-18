@@ -22,6 +22,7 @@ export const CLIENT_NAMESPACES = [
   'feed.comments',
   'feed.loadMore',
   'feed.poll',
+  'feed.replies.more',
   'feed.vote',
   'join',
   'mentions',

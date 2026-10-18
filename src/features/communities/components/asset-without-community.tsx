@@ -5,6 +5,7 @@ import { IdentityBanner } from '@/components/molecules/identity-banner'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import { EmptyState } from '@/components/organisms/empty-state'
 import type { AssetSummary } from '../communities.types'
+import { MarketDetails } from './community-details'
 
 /**
  * The page of an asset of the catalog that has no community yet (specs/backend-answer-1013 BA-09,
@@ -14,6 +15,7 @@ import type { AssetSummary } from '../communities.types'
  */
 export function AssetWithoutCommunity({ asset }: { asset: AssetSummary }) {
   const t = useTranslations('communities.assetOnly')
+  const tc = useTranslations('communities')
   return (
     <>
       <header className="border-b px-4 pb-4 sm:px-0">
@@ -37,6 +39,8 @@ export function AssetWithoutCommunity({ asset }: { asset: AssetSummary }) {
           <p className="type-meta text-muted-foreground">{asset.name}</p>
         </div>
       </header>
+      {/* Its price too, while it has no community (specs/backend-adoption BK-05). */}
+      <MarketDetails market={asset.market} title={tc('assetData.title')} />
       <EmptyState
         icon={<CandlestickChartIcon />}
         title={t('title', { handle: asset.handle })}

@@ -47,6 +47,9 @@ function renderHeader(details: ProfileDetails, membership: 'MEMBER' | null = nul
   )
 }
 
+// The asset's market data is asked on the server (AssetDetails, async): not here.
+vi.mock('../lib/asset-api', () => ({ getAssetSummary: vi.fn() }))
+
 describe('Profile header (specs/community-pages CP-11, CP-12)', () => {
   it('titles with the display name and @username below, without tier nor rating (after the MVP)', () => {
     renderHeader(profile())

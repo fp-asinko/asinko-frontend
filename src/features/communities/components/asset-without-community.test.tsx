@@ -5,6 +5,9 @@ import { AssetWithoutCommunity } from './asset-without-community'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
+// The asset's market data is asked on the server (AssetDetails, async): not here.
+vi.mock('../lib/asset-api', () => ({ getAssetSummary: vi.fn() }))
+
 describe('AssetWithoutCommunity (specs/backend-answer-1013 BA-09)', () => {
   it('titles the page with the symbol and its name, and says the community is coming', () => {
     renderWithIntl(
@@ -15,6 +18,7 @@ describe('AssetWithoutCommunity (specs/backend-answer-1013 BA-09)', () => {
           name: 'Gold Spot / US Dollar',
           logoUrl: null,
           communitySlug: null,
+          market: null,
         }}
       />,
     )

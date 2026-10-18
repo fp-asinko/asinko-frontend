@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { POSTS } from '@/mocks/fixtures/posts'
+import { PROFILES } from '@/mocks/fixtures/users'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
 import { parseFeedParams } from '../schemas/feed-params.schema'
@@ -66,6 +67,21 @@ describe('getFeed', () => {
   it('returns NOT_FOUND for an unknown community, although Explore answers an empty page', async () => {
     const result = await getFeed(parseFeedParams({ community: 'nope' }))
     expect(result).toMatchObject({ ok: false, code: 'NOT_FOUND' })
+  })
+
+  it("reads a person's posts, in any community, newest first (specs/backend-adoption BK-02)", async () => {
+    const maria = PROFILES.find((each) => each.username === 'maria')!
+    const result = await getFeed({ ...parseFeedParams({}), community: 'maria', author: maria.id })
+    if (!result.ok) throw new Error('expected ok')
+    expect(result.data.items.length).toBeGreaterThan(0)
+    expect(
+      result.data.items.every((item) => item.kind === 'post' && item.author?.username === 'maria'),
+    ).toBe(true)
+    // Not only their channel: groups too.
+    const communities = new Set(
+      result.data.items.map((item) => (item.kind === 'post' ? item.community?.slug : null)),
+    )
+    expect(communities.size).toBeGreaterThan(1)
   })
 
   it('reads the Following feed', async () => {

@@ -3,13 +3,16 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { communityPage } from '../communities.fixture'
-import { CommunityDetails } from './community-details'
+import { CommunityDetails, MarketDetails } from './community-details'
 import { CommunityHeader } from './community-header'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 vi.mock('@/lib/communities/join-community.action', () => ({ joinCommunity: vi.fn() }))
 vi.mock('@/lib/communities/leave-community.action', () => ({ leaveCommunity: vi.fn() }))
 vi.mock('@/lib/communities/set-favorite.action', () => ({ setFavorite: vi.fn() }))
+
+// The asset's market data is asked on the server (AssetDetails, async): not here.
+vi.mock('../lib/asset-api', () => ({ getAssetSummary: vi.fn() }))
 
 describe('CommunityHeader (specs/community-pages CP-04)', () => {
   it('titles the page with the handle and shows description, members and the way back', () => {
@@ -58,10 +61,28 @@ describe('CommunityDetails (specs/community-pages CP-08, CP-10)', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  it('shows an asset market data closed, as the prototype, with an explicit empty state', async () => {
+  it("shows an asset's market data open when it has a price (specs/backend-adoption BK-05)", () => {
     renderWithIntl(
-      <CommunityDetails page={communityPage({ slug: 'BTC', handle: '$BTC', kind: 'asset' })} />,
+      <MarketDetails
+        title="Asset data"
+        market={{
+          price: 97430.12,
+          changePct: 2.14,
+          stale: false,
+          updatedAt: null,
+          currency: 'USD',
+        }}
+      />,
     )
+    expect(screen.getByRole('button', { name: 'Asset data' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
+    expect(screen.getByText('$97,430.12')).toBeInTheDocument()
+  })
+
+  it('keeps it closed without a price, with an explicit empty state (CP-10)', async () => {
+    renderWithIntl(<MarketDetails title="Asset data" market={null} />)
     const trigger = screen.getByRole('button', { name: 'Asset data' })
     expect(trigger).toHaveAttribute('aria-expanded', 'false')
     await userEvent.click(trigger)

@@ -11,6 +11,7 @@ import {
   pollSchema,
   postImageUploadSchema,
   profileImageUploadSchema,
+  userCommentSchema,
   postSchema,
   profileSchema,
   searchResultSchema,
@@ -33,6 +34,7 @@ import { withTopPost } from './top-post'
 import { followersOf, followingOf, listItem } from './fixtures/follows'
 import { membersOf } from './fixtures/members'
 import { thesesBy } from './fixtures/theses'
+import { userComments, userContent } from './user-activity'
 import { PROPOSED_USER_FIELDS, updateUser } from './profile-edit'
 import { signProfileImageUpload } from './profile-image'
 import { paginate } from './paginate'
@@ -152,6 +154,25 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     },
     handler: ({ params, body }) => updateUser(params.userId ?? '', body),
   },
+  // P-012 (backend, 2026-10-13): what a person published and commented (specs/backend-adoption).
+  {
+    method: 'GET',
+    path: '/api/v1/users/:userId/content',
+    kind: 'contract',
+    implemented: true,
+    schema: paginatedSchema(feedItemSchema),
+    example: { ...noRequest, params: { userId: PROFILES[1]!.id }, query: { kind: 'POST,POLL' } },
+    handler: ({ params, query }) => userContent(params.userId ?? '', query),
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/users/:userId/comments',
+    kind: 'contract',
+    implemented: true,
+    schema: paginatedSchema(userCommentSchema),
+    example: { ...noRequest, params: { userId: PROFILES[1]!.id } },
+    handler: ({ params, query }) => userComments(params.userId ?? '', query.cursor),
+  },
   // E01: editing your own profile (specs/profile-edit), for the demo viewer.
   {
     method: 'PATCH',
@@ -199,7 +220,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
             each.name.toLowerCase().includes(search) ||
             each.slug.toLowerCase().includes(search)),
       ).sort((a, b) => b.memberCount - a.memberCount)
-      // P-016: each with its main post (the backend adds it later; optional in the contract).
+      // P-016 (backend, 2026-10-13): each with its main post.
       return { status: 200, body: paginate(filtered.map(withTopPost), query.cursor) }
     },
   },
@@ -432,12 +453,12 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
 
   // E05: comments
   {
-    // P-014 (proposal): searching. A post the mocks do not know (a real one, API_MOCKS=missing)
-    // has no results: the mock cannot search the backend's comments.
+    // P-014 (backend, 2026-10-13): searching, a flat list. With API_MOCKS=missing it goes to the
+    // backend; mocked, only the fixtures' comments are found.
     method: 'GET',
     path: '/api/v1/posts/:id/comments',
-    kind: 'proposal',
-    implemented: false,
+    kind: 'contract',
+    implemented: true,
     when: (query) => query.q !== undefined,
     schema: commentListSchema,
     example: { ...noRequest, params: { id: POSTS[2]!.id }, query: { q: 'eth' } },

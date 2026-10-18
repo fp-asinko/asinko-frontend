@@ -185,6 +185,22 @@
       "loading": "Cargando…",
       "loaded": "{count, plural, one {Se cargó # elemento más} other {Se cargaron # elementos más}}",
       "error": "No se pudo cargar más. Inténtalo de nuevo."
+    },
+    "replies": {
+      "title": "Respuestas",
+      "in": "En <post>{title}</post>",
+      "edited": "editado",
+      "points": "{count, plural, one {# punto} other {# puntos}}",
+      "empty": "{handle} todavía no respondió",
+      "emptySelf": "Todavía no respondiste. Tus comentarios aparecerán aquí.",
+      "error": "No se pudieron cargar las respuestas",
+      "errorBody": "El resto del perfil sigue funcionando. Inténtalo de nuevo en un momento.",
+      "more": {
+        "button": "Cargar más",
+        "loading": "Cargando…",
+        "loaded": "{count, plural, one {Se cargó # respuesta más} other {Se cargaron # respuestas más}}",
+        "error": "No se pudo cargar más. Inténtalo de nuevo."
+      }
     }
   },
   "rightColumn": {
@@ -300,7 +316,9 @@
     "assetData": {
       "title": "Datos del activo",
       "empty": "Sin datos de mercado todavía",
-      "soon": "Precio, variación y sentimiento llegan pronto."
+      "price": "Precio",
+      "stale": "Desactualizado · actualizado el {date}",
+      "staleUnknown": "Desactualizado"
     },
     "profile": {
       "followers": "{count, plural, one {<b>#</b> seguidor} other {<b>#</b> seguidores}}",
@@ -327,7 +345,8 @@
     "tabs": {
       "label": "Secciones del perfil",
       "posts": "Posts",
-      "theses": "Tesis"
+      "theses": "Tesis",
+      "replies": "Respuestas"
     },
     "theses": {
       "title": "Tesis",

@@ -127,3 +127,15 @@ export type CommentNode = {
   viewerVote: 1 | -1 | null
   replies: CommentNode[]
 }
+
+/** A person's comment on their profile, out of its thread (specs/backend-adoption BK-03). */
+export type UserReply = {
+  id: string
+  /** Markdown, as a comment's. */
+  body: string
+  score: number
+  createdAt: string
+  edited: boolean
+  /** Where it is: the post's (or poll's) title; a path only for a post, to the comment itself. */
+  where: { title: string; path: string | null; community: CardCommunity | null }
+}

@@ -29,7 +29,17 @@ describe('getAssetSummary (specs/backend-answer-1013 BA-09)', () => {
         name: 'Gold Spot / US Dollar',
         logoUrl: null,
         communitySlug: null,
+        // No price for it in the catalog yet (P-003): the page says so.
+        market: null,
       },
+    })
+  })
+
+  it('brings the market data: the price, the change, how old, in dollars (BK-05, BK-06)', async () => {
+    const result = await getAssetSummary('BTC')
+    expect(result).toMatchObject({
+      ok: true,
+      data: { market: { price: 97430.12, stale: false, currency: 'USD' } },
     })
   })
 

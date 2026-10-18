@@ -19,7 +19,10 @@ export async function CommunityFeed({
   pagePath,
   searchParams,
   filters = true,
+  author,
 }: {
+  /** A profile: the person's id, for everything they published (specs/backend-adoption BK-02). */
+  author?: string
   slug: string
   handle: string
   /** The page itself (/hub/macro): where the filters link to. */
@@ -29,7 +32,7 @@ export async function CommunityFeed({
   filters?: boolean
 }) {
   const { filter } = parseFeedParams(await searchParams)
-  const params: FeedParams = { feed: 'for-you', filter, community: slug }
+  const params: FeedParams = { feed: 'for-you', filter, community: slug, author }
 
   return (
     <>

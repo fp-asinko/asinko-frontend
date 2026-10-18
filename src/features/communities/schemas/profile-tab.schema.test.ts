@@ -7,7 +7,9 @@ describe('profile tab (specs/profile-track-record PT-04)', () => {
     expect(parseProfileTab({ tab: 'theses' })).toBe('theses')
     expect(parseProfileTab({ tab: 'posts' })).toBe('posts')
     expect(parseProfileTab({})).toBe('posts')
-    expect(parseProfileTab({ tab: 'replies' })).toBe('posts')
+    // Replies, since specs/backend-adoption BK-03.
+    expect(parseProfileTab({ tab: 'replies' })).toBe('replies')
+    expect(parseProfileTab({ tab: 'all' })).toBe('posts')
     expect(parseProfileTab({ tab: ['theses', 'posts'] })).toBe('posts')
     expect(parseProfileTab(undefined)).toBe('posts')
   })

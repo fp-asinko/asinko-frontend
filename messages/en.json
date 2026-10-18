@@ -185,6 +185,22 @@
       "loading": "Loading…",
       "loaded": "{count, plural, one {# more item loaded} other {# more items loaded}}",
       "error": "Could not load more. Try again."
+    },
+    "replies": {
+      "title": "Replies",
+      "in": "In <post>{title}</post>",
+      "edited": "edited",
+      "points": "{count, plural, one {# point} other {# points}}",
+      "empty": "{handle} has not replied yet",
+      "emptySelf": "You have not replied yet. Your comments will show up here.",
+      "error": "Could not load the replies",
+      "errorBody": "The rest of the profile still works. Try again in a moment.",
+      "more": {
+        "button": "Load more",
+        "loading": "Loading…",
+        "loaded": "{count, plural, one {# more reply loaded} other {# more replies loaded}}",
+        "error": "Could not load more. Try again."
+      }
     }
   },
   "rightColumn": {
@@ -300,7 +316,9 @@
     "assetData": {
       "title": "Asset data",
       "empty": "No market data yet",
-      "soon": "Price, change and sentiment are coming soon."
+      "price": "Price",
+      "stale": "Out of date · updated {date}",
+      "staleUnknown": "Out of date"
     },
     "profile": {
       "followers": "{count, plural, one {<b>#</b> follower} other {<b>#</b> followers}}",
@@ -327,7 +345,8 @@
     "tabs": {
       "label": "Profile sections",
       "posts": "Posts",
-      "theses": "Theses"
+      "theses": "Theses",
+      "replies": "Replies"
     },
     "theses": {
       "title": "Theses",

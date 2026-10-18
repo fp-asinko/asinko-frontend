@@ -15,6 +15,17 @@ describe('ProfileTabs (specs/profile-track-record PT-04, PT-10)', () => {
     expect(theses).toHaveAttribute('href', '/user/maria?tab=theses')
     expect(theses).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: 'Posts' })).not.toHaveAttribute('aria-current')
-    expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual(['Theses', 'Posts'])
+    expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual([
+      'Theses',
+      'Posts',
+      'Replies',
+    ])
+  })
+
+  it('links Replies to ?tab=replies (specs/backend-adoption BK-03)', () => {
+    renderWithIntl(<ProfileTabs pagePath="/user/maria" current="replies" />)
+    const replies = screen.getByRole('link', { name: 'Replies' })
+    expect(replies).toHaveAttribute('href', '/user/maria?tab=replies')
+    expect(replies).toHaveAttribute('aria-current', 'page')
   })
 })

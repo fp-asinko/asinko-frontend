@@ -55,7 +55,12 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'comments',
       'loadMore',
       'poll',
+      // Only "Load more" of a profile's replies (specs/backend-adoption): the list is the server's.
+      'replies',
       'vote',
+    ])
+    expect(Object.keys((picked.feed as Record<string, Record<string, unknown>>).replies!)).toEqual([
+      'more',
     ])
     // Only the client part of the namespace: the page texts stay on the server.
     // (profile: the badge of the hover cards, specs/mention-preview).

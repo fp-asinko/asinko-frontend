@@ -8,6 +8,8 @@ import { feedParamsSchema } from './feed-params.schema'
  * Server Actions). getFeed checks the cursor's shape before any request.
  */
 export const loadMoreSchema = feedParamsSchema.extend({
+  /** A profile's posts (specs/backend-adoption BK-02): the person's id. */
+  author: z.uuid().optional(),
   cursor: z.string().min(1).max(512),
   locale: z.enum(routing.locales),
 })

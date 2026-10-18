@@ -96,6 +96,24 @@ Soft-delete — no borra la fila; pasa a `status: DELETED`, `username`/`avatarUr
 
 ---
 
+## Actividad del perfil (P-012, implementado el 2026-10-13)
+
+### `GET /api/v1/users/{userId}/content`
+**Público.** Lo que publicó la persona, en cualquier comunidad, del más nuevo al más viejo. Lista estándar (`{ items: FeedItem[], nextCursor }`), con el mismo `FeedItem`, cursor y filtro `?kind=POST,POLL,THESIS` que el feed (E04). Sin borrados ni programados.
+
+**Errores:** `404` — perfil privado para quien no es su dueño, o usuario inexistente.
+
+### `GET /api/v1/users/{userId}/comments`
+**Público.** Sus comentarios, del más nuevo al más viejo (`{ items, nextCursor }`). Cada uno es un `Comment` sin hilo, más dónde está:
+
+```jsonc
+"content": { "kind": "POST | POLL | THESIS", "id": "uuid", "title": "string", "community": { /* CommunitySummary */ } }
+```
+
+`title` es el título del post, la pregunta de la encuesta o el claim de la tesis. Sin comentarios borrados ni en contenido borrado o programado.
+
+**Errores:** `404` — perfil privado para quien no es su dueño, o usuario inexistente.
+
 ## Follow
 
 ### `PUT /api/v1/users/{userId}/follow/{targetUserId}` · `DELETE /api/v1/users/{userId}/follow/{targetUserId}`

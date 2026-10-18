@@ -35,6 +35,8 @@ const cursorSchema = z.string().regex(/^[A-Za-z0-9_\-=.:]{1,512}$/)
 
 const EXPLORE = '/api/v1/feed/explore'
 const FOLLOWING = '/api/v1/feed/following'
+/** What a person published, in any community (P-012, specs/backend-adoption BK-02). */
+const USER_CONTENT = '/api/v1/users/:userId/content'
 
 /** Theses arrive in phase 2: the feed asks only for what it shows, so a page keeps its 20 items. */
 const KINDS = { new: 'POST,POLL', polls: 'POLL' } as const
@@ -42,6 +44,15 @@ const KINDS = { new: 'POST,POLL', polls: 'POLL' } as const
 function requestFeed(params: FeedParams, cursor: string | undefined) {
   const query: Record<string, string> = { kind: KINDS[params.filter] }
   if (cursor) query.cursor = cursor
+  if (params.author) {
+    return apiRequest({
+      method: 'GET',
+      path: USER_CONTENT,
+      params: { userId: params.author },
+      query,
+      schema: looseListSchema,
+    })
+  }
   if (params.feed === 'following') {
     return apiRequest({ method: 'GET', path: FOLLOWING, query, schema: looseListSchema })
   }
@@ -91,7 +102,7 @@ export async function getFeed(
     signedIn = false,
   }: { communityResolved?: boolean; signedIn?: boolean } = {},
 ): Promise<ApiResult<FeedPage>> {
-  const endpoint = params.feed === 'following' ? FOLLOWING : EXPLORE
+  const endpoint = params.author ? USER_CONTENT : params.feed === 'following' ? FOLLOWING : EXPLORE
   if (cursor !== undefined && !cursorSchema.safeParse(cursor).success) return invalidInput(endpoint)
 
   const [feed, filtered] = await Promise.all([

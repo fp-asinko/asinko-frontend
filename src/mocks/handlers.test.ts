@@ -81,16 +81,59 @@ describe('mock handlers behave like the contract', () => {
 
   it('marks as missing only what the backend does not have: the proposals', () => {
     const missing = MOCK_ROUTES.filter((route) => !route.implemented).map((route) => route.path)
-    // Searching comments (P-014) and the profile's new fields (P-019, P-020) go alone: the rest of
-    // those endpoints is the backend's.
+    // The profile's new fields (P-019, P-020) go alone: the rest of that endpoint is the backend's.
+    // Searching comments (P-014) is the backend's since 2026-10-13.
     expect(missing.toSorted()).toEqual(
       [
         '/api/v1/users/:userId',
-        '/api/v1/posts/:id/comments',
         '/api/v1/uploads/avatar',
         '/api/v1/uploads/profile-banner',
       ].toSorted(),
     )
+  })
+
+  describe("a person's activity (P-012, specs/backend-adoption)", () => {
+    const maria = PROFILES.find((each) => each.username === 'maria')!
+    type Page = { items: Array<Record<string, unknown>>; nextCursor: string | null }
+    const body = async (path: Parameters<typeof call>[1], query = {}) =>
+      (await call('GET', path, { params: { userId: maria.id }, query })).body as Page
+
+    it('lists only what the person published, newest first, by kind', async () => {
+      const page = await body('/api/v1/users/:userId/content', { kind: 'POST' })
+      const items = page.items as Array<{
+        kind: string
+        content: { creator: { id: string }; publishedAt: string }
+      }>
+      expect(items.length).toBeGreaterThan(0)
+      expect(
+        items.every((item) => item.kind === 'POST' && item.content.creator.id === maria.id),
+      ).toBe(true)
+      const dates = items.map((item) => item.content.publishedAt)
+      expect(dates).toEqual([...dates].sort().reverse())
+    })
+
+    it("lists the person's comments, replies included, each with where it is", async () => {
+      const page = await body('/api/v1/users/:userId/comments')
+      const items = page.items as Array<{
+        author: { id: string }
+        content: { kind: string; title: string }
+        replies?: unknown
+      }>
+      expect(items.length).toBeGreaterThan(0)
+      expect(items.every((item) => item.author.id === maria.id)).toBe(true)
+      expect(items[0]!.content.title.length).toBeGreaterThan(0)
+      expect(items[0]).not.toHaveProperty('replies')
+    })
+
+    it('answers 404 for a person that does not exist', async () => {
+      const missing = { params: { userId: '00000000-0000-4000-8000-000000009999' } }
+      expect(await call('GET', '/api/v1/users/:userId/content', missing)).toMatchObject({
+        status: 404,
+      })
+      expect(await call('GET', '/api/v1/users/:userId/comments', missing)).toMatchObject({
+        status: 404,
+      })
+    })
   })
 
   describe("the profile's presentation (P-019 to P-021, specs/profile-presentation)", () => {

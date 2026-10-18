@@ -20,6 +20,8 @@ test.describe('JavaScript budget', () => {
     '/en/asset/BTC',
     '/en/user/federico',
     '/en/user/maria?tab=theses',
+    // specs/backend-adoption BK-03
+    '/en/user/maria?tab=replies',
     // specs/submit-page SU-11
     '/en/submit',
     '/en/submit?community=defi',

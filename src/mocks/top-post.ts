@@ -5,7 +5,7 @@ import { POSTS } from './fixtures/posts'
 const WEEK = 7 * 24 * 60 * 60_000
 
 /**
- * P-016 (proposal): a community's main post, what the left column shows under it
+ * P-016 (backend, 2026-10-13): a community's main post, what the left column shows under it
  * (specs/interests-refresh IR-01): the most voted of the last 7 days, or else the newest.
  */
 export function topPostOf(communityId: string): RawCommunity['topPost'] {
@@ -18,7 +18,7 @@ export function topPostOf(communityId: string): RawCommunity['topPost'] {
   return { id: pick.id, title: pick.title }
 }
 
-/** A community as the backend will send it with P-016. */
+/** A community as the backend sends it with P-016. */
 export function withTopPost(community: RawCommunity): RawCommunity {
   return { ...community, topPost: topPostOf(community.id) }
 }

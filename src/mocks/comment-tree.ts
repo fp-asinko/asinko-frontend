@@ -31,7 +31,8 @@ function sorted(list: readonly RawComment[], sort: Sort): RawComment[] {
  * (a positive integer up to 20; anything else is ignored) and only the literal "false" turns
  * `replies` off. Without replies each root keeps `replies: []` and its `replyCount`.
  *
- * And P-014 (proposal): `sort=best|top|new|old` orders every level. Without it, the order of the
+ * And P-014 (backend, 2026-10-13): `sort=best|top|new|old` orders every level (the backend's
+ * `best` is chronological until its formula is set; the mock keeps the proposed one). Without it, the order of the
  * backend today (oldest first), so a request without the parameter answers as the real one.
  */
 export function commentTree(
@@ -55,7 +56,7 @@ const fold = (text: string) =>
     .toLowerCase()
 
 /**
- * P-014 (proposal): `?q=` finds the comments that contain the text, at any level, in a flat list
+ * P-014 (backend, 2026-10-13): `?q=` finds the comments that contain the text, at any level, in a flat list
  * (`replies: []`), the most matches first, then the best voted. Deleted comments never match.
  */
 export function searchComments(roots: readonly RawComment[], q: string): RawComment[] {

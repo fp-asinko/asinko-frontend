@@ -86,6 +86,20 @@ export type AssetSummary = {
   logoUrl: string | null
   /** Its community's slug; null while it has none. */
   communitySlug: string | null
+  /** Its price (P-003, specs/backend-adoption BK-05); null without one. */
+  market: AssetMarket | null
+}
+
+/** An asset's market data, as its page shows it. */
+export type AssetMarket = {
+  price: number
+  /** The day's change in percent (2.14 is +2.14 %); null without one. */
+  changePct: number | null
+  /** The last price known, older than 15 minutes (priceStale). */
+  stale: boolean
+  updatedAt: string | null
+  /** USD, or null for a currency pair (EUR/USD), whose price has no currency of its own. */
+  currency: 'USD' | null
 }
 
 /** The community part of a hover card (specs/mention-preview § 3): only what the card shows. */

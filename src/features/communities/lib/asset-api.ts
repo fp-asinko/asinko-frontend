@@ -9,8 +9,8 @@ import type { AssetSummary } from '../communities.types'
 const ENDPOINT = 'GET /api/v1/assets/:symbol'
 
 /**
- * An asset of the catalog, for its page when it has no community yet (specs/backend-answer-1013
- * BA-09): name, logo and class, and the slug of its community when there is one. The symbol is
+ * An asset of the catalog, for its page (specs/backend-answer-1013 BA-09, specs/backend-adoption
+ * BK-05): name, logo, its market data, and the slug of its community when there is one. The symbol is
  * checked before the request. Cached per request: the metadata and the page ask for the same one.
  */
 export const getAssetSummary = cache(async function getAssetSummary(
@@ -33,6 +33,16 @@ export const getAssetSummary = cache(async function getAssetSummary(
       name: asset.name,
       logoUrl: allowedImageUrl(asset.logoUrl ?? null),
       communitySlug: asset.linkedCommunity?.slug ?? null,
+      market:
+        asset.price === null
+          ? null
+          : {
+              price: asset.price,
+              changePct: asset.priceChangePct,
+              stale: asset.priceStale,
+              updatedAt: asset.priceUpdatedAt,
+              currency: asset.assetClass === 'FOREX' ? null : 'USD',
+            },
     },
   }
 })

@@ -17,7 +17,11 @@ export const feedParamsSchema = z.object({
   community: z.preprocess(first, z.string().regex(SLUG_PATTERN).optional().catch(undefined)),
 })
 
-export type FeedParams = z.infer<typeof feedParamsSchema>
+/**
+ * A feed's state: the URL's, plus who wrote it on a profile (P-012, specs/backend-adoption BK-02).
+ * The author never comes from the URL: the page sets it.
+ */
+export type FeedParams = z.infer<typeof feedParamsSchema> & { author?: string }
 
 export function parseFeedParams(searchParams: unknown): FeedParams {
   return feedParamsSchema.parse(searchParams ?? {})

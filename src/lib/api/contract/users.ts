@@ -33,8 +33,8 @@ export const userSchema = z.object({
 })
 
 export const profileSchema = userSchema.extend({
-  /** P-011 (proposal): optional until the backend sends it (specs/community-pages CP-20). Tier and
-   * rating stay out until after the MVP (backend, 2026-10-07). */
+  /** P-011 (backend, 2026-10-13): null when not set or equal to the username (specs/community-pages
+   * CP-20). Tier and rating stay out until after the MVP. */
   displayName: z.string().nullable().optional(),
   points: z.number().int(),
   badgeStatus: z.enum(['NONE', 'IDENTITY_VERIFIED', 'INSTITUTIONAL']),
