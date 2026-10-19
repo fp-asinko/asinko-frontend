@@ -22,6 +22,20 @@ test.describe('not found', () => {
     await expect(page).toHaveURL(/\/pt$/)
   })
 
+  // A path that cannot be decoded (a lone %) is a bad request, not a server error.
+  test('a malformed URL returns 400, never 500', async ({ request }) => {
+    for (const path of [
+      '/%zz',
+      '/en/%zz',
+      '/en/hub/macro%25zz',
+      '/en/user/a%25',
+      '/en/asset/BTC%25',
+    ]) {
+      const response = await request.get(path, { maxRedirects: 0 })
+      expect(response.status(), path).toBe(400)
+    }
+  })
+
   test('passes the automated accessibility check', async ({ page }) => {
     await page.goto('/en/missing')
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
