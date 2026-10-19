@@ -54,6 +54,21 @@ describe('CalendarWidgetForm (CW-06, CW-10)', () => {
     expect(allDay).toMatchObject({ allDay: true, startsAt: '2026-10-28T00:00:00.000Z', endsAt: '' })
   })
 
+  it('"All day" is a checkbox that turns the times into dates, emptying them', async () => {
+    renderWithIntl(
+      withDone(
+        <CalendarWidgetForm draft={toDraft(CALENDAR) as never} formId="form" onDone={vi.fn()} />,
+      ),
+    )
+    const [timed] = screen.getAllByRole('checkbox', { name: 'All day' })
+    expect(timed).not.toBeChecked()
+    await userEvent.click(timed!)
+    expect(timed).toBeChecked()
+    const [start] = screen.getAllByLabelText(/starts/i)
+    expect(start).toHaveAttribute('type', 'date')
+    expect(start).toHaveValue('')
+  })
+
   it('converts between a field and an instant', () => {
     expect(toFieldValue('2026-10-28T00:00:00.000Z', true)).toBe('2026-10-28')
     expect(fromFieldValue('2026-10-28', true)).toBe('2026-10-28T00:00:00.000Z')

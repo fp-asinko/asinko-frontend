@@ -3,8 +3,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { useId } from 'react'
-import { useFieldArray, useForm, useWatch, type UseFormRegisterReturn } from 'react-hook-form'
+import {
+  Controller,
+  useFieldArray,
+  useForm,
+  useWatch,
+  type UseFormRegisterReturn,
+} from 'react-hook-form'
 import type { z } from 'zod'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { WIDGET_LIMITS as L } from '@/lib/api/contract/widgets'
@@ -172,16 +179,23 @@ export function CalendarWidgetForm({
               error={error(eventErrors?.title?.message)}
             />
             <label className="inline-flex min-h-10 w-fit cursor-pointer items-center gap-2 type-action">
-              <input
-                type="checkbox"
-                {...form.register(`events.${index}.allDay`, {
-                  // The fields change type: what they had no longer fits.
-                  onChange: () => {
-                    form.setValue(`events.${index}.startsAt`, '')
-                    form.setValue(`events.${index}.endsAt`, '')
-                  },
-                })}
-                className="size-4 accent-primary"
+              <Controller
+                control={form.control}
+                name={`events.${index}.allDay`}
+                render={({ field }) => (
+                  <Checkbox
+                    name={field.name}
+                    inputRef={field.ref}
+                    checked={field.value}
+                    onBlur={field.onBlur}
+                    onCheckedChange={(checked) => {
+                      field.onChange(checked)
+                      // The fields change type: what they had no longer fits.
+                      form.setValue(`events.${index}.startsAt`, '')
+                      form.setValue(`events.${index}.endsAt`, '')
+                    }}
+                  />
+                )}
               />
               {t('allDay')}
             </label>
