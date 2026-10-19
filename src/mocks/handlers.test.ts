@@ -93,6 +93,10 @@ describe('mock handlers behave like the contract', () => {
         '/api/v1/drafts/:draftId',
         '/api/v1/drafts/:draftId',
         '/api/v1/uploads/profile-banner',
+        // P-025 (specs/profile-showcase): featured.
+        '/api/v1/users/:userId/featured',
+        '/api/v1/users/:userId/featured',
+        '/api/v1/users/:userId/featured/:kind/:id',
       ].toSorted(),
     )
   })
@@ -180,6 +184,22 @@ describe('mock handlers behave like the contract', () => {
       expect(await code({ displayName: 'x'.repeat(51), headline: 'ok' })).toBe(
         'DISPLAY_NAME_TOO_LONG',
       )
+    })
+
+    it('takes "open to" and an About of 2000, which only the mock can (P-024, P-026)', async () => {
+      const proposal = MOCK_ROUTES.find((route) => route.kind === 'proposal' && route.when)!
+      expect(proposal.when!({}, { openTo: [] })).toBe(true)
+      expect(proposal.when!({}, { bio: 'x'.repeat(161) })).toBe(true)
+      expect(proposal.when!({}, { bio: 'x'.repeat(160) })).toBe(false)
+
+      expect(await patch({ openTo: ['QUESTIONS', 'AMAS'], bio: 'x'.repeat(2000) })).toMatchObject({
+        status: 200,
+        body: { openTo: ['QUESTIONS', 'AMAS'] },
+      })
+      expect(await code({ bio: 'x'.repeat(2001) })).toBe('BIO_TOO_LONG')
+      expect(await code({ openTo: ['TRADING'] })).toBe('INVALID_OPEN_TO')
+      expect(await code({ openTo: ['AMAS', 'AMAS'] })).toBe('INVALID_OPEN_TO')
+      await patch({ openTo: [], bio: '' })
     })
 
     it('signs a photo or banner upload as a post image, never an SVG', async () => {

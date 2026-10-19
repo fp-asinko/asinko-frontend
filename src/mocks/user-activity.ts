@@ -3,6 +3,7 @@ import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { POLLS } from './fixtures/polls'
 import { POSTS } from './fixtures/posts'
 import { PROFILES } from './fixtures/users'
+import { CREATED_POSTS } from './posting'
 import { paginate } from './paginate'
 import type { MockResponse } from './types'
 
@@ -14,7 +15,9 @@ const notFound: MockResponse = {
   body: { error: { code: 'NOT_FOUND', message: 'mock' } },
 }
 
-const ITEMS: RawFeedItem[] = [
+/** Read on each request: the posts created in this process count too (specs/profile-showcase). */
+const items = (): RawFeedItem[] => [
+  ...CREATED_POSTS.map((content) => ({ kind: 'POST' as const, content })),
   ...POSTS.map((content) => ({ kind: 'POST' as const, content })),
   ...POLLS.map((content) => ({ kind: 'POLL' as const, content })),
 ]
@@ -23,20 +26,22 @@ const ITEMS: RawFeedItem[] = [
 export function userContent(userId: string, query: Record<string, string>): MockResponse {
   if (!PROFILES.some((profile) => profile.id === userId)) return notFound
   const kinds = (query.kind ?? '').split(',').filter(Boolean)
-  const items = ITEMS.filter(
-    (item) =>
-      item.content.creator?.id === userId &&
-      !('deleted' in item.content && item.content.deleted) &&
-      (kinds.length === 0 || kinds.includes(item.kind)),
-  ).sort((a, b) => b.content.publishedAt.localeCompare(a.content.publishedAt))
-  return { status: 200, body: paginate(items, query.cursor) }
+  const found = items()
+    .filter(
+      (item) =>
+        item.content.creator?.id === userId &&
+        !('deleted' in item.content && item.content.deleted) &&
+        (kinds.length === 0 || kinds.includes(item.kind)),
+    )
+    .sort((a, b) => b.content.publishedAt.localeCompare(a.content.publishedAt))
+  return { status: 200, body: paginate(found, query.cursor) }
 }
 
 /** GET /users/{userId}/comments?cursor= */
 export function userComments(userId: string, cursor: string | undefined): MockResponse {
   if (!PROFILES.some((profile) => profile.id === userId)) return notFound
   const comments: RawUserComment[] = []
-  for (const item of ITEMS) {
+  for (const item of items()) {
     if ('deleted' in item.content && item.content.deleted) continue
     const where = {
       kind: item.kind,

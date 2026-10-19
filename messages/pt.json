@@ -341,6 +341,71 @@
       "addHeadline": "Adicione um título",
       "addLinks": "Adicione links"
     },
+    "about": {
+      "seeMore": "Ver mais",
+      "seeLess": "Ver menos"
+    },
+    "checklist": {
+      "title": "Complete seu perfil",
+      "onlyYou": "Só você vê isto",
+      "hide": "Ocultar \"Complete seu perfil\"",
+      "progressLabel": "Perfil completo",
+      "progress": "{done, number} de {total, number}",
+      "steps": {
+        "avatar": {
+          "title": "Adicione uma foto",
+          "body": "As pessoas seguem rostos mais do que nomes de usuário.",
+          "action": "Adicionar foto"
+        },
+        "headline": {
+          "title": "Adicione um título",
+          "body": "Diga o que você analisa em uma linha, abaixo do seu nome.",
+          "action": "Adicionar título"
+        },
+        "bio": {
+          "title": "Conte sua história",
+          "body": "Como você investe e o que aprendeu, no seu Sobre.",
+          "action": "Escrever Sobre"
+        },
+        "location": {
+          "title": "Adicione sua localização",
+          "body": "Contexto para suas análises: em que mercado você vive.",
+          "action": "Adicionar localização"
+        },
+        "links": {
+          "title": "Adicione seus links",
+          "body": "Sua newsletter, seu X, seu canal: onde mais te seguir.",
+          "action": "Adicionar links"
+        },
+        "openTo": {
+          "title": "Diga a que você está aberto",
+          "body": "Perguntas, mentorias, colaborações: para que podem te procurar.",
+          "action": "Escolher"
+        },
+        "banner": {
+          "title": "Adicione um banner",
+          "body": "O topo do seu perfil, do seu jeito.",
+          "action": "Adicionar banner"
+        },
+        "featured": {
+          "title": "Destaque o melhor",
+          "body": "Fixe até 3 posts ou teses com o \"⋯\" de cada um.",
+          "action": "Ir para seus posts"
+        }
+      }
+    },
+    "openTo": {
+      "title": "Aberto a",
+      "help": "Para que podem entrar em contato com você.",
+      "edit": "Editar a que você está aberto",
+      "options": {
+        "QUESTIONS": "Perguntas",
+        "COLLABORATIONS": "Colaborações",
+        "MENTORING": "Mentoria",
+        "AMAS": "AMAs",
+        "COMMISSIONED_ANALYSIS": "Análise sob encomenda"
+      }
+    },
     "createPost": "Criar post",
     "tabs": {
       "label": "Seções do perfil",
@@ -387,15 +452,15 @@
     "edit": {
       "button": "Editar perfil",
       "title": "Editar perfil",
-      "bio": "Bio",
-      "bioPlaceholder": "Conte o que você analisa",
+      "bio": "Sobre",
+      "bioPlaceholder": "Como você investe, o que analisa, o que aprendeu",
       "counter": "{count}/{max}",
       "save": "Salvar",
       "saving": "Salvando…",
       "cancel": "Cancelar",
       "saved": "Perfil salvo.",
       "errors": {
-        "bioTooLong": "Até 160 caracteres",
+        "bioTooLong": "Até 2.000 caracteres",
         "general": "Não foi possível salvar. Tente de novo.",
         "invalid": "Revise os campos",
         "displayNameTooLong": "Até 50 caracteres",
@@ -407,7 +472,8 @@
         "imageType": "Apenas imagens JPEG, PNG ou WebP",
         "imageTooLarge": "A imagem é grande demais",
         "imageUnreadable": "Não foi possível ler a imagem",
-        "imageUpload": "Não foi possível enviar a imagem"
+        "imageUpload": "Não foi possível enviar a imagem",
+        "openTo": "Escolha cada opção uma vez, da lista"
       },
       "discard": {
         "title": "Descartar as alterações?",
@@ -475,6 +541,26 @@
     "assetOnly": {
       "title": "{handle} ainda não tem comunidade",
       "body": "Em breve você vai poder segui-lo e publicar aqui."
+    }
+  },
+  "featured": {
+    "title": "Destaques",
+    "postMenu": "Opções do post {title}",
+    "thesisMenu": "Opções da tese {title}",
+    "add": "Destacar no seu perfil",
+    "remove": "Remover dos destaques",
+    "full": "Você tem {max, number} destaques: remova um primeiro.",
+    "added": "Destacado no seu perfil.",
+    "removed": "Removido dos destaques.",
+    "close": "Fechar",
+    "post": "Post",
+    "thesis": "Tese",
+    "postMeta": "{handle} · {score, plural, one {# ponto} other {# pontos}} · {comments, plural, one {# comentário} other {# comentários}}",
+    "errors": {
+      "limit": "Você já tem {max, number} destaques. Remova um primeiro.",
+      "notOwner": "Só dá para destacar seus próprios posts e teses.",
+      "gone": "Não existe mais.",
+      "general": "Não foi possível mudar. Tente de novo."
     }
   },
   "postDetail": {

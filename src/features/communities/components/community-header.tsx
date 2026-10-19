@@ -11,7 +11,10 @@ import { CommunityActions } from './community-actions'
 import { MemberCount, ProfileStats } from './community-stats'
 import { ProfileMarks } from './profile-marks'
 import { EditProfileButton, EditProfileProvider } from './edit-profile-button'
+import { OpenToCard } from './open-to-card'
+import { ProfileAbout } from './profile-about'
 import { ProfileIntro } from './profile-intro'
+import { toEditableProfile } from '../lib/editable-profile'
 
 /**
  * The top of a community page, as the prototype (specs/community-pages § 1, measured on its
@@ -93,12 +96,16 @@ export function CommunityHeader({
       </div>
       {/* Under the name and the actions, the whole width: a long headline never squeezes them. */}
       {profile && <ProfileIntro profile={profile} />}
-      {description && (
-        // The user's own text: long words wrap at 360px and its line breaks stay (PE-07).
-        <p className="mt-2 type-ui wrap-anywhere whitespace-pre-line text-muted-foreground">
-          {description}
-        </p>
-      )}
+      {/* A person's About clamps at three lines (specs/profile-showcase PS-04). */}
+      {description &&
+        (profile ? (
+          <ProfileAbout text={description} />
+        ) : (
+          // The user's own text: long words wrap at 360px and its line breaks stay (PE-07).
+          <p className="mt-2 type-ui wrap-anywhere whitespace-pre-line text-muted-foreground">
+            {description}
+          </p>
+        ))}
       {profile ? (
         <ProfileStats profile={profile} className="mt-3" />
       ) : (
@@ -120,25 +127,10 @@ export function CommunityHeader({
           </ComingSoon>
         </div>
       )}
+      {profile && <OpenToCard values={profile.openTo} isSelf={profile.isSelf} />}
     </header>
   )
 
   if (!profile?.isSelf) return header
-  return (
-    <EditProfileProvider
-      profile={{
-        username: profile.username,
-        displayName: profile.displayName,
-        headline: profile.headline,
-        countryCode: profile.countryCode,
-        city: profile.city,
-        bio: profile.bio,
-        avatarUrl: profile.avatarUrl,
-        bannerUrl: profile.bannerUrl,
-        links: profile.links.map((link) => link.url),
-      }}
-    >
-      {header}
-    </EditProfileProvider>
-  )
+  return <EditProfileProvider profile={toEditableProfile(profile)}>{header}</EditProfileProvider>
 }

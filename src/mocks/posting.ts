@@ -1,7 +1,7 @@
 import type { RawComment, RawPost } from '@/lib/api/contract'
 import { DEMO_USER } from './demo-user'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
-import { communityById, communitySummary } from './fixtures/communities'
+import { communityById, communityBySlug, communitySummary } from './fixtures/communities'
 import { mockId } from './fixtures/ids'
 import { postById } from './fixtures/posts'
 import { summary } from './fixtures/users'
@@ -159,3 +159,17 @@ export function removeCommentVote(commentId: string, userId: string | undefined)
   if (userId !== DEMO_USER.id) return error(403, 'USER_MISMATCH')
   return { status: 204 }
 }
+
+/**
+ * One post of the demo user, on their own channel: their profile has something to feature
+ * (specs/profile-showcase). Only their profile lists it: the feeds do not read created posts.
+ */
+export const DEMO_POST_ID = (
+  createPost({
+    userId: DEMO_USER.id,
+    communityId: communityBySlug(DEMO_USER.username)!.id,
+    type: 'TEXT',
+    title: 'Why I size positions by volatility, not by conviction',
+    body: 'Conviction is a feeling; volatility is a number. Each position risks the same.',
+  }).body as RawPost
+).id

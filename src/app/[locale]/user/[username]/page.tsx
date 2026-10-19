@@ -1,14 +1,17 @@
 import type { Metadata } from 'next'
-import { Suspense } from 'react'
+import { Suspense, type ReactNode } from 'react'
 import { PageColumns } from '@/components/organisms/app-shell'
 import { communityMetadata, CommunityTop, resolveProfileRoute } from '@/features/communities'
 import { ComposeScope } from '@/features/composer'
 // By its path, not the feature's index: the index also brings the post page's client parts (seo.md).
 import { CommunityFeed } from '@/features/feed/components/community-feed'
 // By their paths too: the groups' and assets' pages, which use the index, do not need them.
+import { FeaturedScope } from '@/features/communities/components/featured-scope'
+import { ProfileShowcase } from '@/features/communities/components/profile-showcase'
 import { ProfileTabs } from '@/features/communities/components/profile-tabs'
 import { ThesesList } from '@/features/communities/components/theses-list'
 import { ThesesListSkeleton } from '@/features/communities/components/theses-list-skeleton'
+import { FEATURED_MAX, getProfileFeatured } from '@/features/communities/lib/featured-api'
 import { parseProfileTab } from '@/features/communities/schemas/profile-tab.schema'
 import { ReplyListSkeleton } from '@/features/feed/components/reply-list-skeleton'
 import { UserReplies } from '@/features/feed/components/user-replies'
@@ -32,13 +35,17 @@ export default async function UserPage({
     searchParams,
   ])
   const tab = parseProfileTab(query)
-  return (
-    <PageColumns>
+  // What the person put at the front (specs/profile-showcase PS-05): secondary, none if it fails.
+  const featured = await getProfileFeatured(profile.id)
+
+  const content: ReactNode = (
+    <>
       {/* Only the owner posts on a profile (403 PERSONAL_CHANNEL_OWNER_ONLY). */}
       {profile.isSelf && (
         <ComposeScope id={page.id} slug={page.slug} handle={page.handle} name={page.handle} own />
       )}
       <CommunityTop page={page} profile={profile} />
+      <ProfileShowcase profile={profile} featured={featured} pagePath={path} />
       {/* Theses · Posts · Replies, as X (specs/profile-track-record PT-04, specs/backend-adoption). */}
       <ProfileTabs pagePath={path} current={tab} />
       {tab === 'replies' ? (
@@ -65,6 +72,22 @@ export default async function UserPage({
           // Everything the person published, in any community (specs/backend-adoption BK-02).
           author={profile.id}
         />
+      )}
+    </>
+  )
+
+  return (
+    <PageColumns>
+      {/* Your own profile: "⋯" on your posts and theses features them (PS-07). */}
+      {profile.isSelf ? (
+        <FeaturedScope
+          featured={featured.map((item) => `${item.kind}:${item.id}`)}
+          max={FEATURED_MAX}
+        >
+          {content}
+        </FeaturedScope>
+      ) : (
+        content
       )}
     </PageColumns>
   )

@@ -17,6 +17,7 @@ const PROFILE: EditableProfile = {
   bio: 'On-chain analyst.',
   avatarUrl: null,
   bannerUrl: null,
+  openTo: [],
   links: [],
 }
 
@@ -38,7 +39,7 @@ describe('EditProfileButton (specs/profile-edit PE-01)', () => {
     expect(
       await screen.findByRole('dialog', { name: 'Edit profile' }, { timeout: 3000 }),
     ).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Bio' })).toHaveValue('On-chain analyst.')
+    expect(screen.getByRole('textbox', { name: 'About' })).toHaveValue('On-chain analyst.')
   })
 })
 

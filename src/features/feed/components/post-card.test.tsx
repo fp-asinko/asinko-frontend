@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { FeaturedMenuContext } from '@/components/organisms/featured'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { postItem } from '../feed-items.fixture'
 import { PostCard } from './post-card'
@@ -194,5 +195,26 @@ describe('PostCard as a preview (specs/submit-tools ST-01, ST-02)', () => {
     // A mention of a draft: in bold, without a link (D-1).
     expect(screen.getByText('@maria', { selector: 'strong' })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'maria' })).toBeNull()
+  })
+
+  it('offers "⋯" to feature it only on your own profile (specs/profile-showcase PS-07)', () => {
+    const name = 'Options for the post Whales accumulated 48,000 $BTC'
+    const { unmount } = renderWithIntl(<PostCard post={postItem()} menu />)
+    expect(screen.queryByRole('button', { name })).toBeNull()
+    unmount()
+    renderWithIntl(
+      <FeaturedMenuContext
+        value={{
+          isFeatured: (kind, id) => ([] as string[]).includes(`${kind}:${id}`),
+          full: false,
+          max: 3,
+          pending: false,
+          set: vi.fn(),
+        }}
+      >
+        <PostCard post={postItem()} menu />
+      </FeaturedMenuContext>,
+    )
+    expect(screen.getByRole('button', { name })).toHaveAttribute('aria-haspopup', 'menu')
   })
 })

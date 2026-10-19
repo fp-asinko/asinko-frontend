@@ -22,13 +22,14 @@
 
 1. **P-019 a P-021: el perfil, como LinkedIn.** Titular, ciudad, links, banner y la subida de foto y banner. El front ya lo tiene hecho contra mocks: sin esto, nada de eso se guarda con el backend real.
 2. **Comunidades de los activos del catálogo.** Solo 5 de los 100 tienen la suya (BTC, ETH, AAPL, NVDA, VOO). `GET /communities/TSLA` (y SPY, MSFT, EURUSD, SQM-B, BRK.B, XAU/USD…) da `404`, y `GET /assets/{symbol}` trae `linkedCommunity: null`. **Pedido:** crear la comunidad de cada activo (slug = símbolo). Mientras tanto, el front muestra la página del activo con su precio, sin feed ni Unirse, y no se puede publicar ni etiquetar en ellos.
-3. **P-022 y P-023: borradores en la cuenta y marcas por comunidad**, como Reddit (`specs/drafts-tags`). Hechos contra mocks.
-4. **P-018: comunidades y activos relacionados de un post.** Hoy viajan como menciones al final del cuerpo.
-5. **P-017: "lo seguís" en las listas de seguidores, seguidos y miembros.** Sin respuesta desde el 2026-10-09.
-6. **P-005: `sort=hot|top` del feed.** Fórmulas en definición.
-7. **`best` de los comentarios (P-014).** Hoy es cronológico; el mock usa la fórmula propuesta (abajo). El front ya manda `sort=best`.
-8. **`GET /assets` sin `?q=` devuelve 20, sin `nextCursor`.** No bloquea (el front busca con `?q=`), pero hace falta para listar el catálogo.
-9. **Imágenes huérfanas.** Una imagen subida con la URL firmada y nunca publicada queda en Storage, y no hay cómo borrarla. ¿Se limpian del lado del backend? Aplica también a la foto y el banner (P-021).
+3. **P-024 a P-026: el perfil como vidriera**, como LinkedIn (`specs/profile-showcase`): "Acerca de" de 2000, destacados y "Abierto a". Hechos contra mocks.
+4. **P-022 y P-023: borradores en la cuenta y marcas por comunidad**, como Reddit (`specs/drafts-tags`). Hechos contra mocks.
+5. **P-018: comunidades y activos relacionados de un post.** Hoy viajan como menciones al final del cuerpo.
+6. **P-017: "lo seguís" en las listas de seguidores, seguidos y miembros.** Sin respuesta desde el 2026-10-09.
+7. **P-005: `sort=hot|top` del feed.** Fórmulas en definición.
+8. **`best` de los comentarios (P-014).** Hoy es cronológico; el mock usa la fórmula propuesta (abajo). El front ya manda `sort=best`.
+9. **`GET /assets` sin `?q=` devuelve 20, sin `nextCursor`.** No bloquea (el front busca con `?q=`), pero hace falta para listar el catálogo.
+10. **Imágenes huérfanas.** Una imagen subida con la URL firmada y nunca publicada queda en Storage, y no hay cómo borrarla. ¿Se limpian del lado del backend? Aplica también a la foto y el banner (P-021).
 
 ### P-019: Titular, ciudad y links del perfil
 
@@ -67,6 +68,50 @@
 **Motivo:** `PATCH /users` acepta `avatarUrl`, pero no hay dónde subir la imagen. El front ya recorta y prepara la imagen (WebP, foto de 400×400 y banner de 1500×375).
 
 **Cambio:** el mismo flujo de URL firmada que `POST /uploads/post-image` (P-013): `{ userId, contentType, size }` → `{ uploadUrl, imageUrl, path }`, JPEG, PNG, WebP o GIF (nunca SVG), hasta 5 MB. El `imageUrl` es el que se manda en `PATCH /users` (`avatarUrl` o `bannerUrl`).
+
+### P-024: "Acerca de" de 2000 caracteres
+
+**Estado:** propuesta (2026-10-19), mockeada (un `PATCH /users` con una `bio` de más de 160 va al mock).
+
+**Endpoint:** `PATCH /api/v1/users/{userId}`, el `User` y el `Profile`.
+
+**Motivo:** "Acerca de", como LinkedIn (`specs/profile-showcase`): contar tu estrategia en más de una línea. La bio pasa a ser ese texto (no se suma otro campo: el titular ya es la frase corta).
+
+**Cambio:** `bio` acepta hasta **2000** caracteres (hoy 160), con saltos de línea. `422 BIO_TOO_LONG` más allá.
+
+### P-025: Destacados del perfil
+
+**Estado:** propuesta (2026-10-19), mockeada.
+
+**Endpoints:** `GET /api/v1/users/{userId}/featured` (público), `POST /api/v1/users/{userId}/featured` y `DELETE /api/v1/users/{userId}/featured/{kind}/{id}?userId=` (solo el dueño, `403 USER_MISMATCH`).
+
+**Motivo:** "Destacado", como LinkedIn (`specs/profile-showcase`): hasta 3 posts o tesis propios al frente del perfil. Se destacan desde el menú "⋯" de cada uno.
+
+**Cambio:**
+
+```jsonc
+// GET /users/{userId}/featured → a lo sumo 3, del último destacado al primero; lo borrado no viene
+{
+  "items": [
+    { "kind": "thesis", "thesis": { /* Thesis (E11) */ }, "featuredAt": "ISO 8601" },
+    { "kind": "post", "post": { /* Post */ }, "featuredAt": "ISO 8601" }
+  ]
+}
+```
+
+- `POST /users/{userId}/featured` `{ userId, kind: "post" | "thesis", id }` → `201 { items }`; si ya estaba, `200 { items }`. Con 3, `409 FEATURED_LIMIT`. Contenido de otra persona, `403 NOT_OWNER`; inexistente o borrado, `404`.
+- `DELETE /users/{userId}/featured/{kind}/{id}?userId=` → `204`, también si no estaba.
+- Más adelante, reordenarlos (`PUT` con la lista); no hace falta para el MVP.
+
+### P-026: "Abierto a"
+
+**Estado:** propuesta (2026-10-19), mockeada (un `PATCH /users` con `openTo` va al mock).
+
+**Endpoint:** `PATCH /api/v1/users/{userId}`, el `User` y el `Profile`.
+
+**Motivo:** "Tengo interés en…", como LinkedIn (`specs/profile-showcase`): para qué está disponible la persona. Valores fijos, para traducirlos y, más adelante, filtrar por ellos.
+
+**Cambio:** `"openTo": string[]` con valores de `QUESTIONS`, `COLLABORATIONS`, `MENTORING`, `AMAS`, `COMMISSIONED_ANALYSIS`, sin repetir; `[]` lo borra. `422 INVALID_OPEN_TO` con otro valor o repetido.
 
 ### P-022: Borradores en la cuenta
 

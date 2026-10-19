@@ -33,6 +33,7 @@ import {
 import { CountedField, CountryField } from './edit-profile-fields'
 import { changeImageId, ProfileImages, type ProfileImageKind } from './edit-profile-images'
 import { LinksField } from './edit-profile-links'
+import { OpenToField } from './edit-profile-open-to'
 
 /** The cropper (and its library) comes when an image is picked (seo.md). */
 const ImageCropper = dynamic(
@@ -108,6 +109,7 @@ export function EditProfileDialog({
       city: profile.city ?? '',
       bio: profile.bio ?? '',
       links: profile.links.map((url) => ({ url })),
+      openTo: profile.openTo,
       avatarUrl: profile.avatarUrl,
       bannerUrl: profile.bannerUrl,
     },
@@ -176,12 +178,20 @@ export function EditProfileDialog({
     setPreviews((current) => ({ ...current, [kind]: preview }))
   }
 
-  // Into the field a prompt offered (PP-04), else the name.
+  // Into the field a prompt or a step offered (PP-04, specs/profile-showcase PS-02), else the name.
   function initialFocus() {
-    if (field === 'links') {
-      return document.getElementById(`${ids}-links`)?.querySelector<HTMLElement>('input, button')
+    switch (field) {
+      case 'links':
+      case 'openTo':
+        return document.getElementById(id(field))?.querySelector<HTMLElement>('input, button')
+      case 'avatar':
+      case 'banner':
+        return document.getElementById(changeImageId(`${ids}-images`, field))
+      case 'location':
+        return document.getElementById(id('countryCode'))
+      default:
+        return document.getElementById(id(field ?? 'displayName'))
     }
-    return document.getElementById(id(field ?? 'displayName'))
   }
 
   return (
@@ -309,7 +319,8 @@ export function EditProfileDialog({
               multiline
               alwaysCount
             />
-            <div id={`${ids}-links`}>
+            <OpenToField id={id('openTo')} field={register('openTo')} error={error('openTo')} />
+            <div id={id('links')}>
               <LinksField control={control} register={register} errors={formState.errors.links} />
             </div>
             {serverError && (

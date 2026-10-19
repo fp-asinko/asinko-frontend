@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { FeaturedMenuContext } from '@/components/organisms/featured'
 import { renderWithIntl } from '@/test/render-with-intl'
 import type { ThesisItem } from '../communities.types'
 import { ThesisCard } from './thesis-card'
@@ -78,5 +79,20 @@ describe('ThesisCard (specs/profile-track-record PT-07, PT-08)', () => {
     const mark = chip.querySelector('svg')
     if (icon) expect(mark).toHaveClass(`lucide-${icon}`)
     else expect(mark).toBeNull()
+  })
+
+  it('offers "⋯" to feature it only on your own profile (specs/profile-showcase PS-07)', () => {
+    const name = 'Options for the thesis BTC will close above $150K before December 2026'
+    const { unmount } = renderWithIntl(<ThesisCard thesis={thesis()} menu />)
+    expect(screen.queryByRole('button', { name })).toBeNull()
+    unmount()
+    renderWithIntl(
+      <FeaturedMenuContext
+        value={{ isFeatured: () => false, full: false, max: 3, pending: false, set: vi.fn() }}
+      >
+        <ThesisCard thesis={thesis()} menu />
+      </FeaturedMenuContext>,
+    )
+    expect(screen.getByRole('button', { name })).toHaveAttribute('aria-haspopup', 'menu')
   })
 })

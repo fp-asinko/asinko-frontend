@@ -3,6 +3,7 @@
 export * from './assets'
 export * from './communities'
 export * from './content'
+export * from './featured'
 export * from './search'
 export * from './theses'
 export * from './uploads'

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { useFormatter, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ShareButton } from '@/components/molecules/share-button'
+import { FeatureMenu } from '@/components/organisms/featured'
 import { TagPill } from '@/components/molecules/tag-pill'
 import { Link } from '@/i18n/navigation'
 import { postImageRoute } from '@/lib/share-image/share-metadata'
@@ -39,6 +40,7 @@ export function PostCard({
   fadeImage = false,
   feedCommunity,
   leading,
+  menu = false,
 }: {
   post: PostItem
   /** `preview`: the post being written (specs/submit-tools ST-01): no links into it, no actions. */
@@ -49,9 +51,15 @@ export function PostCard({
   feedCommunity?: string
   /** Before the header, as Reddit's post page: its back button (specs/post-detail-refresh PD-01). */
   leading?: ReactNode
+  /**
+   * A profile's list: "⋯" to feature it (specs/profile-showcase PS-07). It only draws on your own
+   * profile, which provides what it needs.
+   */
+  menu?: boolean
 }) {
   const PostImage = fadeImage ? FadeImage : Image
   const t = useTranslations('feed.card')
+  const tf = useTranslations('featured')
   const format = useFormatter()
   const detail = variant === 'detail'
   const preview = variant === 'preview'
@@ -104,6 +112,12 @@ export function PostCard({
             linked={!preview}
           />
         </div>
+        {menu && !preview && !post.deleted && (
+          // Over the card's link, as the actions row (CardLink).
+          <div className="relative -my-2">
+            <FeatureMenu kind="post" id={post.id} label={tf('postMenu', { title: post.title })} />
+          </div>
+        )}
       </div>
 
       {/* Its tag, before the title as Reddit's flair (specs/drafts-tags DT-10): outside the

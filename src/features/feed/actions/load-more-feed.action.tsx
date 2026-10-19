@@ -28,7 +28,14 @@ export async function loadMoreFeed(raw: unknown): Promise<ActionResult<NextPage>
   return {
     ok: true,
     data: {
-      items: <FeedItems items={items} later feedCommunity={params.community} />,
+      items: (
+        <FeedItems
+          items={items}
+          later
+          feedCommunity={params.community}
+          menus={Boolean(params.author)}
+        />
+      ),
       count: items.length,
       nextCursor,
     },

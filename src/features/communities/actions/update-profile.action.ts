@@ -14,6 +14,7 @@ const FIELD_ERRORS: Record<string, [field: string, key: string]> = {
   CITY_TOO_LONG: ['city', 'communities.edit.errors.cityTooLong'],
   INVALID_LINK: ['links', 'communities.edit.errors.link'],
   TOO_MANY_LINKS: ['links', 'communities.edit.errors.tooManyLinks'],
+  INVALID_OPEN_TO: ['openTo', 'communities.edit.errors.openTo'],
 }
 
 /**

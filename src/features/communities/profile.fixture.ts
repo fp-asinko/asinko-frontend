@@ -14,6 +14,7 @@ export function profileDetails(overrides: Partial<ProfileDetails> = {}): Profile
     countryCode: null,
     links: [],
     bannerUrl: null,
+    openTo: [],
     followerCount: 120,
     followingCount: 48,
     accuracyRate: 0.75,

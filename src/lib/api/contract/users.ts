@@ -30,6 +30,8 @@ export const userSchema = z.object({
   headline: z.string().nullable().optional(),
   city: z.string().nullable().optional(),
   links: z.array(z.string()).nullable().optional(),
+  /** P-026 (proposal, specs/profile-showcase): what the person is open to; unknown values dropped. */
+  openTo: z.array(z.string()).nullable().optional(),
 })
 
 export const profileSchema = userSchema.extend({

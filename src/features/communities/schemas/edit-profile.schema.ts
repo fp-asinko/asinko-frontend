@@ -1,8 +1,12 @@
 import { z } from 'zod'
 import { isHttpUrl } from '@/lib/profile-links'
+import { OPEN_TO } from '../open-to.constants'
 
-/** The backend's limits (PATCH /users/{userId}, E01; P-011 and P-019 for name, headline, city). */
-export const BIO_MAX = 160
+/**
+ * The backend's limits (PATCH /users/{userId}, E01; P-011 and P-019 for name, headline, city). The
+ * bio is the "About" of P-024 (specs/profile-showcase PS-04): 2000, the backend's 160 today.
+ */
+export const BIO_MAX = 2000
 export const DISPLAY_NAME_MAX = 50
 export const HEADLINE_MAX = 100
 export const CITY_MAX = 60
@@ -29,6 +33,10 @@ const profileFields = z.object({
   city: z.string().trim().max(CITY_MAX, { message: 'communities.edit.errors.cityTooLong' }),
   bio: z.string().trim().max(BIO_MAX, { message: 'communities.edit.errors.bioTooLong' }),
   links: z.array(linkSchema).max(LINKS_MAX, { message: 'communities.edit.errors.tooManyLinks' }),
+  /** P-026 (specs/profile-showcase PS-09): from the list, each once. */
+  openTo: z.array(z.enum(OPEN_TO)).refine((values) => new Set(values).size === values.length, {
+    message: 'communities.edit.errors.openTo',
+  }),
   /** An uploaded image's URL, or null to go back to the initials or the color (PP-07). */
   avatarUrl: z.string().nullable(),
   bannerUrl: z.string().nullable(),

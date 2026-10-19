@@ -341,6 +341,71 @@
       "addHeadline": "Add a headline",
       "addLinks": "Add links"
     },
+    "about": {
+      "seeMore": "See more",
+      "seeLess": "See less"
+    },
+    "checklist": {
+      "title": "Complete your profile",
+      "onlyYou": "Only you see this",
+      "hide": "Hide \"Complete your profile\"",
+      "progressLabel": "Profile completed",
+      "progress": "{done, number} of {total, number}",
+      "steps": {
+        "avatar": {
+          "title": "Add a photo",
+          "body": "People follow faces more than usernames.",
+          "action": "Add photo"
+        },
+        "headline": {
+          "title": "Add a headline",
+          "body": "Say what you analyze in one line, under your name.",
+          "action": "Add headline"
+        },
+        "bio": {
+          "title": "Tell your story",
+          "body": "How you invest and what you have learned, in your About.",
+          "action": "Write About"
+        },
+        "location": {
+          "title": "Add your location",
+          "body": "Context for your calls: which market you live in.",
+          "action": "Add location"
+        },
+        "links": {
+          "title": "Add your links",
+          "body": "Your newsletter, your X, your channel: where else to follow you.",
+          "action": "Add links"
+        },
+        "openTo": {
+          "title": "Say what you are open to",
+          "body": "Questions, mentoring, collaborations: what people can reach you for.",
+          "action": "Choose"
+        },
+        "banner": {
+          "title": "Add a banner",
+          "body": "The top of your profile, your own.",
+          "action": "Add banner"
+        },
+        "featured": {
+          "title": "Feature your best",
+          "body": "Pin up to 3 posts or theses with \"⋯\" on each one.",
+          "action": "Go to your posts"
+        }
+      }
+    },
+    "openTo": {
+      "title": "Open to",
+      "help": "What people can reach you for.",
+      "edit": "Edit what you are open to",
+      "options": {
+        "QUESTIONS": "Questions",
+        "COLLABORATIONS": "Collaborations",
+        "MENTORING": "Mentoring",
+        "AMAS": "AMAs",
+        "COMMISSIONED_ANALYSIS": "Commissioned analysis"
+      }
+    },
     "createPost": "Create post",
     "tabs": {
       "label": "Profile sections",
@@ -387,15 +452,15 @@
     "edit": {
       "button": "Edit profile",
       "title": "Edit profile",
-      "bio": "Bio",
-      "bioPlaceholder": "Tell people what you analyze",
+      "bio": "About",
+      "bioPlaceholder": "How you invest, what you analyze, what you have learned",
       "counter": "{count}/{max}",
       "save": "Save",
       "saving": "Saving…",
       "cancel": "Cancel",
       "saved": "Profile saved.",
       "errors": {
-        "bioTooLong": "Up to 160 characters",
+        "bioTooLong": "Up to 2,000 characters",
         "general": "Could not save. Try again.",
         "invalid": "Check the fields",
         "displayNameTooLong": "Up to 50 characters",
@@ -407,7 +472,8 @@
         "imageType": "Only JPEG, PNG or WebP images",
         "imageTooLarge": "The image is too large",
         "imageUnreadable": "Could not read the image",
-        "imageUpload": "Could not upload the image"
+        "imageUpload": "Could not upload the image",
+        "openTo": "Choose each option once, from the list"
       },
       "discard": {
         "title": "Discard changes?",
@@ -475,6 +541,26 @@
     "assetOnly": {
       "title": "{handle} does not have a community yet",
       "body": "Soon you will be able to follow it and post here."
+    }
+  },
+  "featured": {
+    "title": "Featured",
+    "postMenu": "Options for the post {title}",
+    "thesisMenu": "Options for the thesis {title}",
+    "add": "Feature on your profile",
+    "remove": "Remove from featured",
+    "full": "You have {max, number} featured: remove one first.",
+    "added": "Featured on your profile.",
+    "removed": "Removed from featured.",
+    "close": "Close",
+    "post": "Post",
+    "thesis": "Thesis",
+    "postMeta": "{handle} · {score, plural, one {# point} other {# points}} · {comments, plural, one {# comment} other {# comments}}",
+    "errors": {
+      "limit": "You already have {max, number} featured. Remove one first.",
+      "notOwner": "Only your own posts and theses can be featured.",
+      "gone": "It no longer exists.",
+      "general": "It couldn't be changed. Try again."
     }
   },
   "postDetail": {

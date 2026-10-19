@@ -60,6 +60,7 @@ describe('ProfileIntro (specs/profile-presentation PP-01 to PP-04)', () => {
           bio: null,
           avatarUrl: null,
           bannerUrl: null,
+          openTo: [],
           links: [],
         }}
       >

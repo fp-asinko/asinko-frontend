@@ -2,6 +2,7 @@
 // knows these, never the raw contract shapes.
 
 import type { CommunityKind } from '@/lib/communities/paths'
+import type { OpenTo } from './open-to.constants'
 import type { ProfileLink } from '@/lib/profile-links'
 
 export type { CommunityKind }
@@ -23,6 +24,8 @@ export type ProfileDetails = {
   countryCode: string | null
   /** Up to five, only http(s), in the person's order. */
   links: ProfileLink[]
+  /** What they are open to (P-026, specs/profile-showcase PS-10), in the list's order. */
+  openTo: OpenTo[]
   /** Their own banner; null: the personal channel's, or the color of their identity. */
   bannerUrl: string | null
   followerCount: number
@@ -50,10 +53,15 @@ export type EditableProfile = Pick<
   | 'bio'
   | 'avatarUrl'
   | 'bannerUrl'
+  | 'openTo'
 > & { links: string[] }
 
-/** A field "Edit profile" can open on (PP-04: "Add a headline" goes to the headline). */
-export type EditProfileField = 'headline' | 'links'
+/**
+ * A field "Edit profile" can open on (PP-04: "Add a headline" goes to the headline), and each step
+ * of "Complete your profile" (specs/profile-showcase PS-02).
+ */
+export type EditProfileField =
+  'avatar' | 'banner' | 'headline' | 'bio' | 'location' | 'links' | 'openTo'
 
 export type CommunityPage = {
   /** Where a post from this page goes (specs/post-create-detail PC-06). */
@@ -160,3 +168,25 @@ export type FollowItem = {
   /** The viewer themself: no button. */
   isSelf: boolean
 }
+
+/** Where a featured item belongs (specs/profile-showcase PS-05): its community, as a mention. */
+type FeaturedCommunity = { handle: string; path: string }
+
+/** A post or a thesis a person put at the front of their profile (P-025, PS-05): a small card. */
+export type FeaturedItem =
+  | {
+      kind: 'post'
+      id: string
+      title: string
+      path: string
+      community: FeaturedCommunity
+      score: number
+      commentCount: number
+    }
+  | {
+      kind: 'thesis'
+      id: string
+      claim: string
+      state: ThesisItem['state']
+      community: FeaturedCommunity
+    }

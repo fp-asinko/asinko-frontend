@@ -18,6 +18,7 @@ const VALID = {
   city: ' La Plata ',
   bio: '  Macro and rates.  ',
   links: [{ url: ' https://x.com/juan ' }],
+  openTo: ['QUESTIONS'],
   avatarUrl: null,
   bannerUrl: null,
 }
@@ -33,6 +34,7 @@ describe('editProfileSchema (specs/profile-edit PE-04, specs/profile-presentatio
       city: 'La Plata',
       bio: 'Macro and rates.',
       links: ['https://x.com/juan'],
+      openTo: ['QUESTIONS'],
       avatarUrl: null,
       bannerUrl: null,
     })
@@ -51,8 +53,11 @@ describe('editProfileSchema (specs/profile-edit PE-04, specs/profile-presentatio
       'communities.edit.errors.headlineTooLong',
     )
     expect(issue({ ...VALID, city: 'x'.repeat(61) })).toBe('communities.edit.errors.cityTooLong')
-    expect(issue({ ...VALID, bio: 'x'.repeat(161) })).toBe('communities.edit.errors.bioTooLong')
-    expect(editProfileSchema.safeParse({ ...VALID, bio: 'x'.repeat(160) }).success).toBe(true)
+    // The About of P-024 (specs/profile-showcase PS-04).
+    expect(issue({ ...VALID, bio: 'x'.repeat(2001) })).toBe('communities.edit.errors.bioTooLong')
+    expect(editProfileSchema.safeParse({ ...VALID, bio: 'x'.repeat(2000) }).success).toBe(true)
+    expect(issue({ ...VALID, openTo: ['TRADING'] })).toBeDefined()
+    expect(issue({ ...VALID, openTo: ['AMAS', 'AMAS'] })).toBe('communities.edit.errors.openTo')
   })
 
   it('takes up to five http(s) links and a country code only', () => {
@@ -96,7 +101,7 @@ describe('updateProfile (PE-03 to PE-06, PP-08, PP-09)', () => {
   })
 
   it('refuses a field before asking, with its error', async () => {
-    const result = await updateProfile({ bio: 'x'.repeat(161) })
+    const result = await updateProfile({ bio: 'x'.repeat(2001) })
     expect(result).toMatchObject({
       ok: false,
       fieldErrors: { bio: ['communities.edit.errors.bioTooLong'] },

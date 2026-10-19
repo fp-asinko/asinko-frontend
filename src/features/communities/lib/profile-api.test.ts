@@ -105,6 +105,13 @@ describe('profile details (specs/community-pages § 12)', () => {
     ).toMatchObject({ avatarUrl: null, bio: null })
   })
 
+  it('keeps only the known "open to", in the list order (specs/profile-showcase PS-10)', () => {
+    expect(
+      toProfileDetails({ ...federico, openTo: ['MENTORING', 'TRADING', 'QUESTIONS'] }, null).openTo,
+    ).toEqual(['QUESTIONS', 'MENTORING'])
+    expect(toProfileDetails({ ...federico, openTo: null }, null).openTo).toEqual([])
+  })
+
   it('asks the profile, passing NOT_FOUND through and rejecting a bad username', async () => {
     state.viewer = { id: 'x', username: 'federico' }
     expect(await getProfileDetails('federico')).toMatchObject({ ok: true, data: { isSelf: true } })
@@ -146,6 +153,12 @@ describe('updateProfileAs (specs/profile-edit PE-03, specs/profile-presentation 
     state.bodies = []
     await updateProfileAs(DEMO_USER.id, { bio: 'Hi' })
     expect(state.bodies).toEqual([{ bio: 'Hi' }])
+    // An About past the backend's 160 and "open to" are proposals (P-024, P-026).
+    state.bodies = []
+    const about = 'x'.repeat(161)
+    await updateProfileAs(DEMO_USER.id, { displayName: 'Demo', bio: about, openTo: ['AMAS'] })
+    expect(state.bodies).toEqual([{ displayName: 'Demo' }, { bio: about, openTo: ['AMAS'] }])
+    await updateProfileAs(DEMO_USER.id, { bio: '', openTo: [] })
     await updateProfileAs(DEMO_USER.id, { displayName: '', headline: '', city: '' })
   })
 
@@ -154,7 +167,7 @@ describe('updateProfileAs (specs/profile-edit PE-03, specs/profile-presentation 
       ok: false,
       code: 'USER_MISMATCH',
     })
-    expect(await updateProfileAs(DEMO_USER.id, { bio: 'x'.repeat(161) })).toMatchObject({
+    expect(await updateProfileAs(DEMO_USER.id, { bio: 'x'.repeat(2001) })).toMatchObject({
       ok: false,
       code: 'BIO_TOO_LONG',
     })

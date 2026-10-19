@@ -6,6 +6,7 @@ import { allowedImageUrl } from '@/lib/images'
 import { toProfileLink, type ProfileLink } from '@/lib/profile-links'
 import { getViewer } from '@/lib/session'
 import type { ProfileDetails } from '../communities.types'
+import { knownOpenTo } from '../open-to.constants'
 import type { EditProfileChanges } from '../schemas/edit-profile.schema'
 
 const ENDPOINT = 'GET /api/v1/profiles/:identifier'
@@ -32,6 +33,7 @@ export function toProfileDetails(profile: RawProfile, viewerName: string | null)
       .map(toProfileLink)
       .filter((link): link is ProfileLink => link !== null)
       .slice(0, 5),
+    openTo: knownOpenTo(profile.openTo),
     bannerUrl: allowedImageUrl(profile.bannerUrl ?? null),
     followerCount: profile.followerCount,
     followingCount: profile.followingCount,
@@ -65,8 +67,15 @@ export async function getProfileDetails(username: string): Promise<ApiResult<Pro
     : result
 }
 
-/** Fields the backend has (E01, P-011) and the ones proposed (P-019, P-020): sent apart. */
-const PROPOSED = ['headline', 'city', 'links', 'bannerUrl'] as const
+/** Fields the backend has (E01, P-011) and the ones proposed (P-019, P-020, P-026): sent apart. */
+const PROPOSED: readonly string[] = ['headline', 'city', 'links', 'bannerUrl', 'openTo']
+
+/** The bio the backend takes today (E01); a longer one is the About of P-024. */
+const BACKEND_BIO_MAX = 160
+
+const isProposed = (key: string, value: unknown) =>
+  PROPOSED.includes(key) ||
+  (key === 'bio' && typeof value === 'string' && value.length > BACKEND_BIO_MAX)
 
 /**
  * Edits the viewer's own profile (E01, specs/profile-edit, specs/profile-presentation PP-08): only
@@ -85,7 +94,7 @@ export async function updateProfileAs(
     ...(countryCode !== undefined && { countryCode: countryCode || null }),
   }
   const proposed = Object.fromEntries(
-    PROPOSED.filter((key) => key in body).map((key) => [key, body[key]]),
+    Object.entries(body).filter(([key, value]) => isProposed(key, value)),
   )
   const known = Object.fromEntries(Object.entries(body).filter(([key]) => !(key in proposed)))
 

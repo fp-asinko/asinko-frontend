@@ -80,6 +80,8 @@ export const PROFILES: RawProfile[] = [
       'https://www.youtube.com/@mariaonchain',
       'https://dune.com/maria',
     ],
+    // P-026 (proposal, specs/profile-showcase).
+    openTo: ['QUESTIONS', 'MENTORING'],
     bannerUrl: '/mocks/banner-demo.svg',
     accuracyRate: 0.74,
     points: 12400,

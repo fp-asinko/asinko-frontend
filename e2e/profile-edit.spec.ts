@@ -22,7 +22,7 @@ test.describe('Edit profile', () => {
     const dialog = page.getByRole('dialog', { name: 'Edit profile' })
     // The window starts on the name (specs/profile-presentation PP-05).
     await expect(dialog.getByRole('textbox', { name: 'Name' })).toBeFocused()
-    const field = dialog.getByRole('textbox', { name: 'Bio' })
+    const field = dialog.getByRole('textbox', { name: 'About' })
     await field.fill(bio)
     await dialog.getByRole('button', { name: 'Save' }).click()
 
@@ -36,12 +36,14 @@ test.describe('Edit profile', () => {
     await expect(page.getByRole('button', { name: 'Edit profile' })).toHaveCount(0)
   })
 
-  test('marks a bio over 160 characters and does not save it (PE-04)', async ({ page }) => {
+  test('marks an About over 2000 characters and does not save it (PE-04, specs/profile-showcase PS-04)', async ({
+    page,
+  }) => {
     await page.goto('/en/user/demo')
     await page.getByRole('button', { name: 'Edit profile' }).click()
     const dialog = page.getByRole('dialog', { name: 'Edit profile' })
-    await dialog.getByRole('textbox', { name: 'Bio' }).fill('x'.repeat(161))
-    await expect(dialog.getByText('161/160')).toBeVisible()
+    await dialog.getByRole('textbox', { name: 'About' }).fill('x'.repeat(2001))
+    await expect(dialog.getByText('2001/2000')).toBeVisible()
     await expect(dialog.getByRole('button', { name: 'Save' })).toHaveAttribute(
       'aria-disabled',
       'true',
@@ -64,7 +66,7 @@ test.describe('Edit profile', () => {
       await expectNoA11yViolations(page)
 
       // A word of 160 characters, saved: it wraps instead of widening the page (PE-07).
-      await dialog.getByRole('textbox', { name: 'Bio' }).fill('x'.repeat(160))
+      await dialog.getByRole('textbox', { name: 'About' }).fill('x'.repeat(160))
       await dialog.getByRole('button', { name: 'Save' }).click()
       await expect(dialog).toBeHidden()
       await expect(page.getByRole('button', { name: 'Edit profile' })).toBeFocused()

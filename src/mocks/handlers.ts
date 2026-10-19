@@ -13,6 +13,7 @@ import {
   profileImageUploadSchema,
   userCommentSchema,
   draftSchema,
+  featuredListSchema,
   postSchema,
   profileSchema,
   searchResultSchema,
@@ -37,7 +38,8 @@ import { membersOf } from './fixtures/members'
 import { thesesBy } from './fixtures/theses'
 import { userComments, userContent } from './user-activity'
 import { createDraft, deleteDraft, listDrafts, SEED_DRAFT_ID, updateDraft } from './drafts'
-import { PROPOSED_USER_FIELDS, updateUser } from './profile-edit'
+import { addFeatured, listFeatured, removeFeatured } from './featured'
+import { isProposedUserChange, updateUser } from './profile-edit'
 import { signProfileImageUpload } from './profile-image'
 import { paginate } from './paginate'
 import { signPostImageUpload } from './post-image'
@@ -47,6 +49,7 @@ import {
   commentsOf,
   createComment,
   createPost,
+  DEMO_POST_ID,
   findPost,
   removeCommentVote,
   voteComment,
@@ -133,17 +136,15 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     },
   },
 
-  // P-019 and P-020 (proposals, specs/profile-presentation): a PATCH with a headline, a city,
-  // links or a banner goes to the mock; the rest of the profile, to the backend.
+  // P-019, P-020, P-024 and P-026 (proposals, specs/profile-presentation, specs/profile-showcase):
+  // a PATCH with a headline, a city, links, a banner, "open to" or a bio past 160 goes to the mock;
+  // the rest of the profile, to the backend.
   {
     method: 'PATCH',
     path: '/api/v1/users/:userId',
     kind: 'proposal',
     implemented: false,
-    when: (_query, body) =>
-      typeof body === 'object' &&
-      body !== null &&
-      PROPOSED_USER_FIELDS.some((field) => field in body),
+    when: (_query, body) => isProposedUserChange(body),
     schema: userSchema,
     example: {
       ...noRequest,
@@ -222,6 +223,43 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       query: { userId: DEMO_USER.id },
     },
     handler: ({ params, query }) => deleteDraft(params.draftId ?? '', query.userId),
+  },
+  // P-025 (proposal, specs/profile-showcase): what a person put at the front of their profile.
+  {
+    method: 'GET',
+    path: '/api/v1/users/:userId/featured',
+    kind: 'proposal',
+    implemented: false,
+    schema: featuredListSchema,
+    example: { ...noRequest, params: { userId: PROFILES[1]!.id } },
+    handler: ({ params }) => listFeatured(params.userId ?? ''),
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/users/:userId/featured',
+    kind: 'proposal',
+    implemented: false,
+    schema: featuredListSchema,
+    example: {
+      ...noRequest,
+      params: { userId: DEMO_USER.id },
+      body: { userId: DEMO_USER.id, kind: 'post', id: DEMO_POST_ID },
+    },
+    handler: ({ params, body }) => addFeatured(params.userId ?? '', body),
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/users/:userId/featured/:kind/:id',
+    kind: 'proposal',
+    implemented: false,
+    schema: noContentSchema,
+    example: {
+      ...noRequest,
+      params: { userId: DEMO_USER.id, kind: 'post', id: DEMO_POST_ID },
+      query: { userId: DEMO_USER.id },
+    },
+    handler: ({ params, query }) =>
+      removeFeatured(params.userId ?? '', params.kind ?? '', params.id ?? '', query.userId),
   },
   // E01: editing your own profile (specs/profile-edit), for the demo viewer.
   {

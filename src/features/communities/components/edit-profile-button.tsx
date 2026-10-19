@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { PencilIcon, PlusIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { createContext, use, useRef, useState, type ReactNode } from 'react'
+import { cva } from 'class-variance-authority'
 import { useRouter } from '@/i18n/navigation'
 import type { EditableProfile, EditProfileField } from '../communities.types'
 
@@ -101,28 +102,52 @@ export function EditProfileButton() {
   )
 }
 
+const prompt = cva(
+  'inline-flex tap items-center outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+  {
+    variants: {
+      variant: {
+        // What is missing, where it would go (PP-04): gray, with a "+".
+        add: 'min-h-6 gap-1 rounded-md type-meta text-muted-foreground hover:text-foreground [&_svg]:size-3.5',
+        // A step of "Complete your profile" (specs/profile-showcase PS-01): an outlined pill.
+        pill: 'h-11 gap-1.5 rounded-full border border-input px-4 type-action hover:bg-muted md:h-9 [&_svg]:size-4',
+        // Edit a section in place (PS-10): a pencil.
+        edit: 'size-9 justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground [&_svg]:size-4',
+      },
+    },
+  },
+)
+
 /**
- * What your profile is missing, offered where it would go (specs/profile-presentation PP-04): in
- * gray, it opens "Edit profile" on that field. Never on someone else's profile.
+ * Opens "Edit profile" on a field (specs/profile-presentation PP-04, specs/profile-showcase PS-02,
+ * PS-10): what your profile is missing, in gray where it would go; a step of "Complete your
+ * profile"; or the pencil of a section, which needs its name in words. Never on someone else's
+ * profile.
  */
-export function EditProfilePrompt({
-  field,
-  children,
-}: {
-  field: EditProfileField
-  children: ReactNode
-}) {
+export function EditProfilePrompt(
+  props: { field: EditProfileField } & (
+    { variant?: 'add' | 'pill'; children: ReactNode } | { variant: 'edit'; children: string }
+  ),
+) {
+  const { field, children, variant = 'add' } = props
   const open = useOpenEditProfile()
   return (
     <button
       type="button"
       aria-haspopup="dialog"
+      aria-label={variant === 'edit' ? (children as string) : undefined}
       {...preload}
       onClick={() => open(field)}
-      className="inline-flex min-h-6 tap items-center gap-1 rounded-md type-meta text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-3.5"
+      className={prompt({ variant })}
     >
-      <PlusIcon aria-hidden />
-      {children}
+      {variant === 'edit' ? (
+        <PencilIcon aria-hidden />
+      ) : (
+        <>
+          {variant === 'add' && <PlusIcon aria-hidden />}
+          {children}
+        </>
+      )}
     </button>
   )
 }

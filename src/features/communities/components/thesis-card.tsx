@@ -1,28 +1,20 @@
-import { CheckIcon, XIcon } from 'lucide-react'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
+import { FeatureMenu } from '@/components/organisms/featured'
 import { Link } from '@/i18n/navigation'
 import { previewProps } from '@/lib/communities/preview'
 import { cn } from '@/lib/utils'
 import type { ThesisItem } from '../communities.types'
-
-/** The state's chip: the accuracy tints for the resolved ones, gray for the rest (PT-07). */
-const STATE_CLASSES: Record<ThesisItem['state'], string> = {
-  open: 'bg-muted text-foreground',
-  correct: 'bg-thesis-correct text-thesis-correct-foreground',
-  incorrect: 'bg-thesis-incorrect text-thesis-incorrect-foreground',
-  disputed: 'bg-thesis-disputed text-thesis-disputed-foreground',
-  expired: 'bg-muted text-muted-foreground',
-  cancelled: 'bg-muted text-muted-foreground',
-}
+import { ThesisState } from './thesis-state'
 
 /**
  * A thesis in a person's "Theses" tab, as the prototype's card without its votes (votes on theses
  * come with them to the feed, specs/profile-track-record PT-07): the asset and when, the state,
  * the claim, what it bets on and by when, how it ended, and the conviction in 4 bars. A Server
- * Component: read only.
+ * Component: read only. On your own profile, "⋯" features it (specs/profile-showcase PS-07).
  */
-export function ThesisCard({ thesis }: { thesis: ThesisItem }) {
+export function ThesisCard({ thesis, menu = false }: { thesis: ThesisItem; menu?: boolean }) {
   const t = useTranslations('communities.theses')
+  const tf = useTranslations('featured')
   const format = useFormatter()
   const now = useNow()
   const titleId = `thesis-${thesis.id}`
@@ -56,17 +48,16 @@ export function ThesisCard({ thesis }: { thesis: ThesisItem }) {
             {format.relativeTime(new Date(thesis.publishedAt), now)}
           </time>
         </p>
-        <span
-          data-state={thesis.state}
-          className={cn(
-            'inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 type-meta font-bold',
-            STATE_CLASSES[thesis.state],
+        <div className="-my-2 flex items-center gap-1">
+          <ThesisState state={thesis.state} />
+          {menu && (
+            <FeatureMenu
+              kind="thesis"
+              id={thesis.id}
+              label={tf('thesisMenu', { title: thesis.claim })}
+            />
           )}
-        >
-          {thesis.state === 'correct' && <CheckIcon aria-hidden className="size-3.5" />}
-          {thesis.state === 'incorrect' && <XIcon aria-hidden className="size-3.5" />}
-          {t(`state.${thesis.state}`)}
-        </span>
+        </div>
       </div>
 
       <h3 id={titleId} className="mt-2 type-post-title">

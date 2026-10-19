@@ -3,18 +3,32 @@ import { DEMO_USER } from './demo-user'
 import { PROFILES } from './fixtures/users'
 import type { MockResponse } from './types'
 
-// Editing your own profile (E01, specs/profile-edit and specs/profile-presentation), for the demo
-// viewer. Validates as the backend does (and as P-019 and P-020 propose); what is saved lives in
-// this process's memory, so an e2e can save it and see it.
+// Editing your own profile (E01, specs/profile-edit, specs/profile-presentation and
+// specs/profile-showcase), for the demo viewer. Validates as the backend does (and as P-019, P-020,
+// P-024 and P-026 propose); what is saved lives in this process's memory, so an e2e can save it
+// and see it.
 
-const BIO_MAX = 160
+/** The backend's bio today (E01); a longer one is the "About" of P-024. */
+export const BACKEND_BIO_MAX = 160
+const BIO_MAX = 2000
+const OPEN_TO = ['QUESTIONS', 'COLLABORATIONS', 'MENTORING', 'AMAS', 'COMMISSIONED_ANALYSIS']
 const DISPLAY_NAME_MAX = 50
 const HEADLINE_MAX = 100
 const CITY_MAX = 60
 const LINKS_MAX = 5
 
-/** The fields of P-019 and P-020: a PATCH with any of them goes to the mock (`when`). */
-export const PROPOSED_USER_FIELDS = ['headline', 'city', 'links', 'bannerUrl'] as const
+/** The fields of P-019, P-020 and P-026: a PATCH with any of them goes to the mock (`when`). */
+export const PROPOSED_USER_FIELDS = ['headline', 'city', 'links', 'bannerUrl', 'openTo'] as const
+
+/** A PATCH the backend cannot take yet: a proposed field, or a bio past today's 160 (P-024). */
+export function isProposedUserChange(body: unknown) {
+  if (typeof body !== 'object' || body === null) return false
+  const input = body as Record<string, unknown>
+  return (
+    PROPOSED_USER_FIELDS.some((field) => field in input) ||
+    (typeof input.bio === 'string' && input.bio.length > BACKEND_BIO_MAX)
+  )
+}
 
 const isHttpUrl = (value: unknown) => {
   if (typeof value !== 'string') return false
@@ -48,6 +62,16 @@ export function updateUser(userId: string, body: unknown): MockResponse {
   if (typeof input.countryCode === 'string' && !/^[A-Z]{2}$/.test(input.countryCode)) {
     return error(422, 'VALIDATION_ERROR')
   }
+  if (input.openTo !== undefined) {
+    const values = input.openTo
+    if (
+      !Array.isArray(values) ||
+      !values.every((each) => OPEN_TO.includes(each)) ||
+      new Set(values).size !== values.length
+    ) {
+      return error(422, 'INVALID_OPEN_TO')
+    }
+  }
   if (input.links !== undefined) {
     if (!Array.isArray(input.links)) return error(422, 'VALIDATION_ERROR')
     if (input.links.length > LINKS_MAX) return error(422, 'TOO_MANY_LINKS')
@@ -67,9 +91,10 @@ export function updateUser(userId: string, body: unknown): MockResponse {
   if ('city' in input) profile.city = text(input.city)
   if ('bannerUrl' in input) profile.bannerUrl = text(input.bannerUrl)
   if (Array.isArray(input.links)) profile.links = input.links as string[]
+  if (Array.isArray(input.openTo)) profile.openTo = input.openTo as string[]
   // The response is the User, not the extended Profile (E01).
   const { id, username, usernameChangedAt, avatarUrl, bio, countryCode, countrySource } = profile
-  const { language, isPublic, status, createdAt, headline, city, links } = profile
+  const { language, isPublic, status, createdAt, headline, city, links, openTo } = profile
   return {
     status: 200,
     body: {
@@ -87,6 +112,7 @@ export function updateUser(userId: string, body: unknown): MockResponse {
       headline,
       city,
       links,
+      openTo,
     },
   }
 }

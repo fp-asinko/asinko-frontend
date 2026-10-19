@@ -45,6 +45,7 @@ const PROFILE: EditableProfile = {
   bio: 'On-chain analyst.',
   avatarUrl: null,
   bannerUrl: null,
+  openTo: [],
   links: ['https://x.com/juan'],
 }
 
@@ -83,8 +84,8 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
     expect(box('Headline')).toHaveValue('')
     expect(screen.getByRole('group', { name: 'Location' })).toBeInTheDocument()
     expect(screen.getByRole('combobox', { name: 'Country' })).toHaveValue('AR')
-    expect(box('Bio')).toHaveValue('On-chain analyst.')
-    expect(box('Bio')).toHaveAccessibleDescription(/17\/160/)
+    expect(box('About')).toHaveValue('On-chain analyst.')
+    expect(box('About')).toHaveAccessibleDescription(/17\/2000/)
     expect(box('Link 1')).toHaveValue('https://x.com/juan')
     await vi.waitFor(() => expect(box('Name')).toHaveFocus())
   })
@@ -178,10 +179,10 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
   it('says a general failure, keeping what was written (PE-05)', async () => {
     action.updateProfile.mockResolvedValue({ ok: false, error: 'api.errors.UNAVAILABLE' })
     renderDialog()
-    await userEvent.type(box('Bio'), ' More.')
+    await userEvent.type(box('About'), ' More.')
     await userEvent.click(save())
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not save. Try again.')
-    expect(box('Bio')).toHaveValue('On-chain analyst. More.')
+    expect(box('About')).toHaveValue('On-chain analyst. More.')
   })
 
   it('asks before discarding changes, and closes at once without any (PE-03)', async () => {
@@ -190,7 +191,7 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
     expect(view.onOpenChange).toHaveBeenCalledWith(false)
 
     view.onOpenChange.mockClear()
-    await userEvent.type(box('Bio'), ' More.')
+    await userEvent.type(box('About'), ' More.')
     await userEvent.keyboard('{Escape}')
     expect(view.onOpenChange).not.toHaveBeenCalled()
     const confirm = await screen.findByRole('alertdialog', { name: 'Discard changes?' })
@@ -247,11 +248,46 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
   it('says Saving… while it saves and never sends twice (PE-03)', async () => {
     action.updateProfile.mockReturnValue(new Promise(() => {}))
     renderDialog()
-    await userEvent.type(box('Bio'), ' More.')
+    await userEvent.type(box('About'), ' More.')
     await userEvent.click(save())
     const saving = await screen.findByRole('button', { name: 'Saving…' })
     expect(saving).toHaveAttribute('aria-disabled', 'true')
     await userEvent.click(saving)
     expect(action.updateProfile).toHaveBeenCalledOnce()
+  })
+
+  it('saves what the person is open to (specs/profile-showcase PS-09)', async () => {
+    const { onSaved } = renderDialog({ openTo: ['QUESTIONS'] })
+    const group = screen.getByRole('group', { name: 'Open to' })
+    expect(within(group).getByRole('checkbox', { name: 'Questions' })).toBeChecked()
+    await userEvent.click(within(group).getByRole('checkbox', { name: 'Mentoring' }))
+    await userEvent.click(within(group).getByRole('checkbox', { name: 'Questions' }))
+    await userEvent.click(save())
+    expect(action.updateProfile).toHaveBeenCalledWith({ openTo: ['MENTORING'] })
+    expect(onSaved).toHaveBeenCalled()
+  })
+
+  it('says under Open to when the server refuses it (WCAG 3.3.1)', async () => {
+    action.updateProfile.mockResolvedValue({
+      ok: false,
+      error: 'communities.edit.errors.openTo',
+      fieldErrors: { openTo: ['communities.edit.errors.openTo'] },
+    })
+    renderDialog()
+    await userEvent.click(screen.getByRole('checkbox', { name: 'AMAs' }))
+    await userEvent.click(save())
+    const group = screen.getByRole('group', { name: 'Open to' })
+    expect(await within(group).findByText('Choose each option once, from the list')).toBeVisible()
+    expect(group).toHaveAccessibleDescription(/Choose each option once/)
+  })
+
+  it.each([
+    ['openTo', () => screen.getByRole('checkbox', { name: 'Questions' })],
+    ['bio', () => box('About')],
+    ['location', () => screen.getByRole('combobox', { name: 'Country' })],
+    ['avatar', () => screen.getByRole('button', { name: /Change photo/ })],
+  ] as const)('opens on %s when a step asks (PS-02)', async (field, target) => {
+    renderDialog({}, field)
+    await vi.waitFor(() => expect(target()).toHaveFocus())
   })
 })

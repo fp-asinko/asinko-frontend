@@ -86,7 +86,11 @@ export function FeedListView({
         ) : (
           <>
             <ul className="divide-y">
-              <FeedItems items={items} feedCommunity={params.community} />
+              <FeedItems
+                items={items}
+                feedCommunity={params.community}
+                menus={Boolean(params.author)}
+              />
             </ul>
             {state.status === 'ok' && state.nextCursor && (
               <LoadMore params={params} cursor={state.nextCursor} />

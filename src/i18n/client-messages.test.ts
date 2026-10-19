@@ -42,6 +42,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'devLogin',
       'emoji',
       'errors',
+      'featured',
       'feed',
       'join',
       'mentions',
@@ -68,6 +69,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'actions',
       'edit',
       'follows',
+      'openTo',
       'profile',
       'theses',
     ])
