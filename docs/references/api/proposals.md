@@ -2,7 +2,7 @@
 
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla. Cuando el backend la implementa y el front la adopta, sale de este archivo (queda en el historial de git) y pasa al snapshot del contrato.
 
-**Actualizado el 2026-10-19:** se sumaron P-022 a P-029 (borradores, marcas, el perfil como LinkedIn y Reddit, y los widgets de los grupos), todas hechas en el front contra mocks. Lo de antes sigue como se adoptó el 2026-10-18, después de la respuesta del backend del 2026-10-13 ([`responses/2026-10-13-backend.md`](responses/2026-10-13-backend.md)).
+**Actualizado el 2026-10-19:** se sumaron P-022 a P-030 (borradores, marcas, el perfil como LinkedIn y Reddit, los widgets de los grupos y los logros), todas hechas en el front contra mocks. Lo de antes sigue como se adoptó el 2026-10-18, después de la respuesta del backend del 2026-10-13 ([`responses/2026-10-13-backend.md`](responses/2026-10-13-backend.md)).
 
 **Verificado contra el deploy de `dev` el 2026-10-19** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 8 de 8 en verde, solo lecturas. Cada respuesta se validó con el mismo esquema que usa el mock:
 
@@ -37,13 +37,14 @@
 2. **Comunidades de los activos del catálogo.** Solo 5 de los 100 tienen la suya (BTC, ETH, AAPL, NVDA, VOO). `GET /communities/TSLA` (y SPY, MSFT, EURUSD, SQM-B, BRK.B, XAU/USD…) da `404`, y `GET /assets/{symbol}` trae `linkedCommunity: null`. **Pedido:** crear la comunidad de cada activo (slug = símbolo). Mientras tanto, el front muestra la página del activo con su precio, sin feed ni Unirse, y no se puede publicar ni etiquetar en ellos.
 3. **P-024 a P-027: el perfil como vidriera**, como LinkedIn (`specs/profile-showcase`): "Acerca de" de 2000, destacados, "Abierto a" y dónde publica cada persona (`specs/profile-aside`). Hechos contra mocks.
 4. **P-028 y P-029: widgets de los grupos**, como Reddit (`specs/community-widgets`): Texto, Reglas, Botones, Lista de comunidades, Imágenes y Calendario en la columna derecha, que arma el moderador. Hechos contra mocks.
-5. **P-022 y P-023: borradores en la cuenta y marcas por comunidad**, como Reddit (`specs/drafts-tags`). Hechos contra mocks.
-6. **P-018: comunidades y activos relacionados de un post.** Hoy viajan como menciones al final del cuerpo.
-7. **P-017: "lo seguís" en las listas de seguidores, seguidos y miembros.** Sin respuesta desde el 2026-10-09.
-8. **P-005: `sort=hot|top` del feed.** Fórmulas en definición.
-9. **`best` de los comentarios (P-014).** Hoy es cronológico; el mock usa la fórmula propuesta (abajo). El front ya manda `sort=best`.
-10. **`GET /assets` sin `?q=` devuelve 20, sin `nextCursor`.** No bloquea (el front busca con `?q=`), pero hace falta para listar el catálogo.
-11. **Imágenes huérfanas.** Una imagen subida con la URL firmada y nunca publicada queda en Storage, y no hay cómo borrarla. ¿Se limpian del lado del backend? Aplica también a la foto y el banner (P-021), a la imagen de un borrador eliminado (P-022) y a la de un widget que se quita (P-029).
+5. **P-030: logros del perfil**, como la vitrina de trofeos de Reddit (`specs/profile-achievements`): 16 logros, quién ganó cuál y, para el dueño, cuánto le falta. Hecho contra mocks.
+6. **P-022 y P-023: borradores en la cuenta y marcas por comunidad**, como Reddit (`specs/drafts-tags`). Hechos contra mocks.
+7. **P-018: comunidades y activos relacionados de un post.** Hoy viajan como menciones al final del cuerpo.
+8. **P-017: "lo seguís" en las listas de seguidores, seguidos y miembros.** Sin respuesta desde el 2026-10-09.
+9. **P-005: `sort=hot|top` del feed.** Fórmulas en definición.
+10. **`best` de los comentarios (P-014).** Hoy es cronológico; el mock usa la fórmula propuesta (abajo). El front ya manda `sort=best`.
+11. **`GET /assets` sin `?q=` devuelve 20, sin `nextCursor`.** No bloquea (el front busca con `?q=`), pero hace falta para listar el catálogo.
+12. **Imágenes huérfanas.** Una imagen subida con la URL firmada y nunca publicada queda en Storage, y no hay cómo borrarla. ¿Se limpian del lado del backend? Aplica también a la foto y el banner (P-021), a la imagen de un borrador eliminado (P-022) y a la de un widget que se quita (P-029).
 
 ### P-019: Titular, ciudad y links del perfil
 
@@ -191,6 +192,37 @@
 **Motivo:** el widget de Imágenes (P-028). También sirve para el banner y el avatar del grupo cuando exista "Editar comunidad".
 
 **Cambio:** el mismo flujo de URL firmada que `POST /uploads/post-image` (P-013): JPEG, PNG, WebP o GIF (nunca SVG), hasta 5 MB. Solo moderadores de esa comunidad (`403 NOT_MODERATOR`).
+
+### P-030: Logros del perfil
+
+**Estado:** propuesta (2026-10-19), mockeada.
+
+**Endpoint:** `GET /api/v1/users/{userId}/achievements` (público).
+
+**Motivo:** la vitrina de trofeos del perfil, como Reddit (`specs/profile-achievements`). Quién ganó qué tiene que decidirlo el backend: el front no ve todas las tesis, votos ni seguidores de una persona, y armarlo ahí sería compensar con lógica.
+
+**Cambio:**
+
+```jsonc
+{
+  "items": [
+    { "code": "STREAK_3", "earnedAt": "2026-09-02T14:00:00Z", "level": null, "progress": null },
+    { "code": "ANNIVERSARY", "earnedAt": "2026-10-01T00:00:00Z", "level": 1, "progress": null },
+    // Solo con la sesión del dueño: los que faltan.
+    { "code": "STREAK_5", "earnedAt": null, "level": null, "progress": { "current": 3, "target": 5 } },
+  ],
+}
+```
+
+- `code`, uno de 16:
+  - tesis: `FIRST_THESIS`, `FIRST_CORRECT`, `STREAK_3`, `STREAK_5`, `STREAK_10` (acertadas seguidas), `RESOLVED_10` y `ACCURACY_70` (con 10 o más resueltas);
+  - comunidad: `FIRST_POST`, `FIRST_COMMENT`, `POST_100_VOTES` (un post con 100 votos), `FOLLOWERS_100`, `GROUP_FOUNDER` y `GROUP_MODERATOR`;
+  - antigüedad: `ANNIVERSARY` (`level` = años cumplidos, un solo ítem) y `FOUNDING_MEMBER` (se registró antes del lanzamiento: la fecha la define el backend);
+  - `PROFILE_COMPLETE`: foto, titular, "Acerca de", ubicación, links, "Abierto a", banner y al menos un destacado.
+- Un logro ganado no se pierde aunque después baje la racha o la precisión.
+- `progress` en los que se miden (rachas, resueltas, votos del mejor post, seguidores, precisión en puntos, pasos del perfil); `null` en los de sí o no.
+- Orden: los ganados del más nuevo al más viejo; después los que faltan, en el orden de la lista de arriba.
+- Sin sesión o de otra persona: solo los ganados. Usuario inexistente, `404`.
 
 ### P-022: Borradores en la cuenta
 

@@ -12,6 +12,7 @@ import {
   postImageUploadSchema,
   profileImageUploadSchema,
   userCommentSchema,
+  achievementListSchema,
   activeCommunitiesSchema,
   communityImageUploadSchema,
   widgetListSchema,
@@ -39,6 +40,7 @@ import { withTopPost } from './top-post'
 import { followersOf, followingOf, listItem } from './fixtures/follows'
 import { membersOf } from './fixtures/members'
 import { thesesBy } from './fixtures/theses'
+import { listAchievements } from './achievements'
 import { userComments, userContent, activeCommunities } from './user-activity'
 import { createDraft, deleteDraft, listDrafts, SEED_DRAFT_ID, updateDraft } from './drafts'
 import { addFeatured, listFeatured, removeFeatured } from './featured'
@@ -282,6 +284,16 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       query: { days: '90', limit: '20' },
     },
     handler: ({ params, query }) => activeCommunities(params.userId ?? '', query),
+  },
+  // P-030 (proposal, specs/profile-achievements): a person's trophy case.
+  {
+    method: 'GET',
+    path: '/api/v1/users/:userId/achievements',
+    kind: 'proposal',
+    implemented: false,
+    schema: achievementListSchema,
+    example: { ...noRequest, params: { userId: DEMO_USER.id } },
+    handler: ({ params }) => listAchievements(params.userId ?? ''),
   },
   // P-025 (proposal, specs/profile-showcase): what a person put at the front of their profile.
   {

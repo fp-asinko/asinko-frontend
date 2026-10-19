@@ -97,6 +97,8 @@ describe('mock handlers behave like the contract', () => {
         '/api/v1/communities/:slug/widgets',
         '/api/v1/communities/:slug/widgets',
         '/api/v1/uploads/community-image',
+        // P-030 (specs/profile-achievements): a person's trophy case.
+        '/api/v1/users/:userId/achievements',
         // P-027 (specs/profile-aside): where a person publishes.
         '/api/v1/users/:userId/active-communities',
         // P-025 (specs/profile-showcase): featured.

@@ -1,6 +1,7 @@
 // Domain types of the community, asset and profile pages (specs/community-pages § 3). The UI only
 // knows these, never the raw contract shapes.
 
+import type { AchievementCode } from '@/lib/api/contract'
 import type { CommunityKind } from '@/lib/communities/paths'
 import type { OpenTo } from './open-to.constants'
 import type { ProfileLink } from '@/lib/profile-links'
@@ -192,6 +193,19 @@ export type FeaturedItem =
       state: ThesisItem['state']
       community: FeaturedCommunity
     }
+
+/** The four groups of the catalog (specs/profile-achievements AC-01). */
+export type AchievementGroup = 'theses' | 'community' | 'tenure' | 'profile'
+
+/** An achievement (P-030): earned (`earnedAt`) or, on your own profile, missing. */
+export type Achievement = {
+  code: AchievementCode
+  group: AchievementGroup
+  earnedAt: string | null
+  /** The anniversary's years. */
+  level: number | null
+  progress: { current: number; target: number } | null
+}
 
 /** A community or asset where a person published lately (P-027, specs/profile-aside PA-05). */
 export type ActiveCommunity = {

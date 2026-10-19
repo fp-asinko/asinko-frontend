@@ -689,6 +689,96 @@
     "assetOnly": {
       "title": "{handle} ainda não tem comunidade",
       "body": "Em breve você vai poder segui-lo e publicar aqui."
+    },
+    "achievements": {
+      "title": "Conquistas",
+      "cardTitle": "Conquistas · {count, number}",
+      "seeAll": "Ver todas",
+      "seeAllLabel": "Ver todas as conquistas de {name}",
+      "empty": "Você ainda não tem conquistas",
+      "closest": "A mais próxima",
+      "locked": "Bloqueada",
+      "earnedOn": "Conquistada em {date}",
+      "progress": "{current, number} de {target, number}",
+      "progressLabel": "Progresso",
+      "groups": {
+        "theses": "Teses e reputação",
+        "community": "Comunidade",
+        "tenure": "Tempo de casa",
+        "profile": "Perfil"
+      },
+      "page": {
+        "metaTitle": "Conquistas de {name}",
+        "metaDescription": "As conquistas de {name} no Asinko: teses, comunidade e tempo de casa.",
+        "back": "Voltar ao perfil de {name}",
+        "none": "{name} ainda não tem conquistas."
+      },
+      "items": {
+        "FIRST_THESIS": {
+          "name": "Primeira tese",
+          "description": "Uma tese publicada."
+        },
+        "FIRST_CORRECT": {
+          "name": "Primeiro acerto",
+          "description": "Uma tese resolvida como certa."
+        },
+        "STREAK_3": {
+          "name": "Sequência de 3",
+          "description": "3 teses certas seguidas."
+        },
+        "STREAK_5": {
+          "name": "Sequência de 5",
+          "description": "5 teses certas seguidas."
+        },
+        "STREAK_10": {
+          "name": "Sequência de 10",
+          "description": "10 teses certas seguidas."
+        },
+        "RESOLVED_10": {
+          "name": "10 resolvidas",
+          "description": "10 teses resolvidas, certas ou não."
+        },
+        "ACCURACY_70": {
+          "name": "Precisão de 70%",
+          "description": "70% ou mais, com 10 ou mais resolvidas."
+        },
+        "FIRST_POST": {
+          "name": "Primeiro post",
+          "description": "Um post publicado."
+        },
+        "FIRST_COMMENT": {
+          "name": "Primeiro comentário",
+          "description": "Um comentário escrito."
+        },
+        "POST_100_VOTES": {
+          "name": "100 votos",
+          "description": "Um post com 100 votos."
+        },
+        "FOLLOWERS_100": {
+          "name": "100 seguidores",
+          "description": "Seguido por 100 pessoas."
+        },
+        "GROUP_FOUNDER": {
+          "name": "Fundou um grupo",
+          "description": "Criou um grupo no Asinko."
+        },
+        "GROUP_MODERATOR": {
+          "name": "Modera um grupo",
+          "description": "Modera um grupo no Asinko."
+        },
+        "ANNIVERSARY": {
+          "name": "{years, plural, one {# ano} other {# anos}} no Asinko",
+          "description": "Um a mais a cada ano desde que chegou."
+        },
+        "FOUNDING_MEMBER": {
+          "name": "Membro fundador",
+          "description": "Chegou antes do lançamento."
+        },
+        "PROFILE_COMPLETE": {
+          "name": "Perfil completo",
+          "description": "Os 8 passos de \"Complete seu perfil\" feitos."
+        }
+      }
     }
   },
   "featured": {

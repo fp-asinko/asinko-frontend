@@ -1,6 +1,6 @@
 # Logros en el perfil, como la vitrina de trofeos de Reddit — Requirements
 
-> **Estado:** borrador, para aprobar por el PO.
+> **Estado:** aprobado por el PO el 2026-10-19 ("sigamos con logros").
 > **Fuente:** pedido del PO (2026-10-19), después de `specs/profile-aside` ("los logros, en otro spec"). Respuestas:
 >
 > - Catálogo: **tesis y reputación**, **comunidad**, **antigüedad** y **perfil completo**.

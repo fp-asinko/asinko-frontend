@@ -25,6 +25,7 @@ Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of 
 | PUT    | `/api/v1/communities/:slug/widgets`        | proposal | P-028. Saves the whole list; `403 NOT_MODERATOR`, `422 INVALID_WIDGET` with `index` and `field`                       |
 | POST   | `/api/v1/uploads/community-image`          | proposal | P-029. A moderator of that community, as a post image                                                                 |
 | GET    | `/api/v1/users/:userId/active-communities` | proposal | P-027. Counts the fixtures' and the created posts by community, in the last `days`                                    |
+| GET    | `/api/v1/users/:userId/achievements`       | proposal | P-030. Demo, María and Federico have earned ones; only the demo's own list brings the missing ones                    |
 | GET    | `/api/v1/users/:userId/featured`           | proposal | P-025. In memory; María has a thesis and a post (seeded)                                                              |
 | POST   | `/api/v1/users/:userId/featured`           | proposal | P-025. Only your own; `409 FEATURED_LIMIT` past 3, `403 NOT_OWNER`                                                    |
 | DELETE | `/api/v1/users/:userId/featured/:kind/:id` | proposal | P-025                                                                                                                 |

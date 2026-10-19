@@ -689,6 +689,96 @@
     "assetOnly": {
       "title": "{handle} does not have a community yet",
       "body": "Soon you will be able to follow it and post here."
+    },
+    "achievements": {
+      "title": "Achievements",
+      "cardTitle": "Achievements · {count, number}",
+      "seeAll": "See all",
+      "seeAllLabel": "See all of {name}'s achievements",
+      "empty": "You have no achievements yet",
+      "closest": "The closest",
+      "locked": "Locked",
+      "earnedOn": "Earned {date}",
+      "progress": "{current, number} of {target, number}",
+      "progressLabel": "Progress",
+      "groups": {
+        "theses": "Theses and reputation",
+        "community": "Community",
+        "tenure": "Tenure",
+        "profile": "Profile"
+      },
+      "page": {
+        "metaTitle": "{name}'s achievements",
+        "metaDescription": "The achievements of {name} on Asinko: theses, community and tenure.",
+        "back": "Back to {name}'s profile",
+        "none": "{name} has no achievements yet."
+      },
+      "items": {
+        "FIRST_THESIS": {
+          "name": "First thesis",
+          "description": "A thesis published."
+        },
+        "FIRST_CORRECT": {
+          "name": "First hit",
+          "description": "A thesis resolved as correct."
+        },
+        "STREAK_3": {
+          "name": "Streak of 3",
+          "description": "3 correct theses in a row."
+        },
+        "STREAK_5": {
+          "name": "Streak of 5",
+          "description": "5 correct theses in a row."
+        },
+        "STREAK_10": {
+          "name": "Streak of 10",
+          "description": "10 correct theses in a row."
+        },
+        "RESOLVED_10": {
+          "name": "10 resolved",
+          "description": "10 theses resolved, right or wrong."
+        },
+        "ACCURACY_70": {
+          "name": "70% accuracy",
+          "description": "70% or more, with 10 or more resolved."
+        },
+        "FIRST_POST": {
+          "name": "First post",
+          "description": "A post published."
+        },
+        "FIRST_COMMENT": {
+          "name": "First comment",
+          "description": "A comment written."
+        },
+        "POST_100_VOTES": {
+          "name": "100 votes",
+          "description": "A post with 100 votes."
+        },
+        "FOLLOWERS_100": {
+          "name": "100 followers",
+          "description": "Followed by 100 people."
+        },
+        "GROUP_FOUNDER": {
+          "name": "Founded a group",
+          "description": "Created a group on Asinko."
+        },
+        "GROUP_MODERATOR": {
+          "name": "Moderates a group",
+          "description": "Moderates a group on Asinko."
+        },
+        "ANNIVERSARY": {
+          "name": "{years, plural, one {# year} other {# years}} on Asinko",
+          "description": "One more each year since joining."
+        },
+        "FOUNDING_MEMBER": {
+          "name": "Founding member",
+          "description": "Joined before the launch."
+        },
+        "PROFILE_COMPLETE": {
+          "name": "Complete profile",
+          "description": "The 8 steps of \"Complete your profile\" done."
+        }
+      }
     }
   },
   "featured": {
