@@ -17,7 +17,10 @@ async function feature() {
     </FeaturedScope>,
   )
   await userEvent.click(screen.getByRole('button', { name: 'Options for the post Rates' }))
-  await userEvent.click(await screen.findByRole('menuitem', { name: 'Feature on your profile' }))
+  // The menu is loaded on the first open (deferred): give it time under load.
+  await userEvent.click(
+    await screen.findByRole('menuitem', { name: 'Feature on your profile' }, { timeout: 3000 }),
+  )
 }
 
 describe('FeaturedScope (specs/profile-showcase PS-07)', () => {

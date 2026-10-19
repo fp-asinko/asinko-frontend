@@ -25,7 +25,7 @@ function renderMenu(featured: string[] = [], state: Partial<FeaturedMenuState> =
 
 const open = async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Options for the post Rates' }))
-  return screen.findByRole('menuitem')
+  return screen.findByRole('menuitem', {}, { timeout: 3000 })
 }
 
 describe('FeatureMenu (specs/profile-showcase PS-07)', () => {

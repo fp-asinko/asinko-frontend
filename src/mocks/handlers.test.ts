@@ -93,6 +93,8 @@ describe('mock handlers behave like the contract', () => {
         '/api/v1/drafts/:draftId',
         '/api/v1/drafts/:draftId',
         '/api/v1/uploads/profile-banner',
+        // P-027 (specs/profile-aside): where a person publishes.
+        '/api/v1/users/:userId/active-communities',
         // P-025 (specs/profile-showcase): featured.
         '/api/v1/users/:userId/featured',
         '/api/v1/users/:userId/featured',

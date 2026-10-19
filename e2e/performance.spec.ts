@@ -22,6 +22,8 @@ test.describe('JavaScript budget', () => {
     '/en/user/maria?tab=theses',
     // specs/profile-showcase PS-11: your own, with its checklist and "⋯"
     '/en/user/demo',
+    // specs/profile-aside PA-06: its card, in the page and in the right column
+    '/en/user/maria',
     // specs/backend-adoption BK-03
     '/en/user/maria?tab=replies',
     // specs/submit-page SU-11

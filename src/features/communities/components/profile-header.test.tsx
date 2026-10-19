@@ -65,17 +65,24 @@ describe('Profile header (specs/community-pages CP-11, CP-12)', () => {
     expect(screen.getByRole('heading', { level: 1, name: '@federico' })).toBeInTheDocument()
   })
 
-  it('shows followers, accuracy and streak, each number with its word', () => {
+  it('shows followers under the name, each number with its word (specs/profile-aside PA-02)', () => {
     renderHeader(profile())
     const stats = screen.getByText('3,200').closest('p')!
     expect(stats).toHaveTextContent('3,200 followers')
-    expect(stats).toHaveTextContent('68% accuracy')
-    expect(stats).toHaveTextContent('2 streak')
+    expect(stats).not.toHaveTextContent('accuracy')
   })
 
   it('names a verified or institutional badge for screen readers', () => {
     renderHeader(profile({ badge: 'institutional' }))
     expect(screen.getByText('Institutional')).toBeInTheDocument()
+  })
+
+  it('shares the profile from the actions (specs/profile-aside PA-04)', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.assign(navigator, { clipboard: { writeText } })
+    renderHeader(profile())
+    await userEvent.click(screen.getByRole('button', { name: 'Share profile' }))
+    expect(writeText).toHaveBeenCalledWith(expect.stringMatching(/\/en\/user\/federico$/))
   })
 
   it('offers "Ask" as coming soon', async () => {

@@ -31,6 +31,8 @@ export type ProfileDetails = {
   followerCount: number
   followingCount: number
   accuracyRate: number | null
+  /** The points of their reputation (specs/profile-aside PA-01). */
+  points: number
   /** The track record (PT-02): theses resolved right, wrong, and cancelled. */
   correctCount: number
   incorrectCount: number
@@ -190,3 +192,15 @@ export type FeaturedItem =
       state: ThesisItem['state']
       community: FeaturedCommunity
     }
+
+/** A community or asset where a person published lately (P-027, specs/profile-aside PA-05). */
+export type ActiveCommunity = {
+  /** $GGAL, #macro or @maria. */
+  handle: string
+  path: string
+  avatarUrl: string | null
+  /** The stable key of its color: its slug. */
+  colorKey: string
+  kind: CommunityKind
+  postCount: number
+}

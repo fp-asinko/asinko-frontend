@@ -16,7 +16,8 @@ test.describe('Profile track record', () => {
     const header = page.getByRole('main').locator('header').first()
     await expect(header.getByText(/12,400\s*followers/)).toBeVisible()
     await expect(header.getByText(/180\s*following/)).toBeVisible()
-    await expect(header.getByText(/74%\s*accuracy/)).toBeVisible()
+    // The accuracy and the streak moved to the profile's card (specs/profile-aside PA-02).
+    await expect(header.getByText(/accuracy/)).toHaveCount(0)
     // The detail lives in the Theses tab (changed with the PO on 2026-10-09).
     await expect(header.getByText(/115\s*correct/)).toHaveCount(0)
     await page.goto('/en/user/maria?tab=theses')

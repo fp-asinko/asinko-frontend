@@ -1,7 +1,8 @@
-import { CircleHelpIcon, PlusIcon } from 'lucide-react'
+import { CircleHelpIcon, PlusIcon, Share2Icon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { BackButton } from '@/components/molecules/back-button'
 import { ComingSoon } from '@/components/molecules/coming-soon'
+import { ShareButton } from '@/components/molecules/share-button'
 import { IdentityBanner } from '@/components/molecules/identity-banner'
 import { ComposeTrigger } from '@/components/organisms/compose'
 import { UserAvatar } from '@/components/molecules/user-avatar'
@@ -69,7 +70,7 @@ export function CommunityHeader({
           </div>
           {subtitle && <p className="type-meta text-muted-foreground">{subtitle}</p>}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {canPost && (
             // As Reddit's "Create post": the page to create one, with this community chosen
             // (specs/submit-page SU-02).
@@ -91,6 +92,17 @@ export function CommunityHeader({
               favorite={page.viewerIsFavorite}
               variant={profile ? 'user' : 'community'}
             />
+          )}
+          {profile && (
+            // Share the profile, as Reddit's card (specs/profile-aside PA-04): here, by the
+            // actions, the same in phones and desktop; in the right column it would travel twice.
+            <ShareButton
+              href={`/user/${encodeURIComponent(profile.username)}`}
+              aria-label={t('profile.share')}
+              className="inline-flex size-8 tap items-center justify-center rounded-full bg-muted outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-4"
+            >
+              <Share2Icon aria-hidden />
+            </ShareButton>
           )}
         </div>
       </div>

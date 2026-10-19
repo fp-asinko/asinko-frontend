@@ -1,5 +1,5 @@
 import { CheckIcon, XIcon } from 'lucide-react'
-import { useFormatter, useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { FollowCounts } from './follow-counts'
@@ -37,42 +37,21 @@ function Strong({ children }: { children: ReactNode }) {
 }
 
 /**
- * A person's numbers in one line, as the prototype's profile (specs/profile-track-record PT-01,
- * changed with the PO on 2026-10-09): followers, following, accuracy and streak (correct theses in
- * a row, not days), apart without separators. The detail of the theses lives in their tab
- * (TrackRecord).
+ * Under a person's name: followers and following, which open their lists (specs/follow-lists
+ * FL-01). The rest of the numbers are in the profile's card (specs/profile-aside PA-02).
  */
 export function ProfileStats({
   profile,
   className,
 }: {
-  profile: Pick<
-    ProfileDetails,
-    | 'id'
-    | 'username'
-    | 'isSelf'
-    | 'followerCount'
-    | 'followingCount'
-    | 'accuracyRate'
-    | 'currentStreak'
-  >
+  profile: Pick<ProfileDetails, 'id' | 'username' | 'isSelf' | 'followerCount' | 'followingCount'>
   className?: string
 }) {
   const t = useTranslations('communities.profile')
-  const format = useFormatter()
   const b = (chunks: ReactNode) => <Strong>{chunks}</Strong>
-  const parts = [
-    profile.accuracyRate !== null &&
-      t.rich('accuracy', {
-        value: format.number(profile.accuracyRate, { style: 'percent' }),
-        b,
-      }),
-    t.rich('streak', { count: profile.currentStreak, b }),
-  ].filter(Boolean)
 
   return (
     <p className={cn('flex flex-wrap gap-x-5 gap-y-1 type-meta text-muted-foreground', className)}>
-      {/* Followers and following open their lists (specs/follow-lists FL-01). */}
       <FollowCounts
         userId={profile.id}
         handle={`@${profile.username}`}
@@ -80,10 +59,6 @@ export function ProfileStats({
         followers={t.rich('followers', { count: profile.followerCount, b })}
         following={t.rich('following', { count: profile.followingCount, b })}
       />
-      {parts.map((part, index) => (
-        // A text space too: read aloud, the parts do not run together.
-        <span key={index}> {part}</span>
-      ))}
     </p>
   )
 }

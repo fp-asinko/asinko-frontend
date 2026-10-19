@@ -322,8 +322,6 @@
     },
     "profile": {
       "followers": "{count, plural, one {<b>#</b> seguidor} other {<b>#</b> seguidores}}",
-      "accuracy": "<b>{value}</b> de acierto",
-      "streak": "<b>{count}</b> de racha",
       "badge": {
         "verified": "Verificado",
         "institutional": "Institucional"
@@ -339,7 +337,21 @@
       "links": "Links",
       "newTab": "(se abre en una pestaña nueva)",
       "addHeadline": "Agrega un titular",
-      "addLinks": "Agrega links"
+      "addLinks": "Agrega links",
+      "share": "Compartir perfil"
+    },
+    "profileCard": {
+      "accuracy": "Precisión",
+      "noResolved": "Sin tesis resueltas",
+      "streak": "Racha",
+      "correct": "Acertadas",
+      "incorrect": "Erradas",
+      "points": "Puntos",
+      "memberSince": "Miembro desde",
+      "activeTitle": "Participa en",
+      "posts": "{count, plural, one {# post} other {# posts}}",
+      "seeAll": "Ver todas ({count, number})",
+      "seeFewer": "Ver menos"
     },
     "about": {
       "seeMore": "Ver más",

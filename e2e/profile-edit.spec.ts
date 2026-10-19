@@ -178,7 +178,8 @@ test.describe('Profile presentation', () => {
     await dialog.getByRole('button', { name: 'Save' }).click()
     await expect(dialog).toBeHidden()
     // With mocks, the uploaded photo is the mock's fixture.
-    await expect(page.getByRole('main').locator('img[src*="avatar-demo"]')).toBeVisible()
+    // The header's (the card repeats it under lg, specs/profile-aside PA-03).
+    await expect(page.getByRole('main').locator('img[src*="avatar-demo"]').first()).toBeVisible()
 
     await page.getByRole('button', { name: 'Edit profile' }).click()
     await dialog.getByRole('button', { name: 'Remove photo' }).click()

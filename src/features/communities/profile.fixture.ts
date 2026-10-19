@@ -15,6 +15,7 @@ export function profileDetails(overrides: Partial<ProfileDetails> = {}): Profile
     links: [],
     bannerUrl: null,
     openTo: [],
+    points: 0,
     followerCount: 120,
     followingCount: 48,
     accuracyRate: 0.75,

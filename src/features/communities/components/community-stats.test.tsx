@@ -17,12 +17,13 @@ describe('community stats (specs/community-pages CP-11)', () => {
     )
   })
 
-  it('shows followers, following, accuracy and streak in one line (specs/profile-track-record PT-01)', () => {
+  it('shows followers and following in one line; the rest is in the card (specs/profile-aside PA-02)', () => {
     renderWithIntl(
       <ProfileStats profile={profileDetails({ followerCount: 1, followingCount: 48 })} />,
     )
     const line = screen.getByRole('paragraph')
-    expect(line).toHaveTextContent('1 follower 48 following 75% accuracy 3 streak')
+    expect(line).toHaveTextContent('1 follower 48 following')
+    expect(line).not.toHaveTextContent(/accuracy|streak/)
     expect(screen.getByText('48').tagName).toBe('STRONG')
     // Followers and following open their lists (specs/follow-lists FL-01).
     expect(screen.getByRole('button', { name: '48 following' })).toHaveAttribute(
@@ -30,11 +31,6 @@ describe('community stats (specs/community-pages CP-11)', () => {
       'dialog',
     )
     expect(screen.getByRole('button', { name: '1 follower' })).toBeInTheDocument()
-  })
-
-  it('leaves out an unknown accuracy', () => {
-    renderWithIntl(<ProfileStats profile={profileDetails({ accuracyRate: null })} />)
-    expect(screen.queryByText(/accuracy/)).not.toBeInTheDocument()
   })
 })
 

@@ -15,6 +15,11 @@ const notFound: MockResponse = {
   body: { error: { code: 'NOT_FOUND', message: 'mock' } },
 }
 
+const invalid: MockResponse = {
+  status: 422,
+  body: { error: { code: 'VALIDATION_ERROR', message: 'mock' } },
+}
+
 /** Read on each request: the posts created in this process count too (specs/profile-showcase). */
 const items = (): RawFeedItem[] => [
   ...CREATED_POSTS.map((content) => ({ kind: 'POST' as const, content })),
@@ -35,6 +40,39 @@ export function userContent(userId: string, query: Record<string, string>): Mock
     )
     .sort((a, b) => b.content.publishedAt.localeCompare(a.content.publishedAt))
   return { status: 200, body: paginate(found, query.cursor) }
+}
+
+const DAY = 86_400_000
+
+/**
+ * GET /users/{userId}/active-communities?days=&limit= (P-027, proposal, specs/profile-aside): where
+ * the person published in the last days, the most posts first; a tie, the latest published first.
+ */
+export function activeCommunities(userId: string, query: Record<string, string>): MockResponse {
+  if (!PROFILES.some((profile) => profile.id === userId)) return notFound
+  const days = Number(query.days ?? 90)
+  const limit = Number(query.limit ?? 5)
+  if (!Number.isInteger(days) || days < 1 || days > 365) return invalid
+  if (!Number.isInteger(limit) || limit < 1 || limit > 20) return invalid
+  const since = Date.now() - days * DAY
+  const counts = new Map<string, { item: RawFeedItem; count: number; latest: string }>()
+  for (const item of items()) {
+    const { content } = item
+    if (content.creator?.id !== userId) continue
+    if ('deleted' in content && content.deleted) continue
+    if (Date.parse(content.publishedAt) < since) continue
+    const known = counts.get(content.community.id)
+    counts.set(content.community.id, {
+      item: known?.item ?? item,
+      count: (known?.count ?? 0) + 1,
+      latest: known && known.latest > content.publishedAt ? known.latest : content.publishedAt,
+    })
+  }
+  const list = [...counts.values()]
+    .sort((a, b) => b.count - a.count || b.latest.localeCompare(a.latest))
+    .slice(0, limit)
+    .map(({ item, count }) => ({ community: item.content.community, postCount: count }))
+  return { status: 200, body: { items: list } }
 }
 
 /** GET /users/{userId}/comments?cursor= */

@@ -322,8 +322,6 @@
     },
     "profile": {
       "followers": "{count, plural, one {<b>#</b> follower} other {<b>#</b> followers}}",
-      "accuracy": "<b>{value}</b> accuracy",
-      "streak": "<b>{count}</b> streak",
       "badge": {
         "verified": "Verified",
         "institutional": "Institutional"
@@ -339,7 +337,21 @@
       "links": "Links",
       "newTab": "(opens in a new tab)",
       "addHeadline": "Add a headline",
-      "addLinks": "Add links"
+      "addLinks": "Add links",
+      "share": "Share profile"
+    },
+    "profileCard": {
+      "accuracy": "Accuracy",
+      "noResolved": "No resolved theses",
+      "streak": "Streak",
+      "correct": "Correct",
+      "incorrect": "Incorrect",
+      "points": "Points",
+      "memberSince": "Member since",
+      "activeTitle": "Participates in",
+      "posts": "{count, plural, one {# post} other {# posts}}",
+      "seeAll": "See all ({count, number})",
+      "seeFewer": "Show fewer"
     },
     "about": {
       "seeMore": "See more",

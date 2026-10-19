@@ -22,7 +22,7 @@
 
 1. **P-019 a P-021: el perfil, como LinkedIn.** Titular, ciudad, links, banner y la subida de foto y banner. El front ya lo tiene hecho contra mocks: sin esto, nada de eso se guarda con el backend real.
 2. **Comunidades de los activos del catálogo.** Solo 5 de los 100 tienen la suya (BTC, ETH, AAPL, NVDA, VOO). `GET /communities/TSLA` (y SPY, MSFT, EURUSD, SQM-B, BRK.B, XAU/USD…) da `404`, y `GET /assets/{symbol}` trae `linkedCommunity: null`. **Pedido:** crear la comunidad de cada activo (slug = símbolo). Mientras tanto, el front muestra la página del activo con su precio, sin feed ni Unirse, y no se puede publicar ni etiquetar en ellos.
-3. **P-024 a P-026: el perfil como vidriera**, como LinkedIn (`specs/profile-showcase`): "Acerca de" de 2000, destacados y "Abierto a". Hechos contra mocks.
+3. **P-024 a P-027: el perfil como vidriera**, como LinkedIn (`specs/profile-showcase`): "Acerca de" de 2000, destacados, "Abierto a" y dónde publica cada persona (`specs/profile-aside`). Hechos contra mocks.
 4. **P-022 y P-023: borradores en la cuenta y marcas por comunidad**, como Reddit (`specs/drafts-tags`). Hechos contra mocks.
 5. **P-018: comunidades y activos relacionados de un post.** Hoy viajan como menciones al final del cuerpo.
 6. **P-017: "lo seguís" en las listas de seguidores, seguidos y miembros.** Sin respuesta desde el 2026-10-09.
@@ -112,6 +112,23 @@
 **Motivo:** "Tengo interés en…", como LinkedIn (`specs/profile-showcase`): para qué está disponible la persona. Valores fijos, para traducirlos y, más adelante, filtrar por ellos.
 
 **Cambio:** `"openTo": string[]` con valores de `QUESTIONS`, `COLLABORATIONS`, `MENTORING`, `AMAS`, `COMMISSIONED_ANALYSIS`, sin repetir; `[]` lo borra. `422 INVALID_OPEN_TO` con otro valor o repetido.
+
+### P-027: Dónde publica una persona
+
+**Estado:** propuesta (2026-10-19), mockeada.
+
+**Endpoint:** `GET /api/v1/users/{userId}/active-communities?days=90&limit=20` (público).
+
+**Motivo:** "Participa en", como la tarjeta del perfil de Reddit (`specs/profile-aside`): las comunidades y activos donde la persona más publicó últimamente, para saber de qué habla. Armarlo en el front con los posts sería compensar con lógica algo que el backend resuelve con una consulta.
+
+**Cambio:**
+
+```jsonc
+{ "items": [{ "community": { /* CommunitySummary */ }, "postCount": 12 }] }
+```
+
+- De más posts a menos; a igual cantidad, el último publicado primero. Solo posts y encuestas no borrados publicados en los últimos `days` días.
+- `days` de 1 a 365 (por defecto 90); `limit` de 1 a 20 (por defecto 5). Fuera de rango, `422 VALIDATION_ERROR`. Usuario inexistente, `404`.
 
 ### P-022: Borradores en la cuenta
 

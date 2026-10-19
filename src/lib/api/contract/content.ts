@@ -159,6 +159,19 @@ export const userCommentSchema = z.object({
 export type RawUserComment = z.infer<typeof userCommentSchema>
 
 /**
+ * Where a person published lately (P-027, proposal, specs/profile-aside): a community and how many
+ * posts. The list takes any item: one malformed is dropped, not the list (keepValidItems).
+ */
+export const activeCommunitySchema = z.object({
+  community: communitySummarySchema,
+  postCount: z.number().int().positive(),
+})
+
+export const activeCommunitiesSchema = z.object({ items: z.array(z.unknown()) })
+
+export type RawActiveCommunity = z.infer<typeof activeCommunitySchema>
+
+/**
  * A post saved to finish later (P-022, proposal, specs/drafts-tags): what the editor had, in the
  * person's account. Texts are "" when empty; up to 20 per person.
  */

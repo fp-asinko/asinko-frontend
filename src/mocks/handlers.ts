@@ -12,6 +12,7 @@ import {
   postImageUploadSchema,
   profileImageUploadSchema,
   userCommentSchema,
+  activeCommunitiesSchema,
   draftSchema,
   featuredListSchema,
   postSchema,
@@ -36,7 +37,7 @@ import { withTopPost } from './top-post'
 import { followersOf, followingOf, listItem } from './fixtures/follows'
 import { membersOf } from './fixtures/members'
 import { thesesBy } from './fixtures/theses'
-import { userComments, userContent } from './user-activity'
+import { userComments, userContent, activeCommunities } from './user-activity'
 import { createDraft, deleteDraft, listDrafts, SEED_DRAFT_ID, updateDraft } from './drafts'
 import { addFeatured, listFeatured, removeFeatured } from './featured'
 import { isProposedUserChange, updateUser } from './profile-edit'
@@ -223,6 +224,20 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       query: { userId: DEMO_USER.id },
     },
     handler: ({ params, query }) => deleteDraft(params.draftId ?? '', query.userId),
+  },
+  // P-027 (proposal, specs/profile-aside): where a person published lately.
+  {
+    method: 'GET',
+    path: '/api/v1/users/:userId/active-communities',
+    kind: 'proposal',
+    implemented: false,
+    schema: activeCommunitiesSchema,
+    example: {
+      ...noRequest,
+      params: { userId: PROFILES[1]!.id },
+      query: { days: '90', limit: '20' },
+    },
+    handler: ({ params, query }) => activeCommunities(params.userId ?? '', query),
   },
   // P-025 (proposal, specs/profile-showcase): what a person put at the front of their profile.
   {

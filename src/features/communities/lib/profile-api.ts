@@ -1,4 +1,5 @@
 import 'server-only'
+import { cache } from 'react'
 import { apiRequest, invalidInput, type ApiResult } from '@/lib/api'
 import { profileSchema, userSchema, type RawProfile } from '@/lib/api/contract'
 import { communitySlugSchema } from '@/lib/communities/community-slug.schema'
@@ -38,6 +39,7 @@ export function toProfileDetails(profile: RawProfile, viewerName: string | null)
     followerCount: profile.followerCount,
     followingCount: profile.followingCount,
     accuracyRate: profile.accuracyRate,
+    points: profile.points,
     correctCount: profile.correctCount,
     incorrectCount: profile.incorrectCount,
     cancelledCount: profile.cancelledCount,
@@ -49,9 +51,12 @@ export function toProfileDetails(profile: RawProfile, viewerName: string | null)
 
 /**
  * The profile of a /user page (specs/community-pages § 12), next to its personal channel. Never
- * throws: NOT_FOUND passes through for the not-found page.
+ * throws: NOT_FOUND passes through for the not-found page. Cached per request: the page and its
+ * right column ask for the same one (specs/profile-aside).
  */
-export async function getProfileDetails(username: string): Promise<ApiResult<ProfileDetails>> {
+export const getProfileDetails = cache(async function getProfileDetails(
+  username: string,
+): Promise<ApiResult<ProfileDetails>> {
   if (!communitySlugSchema.safeParse(username).success) return invalidInput(ENDPOINT)
   const [result, viewer] = await Promise.all([
     apiRequest({
@@ -65,7 +70,7 @@ export async function getProfileDetails(username: string): Promise<ApiResult<Pro
   return result.ok
     ? { ok: true, data: toProfileDetails(result.data, viewer?.username ?? null) }
     : result
-}
+})
 
 /** Fields the backend has (E01, P-011) and the ones proposed (P-019, P-020, P-026): sent apart. */
 const PROPOSED: readonly string[] = ['headline', 'city', 'links', 'bannerUrl', 'openTo']
