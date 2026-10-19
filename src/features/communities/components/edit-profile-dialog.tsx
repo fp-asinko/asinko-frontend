@@ -152,6 +152,8 @@ export function EditProfileDialog({
     const changes = Object.fromEntries(
       Object.entries(values).filter(([key]) => dirty[key as keyof EditProfileInput]),
     )
+    // Emptied, the list is not marked dirty (react-hook-form unsets it): compared by value.
+    if (values.links.join('\n') !== profile.links.join('\n')) changes.links = values.links
     if (Object.keys(changes).length === 0) return onOpenChange(false)
 
     const result = await updateProfile(changes)

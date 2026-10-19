@@ -119,6 +119,13 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
     expect(editProfileChangesSchema.safeParse(sent).success).toBe(true)
   })
 
+  it('sends an empty list when the last link is removed (a bug: it was not saved)', async () => {
+    renderDialog()
+    await userEvent.click(screen.getByRole('button', { name: 'Remove link 1' }))
+    await userEvent.click(save())
+    expect(action.updateProfile).toHaveBeenCalledWith({ links: [] })
+  })
+
   it('counts a text near its limit, and stops one past it (PP-05)', async () => {
     renderDialog()
     await userEvent.click(box('Headline'))

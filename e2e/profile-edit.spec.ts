@@ -110,13 +110,16 @@ test.describe('Profile presentation', () => {
     await dialog.getByRole('combobox', { name: 'Country' }).selectOption('AR')
     await dialog.getByRole('textbox', { name: 'City' }).fill('La Plata')
     const links = dialog.getByRole('group', { name: 'Links' })
+    // The demo's profile is the server's, shared: whatever links it has, this one goes after them.
+    const n = (await links.getByRole('textbox').count()) + 1
+    const link = links.getByRole('textbox', { name: `Link ${n}`, exact: true })
     await links.getByRole('button', { name: 'Add link' }).click()
-    await expect(links.getByRole('textbox', { name: 'Link 1' })).toBeFocused()
-    await links.getByRole('textbox', { name: 'Link 1' }).fill('javascript:alert(1)')
+    await expect(link).toBeFocused()
+    await link.fill('javascript:alert(1)')
     await expect(
       dialog.getByText('Enter a link that starts with http:// or https://'),
     ).toBeVisible()
-    await links.getByRole('textbox', { name: 'Link 1' }).fill('https://www.youtube.com/@demo')
+    await link.fill('https://www.youtube.com/@demo')
     await dialog.getByRole('button', { name: 'Save' }).click()
     await expect(dialog).toBeHidden()
 
@@ -130,7 +133,7 @@ test.describe('Profile presentation', () => {
     await dialog.getByRole('textbox', { name: 'Headline' }).fill('')
     await dialog.getByRole('combobox', { name: 'Country' }).selectOption('')
     await dialog.getByRole('textbox', { name: 'City' }).fill('')
-    await links.getByRole('button', { name: 'Remove link 1' }).click()
+    await links.getByRole('button', { name: `Remove link ${n}`, exact: true }).click()
     await dialog.getByRole('button', { name: 'Save' }).click()
     await expect(page.getByRole('button', { name: 'Add a headline' })).toBeVisible()
   })
