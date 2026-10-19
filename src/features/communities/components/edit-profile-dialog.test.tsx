@@ -4,8 +4,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import type { EditableProfile, EditProfileField } from '../communities.types'
 import { editProfileChangesSchema } from '../schemas/edit-profile.schema'
+import { router } from '@/test/navigation-mock'
 import { EditProfileDialog } from './edit-profile-dialog'
 
+vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 const action = vi.hoisted(() => ({ updateProfile: vi.fn() }))
 vi.mock('../actions/update-profile.action', () => action)
 // The cropper has its own tests: here it applies or goes back at once.
@@ -289,5 +291,20 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
   ] as const)('opens on %s when a step asks (PS-02)', async (field, target) => {
     renderDialog({}, field)
     await vi.waitFor(() => expect(target()).toHaveFocus())
+  })
+
+  it('does not offer "Complete your profile" while it is not hidden (PS-14)', async () => {
+    renderDialog()
+    expect(screen.queryByRole('button', { name: 'Show "Complete your profile"' })).toBeNull()
+  })
+
+  it('shows "Complete your profile" again: clears the cookie and refreshes the page (PS-14)', async () => {
+    document.cookie = 'asinko-profile-checklist=hidden; path=/'
+    renderDialog()
+    await userEvent.click(screen.getByRole('button', { name: 'Show "Complete your profile"' }))
+    expect(document.cookie).not.toContain('asinko-profile-checklist=hidden')
+    expect(router.refresh).toHaveBeenCalled()
+    expect(screen.queryByRole('button', { name: 'Show "Complete your profile"' })).toBeNull()
+    expect(screen.getByText('You will see it again on your profile.')).toHaveFocus()
   })
 })

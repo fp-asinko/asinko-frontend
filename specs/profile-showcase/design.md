@@ -29,12 +29,12 @@ Mocks (`kind: 'proposal'`, `implemented: false`):
   - tesis: `{ kind, id, claim, state, community, asset }`.
   - También `featureAs` y `unfeatureAs`.
 - Actions (`actions/featured.action.ts`): `featureContent({ kind, id })` y `unfeatureContent({ kind, id })`, con zod, sesión y `userId` de la sesión. `FEATURED_LIMIT` tiene su mensaje.
-- `actions/hide-checklist.action.ts`: pone la cookie `asinko-profile-checklist=hidden` (un año, `SameSite=Lax`). La página la lee con `cookies()`. Ocultar la tarjeta es una preferencia de ese navegador, no un dato de la cuenta.
+- `lib/checklist-cookie.ts`: la cookie `asinko-profile-checklist=hidden` (un año, `SameSite=Lax`). La página la lee con `cookies()`. Ocultar la tarjeta es una preferencia de ese navegador, no un dato de la cuenta. _Cambio con PS-13 y PS-14 (2026-10-19): la escribe el navegador (`writeChecklistHidden`), sin `httpOnly`: no es un dato sensible, y así Deshacer no espera al servidor y la ventana "Editar perfil" sabe si está oculta. Antes era una Server Action._
 
 ### Completa tu perfil (PS-01 a PS-03)
 
 - `profileSteps(profile, featuredCount)` (`lib/profile-steps.ts`, puro, con tests) devuelve los 8 pasos con su estado. La tarjeta muestra el avance y las dos primeras sugerencias pendientes.
-- `ProfileChecklist` es un Server Component, con su propio `EditProfileProvider` (otra ventana, como la de la cabecera). Al ocultarla, el foco vuelve al inicio de la página: no hay JavaScript propio que lo lleve a otro lado, y se acepta así. Los botones de los campos son `EditProfilePrompt` (ya existe, cliente) con el `field` del paso. `EditProfileField` suma `avatar`, `banner`, `bio`, `location` y `openTo`, y la ventana enfoca esa sección como hoy con `links`. Ocultar es un `<form action>` con la action, sin JavaScript propio.
+- `ProfileChecklist` es un Server Component, con su propio `EditProfileProvider` (otra ventana, como la de la cabecera). _Con PS-13: `HideableChecklist` (cliente) envuelve la tarjeta; la ✕ (`HideChecklistButton`) la cambia por la línea con Deshacer, que toma el foco (un ref y un efecto después del cambio); Deshacer devuelve la tarjeta y el foco a la ✕. PS-14: la ventana lee la cookie al abrirse y, oculta, muestra "Mostrar «Completa tu perfil»"; al tocarlo la borra, lo anuncia con `role="status"` y refresca la página detrás._ Los botones de los campos son `EditProfilePrompt` (ya existe, cliente) con el `field` del paso. `EditProfileField` suma `avatar`, `banner`, `bio`, `location` y `openTo`, y la ventana enfoca esa sección como hoy con `links`.
 
 ### Acerca de (PS-04)
 
@@ -80,6 +80,8 @@ El perfil está en 238,3 KB y el límite es 240.
 - Lo nuevo es de servidor, salvo el disparador del "⋯", que es un botón con estado. El menú se difiere: suma su entrada al manifiesto de todas las rutas, ~0,15 KB.
 - La ventana "Editar perfil" ya se carga diferida.
 - Si al medir pasa de 240, el disparador se arma como el de compartir (`ShareButton`): un solo módulo que carga el menú.
+
+_Con PS-13 (2026-10-19): `HideableChecklist` es cliente y viaja en todos los perfiles: 239,3 → 239,9 KB. Lo próximo del perfil va diferido o recorta algo._
 
 ## 4. Tests
 

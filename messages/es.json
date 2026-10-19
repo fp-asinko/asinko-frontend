@@ -536,7 +536,9 @@
           "body": "Fija hasta 3 posts o tesis con el \"⋯\" de cada uno.",
           "action": "Ir a tus posts"
         }
-      }
+      },
+      "hidden": "Ocultaste \"Completa tu perfil\".",
+      "undo": "Deshacer"
     },
     "openTo": {
       "title": "Abierto a",
@@ -648,7 +650,9 @@
       "zoom": "Zoom",
       "back": "Volver",
       "apply": "Aplicar",
-      "uploading": "Subiendo…"
+      "uploading": "Subiendo…",
+      "showChecklist": "Mostrar \"Completa tu perfil\"",
+      "checklistShown": "Volverás a verla en tu perfil."
     },
     "follows": {
       "close": "Cerrar",

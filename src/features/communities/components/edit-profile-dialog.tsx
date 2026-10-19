@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type RefObject } from 'react'
 import dynamic from 'next/dynamic'
 import { useForm, useWatch } from 'react-hook-form'
+import { useRouter } from '@/i18n/navigation'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +21,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { updateProfile } from '../actions/update-profile.action'
+import { readChecklistHidden, writeChecklistHidden } from '../lib/checklist-cookie'
 import type { EditableProfile, EditProfileField } from '../communities.types'
 import {
   BIO_MAX,
@@ -92,6 +94,15 @@ export function EditProfileDialog({
   const ids = useId()
   const [confirming, setConfirming] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
+  const router = useRouter()
+  // "Complete your profile" hidden in this browser (PS-14): read once, when the window opens.
+  const [checklist, setChecklist] = useState<'hidden' | 'shown' | null>(() =>
+    readChecklistHidden() ? 'hidden' : null,
+  )
+  const checklistLine = useRef<HTMLParagraphElement>(null)
+  useEffect(() => {
+    if (checklist === 'shown') checklistLine.current?.focus()
+  }, [checklist])
   // An image being cropped (PP-07): the cropper takes the window's body until Apply or Back.
   const [cropping, setCropping] = useState<{
     kind: ProfileImageKind
@@ -327,6 +338,33 @@ export function EditProfileDialog({
               <p role="alert" className="type-small text-destructive">
                 {serverError}
               </p>
+            )}
+            {checklist && (
+              <div className="border-t pt-4">
+                {/* Shown, the button gives way to the line that says so: the focus goes to it. */}
+                {/* Read as it takes the focus: no live region, or it would be said twice. */}
+                <p
+                  tabIndex={-1}
+                  ref={checklistLine}
+                  className="type-small text-muted-foreground outline-none"
+                >
+                  {checklist === 'shown' ? t('checklistShown') : ''}
+                </p>
+                {checklist === 'hidden' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      writeChecklistHidden(false)
+                      setChecklist('shown')
+                      // The profile behind the window shows it again.
+                      router.refresh()
+                    }}
+                    className="inline-flex h-11 tap items-center rounded-full bg-muted px-4 type-action outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 md:h-9"
+                  >
+                    {t('showChecklist')}
+                  </button>
+                )}
+              </div>
             )}
           </div>
         </form>

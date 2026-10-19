@@ -536,7 +536,9 @@
           "body": "Pin up to 3 posts or theses with \"⋯\" on each one.",
           "action": "Go to your posts"
         }
-      }
+      },
+      "hidden": "You hid \"Complete your profile\".",
+      "undo": "Undo"
     },
     "openTo": {
       "title": "Open to",
@@ -648,7 +650,9 @@
       "zoom": "Zoom",
       "back": "Back",
       "apply": "Apply",
-      "uploading": "Uploading…"
+      "uploading": "Uploading…",
+      "showChecklist": "Show \"Complete your profile\"",
+      "checklistShown": "You will see it again on your profile."
     },
     "follows": {
       "close": "Close",

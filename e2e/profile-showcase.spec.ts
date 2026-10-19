@@ -44,8 +44,34 @@ test.describe('The profile as a showcase, as LinkedIn', () => {
 
     await checklist(page).getByRole('button', { name: 'Hide "Complete your profile"' }).click()
     await expect(checklist(page)).toHaveCount(0)
+    // Undo in its place, with the focus, brings it back (PS-13).
+    const undo = main(page).getByRole('button', { name: 'Undo' })
+    await expect(undo).toBeFocused()
+    await undo.click()
+    await expect(checklist(page)).toBeVisible()
+
+    // Hidden, "Edit profile" shows it again, without a reload (PS-14).
+    await checklist(page).getByRole('button', { name: 'Hide "Complete your profile"' }).click()
+    await main(page).getByRole('button', { name: 'Edit profile' }).click()
+    await page
+      .getByRole('dialog', { name: 'Edit profile' })
+      .getByRole('button', { name: 'Show "Complete your profile"' })
+      .click()
+    await page.keyboard.press('Escape')
+    await expect(checklist(page)).toBeVisible()
+    await expect(undo).toHaveCount(0)
+
+    await checklist(page).getByRole('button', { name: 'Hide "Complete your profile"' }).click()
     await page.reload()
     await expect(checklist(page)).toHaveCount(0)
+    await expect(undo).toHaveCount(0)
+
+    // "Edit profile" offers it again (PS-14).
+    await main(page).getByRole('button', { name: 'Edit profile' }).click()
+    const dialog = page.getByRole('dialog', { name: 'Edit profile' })
+    await dialog.getByRole('button', { name: 'Show "Complete your profile"' }).click()
+    await expect(dialog.getByText('You will see it again on your profile.')).toBeFocused()
+    await expect(checklist(page)).toBeVisible()
   })
 
   test('features your own post from "⋯" and takes it out from Featured (PS-05 to PS-07)', async ({

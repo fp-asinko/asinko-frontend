@@ -24,6 +24,8 @@ Que tu perfil se sienta tuyo y se arme rápido: te dice qué te falta, cuenta tu
 - [x] **PS-01** En tu perfil, entre la presentación y las pestañas, una tarjeta **"Completa tu perfil"** con el ojo y "Solo para ti", como LinkedIn: cuántos pasos llevas ("3 de 8") con una barra, y las **dos** próximas sugerencias como tarjetas, cada una con su texto y su botón.
 - [x] **PS-02** Los 8 pasos, en este orden: foto, titular, acerca de, ubicación, links, abierto a, banner y destacados. Los de los campos abren "Editar perfil" en esa sección; el de destacados explica cómo (el "⋯" de un post o una tesis) y lleva a la pestaña Posts.
 - [x] **PS-03** Con todo completo, la tarjeta no aparece. **Ocultar** la cierra en ese navegador; en el perfil de otra persona nunca aparece.
+- [x] **PS-13** (pedido del PO, 2026-10-19) Al **ocultarla**, en su lugar queda una línea: "Ocultaste «Completa tu perfil»" con **Deshacer**, que la vuelve a mostrar. El foco va a Deshacer y vuelve a la ✕ al deshacer. La línea se va al salir de la página.
+- [x] **PS-14** Oculta, la ventana **Editar perfil** ofrece al final **Mostrar «Completa tu perfil»**. Al tocarlo, lo dice ("Vas a volver a verla en tu perfil") y el perfil la muestra de nuevo.
 
 ### Acerca de (Q1)
 

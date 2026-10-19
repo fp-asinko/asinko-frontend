@@ -5,5 +5,6 @@
 - [x] **T-03 (L)** Destacados: `featured-api`, actions, `FeaturedSection`/`FeaturedCard`, `FeatureMenu` diferido en `PostCard` y `ThesisCard` de tu perfil (y en "Cargar más"). Tests. → PS-05 a PS-08
 - [x] **T-04 (M)** Completa tu perfil: `profileSteps`, `ProfileChecklist`, los campos nuevos de `EditProfileField`, ocultar con cookie. Tests. → PS-01 a PS-03
 - [x] **T-05 (M)** E2E, 360 px, axe, presupuesto de JS, mensajes; `ui-reviewer`; commit. → PS-11
+- [x] **T-06 (S)** Deshacer al ocultar y "Mostrar «Completa tu perfil»" en "Editar perfil": la cookie desde el navegador, `HideableChecklist`, mensajes, tests unitarios y e2e, presupuesto de JS. → PS-13, PS-14
 
-Orden: T-01 → T-05.
+Orden: T-01 → T-06.
