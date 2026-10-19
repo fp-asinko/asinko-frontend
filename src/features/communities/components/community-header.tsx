@@ -1,5 +1,6 @@
 import { CircleHelpIcon, PlusIcon, Share2Icon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import type { ReactNode } from 'react'
 import { BackButton } from '@/components/molecules/back-button'
 import { ComingSoon } from '@/components/molecules/coming-soon'
 import { ShareButton } from '@/components/molecules/share-button'
@@ -29,9 +30,12 @@ import { toEditableProfile } from '../lib/editable-profile'
 export function CommunityHeader({
   page,
   profile,
+  moderation,
 }: {
   page: CommunityPage
   profile?: ProfileDetails
+  /** A moderator's tools, by the actions (specs/community-widgets CW-08: "Edit widgets"). */
+  moderation?: ReactNode
 }) {
   const t = useTranslations('communities')
   const title = profile?.displayName ?? page.handle
@@ -82,6 +86,7 @@ export function CommunityHeader({
               {t('createPost')}
             </ComposeTrigger>
           )}
+          {moderation}
           {/* Your own profile: edit it where others follow (specs/profile-edit PE-01). */}
           {profile?.isSelf && <EditProfileButton />}
           {!profile?.isSelf && (

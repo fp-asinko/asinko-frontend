@@ -134,6 +134,15 @@ describe('createApiClient', () => {
       })
     })
 
+    it('keeps which item and field a 422 refused (P-028 INVALID_WIDGET)', async () => {
+      const { api } = clientWith(
+        respond(422, {
+          error: { code: 'INVALID_WIDGET', message: 'x', index: 2, field: 'buttons' },
+        }),
+      )
+      expect(await api(getProfile)).toMatchObject({ index: 2, field: 'buttons' })
+    })
+
     it('falls back to api.errors.UNKNOWN for an unknown code', async () => {
       const { api } = clientWith(respond(409, { error: { code: 'SLUG_TAKEN', message: 'x' } }))
       expect(await api(getProfile)).toMatchObject({

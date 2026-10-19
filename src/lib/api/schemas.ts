@@ -8,6 +8,9 @@ export const apiErrorSchema = z.object({
     code: z.string(),
     message: z.string().optional(),
     retryAfter: z.string().optional(),
+    /** Which item of a list and which field were refused (P-028's INVALID_WIDGET). */
+    index: z.number().int().min(0).max(1000).optional(),
+    field: z.string().max(50).optional(),
   }),
 })
 

@@ -15,6 +15,16 @@ vi.mock('@/lib/communities/set-favorite.action', () => ({ setFavorite: vi.fn() }
 vi.mock('../lib/asset-api', () => ({ getAssetSummary: vi.fn() }))
 
 describe('CommunityHeader (specs/community-pages CP-04)', () => {
+  it('puts a moderator tool by the actions (specs/community-widgets CW-08)', () => {
+    renderWithIntl(
+      <CommunityHeader
+        page={communityPage()}
+        moderation={<button type="button">Edit widgets</button>}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Edit widgets' })).toBeInTheDocument()
+  })
+
   it('titles the page with the handle and shows description, members and the way back', () => {
     renderWithIntl(<CommunityHeader page={communityPage()} />)
     expect(screen.getByRole('heading', { level: 1, name: '#macro' })).toBeInTheDocument()

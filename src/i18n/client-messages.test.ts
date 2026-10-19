@@ -72,6 +72,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'openTo',
       'profile',
       'theses',
+      'widgets',
     ])
     expect(picked.errors).toEqual({ unexpected: en.errors.unexpected })
     // The order and the search of the comments; the rest of the post's page stays on the server.

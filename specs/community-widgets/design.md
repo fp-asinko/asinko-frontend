@@ -64,15 +64,15 @@ En todos los tipos, el título va de 1 a 50 caracteres. La comunidad de un `COMM
 
 ### Editar widgets (CW-08 a CW-13)
 
-- `EditWidgetsButton` (cliente, solo si `viewerMembership` es `MODERATOR` o `PRINCIPAL_MODERATOR`). Abre `EditWidgetsDialog`, cargado con `next/dynamic` al primer uso.
+- `EditWidgetsButton` (cliente, solo si `viewerMembership` es `MODERATOR` o `PRINCIPAL_MODERATOR`), en la cabecera del grupo (`CommunityHeader` recibe `moderation`). Abre `EditWidgetsDialog`, cargado con `next/dynamic` al primer uso. Va en la cabecera y no en la columna: la columna (`@right`) es otra entrada de Turbopack, y un componente cliente en las dos viaja dos veces (medido: grupo 240,4 KB → 239,1).
 - La ventana tiene dos vistas en el mismo `Dialog`: la lista y el formulario de un widget. El estado es un borrador local de la lista entera, y "Guardar" la manda con `saveWidgets` (action).
   - La lista usa `useReducer` con las acciones `add`, `update`, `move`, `remove`.
   - Los formularios usan `react-hook-form` + zod, un esquema por tipo (`widget.schema.ts`), validados al volver a la lista y otra vez en la action.
 - **Ordenar (Q4):**
   - El arrastre es propio, con pointer events (mouse y dedo), sobre la lista: al mover un ítem por encima del centro del vecino, se intercambian. Son unas 60 líneas, sin librería, por el criterio de `libraries.md`.
   - **Subir** y **Bajar** son botones en cada fila, y un `role="status"` anuncia la nueva posición.
-- **Lista de comunidades:** se eligen con el selector de comunidades del editor de posts (`CommunityPicker`). Ese selector vive en `composer`, y un feature no importa a otro: sube a `components/organisms` como selector genérico (la búsqueda llega por prop, con una action de `communities`).
-- **Imágenes:** se eligen con `prepareImage` y se suben con `uploadSignedImage` a P-029 al volver a la lista. Mientras suben, Guardar espera.
+- **Lista de comunidades:** un buscador propio (campo + resultados con "+"), con su action `findWidgetCommunities` (`GET /communities?search=`, sin canales personales). _Cambio al implementar:_ subir `CommunityPicker` de `composer` a `organisms` arrastraba sus filtros y su caché, que acá no hacen falta.
+- **Imágenes:** se preparan con `prepareImage` y se suben **al elegirlas** con `uploadSignedImage` a P-029, como la imagen de un post. Mientras suben, "Listo" y Guardar esperan. _Cambio al implementar:_ subirlas al volver a la lista dejaba la vista previa sin URL para `next/image`.
 - **Calendario:** `datetime-local` nativo (el teléfono abre su selector), convertido a ISO con la zona del navegador; "todo el día" usa `date`.
 - **Errores:**
   - `422 INVALID_WIDGET` marca el widget de la lista (`index`) y su campo.

@@ -1,4 +1,5 @@
-import { RightColumn } from '@/components/organisms/right-column'
+// By its path: the column's index also brings "Recently viewed", which only the Home has (seo.md).
+import { RightColumn } from '@/components/organisms/right-column/right-column'
 
 // The right column of a page without its own (specs/right-column), as a parallel slot so a page
 // can bring its own (specs/submit-page § 2). This route and its siblings (the catch-all) keep it on

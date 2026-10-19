@@ -7,9 +7,15 @@ import { MOCK_STORAGE_HOST } from './mock-storage'
 
 const TIMEOUT_MS = 10_000
 
-/** Where the backend signs an image upload: a post's (P-013) or a profile's (P-021, proposal). */
+/**
+ * Where the backend signs an image upload: a post's (P-013), a profile's (P-021, proposal) or a
+ * group's widget (P-029, proposal).
+ */
 export type SignedImagePath =
-  '/api/v1/uploads/post-image' | '/api/v1/uploads/avatar' | '/api/v1/uploads/profile-banner'
+  | '/api/v1/uploads/post-image'
+  | '/api/v1/uploads/avatar'
+  | '/api/v1/uploads/profile-banner'
+  | '/api/v1/uploads/community-image'
 
 export type UploadDeps = {
   fetch: typeof fetch
@@ -38,13 +44,24 @@ export type UploadResult =
  */
 export async function uploadSignedImage(
   path: SignedImagePath,
-  input: { userId: string; body: Blob; contentType: string },
+  input: {
+    userId: string
+    body: Blob
+    contentType: string
+    /** What else the path asks (a group's image: its communityId). */
+    extra?: Record<string, string>
+  },
   deps: UploadDeps = defaults(),
 ): Promise<UploadResult> {
   const asked = await apiRequest({
     method: 'POST',
     path,
-    body: { userId: input.userId, contentType: input.contentType, size: input.body.size },
+    body: {
+      ...input.extra,
+      userId: input.userId,
+      contentType: input.contentType,
+      size: input.body.size,
+    },
     schema: postImageUploadSchema,
   })
   if (!asked.ok) {

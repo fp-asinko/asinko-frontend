@@ -1,4 +1,5 @@
-import { RightColumn } from '@/components/organisms/right-column'
+// By its path: the column's index also brings "Recently viewed", which only the Home has (seo.md).
+import { RightColumn } from '@/components/organisms/right-column/right-column'
 // By their paths: the groups' and profiles' pages, which use the feature's index, do not need them.
 import { AssetAside } from '@/features/communities/components/asset-aside'
 import { getAssetSummary } from '@/features/communities/lib/asset-api'

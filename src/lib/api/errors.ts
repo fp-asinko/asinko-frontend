@@ -35,6 +35,9 @@ export type ExpectedFailure = FailureBase & {
   kind: 'expected'
   code: string
   retryAfter?: string
+  /** Which item of a list was refused, and its field (P-028's INVALID_WIDGET). */
+  index?: number
+  field?: string
 }
 
 /** The backend or the network failed, or the contract changed. Reported to Sentry. */
@@ -70,6 +73,8 @@ export function toExpectedFailure(
   const envelope = apiErrorSchema.safeParse(body)
   const code = envelope.success ? envelope.data.error.code : (CODE_BY_STATUS[status] ?? 'UNKNOWN')
   const retryAfter = envelope.success ? envelope.data.error.retryAfter : undefined
+  const index = envelope.success ? envelope.data.error.index : undefined
+  const field = envelope.success ? envelope.data.error.field : undefined
 
   return {
     ok: false,
@@ -79,6 +84,8 @@ export function toExpectedFailure(
     code,
     errorKey: `api.errors.${isKnownCode(code) ? code : 'UNKNOWN'}`,
     ...(retryAfter ? { retryAfter } : {}),
+    ...(index === undefined ? {} : { index }),
+    ...(field ? { field } : {}),
   }
 }
 

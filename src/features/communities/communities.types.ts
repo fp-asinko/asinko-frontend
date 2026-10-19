@@ -204,3 +204,46 @@ export type ActiveCommunity = {
   kind: CommunityKind
   postCount: number
 }
+
+/** A link a moderator wrote (specs/community-widgets CW-07): a page of the site, or http(s). */
+export type WidgetLink = {
+  /** Used as is: a path of the site (/hub/defi) or an http(s) URL. */
+  url: string
+  external: boolean
+  /** The real host of an external link (security.md § 1); null for a page of the site. */
+  host: string | null
+}
+
+/** A community in a "Communities" widget (CW-06), with what its row and "Join" need. */
+export type WidgetCommunity = {
+  id: string
+  slug: string
+  handle: string
+  name: string
+  path: string
+  kind: CommunityKind
+  avatarUrl: string | null
+  memberCount: number
+  /** null without a session: "Join" asks to sign in. */
+  viewerIsMember: boolean | null
+}
+
+/** A widget of a group's right column (P-028, CW-06), as the UI shows and edits it. */
+export type CommunityWidget = { id: string; title: string } & (
+  | { type: 'TEXT'; body: string }
+  | { type: 'RULES'; rules: { title: string; description: string }[] }
+  | { type: 'BUTTONS'; buttons: { label: string; link: WidgetLink }[] }
+  | { type: 'COMMUNITIES'; communities: WidgetCommunity[] }
+  | { type: 'IMAGES'; images: { src: string; alt: string; link: WidgetLink | null }[] }
+  | {
+      type: 'CALENDAR'
+      events: {
+        title: string
+        startsAt: string
+        endsAt: string | null
+        allDay: boolean
+        location: string | null
+        link: WidgetLink | null
+      }[]
+    }
+)
