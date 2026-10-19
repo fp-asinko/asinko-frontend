@@ -90,7 +90,7 @@ El `message` del backend **nunca llega a la UI** (viene en español y es para de
 
 ### Smoke tests contra el backend real
 
-`pnpm api:smoke` llama al backend de desarrollo (`API_SMOKE_BASE_URL`, por defecto el deploy de `asinko-app` en Vercel, `https://asinko-app-web.vercel.app`) con el `liveExample` de cada mock de tipo "contrato" y valida la respuesta con **el mismo esquema** que usa el mock. Detecta cuándo el backend y nuestro contrato se separaron. Solo en desarrollo: nunca en el CI normal ni contra producción.
+`pnpm api:smoke` llama al backend de desarrollo (`API_SMOKE_BASE_URL`, por defecto el deploy de `asinko-app` en Vercel, `https://asinko-app-web.vercel.app`) con el `liveExample` de cada mock de tipo "contrato" y valida la respuesta con **el mismo esquema** que usa el mock. Detecta cuándo el backend y nuestro contrato se separaron. Solo en desarrollo: nunca en el CI normal ni contra producción. Además del `liveExample` de cada ruta, encadena lecturas que necesitan un id real (el de un perfil, el primer post del feed) para cubrir lo adoptado del backend. Solo hace `GET`: nunca escribe en la base. Se corre antes de pasarle `proposals.md` al backend, y el resultado se anota ahí.
 
 ## Sesión
 

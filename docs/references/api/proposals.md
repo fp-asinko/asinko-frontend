@@ -2,7 +2,20 @@
 
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla. Cuando el backend la implementa y el front la adopta, sale de este archivo (queda en el historial de git) y pasa al snapshot del contrato.
 
-**Actualizado el 2026-10-19:** se sumaron P-022 a P-027 (borradores, marcas, y el perfil como LinkedIn y Reddit), todas hechas en el front contra mocks. Lo de antes sigue como se adoptó el 2026-10-18, después de la respuesta del backend del 2026-10-13 ([`responses/2026-10-13-backend.md`](responses/2026-10-13-backend.md)). **No se verificó todavía contra el deploy** (`pnpm api:smoke`): lo adoptado se probó con los mocks, que siguen la forma de esa respuesta.
+**Actualizado el 2026-10-19:** se sumaron P-022 a P-027 (borradores, marcas, y el perfil como LinkedIn y Reddit), todas hechas en el front contra mocks. Lo de antes sigue como se adoptó el 2026-10-18, después de la respuesta del backend del 2026-10-13 ([`responses/2026-10-13-backend.md`](responses/2026-10-13-backend.md)).
+
+**Verificado contra el deploy de `dev` el 2026-10-19** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 8 de 8 en verde, solo lecturas. Cada respuesta se validó con el mismo esquema que usa el mock:
+
+- `GET /profiles/{identifier}`, `GET /feed/explore` (P-001: las `entities` vienen dentro del esquema), `GET /search` y `GET /assets?q=`.
+- P-012: `GET /users/{id}/content` y `GET /users/{id}/comments`.
+- P-003: `GET /assets/{symbol}` con el precio.
+- P-007 y P-014: `GET /posts/{id}/comments` con `replies=false`, `sort=best`, `sort=new` y `?q=`. Un `?q=` de 1 letra da `422`, como dice el contrato (el front nunca lo manda).
+
+**Sin verificar contra el deploy**, porque escriben o necesitan sesión:
+
+- la subida de imágenes (P-013);
+- `topPost` de "Tus intereses" (P-016);
+- los anuncios (P-015), que el backend todavía no manda.
 
 ## Adoptado por el front (sale de este archivo)
 
