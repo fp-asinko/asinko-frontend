@@ -24,6 +24,14 @@ async function openBody(page: Page, isMobile: boolean) {
 
 const panel = (page: Page) => page.getByRole('dialog', { name: 'Emojis' })
 
+/** The panel's box once it opened: mid-entrance it sits a fraction of a pixel off (EP-02 flaked). */
+async function openedBox(page: Page) {
+  await panel(page).evaluate((element) =>
+    Promise.all(element.getAnimations({ subtree: true }).map((animation) => animation.finished)),
+  )
+  return (await panel(page).boundingBox())!
+}
+
 test.describe('Emoji picker', () => {
   test('puts an emoji where the caret is in a post body (EP-01 to EP-03)', async ({
     page,
@@ -65,7 +73,7 @@ test.describe('Emoji picker', () => {
     await body.click()
     await editor.getByRole('button', { name: 'Add emoji' }).click()
     await expect(panel(page).getByRole('searchbox', { name: 'Search emoji' })).toBeFocused()
-    const box = (await panel(page).boundingBox())!
+    const box = await openedBox(page)
     expect(box.y + box.height).toBeLessThanOrEqual(560)
 
     const before = await page.evaluate(() => window.scrollY)
@@ -140,7 +148,7 @@ test.describe('Emoji picker', () => {
       await page.getByRole('button', { name: 'Add emoji' }).click()
       await expect(panel(page).getByRole('heading', { name: 'Smileys' })).toBeVisible()
 
-      const box = (await panel(page).boundingBox())!
+      const box = await openedBox(page)
       const viewport = page.viewportSize()!
       expect(box.x).toBeGreaterThanOrEqual(0)
       expect(box.x + box.width).toBeLessThanOrEqual(viewport.width)

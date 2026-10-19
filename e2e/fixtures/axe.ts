@@ -3,6 +3,13 @@ import { expect, type Page } from '@playwright/test'
 
 /** WCAG 2.2 AA automated check (design-system.md § Accesibilidad). Manual testing still applies. */
 export async function expectNoA11yViolations(page: Page) {
+  // While measuring, reduced motion: the global rule (globals.css) ends every animation at once,
+  // also one that starts after the wait below (a part streamed late under load, ES-02). Then back
+  // to what the test had.
+  const reduced = await page.evaluate(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  )
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   // Entrances fade in (stagger, consensus): measured mid-fade, text looks low-contrast. Wait for
   // every finite animation to end; infinite ones (the Live pulse) never would.
   // Until none is left: content that arrives late (a server action, a hydrated column) starts its
@@ -44,6 +51,7 @@ export async function expectNoA11yViolations(page: Page) {
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
     .analyze()
   await stuck('')
+  await page.emulateMedia({ reducedMotion: reduced ? 'reduce' : 'no-preference' })
   expect(
     results.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(' | ')}`),
   ).toEqual([])
