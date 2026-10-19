@@ -1,20 +1,16 @@
 import type { ReactNode } from 'react'
-import { RecentlyViewedSlot } from './recently-viewed-slot'
-import { SeasonTokensTeaser } from './season-tokens-teaser'
 import { SiteFooter } from './site-footer'
 
 /**
- * The content of the right column (specs/right-column): the season tokens, then "Recently viewed"
- * (specs/recently-viewed), which arrives after the page loads and so goes below.
- * The footer sits at the bottom of the column, whatever the cards above take. The invitation to
- * join moved to the left column (specs/guest-sidebar GS-05). A page can lead with its own card
- * instead of the season tokens: a profile, its person's card (specs/profile-aside PA-01).
+ * The right column (specs/right-column): what the page brings, then the footer at its bottom,
+ * whatever the cards above take. Each page brings what speaks of it (specs/community-widgets
+ * CW-02, CW-03): the Home, the season tokens and "Recently viewed"; a group, its widgets; a
+ * profile, its card. Without anything, only the footer.
  */
-export function RightColumn({ lead }: { lead?: ReactNode }) {
+export function RightColumn({ children }: { children?: ReactNode }) {
   return (
     <div className="flex min-h-full flex-col">
-      {lead ?? <SeasonTokensTeaser />}
-      <RecentlyViewedSlot />
+      {children}
       <SiteFooter className="mt-auto" />
     </div>
   )

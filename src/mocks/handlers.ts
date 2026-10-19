@@ -13,6 +13,8 @@ import {
   profileImageUploadSchema,
   userCommentSchema,
   activeCommunitiesSchema,
+  communityImageUploadSchema,
+  widgetListSchema,
   draftSchema,
   featuredListSchema,
   postSchema,
@@ -40,6 +42,7 @@ import { thesesBy } from './fixtures/theses'
 import { userComments, userContent, activeCommunities } from './user-activity'
 import { createDraft, deleteDraft, listDrafts, SEED_DRAFT_ID, updateDraft } from './drafts'
 import { addFeatured, listFeatured, removeFeatured } from './featured'
+import { listWidgets, saveWidgets, signCommunityImageUpload } from './widgets'
 import { isProposedUserChange, updateUser } from './profile-edit'
 import { signProfileImageUpload } from './profile-image'
 import { paginate } from './paginate'
@@ -224,6 +227,47 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       query: { userId: DEMO_USER.id },
     },
     handler: ({ params, query }) => deleteDraft(params.draftId ?? '', query.userId),
+  },
+  // P-028 (proposal, specs/community-widgets): a group's widgets, saved whole by a moderator.
+  {
+    method: 'GET',
+    path: '/api/v1/communities/:slug/widgets',
+    kind: 'proposal',
+    implemented: false,
+    schema: widgetListSchema,
+    example: { ...noRequest, params: { slug: 'trading-on-chain' } },
+    handler: ({ params }) => listWidgets(params.slug ?? ''),
+  },
+  {
+    method: 'PUT',
+    path: '/api/v1/communities/:slug/widgets',
+    kind: 'proposal',
+    implemented: false,
+    schema: widgetListSchema,
+    example: {
+      ...noRequest,
+      params: { slug: 'trading-on-chain' },
+      body: { userId: DEMO_USER.id, items: [] },
+    },
+    handler: ({ params, body }) => saveWidgets(params.slug ?? '', body),
+  },
+  // P-029 (proposal): where to put a widget's image.
+  {
+    method: 'POST',
+    path: '/api/v1/uploads/community-image',
+    kind: 'proposal',
+    implemented: false,
+    schema: communityImageUploadSchema,
+    example: {
+      ...noRequest,
+      body: {
+        userId: DEMO_USER.id,
+        communityId: COMMUNITIES.find((each) => each.slug === 'trading-on-chain')!.id,
+        contentType: 'image/webp',
+        size: 120_000,
+      },
+    },
+    handler: ({ body }) => signCommunityImageUpload(body),
   },
   // P-027 (proposal, specs/profile-aside): where a person published lately.
   {

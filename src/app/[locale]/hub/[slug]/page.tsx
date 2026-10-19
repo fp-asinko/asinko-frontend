@@ -1,6 +1,11 @@
 import type { Metadata } from 'next'
-import { PageColumns } from '@/components/organisms/app-shell'
-import { communityMetadata, CommunityTop, resolveCommunityRoute } from '@/features/communities'
+import { PageColumns, PageHero } from '@/components/organisms/app-shell'
+import {
+  CommunityDetails,
+  CommunityHeader,
+  communityMetadata,
+  resolveCommunityRoute,
+} from '@/features/communities'
 import { ComposeScope } from '@/features/composer'
 // By its path, not the feature's index: the index also brings the post page's client parts (seo.md).
 import { CommunityFeed } from '@/features/feed/components/community-feed'
@@ -20,20 +25,27 @@ export default async function HubPage({ params, searchParams }: PageProps<'/[loc
   const { locale, slug } = await params
   const { page, path } = await resolveCommunityRoute('group', decodeURIComponent(slug), locale)
   return (
-    <PageColumns>
-      <ComposeScope
-        id={page.id}
-        slug={page.slug}
-        handle={page.handle}
-        name={page.subtitle ?? page.handle}
-      />
-      <CommunityTop page={page} />
-      <CommunityFeed
-        slug={page.slug}
-        handle={page.handle}
-        pagePath={path}
-        searchParams={searchParams}
-      />
-    </PageColumns>
+    <>
+      {/* The banner and the header over both columns from lg, as Reddit's (specs/community-widgets
+          CW-01); the feed and the right column under them. */}
+      <PageHero>
+        <CommunityHeader page={page} />
+      </PageHero>
+      <PageColumns>
+        <ComposeScope
+          id={page.id}
+          slug={page.slug}
+          handle={page.handle}
+          name={page.subtitle ?? page.handle}
+        />
+        <CommunityDetails page={page} />
+        <CommunityFeed
+          slug={page.slug}
+          handle={page.handle}
+          pagePath={path}
+          searchParams={searchParams}
+        />
+      </PageColumns>
+    </>
   )
 }

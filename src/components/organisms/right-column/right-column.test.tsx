@@ -3,24 +3,22 @@ import { describe, expect, it } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { RightColumn } from './right-column'
 
-describe('RightColumn (RC-01)', () => {
-  it('shows the season tokens first and the footer after them', () => {
-    renderWithIntl(<RightColumn />)
-    const tokens = screen.getByRole('region', { name: 'Season tokens' })
-    const rules = screen.getByRole('button', { name: 'Rules' })
-    expect(tokens.compareDocumentPosition(rules) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-  })
-
-  it("leads with the page's own card instead of the season tokens (specs/profile-aside PA-01)", () => {
-    renderWithIntl(<RightColumn lead={<section aria-label="Lead" />} />)
+describe('RightColumn (RC-01, specs/community-widgets CW-02)', () => {
+  it('shows what the page brings, and the footer after it', () => {
+    renderWithIntl(
+      <RightColumn>
+        <section aria-label="Lead" />
+      </RightColumn>,
+    )
     const lead = screen.getByRole('region', { name: 'Lead' })
-    expect(screen.queryByRole('region', { name: 'Season tokens' })).toBeNull()
     const rules = screen.getByRole('button', { name: 'Rules' })
     expect(lead.compareDocumentPosition(rules) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
-  it('no longer invites to join: that moved to the left column (specs/guest-sidebar GS-05)', () => {
+  it('brings neither the season tokens nor an invitation by itself: only the footer', () => {
     renderWithIntl(<RightColumn />)
+    expect(screen.queryByRole('region', { name: 'Season tokens' })).toBeNull()
     expect(screen.queryByRole('region', { name: 'New to Asinko?' })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Rules' })).toBeInTheDocument()
   })
 })

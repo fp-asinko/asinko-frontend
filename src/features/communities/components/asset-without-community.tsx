@@ -40,7 +40,10 @@ export function AssetWithoutCommunity({ asset }: { asset: AssetSummary }) {
         </div>
       </header>
       {/* Its price too, while it has no community (specs/backend-adoption BK-05). */}
-      <MarketDetails market={asset.market} title={tc('assetData.title')} />
+      {/* From lg, in the right column (specs/community-widgets CW-03). */}
+      <div className="lg:hidden">
+        <MarketDetails market={asset.market} title={tc('assetData.title')} />
+      </div>
       <EmptyState
         icon={<CandlestickChartIcon />}
         title={t('title', { handle: asset.handle })}

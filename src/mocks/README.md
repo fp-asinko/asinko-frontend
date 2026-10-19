@@ -21,6 +21,9 @@ Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of 
 | GET    | `/api/v1/assets`                           | contract | E14. Response shape assumed (proposal P-003). `q`, `cursor`                                                           |
 | GET    | `/api/v1/assets/:symbol`                   | contract | E14. `openTheses` empty until phase 2                                                                                 |
 | PATCH  | `/api/v1/users/:userId`                    | proposal | P-019, P-020, P-024, P-026: only with `headline`, `city`, `links`, `bannerUrl`, `openTo` or a `bio` past 160 (`when`) |
+| GET    | `/api/v1/communities/:slug/widgets`        | proposal | P-028. In memory; #trading-on-chain (the demo moderates it) has one of each type, #macro two                          |
+| PUT    | `/api/v1/communities/:slug/widgets`        | proposal | P-028. Saves the whole list; `403 NOT_MODERATOR`, `422 INVALID_WIDGET` with `index` and `field`                       |
+| POST   | `/api/v1/uploads/community-image`          | proposal | P-029. A moderator of that community, as a post image                                                                 |
 | GET    | `/api/v1/users/:userId/active-communities` | proposal | P-027. Counts the fixtures' and the created posts by community, in the last `days`                                    |
 | GET    | `/api/v1/users/:userId/featured`           | proposal | P-025. In memory; María has a thesis and a post (seeded)                                                              |
 | POST   | `/api/v1/users/:userId/featured`           | proposal | P-025. Only your own; `409 FEATURED_LIMIT` past 3, `403 NOT_OWNER`                                                    |

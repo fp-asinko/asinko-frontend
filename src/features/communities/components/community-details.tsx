@@ -25,7 +25,14 @@ export function CommunityDetails({
 }) {
   const t = useTranslations('communities')
 
-  if (page.kind === 'asset') return <AssetDetails symbol={page.slug} title={t('assetData.title')} />
+  // From lg the market data is in the right column (specs/community-widgets CW-03): here, under it.
+  if (page.kind === 'asset') {
+    return (
+      <div className="lg:hidden">
+        <AssetDetails symbol={page.slug} title={t('assetData.title')} />
+      </div>
+    )
+  }
 
   if (!page.rules && !page.mainUrl) return null
   return (

@@ -51,7 +51,8 @@ test.describe('Recently viewed', () => {
 
     await links.nth(1).click()
     await expect(page).toHaveURL(new RegExp(`${ETH}$`))
-    // Opened again: first now.
+    // Opened again: first now, back on the Home (its only page, specs/community-widgets CW-02).
+    await page.goto('/en')
     await expect(recent(page).getByRole('link').first()).toContainText('ETH/BTC at a 4-year low')
   })
 

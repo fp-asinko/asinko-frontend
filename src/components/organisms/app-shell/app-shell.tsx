@@ -63,13 +63,16 @@ export function AppShell({
           </div>
         </div>
         {/* Center (max 780px) and right (300px) travel together, centered in the remaining space,
-            as in the prototype: at 1440px the right column sits next to the center, not at the edge. */}
-        <div className="min-w-0 lg:flex lg:justify-center">
+            as in the prototype: at 1440px the right column sits next to the center, not at the edge.
+            A grid of two rows: a page's hero (data-hero, a group's banner, specs/community-widgets
+            CW-01) takes the first row over both columns, inside <main> (a subgrid), and the right
+            column starts under it. Without a hero, both columns take both rows. */}
+        <div className="group/row min-w-0 lg:grid lg:grid-cols-[minmax(0,48.75rem)_18.75rem] lg:grid-rows-[auto_1fr] lg:justify-center">
           {/* outline-none: focused only by the skip link (tabIndex -1), never reachable with Tab. */}
           <main
             id="content"
             tabIndex={-1}
-            className="min-w-0 pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none sm:px-4 sm:pt-6 md:pb-8 lg:max-w-195 lg:flex-1"
+            className="min-w-0 pb-[calc(5rem+env(safe-area-inset-bottom))] outline-none sm:px-4 sm:pt-6 md:pb-8 lg:col-start-1 lg:row-start-1 lg:row-end-3 lg:has-[>[data-hero]]:col-end-3 lg:has-[>[data-hero]]:grid lg:has-[>[data-hero]]:grid-cols-subgrid lg:has-[>[data-hero]]:grid-rows-subgrid lg:has-[>[data-hero]]:content-start"
           >
             {children}
           </main>
@@ -78,12 +81,12 @@ export function AppShell({
           {right ? (
             <aside
               aria-label={tr('label')}
-              className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] w-75 shrink-0 self-start overflow-y-auto border-l lg:block"
+              className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] w-75 shrink-0 self-start overflow-y-auto border-l lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:block lg:group-has-[main>[data-hero]]/row:row-span-1 lg:group-has-[main>[data-hero]]/row:row-start-2"
             >
               {right}
             </aside>
           ) : (
-            <div className="hidden w-75 shrink-0 border-l lg:block" />
+            <div className="hidden w-75 shrink-0 border-l lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:block lg:group-has-[main>[data-hero]]/row:row-span-1 lg:group-has-[main>[data-hero]]/row:row-start-2" />
           )}
         </div>
       </div>

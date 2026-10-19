@@ -1,2 +1,16 @@
-// The right column of every page: the same as default (see there why each URL needs a match).
-export { default } from './default'
+import {
+  RecentlyViewedSlot,
+  RightColumn,
+  SeasonTokensTeaser,
+} from '@/components/organisms/right-column'
+
+// The Home's right column: the season tokens, then "Recently viewed" (specs/recently-viewed),
+// which arrives after the page loads and so goes below. Only here (specs/community-widgets CW-02).
+export default function HomeRight() {
+  return (
+    <RightColumn>
+      <SeasonTokensTeaser />
+      <RecentlyViewedSlot />
+    </RightColumn>
+  )
+}

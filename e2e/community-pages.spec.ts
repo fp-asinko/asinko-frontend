@@ -70,26 +70,35 @@ test.describe('Community pages', () => {
 
   test("an asset's page shows its price and change, open (specs/backend-adoption BK-05)", async ({
     page,
+    isMobile,
   }) => {
     await page.goto('/en/asset/BTC')
     await expect(heading(page, '$BTC')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Asset data' })).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    )
-    await expect(page.getByRole('main').getByText('$97,430.12')).toBeVisible()
-    await expect(page.getByRole('main').getByText('up 2.14%')).toBeAttached()
+    // From lg, in the right column (specs/community-widgets CW-03); under it, open in the page.
+    const where = isMobile
+      ? page.getByRole('main')
+      : page.getByRole('complementary', { name: 'Related' })
+    if (isMobile) {
+      await expect(page.getByRole('button', { name: 'Asset data' })).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      )
+    }
+    await expect(where.getByText('$97,430.12')).toBeVisible()
+    await expect(where.getByText('up 2.14%')).toBeAttached()
   })
 
   test('an old price says it is out of date; without one, an explicit empty state (BK-05, CP-10)', async ({
     page,
+    isMobile,
   }) => {
     // AVAX's price in the mocks is older than 15 minutes; XAU/USD has none.
     await page.goto('/en/asset/AVAX')
-    await expect(page.getByText(/Out of date · updated/)).toBeVisible()
+    // In the page under lg, in the right column from lg (specs/community-widgets CW-03).
+    await expect(page.getByText(/Out of date · updated/).locator('visible=true')).toBeVisible()
     await page.goto('/en/asset/XAU%2FUSD')
-    await page.getByRole('button', { name: 'Asset data' }).click()
-    await expect(page.getByText('No market data yet')).toBeVisible()
+    if (isMobile) await page.getByRole('button', { name: 'Asset data' }).click()
+    await expect(page.getByText('No market data yet').locator('visible=true')).toBeVisible()
   })
 
   test('redirects a community to the page of its kind, 308, in the same locale (CP-02)', async ({

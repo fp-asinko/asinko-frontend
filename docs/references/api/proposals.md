@@ -2,7 +2,7 @@
 
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla. Cuando el backend la implementa y el front la adopta, sale de este archivo (queda en el historial de git) y pasa al snapshot del contrato.
 
-**Actualizado el 2026-10-19:** se sumaron P-022 a P-027 (borradores, marcas, y el perfil como LinkedIn y Reddit), todas hechas en el front contra mocks. Lo de antes sigue como se adoptó el 2026-10-18, después de la respuesta del backend del 2026-10-13 ([`responses/2026-10-13-backend.md`](responses/2026-10-13-backend.md)).
+**Actualizado el 2026-10-19:** se sumaron P-022 a P-029 (borradores, marcas, el perfil como LinkedIn y Reddit, y los widgets de los grupos), todas hechas en el front contra mocks. Lo de antes sigue como se adoptó el 2026-10-18, después de la respuesta del backend del 2026-10-13 ([`responses/2026-10-13-backend.md`](responses/2026-10-13-backend.md)).
 
 **Verificado contra el deploy de `dev` el 2026-10-19** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 8 de 8 en verde, solo lecturas. Cada respuesta se validó con el mismo esquema que usa el mock:
 
@@ -36,13 +36,14 @@
 1. **P-019 a P-021: el perfil, como LinkedIn.** Titular, ciudad, links, banner y la subida de foto y banner. El front ya lo tiene hecho contra mocks: sin esto, nada de eso se guarda con el backend real.
 2. **Comunidades de los activos del catálogo.** Solo 5 de los 100 tienen la suya (BTC, ETH, AAPL, NVDA, VOO). `GET /communities/TSLA` (y SPY, MSFT, EURUSD, SQM-B, BRK.B, XAU/USD…) da `404`, y `GET /assets/{symbol}` trae `linkedCommunity: null`. **Pedido:** crear la comunidad de cada activo (slug = símbolo). Mientras tanto, el front muestra la página del activo con su precio, sin feed ni Unirse, y no se puede publicar ni etiquetar en ellos.
 3. **P-024 a P-027: el perfil como vidriera**, como LinkedIn (`specs/profile-showcase`): "Acerca de" de 2000, destacados, "Abierto a" y dónde publica cada persona (`specs/profile-aside`). Hechos contra mocks.
-4. **P-022 y P-023: borradores en la cuenta y marcas por comunidad**, como Reddit (`specs/drafts-tags`). Hechos contra mocks.
-5. **P-018: comunidades y activos relacionados de un post.** Hoy viajan como menciones al final del cuerpo.
-6. **P-017: "lo seguís" en las listas de seguidores, seguidos y miembros.** Sin respuesta desde el 2026-10-09.
-7. **P-005: `sort=hot|top` del feed.** Fórmulas en definición.
-8. **`best` de los comentarios (P-014).** Hoy es cronológico; el mock usa la fórmula propuesta (abajo). El front ya manda `sort=best`.
-9. **`GET /assets` sin `?q=` devuelve 20, sin `nextCursor`.** No bloquea (el front busca con `?q=`), pero hace falta para listar el catálogo.
-10. **Imágenes huérfanas.** Una imagen subida con la URL firmada y nunca publicada queda en Storage, y no hay cómo borrarla. ¿Se limpian del lado del backend? Aplica también a la foto y el banner (P-021) y a la imagen de un borrador eliminado (P-022).
+4. **P-028 y P-029: widgets de los grupos**, como Reddit (`specs/community-widgets`): Texto, Reglas, Botones, Lista de comunidades, Imágenes y Calendario en la columna derecha, que arma el moderador. Hechos contra mocks.
+5. **P-022 y P-023: borradores en la cuenta y marcas por comunidad**, como Reddit (`specs/drafts-tags`). Hechos contra mocks.
+6. **P-018: comunidades y activos relacionados de un post.** Hoy viajan como menciones al final del cuerpo.
+7. **P-017: "lo seguís" en las listas de seguidores, seguidos y miembros.** Sin respuesta desde el 2026-10-09.
+8. **P-005: `sort=hot|top` del feed.** Fórmulas en definición.
+9. **`best` de los comentarios (P-014).** Hoy es cronológico; el mock usa la fórmula propuesta (abajo). El front ya manda `sort=best`.
+10. **`GET /assets` sin `?q=` devuelve 20, sin `nextCursor`.** No bloquea (el front busca con `?q=`), pero hace falta para listar el catálogo.
+11. **Imágenes huérfanas.** Una imagen subida con la URL firmada y nunca publicada queda en Storage, y no hay cómo borrarla. ¿Se limpian del lado del backend? Aplica también a la foto y el banner (P-021), a la imagen de un borrador eliminado (P-022) y a la de un widget que se quita (P-029).
 
 ### P-019: Titular, ciudad y links del perfil
 
@@ -143,6 +144,53 @@
 
 - De más posts a menos; a igual cantidad, el último publicado primero. Solo posts y encuestas no borrados publicados en los últimos `days` días.
 - `days` de 1 a 365 (por defecto 90); `limit` de 1 a 20 (por defecto 5). Fuera de rango, `422 VALIDATION_ERROR`. Usuario inexistente, `404`.
+
+### P-028: Widgets de un grupo
+
+**Estado:** propuesta (2026-10-19), mockeada.
+
+**Endpoints:** `GET /api/v1/communities/{slug}/widgets` (público) y `PUT /api/v1/communities/{slug}/widgets` (solo moderadores).
+
+**Motivo:** que un grupo se sienta como su página web (`specs/community-widgets`): el moderador arma la columna derecha con bloques, como los widgets de Reddit. "Detalles de la comunidad" va siempre primero y sale del `Community` (no es un widget).
+
+**Cambio:**
+
+```jsonc
+// GET → { items: Widget[] }, en su orden
+{ "id": "string", "type": "TEXT", "title": "Bienvenida", "body": "Markdown" }
+{ "id": "…", "type": "RULES", "title": "Reglas", "rules": [{ "title": "…", "description": "…" }] }
+{ "id": "…", "type": "BUTTONS", "title": "Links", "buttons": [{ "label": "Discord", "url": "https://…" }] }
+{ "id": "…", "type": "COMMUNITIES", "title": "Relacionadas", "communities": [/* CommunitySummary + memberCount */] }
+{ "id": "…", "type": "IMAGES", "title": "", "images": [{ "imageUrl": "…", "alt": "…", "linkUrl": null }] }
+{ "id": "…", "type": "CALENDAR", "title": "Eventos", "events": [{ "title": "…", "startsAt": "ISO 8601", "endsAt": null, "allDay": false, "location": null, "url": null }] }
+```
+
+- `PUT` `{ userId, items: WidgetInput[] }` → `{ items: Widget[] }`: reemplaza la lista entera, en ese orden. `WidgetInput` es igual que `Widget`, con `id` opcional (sin él, es nuevo) y `communityIds: string[]` en lugar de `communities`.
+- Límites:
+  - hasta 20 widgets;
+  - título de 1 a 50 caracteres (en Imágenes, opcional);
+  - Texto: cuerpo de 1 a 5000 caracteres;
+  - Reglas: de 1 a 15, título de hasta 100 y descripción de hasta 500;
+  - Botones: de 1 a 10, texto de hasta 30;
+  - Comunidades: de 1 a 10;
+  - Imágenes: de 1 a 10, descripción de 1 a 300;
+  - Eventos: de 1 a 20, título de hasta 100 y lugar de hasta 100.
+- Un link de usuario (`url`, `linkUrl`) es `http(s)` o una ruta del sitio que empieza con `/` (nunca `//`).
+- Errores:
+  - `403 NOT_MODERATOR`, `403 USER_MISMATCH`;
+  - `422 TOO_MANY_WIDGETS`;
+  - `422 INVALID_WIDGET` con `index` (qué widget) y `field` (`title`, `body`, `rules`, `buttons`, `communityIds`, `images`, `events`, `type`), para que el front marque cuál.
+- Una comunidad de la lista que ya no existe no viene en `communities`.
+
+### P-029: Imágenes de un grupo
+
+**Estado:** propuesta (2026-10-19), mockeada.
+
+**Endpoint:** `POST /api/v1/uploads/community-image` `{ userId, communityId, contentType, size }` → `{ uploadUrl, imageUrl, path }`.
+
+**Motivo:** el widget de Imágenes (P-028). También sirve para el banner y el avatar del grupo cuando exista "Editar comunidad".
+
+**Cambio:** el mismo flujo de URL firmada que `POST /uploads/post-image` (P-013): JPEG, PNG, WebP o GIF (nunca SVG), hasta 5 MB. Solo moderadores de esa comunidad (`403 NOT_MODERATOR`).
 
 ### P-022: Borradores en la cuenta
 
