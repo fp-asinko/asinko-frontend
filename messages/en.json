@@ -778,7 +778,9 @@
           "name": "Complete profile",
           "description": "The 8 steps of \"Complete your profile\" done."
         }
-      }
+      },
+      "loadError": "Couldn't load the achievements.",
+      "progressPercent": "{current, number}% of {target, number}%"
     }
   },
   "featured": {

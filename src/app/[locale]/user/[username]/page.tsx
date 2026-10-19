@@ -7,11 +7,13 @@ import { ComposeScope } from '@/features/composer'
 import { CommunityFeed } from '@/features/feed/components/community-feed'
 // By their paths too: the groups' and assets' pages, which use the index, do not need them.
 import { FeaturedScope } from '@/features/communities/components/featured-scope'
+import { AchievementsCard } from '@/features/communities/components/achievements-card'
 import { ProfileCard } from '@/features/communities/components/profile-card'
 import { ProfileShowcase } from '@/features/communities/components/profile-showcase'
 import { ProfileTabs } from '@/features/communities/components/profile-tabs'
 import { ThesesList } from '@/features/communities/components/theses-list'
 import { ThesesListSkeleton } from '@/features/communities/components/theses-list-skeleton'
+import { getAchievements } from '@/features/communities/lib/achievements-api'
 import { getActiveCommunities } from '@/features/communities/lib/active-communities-api'
 import { FEATURED_MAX, getProfileFeatured } from '@/features/communities/lib/featured-api'
 import { parseProfileTab } from '@/features/communities/schemas/profile-tab.schema'
@@ -38,10 +40,12 @@ export default async function UserPage({
   ])
   const tab = parseProfileTab(query)
   // What the person put at the front (specs/profile-showcase PS-05): secondary, none if it fails.
-  const [featured, communities] = await Promise.all([
+  const [featured, communities, achievements] = await Promise.all([
     getProfileFeatured(profile.id),
     // Where the person publishes (specs/profile-aside PA-05): also in the right column, cached.
     getActiveCommunities(profile.id),
+    // Their trophy case (specs/profile-achievements AC-05): also in the right column, cached.
+    getAchievements(profile.id, profile.isSelf),
   ])
 
   const content: ReactNode = (
@@ -51,9 +55,17 @@ export default async function UserPage({
         <ComposeScope id={page.id} slug={page.slug} handle={page.handle} name={page.handle} own />
       )}
       <CommunityTop page={page} profile={profile} />
-      {/* Without the right column (under lg), the person's card goes here (PA-03). */}
-      <div className="border-b px-4 py-4 sm:px-0 lg:hidden">
+      {/* Without the right column (under lg), the person's card and achievements go here (PA-03,
+          specs/profile-achievements AC-05). */}
+      <div className="flex flex-col gap-3 border-b px-4 py-4 sm:px-0 lg:hidden">
         <ProfileCard profile={profile} communities={communities} idPrefix="profile-card-page" />
+        <AchievementsCard
+          achievements={achievements}
+          isSelf={profile.isSelf}
+          name={profile.displayName ?? `@${profile.username}`}
+          achievementsPath={`${path}/achievements`}
+          idPrefix="achievements-page"
+        />
       </div>
       <ProfileShowcase profile={profile} featured={featured} pagePath={path} />
       {/* Theses · Posts · Replies, as X (specs/profile-track-record PT-04, specs/backend-adoption). */}

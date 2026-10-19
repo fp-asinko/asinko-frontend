@@ -45,7 +45,7 @@ Mock (`kind: 'proposal'`, `implemented: false`): el usuario demo con ganados y f
 
 ### Rutas
 
-- `app/[locale]/user/[username]/achievements/page.tsx`: lee el perfil (`getProfileDetails`, ya en `cache`) y los logros; `notFound()` si no existe. `generateMetadata` con título "Logros de {nombre}", canonical y `alternates`. El shell y su columna: `@right/user/[username]/achievements/page.tsx` con la tarjeta de reputación.
+- `app/[locale]/user/[username]/achievements/page.tsx`: lee el perfil (`getProfileDetails`, ya en `cache`) y los logros; `notFound()` si no existe. `generateMetadata` con título "Logros de {nombre}", canonical y `alternates`. El shell y su columna: `@right/user/[username]/achievements/page.tsx` con la tarjeta de reputación, sin la de logros (su "Ver todos" llevaría a la misma página). El `h1` dice de quién son ("Logros de María"), por la jerarquía y el GEO; la tarjeta es la molécula `AsideCard`.
 - La columna del perfil (`@right/user/[username]/page.tsx`) suma `AchievementsCard` después de `ProfileCard`. En la página, dentro del `div lg:hidden` de PA-03.
 - El sitemap no lista perfiles hoy: la página nueva tampoco.
 

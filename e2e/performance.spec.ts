@@ -22,6 +22,7 @@ test.describe('JavaScript budget', () => {
     '/en/user/maria?tab=theses',
     // specs/profile-showcase PS-11: your own, with its checklist and "⋯"
     '/en/user/demo',
+    '/en/user/maria/achievements',
     // specs/community-widgets CW-14: a group with its widgets and, for its moderator, the pencil
     '/en/hub/trading-on-chain',
     // specs/profile-aside PA-06: its card, in the page and in the right column

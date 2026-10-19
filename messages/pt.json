@@ -778,7 +778,9 @@
           "name": "Perfil completo",
           "description": "Os 8 passos de \"Complete seu perfil\" feitos."
         }
-      }
+      },
+      "loadError": "Não foi possível carregar as conquistas.",
+      "progressPercent": "{current, number}% de {target, number}%"
     }
   },
   "featured": {
