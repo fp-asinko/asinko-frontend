@@ -4,11 +4,16 @@ import { cn } from '@/lib/utils'
 /**
  * Center column of a page: up to 780px (48.75rem) as in the prototype, centered. Under a hero
  * (PageHero), from lg, it takes the center of the second row (specs/community-widgets CW-01).
+ * There <main> spans both columns, so its padding no longer parts the center from the right
+ * column: the center keeps its own 16px gap, as without a hero.
  */
 export function PageColumns({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={cn('mx-auto w-full max-w-195 min-w-0 lg:col-start-1 lg:row-start-2', className)}
+      className={cn(
+        'mx-auto w-full max-w-195 min-w-0 lg:col-start-1 lg:row-start-2 lg:group-has-[main>[data-hero]]/row:pr-4',
+        className,
+      )}
     >
       {children}
     </div>

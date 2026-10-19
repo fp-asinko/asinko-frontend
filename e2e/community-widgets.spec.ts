@@ -25,6 +25,9 @@ test.describe('A group as a web page, as Reddit', () => {
     // Over the right column too (the banner bleeds over main's 16px gutter), and the column below.
     expect(hero.x + hero.width).toBeGreaterThanOrEqual(aside.x + aside.width - 17)
     expect(aside.y).toBeGreaterThanOrEqual(hero.y + hero.height - 1)
+    // The feed keeps its 16px gap from the right column, as on a page without a banner.
+    const post = (await page.getByRole('main').getByRole('article').first().boundingBox())!
+    expect(post.x + post.width).toBeLessThanOrEqual(aside.x - 16)
   })
 
   test('each page brings its own right column (CW-02, CW-03)', async ({ page, isMobile }) => {
