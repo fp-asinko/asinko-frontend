@@ -2,7 +2,7 @@
 
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla. Cuando el backend la implementa y el front la adopta, sale de este archivo (queda en el historial de git) y pasa al snapshot del contrato.
 
-**Actualizado el 2026-10-18**, después de adoptar en el front lo que respondió el backend el 2026-10-13 ([`responses/2026-10-13-backend.md`](responses/2026-10-13-backend.md)). **No se verificó todavía contra el deploy** (`pnpm api:smoke`): lo adoptado se probó con los mocks, que siguen la forma de esa respuesta.
+**Actualizado el 2026-10-19:** se sumaron P-022 a P-027 (borradores, marcas, y el perfil como LinkedIn y Reddit), todas hechas en el front contra mocks. Lo de antes sigue como se adoptó el 2026-10-18, después de la respuesta del backend del 2026-10-13 ([`responses/2026-10-13-backend.md`](responses/2026-10-13-backend.md)). **No se verificó todavía contra el deploy** (`pnpm api:smoke`): lo adoptado se probó con los mocks, que siguen la forma de esa respuesta.
 
 ## Adoptado por el front (sale de este archivo)
 
@@ -29,7 +29,7 @@
 7. **P-005: `sort=hot|top` del feed.** Fórmulas en definición.
 8. **`best` de los comentarios (P-014).** Hoy es cronológico; el mock usa la fórmula propuesta (abajo). El front ya manda `sort=best`.
 9. **`GET /assets` sin `?q=` devuelve 20, sin `nextCursor`.** No bloquea (el front busca con `?q=`), pero hace falta para listar el catálogo.
-10. **Imágenes huérfanas.** Una imagen subida con la URL firmada y nunca publicada queda en Storage, y no hay cómo borrarla. ¿Se limpian del lado del backend? Aplica también a la foto y el banner (P-021).
+10. **Imágenes huérfanas.** Una imagen subida con la URL firmada y nunca publicada queda en Storage, y no hay cómo borrarla. ¿Se limpian del lado del backend? Aplica también a la foto y el banner (P-021) y a la imagen de un borrador eliminado (P-022).
 
 ### P-019: Titular, ciudad y links del perfil
 
@@ -102,6 +102,7 @@
 - `POST /users/{userId}/featured` `{ userId, kind: "post" | "thesis", id }` → `201 { items }`; si ya estaba, `200 { items }`. Con 3, `409 FEATURED_LIMIT`. Contenido de otra persona, `403 NOT_OWNER`; inexistente o borrado, `404`.
 - `DELETE /users/{userId}/featured/{kind}/{id}?userId=` → `204`, también si no estaba.
 - Más adelante, reordenarlos (`PUT` con la lista); no hace falta para el MVP.
+- **Pregunta:** ¿una encuesta se destaca como `kind: "post"` o necesita su propio `kind: "poll"`? Hoy el front solo ofrece destacar posts y tesis.
 
 ### P-026: "Abierto a"
 
@@ -161,6 +162,7 @@
 - `PATCH /drafts/{draftId}` con los mismos campos → `200 Draft` (lo pasa primero en la lista). `404` si no existe o no es del usuario.
 - `DELETE /drafts/{draftId}?userId=` → `204`.
 - Publicar un borrador es `POST /posts` y después `DELETE /drafts/{id}`, que hace el servidor del front. Si el backend prefiere `POST /posts` con `draftId` y borrarlo él, mejor: es un cambio de una línea en el front.
+- **Relacionados:** hoy un borrador no guarda las comunidades y activos relacionados del post (los "+"), porque P-018 no existe todavía. Cuando exista, el `Draft` suma `related` con la misma forma.
 
 ### P-023: Marcas por comunidad
 
