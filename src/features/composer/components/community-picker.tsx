@@ -23,12 +23,13 @@ const SEARCH_DELAY = 250
 
 /** The picker's trigger: the chosen community's chip, or the "+" that adds a related one. */
 const trigger = cva(
-  'inline-flex h-8 tap items-center rounded-full bg-muted outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50',
+  'inline-flex tap items-center rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
   {
     variants: {
       variant: {
-        chip: 'max-w-full gap-1 pr-2.5 pl-3 type-meta font-bold aria-invalid:ring-2 aria-invalid:ring-destructive/40 [&_svg]:size-3.5',
-        add: 'w-8 justify-center text-foreground [&_svg]:size-4',
+        // As Reddit's "Select community": outlined and bigger (specs/submit-form-layout SF-01).
+        chip: 'h-10 max-w-full gap-1.5 border border-border-strong bg-background pr-3 pl-4 type-action font-bold hover:bg-surface aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/40 [&_svg]:size-4',
+        add: 'h-8 w-8 justify-center bg-muted text-foreground hover:bg-muted-hover [&_svg]:size-4',
       },
     },
   },

@@ -440,3 +440,21 @@ describe('PostEditor tools (specs/submit-tools)', () => {
     expect(body()).toHaveValue('> **rates**')
   })
 })
+
+describe('PostEditor as Reddit (specs/submit-form-layout)', () => {
+  it("shows the title's counter always, and says the title is required (SF-03)", async () => {
+    renderEditor()
+    expect(title()).toHaveAttribute('aria-required', 'true')
+    expect(title()).toHaveAccessibleDescription(/0\/300/)
+    await userEvent.type(title(), 'Rates')
+    expect(title()).toHaveAccessibleDescription(/5\/300/)
+  })
+
+  it('puts the formats on top and only Cancel and Publish at the bottom (SF-02, SF-06)', () => {
+    renderEditor()
+    const formats = screen.getByRole('tablist', { name: 'Post type' })
+    const actions = screen.getByRole('button', { name: 'Publish' }).parentElement!
+    expect(formats.compareDocumentPosition(title()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(actions.querySelectorAll('button')).toHaveLength(2)
+  })
+})

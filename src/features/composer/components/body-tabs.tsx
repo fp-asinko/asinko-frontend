@@ -10,6 +10,10 @@ import { cn } from '@/lib/utils'
 /** The preview's Server Action (the feed's card), passed down from the page (structure.md). */
 export type PreviewAction = (draft: unknown) => Promise<ActionResult<{ card: ReactNode }>>
 
+/** The body's box, as Reddit's: its border darkens while writing in it (SF-04, SF-07). */
+const BOX =
+  'rounded-2xl border border-input transition-colors duration-150 focus-within:border-foreground/60'
+
 const TAB =
   'h-8 rounded-full px-3 type-action text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 data-active:bg-muted data-active:text-foreground'
 
@@ -42,10 +46,10 @@ export function BodyTabs({
 
   if (!preview) {
     return (
-      <>
-        {toolbar}
-        {children}
-      </>
+      <div className={BOX}>
+        <div className="flex justify-end px-2 pt-2">{toolbar}</div>
+        <div className="px-4 pt-1 pb-3">{children}</div>
+      </div>
     )
   }
 
@@ -74,9 +78,9 @@ export function BodyTabs({
     <Tabs
       value={tab}
       onValueChange={(next) => open(next === 'preview' ? 'preview' : 'write')}
-      className="gap-2"
+      className={cn(BOX, 'gap-0')}
     >
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-2 pt-2">
         <TabsList aria-label={t('label')} className="h-auto gap-1 bg-transparent p-0">
           <TabsTrigger value="write" className={TAB}>
             {t('write')}
@@ -94,10 +98,10 @@ export function BodyTabs({
           {toolbar}
         </div>
       </div>
-      <TabsContent value="write" keepMounted>
+      <TabsContent value="write" keepMounted className="px-4 pt-1 pb-3">
         {children}
       </TabsContent>
-      {/* The card in a box with room: as the feed, not touching its edge. */}
+      {/* The card inside the box, with room: as the feed, not touching its edge. */}
       {/* What the preview is doing, announced: the focus stays on its tab (WCAG 4.1.3). */}
       <p role="status" className="sr-only">
         {tab !== 'preview'
@@ -110,7 +114,7 @@ export function BodyTabs({
                 ? t('ready')
                 : ''}
       </p>
-      <TabsContent value="preview" className="rounded-lg border md:px-4">
+      <TabsContent value="preview" className="md:px-4">
         {state === 'missing' ? (
           <p className="px-4 py-6 text-center type-small text-muted-foreground md:px-0">
             {t('missing')}

@@ -42,15 +42,19 @@ import { RelatedPicker } from './related-picker'
 const BARE =
   'h-auto rounded-none border-0 bg-transparent p-0 text-foreground shadow-none focus-visible:ring-0 aria-invalid:ring-0 dark:bg-transparent'
 
-/** A format: the gray pill of the system when chosen, plain otherwise. */
+/**
+ * A format, as Reddit's tabs: its name, a line under the chosen one (SF-02), on the row's border
+ * (shadcn's sits 5px below it).
+ */
 const FORMAT =
-  'h-8 flex-none gap-1.5 rounded-full border-0 px-3 type-meta font-bold text-muted-foreground hover:bg-muted data-active:bg-muted data-active:text-foreground data-active:shadow-none dark:data-active:bg-muted [&_svg]:size-3.5'
+  'h-10 flex-none gap-1.5 rounded-none border-0 px-3 type-action text-muted-foreground hover:text-foreground data-active:text-foreground group-data-horizontal/tabs:after:-bottom-px [&_svg]:size-4'
+
+/** A field in its own box, as Reddit's title (SF-03, SF-05): the border darkens while writing. */
+const FIELD_BOX =
+  'rounded-2xl border border-input bg-background px-4 text-base shadow-none transition-colors duration-150 focus-visible:border-foreground/60 focus-visible:ring-0 aria-invalid:border-destructive aria-invalid:ring-0 md:text-base dark:bg-transparent dark:aria-invalid:ring-0'
 
 const PILL =
   'inline-flex h-11 tap items-center justify-center rounded-full px-3 type-action font-bold outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-50 aria-disabled:active:scale-100 sm:px-4 md:h-9'
-
-/** The title's counter shows near the limit (PC-08). */
-const COUNTER_FROM = 250
 
 const ERROR_NAMES = [
   'community',
@@ -378,7 +382,7 @@ export function PostEditor({
         className="flex flex-1 flex-col gap-0"
       >
         {/* The parts arrive one after the other, quickly (specs/home-motion: stagger). */}
-        <div className="flex stagger flex-col gap-3">
+        <div className="flex stagger flex-col gap-4">
           <Field
             data-invalid={invalid('communityId') || undefined}
             // In the box, as tall as the avatar beside it (43px): the title starts below both.
@@ -430,6 +434,26 @@ export function PostEditor({
             />
           </Field>
 
+          {/* The formats on top, as Reddit's (SF-02). Icons and names: room enough here. */}
+          <TabsList
+            variant="line"
+            aria-label={t('type.label')}
+            className="h-auto w-full justify-start gap-1 border-b p-0"
+          >
+            <TabsTrigger value="TEXT" className={FORMAT}>
+              <AlignLeftIcon aria-hidden />
+              {t('type.text')}
+            </TabsTrigger>
+            <TabsTrigger value="LINK" className={FORMAT}>
+              <LinkIcon aria-hidden />
+              {t('type.link')}
+            </TabsTrigger>
+            <TabsTrigger value="IMAGE" className={FORMAT}>
+              <ImageIcon aria-hidden />
+              {t('type.image')}
+            </TabsTrigger>
+          </TabsList>
+
           <Field data-invalid={invalid('title') || undefined} className="gap-1">
             <FieldLabel htmlFor={`${ids}-title`} className="sr-only">
               {t('fields.title')}
@@ -440,14 +464,24 @@ export function PostEditor({
               {...register('title')}
               onFocus={(event) => (emojiTarget.current = event.currentTarget)}
               aria-invalid={invalid('title') || undefined}
+              aria-required
               aria-describedby={`${ids}-title-count ${ids}-title-error`}
-              className={cn(BARE, 'text-[1.0625rem] leading-[1.3] font-bold md:text-[1.0625rem]')}
+              // Its own box, as Reddit's: where the title goes is plain at a glance (SF-03).
+              className={cn(FIELD_BOX, 'h-14 font-semibold')}
             />
-            <FieldError
-              id={`${ids}-title-error`}
-              errors={fieldError('title')}
-              className="type-meta"
-            />
+            <div className="flex justify-between gap-2 px-1 type-meta">
+              <FieldError id={`${ids}-title-error`} errors={fieldError('title')} />
+              {/* Always, as Reddit's: how much room is left (SF-03). */}
+              <span
+                id={`${ids}-title-count`}
+                className={cn(
+                  'ml-auto tabular-nums',
+                  title.length > TITLE_MAX ? 'font-bold text-destructive' : 'text-muted-foreground',
+                )}
+              >
+                {t('fields.counter', { count: title.length, max: TITLE_MAX })}
+              </span>
+            </div>
           </Field>
 
           {/* Title and body stay outside the panels, mounted across formats: a field remounted
@@ -458,8 +492,11 @@ export function PostEditor({
               <FieldLabel htmlFor={`${ids}-url`} className="sr-only">
                 {t('fields.url')}
               </FieldLabel>
-              <div className="flex items-center gap-2 rounded-lg bg-surface px-3 py-2">
-                <LinkIcon aria-hidden className="size-4 shrink-0 text-muted-foreground" />
+              <div className="relative">
+                <LinkIcon
+                  aria-hidden
+                  className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground"
+                />
                 <Input
                   id={`${ids}-url`}
                   type="url"
@@ -469,7 +506,7 @@ export function PostEditor({
                   {...register('url')}
                   aria-invalid={invalid('url') || undefined}
                   aria-describedby={`${ids}-url-error`}
-                  className={BARE}
+                  className={cn(FIELD_BOX, 'h-12 pl-11')}
                 />
               </div>
               <FieldError
@@ -517,7 +554,7 @@ export function PostEditor({
                   {...register('imageAlt')}
                   aria-invalid={invalid('imageAlt') || undefined}
                   aria-describedby={`${ids}-image-alt-error`}
-                  className="h-11 rounded-lg bg-surface px-3 text-base md:h-10 md:text-sm"
+                  className={cn(FIELD_BOX, 'h-12')}
                 />
                 <FieldError
                   id={`${ids}-image-alt-error`}
@@ -536,7 +573,14 @@ export function PostEditor({
             <BodyTabs
               preview={preview}
               draft={draftForPreview}
-              toolbar={<FormatToolbar fieldRef={bodyRef} />}
+              // The format toolbar and the emojis, inside the box on top (SF-04). Emojis go into
+              // the title or the body, the last one used, at its caret (EP-01).
+              toolbar={
+                <div className="flex items-center gap-0.5">
+                  <FormatToolbar fieldRef={bodyRef} />
+                  <EmojiButton fieldRef={emojiTarget} />
+                </div>
+              }
             >
               {/* $ # @ suggest assets, communities and people (specs/mention-autocomplete). */}
               <div className="relative">
@@ -559,7 +603,7 @@ export function PostEditor({
                   }}
                   aria-invalid={invalid('body') || undefined}
                   aria-describedby={`${ids}-body-help ${ids}-body-error`}
-                  className={cn(BARE, 'min-h-24 resize-none leading-[1.55]')}
+                  className={cn(BARE, 'min-h-36 resize-none text-base leading-[1.55] md:text-base')}
                 />
                 <MentionField fieldRef={bodyRef} search={searchMentions} />
               </div>
@@ -569,13 +613,9 @@ export function PostEditor({
               errors={fieldError('body')}
               className="type-meta"
             />
-            <div className="flex justify-between gap-2 type-meta text-muted-foreground">
-              <span id={`${ids}-body-help`}>{t('fields.bodyHelp')}</span>
-              <span id={`${ids}-title-count`} className="font-bold tabular-nums">
-                {title.length >= COUNTER_FROM &&
-                  t('fields.counter', { count: title.length, max: TITLE_MAX })}
-              </span>
-            </div>
+            <p id={`${ids}-body-help`} className="px-1 type-meta text-muted-foreground">
+              {t('fields.bodyHelp')}
+            </p>
           </Field>
         </div>
 
@@ -585,38 +625,18 @@ export function PostEditor({
           </p>
         )}
 
-        {/* Formats on the left, actions on the right. */}
-        {/* Tighter in phones: formats, emoji, Cancel and Publish fit 360px in every language. */}
-        {/* In phones it sticks over the bottom bar while a long post is written (specs/submit-tools
-            ST-07), edge to edge; from md, in its place. */}
+        {/* Only Cancel and Publish, on the right (SF-06). In phones it sticks over the bottom bar
+            while a long post is written (specs/submit-tools ST-07), edge to edge; from md, in its
+            place. */}
         <div
           data-sticky-actions
-          className="sticky bottom-[calc(3.5625rem+env(safe-area-inset-bottom))] z-10 -mx-4 mt-3 flex items-center gap-1 border-t bg-background px-4 py-3 sm:gap-2 md:static md:mx-0 md:px-0 md:pb-0"
+          className="sticky bottom-[calc(3.5625rem+env(safe-area-inset-bottom))] z-10 -mx-4 mt-4 flex items-center justify-end border-t bg-background px-4 py-3 md:static md:mx-0 md:border-t-0 md:px-0 md:pt-0 md:pb-0"
         >
-          <TabsList aria-label={t('type.label')} className="h-auto gap-0.5 bg-transparent p-0">
-            <TabsTrigger value="TEXT" className={FORMAT}>
-              <AlignLeftIcon aria-hidden />
-              {/* Icons only at 360px: the three names and Publish do not fit (PI-12). */}
-              <span className="sr-only sm:not-sr-only">{t('type.text')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="LINK" className={FORMAT}>
-              <LinkIcon aria-hidden />
-              {/* Icons only at 360px: the three names and Publish do not fit (PI-12). */}
-              <span className="sr-only sm:not-sr-only">{t('type.link')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="IMAGE" className={FORMAT}>
-              <ImageIcon aria-hidden />
-              {/* Icons only at 360px: the three names and Publish do not fit (PI-12). */}
-              <span className="sr-only sm:not-sr-only">{t('type.image')}</span>
-            </TabsTrigger>
-          </TabsList>
-          {/* Emojis go into the title or the body, the last one used, at its caret (EP-01). */}
-          <EmojiButton fieldRef={emojiTarget} />
-          <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onCancel}
-              className={cn(PILL, 'text-muted-foreground hover:bg-muted hover:text-foreground')}
+              className={cn(PILL, 'bg-muted text-foreground hover:bg-muted-hover')}
             >
               {t('cancel')}
             </button>

@@ -548,7 +548,7 @@
       "bodyHelp": "Supports Markdown",
       "counter": "{count}/{max}",
       "urlPlaceholder": "https://",
-      "titlePlaceholder": "Title",
+      "titlePlaceholder": "Title *",
       "bodyPlaceholder": "Share your analysis, idea or question...",
       "imageAlt": "Image description (optional)",
       "imageAltPlaceholder": "What the image shows, for those who cannot see it"
