@@ -157,6 +157,25 @@ export const userCommentSchema = z.object({
 })
 
 export type RawUserComment = z.infer<typeof userCommentSchema>
+
+/**
+ * A post saved to finish later (P-022, proposal, specs/drafts-tags): what the editor had, in the
+ * person's account. Texts are "" when empty; up to 20 per person.
+ */
+export const draftSchema = z.object({
+  id: z.uuid(),
+  type: z.enum(['TEXT', 'LINK', 'IMAGE']),
+  title: z.string(),
+  body: z.string(),
+  url: z.string(),
+  imageUrl: z.string().nullable(),
+  imageAlt: z.string(),
+  tag: z.string().nullable(),
+  community: communitySummarySchema.nullable(),
+  updatedAt: z.iso.datetime(),
+})
+
+export type RawDraft = z.infer<typeof draftSchema>
 export type RawPost = z.infer<typeof postSchema>
 export type RawPoll = z.infer<typeof pollSchema>
 export type RawEntity = z.infer<typeof entitySchema>

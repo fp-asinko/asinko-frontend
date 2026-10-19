@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { useFormatter, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ShareButton } from '@/components/molecules/share-button'
+import { TagPill } from '@/components/molecules/tag-pill'
 import { Link } from '@/i18n/navigation'
 import { postImageRoute } from '@/lib/share-image/share-metadata'
 import { cn } from '@/lib/utils'
@@ -105,6 +106,9 @@ export function PostCard({
         </div>
       </div>
 
+      {/* Its tag, before the title as Reddit's flair (specs/drafts-tags DT-10): outside the
+          heading, so the article keeps the title as its name. */}
+      {!post.deleted && post.tag && <TagPill label={post.tag} className="mb-1.5" />}
       <Title
         id={`post-${post.id}`}
         // Focus target when the join button disappears (CF-14); not in the tab order.

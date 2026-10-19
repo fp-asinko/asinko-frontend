@@ -58,6 +58,8 @@ export type PostItem = {
   publishedAt: string
   edited: boolean
   deleted: boolean
+  /** Its tag, beside the title (P-023, specs/drafts-tags DT-10); null without one. */
+  tag: string | null
 }
 
 export type PollOption = {

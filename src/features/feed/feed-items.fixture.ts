@@ -35,6 +35,7 @@ export function postItem(overrides: Partial<PostItem> = {}): PostItem {
     publishedAt: new Date(Date.now() - 2 * 3600_000).toISOString(),
     edited: false,
     deleted: false,
+    tag: null,
     ...overrides,
   }
 }

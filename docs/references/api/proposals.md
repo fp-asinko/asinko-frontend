@@ -22,12 +22,13 @@
 
 1. **P-019 a P-021: el perfil, como LinkedIn.** Titular, ciudad, links, banner y la subida de foto y banner. El front ya lo tiene hecho contra mocks: sin esto, nada de eso se guarda con el backend real.
 2. **Comunidades de los activos del catálogo.** Solo 5 de los 100 tienen la suya (BTC, ETH, AAPL, NVDA, VOO). `GET /communities/TSLA` (y SPY, MSFT, EURUSD, SQM-B, BRK.B, XAU/USD…) da `404`, y `GET /assets/{symbol}` trae `linkedCommunity: null`. **Pedido:** crear la comunidad de cada activo (slug = símbolo). Mientras tanto, el front muestra la página del activo con su precio, sin feed ni Unirse, y no se puede publicar ni etiquetar en ellos.
-3. **P-018: comunidades y activos relacionados de un post.** Hoy viajan como menciones al final del cuerpo.
-4. **P-017: "lo seguís" en las listas de seguidores, seguidos y miembros.** Sin respuesta desde el 2026-10-09.
-5. **P-005: `sort=hot|top` del feed.** Fórmulas en definición.
-6. **`best` de los comentarios (P-014).** Hoy es cronológico; el mock usa la fórmula propuesta (abajo). El front ya manda `sort=best`.
-7. **`GET /assets` sin `?q=` devuelve 20, sin `nextCursor`.** No bloquea (el front busca con `?q=`), pero hace falta para listar el catálogo.
-8. **Imágenes huérfanas.** Una imagen subida con la URL firmada y nunca publicada queda en Storage, y no hay cómo borrarla. ¿Se limpian del lado del backend? Aplica también a la foto y el banner (P-021).
+3. **P-022 y P-023: borradores en la cuenta y marcas por comunidad**, como Reddit (`specs/drafts-tags`). Hechos contra mocks.
+4. **P-018: comunidades y activos relacionados de un post.** Hoy viajan como menciones al final del cuerpo.
+5. **P-017: "lo seguís" en las listas de seguidores, seguidos y miembros.** Sin respuesta desde el 2026-10-09.
+6. **P-005: `sort=hot|top` del feed.** Fórmulas en definición.
+7. **`best` de los comentarios (P-014).** Hoy es cronológico; el mock usa la fórmula propuesta (abajo). El front ya manda `sort=best`.
+8. **`GET /assets` sin `?q=` devuelve 20, sin `nextCursor`.** No bloquea (el front busca con `?q=`), pero hace falta para listar el catálogo.
+9. **Imágenes huérfanas.** Una imagen subida con la URL firmada y nunca publicada queda en Storage, y no hay cómo borrarla. ¿Se limpian del lado del backend? Aplica también a la foto y el banner (P-021).
 
 ### P-019: Titular, ciudad y links del perfil
 
@@ -66,6 +67,51 @@
 **Motivo:** `PATCH /users` acepta `avatarUrl`, pero no hay dónde subir la imagen. El front ya recorta y prepara la imagen (WebP, foto de 400×400 y banner de 1500×375).
 
 **Cambio:** el mismo flujo de URL firmada que `POST /uploads/post-image` (P-013): `{ userId, contentType, size }` → `{ uploadUrl, imageUrl, path }`, JPEG, PNG, WebP o GIF (nunca SVG), hasta 5 MB. El `imageUrl` es el que se manda en `PATCH /users` (`avatarUrl` o `bannerUrl`).
+
+### P-022: Borradores en la cuenta
+
+**Estado:** propuesta (2026-10-19), mockeada.
+
+**Endpoints:** `GET /api/v1/users/{userId}/drafts`, `POST /api/v1/drafts`, `PATCH /api/v1/drafts/{draftId}` y `DELETE /api/v1/drafts/{draftId}?userId=`. Todos con sesión: el `userId` (cuerpo o query) se compara con ella, `403 USER_MISMATCH`.
+
+**Motivo:** "Guardar borrador" y "Borradores" de la página de crear post, como Reddit (`specs/drafts-tags`): guardar un post a medias y terminarlo después, desde cualquier dispositivo. El borrador automático que el front guarda en el navegador sigue como red de seguridad, pero no viaja entre dispositivos.
+
+**Cambio:**
+
+```jsonc
+// Draft
+{
+  "id": "uuid",
+  "type": "TEXT | LINK | IMAGE",
+  "title": "string",     // "" si no hay
+  "body": "string",
+  "url": "string",
+  "imageUrl": "string | null",
+  "imageAlt": "string",
+  "tag": "string | null",
+  "community": { /* CommunitySummary */ } | null,
+  "updatedAt": "ISO 8601"
+}
+```
+
+- `GET /users/{userId}/drafts` → `{ items: Draft[], nextCursor: null }`, a lo sumo 20, del más reciente (`updatedAt`) al más viejo.
+- `POST /drafts` `{ userId, communityId?, type, title?, body?, url?, imageUrl?, imageAlt?, tag? }` → `201 Draft`. Con 20 guardados, `409 DRAFT_LIMIT`. Un borrador no exige título ni cuerpo.
+- `PATCH /drafts/{draftId}` con los mismos campos → `200 Draft` (lo pasa primero en la lista). `404` si no existe o no es del usuario.
+- `DELETE /drafts/{draftId}?userId=` → `204`.
+- Publicar un borrador es `POST /posts` y después `DELETE /drafts/{id}`, que hace el servidor del front. Si el backend prefiere `POST /posts` con `draftId` y borrarlo él, mejor: es un cambio de una línea en el front.
+
+### P-023: Marcas por comunidad
+
+**Estado:** propuesta (2026-10-19), mockeada.
+
+**Endpoint:** el recurso `Community` (`GET /communities`, `GET /communities/{slug}`) y `POST /posts`.
+
+**Motivo:** "Añadir marca" al crear un post, como el flair de Reddit (`specs/drafts-tags`): cada comunidad tiene sus marcas ("Análisis", "Noticia", "Pregunta"…) y el post lleva una, opcional, que se ve junto al título. El `Post` ya tiene `tag` y `POST /posts` lo acepta, pero no hay de dónde sacar las marcas de cada comunidad.
+
+**Cambio:**
+
+- `"tags": string[]` en el `Community`: hasta 20, de 1 a 24 caracteres; `[]` si no tiene. Las definen sus moderadores (más adelante, con `PATCH /communities`); mientras tanto, del seed.
+- `POST /posts` con un `tag` que no está en las de su comunidad: `422 INVALID_TAG`.
 
 ### P-018: Comunidades y activos relacionados de un post
 

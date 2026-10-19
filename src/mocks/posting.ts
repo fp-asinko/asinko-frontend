@@ -49,6 +49,10 @@ export function createPost(body: unknown): MockResponse {
   const imageAlt =
     typeof input.imageAlt === 'string' && input.imageAlt.trim() ? input.imageAlt.trim() : null
   if (imageAlt && imageAlt.length > 300) return error(422, 'VALIDATION_ERROR')
+  // P-023 (proposal): a tag only of its community's.
+  if (input.tag !== undefined && !(community.tags ?? []).includes(input.tag as string)) {
+    return error(422, 'INVALID_TAG')
+  }
 
   created += 1
   const now = new Date().toISOString()
@@ -62,7 +66,7 @@ export function createPost(body: unknown): MockResponse {
     url: type === 'LINK' && typeof input.url === 'string' ? input.url : null,
     imageUrl: type === 'IMAGE' ? MOCK_POST_IMAGE : null,
     imageAlt: type === 'IMAGE' ? imageAlt : null,
-    tag: null,
+    tag: typeof input.tag === 'string' ? input.tag : null,
     creator: summary(DEMO_USER.username),
     creatorType: 'USER',
     score: 0,

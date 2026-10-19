@@ -7,8 +7,10 @@ const deps = vi.hoisted(() => ({
   getViewer: vi.fn(),
   createPostAs: vi.fn(),
   listCommunityOptions: vi.fn(),
+  deleteDraftAs: vi.fn(),
 }))
 vi.mock('@/lib/session', () => ({ getViewer: deps.getViewer }))
+vi.mock('../lib/drafts-api', () => ({ deleteDraftAs: deps.deleteDraftAs }))
 vi.mock('../lib/composer-api', () => ({
   createPostAs: deps.createPostAs,
   listCommunityOptions: deps.listCommunityOptions,
@@ -57,6 +59,23 @@ describe('createPost (specs/post-create-detail PC-09 to PC-11)', () => {
       body: 'Body',
     })
     expect(result).toEqual({ ok: true, data: { id: 'new', title: 'Title' } })
+  })
+
+  it('deletes the draft it was published from, and only after publishing (specs/drafts-tags DT-03)', async () => {
+    const draft = '00000000-0000-4000-8000-000000000901'
+    deps.createPostAs.mockResolvedValue(failure('RATE_LIMITED'))
+    await createPost(valid, draft)
+    expect(deps.deleteDraftAs).not.toHaveBeenCalled()
+
+    deps.createPostAs.mockResolvedValue({ ok: true, data: { id: 'new', title: 'Title' } })
+    // A failed delete leaves the post published.
+    deps.deleteDraftAs.mockResolvedValue(failure('HTTP'))
+    expect(await createPost(valid, draft)).toMatchObject({ ok: true })
+    expect(deps.deleteDraftAs).toHaveBeenCalledWith(DEMO_USER.id, draft)
+
+    deps.deleteDraftAs.mockClear()
+    await createPost(valid, '../x')
+    expect(deps.deleteDraftAs).not.toHaveBeenCalled()
   })
 
   it('explains the backend refusals in the editor words', async () => {

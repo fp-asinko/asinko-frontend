@@ -569,6 +569,7 @@
       "url": "Digite um link que comece com http:// ou https://",
       "ownProfileOnly": "Você só pode publicar no seu próprio perfil",
       "invalidCommunity": "Você não pode publicar nessa comunidade",
+      "invalidTag": "Esse marcador não é desta comunidade. Escolha outro.",
       "invalid": "Revise os campos e tente de novo",
       "general": "Não foi possível publicar seu post. Tente de novo.",
       "imageType": "Apenas imagens JPEG, PNG ou WebP",
@@ -598,6 +599,47 @@
     "related": {
       "label": "Relacionados",
       "remove": "Remover {handle}"
+    },
+    "tag": {
+      "add": "Adicionar marcador",
+      "remove": "Remover o marcador {tag}",
+      "none": "Esta comunidade não tem marcadores",
+      "noCommunity": "Escolha uma comunidade primeiro"
+    },
+    "drafts": {
+      "open": "Rascunhos",
+      "title": "Rascunhos",
+      "count": "{count, number}/{max, number}",
+      "countLabel": "{count, plural, one {# rascunho} other {# rascunhos}} de {max, number}",
+      "close": "Fechar",
+      "save": "Salvar rascunho",
+      "saving": "Salvando…",
+      "saved": "Rascunho salvo",
+      "savedShort": "Salvo",
+      "loading": "Carregando seus rascunhos…",
+      "failed": "Não foi possível carregar seus rascunhos",
+      "retry": "Tentar de novo",
+      "emptyTitle": "Ainda não há rascunhos",
+      "emptyBody": "Salve rascunhos para publicá-los quando quiser.",
+      "untitled": "Sem título",
+      "noCommunity": "Sem comunidade",
+      "yourProfile": "Seu perfil",
+      "meta": "{where} · {when}",
+      "delete": "Excluir o rascunho {title}",
+      "deleteTitle": "Excluir este rascunho?",
+      "deleteBody": "Não dá para recuperá-lo.",
+      "deleteConfirm": "Excluir",
+      "cancel": "Cancelar",
+      "replaceTitle": "Substituir o que você escreveu?",
+      "replaceBody": "O rascunho ocupa o lugar do que está no formulário agora.",
+      "replaceConfirm": "Substituir",
+      "errors": {
+        "limit": "Você tem {max, number} rascunhos, o máximo. Exclua um para salvar este.",
+        "gone": "Esse rascunho não existe mais. Salve de novo para tê-lo como um novo.",
+        "invalid": "Não foi possível salvar o rascunho. Revise os campos.",
+        "general": "Não foi possível salvar o rascunho. Tente de novo.",
+        "delete": "Não foi possível excluir o rascunho. Tente de novo."
+      }
     },
     "format": {
       "label": "Formato do texto",

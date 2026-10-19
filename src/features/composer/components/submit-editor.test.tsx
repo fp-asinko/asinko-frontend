@@ -13,6 +13,11 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 vi.mock('@/lib/mentions/search-mentions.action', () => ({ searchMentions: vi.fn() }))
 vi.mock('@/components/molecules/mention-assist', () => ({ MentionField: () => null }))
 vi.mock('../actions/create-post.action', () => ({ createPost: actions.createPost }))
+vi.mock('../actions/drafts.action', () => ({
+  saveDraft: vi.fn(),
+  listDrafts: vi.fn(),
+  deleteDraft: vi.fn(),
+}))
 vi.mock('../actions/upload-post-image.action', () => ({ uploadPostImageAction: vi.fn() }))
 vi.mock('../actions/search-communities.action', () => ({
   searchCommunities: actions.searchCommunities,

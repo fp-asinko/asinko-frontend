@@ -1,6 +1,12 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
-import { createPostSchema, IMAGE_ALT_MAX, RELATED_MAX, TITLE_MAX } from './create-post.schema'
+import {
+  createPostSchema,
+  IMAGE_ALT_MAX,
+  RELATED_MAX,
+  TAG_MAX,
+  TITLE_MAX,
+} from './create-post.schema'
 
 const COMMUNITY = '00000000-0000-4000-8000-000000001001'
 const valid = {
@@ -117,5 +123,16 @@ describe('createPostSchema related (specs/related-tags RT-02, RT-04)', () => {
     expect(errors({ ...valid, related: ['@maria'] })).toHaveProperty('related')
     expect(errors({ ...valid, related: ['#macro x'] })).toHaveProperty('related')
     expect(errors({ ...valid, related: ['#macro', '#macro'] })).toHaveProperty('related')
+  })
+})
+
+describe('createPostSchema tag (specs/drafts-tags DT-09)', () => {
+  it('sends one tag when chosen, and none when empty', () => {
+    expect(createPostSchema.parse({ ...valid, tag: ' News ' })).toMatchObject({ tag: 'News' })
+    expect(createPostSchema.parse({ ...valid, tag: '' })).not.toHaveProperty('tag')
+    expect(createPostSchema.parse(valid)).not.toHaveProperty('tag')
+    expect(createPostSchema.safeParse({ ...valid, tag: 'x'.repeat(TAG_MAX + 1) }).success).toBe(
+      false,
+    )
   })
 })

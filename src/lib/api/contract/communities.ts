@@ -37,6 +37,11 @@ export const communitySchema = z.object({
    * newest; null for a community with no posts. Optional: an older backend does not send it.
    */
   topPost: z.object({ id: z.string(), title: z.string() }).nullable().optional(),
+  /**
+   * P-023 (proposal, specs/drafts-tags): the tags a post of this community can carry, one each.
+   * Optional until the backend sends it: without it, none.
+   */
+  tags: z.array(z.string()).optional(),
 })
 
 export type RawCommunity = z.infer<typeof communitySchema>

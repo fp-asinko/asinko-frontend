@@ -331,7 +331,7 @@ Pedido del usuario, con capturas de Reddit.
   - En mobile sigue a la derecha (`ml-auto`).
   - Desde `md` se suma al grupo de la izquierda, como Reddit: votos · comentarios · compartir.
   - Sigue siendo "Próximamente".
-- **Sin tags:** se saca la etiqueta del post ("Análisis", "Discusión", "On-chain"…). El backend sigue mandando `tag`; el mapper ya no lo pasa a la UI y `PostItem` no lo tiene.
+- **Sin tags:** se saca la etiqueta del post ("Análisis", "Discusión", "On-chain"…). El backend sigue mandando `tag`; el mapper ya no lo pasa a la UI y `PostItem` no lo tiene. **Revertido el 2026-10-19** (`specs/drafts-tags` DT-10): el PO pidió marcas por comunidad, como el flair de Reddit, y la tarjeta vuelve a mostrar `tag` en una píldora antes del título.
 - Las encuestas no cambian: su fila solo tiene comentarios y el resumen de votos.
 
 ## 15. Revisión 4 — Votos, tu avatar y nota (2026-10-05)

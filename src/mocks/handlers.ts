@@ -12,6 +12,7 @@ import {
   postImageUploadSchema,
   profileImageUploadSchema,
   userCommentSchema,
+  draftSchema,
   postSchema,
   profileSchema,
   searchResultSchema,
@@ -35,6 +36,7 @@ import { followersOf, followingOf, listItem } from './fixtures/follows'
 import { membersOf } from './fixtures/members'
 import { thesesBy } from './fixtures/theses'
 import { userComments, userContent } from './user-activity'
+import { createDraft, deleteDraft, listDrafts, SEED_DRAFT_ID, updateDraft } from './drafts'
 import { PROPOSED_USER_FIELDS, updateUser } from './profile-edit'
 import { signProfileImageUpload } from './profile-image'
 import { paginate } from './paginate'
@@ -172,6 +174,54 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     schema: paginatedSchema(userCommentSchema),
     example: { ...noRequest, params: { userId: PROFILES[1]!.id } },
     handler: ({ params, query }) => userComments(params.userId ?? '', query.cursor),
+  },
+  // P-022 (proposal, specs/drafts-tags): a person's drafts.
+  {
+    method: 'GET',
+    path: '/api/v1/users/:userId/drafts',
+    kind: 'proposal',
+    implemented: false,
+    schema: paginatedSchema(draftSchema),
+    example: { ...noRequest, params: { userId: DEMO_USER.id } },
+    handler: ({ params }) => listDrafts(params.userId ?? ''),
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/drafts',
+    kind: 'proposal',
+    implemented: false,
+    schema: draftSchema,
+    example: {
+      ...noRequest,
+      body: { userId: DEMO_USER.id, type: 'TEXT', title: 'Half a thought' },
+    },
+    handler: ({ body }) => createDraft(body),
+  },
+  {
+    method: 'PATCH',
+    path: '/api/v1/drafts/:draftId',
+    kind: 'proposal',
+    implemented: false,
+    schema: draftSchema,
+    example: {
+      ...noRequest,
+      params: { draftId: SEED_DRAFT_ID },
+      body: { userId: DEMO_USER.id, title: 'x' },
+    },
+    handler: ({ params, body }) => updateDraft(params.draftId ?? '', body),
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/drafts/:draftId',
+    kind: 'proposal',
+    implemented: false,
+    schema: noContentSchema,
+    example: {
+      ...noRequest,
+      params: { draftId: SEED_DRAFT_ID },
+      query: { userId: DEMO_USER.id },
+    },
+    handler: ({ params, query }) => deleteDraft(params.draftId ?? '', query.userId),
   },
   // E01: editing your own profile (specs/profile-edit), for the demo viewer.
   {

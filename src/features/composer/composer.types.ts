@@ -12,6 +12,8 @@ export type CommunityOption = {
   name: string
   /** Your own personal channel: shown first, as "Your profile". */
   own: boolean
+  /** The tags a post of it can carry (P-023, specs/drafts-tags); none when absent. */
+  tags?: string[]
 }
 
 /** What the picker lists (specs/picker-filters PF-01): everything, only groups or only assets. */
@@ -37,4 +39,19 @@ export type SubmitCommunity = {
   /** When a person created it; null for the system's. */
   createdAt: string | null
   rules: string | null
+}
+
+/** A post saved in the account to finish later (P-022, specs/drafts-tags): what the editor had. */
+export type SavedDraft = {
+  id: string
+  type: 'TEXT' | 'LINK' | 'IMAGE'
+  title: string
+  body: string
+  url: string
+  imageUrl: string | null
+  imageAlt: string
+  tag: string
+  /** Where it goes, with its tags; null when not chosen yet, or no longer there. */
+  community: CommunityOption | null
+  updatedAt: string
 }

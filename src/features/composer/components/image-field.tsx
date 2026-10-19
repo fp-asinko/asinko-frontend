@@ -1,13 +1,15 @@
 'use client'
 
 import { ImageIcon, LoaderCircleIcon, XIcon } from 'lucide-react'
+import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type RefObject } from 'react'
 import { IMAGE_TYPES, prepareImage } from '@/lib/prepare-image'
 import { cn } from '@/lib/utils'
 import { uploadPostImageAction } from '../actions/upload-post-image.action'
 
-type Preview = { src: string; width: number; height: number }
+/** A prepared file (a blob: URL), or an image already uploaded (a draft's, remote: true, its size unknown). */
+type Preview = { src: string; width: number; height: number; remote?: boolean }
 
 type State =
   | { status: 'idle' }
@@ -51,8 +53,11 @@ export function ImageField({
   takeRef,
   invalid,
   describedBy,
+  initialUrl = null,
 }: {
   id: string
+  /** An image already uploaded: a draft's (specs/drafts-tags DT-03), allowed by the caller. */
+  initialUrl?: string | null
   onChange: (imageUrl: string) => void
   onBusy: (busy: boolean) => void
   onUnauthenticated: () => void
@@ -69,7 +74,11 @@ export function ImageField({
   const retryButton = useRef<HTMLButtonElement>(null)
   const pendingFocus = useRef<FocusTarget | null>(null)
   const errorId = useId()
-  const [state, setState] = useState<State>({ status: 'idle' })
+  const [state, setState] = useState<State>(() =>
+    initialUrl
+      ? { status: 'ready', preview: { src: initialUrl, width: 0, height: 0, remote: true } }
+      : { status: 'idle' },
+  )
   const [dragging, setDragging] = useState(false)
   // Each file taken is an attempt: only the last one counts.
   const attempt = useRef(0)
@@ -167,7 +176,10 @@ export function ImageField({
 
   // The preview's object URL lives as long as it shows.
   const preview = state.status === 'uploading' || state.status === 'ready' ? state.preview : null
-  useEffect(() => () => void (preview && URL.revokeObjectURL(preview.src)), [preview])
+  useEffect(
+    () => () => void (preview && !preview.remote && URL.revokeObjectURL(preview.src)),
+    [preview],
+  )
 
   const busy = state.status === 'preparing' || state.status === 'uploading'
   const chooseDescribedBy = [describedBy, state.status === 'error' ? errorId : null]
@@ -195,16 +207,32 @@ export function ImageField({
       </p>
       {preview ? (
         <div className="relative overflow-hidden rounded-lg border bg-surface" aria-busy={busy}>
-          {/* The prepared image itself (a blob: URL): no request, and it is exactly what goes. Its
-              size reserves the room before it decodes. */}
-          {/* eslint-disable-next-line @next/next/no-img-element -- a local blob: preview, not a remote image for next/image */}
-          <img
-            src={preview.src}
-            width={preview.width}
-            height={preview.height}
-            alt={t('image.alt')}
-            className="mx-auto aspect-auto max-h-80 w-auto max-w-full animate-fade-in object-contain"
-          />
+          {preview.remote ? (
+            // A draft's, already uploaded: through next/image, as the feed shows it (security.md § 6).
+            // Its size is not known: a box of the preview's tallest, the image contained in it.
+            <div className="relative h-80">
+              <Image
+                src={preview.src}
+                fill
+                sizes="(min-width: 768px) 640px, 100vw"
+                alt={t('image.alt')}
+                className="animate-fade-in object-contain"
+              />
+            </div>
+          ) : (
+            <>
+              {/* The prepared image itself (a blob: URL): no request, and it is exactly what goes. Its
+                size reserves the room before it decodes. */}
+              {/* eslint-disable-next-line @next/next/no-img-element -- a local blob: preview, not a remote image for next/image */}
+              <img
+                src={preview.src}
+                width={preview.width}
+                height={preview.height}
+                alt={t('image.alt')}
+                className="mx-auto aspect-auto max-h-80 w-auto max-w-full animate-fade-in object-contain"
+              />
+            </>
+          )}
           {state.status === 'uploading' ? (
             <div
               aria-hidden

@@ -29,8 +29,8 @@ describe('the post draft (specs/submit-page SU-12)', () => {
     expect(KEY).toBe('asinko:post-draft:u1')
     writeDraft(KEY, DRAFT)
     const { result } = renderHook(() => useStoredDraft(KEY))
-    // A draft from before related ones existed reads with none (specs/related-tags RT-06).
-    expect(result.current).toEqual({ ...DRAFT, related: [] })
+    // A draft from before related ones existed reads with none, and without a tag (specs/related-tags RT-06).
+    expect(result.current).toEqual({ ...DRAFT, related: [], tag: '' })
     // What is saved while writing is not offered back on the same visit.
     writeDraft(KEY, { ...DRAFT, title: 'Newer' })
     expect(renderHook(() => useStoredDraft(KEY)).result.current?.title).toBe('A title')

@@ -87,6 +87,11 @@ describe('mock handlers behave like the contract', () => {
       [
         '/api/v1/users/:userId',
         '/api/v1/uploads/avatar',
+        // P-022 (specs/drafts-tags): drafts.
+        '/api/v1/users/:userId/drafts',
+        '/api/v1/drafts',
+        '/api/v1/drafts/:draftId',
+        '/api/v1/drafts/:draftId',
         '/api/v1/uploads/profile-banner',
       ].toSorted(),
     )

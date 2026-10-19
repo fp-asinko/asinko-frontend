@@ -17,6 +17,7 @@ const draftSchema = z.object({
       handle: z.string(),
       name: z.string(),
       own: z.boolean(),
+      tags: z.array(z.string()).optional(),
     })
     .nullable(),
   // Checked as on Publish: a broken one would make it fail without saying why.
@@ -25,6 +26,8 @@ const draftSchema = z.object({
   title: z.string(),
   body: z.string(),
   url: z.string(),
+  /** Its tag (specs/drafts-tags); older drafts have none. */
+  tag: z.string().default(''),
   savedAt: z.number(),
 })
 

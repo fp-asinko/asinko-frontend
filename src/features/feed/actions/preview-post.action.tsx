@@ -22,6 +22,7 @@ const previewSchema = z.object({
   type: z.enum(['TEXT', 'LINK', 'IMAGE']),
   url: z.string().trim().max(2048).optional(),
   imageUrl: z.string().max(2048).optional(),
+  tag: z.string().trim().max(24).optional(),
   imageAlt: z.string().trim().max(300).optional(),
   community: z
     .object({
@@ -58,7 +59,7 @@ export async function previewPost(raw: unknown): Promise<ActionResult<{ card: Re
   const viewer = await getViewer()
   if (!viewer) return { ok: false, error: 'api.errors.UNAUTHENTICATED' }
 
-  const { title, body, type, url, imageUrl, imageAlt, community, locale } = parsed.data
+  const { title, body, type, url, imageUrl, imageAlt, tag, community, locale } = parsed.data
   setRequestLocale(locale)
   const kind = community ? (KIND[community.handle[0]!] ?? 'group') : null
   const image = type === 'IMAGE' && imageUrl ? allowedImageUrl(imageUrl) : null
@@ -101,6 +102,7 @@ export async function previewPost(raw: unknown): Promise<ActionResult<{ card: Re
     publishedAt: new Date().toISOString(),
     edited: false,
     deleted: false,
+    tag: tag || null,
   }
   return { ok: true, data: { card: <PostCard post={post} variant="preview" /> } }
 }

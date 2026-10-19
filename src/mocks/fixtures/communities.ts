@@ -19,6 +19,8 @@ function community(n: number, seed: Seed): RawCommunity {
     createdAt: daysAgo(200 - n * 10),
     viewerMembership: null,
     viewerIsFavorite: null,
+    // P-023 (proposal): a community's tags; a personal channel has none.
+    tags: seed.type === 'PERSONAL_CHANNEL' ? [] : ['Analysis', 'News', 'Question', 'Discussion'],
     ...seed,
   }
 }
@@ -101,6 +103,8 @@ export const COMMUNITIES: RawCommunity[] = [
       description: 'Crypto in Latin America: regulation, adoption and local exchanges.',
       type: 'SYSTEM_GEO',
       memberCount: 7310,
+      // A group without tags: "Add tag" shows disabled (specs/drafts-tags DT-08).
+      tags: [],
     }),
     viewerMembership: 'MEMBER',
   },

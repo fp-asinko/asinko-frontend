@@ -569,6 +569,7 @@
       "url": "Ingresa un link que empiece con http:// o https://",
       "ownProfileOnly": "Solo puedes publicar en tu propio perfil",
       "invalidCommunity": "No puedes publicar en esa comunidad",
+      "invalidTag": "Esa marca no es de esta comunidad. Elige otra.",
       "invalid": "Revisa los campos y vuelve a intentarlo",
       "general": "No se pudo publicar tu post. Inténtalo de nuevo.",
       "imageType": "Solo imágenes JPEG, PNG o WebP",
@@ -598,6 +599,47 @@
     "related": {
       "label": "Relacionados",
       "remove": "Quitar {handle}"
+    },
+    "tag": {
+      "add": "Añadir marca",
+      "remove": "Quitar la marca {tag}",
+      "none": "Esta comunidad no tiene marcas",
+      "noCommunity": "Primero elige una comunidad"
+    },
+    "drafts": {
+      "open": "Borradores",
+      "title": "Borradores",
+      "count": "{count, number}/{max, number}",
+      "countLabel": "{count, plural, one {# borrador} other {# borradores}} de {max, number}",
+      "close": "Cerrar",
+      "save": "Guardar borrador",
+      "saving": "Guardando…",
+      "saved": "Borrador guardado",
+      "savedShort": "Guardado",
+      "loading": "Cargando tus borradores…",
+      "failed": "No se pudieron cargar tus borradores",
+      "retry": "Reintentar",
+      "emptyTitle": "Todavía no hay borradores",
+      "emptyBody": "Guarda borradores para publicarlos cuando quieras.",
+      "untitled": "Sin título",
+      "noCommunity": "Sin comunidad",
+      "yourProfile": "Tu perfil",
+      "meta": "{where} · {when}",
+      "delete": "Eliminar el borrador {title}",
+      "deleteTitle": "¿Eliminar este borrador?",
+      "deleteBody": "No se puede recuperar.",
+      "deleteConfirm": "Eliminar",
+      "cancel": "Cancelar",
+      "replaceTitle": "¿Reemplazar lo que escribiste?",
+      "replaceBody": "El borrador ocupa el lugar de lo que hay ahora en el formulario.",
+      "replaceConfirm": "Reemplazar",
+      "errors": {
+        "limit": "Tienes {max, number} borradores, el máximo. Elimina uno para guardar este.",
+        "gone": "Ese borrador ya no existe. Guárdalo de nuevo para tenerlo como uno nuevo.",
+        "invalid": "No se pudo guardar el borrador. Revisa sus campos.",
+        "general": "No se pudo guardar el borrador. Inténtalo de nuevo.",
+        "delete": "No se pudo eliminar el borrador. Inténtalo de nuevo."
+      }
     },
     "format": {
       "label": "Formato del texto",

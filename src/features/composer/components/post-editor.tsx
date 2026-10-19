@@ -18,7 +18,7 @@ import { postPath } from '@/lib/posts/paths'
 import type { TextField } from '@/lib/insert-text'
 import { cn } from '@/lib/utils'
 import { createPost } from '../actions/create-post.action'
-import type { CommunityOption } from '../composer.types'
+import type { CommunityOption, SavedDraft } from '../composer.types'
 import {
   createPostSchema,
   IMAGE_ALT_MAX,
@@ -33,10 +33,14 @@ import {
   useStoredDraft,
   writeDraft,
 } from '../hooks/use-post-draft'
+import { useSavedDraft } from '../hooks/use-saved-draft'
 import { CommunityPicker } from './community-picker'
+import { DraftsButton } from './drafts-button'
+import { DRAFT_LIMIT } from './drafts-dialog'
 import { ImageField, type TakeImage } from './image-field'
 import { BodyTabs, type PreviewAction } from './body-tabs'
 import { RelatedPicker } from './related-picker'
+import { TagPicker } from './tag-picker'
 
 /** A field without its own box: the composer box around them is the box, as X. */
 const BARE =
@@ -64,6 +68,7 @@ const ERROR_NAMES = [
   'url',
   'ownProfileOnly',
   'invalidCommunity',
+  'invalidTag',
   'invalid',
   'imageRequired',
   'imageType',
@@ -79,6 +84,14 @@ type ErrorName = (typeof ERROR_NAMES)[number]
 function errorName(key: string | undefined): ErrorName {
   const name = key?.replace(/^composer\.errors\./, '')
   return ERROR_NAMES.find((each) => each === name) ?? 'general'
+}
+
+const DRAFT_ERRORS = ['limit', 'gone', 'invalid', 'general'] as const
+
+/** A draft's error key (composer.drafts.errors.*), or the general one. */
+function draftError(key: string) {
+  const name = key.replace(/^composer.drafts.errors./, '')
+  return DRAFT_ERRORS.find((each) => each === name) ?? 'general'
 }
 
 const FIELDS = ['communityId', 'title', 'body', 'url', 'imageUrl', 'imageAlt'] as const
@@ -147,6 +160,13 @@ export function PostEditor({
   // The image is uploading: Publish waits (PI-06).
   const [uploading, setUploading] = useState(false)
   const takeImage = useRef<TakeImage | null>(null)
+  // The account's draft open in the form (specs/drafts-tags DT-01, DT-03).
+  const saved = useSavedDraft()
+  // An opened draft's image, already uploaded: the image field starts again with it.
+  const [draftImage, setDraftImage] = useState<{ key: string; url: string | null }>({
+    key: 'none',
+    url: null,
+  })
   const form = useForm<CreatePostForm, unknown, CreatePostInput>({
     resolver: zodResolver(createPostSchema),
     defaultValues: {
@@ -158,6 +178,7 @@ export function PostEditor({
       imageUrl: '',
       imageAlt: '',
       related: initialRelated,
+      tag: '',
     },
     // As X: no errors while writing; Publish says what is missing, then they follow the typing.
     // (On blur, an error appearing above would also move the format row under the pointer.)
@@ -165,10 +186,23 @@ export function PostEditor({
     reValidateMode: 'onChange',
   })
   const { register, control, handleSubmit, setValue, setError, getValues, formState } = form
-  const [title = '', body = '', url = '', current = type, imageUrl = '', related = []] = useWatch({
+  const [
+    title = '',
+    body = '',
+    url = '',
+    current = type,
+    imageUrl = '',
+    related = [],
+    tag = '',
+    communityId = '',
+    imageAlt = '',
+  ] = useWatch({
     control,
-    name: ['title', 'body', 'url', 'type', 'imageUrl', 'related'],
+    name: ['title', 'body', 'url', 'type', 'imageUrl', 'related', 'tag', 'communityId', 'imageAlt'],
   })
+  // What a draft of the account keeps (DT-01): "Saved" holds while the form still says it.
+  const snapshot = JSON.stringify([communityId, current, title, body, url, imageUrl, imageAlt, tag])
+  const savedNow = saved.savedAs === snapshot
 
   useEffect(() => {
     draftRef.current = () => {
@@ -194,6 +228,7 @@ export function PostEditor({
         title,
         body,
         url,
+        tag,
         savedAt: Date.now(),
       }
       if (hasText(draft)) writeDraft(storageKey, draft)
@@ -204,7 +239,7 @@ export function PostEditor({
       clearTimeout(timer)
       window.removeEventListener('pagehide', keep)
     }
-  }, [storageKey, offered, chosen, related, current, title, body, url])
+  }, [storageKey, offered, chosen, related, current, title, body, url, tag])
   useEffect(() => {
     if (!storageKey) return
     return () => forgetOpenedDraft(storageKey)
@@ -230,10 +265,34 @@ export function PostEditor({
       body: offered.body,
       url: offered.url,
       related: offered.related,
+      tag: offered.tag,
     })
     setChosen(offered.community)
     onCommunityChange?.(offered.community)
     onRelatedChange?.(offered.related)
+    setAnswered(true)
+    focusTitle()
+  }
+
+  // A draft of the account takes the form's place (DT-03): the related ones are not kept there.
+  function openSaved(draft: SavedDraft) {
+    form.reset({
+      communityId: draft.community?.id ?? '',
+      type: draft.type,
+      title: draft.title,
+      body: draft.body,
+      url: draft.url,
+      imageUrl: draft.imageUrl ?? '',
+      imageAlt: draft.imageAlt,
+      related: [],
+      tag: draft.community?.tags?.includes(draft.tag) ? draft.tag : '',
+    })
+    setChosen(draft.community)
+    setDraftImage({ key: draft.id, url: draft.imageUrl })
+    setServerError(null)
+    saved.open(draft.id)
+    onCommunityChange?.(draft.community)
+    onRelatedChange?.([])
     setAnswered(true)
     focusTitle()
   }
@@ -252,10 +311,13 @@ export function PostEditor({
     (current !== 'IMAGE' || imageUrl),
   )
   const blocked = !complete || uploading || formState.isSubmitting
+  // A draft needs something written (DT-01), and waits for an image going up.
+  const unsaveable =
+    !(title.trim() || body.trim() || url.trim() || imageUrl) || uploading || saved.saving
 
   async function publish(values: CreatePostInput) {
     setServerError(null)
-    const result = await createPost(values)
+    const result = await (saved.draftId ? createPost(values, saved.draftId) : createPost(values))
     if (result.ok) {
       if (storageKey) clearDraft(storageKey)
       onPublished(postPath(result.data.id, result.data.title))
@@ -300,6 +362,7 @@ export function PostEditor({
       url: values.url || undefined,
       imageUrl: values.imageUrl || undefined,
       imageAlt: values.imageAlt || undefined,
+      tag: values.tag || undefined,
       community: chosen
         ? { slug: chosen.slug, handle: chosen.handle, name: chosen.name, own: chosen.own }
         : null,
@@ -340,9 +403,11 @@ export function PostEditor({
       className="flex flex-col"
     >
       {/* Always there, so what arrives in it is announced; only the words, not the buttons. */}
+      {/* Also "Draft saved" (specs/drafts-tags DT-01): one region, so nothing is announced twice. */}
       <p role="status" className="sr-only">
-        {offered &&
-          t('draft.notice', { when: format.relativeTime(new Date(offered.savedAt), now) })}
+        {offered
+          ? t('draft.notice', { when: format.relativeTime(new Date(offered.savedAt), now) })
+          : savedNow && t('drafts.saved')}
       </p>
       {offered && (
         // An unpublished draft from before (SU-12): offered, never applied unasked.
@@ -403,6 +468,8 @@ export function PostEditor({
                     onChange={(next) => {
                       setChosen(next)
                       field.onChange(next?.id ?? '')
+                      // A tag the new one does not have goes (specs/drafts-tags DT-08).
+                      if (tag && !next?.tags?.includes(tag)) setValue('tag', '')
                       // The new main one is no longer a related one (RT-05).
                       if (next && related.includes(next.handle)) {
                         const rest = related.filter((handle) => handle !== next.handle)
@@ -424,6 +491,13 @@ export function PostEditor({
                       }}
                     />
                   )}
+                  {/* The account's drafts, at the row's end (DT-02). */}
+                  <DraftsButton
+                    written={() => draftRef.current?.() ?? false}
+                    onOpen={openSaved}
+                    onDeleted={saved.forget}
+                    openedFocus={() => document.getElementById(`${ids}-title`)}
+                  />
                 </div>
               )}
             />
@@ -484,6 +558,14 @@ export function PostEditor({
             </div>
           </Field>
 
+          {/* Below the title, as Reddit's flair (specs/drafts-tags DT-07). */}
+          <TagPicker
+            tags={chosen?.tags ?? []}
+            hasCommunity={Boolean(chosen)}
+            value={tag}
+            onChange={(next) => setValue('tag', next)}
+          />
+
           {/* Title and body stay outside the panels, mounted across formats: a field remounted
               on a switch could drop what was just typed. Link only adds its URL. */}
           <TabsContent value="TEXT" />
@@ -523,6 +605,8 @@ export function PostEditor({
             <Field data-invalid={invalid('imageUrl') || undefined} className="gap-1">
               {/* No label: the button is named by what it says, "Choose image" (WCAG 2.5.3). */}
               <ImageField
+                key={draftImage.key}
+                initialUrl={draftImage.url}
                 id={`${ids}-image`}
                 takeRef={takeImage}
                 onChange={(next) => {
@@ -625,20 +709,45 @@ export function PostEditor({
           </p>
         )}
 
-        {/* Only Cancel and Publish, on the right (SF-06). In phones it sticks over the bottom bar
+        {/* Why a draft was not saved (DT-05). */}
+        {/* Why a draft was not saved (DT-05), as the server's errors above. */}
+        {saved.error && (
+          <p role="alert" className="mt-3 type-small text-destructive">
+            {t(`drafts.errors.${draftError(saved.error)}`, { max: DRAFT_LIMIT })}
+          </p>
+        )}
+
+        {/* Only Cancel, Save draft and Publish, on the right (SF-06, DT-01). In phones it sticks over the bottom bar
             while a long post is written (specs/submit-tools ST-07), edge to edge; from md, in its
             place. */}
         <div
           data-sticky-actions
           className="sticky bottom-[calc(3.5625rem+env(safe-area-inset-bottom))] z-10 -mx-4 mt-4 flex items-center justify-end border-t bg-background px-4 py-3 md:static md:mx-0 md:border-t-0 md:px-0 md:pt-0 md:pb-0"
         >
-          <div className="flex items-center gap-2">
+          {/* Wraps before overflowing at 360px, whatever the language's words. */}
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <button
               type="button"
               onClick={onCancel}
-              className={cn(PILL, 'bg-muted text-foreground hover:bg-muted-hover')}
+              className={cn(PILL, 'text-muted-foreground hover:bg-muted hover:text-foreground')}
             >
               {t('cancel')}
+            </button>
+            <button
+              type="button"
+              aria-disabled={unsaveable || undefined}
+              onClick={() => {
+                if (unsaveable) return
+                const { related: _, ...fields } = getValues()
+                saved.save(fields, snapshot)
+              }}
+              className={cn(PILL, 'bg-muted text-foreground hover:bg-muted-hover')}
+            >
+              {saved.saving
+                ? t('drafts.saving')
+                : savedNow
+                  ? t('drafts.savedShort')
+                  : t('drafts.save')}
             </button>
             {/* The black pill of the main actions (JoinButton, comments): written out as there,
                 not a Button variant (Button has no full pill of this size). */}

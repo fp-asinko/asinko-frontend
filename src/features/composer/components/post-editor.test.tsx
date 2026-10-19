@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AuthGateProvider } from '@/components/organisms/auth-gate'
 import { renderWithIntl } from '@/test/render-with-intl'
-import type { CommunityOption } from '../composer.types'
+import type { CommunityOption, SavedDraft } from '../composer.types'
 import { PostEditor } from './post-editor'
 
 const actions = vi.hoisted(() => ({
@@ -11,6 +11,14 @@ const actions = vi.hoisted(() => ({
   searchCommunities: vi.fn(),
   uploadPostImageAction: vi.fn(),
   prepareImage: vi.fn(),
+  saveDraft: vi.fn(),
+  listDrafts: vi.fn(),
+  deleteDraft: vi.fn(),
+}))
+vi.mock('../actions/drafts.action', () => ({
+  saveDraft: actions.saveDraft,
+  listDrafts: actions.listDrafts,
+  deleteDraft: actions.deleteDraft,
 }))
 // Mentions have their own tests (specs/mention-autocomplete): out of this component's.
 vi.mock('@/lib/mentions/search-mentions.action', () => ({ searchMentions: vi.fn() }))
@@ -450,11 +458,146 @@ describe('PostEditor as Reddit (specs/submit-form-layout)', () => {
     expect(title()).toHaveAccessibleDescription(/5\/300/)
   })
 
-  it('puts the formats on top and only Cancel and Publish at the bottom (SF-02, SF-06)', () => {
+  it('puts the formats on top and only Cancel, Save draft and Publish at the bottom (SF-02, SF-06, DT-01)', () => {
     renderEditor()
     const formats = screen.getByRole('tablist', { name: 'Post type' })
     const actions = screen.getByRole('button', { name: 'Publish' }).parentElement!
     expect(formats.compareDocumentPosition(title()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-    expect(actions.querySelectorAll('button')).toHaveLength(2)
+    expect(actions.querySelectorAll('button')).toHaveLength(3)
+  })
+})
+
+describe('PostEditor tags (specs/drafts-tags DT-07 to DT-09)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  const TAGGED: CommunityOption = { ...DEFI, tags: ['Analysis', 'News'] }
+
+  it('publishes the chosen tag', async () => {
+    actions.createPost.mockResolvedValue({ ok: true, data: { id: 'abc', title: 'Yields' } })
+    renderEditor({ community: TAGGED })
+    await userEvent.type(title(), 'Yields')
+    await userEvent.type(body(), 'Up.')
+    await userEvent.click(screen.getByRole('button', { name: 'Add tag' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'News' }))
+    await userEvent.click(publish())
+    expect(actions.createPost).toHaveBeenCalledWith(expect.objectContaining({ tag: 'News' }))
+  })
+
+  it('drops the tag when the new community does not have it', async () => {
+    const GGAL: CommunityOption = {
+      id: '00000000-0000-4000-8000-000000009001',
+      slug: 'GGAL',
+      handle: '$GGAL',
+      name: 'Galicia',
+      own: false,
+      tags: [],
+    }
+    actions.searchCommunities.mockResolvedValue({ ok: true, data: [TAGGED, GGAL] })
+    renderEditor({ community: TAGGED })
+    await userEvent.click(screen.getByRole('button', { name: 'Add tag' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Analysis' }))
+    expect(screen.getByRole('button', { name: 'Remove tag Analysis' })).toBeInTheDocument()
+
+    screen.getByRole('combobox', { name: 'Community' }).focus()
+    await userEvent.keyboard('{ArrowDown}')
+    await userEvent.click(await screen.findByRole('option', { name: /GGAL/ }))
+    expect(screen.queryByText('Analysis')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Add tag' })).toHaveAccessibleDescription(
+      'This community has no tags',
+    )
+  })
+})
+
+describe('PostEditor drafts (specs/drafts-tags DT-01 to DT-05)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  const DRAFT_ID = '00000000-0000-4000-8000-000000000901'
+  const saveDraftButton = () => screen.getByRole('button', { name: /Save draft|Saved/ })
+  const SAVED: SavedDraft = {
+    id: DRAFT_ID,
+    type: 'TEXT',
+    title: 'Rates are going down',
+    body: 'The Fed cuts.',
+    url: '',
+    imageUrl: null,
+    imageAlt: '',
+    tag: 'Analysis',
+    community: { ...DEFI, slug: 'macro', handle: '#macro', name: 'Macro', tags: ['Analysis'] },
+    updatedAt: new Date().toISOString(),
+  }
+
+  async function openDraft() {
+    await userEvent.click(screen.getByRole('button', { name: 'Drafts' }))
+    await userEvent.click(await screen.findByRole('button', { name: /^Rates are going down/ }))
+  }
+
+  it('saves what is written, says so, and saving again updates the same draft', async () => {
+    actions.saveDraft.mockResolvedValue({ ok: true, data: { id: DRAFT_ID } })
+    renderEditor()
+    expect(saveDraftButton()).toHaveAttribute('aria-disabled', 'true')
+
+    await userEvent.type(title(), 'Yields')
+    await userEvent.click(saveDraftButton())
+    expect(actions.saveDraft).toHaveBeenCalledWith(
+      expect.objectContaining({ communityId: DEFI.id, title: 'Yields' }),
+    )
+    expect(actions.saveDraft.mock.calls[0]![0]).not.toHaveProperty('draftId')
+    expect(await screen.findByRole('status')).toHaveTextContent('Draft saved')
+    expect(await screen.findByRole('button', { name: 'Saved' })).toBeInTheDocument()
+
+    // Writing on: no longer what was saved.
+    await userEvent.type(body(), 'Up.')
+    expect(saveDraftButton()).toHaveTextContent('Save draft')
+    expect(screen.getByRole('status')).not.toHaveTextContent('Draft saved')
+    await userEvent.click(saveDraftButton())
+    expect(actions.saveDraft).toHaveBeenLastCalledWith(
+      expect.objectContaining({ draftId: DRAFT_ID, body: 'Up.' }),
+    )
+  })
+
+  it('says when there are already 20 (DT-05)', async () => {
+    actions.saveDraft.mockResolvedValue({ ok: false, error: 'composer.drafts.errors.limit' })
+    renderEditor()
+    await userEvent.type(title(), 'One more')
+    await userEvent.click(saveDraftButton())
+    expect(await screen.findByRole('alert')).toHaveTextContent(/You have 20 drafts/)
+  })
+
+  it('opens a draft in the form, and publishing it deletes it (DT-03)', async () => {
+    actions.listDrafts.mockResolvedValue({ ok: true, data: [SAVED] })
+    actions.createPost.mockResolvedValue({ ok: true, data: { id: 'abc', title: 'Rates' } })
+    renderEditor()
+    await openDraft()
+
+    expect(title()).toHaveValue('Rates are going down')
+    expect(body()).toHaveValue('The Fed cuts.')
+    expect(screen.getByRole('combobox', { name: 'Community' })).toHaveTextContent('#macro')
+    expect(screen.getByRole('button', { name: 'Remove tag Analysis' })).toBeInTheDocument()
+    // The focus goes to the form, not back to "Drafts" (WCAG 2.4.3).
+    await vi.waitFor(() => expect(title()).toHaveFocus())
+
+    await userEvent.click(publish())
+    expect(actions.createPost).toHaveBeenCalledWith(
+      expect.objectContaining({ title: 'Rates are going down', tag: 'Analysis' }),
+      DRAFT_ID,
+    )
+  })
+
+  it('asks before replacing what is written, and keeps it on Cancel', async () => {
+    actions.listDrafts.mockResolvedValue({ ok: true, data: [SAVED] })
+    renderEditor()
+    await userEvent.type(title(), 'Mine')
+    await openDraft()
+
+    const ask = await screen.findByRole('alertdialog', { name: "Replace what you've written?" })
+    await userEvent.click(within(ask).getByRole('button', { name: 'Cancel' }))
+    // Back to the list, still open over the form: what was written stays.
+    expect(screen.getByDisplayValue('Mine')).toBeInTheDocument()
+
+    await userEvent.click(await screen.findByRole('button', { name: /^Rates are going down/ }))
+    await userEvent.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Replace' }),
+    )
+    expect(title()).toHaveValue('Rates are going down')
   })
 })

@@ -158,3 +158,23 @@ describe('ImageField (specs/post-image PI-01, PI-06, PI-08)', () => {
     expect(onChange).not.toHaveBeenCalledWith(IMAGE)
   })
 })
+
+describe('ImageField with a draft image (specs/drafts-tags DT-03)', () => {
+  it('starts with the image already uploaded, which can be removed', async () => {
+    const onChange = vi.fn()
+    renderWithIntl(
+      <ImageField
+        id="image"
+        initialUrl={IMAGE}
+        onChange={onChange}
+        onBusy={vi.fn()}
+        onUnauthenticated={vi.fn()}
+        takeRef={{ current: null }}
+      />,
+    )
+    expect(screen.getByRole('img', { name: 'The image of your post' })).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Remove image' }))
+    expect(onChange).toHaveBeenCalledWith('')
+    expect(screen.getByRole('button', { name: /Choose image/ })).toBeInTheDocument()
+  })
+})

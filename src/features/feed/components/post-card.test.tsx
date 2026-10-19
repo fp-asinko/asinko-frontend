@@ -13,7 +13,7 @@ vi.mock('../actions/vote-comment.action', () => ({ voteComment: vi.fn() }))
 vi.mock('../actions/vote-poll.action', () => ({ votePoll: vi.fn() }))
 
 describe('PostCard (H-12)', () => {
-  it('shows byline, title, Markdown body with mentions and actions, without a tag', () => {
+  it('shows byline, title, Markdown body with mentions and actions', () => {
     renderWithIntl(<PostCard post={postItem()} />)
 
     expect(
@@ -22,8 +22,6 @@ describe('PostCard (H-12)', () => {
     expect(screen.getByText('@maria')).toBeInTheDocument()
     expect(screen.getByText('74% accuracy, high')).toBeInTheDocument()
     expect(screen.getByText('2 hours ago')).toBeInTheDocument()
-    // Post tags are not shown (specs/feed-cards § 14).
-    expect(screen.queryByText('On-chain')).not.toBeInTheDocument()
     // The byline community and the body mention both link to the filtered Home.
     for (const link of screen.getAllByRole('link', { name: '$BTC' })) {
       expect(link).toHaveAttribute('href', '/asset/BTC')
@@ -89,10 +87,18 @@ describe('PostCard (H-12)', () => {
     expect(screen.getByText('edited')).toBeInTheDocument()
   })
 
+  it('shows its tag before the title, keeping the title as the name (specs/drafts-tags DT-10)', () => {
+    renderWithIntl(<PostCard post={postItem({ tag: 'Analysis' })} />)
+    expect(screen.getByText('Analysis')).toBeInTheDocument()
+    expect(
+      screen.getByRole('article', { name: 'Whales accumulated 48,000 $BTC' }),
+    ).toBeInTheDocument()
+  })
+
   it('shows a deleted post without body, tag or actions', () => {
-    renderWithIntl(<PostCard post={postItem({ deleted: true, body: '' })} />)
+    renderWithIntl(<PostCard post={postItem({ deleted: true, body: '', tag: 'Analysis' })} />)
     expect(screen.getByRole('heading', { name: '[deleted]' })).toBeInTheDocument()
-    expect(screen.queryByText('On-chain')).toBeNull()
+    expect(screen.queryByText('Analysis')).toBeNull()
     expect(screen.queryByText(/points/)).toBeNull()
   })
 

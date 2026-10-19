@@ -8,6 +8,9 @@ export const TITLE_MAX = 300
 /** The backend's limit for an image's description (imageAlt, P-013, 2026-10-13). */
 export const IMAGE_ALT_MAX = 300
 
+/** The longest tag (P-023, specs/drafts-tags). */
+export const TAG_MAX = 24
+
 /** How many related communities or assets a post can name (specs/related-tags RT-02). */
 export const RELATED_MAX = 3
 
@@ -58,6 +61,8 @@ export const createPostSchema = z
       .max(RELATED_MAX)
       .refine((handles) => new Set(handles).size === handles.length)
       .default([]),
+    /** One of its community's tags, or none (P-023, specs/drafts-tags DT-07). */
+    tag: z.string().trim().max(TAG_MAX).optional(),
   })
   .superRefine((post, ctx) => {
     if (post.type === 'LINK' && !(post.url && isHttpUrl(post.url))) {
@@ -72,8 +77,11 @@ export const createPostSchema = z
   // The related communities and assets go as mentions on a last line of the body (specs/related-tags
   // RT-04): the backend resolves them as any mention. The description only with an image, and only
   // when written (the backend rejects it on other types, specs/backend-answer-1013 BA-04).
-  .transform(({ url, imageUrl, imageAlt, related, ...rest }) => {
-    const post = related.length ? { ...rest, body: `${rest.body}\n\n${related.join(' ')}` } : rest
+  .transform(({ url, imageUrl, imageAlt, related, tag, ...rest }) => {
+    const tagged = tag ? { ...rest, tag } : rest
+    const post = related.length
+      ? { ...tagged, body: `${tagged.body}\n\n${related.join(' ')}` }
+      : tagged
     return post.type === 'LINK'
       ? { ...post, url }
       : post.type === 'IMAGE'

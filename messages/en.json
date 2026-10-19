@@ -569,6 +569,7 @@
       "url": "Enter a link that starts with http:// or https://",
       "ownProfileOnly": "You can only post on your own profile",
       "invalidCommunity": "You cannot post in that community",
+      "invalidTag": "That tag isn't one of this community's. Choose another.",
       "invalid": "Check the fields and try again",
       "general": "Could not publish your post. Try again.",
       "imageType": "Only JPEG, PNG or WebP images",
@@ -598,6 +599,47 @@
     "related": {
       "label": "Related",
       "remove": "Remove {handle}"
+    },
+    "tag": {
+      "add": "Add tag",
+      "remove": "Remove tag {tag}",
+      "none": "This community has no tags",
+      "noCommunity": "Choose a community first"
+    },
+    "drafts": {
+      "open": "Drafts",
+      "title": "Drafts",
+      "count": "{count, number}/{max, number}",
+      "countLabel": "{count, plural, one {# draft} other {# drafts}} of {max, number}",
+      "close": "Close",
+      "save": "Save draft",
+      "saving": "Saving…",
+      "saved": "Draft saved",
+      "savedShort": "Saved",
+      "loading": "Loading your drafts…",
+      "failed": "Your drafts couldn't load",
+      "retry": "Try again",
+      "emptyTitle": "No drafts yet",
+      "emptyBody": "Save drafts to post them whenever you want.",
+      "untitled": "Untitled",
+      "noCommunity": "No community",
+      "yourProfile": "Your profile",
+      "meta": "{where} · {when}",
+      "delete": "Delete the draft {title}",
+      "deleteTitle": "Delete this draft?",
+      "deleteBody": "It can't be recovered.",
+      "deleteConfirm": "Delete",
+      "cancel": "Cancel",
+      "replaceTitle": "Replace what you've written?",
+      "replaceBody": "The draft takes the place of what is in the form now.",
+      "replaceConfirm": "Replace",
+      "errors": {
+        "limit": "You have {max, number} drafts, the most you can keep. Delete one to save this.",
+        "gone": "That draft no longer exists. Save again to keep it as a new one.",
+        "invalid": "This draft couldn't be saved. Check its fields.",
+        "general": "The draft couldn't be saved. Try again.",
+        "delete": "The draft couldn't be deleted. Try again."
+      }
     },
     "format": {
       "label": "Text format",

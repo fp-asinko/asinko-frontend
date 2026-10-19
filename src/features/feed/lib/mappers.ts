@@ -115,6 +115,7 @@ export function toPostItem(post: RawPost, mentions: MentionLookup, signedIn = fa
     publishedAt: post.publishedAt,
     edited: post.editedAt !== null,
     deleted: post.deleted,
+    tag: post.tag?.trim() || null,
   }
 }
 
