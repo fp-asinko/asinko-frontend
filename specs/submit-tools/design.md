@@ -24,6 +24,7 @@
   - `LeftColumnFold` (organismo cliente, `app-shell/left-column-fold.tsx`, importado por su ruta, no por el `index` del shell que importa el layout) es el botón. Lo dibuja `SubmitPage`, fijo sobre la parte de arriba de la columna (a su derecha cuando está abierta). Lleva `data-left-fold="folded" | "open"`, `aria-expanded` y `aria-controls="left-column"`.
   - `AppShell` se pliega **por CSS** mientras ese botón diga `folded`: `html:has([data-left-fold=folded])` angosta la grilla a `3.5rem` y oculta el contenido de la columna (no lo desmonta).
 - Con el botón, la franja de arriba (56 px) queda para él y solo scrollea el contenido de abajo: nada pasa por debajo del botón.
+- **Animación (ST-08b):** la grilla transiciona `grid-template-columns` (200 ms al abrir, 150 al cerrar, `ease-out`): como el alto de un desplegable, es la excepción a "solo `transform` y `opacity`" de `design-system.md § Movimiento`, porque el centro tiene que ganar el espacio. El contenido mantiene su ancho (`w-65`, recortado por la columna) y pasa por `opacity` + `visibility`; el botón se desliza con `translate` (la transición de `tap`, acortada a 150 ms al cerrar). La regla global de `prefers-reduced-motion` lo deja instantáneo.
 - Arranca plegada también en el servidor (`useSyncExternalStore` con snapshot de servidor plegado): el primer dibujo no salta. La elección se guarda en `localStorage` (en `try/catch`).
 
 ## 5. Tests

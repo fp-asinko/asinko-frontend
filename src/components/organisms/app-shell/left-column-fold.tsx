@@ -53,8 +53,10 @@ export function LeftColumnFold() {
       aria-label={t('label')}
       onClick={() => writeOpen(!open)}
       className={cn(
-        'fixed top-17.5 z-20 hidden size-9 tap items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex [&_svg]:size-4.5',
-        open ? 'left-54' : 'left-2.5',
+        'fixed top-17.5 left-2.5 z-20 hidden size-9 tap items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex [&_svg]:size-4.5',
+        // It slides with the column's edge (`tap` animates translate, 200ms): to close, as the
+        // column, in 150 (colors, borders, translate, the press).
+        open ? 'translate-x-51.5' : '[transition-duration:150ms,150ms,150ms,150ms,120ms]',
       )}
     >
       {open ? <PanelLeftCloseIcon aria-hidden /> : <PanelLeftOpenIcon aria-hidden />}

@@ -47,24 +47,7 @@ export function InterestsSections({ interests }: { interests: Interests }) {
       <p aria-hidden className={COLUMN_TITLE}>
         {t('title')}
       </p>
-      <SidebarSection
-        title={t('assets')}
-        result={interests.assets}
-        empty={t('empty.assets')}
-        emptyIcon={<CoinsIcon />}
-        moreLabel={t('moreAssets')}
-      >
-        {(tiles) => <AssetTiles tiles={tiles} />}
-      </SidebarSection>
-      <SidebarSection
-        title={t('people')}
-        result={interests.people}
-        empty={t('empty.people')}
-        emptyIcon={<UsersIcon />}
-        moreLabel={t('morePeople')}
-      >
-        {(people) => <PeopleList people={people} />}
-      </SidebarSection>
+      {/* Groups first, then assets and people (PO, 2026-10-18). */}
       <SidebarSection
         title={t('groups')}
         result={interests.groups}
@@ -85,6 +68,24 @@ export function InterestsSections({ interests }: { interests: Interests }) {
           {t('createGroup')}
         </ComingSoon>
       </div>
+      <SidebarSection
+        title={t('assets')}
+        result={interests.assets}
+        empty={t('empty.assets')}
+        emptyIcon={<CoinsIcon />}
+        moreLabel={t('moreAssets')}
+      >
+        {(tiles) => <AssetTiles tiles={tiles} />}
+      </SidebarSection>
+      <SidebarSection
+        title={t('people')}
+        result={interests.people}
+        empty={t('empty.people')}
+        emptyIcon={<UsersIcon />}
+        moreLabel={t('morePeople')}
+      >
+        {(people) => <PeopleList people={people} />}
+      </SidebarSection>
       {/* At the bottom of the column, after a short, soft line (as without a session). */}
       <hr className="mx-1 mt-auto mb-6 shrink-0 border-border/60" />
       <SidebarSection title={t('suggested')} result={interests.suggested}>

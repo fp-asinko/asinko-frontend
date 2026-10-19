@@ -2,6 +2,7 @@
 
 > **Estado:** aprobado por el PO el 2026-10-08 ("dale, hagamos los 4"), sobre las cuatro sugerencias que se le pasaron, con la recomendación de mantener el `#` en los grupos.
 > **Fuente:** pedido del PO (2026-10-08), con capturas de la columna actual y del prototipo: "en el prototipo los grupos tienen una breve descripción, lo mismo que en sugerencias" y "siento que las personas y grupos se ven mejor en el prototipo".
+> **Cambio con el PO (2026-10-18):** el orden de las secciones es **Grupos, Activos y Personas** (antes Activos, Personas y Grupos), con "Crear grupo" debajo de los grupos como siempre y Sugeridas al pie.
 
 ## Objetivo
 

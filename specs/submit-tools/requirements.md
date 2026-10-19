@@ -22,6 +22,7 @@
 ## La columna izquierda
 
 - [x] **ST-08** (D-2) En la página de crear post, desde `md`, la columna izquierda ("Tus intereses") arranca **plegada**: una franja angosta con un botón para desplegarla. Desplegada, se ve como en el resto del sitio, con un botón para plegarla. En las demás páginas no cambia nada.
+- [x] **ST-08b** **Cambio con el PO (2026-10-18):** plegarla y desplegarla se anima: el ancho se desliza como un cajón (200 ms al abrir, 150 al cerrar), el contenido se desvanece sin aplastarse y el botón acompaña el borde. Sin movimiento con `prefers-reduced-motion`.
 - [x] **ST-09** (D-3) La elección se recuerda en el navegador (abierta o plegada) para la próxima vez que se crea un post. Si el navegador no guarda nada (modo privado), arranca plegada.
 
 ## Calidad

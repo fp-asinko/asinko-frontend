@@ -47,15 +47,18 @@ export function AppShell({
       />
       {/* A page can fold the left column (LeftColumnFold, specs/submit-tools ST-08): while its
           button says so, the column is a 56px strip and its content is hidden, by CSS alone, so
-          the other pages carry no code for it. */}
-      <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)] md:[html:has([data-left-fold=folded])_&]:grid-cols-[3.5rem_minmax(0,1fr)]">
+          the other pages carry no code for it. Its width slides, as a drawer: 200ms to open and
+          150 to close (design-system.md § Motion; no motion with prefers-reduced-motion). */}
+      <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)] md:transition-[grid-template-columns] md:duration-200 md:ease-out md:[html:has([data-left-fold=folded])_&]:grid-cols-[3.5rem_minmax(0,1fr)] md:[html:has([data-left-fold=folded])_&]:duration-150">
         <div
           id="left-column"
           // With the fold button, the top 56px stay for it and only the content below scrolls:
           // nothing passes under the button (WCAG 2.4.11).
           className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-2 py-2.5 md:block [html:has([data-left-fold])_&]:overflow-hidden [html:has([data-left-fold])_&]:p-0 [html:has([data-left-fold])_&]:pt-14"
         >
-          <div className="[html:has([data-left-fold=folded])_&]:hidden [html:has([data-left-fold])_&]:h-full [html:has([data-left-fold])_&]:overflow-y-auto [html:has([data-left-fold])_&]:px-2 [html:has([data-left-fold])_&]:pb-2.5">
+          {/* Its full width while the column slides (clipped, never squeezed), fading out as it
+              folds and in as it opens; folded, invisible: out of reach and of what is read. */}
+          <div className="[html:has([data-left-fold=folded])_&]:invisible [html:has([data-left-fold=folded])_&]:opacity-0 [html:has([data-left-fold=folded])_&]:duration-150 [html:has([data-left-fold])_&]:h-full [html:has([data-left-fold])_&]:w-65 [html:has([data-left-fold])_&]:overflow-y-auto [html:has([data-left-fold])_&]:px-2 [html:has([data-left-fold])_&]:pb-2.5 [html:has([data-left-fold])_&]:transition-[opacity,visibility] [html:has([data-left-fold])_&]:duration-200 [html:has([data-left-fold])_&]:ease-out">
             {sidebar}
           </div>
         </div>
