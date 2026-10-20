@@ -1,6 +1,6 @@
 # Adoptar la respuesta del backend del 2026-10-20 — Requirements
 
-> **Estado:** borrador, para aprobar por el PO. Decisiones tomadas el 2026-10-20: las relacionadas se muestran como **píldoras bajo el cuerpo**; Explore v1 ("por qué ves esto" e impresiones) va en **otro spec**; las listas suman **Seguir / Siguiendo** en cada fila.
+> **Estado:** aprobado por el PO el 2026-10-20 ("dale"). Decisiones tomadas el 2026-10-20: las relacionadas se muestran como **píldoras bajo el cuerpo**; Explore v1 ("por qué ves esto" e impresiones) va en **otro spec**; las listas suman **Seguir / Siguiendo** en cada fila.
 > **Fuente:** `docs/references/api/responses/2026-10-20-backend.md` (respuesta a `proposals6`).
 > **Verificado contra `dev` el 2026-10-20** (`pnpm api:smoke` 8 de 8, y a mano con `GET` públicos):
 >

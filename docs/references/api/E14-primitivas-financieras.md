@@ -29,13 +29,15 @@
 **Respuesta `200`:** el `Asset` de arriba, más:
 ```
 "openTheses": Thesis[],   // theses abiertas sobre este activo, forma completa en E11-contenido-finanzas.md
-"linkedCommunity": { "id", "slug", "name" } | null  // la comunidad SYSTEM_ASSET de este activo, si existe
+"linkedCommunity": { "id", "slug", "name" } | null  // la comunidad SYSTEM_ASSET de este activo, si existe. Su slug NO es el símbolo (minúscula, sin barra: tsla, brk-b; 2026-10-20): se toma de acá, nunca se deduce
 ```
 **Errores:** `404` · `422 AMBIGUOUS_SYMBOL` — si `exchange` se omite y hay más de un match; devuelve la lista de matches (`id`, `symbol`, `exchange`, `name`).
 
 ### `GET /api/v1/assets` — Catálogo / autocomplete
 **Público.**
-**Query params:** `q` (string) — matchea `symbol`/`name`.
+**Query params:** `q?` (string) — matchea `symbol`/`name` · `cursor?` · `assetClass?` (`EQUITY,ETF`…, sin distinguir mayúsculas; una clase desconocida da `422`).
+
+**Respuesta (2026-10-20):** `{ items: Asset[], nextCursor }`. Sin `q`: el catálogo entero, alfabético por símbolo, de a 50 con cursor. Con `q`: el autocomplete (hasta 20), `nextCursor: null`.
 
 ---
 

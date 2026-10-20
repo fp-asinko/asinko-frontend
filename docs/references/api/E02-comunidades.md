@@ -83,7 +83,7 @@ Restricciones de estado, no de identidad:
 Idempotente.
 
 ### `GET /api/v1/communities/{slug}/members`
-**Público.** Lista paginada, forma resumida de `Profile` + `role`.
+**Público.** Lista paginada, forma resumida de `Profile` + `role`, con `displayName` e `isFollowedByViewer` (`boolean | null`: `null` sin sesión y en la fila del propio viewer; P-017, 2026-10-20).
 
 ### `PATCH /api/v1/communities/{slug}/members/{targetUserId}` — Cambiar rol
 **Auth:** requerida.

@@ -12,7 +12,11 @@
   "username": "string",         // mutable
   "usernameChangedAt": "ISO 8601 | null", // último cambio; null = nunca cambiado
   "avatarUrl": "string | null", // imagen original
-  "bio": "string | null",
+  "bio": "string | null",        // hasta 2000, con saltos de línea (P-024)
+  "headline": "string | null",   // hasta 100, una línea (P-019)
+  "city": "string | null",       // hasta 60 (P-019)
+  "links": "string[]",           // hasta 5 http(s), en el orden del usuario (P-019)
+  "bannerUrl": "string | null",  // el mismo dato que el banner del canal personal (P-020)
   "email": "string",              // solo si el viewer es el propio usuario
   "countryCode": "string | null", // ISO 3166-1 alpha-2
   "countrySource": "IP | MANUAL | null",
@@ -58,7 +62,8 @@ User & {
 - cualquier otro campo *client-safe* de `User`/`Profile` no listado arriba — también aceptado, opcional
 
 **Respuesta `201`:** el `User` creado (no el `Profile` extendido).
-**Errores:** `409 USERNAME_TAKEN` · `422` si `ageConfirmed`/`termsAccepted` no son `true`.
+**Errores (P-019, P-024, 2026-10-20):** `422 HEADLINE_TOO_LONG` · `422 CITY_TOO_LONG` · `422 BIO_TOO_LONG` · `422 INVALID_LINK` (con el link en `error.link`) · `422 TOO_MANY_LINKS`.
+**Errores de `username`:** `409 USERNAME_TAKEN` · `422` si `ageConfirmed`/`termsAccepted` no son `true`.
 
 ---
 
@@ -74,8 +79,11 @@ User & {
 **Usuario:** debe ser igual a `{userId}` — comparado contra la sesión.
 
 **Request body — todos opcionales:**
-- `bio?` (string, ≤160 caracteres)
-- `avatarUrl?` (string)
+- `bio?` (string, ≤2000 caracteres, con saltos de línea; P-024)
+- `headline?` (string, ≤100, una línea; `null` o `""` lo borran; P-019)
+- `city?` (string, ≤60; `null` o `""` la borran; P-019)
+- `links?` (string[], hasta 5 `http(s)` con dominio, ≤300 cada uno; `[]` o `null` los borran; P-019)
+- `avatarUrl?` · `bannerUrl?` (string | null): **solo** una imagen subida con `POST /uploads/avatar` o `POST /uploads/profile-banner`, el valor que ya tiene o `null`. Otra URL da `422`. El backend la re-codifica sin metadatos y la achica (400×400, 1500×375): **la URL guardada es distinta de la mandada**, se usa la de la respuesta (P-021).
 - `isPublic?` (boolean)
 - `language?` (string, ISO 639-1)
 - `countryCode?` (string, ISO 3166-1 alpha-2 — setea `countrySource: MANUAL`)
@@ -114,6 +122,27 @@ Soft-delete — no borra la fila; pasa a `status: DELETED`, `username`/`avatarUr
 
 **Errores:** `404` — perfil privado para quien no es su dueño, o usuario inexistente.
 
+## Subida de foto y banner (P-021, implementado el 2026-10-20)
+
+### `POST /api/v1/uploads/avatar` · `POST /api/v1/uploads/profile-banner`
+**Auth:** requerida. El mismo flujo que `POST /uploads/post-image` (E03): `{ userId, contentType, size }` → `{ uploadUrl, imageUrl, path }`. JPEG, PNG, WebP o GIF, hasta 5 MB, nunca SVG. El `imageUrl` se manda en `PATCH /users/{userId}` como `avatarUrl` o `bannerUrl`.
+
+## El perfil como vidriera (implementado el 2026-10-20)
+
+### `GET /api/v1/users/{userId}/featured` (P-025)
+**Público**, con la visibilidad del perfil (privado → `404` para quien no es su dueño). Hasta 3, del último destacado al primero; lo borrado no viene ni cuenta para el tope.
+
+```jsonc
+{ "items": [{ "kind": "POST | POLL | THESIS", "content": { /* Post | Poll | Thesis */ }, "featuredAt": "ISO 8601" }] }
+```
+
+### `POST /api/v1/users/{userId}/featured` · `DELETE /api/v1/users/{userId}/featured/{kind}/{id}?userId=`
+**Auth:** requerida (el dueño). `POST` `{ userId, kind, id }` (`kind` sin distinguir mayúsculas) → la lista: `201` si lo agregó, `200` si ya estaba. `DELETE` → `204`, también si no estaba.
+**Errores:** `409 FEATURED_LIMIT` (con 3) · `403 NOT_OWNER` · `404` si no existe, está borrado, programado o es de otro `kind`.
+
+### `GET /api/v1/users/{userId}/active-communities?days=&limit=` (P-027)
+**Público.** `{ items: [{ community: CommunitySummary, postCount }] }`, de más publicaciones a menos. Cuenta posts, encuestas **y tesis** de los últimos `days` días (1 a 365, por defecto 90); `limit` de 1 a 20 (por defecto 5). No incluye el canal personal. Fuera de rango, `422`.
+
 ## Follow
 
 ### `PUT /api/v1/users/{userId}/follow/{targetUserId}` · `DELETE /api/v1/users/{userId}/follow/{targetUserId}`
@@ -138,7 +167,7 @@ Idempotente.
 - **`followers`** = miembros de la `PERSONAL_CHANNEL` de `{userId}`.
 - **`following`** = otras `PERSONAL_CHANNEL` de las que `{userId}` es miembro (excluye la propia).
 
-Lista paginada por cursor, forma resumida de `User`: `id`, `username`, `avatarUrl`, `accuracyRate`.
+Lista paginada por cursor, forma resumida de `User`: `id`, `username`, `displayName`, `avatarUrl`, `accuracyRate` e `isFollowedByViewer` (`boolean | null`: `null` sin sesión y en la fila del propio viewer; P-017, 2026-10-20).
 
 ---
 

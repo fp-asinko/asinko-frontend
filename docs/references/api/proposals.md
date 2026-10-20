@@ -2,149 +2,73 @@
 
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla. Cuando el backend la implementa y el front la adopta, sale de este archivo (queda en el historial de git) y pasa al snapshot del contrato.
 
-**Actualizado el 2026-10-19:** se sumaron P-022 a P-030 (borradores, marcas, el perfil como LinkedIn y Reddit, los widgets de los grupos y los logros), todas hechas en el front contra mocks. Lo de antes sigue como se adoptó el 2026-10-18, después de la respuesta del backend del 2026-10-13 ([`responses/2026-10-13-backend.md`](responses/2026-10-13-backend.md)).
+**Actualizado el 2026-10-20**, después de la respuesta del backend a `proposals6` ([`responses/2026-10-20-backend.md`](responses/2026-10-20-backend.md)). Lo implementado se adoptó (`specs/backend-answer-1020`) y salió de acá. Quedan:
 
-**Verificado contra el deploy de `dev` el 2026-10-19** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 8 de 8 en verde, solo lecturas. Cada respuesta se validó con el mismo esquema que usa el mock:
+- lo nuevo, que el backend todavía no vio: **P-030** (logros), **P-028** y **P-029** (widgets de los grupos);
+- lo que espera una decisión de producto: P-026, P-023 y la fórmula de `best` (P-014);
+- una pregunta sobre los slugs de los activos (abajo).
 
-- `GET /profiles/{identifier}`, `GET /feed/explore` (P-001: las `entities` vienen dentro del esquema), `GET /search` y `GET /assets?q=`.
-- P-012: `GET /users/{id}/content` y `GET /users/{id}/comments`.
-- P-003: `GET /assets/{symbol}` con el precio.
-- P-007 y P-014: `GET /posts/{id}/comments` con `replies=false`, `sort=best`, `sort=new` y `?q=`. Un `?q=` de 1 letra da `422`, como dice el contrato (el front nunca lo manda).
-
-**Sin verificar contra el deploy**, porque escriben o necesitan sesión:
-
-- la subida de imágenes (P-013);
-- `topPost` de "Tus intereses" (P-016);
-- los anuncios (P-015), que el backend todavía no manda.
+**Verificado contra el deploy de `dev` el 2026-10-20** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`, solo lecturas): ver [Por verificar con datos reales](#por-verificar-con-datos-reales).
 
 ## Adoptado por el front (sale de este archivo)
 
-| Propuesta                     | Qué hizo el front                                                                                                  | Spec                    |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------- |
-| P-001 menciones               | Se muestran desde `entities` en posts y comentarios. El feed de lo que menciona algo no se hace (`overview.md`).   | `backend-answer-1013`   |
-| P-003 precios                 | La página del activo muestra el precio y la variación, "desactualizado" con su fecha, o "Sin datos de mercado".    | `backend-adoption`      |
-| P-011 nombre visible          | El perfil se titula con él y se edita en "Editar perfil".                                                         | `profile-presentation`  |
-| P-012 contenido y comentarios | La pestaña Posts usa `GET /users/{id}/content`; la pestaña nueva Respuestas, `GET /users/{id}/comments`.           | `backend-adoption`      |
-| P-013 imágenes                | Subida por URL firmada (`POST /uploads/post-image`) e `imageAlt`.                                                  | `backend-answer-1013`   |
-| P-014 orden y búsqueda        | Orden por `sort` y búsqueda por `?q=` contra el backend (el mock de `?q=` se apagó con `API_MOCKS=missing`).       | `backend-adoption`      |
-| P-015 anuncios                | Sin intercalado propio; el feed ignora los `kind` que no conoce, para cuando lleguen.                             | `backend-answer-1013`   |
-| P-016 post principal          | La columna "Tus intereses" muestra `topPost`.                                                                      | `backend-adoption`      |
-| Catálogo                      | Rutas y menciones con `.` y `/` (`BRK.B`, `XAU/USD`); un activo sin comunidad tiene su página.                     | `backend-answer-1013`   |
+| Propuesta                       | Qué hizo el front                                                                                                  | Spec                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------- |
+| P-001 menciones                 | Se muestran desde `entities` en posts y comentarios. El feed de lo que menciona algo no se hace (`overview.md`).   | `backend-answer-1013` |
+| P-003 precios                   | La página del activo muestra el precio y la variación, "desactualizado" con su fecha, o "Sin datos de mercado".    | `backend-adoption`    |
+| P-011 nombre visible            | El perfil se titula con él y se edita en "Editar perfil".                                                         | `profile-presentation` |
+| P-012 contenido y comentarios   | La pestaña Posts usa `GET /users/{id}/content`; la pestaña Respuestas, `GET /users/{id}/comments`.               | `backend-adoption`    |
+| P-013 imágenes                  | Subida por URL firmada (`POST /uploads/post-image`) e `imageAlt`.                                                  | `backend-answer-1013` |
+| P-015 anuncios                  | Sin intercalado propio; el feed ignora los `kind` que no conoce, para cuando lleguen.                             | `backend-answer-1013` |
+| P-016 post principal            | La columna "Tus intereses" muestra `topPost`.                                                                      | `backend-adoption`    |
+| P-017 "lo seguís"               | Seguir / Siguiendo en cada fila de seguidores, seguidos y miembros, con su nombre visible.                        | `backend-answer-1020` |
+| P-018 relacionadas              | Se mandan con `relatedCommunityIds` y se muestran como píldoras bajo el cuerpo; ya no van como menciones al final. | `backend-answer-1020` |
+| P-019 a P-021, P-024 el perfil  | Titular, ciudad, links, banner, "Acerca de" de 2000 y la subida de foto y banner, contra el backend.             | `backend-answer-1020` |
+| P-022 borradores                | Contra el backend, con sus relacionadas; se publican con `draftId`.                                                | `backend-answer-1020` |
+| P-025 destacados                | La forma de `FeedItem` con `featuredAt`; también se destacan encuestas.                                           | `backend-answer-1020` |
+| P-027 dónde publica             | "Participa en" contra el backend (cuenta también las tesis).                                                       | `backend-answer-1020` |
+| Catálogo                        | Rutas y menciones con `.` y `/` (`BRK.B`, `XAU/USD`); la comunidad de un activo sale de `linkedCommunity`.       | `backend-answer-1020` |
+| P-005 orden del feed            | Descartado por el backend (solo Following y Explore). El front no tenía Hot ni Top: no cambia nada.               | —                     |
+| `GET /assets` paginado y huérfanas | Resueltos del lado del backend; el front no los usa todavía.                                                  | —                     |
 
 ## Pendientes, en orden de prioridad para el front
 
-1. **P-019 a P-021: el perfil, como LinkedIn.** Titular, ciudad, links, banner y la subida de foto y banner. El front ya lo tiene hecho contra mocks: sin esto, nada de eso se guarda con el backend real.
-2. **Comunidades de los activos del catálogo.** Solo 5 de los 100 tienen la suya (BTC, ETH, AAPL, NVDA, VOO). `GET /communities/TSLA` (y SPY, MSFT, EURUSD, SQM-B, BRK.B, XAU/USD…) da `404`, y `GET /assets/{symbol}` trae `linkedCommunity: null`. **Pedido:** crear la comunidad de cada activo (slug = símbolo). Mientras tanto, el front muestra la página del activo con su precio, sin feed ni Unirse, y no se puede publicar ni etiquetar en ellos.
-3. **P-024 a P-027: el perfil como vidriera**, como LinkedIn (`specs/profile-showcase`): "Acerca de" de 2000, destacados, "Abierto a" y dónde publica cada persona (`specs/profile-aside`). Hechos contra mocks.
-4. **P-028 y P-029: widgets de los grupos**, como Reddit (`specs/community-widgets`): Texto, Reglas, Botones, Lista de comunidades, Imágenes y Calendario en la columna derecha, que arma el moderador. Hechos contra mocks.
-5. **P-030: logros del perfil**, como la vitrina de trofeos de Reddit (`specs/profile-achievements`): 16 logros, quién ganó cuál y, para el dueño, cuánto le falta. Hecho contra mocks.
-6. **P-022 y P-023: borradores en la cuenta y marcas por comunidad**, como Reddit (`specs/drafts-tags`). Hechos contra mocks.
-7. **P-018: comunidades y activos relacionados de un post.** Hoy viajan como menciones al final del cuerpo.
-8. **P-017: "lo seguís" en las listas de seguidores, seguidos y miembros.** Sin respuesta desde el 2026-10-09.
-9. **P-005: `sort=hot|top` del feed.** Fórmulas en definición.
-10. **`best` de los comentarios (P-014).** Hoy es cronológico; el mock usa la fórmula propuesta (abajo). El front ya manda `sort=best`.
-11. **`GET /assets` sin `?q=` devuelve 20, sin `nextCursor`.** No bloquea (el front busca con `?q=`), pero hace falta para listar el catálogo.
-12. **Imágenes huérfanas.** Una imagen subida con la URL firmada y nunca publicada queda en Storage, y no hay cómo borrarla. ¿Se limpian del lado del backend? Aplica también a la foto y el banner (P-021), a la imagen de un borrador eliminado (P-022) y a la de un widget que se quita (P-029).
+1. **P-030: logros del perfil**, como la vitrina de trofeos de Reddit (`specs/profile-achievements`): 16 logros, quién ganó cuál y, para el dueño, cuánto le falta. Hecho contra mocks.
+2. **P-028 y P-029: widgets de los grupos**, como Reddit (`specs/community-widgets`): Texto, Reglas, Botones, Lista de comunidades, Imágenes y Calendario en la columna derecha, que arma el moderador. Hechos contra mocks.
+3. **P-026: "Abierto a"** y **P-023: marcas por comunidad.** Esperan la decisión de producto (respuesta del 2026-10-20). Los valores y la forma de abajo son lo que el front ya tiene hecho contra mocks; si cambian, se ajusta el mock.
+4. **`best` de los comentarios (P-014).** Espera la fórmula. El front ya manda `sort=best`.
+5. **Pregunta: slugs de las comunidades de activo.** La respuesta del 2026-10-20 dice que van en minúscula y sin barra (`tsla`, `brk-b`), pero las que ya existen en `dev` siguen en mayúscula (`BTC`, `AAPL`, `VOO`). ¿Se renombran? El front ya no deduce el slug del símbolo (usa `linkedCommunity.slug`), así que funciona de las dos maneras; lo preguntamos para que los links viejos sigan andando.
 
-### P-019: Titular, ciudad y links del perfil
-
-**Estado:** propuesta (2026-10-16), mockeada (`PATCH /users` con estos campos va al mock; el resto, al backend).
-
-**Endpoint:** `PATCH /api/v1/users/{userId}`, el `User` y el `Profile` (`GET /profiles/{identifier}`).
-
-**Motivo:** el perfil, como LinkedIn (`specs/profile-presentation`): un titular bajo el nombre ("Analista macro | Renta fija | LatAm"), la ciudad junto al país (`countryCode` ya existe) y hasta 5 links externos (Substack, X, YouTube…) con su ícono.
-
-**Cambio:** tres campos opcionales en el `User` y el `Profile`, editables como `bio`:
-
-```json
-{ "headline": "Analista macro | Renta fija", "city": "La Plata", "links": ["https://example.substack.com"] }
-```
-
-- `headline`: hasta 100 caracteres; `""` o `null` lo borran. `422 HEADLINE_TOO_LONG`.
-- `city`: hasta 60, texto libre; `""` o `null` la borran. `422 CITY_TOO_LONG`.
-- `links`: hasta 5 URLs `http(s)`, en el orden del usuario; `[]` los borra. `422 INVALID_LINK` (otro esquema o mal formada), `422 TOO_MANY_LINKS`.
-
-### P-020: Banner del perfil
-
-**Estado:** propuesta (2026-10-16), mockeada.
-
-**Endpoint:** `PATCH /api/v1/users/{userId}` y el `Profile`.
-
-**Motivo:** hoy el banner del perfil es el de su canal personal (`Community.bannerUrl`), que el usuario no puede editar desde su perfil. `specs/profile-presentation` deja subir el banner como la foto.
-
-**Cambio:** `"bannerUrl": string | null` en el `Profile`, editable con `PATCH /users/{userId}` como `avatarUrl`. Si conviene que sea el mismo dato que el banner del canal personal, mejor: el front lo lee de los dos lados.
-
-### P-021: Subida de foto y banner del perfil
-
-**Estado:** propuesta (2026-10-16), mockeada.
-
-**Endpoint:** `POST /api/v1/uploads/avatar` y `POST /api/v1/uploads/profile-banner`.
-
-**Motivo:** `PATCH /users` acepta `avatarUrl`, pero no hay dónde subir la imagen. El front ya recorta y prepara la imagen (WebP, foto de 400×400 y banner de 1500×375).
-
-**Cambio:** el mismo flujo de URL firmada que `POST /uploads/post-image` (P-013): `{ userId, contentType, size }` → `{ uploadUrl, imageUrl, path }`, JPEG, PNG, WebP o GIF (nunca SVG), hasta 5 MB. El `imageUrl` es el que se manda en `PATCH /users` (`avatarUrl` o `bannerUrl`).
-
-### P-024: "Acerca de" de 2000 caracteres
-
-**Estado:** propuesta (2026-10-19), mockeada (un `PATCH /users` con una `bio` de más de 160 va al mock).
-
-**Endpoint:** `PATCH /api/v1/users/{userId}`, el `User` y el `Profile`.
-
-**Motivo:** "Acerca de", como LinkedIn (`specs/profile-showcase`): contar tu estrategia en más de una línea. La bio pasa a ser ese texto (no se suma otro campo: el titular ya es la frase corta).
-
-**Cambio:** `bio` acepta hasta **2000** caracteres (hoy 160), con saltos de línea. `422 BIO_TOO_LONG` más allá.
-
-### P-025: Destacados del perfil
+### P-030: Logros del perfil
 
 **Estado:** propuesta (2026-10-19), mockeada.
 
-**Endpoints:** `GET /api/v1/users/{userId}/featured` (público), `POST /api/v1/users/{userId}/featured` y `DELETE /api/v1/users/{userId}/featured/{kind}/{id}?userId=` (solo el dueño, `403 USER_MISMATCH`).
+**Endpoint:** `GET /api/v1/users/{userId}/achievements` (público).
 
-**Motivo:** "Destacado", como LinkedIn (`specs/profile-showcase`): hasta 3 posts o tesis propios al frente del perfil. Se destacan desde el menú "⋯" de cada uno.
+**Motivo:** la vitrina de trofeos del perfil, como Reddit (`specs/profile-achievements`). Quién ganó qué tiene que decidirlo el backend: el front no ve todas las tesis, votos ni seguidores de una persona, y armarlo ahí sería compensar con lógica.
 
 **Cambio:**
 
 ```jsonc
-// GET /users/{userId}/featured → a lo sumo 3, del último destacado al primero; lo borrado no viene
 {
   "items": [
-    { "kind": "thesis", "thesis": { /* Thesis (E11) */ }, "featuredAt": "ISO 8601" },
-    { "kind": "post", "post": { /* Post */ }, "featuredAt": "ISO 8601" }
-  ]
+    { "code": "STREAK_3", "earnedAt": "2026-09-02T14:00:00Z", "level": null, "progress": null },
+    { "code": "ANNIVERSARY", "earnedAt": "2026-10-01T00:00:00Z", "level": 1, "progress": null },
+    // Solo con la sesión del dueño: los que faltan.
+    { "code": "STREAK_5", "earnedAt": null, "level": null, "progress": { "current": 3, "target": 5 } },
+  ],
 }
 ```
 
-- `POST /users/{userId}/featured` `{ userId, kind: "post" | "thesis", id }` → `201 { items }`; si ya estaba, `200 { items }`. Con 3, `409 FEATURED_LIMIT`. Contenido de otra persona, `403 NOT_OWNER`; inexistente o borrado, `404`.
-- `DELETE /users/{userId}/featured/{kind}/{id}?userId=` → `204`, también si no estaba.
-- Más adelante, reordenarlos (`PUT` con la lista); no hace falta para el MVP.
-- **Pregunta:** ¿una encuesta se destaca como `kind: "post"` o necesita su propio `kind: "poll"`? Hoy el front solo ofrece destacar posts y tesis.
-
-### P-026: "Abierto a"
-
-**Estado:** propuesta (2026-10-19), mockeada (un `PATCH /users` con `openTo` va al mock).
-
-**Endpoint:** `PATCH /api/v1/users/{userId}`, el `User` y el `Profile`.
-
-**Motivo:** "Tengo interés en…", como LinkedIn (`specs/profile-showcase`): para qué está disponible la persona. Valores fijos, para traducirlos y, más adelante, filtrar por ellos.
-
-**Cambio:** `"openTo": string[]` con valores de `QUESTIONS`, `COLLABORATIONS`, `MENTORING`, `AMAS`, `COMMISSIONED_ANALYSIS`, sin repetir; `[]` lo borra. `422 INVALID_OPEN_TO` con otro valor o repetido.
-
-### P-027: Dónde publica una persona
-
-**Estado:** propuesta (2026-10-19), mockeada.
-
-**Endpoint:** `GET /api/v1/users/{userId}/active-communities?days=90&limit=20` (público).
-
-**Motivo:** "Participa en", como la tarjeta del perfil de Reddit (`specs/profile-aside`): las comunidades y activos donde la persona más publicó últimamente, para saber de qué habla. Armarlo en el front con los posts sería compensar con lógica algo que el backend resuelve con una consulta.
-
-**Cambio:**
-
-```jsonc
-{ "items": [{ "community": { /* CommunitySummary */ }, "postCount": 12 }] }
-```
-
-- De más posts a menos; a igual cantidad, el último publicado primero. Solo posts y encuestas no borrados publicados en los últimos `days` días.
-- `days` de 1 a 365 (por defecto 90); `limit` de 1 a 20 (por defecto 5). Fuera de rango, `422 VALIDATION_ERROR`. Usuario inexistente, `404`.
+- `code`, uno de 16:
+  - tesis: `FIRST_THESIS`, `FIRST_CORRECT`, `STREAK_3`, `STREAK_5`, `STREAK_10` (acertadas seguidas), `RESOLVED_10` y `ACCURACY_70` (con 10 o más resueltas);
+  - comunidad: `FIRST_POST`, `FIRST_COMMENT`, `POST_100_VOTES` (un post con 100 votos), `FOLLOWERS_100`, `GROUP_FOUNDER` y `GROUP_MODERATOR`;
+  - antigüedad: `ANNIVERSARY` (`level` = años cumplidos, un solo ítem) y `FOUNDING_MEMBER` (se registró antes del lanzamiento: la fecha la define el backend);
+  - `PROFILE_COMPLETE`: foto, titular, "Acerca de", ubicación, links, "Abierto a", banner y al menos un destacado.
+- Un logro ganado no se pierde aunque después baje la racha o la precisión.
+- `progress` en los que se miden (rachas, resueltas, votos del mejor post, seguidores, precisión en puntos, pasos del perfil); `null` en los de sí o no.
+- Orden: los ganados del más nuevo al más viejo; después los que faltan, en el orden de la lista de arriba.
+- Sin sesión o de otra persona: solo los ganados. Usuario inexistente, `404`.
 
 ### P-028: Widgets de un grupo
 
@@ -193,73 +117,19 @@
 
 **Cambio:** el mismo flujo de URL firmada que `POST /uploads/post-image` (P-013): JPEG, PNG, WebP o GIF (nunca SVG), hasta 5 MB. Solo moderadores de esa comunidad (`403 NOT_MODERATOR`).
 
-### P-030: Logros del perfil
+### P-026: "Abierto a"
 
-**Estado:** propuesta (2026-10-19), mockeada.
+**Estado:** propuesta (2026-10-19), mockeada (un `PATCH /users` con `openTo` va al mock). **Backend, 2026-10-20:** lo define producto con el equipo, incluida la lista de valores.
 
-**Endpoint:** `GET /api/v1/users/{userId}/achievements` (público).
+**Endpoint:** `PATCH /api/v1/users/{userId}`, el `User` y el `Profile`.
 
-**Motivo:** la vitrina de trofeos del perfil, como Reddit (`specs/profile-achievements`). Quién ganó qué tiene que decidirlo el backend: el front no ve todas las tesis, votos ni seguidores de una persona, y armarlo ahí sería compensar con lógica.
+**Motivo:** "Tengo interés en…", como LinkedIn (`specs/profile-showcase`): para qué está disponible la persona. Valores fijos, para traducirlos y, más adelante, filtrar por ellos.
 
-**Cambio:**
-
-```jsonc
-{
-  "items": [
-    { "code": "STREAK_3", "earnedAt": "2026-09-02T14:00:00Z", "level": null, "progress": null },
-    { "code": "ANNIVERSARY", "earnedAt": "2026-10-01T00:00:00Z", "level": 1, "progress": null },
-    // Solo con la sesión del dueño: los que faltan.
-    { "code": "STREAK_5", "earnedAt": null, "level": null, "progress": { "current": 3, "target": 5 } },
-  ],
-}
-```
-
-- `code`, uno de 16:
-  - tesis: `FIRST_THESIS`, `FIRST_CORRECT`, `STREAK_3`, `STREAK_5`, `STREAK_10` (acertadas seguidas), `RESOLVED_10` y `ACCURACY_70` (con 10 o más resueltas);
-  - comunidad: `FIRST_POST`, `FIRST_COMMENT`, `POST_100_VOTES` (un post con 100 votos), `FOLLOWERS_100`, `GROUP_FOUNDER` y `GROUP_MODERATOR`;
-  - antigüedad: `ANNIVERSARY` (`level` = años cumplidos, un solo ítem) y `FOUNDING_MEMBER` (se registró antes del lanzamiento: la fecha la define el backend);
-  - `PROFILE_COMPLETE`: foto, titular, "Acerca de", ubicación, links, "Abierto a", banner y al menos un destacado.
-- Un logro ganado no se pierde aunque después baje la racha o la precisión.
-- `progress` en los que se miden (rachas, resueltas, votos del mejor post, seguidores, precisión en puntos, pasos del perfil); `null` en los de sí o no.
-- Orden: los ganados del más nuevo al más viejo; después los que faltan, en el orden de la lista de arriba.
-- Sin sesión o de otra persona: solo los ganados. Usuario inexistente, `404`.
-
-### P-022: Borradores en la cuenta
-
-**Estado:** propuesta (2026-10-19), mockeada.
-
-**Endpoints:** `GET /api/v1/users/{userId}/drafts`, `POST /api/v1/drafts`, `PATCH /api/v1/drafts/{draftId}` y `DELETE /api/v1/drafts/{draftId}?userId=`. Todos con sesión: el `userId` (cuerpo o query) se compara con ella, `403 USER_MISMATCH`.
-
-**Motivo:** "Guardar borrador" y "Borradores" de la página de crear post, como Reddit (`specs/drafts-tags`): guardar un post a medias y terminarlo después, desde cualquier dispositivo. El borrador automático que el front guarda en el navegador sigue como red de seguridad, pero no viaja entre dispositivos.
-
-**Cambio:**
-
-```jsonc
-// Draft
-{
-  "id": "uuid",
-  "type": "TEXT | LINK | IMAGE",
-  "title": "string",     // "" si no hay
-  "body": "string",
-  "url": "string",
-  "imageUrl": "string | null",
-  "imageAlt": "string",
-  "tag": "string | null",
-  "community": { /* CommunitySummary */ } | null,
-  "updatedAt": "ISO 8601"
-}
-```
-
-- `GET /users/{userId}/drafts` → `{ items: Draft[], nextCursor: null }`, a lo sumo 20, del más reciente (`updatedAt`) al más viejo.
-- `POST /drafts` `{ userId, communityId?, type, title?, body?, url?, imageUrl?, imageAlt?, tag? }` → `201 Draft`. Con 20 guardados, `409 DRAFT_LIMIT`. Un borrador no exige título ni cuerpo.
-- `PATCH /drafts/{draftId}` con los mismos campos → `200 Draft` (lo pasa primero en la lista). `404` si no existe o no es del usuario.
-- `DELETE /drafts/{draftId}?userId=` → `204`.
-- Publicar un borrador es `POST /posts` y después `DELETE /drafts/{id}`, que hace el servidor del front. Si el backend prefiere `POST /posts` con `draftId` y borrarlo él, mejor: es un cambio de una línea en el front.
-- **Relacionados:** hoy un borrador no guarda las comunidades y activos relacionados del post (los "+"), porque P-018 no existe todavía. Cuando exista, el `Draft` suma `related` con la misma forma.
+**Cambio:** `"openTo": string[]` con valores de `QUESTIONS`, `COLLABORATIONS`, `MENTORING`, `AMAS`, `COMMISSIONED_ANALYSIS`, sin repetir; `[]` lo borra. `422 INVALID_OPEN_TO` con otro valor o repetido.
 
 ### P-023: Marcas por comunidad
 
-**Estado:** propuesta (2026-10-19), mockeada.
+**Estado:** propuesta (2026-10-19), mockeada. **Backend, 2026-10-20:** lo define producto con el equipo (quién define las marcas y si los moderadores las editan). El `Draft` ya trae `tag`. El nombre del campo en el `Community` probablemente no sea `tags` (Explore ya lo usa para los temas): el front lo cambia en el mapper cuando se confirme.
 
 **Endpoint:** el recurso `Community` (`GET /communities`, `GET /communities/{slug}`) y `POST /posts`.
 
@@ -270,30 +140,6 @@
 - `"tags": string[]` en el `Community`: hasta 20, de 1 a 24 caracteres; `[]` si no tiene. Las definen sus moderadores (más adelante, con `PATCH /communities`); mientras tanto, del seed.
 - `POST /posts` con un `tag` que no está en las de su comunidad: `422 INVALID_TAG`.
 
-### P-018: Comunidades y activos relacionados de un post
-
-**Estado:** propuesta (2026-10-16). Sin mock: mientras tanto el front los manda como menciones.
-
-**Endpoint:** `POST /api/v1/posts` (y el recurso `Post`).
-
-**Motivo:** al crear un post (`specs/related-tags`), además de la comunidad donde se publica se pueden sumar hasta 3 comunidades o activos relacionados, como un post en `#argentina` sobre `$GGAL` y `#macro`. Hoy el front los agrega al final del cuerpo como menciones (`\n\n$GGAL #macro`): se ven como links y notifican, pero ensucian el cuerpo y el post no aparece en esos feeds (decisión del 2026-10-13).
-
-**Cambio:** un campo opcional `relatedCommunityIds: string[]` (hasta 3, distintos de `communityId`, sin canales personales; `422` si no se cumple) en el body de `POST /posts`, y `related: [{ id, slug, type, name }]` en el `Post`. Que el post aparezca también en el feed de cada relacionada (`GET /feed/explore?community=`). Si se acepta, el front deja de escribir la línea de menciones y muestra los relacionados en la tarjeta.
-
-### P-017: Si seguís a cada persona de una lista
-
-**Estado:** propuesta (2026-10-09), mockeada; **sin respuesta** en la del 2026-10-13. La usan las listas de seguidores y seguidos del perfil (`specs/follow-lists`) y, desde el 2026-10-10, la de miembros de una comunidad (`specs/community-members`).
-
-**Endpoints:** `GET /api/v1/users/{userId}/followers`, `GET /api/v1/users/{userId}/following` y `GET /api/v1/communities/{slug}/members`.
-
-**Motivo:** cada fila de las listas lleva "Seguir" o "Siguiendo", como Instagram y X. Hoy los ítems traen solo `id`, `username`, `avatarUrl` y `accuracyRate`: el front no sabe si el viewer ya sigue a cada persona, y sin ese dato no muestra el botón.
-
-**Cambio:** sumar a cada ítem `"isFollowedByViewer": boolean | null`, igual que en el `Profile`: `null` sin sesión o en la fila del propio viewer. El front ya lo lee como opcional: mientras no llegue, las listas se ven sin botones.
-
-### P-005: Orden del feed
-
-**Estado:** pendiente (backend, 2026-10-13: fórmulas en definición; hoy los feeds son `new`). El filtro por tipo (`?kind=POST,POLL`) ya está y está en el contrato. **Falta:** `sort=hot|new|top`, para los filtros _Hot_ y _Top_ del prototipo. ¿Cuándo?
-
 ### `best` de los comentarios (P-014)
 
 **Estado:** el backend acepta `sort=best` y por ahora responde cronológico; la fórmula está en definición.
@@ -302,12 +148,12 @@
 
 ## Por verificar con datos reales
 
-Lo adoptado se probó contra mocks con la forma de la respuesta del 2026-10-13. Falta correr `pnpm api:smoke` y revisar a mano, contra el deploy de `dev`:
+Lo que necesita sesión y no se probó contra el deploy (lo mismo que listó el backend el 2026-10-20):
 
-- Que las menciones lleguen como `entities` en posts **y comentarios** y se vean como links.
-- `GET /users/{id}/content` y `GET /users/{id}/comments` (la forma de `content.community` en un comentario).
-- La subida de imágenes por URL firmada (el bucket `post-images` existe desde el 2026-10-13).
-- Los precios y `priceStale` en la página de un activo.
+- subir foto y banner (bucket `profile-images`) y que el perfil muestre la URL que devuelve `PATCH /users`;
+- destacar y sacar destacados, también una encuesta;
+- crear un post con relacionadas, y guardar, editar y publicar un borrador con `draftId`;
+- seguir y dejar de seguir desde una fila de las listas.
 
 ## Formato de una propuesta
 

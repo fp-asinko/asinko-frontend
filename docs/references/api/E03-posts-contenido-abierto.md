@@ -17,6 +17,7 @@
   "url": "string | null",    // solo type = LINK
   "imageUrl": "string | null", // solo type = IMAGE
   "tag": "string | null",
+  "related": [{ "id", "slug", "name", "type", "avatarUrl" }], // P-018 (2026-10-20): las que eligió el autor, en su orden; [] si está borrado
   "creator": { "id", "username", "avatarUrl", "accuracyRate" } | null, // "[usuario eliminado]" si se borró; null si creatorType = SYSTEM
   "creatorType": "USER | SYSTEM",
   "score": "number",         // upvotes - downvotes
@@ -33,9 +34,31 @@
 **Auth:** requerida.
 **Usuario:** sin ownership, `userId` explícito — `userId` (body) debe coincidir con la sesión — se convierte en `Post.creatorId`.
 
-**Request body:** `userId`, `communityId`, `type`, `title` (≤300), `body`, `url?` (si `type=LINK`), `imageUrl?` (si `type=IMAGE`), `tag?`
+**Request body:** `userId`, `communityId`, `type`, `title` (≤300), `body`, `url?` (si `type=LINK`), `imageUrl?` (si `type=IMAGE`), `tag?`, `relatedCommunityIds?` (hasta 3, distintos de `communityId`, sin canales personales; P-018), `draftId?` (publica ese borrador y lo borra en la misma operación; P-022)
 **Respuesta `201`:** el `Post` creado, más `entities: [{ type: "TICKER"|"MENTION"|"COMMUNITY", raw: string, resolvedId: string, position: [number, number] }]`.
-**Errores:** `403 USER_MISMATCH` · `422` si `title`/`body` vacíos o exceden el límite, o si `communityId` no existe.
+**Errores:** `403 USER_MISMATCH` · `422` si `title`/`body` vacíos o exceden el límite, o si `communityId` no existe · `422 INVALID_RELATED_COMMUNITY` (más de 3, repetidas, la principal, inexistente o un canal personal) · `404` si `draftId` no existe o es ajeno (no publica nada).
+**Relacionadas:** el post aparece también en `GET /feed/explore?community=` de cada una y en Following de quien sigue alguna (una sola vez). No se editan después: `PATCH /posts/{id}` con `relatedCommunityIds` da `422`.
+
+## Borradores (P-022, implementado el 2026-10-20)
+
+Todos con sesión: el `userId` (body o query) se compara con ella.
+
+```jsonc
+// Draft
+{
+  "id": "uuid", "type": "TEXT | LINK | IMAGE",
+  "title": "", "body": "", "url": "", "imageUrl": null, "imageAlt": "", "tag": null,
+  "community": null, // CommunitySummary | null
+  "related": [],     // como Post.related
+  "createdAt": "ISO 8601", "updatedAt": "ISO 8601"
+}
+```
+
+- `GET /api/v1/users/{userId}/drafts`: solo el dueño; hasta 20, del último guardado al más viejo, `nextCursor: null`.
+- `POST /api/v1/drafts`: `201 Draft`; con 20, `409 DRAFT_LIMIT`. Nada es obligatorio; se validan los largos, la comunidad y que `imageUrl` sea una imagen subida con `POST /uploads/post-image`. Las relacionadas van en `relatedCommunityIds`.
+- `PATCH /api/v1/drafts/{draftId}`: `200 Draft` y lo pasa primero. Lo que no se manda no cambia; `null` borra. Inexistente o ajeno, `404`.
+- `DELETE /api/v1/drafts/{draftId}?userId=`: `204`, también si ya no existía.
+- Se publican con `POST /posts` y `draftId` (arriba).
 
 ### `GET /api/v1/posts/{id}`
 **Público** (si la comunidad del post es pública).

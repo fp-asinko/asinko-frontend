@@ -1,6 +1,6 @@
 # Adoptar la respuesta del backend del 2026-10-20 — Tasks
 
-- [ ] **T-01 (S)** La respuesta en `responses/`, el snapshot y `proposals.md` limpio. → BA-11
+- [x] **T-01 (S)** La respuesta en `responses/`, el snapshot y `proposals.md` limpio. → BA-11
 - [ ] **T-02 (M)** Mocks adoptados (`implemented: true`, `PATCH /users` partido) y los errores nuevos del perfil. Tests. → BA-01 a BA-03
 - [ ] **T-03 (M)** Destacados con la forma real, y destacar una encuesta. Tests. → BA-04
 - [ ] **T-04 (M)** Relacionadas: `relatedCommunityIds` al crear, sin la línea al final; borradores con `draftId` y sus relacionadas; el error. Tests. → BA-05, BA-06, BA-08
