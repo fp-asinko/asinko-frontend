@@ -30,7 +30,9 @@ async function openPanel() {
   return screen.findByRole('dialog', { name: 'Emojis' })
 }
 
-describe('EmojiButton (specs/emoji-picker)', () => {
+// The whole panel (every category) renders in each test: ~1 s alone, past Vitest's 5 s under the
+// coverage run's load. A longer limit, not a slower check.
+describe('EmojiButton (specs/emoji-picker)', { timeout: 15_000 }, () => {
   beforeEach(() => localStorage.clear())
 
   it('opens a panel named Emojis, with the focus in its search and every category (EP-02, EP-08)', async () => {

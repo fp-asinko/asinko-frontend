@@ -7,7 +7,19 @@ import { isIndexable } from './src/lib/seo/robots'
 // Validates environment variables at build time (F-29, F-30).
 import { env } from './src/env'
 
-const withNextIntl = createNextIntlPlugin()
+// Messages precompiled at build time: the browser gets the formatter without the ICU parser
+// (~5 KB gzip on every route, seo.md § Presupuesto de JS).
+const withNextIntl = createNextIntlPlugin({
+  experimental: {
+    messages: {
+      path: './messages',
+      format: 'json',
+      locales: 'infer',
+      sourceLocale: 'en',
+      precompile: true,
+    },
+  },
+})
 
 // Fixed security headers for every response, assets included (security.md). The CSP is per-request
 // and lives in src/proxy.ts because it carries a nonce.
