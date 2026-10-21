@@ -46,8 +46,10 @@ describe('widgets-api (P-028, specs/community-widgets)', () => {
   })
 
   it('says it could not ask them, not that there are none', async () => {
-    expect(await getWidgets('nowhere')).toBeNull()
+    // A slug that cannot be asked (checked before the network); a real group without any, [].
+    expect(await getWidgets('../nowhere')).toBeNull()
     expect(await getWidgets('latam')).toEqual([])
+    expect(await getWidgets('a-real-group')).toEqual([])
   })
 
   it('drops a button or an image that is not allowed; an event keeps itself without its link', () => {

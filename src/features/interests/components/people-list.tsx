@@ -15,7 +15,8 @@ export function PeopleList({ people }: { people: Person[] }) {
   const format = useFormatter()
 
   return (
-    <ul className="flex flex-col gap-0.5">
+    // As many as the column's height takes (specs/sidebar-fill SF-03): 5, 3, 2, at least 1.
+    <ul className="flex flex-col gap-0.5 column-short:[&>li:nth-child(n+2)]:hidden column-mid:[&>li:nth-child(n+3)]:hidden column-tall:[&>li:nth-child(n+4)]:hidden [&>li:nth-child(n+6)]:hidden">
       {people.map((person) => (
         <li key={person.id}>
           <CommunityLink

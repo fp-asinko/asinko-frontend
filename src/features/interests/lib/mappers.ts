@@ -3,8 +3,8 @@ import type { AssetTile, Group, Person, Suggestion } from '../interests.types'
 import { communityPath, kindOf, mentionOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 
-/** Suggestions under the viewer sections; without a session the list is all the column shows. */
-export const SUGGESTION_COUNT = { signedIn: 3, guest: 8 } as const
+/** Up to 8, with or without a session: Suggested shows the ones that fit (specs/sidebar-fill SF-02). */
+export const SUGGESTION_COUNT = { signedIn: 8, guest: 8 } as const
 
 /** A community's mention: an asset's symbol from its name (specs/backend-answer-1020 BA-10). */
 const communityHandle = (community: RawCommunity) => mentionOf(community).handle

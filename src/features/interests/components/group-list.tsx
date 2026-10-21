@@ -13,7 +13,8 @@ export function GroupList({ groups }: { groups: Group[] }) {
   const t = useTranslations('interests')
 
   return (
-    <ul className="flex flex-col gap-0.5">
+    // As many as the column's height takes (specs/sidebar-fill SF-03): 6, 4, 3, at least 2.
+    <ul className="flex flex-col gap-0.5 column-short:[&>li:nth-child(n+3)]:hidden column-mid:[&>li:nth-child(n+4)]:hidden column-tall:[&>li:nth-child(n+5)]:hidden [&>li:nth-child(n+7)]:hidden">
       {groups.map((group) => (
         <li key={group.slug}>
           <CommunityLink

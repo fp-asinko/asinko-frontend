@@ -1,8 +1,8 @@
 # La columna izquierda llena su alto — Tasks
 
-- [ ] **T-01 (S)** El orden nuevo y 8 sugerencias con sesión. Tests. → SF-01
-- [ ] **T-02 (M)** La columna como contenedor de tamaño; Sugeridos llena el resto; los escalones por alto en cada lista. Tests. → SF-02 a SF-06
-- [ ] **T-03 (S)** E2E con tres altos, axe, presupuesto de JS; `ui-reviewer`; commit. → SF-04 a SF-06
+- [x] **T-01 (S)** El orden nuevo y 8 sugerencias con sesión. Tests. → SF-01
+- [x] **T-02 (M)** La columna como contenedor de tamaño; Sugeridos llena el resto; los escalones por alto en cada lista. Tests. → SF-02 a SF-06
+- [x] **T-03 (S)** E2E con tres altos, axe, presupuesto de JS; `ui-reviewer`; commit. → SF-04 a SF-06
 
 Orden: T-01 → T-03.
 

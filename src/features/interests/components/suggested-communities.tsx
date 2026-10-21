@@ -1,4 +1,5 @@
 import { useTranslations } from 'next-intl'
+import { FitList } from '@/components/molecules/fit-list'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import { HideWhenJoined, JoinButton } from '@/components/organisms/join'
 import { joinCommunity } from '@/lib/communities/join-community.action'
@@ -15,7 +16,8 @@ export function SuggestedCommunities({ suggestions }: { suggestions: Suggestion[
   const t = useTranslations('interests')
 
   return (
-    <ul className="flex flex-col">
+    // As many as fit whole in the height left, at least one (specs/sidebar-fill SF-02, SF-04).
+    <FitList className="min-h-13">
       {suggestions.map((suggestion) => (
         <HideWhenJoined key={suggestion.slug} slug={suggestion.slug}>
           {/* The whole row is the hover and the current page, Join included (the PO, 2026-10-10). */}
@@ -51,6 +53,6 @@ export function SuggestedCommunities({ suggestions }: { suggestions: Suggestion[
           </li>
         </HideWhenJoined>
       ))}
-    </ul>
+    </FitList>
   )
 }

@@ -19,7 +19,8 @@ export function AssetTiles({ tiles }: { tiles: AssetTile[] }) {
   return (
     <>
       <p className="mb-1.5 text-right text-[0.5625rem] text-muted-foreground">{t('period')}</p>
-      <ul className="grid grid-cols-3 gap-1.25">
+      {/* As many rows as the column's height takes (specs/sidebar-fill SF-03): 3, 2, at least 1. */}
+      <ul className="grid grid-cols-3 gap-1.25 [&>li:nth-child(n+10)]:hidden column-mid:[&>li:nth-child(n+4)]:hidden column-tall:[&>li:nth-child(n+7)]:hidden">
         {tiles.map((tile) => {
           const change = tile.changePct ?? 0
           return (

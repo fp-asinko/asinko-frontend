@@ -1,6 +1,7 @@
 import 'server-only'
 import { cache } from 'react'
 import { apiRequest, keepValidItems, type ApiResult } from '@/lib/api'
+import { communitySlugSchema } from '@/lib/communities/community-slug.schema'
 import { widgetListSchema, widgetSchema, type RawWidget } from '@/lib/api/contract'
 import { kindOf, mentionOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
@@ -88,6 +89,8 @@ export function toWidget(raw: RawWidget, signedIn: boolean): CommunityWidget {
 export const getWidgets = cache(async function getWidgets(
   slug: string,
 ): Promise<CommunityWidget[] | null> {
+  // Checked before the network (api-integration.md): one that cannot be a slug is not asked.
+  if (!communitySlugSchema.safeParse(slug).success) return null
   const [result, viewer] = await Promise.all([
     apiRequest({
       method: 'GET',

@@ -5,6 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 /* Translucent bars become solid when the user asks for less transparency (apple-design §12). */
 @custom-variant reduced-transparency (@media (prefers-reduced-transparency: reduce));
+/* The left column's height (specs/sidebar-fill SF-03): each list shows fewer items when it is low,
+   with the browser's zoom too (the height in CSS pixels goes down). Measured: about 406px of
+   titles, "more" and lines, then a group 52, a person 42, a row of assets 85, a suggestion 50. */
+@custom-variant column-short (@container column (height < 48.8rem));
+@custom-variant column-mid (@container column (height < 60rem));
+@custom-variant column-tall (@container column (height < 75rem));
 
 /*
  * Design tokens: the prototype's visual system (specs/home/design.md §2), measured in the browser.

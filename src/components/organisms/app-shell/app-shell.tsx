@@ -58,7 +58,7 @@ export function AppShell({
         >
           {/* Its full width while the column slides (clipped, never squeezed), fading out as it
               folds and in as it opens; folded, invisible: out of reach and of what is read. */}
-          <div className="[html:has([data-left-fold=folded])_&]:invisible [html:has([data-left-fold=folded])_&]:opacity-0 [html:has([data-left-fold=folded])_&]:duration-150 [html:has([data-left-fold])_&]:h-full [html:has([data-left-fold])_&]:w-65 [html:has([data-left-fold])_&]:overflow-y-auto [html:has([data-left-fold])_&]:px-2 [html:has([data-left-fold])_&]:pb-2.5 [html:has([data-left-fold])_&]:transition-[opacity,visibility] [html:has([data-left-fold])_&]:duration-200 [html:has([data-left-fold])_&]:ease-out">
+          <div className="h-full [html:has([data-left-fold=folded])_&]:invisible [html:has([data-left-fold=folded])_&]:opacity-0 [html:has([data-left-fold=folded])_&]:duration-150 [html:has([data-left-fold])_&]:w-65 [html:has([data-left-fold])_&]:overflow-y-auto [html:has([data-left-fold])_&]:px-2 [html:has([data-left-fold])_&]:pb-2.5 [html:has([data-left-fold])_&]:transition-[opacity,visibility] [html:has([data-left-fold])_&]:duration-200 [html:has([data-left-fold])_&]:ease-out">
             {sidebar}
           </div>
         </div>

@@ -38,6 +38,20 @@ describe('SidebarSection', () => {
     expect(await screen.findByText('BTC, ETH')).toBeVisible()
   })
 
+  it('filling the column, it still opens and closes (specs/sidebar-fill SF-02)', async () => {
+    renderWithIntl(
+      <SidebarSection title="Suggested" result={{ ok: true, data: ['A'] }} fill>
+        {(items) => <p>{items.join(', ')}</p>}
+      </SidebarSection>,
+    )
+    const toggle = screen.getByRole('button', { name: 'Suggested' })
+    await userEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    await waitFor(() => expect(screen.queryByText('A')).toBeNull())
+    await userEvent.click(toggle)
+    expect(await screen.findByText('A')).toBeVisible()
+  })
+
   it('shows its own error without breaking the column (H-19)', () => {
     renderSection({ ok: false })
     expect(screen.getByText('Could not load this section.')).toBeInTheDocument()

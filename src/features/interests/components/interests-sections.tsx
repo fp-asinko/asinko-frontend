@@ -43,11 +43,16 @@ export function InterestsSections({ interests }: { interests: Interests }) {
   }
 
   return (
-    <section aria-label={t('title')} className="flex min-h-full flex-col">
+    // A size container (specs/sidebar-fill): its lists ask for the height there is.
+    <section
+      aria-label={t('title')}
+      // Only the desktop column: the phone's panel keeps its natural height (out of scope).
+      className="flex flex-col md:[container-type:size] md:h-full md:[container-name:column]"
+    >
       <p aria-hidden className={COLUMN_TITLE}>
         {t('title')}
       </p>
-      {/* Groups first, then assets and people (PO, 2026-10-18). */}
+      {/* Groups, people, then assets (PO, 2026-10-21, specs/sidebar-fill SF-01). */}
       <SidebarSection
         title={t('groups')}
         result={interests.groups}
@@ -69,15 +74,6 @@ export function InterestsSections({ interests }: { interests: Interests }) {
         </ComingSoon>
       </div>
       <SidebarSection
-        title={t('assets')}
-        result={interests.assets}
-        empty={t('empty.assets')}
-        emptyIcon={<CoinsIcon />}
-        moreLabel={t('moreAssets')}
-      >
-        {(tiles) => <AssetTiles tiles={tiles} />}
-      </SidebarSection>
-      <SidebarSection
         title={t('people')}
         result={interests.people}
         empty={t('empty.people')}
@@ -86,9 +82,19 @@ export function InterestsSections({ interests }: { interests: Interests }) {
       >
         {(people) => <PeopleList people={people} />}
       </SidebarSection>
+      <SidebarSection
+        title={t('assets')}
+        result={interests.assets}
+        empty={t('empty.assets')}
+        emptyIcon={<CoinsIcon />}
+        moreLabel={t('moreAssets')}
+      >
+        {(tiles) => <AssetTiles tiles={tiles} />}
+      </SidebarSection>
       {/* At the bottom of the column, after a short, soft line (as without a session). */}
-      <hr className="mx-1 mt-auto mb-6 shrink-0 border-border/60" />
-      <SidebarSection title={t('suggested')} result={interests.suggested}>
+      <hr className="mx-1 mb-6 shrink-0 border-border/60" />
+      {/* It takes the height left, whole items only (SF-02). */}
+      <SidebarSection title={t('suggested')} result={interests.suggested} fill className="mb-0">
         {(suggestions) => <SuggestedCommunities suggestions={suggestions} />}
       </SidebarSection>
     </section>

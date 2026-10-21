@@ -36,12 +36,12 @@ describe('interests mappers', () => {
     ])
   })
 
-  it('suggests the three biggest communities the viewer is not in', () => {
+  it('suggests the biggest communities the viewer is not in, the biggest first', () => {
     const list = [10, 50, 30, 40, 20].map((memberCount, index) =>
       community({ slug: `c${index}`, type: 'USER_PUBLIC', viewerMembership: null, memberCount }),
     )
     list.push(community({ slug: 'mine', viewerMembership: 'MEMBER', memberCount: 999 }))
-    expect(toSuggestions(list).map((s) => s.slug)).toEqual(['c1', 'c3', 'c2'])
+    expect(toSuggestions(list).map((s) => s.slug)).toEqual(['c1', 'c3', 'c2', 'c4', 'c0'])
   })
 
   it('marks suggested asset communities with $ and groups with #', () => {
@@ -52,7 +52,7 @@ describe('interests mappers', () => {
     expect(toSuggestions(list).map((s) => s.handle)).toEqual(['$ETH', '#macro'])
   })
 
-  it('suggests up to 8 communities without a session', () => {
+  it('suggests up to 8, with or without a session (specs/sidebar-fill SF-02)', () => {
     const list = Array.from({ length: 12 }, (_, index) =>
       community({
         slug: `c${index}`,
@@ -62,7 +62,7 @@ describe('interests mappers', () => {
       }),
     )
     expect(toSuggestions(list, SUGGESTION_COUNT.guest)).toHaveLength(8)
-    expect(toSuggestions(list)).toHaveLength(3)
+    expect(toSuggestions(list)).toHaveLength(8)
   })
 
   it('defaults a missing accuracy to null', () => {

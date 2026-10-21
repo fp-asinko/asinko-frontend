@@ -86,12 +86,12 @@ describe('InterestsSections', () => {
     renderWithIntl(<InterestsSections interests={interests} />)
     const region = screen.getByRole('region', { name: 'Your interests' })
 
-    // Groups first, then assets and people (PO, 2026-10-18).
+    // Groups, people, then assets (PO, 2026-10-21, specs/sidebar-fill SF-01).
     expect(
       within(region)
         .getAllByRole('heading')
         .map((heading) => heading.textContent),
-    ).toEqual(['Groups', 'Assets', 'People', 'Suggested'])
+    ).toEqual(['Groups', 'People', 'Assets', 'Suggested'])
     for (const name of ['Groups', 'Assets', 'People', 'Suggested']) {
       const heading = within(region).getByRole('heading', { name })
       expect(within(heading.closest('section')!).getByRole('button', { name })).toHaveAttribute(

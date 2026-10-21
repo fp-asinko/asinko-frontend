@@ -21,6 +21,7 @@ export function SidebarSection<T>({
   empty,
   emptyIcon,
   moreLabel,
+  fill = false,
   className,
   children,
 }: {
@@ -31,6 +32,8 @@ export function SidebarSection<T>({
   emptyIcon?: ReactNode
   /** Accessible name of the section's "more" link (coming soon, H-26), e.g. "More assets". */
   moreLabel?: string
+  /** Takes the column's height left (specs/sidebar-fill SF-02): its list fills it. */
+  fill?: boolean
   className?: string
   children: (data: T[]) => ReactNode
 }) {
@@ -38,11 +41,18 @@ export function SidebarSection<T>({
   const headingId = useId()
 
   return (
-    <section aria-labelledby={headingId} className={cn('mb-4', className)}>
+    <section
+      aria-labelledby={headingId}
+      className={cn(
+        'mb-4', // At least its title and one whole item: below it, the column scrolls (SF-04).
+        fill && 'md:flex md:min-h-24 md:flex-1 md:flex-col',
+        className,
+      )}
+    >
       <h2 id={headingId} className="sr-only">
         {title}
       </h2>
-      <Collapsible defaultOpen>
+      <Collapsible defaultOpen className={cn(fill && 'md:flex md:min-h-0 md:flex-1 md:flex-col')}>
         <CollapsibleTrigger className="group flex min-h-6 w-full cursor-pointer items-center justify-between rounded-sm px-1 py-1 text-muted-foreground transition-colors duration-150 ease-out outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50">
           <span className="text-[0.625rem] leading-[1.4] font-bold tracking-[0.08em] uppercase">
             {title}
@@ -54,8 +64,15 @@ export function SidebarSection<T>({
           />
         </CollapsibleTrigger>
         {/* Height from Base UI's --collapsible-panel-height: animates in every browser (S-01). */}
-        <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-[height] duration-200 ease-out data-ending-style:h-0 data-ending-style:duration-150 data-starting-style:h-0">
-          <div className="py-1">
+        <CollapsibleContent
+          className={cn(
+            'overflow-hidden transition-[height] duration-200 ease-out data-ending-style:h-0 data-ending-style:duration-150 data-starting-style:h-0',
+            // Filling, its height is the column's left (no measured height to animate to).
+            'h-(--collapsible-panel-height)',
+            fill && 'md:h-auto md:min-h-0 md:flex-1',
+          )}
+        >
+          <div className={cn('py-1', fill && 'md:h-full')}>
             {!result.ok ? (
               <EmptyState
                 icon={<CloudOffIcon />}
