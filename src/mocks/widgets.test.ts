@@ -24,7 +24,28 @@ describe('widgets mock (P-028, specs/community-widgets)', () => {
     ])
     for (const widget of list) expect(widgetSchema.safeParse(widget).success).toBe(true)
     expect(items('latam')).toEqual([])
-    expect(listWidgets('nowhere')).toMatchObject({ status: 404 })
+    // A group of the real backend (the DEV deploy): none yet.
+    expect(listWidgets('nowhere')).toEqual({ status: 200, body: { items: [] } })
+  })
+
+  it("keeps a real group's widgets in memory for any session's user (phase 3 of the backend)", () => {
+    const someone = '11111111-1111-4111-8111-111111111111'
+    const text = { type: 'TEXT', title: 'Welcome', body: 'Hi.' }
+    expect(saveWidgets('a-real-group', { userId: someone, items: [text] })).toMatchObject({
+      status: 200,
+    })
+    expect(items('a-real-group').map((widget) => widget.type)).toEqual(['TEXT'])
+    expect(code(saveWidgets('a-real-group', { userId: 'nobody', items: [] }))).toMatchObject({
+      code: 'USER_MISMATCH',
+    })
+    expect(
+      signCommunityImageUpload({
+        userId: someone,
+        communityId: '22222222-2222-4222-8222-222222222222',
+        contentType: 'image/webp',
+        size: 1000,
+      }),
+    ).toMatchObject({ status: 200 })
   })
 
   it('saves the whole list for a moderator, giving new ones an id and resolving communities', () => {

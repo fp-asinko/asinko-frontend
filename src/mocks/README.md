@@ -2,6 +2,8 @@
 
 Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of them with the demo user; `API_MOCKS=missing` only the ones the backend does not have yet (`implemented: false`: today the proposals P-023 and P-026, a community's tags and the profile's "open to", P-028 and P-029, a group's widgets, and P-030, achievements; the rest was adopted on 2026-10-20, `specs/backend-answer-1020`). Handlers follow the backend's `dev` branch (`asinko-app` `0cdf243`): `?kind=` on the feeds, `?mine=true` on communities, an empty page for an unknown community. See `docs/ai-guidelines/api-integration.md § Mocks`.
 
+**The DEV deploy (`API_MOCKS=missing`):** the backend's phase 3 (achievements, P-030; a group's widgets and their images, P-028 and P-029) is shown against these mocks, with the real users and groups of `dev`. A person who is not in the fixtures gets a sample of earned achievements, always the same for them (from their id). A group that is not in the fixtures starts without widgets; any session's user can save them (the front offers it only to its moderators, from the backend's data), and they live in the memory of that server instance: they can go away or not show from another device.
+
 | Method | Path                                       | Kind     | Notes                                                                                                           |
 | ------ | ------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------- |
 | GET    | `/api/v1/profiles/:identifier`             | contract | Implemented in the backend (E01). `liveExample` for `pnpm api:smoke`                                            |

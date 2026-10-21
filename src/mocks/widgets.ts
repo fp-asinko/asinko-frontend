@@ -158,8 +158,24 @@ function answer(widget: Stored): RawWidget {
 /** GET /communities/{slug}/widgets */
 export function listWidgets(slug: string): MockResponse {
   const community = communityBySlug(slug)
-  if (!community) return error(404, 'NOT_FOUND')
+  // A group of the real backend (API_MOCKS=missing, the DEV deploy): none yet, or what its
+  // moderators saved in this instance's memory.
+  if (!community) return { status: 200, body: { items: (WIDGETS.get(slug) ?? []).map(answer) } }
   return { status: 200, body: { items: (WIDGETS.get(community.slug) ?? []).map(answer) } }
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
+/**
+ * Who may write the widgets of a group (P-028): the demo user, a moderator of the fixtures'. For a
+ * group of the real backend the mock cannot know the roles: the front already offers it only to its
+ * moderators, from the backend's own data (phase 3 of the backend, 2026-10-21).
+ */
+function writer(slug: string, userId: unknown): MockResponse | null {
+  if (!communityBySlug(slug))
+    return typeof userId === 'string' && UUID.test(userId) ? null : error(403, 'USER_MISMATCH')
+  if (userId !== DEMO_USER.id) return error(403, 'USER_MISMATCH')
+  return moderates(slug) ? null : error(403, 'NOT_MODERATOR')
 }
 
 const text = (value: unknown, min: number, max: number) =>
@@ -312,11 +328,10 @@ function moderates(slug: string) {
 
 /** PUT /communities/{slug}/widgets { userId, items } */
 export function saveWidgets(slug: string, body: unknown): MockResponse {
-  const community = communityBySlug(slug)
-  if (!community) return error(404, 'NOT_FOUND')
+  const key = communityBySlug(slug)?.slug ?? slug
   const input = (body ?? {}) as Record<string, unknown>
-  if (input.userId !== DEMO_USER.id) return error(403, 'USER_MISMATCH')
-  if (!moderates(community.slug)) return error(403, 'NOT_MODERATOR')
+  const refused = writer(key, input.userId)
+  if (refused) return refused
   if (!Array.isArray(input.items)) return error(422, 'VALIDATION_ERROR')
   if (input.items.length > L.widgets) return error(422, 'TOO_MANY_WIDGETS')
   for (const [index, item] of input.items.entries()) {
@@ -327,10 +342,10 @@ export function saveWidgets(slug: string, body: unknown): MockResponse {
     if (field) return error(422, 'INVALID_WIDGET', { index, field })
   }
   WIDGETS.set(
-    community.slug,
+    key,
     input.items.map((item) => stored(item as Record<string, unknown>)),
   )
-  return listWidgets(community.slug)
+  return listWidgets(key)
 }
 
 const TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
@@ -339,17 +354,23 @@ const MAX_BYTES = 5 * 1024 * 1024
 /** POST /uploads/community-image (P-029): a moderator of that community, as a post image. */
 export function signCommunityImageUpload(body: unknown): MockResponse {
   const input = (body ?? {}) as Record<string, unknown>
-  if (input.userId !== DEMO_USER.id) return error(403, 'USER_MISMATCH')
-  const community = typeof input.communityId === 'string' ? communityById(input.communityId) : null
-  if (!community) return error(422, 'VALIDATION_ERROR')
-  if (!moderates(community.slug)) return error(403, 'NOT_MODERATOR')
+  const id = typeof input.communityId === 'string' ? input.communityId : ''
+  const community = communityById(id)
+  // A group of the real backend: any session's user, as saving its widgets (writer).
+  if (!community && !UUID.test(id)) return error(422, 'VALIDATION_ERROR')
+  const refused = community
+    ? writer(community.slug, input.userId)
+    : typeof input.userId === 'string' && UUID.test(input.userId)
+      ? null
+      : error(403, 'USER_MISMATCH')
+  if (refused) return refused
   if (typeof input.contentType !== 'string' || !TYPES.has(input.contentType)) {
     return error(422, 'VALIDATION_ERROR')
   }
   if (typeof input.size !== 'number' || input.size <= 0 || input.size > MAX_BYTES) {
     return error(422, 'VALIDATION_ERROR')
   }
-  const path = `${community.id}/mock.webp`
+  const path = `${id}/mock.webp`
   return {
     status: 200,
     body: {

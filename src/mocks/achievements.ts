@@ -52,8 +52,39 @@ const DEMO_PROGRESS: Progress = {
 }
 
 /** GET /users/{userId}/achievements */
+/**
+ * A person of the real backend (API_MOCKS=missing, the DEV deploy, phase 3 of the backend): a sample
+ * of earned ones, always the same for them (from their id). Without knowing who looks, no missing.
+ */
+const SAMPLE: AchievementCode[] = [
+  'FIRST_POST',
+  'FIRST_COMMENT',
+  'FIRST_THESIS',
+  'FOUNDING_MEMBER',
+  'STREAK_3',
+  'FOLLOWERS_100',
+]
+
+function sampleOf(userId: string): RawAchievement[] {
+  const seed = [...userId].reduce((sum, char) => sum + char.charCodeAt(0), 0)
+  return SAMPLE.filter((_, index) => index < 2 || (seed >> index) % 2 === 1).map((code, index) => ({
+    code,
+    earnedAt: daysAgo(10 + ((seed + index * 17) % 300)),
+    level: null,
+    progress: null,
+  }))
+}
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export function listAchievements(userId: string): MockResponse {
   const user = PROFILES.find((each) => each.id === userId)
+  if (!user && UUID.test(userId)) {
+    const items = sampleOf(userId).toSorted((a, b) =>
+      (b.earnedAt ?? '').localeCompare(a.earnedAt ?? ''),
+    )
+    return { status: 200, body: { items } }
+  }
   if (!user) return { status: 404, body: { error: { code: 'NOT_FOUND', message: 'mock' } } }
   const earned = (EARNED[user.username] ?? []).toSorted((a, b) => a.days - b.days)
   const items: RawAchievement[] = earned.map(({ code, days, level }) => ({

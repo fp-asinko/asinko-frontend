@@ -33,6 +33,15 @@ describe('listAchievements (P-030, specs/profile-achievements AC-01, AC-02)', ()
     expect(items.find((item) => item.code === 'ANNIVERSARY')).toMatchObject({ level: 1 })
   })
 
+  it('a person of the real backend: a sample, the same each time, without missing ones', () => {
+    const someone = '11111111-1111-4111-8111-111111111111'
+    const first = list(someone)
+    expect(first.length).toBeGreaterThanOrEqual(2)
+    expect(first.every((item) => item.earnedAt)).toBe(true)
+    for (const item of first) expect(achievementSchema.parse(item)).toEqual(item)
+    expect(list(someone)).toEqual(first)
+  })
+
   it('nothing earned is an empty list; an unknown person, 404', () => {
     expect(list(userByUsername('jeppe')!.id)).toEqual([])
     expect(listAchievements('nobody')).toMatchObject({ status: 404 })
