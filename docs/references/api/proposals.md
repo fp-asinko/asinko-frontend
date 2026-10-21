@@ -2,11 +2,10 @@
 
 > Lo que el front necesita y el contrato de la API no tiene. Cada propuesta se mockea en `src/mocks/` con esta forma exacta (ver [`api-integration.md`](../../ai-guidelines/api-integration.md)) y se le pasa al backend para implementarla. Cuando el backend la implementa y el front la adopta, sale de este archivo (queda en el historial de git) y pasa al snapshot del contrato.
 
-**Actualizado el 2026-10-20**, después de la respuesta del backend a `proposals6` ([`responses/2026-10-20-backend.md`](responses/2026-10-20-backend.md)). Lo implementado se adoptó (`specs/backend-answer-1020`) y salió de acá. Quedan:
+**Actualizado el 2026-10-21**, después de la respuesta del backend a `proposals6` ([`responses/2026-10-20-backend.md`](responses/2026-10-20-backend.md)). Lo implementado se adoptó (`specs/backend-answer-1020`) y salió de acá. Queda:
 
-- lo nuevo, que el backend todavía no vio: **P-030** (logros), **P-028** y **P-029** (widgets de los grupos);
-- lo que espera una decisión de producto: P-026, P-023 y la fórmula de `best` (P-014);
-- una pregunta sobre los slugs de los activos (abajo).
+- **Pendiente ahora:** una pregunta sobre los slugs de los activos, y lo que espera una decisión de producto (P-026, P-023 y la fórmula de `best`, P-014).
+- **Fase 3 del backend:** los logros (P-030) y los widgets de los grupos (P-028, P-029). En el front ya se ven, contra mocks; el backend los implementa más adelante.
 
 **Verificado contra el deploy de `dev` el 2026-10-21** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 10 de 10 en verde, solo lecturas, cada respuesta con el mismo esquema que usa el mock. Además de lo de antes:
 
@@ -38,15 +37,52 @@ Lo que necesita sesión está en [Por verificar con datos reales](#por-verificar
 
 ## Pendientes, en orden de prioridad para el front
 
-1. **P-030: logros del perfil**, como la vitrina de trofeos de Reddit (`specs/profile-achievements`): 16 logros, quién ganó cuál y, para el dueño, cuánto le falta. Hecho contra mocks.
-2. **P-028 y P-029: widgets de los grupos**, como Reddit (`specs/community-widgets`): Texto, Reglas, Botones, Lista de comunidades, Imágenes y Calendario en la columna derecha, que arma el moderador. Hechos contra mocks.
-3. **P-026: "Abierto a"** y **P-023: marcas por comunidad.** Esperan la decisión de producto (respuesta del 2026-10-20). Los valores y la forma de abajo son lo que el front ya tiene hecho contra mocks; si cambian, se ajusta el mock.
-4. **`best` de los comentarios (P-014).** Espera la fórmula. El front ya manda `sort=best`.
-5. **Pregunta: slugs de las comunidades de activo.** La respuesta del 2026-10-20 dice que van en minúscula y sin barra (`tsla`, `brk-b`), pero las que ya existen en `dev` siguen en mayúscula (`BTC`, `AAPL`, `VOO`). ¿Se renombran? El front ya no deduce el slug del símbolo (usa `linkedCommunity.slug`), así que funciona de las dos maneras; lo preguntamos para que los links viejos sigan andando.
+1. **Pregunta: slugs de las comunidades de activo.** La respuesta del 2026-10-20 dice que van en minúscula y sin barra (`tsla`, `brk-b`), pero las que ya existen en `dev` siguen en mayúscula (`BTC`, `AAPL`, `VOO`). ¿Se renombran? El front ya no deduce el slug del símbolo (usa `linkedCommunity.slug`), así que funciona de las dos maneras; lo preguntamos para que los links viejos sigan andando.
+2. **P-026: "Abierto a"** y **P-023: marcas por comunidad.** Esperan la decisión de producto (respuesta del 2026-10-20). Los valores y la forma de abajo son lo que el front ya tiene hecho contra mocks; si cambian, se ajusta el mock.
+3. **`best` de los comentarios (P-014).** Espera la fórmula. El front ya manda `sort=best`.
+
+### P-026: "Abierto a"
+
+**Estado:** propuesta (2026-10-19), mockeada (un `PATCH /users` con `openTo` va al mock). **Backend, 2026-10-20:** lo define producto con el equipo, incluida la lista de valores.
+
+**Endpoint:** `PATCH /api/v1/users/{userId}`, el `User` y el `Profile`.
+
+**Motivo:** "Tengo interés en…", como LinkedIn (`specs/profile-showcase`): para qué está disponible la persona. Valores fijos, para traducirlos y, más adelante, filtrar por ellos.
+
+**Cambio:** `"openTo": string[]` con valores de `QUESTIONS`, `COLLABORATIONS`, `MENTORING`, `AMAS`, `COMMISSIONED_ANALYSIS`, sin repetir; `[]` lo borra. `422 INVALID_OPEN_TO` con otro valor o repetido.
+
+### P-023: Marcas por comunidad
+
+**Estado:** propuesta (2026-10-19), mockeada. **Backend, 2026-10-20:** lo define producto con el equipo (quién define las marcas y si los moderadores las editan). El `Draft` ya trae `tag`. El nombre del campo en el `Community` probablemente no sea `tags` (Explore ya lo usa para los temas): el front lo cambia en el mapper cuando se confirme.
+
+**Endpoint:** el recurso `Community` (`GET /communities`, `GET /communities/{slug}`) y `POST /posts`.
+
+**Motivo:** "Añadir marca" al crear un post, como el flair de Reddit (`specs/drafts-tags`): cada comunidad tiene sus marcas ("Análisis", "Noticia", "Pregunta"…) y el post lleva una, opcional, que se ve junto al título. El `Post` ya tiene `tag` y `POST /posts` lo acepta, pero no hay de dónde sacar las marcas de cada comunidad.
+
+**Cambio:**
+
+- `"tags": string[]` en el `Community`: hasta 20, de 1 a 24 caracteres; `[]` si no tiene. Las definen sus moderadores (más adelante, con `PATCH /communities`); mientras tanto, del seed.
+- `POST /posts` con un `tag` que no está en las de su comunidad: `422 INVALID_TAG`.
+
+### `best` de los comentarios (P-014)
+
+**Estado:** el backend acepta `sort=best` y por ahora responde cronológico; la fórmula está en definición.
+
+**Propuesta del front** (decisión del PO, 2026-10-08), la de Hacker News: `score / (horas desde createdAt + 2) ^ 1,5`, de mayor a menor; un comentario nuevo y votado sube, y uno viejo baja de a poco. El mock la usa. Reddit usa el intervalo de Wilson sobre votos a favor y en contra por separado, y el contrato solo tiene `score`. Si el backend prefiere otra (o guardar votos a favor y en contra para usar Wilson), el front no cambia: solo manda `sort=best`.
+
+## Fase 3 del backend: solo visual en el front
+
+Decisión del 2026-10-21: estas propuestas se implementan en el backend en una fase 3. Hasta entonces, el front las muestra con mocks (desarrollo y CI, `API_MOCKS=missing` o `true`): la forma de abajo es la que ya usa, y es lo que proponemos.
+
+| Propuesta | Qué se ve en el front | Spec |
+| --- | --- | --- |
+| P-030 logros | La tarjeta "Logros" en la columna derecha del perfil y la página `/user/{username}/achievements`, con 16 logros en cuatro grupos | `profile-achievements` |
+| P-028 widgets | Los widgets de un grupo en su columna derecha (Texto, Reglas, Botones, Comunidades, Imágenes y Calendario) y "Editar widgets" para sus moderadores | `community-widgets` |
+| P-029 imágenes de un grupo | La subida de imágenes del widget de Imágenes | `community-widgets` |
 
 ### P-030: Logros del perfil
 
-**Estado:** propuesta (2026-10-19), mockeada.
+**Estado:** propuesta (2026-10-19), mockeada. **Fase 3 del backend** (2026-10-21).
 
 **Endpoint:** `GET /api/v1/users/{userId}/achievements` (público).
 
@@ -77,7 +113,7 @@ Lo que necesita sesión está en [Por verificar con datos reales](#por-verificar
 
 ### P-028: Widgets de un grupo
 
-**Estado:** propuesta (2026-10-19), mockeada.
+**Estado:** propuesta (2026-10-19), mockeada. **Fase 3 del backend** (2026-10-21).
 
 **Endpoints:** `GET /api/v1/communities/{slug}/widgets` (público) y `PUT /api/v1/communities/{slug}/widgets` (solo moderadores).
 
@@ -114,42 +150,13 @@ Lo que necesita sesión está en [Por verificar con datos reales](#por-verificar
 
 ### P-029: Imágenes de un grupo
 
-**Estado:** propuesta (2026-10-19), mockeada.
+**Estado:** propuesta (2026-10-19), mockeada. **Fase 3 del backend** (2026-10-21).
 
 **Endpoint:** `POST /api/v1/uploads/community-image` `{ userId, communityId, contentType, size }` → `{ uploadUrl, imageUrl, path }`.
 
 **Motivo:** el widget de Imágenes (P-028). También sirve para el banner y el avatar del grupo cuando exista "Editar comunidad".
 
 **Cambio:** el mismo flujo de URL firmada que `POST /uploads/post-image` (P-013): JPEG, PNG, WebP o GIF (nunca SVG), hasta 5 MB. Solo moderadores de esa comunidad (`403 NOT_MODERATOR`).
-
-### P-026: "Abierto a"
-
-**Estado:** propuesta (2026-10-19), mockeada (un `PATCH /users` con `openTo` va al mock). **Backend, 2026-10-20:** lo define producto con el equipo, incluida la lista de valores.
-
-**Endpoint:** `PATCH /api/v1/users/{userId}`, el `User` y el `Profile`.
-
-**Motivo:** "Tengo interés en…", como LinkedIn (`specs/profile-showcase`): para qué está disponible la persona. Valores fijos, para traducirlos y, más adelante, filtrar por ellos.
-
-**Cambio:** `"openTo": string[]` con valores de `QUESTIONS`, `COLLABORATIONS`, `MENTORING`, `AMAS`, `COMMISSIONED_ANALYSIS`, sin repetir; `[]` lo borra. `422 INVALID_OPEN_TO` con otro valor o repetido.
-
-### P-023: Marcas por comunidad
-
-**Estado:** propuesta (2026-10-19), mockeada. **Backend, 2026-10-20:** lo define producto con el equipo (quién define las marcas y si los moderadores las editan). El `Draft` ya trae `tag`. El nombre del campo en el `Community` probablemente no sea `tags` (Explore ya lo usa para los temas): el front lo cambia en el mapper cuando se confirme.
-
-**Endpoint:** el recurso `Community` (`GET /communities`, `GET /communities/{slug}`) y `POST /posts`.
-
-**Motivo:** "Añadir marca" al crear un post, como el flair de Reddit (`specs/drafts-tags`): cada comunidad tiene sus marcas ("Análisis", "Noticia", "Pregunta"…) y el post lleva una, opcional, que se ve junto al título. El `Post` ya tiene `tag` y `POST /posts` lo acepta, pero no hay de dónde sacar las marcas de cada comunidad.
-
-**Cambio:**
-
-- `"tags": string[]` en el `Community`: hasta 20, de 1 a 24 caracteres; `[]` si no tiene. Las definen sus moderadores (más adelante, con `PATCH /communities`); mientras tanto, del seed.
-- `POST /posts` con un `tag` que no está en las de su comunidad: `422 INVALID_TAG`.
-
-### `best` de los comentarios (P-014)
-
-**Estado:** el backend acepta `sort=best` y por ahora responde cronológico; la fórmula está en definición.
-
-**Propuesta del front** (decisión del PO, 2026-10-08), la de Hacker News: `score / (horas desde createdAt + 2) ^ 1,5`, de mayor a menor; un comentario nuevo y votado sube, y uno viejo baja de a poco. El mock la usa. Reddit usa el intervalo de Wilson sobre votos a favor y en contra por separado, y el contrato solo tiene `score`. Si el backend prefiere otra (o guardar votos a favor y en contra para usar Wilson), el front no cambia: solo manda `sort=best`.
 
 ## Por verificar con datos reales
 
