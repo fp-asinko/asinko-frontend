@@ -1,11 +1,9 @@
 import type { RawCommunity } from '@/lib/api/contract'
 import { allowedImageUrl } from '@/lib/images'
-import { kindOf } from '@/lib/communities/paths'
-import type { CommunityKind, CommunityPage } from '../communities.types'
+import { kindOf, mentionOf } from '@/lib/communities/paths'
+import type { CommunityPage } from '../communities.types'
 
 export { kindOf }
-
-const SYMBOL: Record<CommunityKind, string> = { group: '#', asset: '$', user: '@' }
 
 /** Only http(s) links, with the real domain to show (security.md § 1). */
 function safeLink(url: string | null): CommunityPage['mainUrl'] {
@@ -25,14 +23,17 @@ function safeLink(url: string | null): CommunityPage['mainUrl'] {
  */
 export function toCommunityPage(community: RawCommunity, signedIn = true): CommunityPage {
   const kind = kindOf(community.type)
-  const handle = `${SYMBOL[kind]}${community.slug}`
+  // An asset's handle and page come from its symbol, never from its slug (specs/backend-answer-1020
+  // BA-10).
+  const { handle, path } = mentionOf(community)
   // The backend names system communities with their symbol (#Macro, $BTC): no subtitle then.
   const bareName = community.name.replace(/^[#$@]/, '')
-  const subtitle = bareName.toLowerCase() === community.slug.toLowerCase() ? null : community.name
+  const subtitle = bareName.toLowerCase() === handle.slice(1).toLowerCase() ? null : community.name
   return {
     id: community.id,
     slug: community.slug,
     handle,
+    path,
     subtitle,
     description: community.description?.trim() || null,
     avatarUrl: allowedImageUrl(community.avatarUrl),

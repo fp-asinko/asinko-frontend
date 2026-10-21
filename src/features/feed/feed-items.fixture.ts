@@ -36,6 +36,7 @@ export function postItem(overrides: Partial<PostItem> = {}): PostItem {
     edited: false,
     deleted: false,
     tag: null,
+    related: [],
     ...overrides,
   }
 }

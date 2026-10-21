@@ -7,7 +7,7 @@ import {
   activeCommunitySchema,
   type RawActiveCommunity,
 } from '@/lib/api/contract'
-import { communityPath, kindOf } from '@/lib/communities/paths'
+import { kindOf, mentionOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 import type { ActiveCommunity } from '../communities.types'
 
@@ -21,15 +21,11 @@ const DAYS = 90
 
 export function toActiveCommunity({ community, postCount }: RawActiveCommunity): ActiveCommunity {
   const kind = kindOf(community.type)
-  const handle =
-    kind === 'asset'
-      ? `$${community.slug.toUpperCase()}`
-      : kind === 'user'
-        ? `@${community.slug}`
-        : `#${community.slug}`
+  // An asset's symbol from its name, never from its slug (specs/backend-answer-1020 BA-10).
+  const { handle, path } = mentionOf(community)
   return {
     handle,
-    path: communityPath(kind, community.slug),
+    path,
     avatarUrl: allowedImageUrl(community.avatarUrl),
     colorKey: community.slug,
     kind,

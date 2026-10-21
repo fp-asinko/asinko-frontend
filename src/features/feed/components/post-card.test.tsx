@@ -197,6 +197,21 @@ describe('PostCard as a preview (specs/submit-tools ST-01, ST-02)', () => {
     expect(screen.queryByRole('link', { name: 'maria' })).toBeNull()
   })
 
+  it('shows its related ones as pills under the body, not when deleted (specs/backend-answer-1020 BA-07)', () => {
+    const related = [{ handle: '$GGAL', path: '/asset/GGAL' }]
+    const { unmount } = renderWithIntl(<PostCard post={postItem({ related })} />)
+    const pills = screen.getByRole('list', { name: 'Related' })
+    expect(screen.getByRole('link', { name: '$GGAL' })).toHaveAttribute('href', '/asset/GGAL')
+    // Between the body and the votes.
+    expect(
+      pills.compareDocumentPosition(screen.getByRole('button', { name: /upvote/i })) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    unmount()
+    renderWithIntl(<PostCard post={postItem({ related, deleted: true })} />)
+    expect(screen.queryByRole('list', { name: 'Related' })).toBeNull()
+  })
+
   it('offers "⋯" to feature it only on your own profile (specs/profile-showcase PS-07)', () => {
     const name = 'Options for the post Whales accumulated 48,000 $BTC'
     const { unmount } = renderWithIntl(<PostCard post={postItem()} menu />)

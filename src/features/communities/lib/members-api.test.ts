@@ -52,11 +52,12 @@ describe('getMembers (specs/community-members CM-03, CM-05, CM-09)', () => {
     expect(network.calls).toBe(0)
   })
 
-  it('maps a member to a row: their page, no accuracy, unknown follow without P-017', () => {
+  it('maps a member to a row: their page and name, no accuracy, follow unknown without a session', () => {
     const id = '00000000-0000-4000-8000-000000000001'
     expect(toMemberItem({ id, username: 'ana', avatarUrl: null, role: 'MODERATOR' }, null)).toEqual(
       {
         username: 'ana',
+        displayName: null,
         path: '/user/ana',
         avatarUrl: null,
         accuracyRate: null,
@@ -64,5 +65,18 @@ describe('getMembers (specs/community-members CM-03, CM-05, CM-09)', () => {
         isSelf: false,
       },
     )
+    expect(
+      toMemberItem(
+        { id, username: 'ana', displayName: ' Ana ', avatarUrl: null, role: 'MEMBER' },
+        'ana',
+      ),
+    ).toMatchObject({ displayName: 'Ana', isSelf: true })
+    // Without a session nothing is followed, whatever the response says (the mocks answer as demo).
+    expect(
+      toMemberItem(
+        { id, username: 'ana', avatarUrl: null, role: 'MEMBER', isFollowedByViewer: true },
+        null,
+      ),
+    ).toMatchObject({ followed: null })
   })
 })

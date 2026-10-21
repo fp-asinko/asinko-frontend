@@ -103,6 +103,7 @@ export async function previewPost(raw: unknown): Promise<ActionResult<{ card: Re
     edited: false,
     deleted: false,
     tag: tag || null,
+    related: [],
   }
   return { ok: true, data: { card: <PostCard post={post} variant="preview" /> } }
 }

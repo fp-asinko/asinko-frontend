@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import {
+  activeCommunitiesSchema,
+  activeCommunitySchema,
   assetPageSchema,
   commentListSchema,
+  communitySchema,
+  communityMemberSchema,
+  featuredListSchema,
+  featuredSchema,
   feedItemSchema,
   profileSchema,
   userCommentSchema,
+  userSummarySchema,
 } from '@/lib/api/contract'
 import { paginatedSchema } from '@/lib/api/schemas'
 import { createApiClient } from '@/lib/api/create-client'
@@ -141,5 +148,71 @@ describe(`contract smoke against ${baseUrl}`, () => {
       schema: commentListSchema,
     })
     expect(short).toMatchObject({ ok: false, status: 422 })
+  })
+
+  // Adopted 2026-10-21 (specs/backend-answer-1020): what can be read without a session.
+  it("GET a person's featured, where they publish and their lists (P-017, P-025, P-027)", async () => {
+    const profile = await api({
+      method: 'GET',
+      path: '/api/v1/profiles/:identifier',
+      params: { identifier: 'maria' },
+      schema: profileSchema,
+    })
+    if (!profile.ok) throw new Error(JSON.stringify(profile))
+    const userId = profile.data.id
+    const featured = await api({
+      method: 'GET',
+      path: '/api/v1/users/:userId/featured',
+      params: { userId },
+      schema: featuredListSchema,
+    })
+    if (!featured.ok) throw new Error(JSON.stringify(featured))
+    for (const item of featured.data.items)
+      expect(featuredSchema.safeParse(item).success).toBe(true)
+    const active = await api({
+      method: 'GET',
+      path: '/api/v1/users/:userId/active-communities',
+      params: { userId },
+      query: { days: '90', limit: '20' },
+      schema: activeCommunitiesSchema,
+    })
+    if (!active.ok) throw new Error(JSON.stringify(active))
+    for (const item of active.data.items) {
+      expect(activeCommunitySchema.safeParse(item).success).toBe(true)
+    }
+    const followers = await api({
+      method: 'GET',
+      path: '/api/v1/users/:userId/followers',
+      params: { userId },
+      schema: paginatedSchema(userSummarySchema),
+    })
+    expect(followers, JSON.stringify(failures.at(-1) ?? followers)).toMatchObject({ ok: true })
+    const members = await api({
+      method: 'GET',
+      path: '/api/v1/communities/:slug/members',
+      params: { slug: 'macro' },
+      schema: paginatedSchema(communityMemberSchema),
+    })
+    expect(members, JSON.stringify(failures.at(-1) ?? members)).toMatchObject({ ok: true })
+  })
+
+  // BA-10: an asset's community comes from linkedCommunity, which must be there to be read.
+  it('GET /api/v1/assets/:symbol brings the community of the asset, by its own slug', async () => {
+    const asset = await api({
+      method: 'GET',
+      path: '/api/v1/assets/:symbol',
+      params: { symbol: 'AAPL' },
+      schema: assetPageSchema,
+    })
+    if (!asset.ok) throw new Error(JSON.stringify(asset))
+    const slug = asset.data.linkedCommunity?.slug
+    if (!slug) return
+    const community = await api({
+      method: 'GET',
+      path: '/api/v1/communities/:slug',
+      params: { slug },
+      schema: communitySchema,
+    })
+    expect(community, JSON.stringify(community)).toMatchObject({ ok: true })
   })
 })

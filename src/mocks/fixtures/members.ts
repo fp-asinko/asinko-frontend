@@ -21,6 +21,7 @@ function member(profile: Profile, role: RawCommunityMember['role']): RawCommunit
   return {
     id: profile.id,
     username: profile.username,
+    displayName: profile.displayName ?? null,
     avatarUrl: profile.avatarUrl,
     role,
     // P-017: whether the demo viewer follows them; null for the viewer themself.

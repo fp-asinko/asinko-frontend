@@ -26,6 +26,7 @@ const page = (overrides: Partial<CommunityPage>): CommunityPage => ({
   id: '00000000-0000-4000-8000-000000001001',
   slug: 'macro',
   handle: '#macro',
+  path: '/hub/macro',
   subtitle: null,
   description: null,
   avatarUrl: null,
@@ -64,24 +65,24 @@ describe('resolveCommunityPage (specs/community-pages CP-02)', () => {
   })
 
   it('redirects a community of another kind to its own page, in the same locale', async () => {
-    deps.getCommunityPage.mockResolvedValue(found(page({ slug: 'BTC', kind: 'asset' })))
-    await expect(resolveCommunityPage('BTC', 'group', 'es')).rejects.toThrow(
-      'REDIRECT es/asset/BTC',
+    // An asset's page goes by its symbol, whatever its slug (specs/backend-answer-1020 BA-10).
+    deps.getCommunityPage.mockResolvedValue(
+      found(page({ slug: 'brk-b', kind: 'asset', path: '/asset/BRK.B' })),
+    )
+    await expect(resolveCommunityPage('brk-b', 'group', 'es')).rejects.toThrow(
+      'REDIRECT es/asset/BRK.B',
     )
     deps.getCommunityPage.mockResolvedValue(found(page({})))
-    await expect(resolveCommunityPage('macro', 'asset', 'pt')).rejects.toThrow(
+    await expect(resolveCommunityPage('macro', 'user', 'pt')).rejects.toThrow(
       'REDIRECT pt/hub/macro',
     )
   })
 
-  it('tries an asset symbol in upper case and redirects to it (the backend is case-sensitive)', async () => {
-    deps.getCommunityPage
-      .mockResolvedValueOnce(missing)
-      .mockResolvedValueOnce(found(page({ slug: 'BTC', kind: 'asset' })))
-    await expect(resolveCommunityPage('btc', 'asset', 'en')).rejects.toThrow(
-      'REDIRECT en/asset/BTC',
+  it('redirects another casing to its canonical page', async () => {
+    deps.getCommunityPage.mockResolvedValue(found(page({})))
+    await expect(resolveCommunityPage('Macro', 'group', 'en')).rejects.toThrow(
+      'REDIRECT en/hub/macro',
     )
-    expect(deps.getCommunityPage).toHaveBeenLastCalledWith('BTC')
   })
 
   it('throws any other failure, for error.tsx', async () => {
@@ -90,7 +91,7 @@ describe('resolveCommunityPage (specs/community-pages CP-02)', () => {
   })
 })
 
-describe('resolveAssetPage (specs/backend-answer-1013 BA-09)', () => {
+describe('resolveAssetPage (specs/backend-answer-1013 BA-09, specs/backend-answer-1020 BA-10)', () => {
   const TSLA = {
     symbol: 'TSLA',
     handle: '$TSLA',
@@ -101,19 +102,31 @@ describe('resolveAssetPage (specs/backend-answer-1013 BA-09)', () => {
 
   beforeEach(() => vi.clearAllMocks())
 
-  it('takes the community when the asset has one', async () => {
-    deps.getCommunityPage.mockResolvedValue(found(page({ slug: 'BTC', kind: 'asset' })))
-    expect(await resolveAssetPage('BTC', 'en')).toMatchObject({
-      kind: 'community',
-      page: { slug: 'BTC' },
+  it('takes its community by linkedCommunity, never by a slug made from the symbol', async () => {
+    deps.getAssetSummary.mockResolvedValue({
+      ok: true,
+      data: { ...TSLA, symbol: 'BRK.B', handle: '$BRK.B', communitySlug: 'brk-b' },
     })
-    expect(deps.getAssetSummary).not.toHaveBeenCalled()
+    deps.getCommunityPage.mockResolvedValue(
+      found(page({ slug: 'brk-b', kind: 'asset', path: '/asset/BRK.B' })),
+    )
+    expect(await resolveAssetPage('BRK.B', 'en')).toMatchObject({
+      kind: 'community',
+      page: { slug: 'brk-b', path: '/asset/BRK.B' },
+    })
+    expect(deps.getCommunityPage).toHaveBeenCalledWith('brk-b')
+  })
+
+  it('shows the asset alone when its community is not there after all', async () => {
+    deps.getAssetSummary.mockResolvedValue({ ok: true, data: { ...TSLA, communitySlug: 'tsla' } })
+    deps.getCommunityPage.mockResolvedValue(missing)
+    expect(await resolveAssetPage('TSLA', 'en')).toMatchObject({ kind: 'asset' })
   })
 
   it('shows the asset alone while it has no community', async () => {
-    deps.getCommunityPage.mockResolvedValue(missing)
     deps.getAssetSummary.mockResolvedValue({ ok: true, data: TSLA })
     expect(await resolveAssetPage('TSLA', 'en')).toEqual({ kind: 'asset', asset: TSLA })
+    expect(deps.getCommunityPage).not.toHaveBeenCalled()
   })
 
   it('redirects a lower-case symbol to its canonical page', async () => {
@@ -122,6 +135,12 @@ describe('resolveAssetPage (specs/backend-answer-1013 BA-09)', () => {
       symbol === 'TSLA' ? { ok: true, data: TSLA } : missing,
     )
     await expect(resolveAssetPage('tsla', 'es')).rejects.toThrow('REDIRECT es/asset/TSLA')
+  })
+
+  it('sends a community of another kind to its own page (/asset/defi → /hub/defi)', async () => {
+    deps.getAssetSummary.mockResolvedValue(missing)
+    deps.getCommunityPage.mockResolvedValue(found(page({ slug: 'defi', path: '/hub/defi' })))
+    await expect(resolveAssetPage('defi', 'pt')).rejects.toThrow('REDIRECT pt/hub/defi')
   })
 
   it('is the not-found page outside the catalog', async () => {

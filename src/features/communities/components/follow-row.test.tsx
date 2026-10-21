@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import type { FollowItem } from '../communities.types'
@@ -11,6 +12,7 @@ vi.mock('@/lib/communities/set-favorite.action', () => ({ setFavorite: vi.fn() }
 
 const person = (overrides: Partial<FollowItem> = {}): FollowItem => ({
   username: 'maria',
+  displayName: null,
   path: '/user/maria',
   avatarUrl: null,
   accuracyRate: 0.74,
@@ -35,13 +37,24 @@ describe('FollowRow (specs/follow-lists FL-02, FL-05)', () => {
     expect(screen.getByRole('button', { name: /^Following/ })).toBeInTheDocument()
   })
 
-  it('has no button for yourself, nor when it is unknown whether you follow them', () => {
+  it('has no button for yourself; without a session, Follow (it asks for an account)', () => {
     const { unmount } = renderWithIntl(
       <FollowRow person={person({ isSelf: true, followed: null })} list="followers" />,
     )
     expect(screen.queryByRole('button')).toBeNull()
     unmount()
     renderWithIntl(<FollowRow person={person({ followed: null })} list="followers" />)
-    expect(screen.queryByRole('button')).toBeNull()
+    expect(screen.getByRole('button', { name: 'Follow @maria' })).toBeInTheDocument()
+  })
+
+  it('asks before unfollowing from a row (BA-09, security.md § 7)', async () => {
+    renderWithIntl(<FollowRow person={person({ followed: true })} list="followers" />)
+    await userEvent.click(screen.getByRole('button', { name: /^Following/ }))
+    expect(await screen.findByRole('dialog', { name: 'Unfollow @maria?' })).toBeInTheDocument()
+  })
+
+  it('shows the name, then the @username (specs/backend-answer-1020 BA-09)', () => {
+    renderWithIntl(<FollowRow person={person({ displayName: 'María Ruiz' })} list="followers" />)
+    expect(screen.getByRole('link', { name: /^María Ruiz @maria/ })).toBeInTheDocument()
   })
 })

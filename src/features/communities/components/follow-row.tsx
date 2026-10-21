@@ -7,11 +7,11 @@ import type { FollowItem, PeopleList } from '../communities.types'
 import { CommunityActions } from './community-actions'
 
 /**
- * A person in a followers or following list (specs/follow-lists FL-02, FL-05): avatar, @handle
- * (to their page) and accuracy in its tier's color, as the left column; on the right, Follow or
- * Following, as on their profile. No button for yourself, nor when it is unknown whether you
- * follow them (P-017 not there yet, or no session). A community's members use it too, without
- * accuracy (specs/community-members CM-02).
+ * A person in a followers or following list (specs/follow-lists FL-02, FL-05): avatar, their name
+ * and @handle (to their page) and accuracy in its tier's color; on the right, Follow or Following,
+ * as on their profile (P-017, specs/backend-answer-1020 BA-09). No button for yourself; without a
+ * session, Follow asks for an account. A community's members use it too, without accuracy
+ * (specs/community-members CM-02).
  */
 export function FollowRow({ person, list }: { person: FollowItem; list: PeopleList }) {
   const t = useTranslations('communities.follows')
@@ -34,7 +34,12 @@ export function FollowRow({ person, list }: { person: FollowItem; list: PeopleLi
           size="md"
           className="size-10"
         />
-        <span className="min-w-0 truncate type-ui font-bold">{handle}</span>{' '}
+        <span className="flex min-w-0 flex-col">
+          <span className="truncate type-ui font-bold">{person.displayName ?? handle}</span>{' '}
+          {person.displayName && (
+            <span className="truncate type-meta text-muted-foreground">{handle}</span>
+          )}
+        </span>{' '}
         {person.accuracyRate !== null && (
           <span
             data-tier={accuracyTier(person.accuracyRate)}
@@ -48,7 +53,7 @@ export function FollowRow({ person, list }: { person: FollowItem; list: PeopleLi
           </span>
         )}
       </Link>
-      {!person.isSelf && person.followed !== null && (
+      {!person.isSelf && (
         <CommunityActions
           slug={person.username}
           handle={handle}

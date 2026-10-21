@@ -196,7 +196,7 @@ test.describe('Page to create a post', () => {
     await expect(page.getByRole('option').first()).toContainText('Your profile')
   })
 
-  test('adds related ones with "+" and publishes them as mentions (specs/related-tags)', async ({
+  test('adds related ones with "+" and publishes them as pills, apart from the body (BA-06, BA-07)', async ({
     page,
   }, testInfo) => {
     const text = `Banks and the peso (${testInfo.project.name} ${Date.now()})`
@@ -216,8 +216,11 @@ test.describe('Page to create a post', () => {
     await body(page).fill('Cheap again.')
     await editor(page).getByRole('button', { name: 'Publish' }).click()
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(text)
-    // With mocks the mention stays text; the backend makes it a link (P-001).
-    await expect(page.getByRole('main').getByText('$BTC', { exact: false })).toBeVisible()
+    // Its related one as a pill to its page (specs/backend-answer-1020); the body, as written.
+    const pills = page.getByRole('main').getByRole('list', { name: 'Related' })
+    await expect(pills.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/en/asset/BTC')
+    await expect(page.getByRole('main').getByText('Cheap again.', { exact: true })).toBeVisible()
+    await expectNoA11yViolations(page)
   })
 
   for (const theme of ['light', 'dark'] as const) {

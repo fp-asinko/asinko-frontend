@@ -38,6 +38,7 @@ export function listItem(userId: string): RawUserSummary {
   return {
     id: user.id,
     username: user.username,
+    displayName: user.displayName ?? null,
     avatarUrl: user.avatarUrl,
     accuracyRate: user.accuracyRate,
     isFollowedByViewer:

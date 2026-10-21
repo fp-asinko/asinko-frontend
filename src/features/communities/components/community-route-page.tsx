@@ -25,7 +25,10 @@ export async function communityMetadata(
   rawLocale: string,
 ): Promise<Metadata> {
   const locale = safeLocale(rawLocale)
-  const result = await getCommunityPage(slug)
+  // An asset's community by its linkedCommunity, never by its symbol (specs/backend-answer-1020).
+  const assetCommunity = kind === 'asset' ? await assetCommunitySlug(slug) : slug
+  if (assetCommunity === null) return assetMetadata(slug, locale)
+  const result = await getCommunityPage(assetCommunity)
   if (!result.ok && kind === 'asset') return assetMetadata(slug, locale)
   if (!result.ok || result.data.kind !== kind) return {}
   const page = result.data
@@ -44,7 +47,7 @@ export async function communityMetadata(
   return {
     title,
     description,
-    alternates: buildAlternates(env.NEXT_PUBLIC_SITE_URL, locale, communityPath(kind, page.slug)),
+    alternates: buildAlternates(env.NEXT_PUBLIC_SITE_URL, locale, page.path),
     openGraph: {
       title,
       description,
@@ -54,6 +57,12 @@ export async function communityMetadata(
     },
     twitter: image.twitter,
   }
+}
+
+/** The slug of an asset's community, or null without one (or not in the catalog). */
+async function assetCommunitySlug(symbol: string): Promise<string | null> {
+  const asset = await getAssetSummary(symbol)
+  return asset.ok ? asset.data.communitySlug : null
 }
 
 /** An asset without a community (BA-09): its symbol and name, and the brand's share image. */
@@ -99,7 +108,7 @@ export async function resolveAssetRoute(symbol: string, locale: string) {
 /** The community of a route, or its 404 or redirect (CP-02), with the page's own path. */
 export async function resolveCommunityRoute(kind: CommunityKind, slug: string, locale: string) {
   const page = await resolveCommunityPage(slug, kind, safeLocale(locale))
-  return { page, path: communityPath(kind, page.slug) }
+  return { page, path: page.path }
 }
 
 /**

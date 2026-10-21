@@ -28,6 +28,36 @@ describe('toPostItem', () => {
     expect(item.path).toMatch(new RegExp(`^/post/${item.id}/[a-z0-9-]+$`))
   })
 
+  it('maps its related ones as mentions with their page, the symbol from the name (BA-07, BA-10)', () => {
+    const item = toPostItem(
+      {
+        ...post(1),
+        related: [
+          {
+            id: COMMUNITIES[0]!.id,
+            slug: 'brk-b',
+            name: '$BRK.B',
+            type: 'SYSTEM_ASSET',
+            avatarUrl: null,
+          },
+          {
+            id: COMMUNITIES[1]!.id,
+            slug: 'macro',
+            name: '#macro',
+            type: 'SYSTEM_CATEGORY',
+            avatarUrl: null,
+          },
+        ],
+      },
+      communities,
+    )
+    expect(item.related).toEqual([
+      { handle: '$BRK.B', path: '/asset/BRK.B' },
+      { handle: '#macro', path: '/hub/macro' },
+    ])
+    expect(toPostItem({ ...post(1), related: undefined }, communities).related).toEqual([])
+  })
+
   it('shows the real domain of links', () => {
     expect(toPostItem(post(6), communities).media).toEqual({
       type: 'link',

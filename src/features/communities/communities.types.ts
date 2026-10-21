@@ -69,9 +69,12 @@ export type EditProfileField =
 export type CommunityPage = {
   /** Where a post from this page goes (specs/post-create-detail PC-06). */
   id: string
+  /** For the API only (join, members): an asset's is not its symbol (brk-b, 2026-10-20). */
   slug: string
   /** #macro, $BTC or @maria: the page title. */
   handle: string
+  /** Its page: /hub/macro, /asset/BRK.B (the symbol, never the slug) or /user/maria. */
+  path: string
   /** The display name, only when it says more than the handle (NVIDIA under $NVDA). */
   subtitle: string | null
   description: string | null
@@ -162,11 +165,13 @@ export type PeopleSource = { list: FollowKind; userId: string } | { list: 'membe
 /** A person in a followers or following list (FL-02, FL-05). */
 export type FollowItem = {
   username: string
+  /** Shown first, with the @username beside it (2026-10-20). */
+  displayName: string | null
   /** Their page: /user/maria. */
   path: string
   avatarUrl: string | null
   accuracyRate: number | null
-  /** Whether the viewer follows them; null when unknown (no session, or P-017 not there yet). */
+  /** Whether the viewer follows them (P-017); null without a session, or for oneself. */
   followed: boolean | null
   /** The viewer themself: no button. */
   isSelf: boolean

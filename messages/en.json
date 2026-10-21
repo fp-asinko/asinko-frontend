@@ -137,7 +137,8 @@
       "score": "{score, plural, one {# point} other {# points}}{vote, select, up {, you upvoted} down {, you downvoted} other {}}",
       "share": "Share",
       "newTab": "(opens in a new tab)",
-      "linkDomain": "({domain})"
+      "linkDomain": "({domain})",
+      "related": "Related"
     },
     "poll": {
       "badge": "Poll",

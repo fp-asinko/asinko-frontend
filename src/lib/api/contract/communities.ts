@@ -64,6 +64,7 @@ export const communityMemberSchema = z.object({
   avatarUrl: z.string().nullable(),
   role: membershipSchema,
   isFollowedByViewer: z.boolean().nullable().optional(),
+  displayName: z.string().nullable().optional(),
 })
 
 export type RawCommunityMember = z.infer<typeof communityMemberSchema>

@@ -13,7 +13,7 @@ import {
   type RawCommunitySummary,
   type RawFeatured,
 } from '@/lib/api/contract'
-import { communityPath, kindOf } from '@/lib/communities/paths'
+import { mentionOf } from '@/lib/communities/paths'
 import { postPath } from '@/lib/posts/paths'
 import type { FeaturedItem, ThesisItem } from '../communities.types'
 
@@ -33,16 +33,7 @@ export const featuredRefSchema = z.object({
 export type FeaturedRef = z.infer<typeof featuredRefSchema>
 
 /** Its community as a mention: $ for an asset, @ for a personal channel, # for a group. */
-function communityOf(summary: RawCommunitySummary) {
-  const kind = kindOf(summary.type)
-  const handle =
-    kind === 'asset'
-      ? `$${summary.slug.toUpperCase()}`
-      : kind === 'user'
-        ? `@${summary.slug}`
-        : `#${summary.slug}`
-  return { handle, path: communityPath(kind, summary.slug) }
-}
+const communityOf = (summary: RawCommunitySummary) => mentionOf(summary)
 
 export function toFeaturedItem(featured: RawFeatured): FeaturedItem {
   if (featured.kind === 'POST') {

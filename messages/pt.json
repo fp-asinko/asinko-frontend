@@ -137,7 +137,8 @@
       "score": "{score, plural, one {# ponto} other {# pontos}}{vote, select, up {, você votou a favor} down {, você votou contra} other {}}",
       "share": "Compartilhar",
       "newTab": "(abre em uma nova aba)",
-      "linkDomain": "({domain})"
+      "linkDomain": "({domain})",
+      "related": "Relacionadas"
     },
     "poll": {
       "badge": "Enquete",
@@ -907,7 +908,7 @@
       "imageUnreadable": "Não foi possível ler a imagem",
       "imageRequired": "Adicione uma imagem",
       "imageAltTooLong": "Até 300 caracteres.",
-      "invalidRelated": "Uma das comunidades ou ativos relacionados não pode mais ser marcada. Remova e tente de novo."
+      "invalidRelated": "Uma das relacionadas não pode mais ser marcada. Remova e tente de novo."
     },
     "cancel": "Cancelar",
     "image": {

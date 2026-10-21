@@ -2,7 +2,7 @@ import 'server-only'
 import { cache } from 'react'
 import { apiRequest, keepValidItems, type ApiResult } from '@/lib/api'
 import { widgetListSchema, widgetSchema, type RawWidget } from '@/lib/api/contract'
-import { communityPath, kindOf } from '@/lib/communities/paths'
+import { kindOf, mentionOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 import { getViewer } from '@/lib/session'
 import { toWidgetLink } from '@/lib/widget-link'
@@ -18,17 +18,13 @@ type RawCommunity = Extract<RawWidget, { type: 'COMMUNITIES' }>['communities'][n
 
 function toCommunity(community: RawCommunity, signedIn: boolean): WidgetCommunity {
   const kind = kindOf(community.type)
+  const { handle, path } = mentionOf(community)
   return {
     id: community.id,
     slug: community.slug,
-    handle:
-      kind === 'asset'
-        ? `$${community.slug.toUpperCase()}`
-        : kind === 'user'
-          ? `@${community.slug}`
-          : `#${community.slug}`,
+    handle,
     name: community.name,
-    path: communityPath(kind, community.slug),
+    path,
     kind,
     avatarUrl: allowedImageUrl(community.avatarUrl),
     memberCount: community.memberCount,

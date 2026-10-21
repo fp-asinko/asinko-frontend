@@ -60,6 +60,8 @@ export type PostItem = {
   deleted: boolean
   /** Its tag, beside the title (P-023, specs/drafts-tags DT-10); null without one. */
   tag: string | null
+  /** The communities and assets its author tagged it with (P-018), as mentions with their page. */
+  related: { handle: string; path: string }[]
 }
 
 export type PollOption = {

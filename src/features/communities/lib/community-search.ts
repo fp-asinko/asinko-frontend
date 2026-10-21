@@ -1,3 +1,4 @@
+import { mentionOf } from '@/lib/communities/paths'
 import 'server-only'
 import { apiRequest, paginatedSchema, type ApiResult } from '@/lib/api'
 import { communitySchema } from '@/lib/api/contract'
@@ -27,10 +28,7 @@ export async function searchWidgetCommunities(
       .map((community) => ({
         id: community.id,
         slug: community.slug,
-        handle:
-          community.type === 'SYSTEM_ASSET'
-            ? `$${community.slug.toUpperCase()}`
-            : `#${community.slug}`,
+        handle: mentionOf(community).handle,
         avatarUrl: allowedImageUrl(community.avatarUrl),
       })),
   }

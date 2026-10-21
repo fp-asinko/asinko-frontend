@@ -1,4 +1,4 @@
-import { communityPath, kindOf } from '@/lib/communities/paths'
+import { communityPath, kindOf, mentionOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 import { postPath } from '@/lib/posts/paths'
 import type {
@@ -28,8 +28,8 @@ export function toCommunityRef(
   return {
     slug: community.slug,
     name: community.name,
-    handle:
-      community.type === 'SYSTEM_ASSET' ? `$${community.slug.toUpperCase()}` : `#${community.slug}`,
+    // An asset's symbol from its name, never from its slug (specs/backend-answer-1020 BA-10).
+    handle: mentionOf(community).handle,
   }
 }
 
@@ -57,7 +57,7 @@ export function toCardCommunity(summary: RawCommunitySummary, signedIn: boolean)
   return {
     ...toCommunityRef(summary),
     kind: kindOf(summary.type),
-    path: communityPath(kindOf(summary.type), summary.slug),
+    path: mentionOf(summary).path,
     avatarUrl: allowedImageUrl(summary.avatarUrl),
     personal: summary.type === 'PERSONAL_CHANNEL',
     viewerIsMember: signedIn ? summary.viewerMembership !== null : null,
@@ -116,6 +116,7 @@ export function toPostItem(post: RawPost, mentions: MentionLookup, signedIn = fa
     edited: post.editedAt !== null,
     deleted: post.deleted,
     tag: post.tag?.trim() || null,
+    related: post.deleted ? [] : (post.related ?? []).map(mentionOf),
   }
 }
 

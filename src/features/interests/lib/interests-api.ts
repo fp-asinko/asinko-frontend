@@ -1,3 +1,4 @@
+import { assetSymbolOf } from '@/lib/communities/paths'
 import 'server-only'
 import { apiRequest, paginatedSchema } from '@/lib/api'
 import {
@@ -9,7 +10,6 @@ import {
 import type { Viewer } from '@/lib/session'
 import type { Interests, SectionResult } from '../interests.types'
 import {
-  assetSymbol,
   SUGGESTION_COUNT,
   memberAssetCommunities,
   toAssetTile,
@@ -69,17 +69,22 @@ export async function getInterests(
   const suggested = all.ok ? section(toSuggestions(all.data.items, count)) : failed
   if (!mine.ok) return { signedIn, assets: failed, people, groups: failed, suggested }
 
-  const memberSlugs = memberAssetCommunities(mine.data.items).map((community) => community.slug)
-  const assetSlugs =
-    memberSlugs.length > 0 || !signedIn
-      ? memberSlugs
-      : sampleSlugs(sampleAssets, all.ok ? all.data.items : [])
+  // Each asset by its symbol and its community's slug, both from the community (BA-10).
+  const members = memberAssetCommunities(mine.data.items).map((community) => ({
+    slug: community.slug,
+    symbol: assetSymbolOf(community),
+  }))
+  const chosen =
+    members.length > 0 || !signedIn
+      ? members
+      : sampleAssetsOf(sampleAssets, all.ok ? all.data.items : [])
+  const assetSlugs = chosen.map((each) => each.slug)
   const assetPages = await Promise.all(
-    assetSlugs.map((slug) =>
+    chosen.map(({ symbol }) =>
       apiRequest({
         method: 'GET',
         path: '/api/v1/assets/:symbol',
-        params: { symbol: assetSymbol(slug) },
+        params: { symbol },
         schema: assetPageSchema,
       }),
     ),
@@ -94,12 +99,13 @@ export async function getInterests(
   return { signedIn, assets, people, groups: section(toGroups(mine.data.items)), suggested }
 }
 
-/** The slug of each sample symbol: the backend's asset community when there is one. */
-function sampleSlugs(symbols: readonly string[], communities: readonly RawCommunity[]) {
-  return symbols.map(
-    (symbol) =>
+/** Each sample symbol with its community's slug, when the backend has one. */
+function sampleAssetsOf(symbols: readonly string[], communities: readonly RawCommunity[]) {
+  return symbols.map((symbol) => ({
+    symbol,
+    slug:
       communities.find(
-        (community) => community.type === 'SYSTEM_ASSET' && assetSymbol(community.slug) === symbol,
+        (community) => community.type === 'SYSTEM_ASSET' && assetSymbolOf(community) === symbol,
       )?.slug ?? symbol.toLowerCase(),
-  )
+  }))
 }

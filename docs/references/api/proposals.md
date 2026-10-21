@@ -8,7 +8,12 @@
 - lo que espera una decisión de producto: P-026, P-023 y la fórmula de `best` (P-014);
 - una pregunta sobre los slugs de los activos (abajo).
 
-**Verificado contra el deploy de `dev` el 2026-10-20** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`, solo lecturas): ver [Por verificar con datos reales](#por-verificar-con-datos-reales).
+**Verificado contra el deploy de `dev` el 2026-10-21** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 10 de 10 en verde, solo lecturas, cada respuesta con el mismo esquema que usa el mock. Además de lo de antes:
+
+- los destacados, "Participa en", los seguidores de una persona y los miembros de un grupo (P-017, P-025, P-027);
+- la comunidad de un activo por su `linkedCommunity`.
+
+Lo que necesita sesión está en [Por verificar con datos reales](#por-verificar-con-datos-reales).
 
 ## Adoptado por el front (sale de este archivo)
 

@@ -6,6 +6,7 @@ export function communityPage(overrides: Partial<CommunityPage> = {}): Community
     id: '00000000-0000-4000-8000-000000001001',
     slug: 'macro',
     handle: '#macro',
+    path: '/hub/macro',
     subtitle: null,
     description: 'Rates, inflation and central banks.',
     avatarUrl: null,

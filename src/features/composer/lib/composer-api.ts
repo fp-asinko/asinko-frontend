@@ -1,3 +1,4 @@
+import { mentionOf } from '@/lib/communities/paths'
 import 'server-only'
 import { apiRequest, paginatedSchema, type ApiResult } from '@/lib/api'
 import { communitySchema, postSchema, type RawCommunity } from '@/lib/api/contract'
@@ -31,11 +32,9 @@ export async function createPostAs(
   return result.ok ? { ok: true, data: { id: result.data.id, title: result.data.title } } : result
 }
 
-function handleOf(community: Pick<RawCommunity, 'type' | 'slug'>) {
-  if (community.type === 'SYSTEM_ASSET') return `$${community.slug.toUpperCase()}`
-  if (community.type === 'PERSONAL_CHANNEL') return `@${community.slug}`
-  return `#${community.slug}`
-}
+/** Its mention: an asset's symbol from its name, never from its slug (backend 2026-10-20). */
+const handleOf = (community: Pick<RawCommunity, 'type' | 'slug' | 'name'>) =>
+  mentionOf(community).handle
 
 export function toOption(
   community: Pick<RawCommunity, 'id' | 'slug' | 'name' | 'type' | 'tags'>,

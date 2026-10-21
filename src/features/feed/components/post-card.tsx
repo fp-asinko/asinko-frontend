@@ -16,6 +16,7 @@ import { CardLink } from './card-link'
 import { FadeImage } from '@/components/ui/fade-image'
 import { CommentsToggle } from './comments-toggle'
 import { PostMarkdown } from './post-markdown'
+import { RelatedPills } from './related-pills'
 import { SeeAllComments } from './see-all-comments'
 import { VoteControl } from './vote-control'
 
@@ -201,6 +202,10 @@ export function PostCard({
           <ArrowUpRightIcon aria-hidden className="size-3.5 shrink-0" />
           <span className="sr-only">{t('newTab')}</span>
         </a>
+      )}
+
+      {!preview && !post.deleted && (
+        <RelatedPills related={post.related} className={detail ? 'mt-5' : 'mt-3'} />
       )}
 
       {preview && (

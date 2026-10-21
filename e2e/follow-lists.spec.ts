@@ -45,6 +45,20 @@ test.describe('Followers and following', () => {
     await expect(row('@quantsimula').getByRole('button', { name: /^Following/ })).toBeVisible()
   })
 
+  test('without a session, Follow in a row asks for an account (specs/backend-answer-1020 BA-09)', async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    await context.addCookies([{ name: 'asinko-mock-guest', value: '1', url: baseURL! }])
+    await open(page, /following/)
+    const row = lists(page).getByRole('listitem').filter({ hasText: '@federico' })
+    // The name first, then the @username.
+    await expect(row.getByRole('link', { name: /^Federico Piva @federico/ })).toBeVisible()
+    await row.getByRole('button', { name: 'Follow @federico', exact: true }).click()
+    await expect(page.getByRole('dialog', { name: /account|Join Asinko/i })).toBeVisible()
+  })
+
   test('a person in the list takes you to their profile', async ({ page }) => {
     await open(page, /following/)
     await lists(page)

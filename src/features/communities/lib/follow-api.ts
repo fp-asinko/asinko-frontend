@@ -17,11 +17,13 @@ const PATHS = {
 export function toFollowItem(user: RawUserSummary, viewerName: string | null): FollowItem {
   return {
     username: user.username,
+    displayName: user.displayName?.trim() || null,
     path: communityPath('user', user.username),
     avatarUrl: allowedImageUrl(user.avatarUrl),
     accuracyRate: user.accuracyRate ?? null,
-    // P-017 (proposal): unknown until the backend sends it, and then there is no button.
-    followed: user.isFollowedByViewer ?? null,
+    // P-017 (backend 2026-10-20): null without a session, whatever the response says (as the
+    // community pages, CF-12), and then Follow asks for an account.
+    followed: viewerName ? (user.isFollowedByViewer ?? null) : null,
     isSelf: viewerName === user.username,
   }
 }

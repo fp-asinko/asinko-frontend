@@ -16,11 +16,13 @@ const cursorSchema = z.string().regex(/^[A-Za-z0-9_\-=.:]{1,512}$/)
 export function toMemberItem(member: RawCommunityMember, viewerName: string | null): FollowItem {
   return {
     username: member.username,
+    displayName: member.displayName?.trim() || null,
     path: communityPath('user', member.username),
     avatarUrl: allowedImageUrl(member.avatarUrl),
     accuracyRate: null,
-    // P-017 (proposal): unknown until the backend sends it, and then there is no button.
-    followed: member.isFollowedByViewer ?? null,
+    // P-017 (backend 2026-10-20): null without a session, whatever the response says (as the
+    // community pages, CF-12), and then Follow asks for an account.
+    followed: viewerName ? (member.isFollowedByViewer ?? null) : null,
     isSelf: viewerName === member.username,
   }
 }

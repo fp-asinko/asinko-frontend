@@ -46,6 +46,20 @@ describe('FeatureMenu (specs/profile-showcase PS-07)', () => {
     )
   })
 
+  it('features a poll too (specs/backend-answer-1020 BA-04)', async () => {
+    const set = vi.fn()
+    renderWithIntl(
+      <FeaturedMenuContext
+        value={{ isFeatured: () => false, full: false, max: 3, pending: false, set }}
+      >
+        <FeatureMenu kind="poll" id="q1" label="Options for the poll Rates" />
+      </FeaturedMenuContext>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Options for the poll Rates' }))
+    await userEvent.click(await screen.findByRole('menuitem', {}, { timeout: 3000 }))
+    expect(set).toHaveBeenCalledWith('poll', 'q1', true)
+  })
+
   it('takes out one that is featured', async () => {
     const { set } = renderMenu(['post:p1'])
     const item = await open()

@@ -12,11 +12,9 @@ import { getCommunityPage } from './community-api'
 /**
  * The community of a /hub, /asset or /user page, or the way out (specs/community-pages CP-02):
  *
- * - A community that does not exist (or an invalid slug) is the not-found page. On /asset, a
- *   symbol in lower case that does not exist is tried in upper case (the backend is
- *   case-sensitive and asset slugs are their symbol): /asset/btc → /asset/BTC.
+ * - A community that does not exist (or an invalid slug) is the not-found page.
  * - A community of another kind redirects to its own page (/hub/BTC → /asset/BTC,
- *   /asset/macro → /hub/macro), 308.
+ *   /user/macro → /hub/macro), 308. An /asset page goes by resolveAssetPage.
  * - Any other failure throws: the community is the page's main content (error.tsx).
  */
 export async function resolveCommunityPage(
@@ -24,29 +22,12 @@ export async function resolveCommunityPage(
   kind: CommunityKind,
   locale: Locale,
 ): Promise<CommunityPage> {
-  const result = await findCommunityPage(slug, kind)
+  const result = await getCommunityPage(slug)
   if (!result.ok && (result.code === 'NOT_FOUND' || result.code === 'INVALID')) notFound()
   const page = getOrThrow(result)
-  // The asset found in upper case, or one asked with another casing: its canonical URL.
-  if (page.kind === kind && page.slug !== slug) {
-    permanentRedirect({ href: communityPath(kind, page.slug), locale })
-  }
-  if (page.kind !== kind) permanentRedirect({ href: communityPath(page.kind, page.slug), locale })
+  // Asked with another casing: its canonical URL. Of another kind: its own page.
+  if (page.kind !== kind || page.slug !== slug) permanentRedirect({ href: page.path, locale })
   return page
-}
-
-/** The community of a slug; on /asset, a symbol in lower case is tried in upper case too. */
-async function findCommunityPage(slug: string, kind: CommunityKind) {
-  const result = await getCommunityPage(slug)
-  if (
-    !result.ok &&
-    result.code === 'NOT_FOUND' &&
-    kind === 'asset' &&
-    slug !== slug.toUpperCase()
-  ) {
-    return getCommunityPage(slug.toUpperCase())
-  }
-  return result
 }
 
 /** An asset of the catalog, as typed or in upper case. */
@@ -59,24 +40,32 @@ async function findAsset(symbol: string): Promise<ApiResult<AssetSummary>> {
 }
 
 /**
- * An /asset page (specs/backend-answer-1013 BA-09, Q4): its community, as resolveCommunityPage; or,
- * when the asset has none yet, the asset alone (its canonical symbol redirects, 308). Not in the
- * catalog either: the not-found page.
+ * An /asset page (specs/backend-answer-1013 BA-09, specs/backend-answer-1020 BA-10): the asset by
+ * its symbol, then its community by `linkedCommunity`, never by a slug made from the symbol (an
+ * asset's slug is not its symbol: brk-b). Asked with another casing, the canonical symbol
+ * redirects, 308. Without a community yet, the asset alone. Not in the catalog, a community of
+ * another kind by that slug redirects to its own page; nothing, the not-found page.
  */
 export async function resolveAssetPage(
   symbol: string,
   locale: Locale,
 ): Promise<{ kind: 'community'; page: CommunityPage } | { kind: 'asset'; asset: AssetSummary }> {
-  const community = await findCommunityPage(symbol, 'asset')
-  const missing = !community.ok && (community.code === 'NOT_FOUND' || community.code === 'INVALID')
-  if (!missing)
-    return { kind: 'community', page: await resolveCommunityPage(symbol, 'asset', locale) }
-
   const asset = await findAsset(symbol)
-  if (!asset.ok && (asset.code === 'NOT_FOUND' || asset.code === 'INVALID')) notFound()
+  if (!asset.ok && (asset.code === 'NOT_FOUND' || asset.code === 'INVALID')) {
+    // Not an asset: a community of another kind by that slug goes to its own page (/asset/defi →
+    // /hub/defi, 308); nothing, the not-found page.
+    const other = await getCommunityPage(symbol)
+    if (other.ok && other.data.kind !== 'asset') {
+      permanentRedirect({ href: other.data.path, locale })
+    }
+    notFound()
+  }
   const found = getOrThrow(asset)
   if (found.symbol !== symbol) {
     permanentRedirect({ href: communityPath('asset', found.symbol), locale })
   }
-  return { kind: 'asset', asset: found }
+  if (!found.communitySlug) return { kind: 'asset', asset: found }
+  const community = await getCommunityPage(found.communitySlug)
+  if (!community.ok && community.code === 'NOT_FOUND') return { kind: 'asset', asset: found }
+  return { kind: 'community', page: getOrThrow(community) }
 }

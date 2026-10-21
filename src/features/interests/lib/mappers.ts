@@ -1,22 +1,13 @@
 import type { RawAsset, RawCommunity, RawUserSummary } from '@/lib/api/contract'
 import type { AssetTile, Group, Person, Suggestion } from '../interests.types'
-import { communityPath, kindOf } from '@/lib/communities/paths'
+import { communityPath, kindOf, mentionOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 
 /** Suggestions under the viewer sections; without a session the list is all the column shows. */
 export const SUGGESTION_COUNT = { signedIn: 3, guest: 8 } as const
 
-/** An asset community slug is its symbol in lower case (btc → BTC). */
-export function assetSymbol(slug: string) {
-  return slug.toUpperCase()
-}
-
-/** The mention handle of a community: $ for an asset, # for a group (overview.md § Menciones). */
-function communityHandle(community: RawCommunity) {
-  return community.type === 'SYSTEM_ASSET'
-    ? `$${assetSymbol(community.slug)}`
-    : `#${community.slug}`
-}
+/** A community's mention: an asset's symbol from its name (specs/backend-answer-1020 BA-10). */
+const communityHandle = (community: RawCommunity) => mentionOf(community).handle
 
 /** Asset communities the viewer belongs to (one tile each). */
 export function memberAssetCommunities(communities: readonly RawCommunity[]) {
@@ -32,7 +23,7 @@ export function toAssetTile(asset: RawAsset, communitySlug: string): AssetTile {
     price: asset.price,
     stale: asset.priceStale,
     communitySlug,
-    path: communityPath('asset', communitySlug),
+    path: communityPath('asset', asset.symbol),
   }
 }
 

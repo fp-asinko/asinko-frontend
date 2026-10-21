@@ -46,7 +46,7 @@ describe('getActiveCommunities (P-027, specs/profile-aside PA-05)', () => {
         community: { ...summary, slug: 'ggal', type: 'SYSTEM_ASSET' },
         postCount: 2,
       }),
-    ).toMatchObject({ handle: '$GGAL', path: '/asset/ggal', kind: 'asset' })
+    ).toMatchObject({ handle: '$GGAL', path: '/asset/GGAL', kind: 'asset' })
     expect(
       toActiveCommunity({
         community: { ...summary, slug: 'maria', type: 'PERSONAL_CHANNEL' },
