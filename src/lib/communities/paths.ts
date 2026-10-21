@@ -20,3 +20,25 @@ const BASE: Record<CommunityKind, string> = { group: '/hub', asset: '/asset', us
 export function communityPath(kind: CommunityKind, slug: string): string {
   return `${BASE[kind]}/${encodeURIComponent(slug)}`
 }
+
+type NamedCommunity = { type: CommunityType; slug: string; name: string }
+
+/**
+ * An asset community's symbol, from its name ("$BRK.B"), never from its slug: the slug is not the
+ * symbol ("brk-b", backend 2026-10-20, specs/backend-answer-1020 BA-10). A name without "$" (the
+ * mocks' "Bitcoin") falls back to the slug, which matches the symbol in them.
+ */
+export function assetSymbolOf({ slug, name }: Pick<NamedCommunity, 'slug' | 'name'>): string {
+  return name.startsWith('$') && name.length > 1 ? name.slice(1) : slug.toUpperCase()
+}
+
+/** A community as its mention ($BRK.B, #macro, @maria) and its page, both from the same place. */
+export function mentionOf(community: NamedCommunity): { handle: string; path: string } {
+  const kind = kindOf(community.type)
+  if (kind === 'asset') {
+    const symbol = assetSymbolOf(community)
+    return { handle: `$${symbol}`, path: communityPath('asset', symbol) }
+  }
+  const sign = kind === 'user' ? '@' : '#'
+  return { handle: `${sign}${community.slug}`, path: communityPath(kind, community.slug) }
+}

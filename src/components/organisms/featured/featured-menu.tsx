@@ -4,8 +4,8 @@ import { EllipsisIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { createContext, use, useRef, useState } from 'react'
 
-/** A post or a thesis that can be featured on a profile. */
-export type FeaturableKind = 'post' | 'thesis'
+/** A post, a poll or a thesis that can be featured on a profile. */
+export type FeaturableKind = 'post' | 'poll' | 'thesis'
 
 /**
  * What "⋯" needs to know and do (specs/profile-showcase PS-07), given by whoever owns the

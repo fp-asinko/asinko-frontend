@@ -18,12 +18,16 @@ El mock de `active-communities` cuenta también las tesis y deja afuera el canal
 
 ## 3. Relacionadas al crear (BA-06, BA-08)
 
-Hoy el editor guarda las relacionadas como handles (`#macro`, `$GGAL`) y la action las pega al final del cuerpo. El selector ya conoce cada comunidad que se elige (sale de la búsqueda). Entonces:
+Hoy el editor guarda las relacionadas como handles (`#macro`, `$GGAL`) y la action las pega al final del cuerpo.
 
-- el campo `related` del formulario pasa a guardar `{ id, handle }`;
-- la URL de la página de crear post sigue llevando los handles (`specs/related-aside` RA-04), y la página los resuelve a comunidades con la misma búsqueda;
-- `createPostSchema` deja de transformar el cuerpo y manda `relatedCommunityIds`;
-- `INVALID_RELATED_COMMUNITY` se mapea a un error bajo las relacionadas.
+_Cambio al implementar (2026-10-21): el formulario, su URL (`specs/related-aside` RA-04) y el borrador del navegador siguen con handles. Pasarlos a `{ id, handle }` tocaba los tres sin nada visible._
+
+- `createPostSchema` deja de transformar el cuerpo y conserva los handles.
+- `lib/related-communities.ts` (`server-only`) los resuelve a ids en el servidor, justo antes de `POST /posts` o de guardar un borrador:
+  - un grupo con `GET /communities/{slug}`, nunca un canal personal;
+  - un activo con el `linkedCommunity` de `GET /assets/{symbol}`, nunca con un slug deducido.
+- Uno que no existe o no se puede etiquetar se rechaza como el backend: `INVALID_RELATED_COMMUNITY`, que el editor dice con su mensaje de error (donde dice los demás), no bajo el selector.
+- Un borrador que ya no existe (`404` con `draftId`, borrado desde otro dispositivo) no frena la publicación: se publica sin él.
 
 ## 4. Píldoras de relacionadas (BA-07)
 

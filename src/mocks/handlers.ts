@@ -142,9 +142,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     },
   },
 
-  // P-019, P-020, P-024 and P-026 (proposals, specs/profile-presentation, specs/profile-showcase):
-  // a PATCH with a headline, a city, links, a banner, "open to" or a bio past 160 goes to the mock;
-  // the rest of the profile, to the backend.
+  // P-026 (proposal, specs/profile-showcase): a PATCH with "open to" goes to the mock; the rest of
+  // the profile (P-019, P-020, P-024 included, backend 2026-10-20), to the backend.
   {
     method: 'PATCH',
     path: '/api/v1/users/:userId',
@@ -155,11 +154,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     example: {
       ...noRequest,
       params: { userId: DEMO_USER.id },
-      body: {
-        headline: 'Macro | Rates | LatAm',
-        city: 'La Plata',
-        links: ['https://example.substack.com'],
-      },
+      body: { openTo: ['AMAS', 'MENTORING'] },
     },
     handler: ({ params, body }) => updateUser(params.userId ?? '', body),
   },
@@ -182,12 +177,12 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     example: { ...noRequest, params: { userId: PROFILES[1]!.id } },
     handler: ({ params, query }) => userComments(params.userId ?? '', query.cursor),
   },
-  // P-022 (proposal, specs/drafts-tags): a person's drafts.
+  // P-022 (backend, 2026-10-20): a person's drafts (specs/drafts-tags), with their related ones.
   {
     method: 'GET',
     path: '/api/v1/users/:userId/drafts',
-    kind: 'proposal',
-    implemented: false,
+    kind: 'contract',
+    implemented: true,
     schema: paginatedSchema(draftSchema),
     example: { ...noRequest, params: { userId: DEMO_USER.id } },
     handler: ({ params }) => listDrafts(params.userId ?? ''),
@@ -195,8 +190,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
   {
     method: 'POST',
     path: '/api/v1/drafts',
-    kind: 'proposal',
-    implemented: false,
+    kind: 'contract',
+    implemented: true,
     schema: draftSchema,
     example: {
       ...noRequest,
@@ -207,8 +202,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
   {
     method: 'PATCH',
     path: '/api/v1/drafts/:draftId',
-    kind: 'proposal',
-    implemented: false,
+    kind: 'contract',
+    implemented: true,
     schema: draftSchema,
     example: {
       ...noRequest,
@@ -220,8 +215,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
   {
     method: 'DELETE',
     path: '/api/v1/drafts/:draftId',
-    kind: 'proposal',
-    implemented: false,
+    kind: 'contract',
+    implemented: true,
     schema: noContentSchema,
     example: {
       ...noRequest,
@@ -271,12 +266,12 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     },
     handler: ({ body }) => signCommunityImageUpload(body),
   },
-  // P-027 (proposal, specs/profile-aside): where a person published lately.
+  // P-027 (backend, 2026-10-20): where a person published lately (specs/profile-aside).
   {
     method: 'GET',
     path: '/api/v1/users/:userId/active-communities',
-    kind: 'proposal',
-    implemented: false,
+    kind: 'contract',
+    implemented: true,
     schema: activeCommunitiesSchema,
     example: {
       ...noRequest,
@@ -295,12 +290,12 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     example: { ...noRequest, params: { userId: DEMO_USER.id } },
     handler: ({ params }) => listAchievements(params.userId ?? ''),
   },
-  // P-025 (proposal, specs/profile-showcase): what a person put at the front of their profile.
+  // P-025 (backend, 2026-10-20): what a person put at the front of their profile (specs/profile-showcase).
   {
     method: 'GET',
     path: '/api/v1/users/:userId/featured',
-    kind: 'proposal',
-    implemented: false,
+    kind: 'contract',
+    implemented: true,
     schema: featuredListSchema,
     example: { ...noRequest, params: { userId: PROFILES[1]!.id } },
     handler: ({ params }) => listFeatured(params.userId ?? ''),
@@ -308,8 +303,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
   {
     method: 'POST',
     path: '/api/v1/users/:userId/featured',
-    kind: 'proposal',
-    implemented: false,
+    kind: 'contract',
+    implemented: true,
     schema: featuredListSchema,
     example: {
       ...noRequest,
@@ -321,8 +316,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
   {
     method: 'DELETE',
     path: '/api/v1/users/:userId/featured/:kind/:id',
-    kind: 'proposal',
-    implemented: false,
+    kind: 'contract',
+    implemented: true,
     schema: noContentSchema,
     example: {
       ...noRequest,
@@ -465,12 +460,12 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     },
     handler: ({ body }) => signPostImageUpload(body),
   },
-  // P-021 (proposal, specs/profile-presentation): where to put a profile photo or banner.
+  // P-021 (backend, 2026-10-20): where to put a profile photo or banner.
   {
     method: 'POST',
     path: '/api/v1/uploads/avatar',
-    kind: 'proposal',
-    implemented: false,
+    kind: 'contract',
+    implemented: true,
     schema: profileImageUploadSchema,
     example: {
       ...noRequest,
@@ -481,8 +476,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
   {
     method: 'POST',
     path: '/api/v1/uploads/profile-banner',
-    kind: 'proposal',
-    implemented: false,
+    kind: 'contract',
+    implemented: true,
     schema: profileImageUploadSchema,
     example: {
       ...noRequest,

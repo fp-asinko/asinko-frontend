@@ -48,6 +48,7 @@ describe('drafts-api (P-022, specs/drafts-tags DT-01 to DT-04)', () => {
       body: '',
       url: '',
       imageAlt: '',
+      related: [],
     })
     if (!made.ok) throw new Error('expected ok')
     const updated = await saveDraftAs(me, made.data.id, {
@@ -56,6 +57,7 @@ describe('drafts-api (P-022, specs/drafts-tags DT-01 to DT-04)', () => {
       body: '',
       url: '',
       imageAlt: '',
+      related: [],
     })
     expect(updated).toEqual({ ok: true, data: { id: made.data.id } })
     const listed = await listDraftsOf(me, DEMO_USER.username)
@@ -63,6 +65,22 @@ describe('drafts-api (P-022, specs/drafts-tags DT-01 to DT-04)', () => {
 
     expect(await deleteDraftAs(me, made.data.id)).toEqual({ ok: true, data: null })
     expect(await deleteDraftAs(me, made.data.id)).toMatchObject({ ok: false, code: 'NOT_FOUND' })
+  })
+
+  it('keeps its related ones: saved as ids, back as handles (specs/backend-answer-1020 BA-05)', async () => {
+    const made = await saveDraftAs(me, undefined, {
+      type: 'TEXT',
+      title: 'With related',
+      body: '',
+      url: '',
+      imageAlt: '',
+      related: ['#macro', '$BTC'],
+    })
+    if (!made.ok) throw new Error('expected ok')
+    const list = await listDraftsOf(me, DEMO_USER.username)
+    if (!list.ok) throw new Error('expected ok')
+    expect(list.data.find((each) => each.id === made.data.id)?.related).toEqual(['#macro', '$BTC'])
+    await deleteDraftAs(me, made.data.id)
   })
 
   it('keeps a draft whose community cannot be asked, without its tags', async () => {

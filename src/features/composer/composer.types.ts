@@ -53,5 +53,7 @@ export type SavedDraft = {
   tag: string
   /** Where it goes, with its tags; null when not chosen yet, or no longer there. */
   community: CommunityOption | null
+  /** Its related ones, as handles ($GGAL, #macro), as the editor holds them (P-018). */
+  related: string[]
   updatedAt: string
 }

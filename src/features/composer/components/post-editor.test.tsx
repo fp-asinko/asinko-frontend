@@ -172,6 +172,7 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
       type: 'TEXT',
       title: 'Stablecoin yields are back',
       body: 'Lending demand.',
+      related: [],
     })
     expect(onPublished).toHaveBeenCalledWith('/post/abc/stablecoin-yields-are-back')
   })
@@ -264,6 +265,7 @@ describe('PostEditor with an image (specs/post-image)', () => {
       title: 'Chart',
       body: 'Look at this.',
       imageUrl: IMAGE,
+      related: [],
     })
     expect(onPublished).toHaveBeenCalledWith('/post/img/chart')
   })
@@ -363,7 +365,7 @@ describe('PostEditor related ones (specs/related-tags)', () => {
     await userEvent.click(await screen.findByRole('option', { name: handle }))
   }
 
-  it('offers "+" only with a community, and publishes the related ones as mentions (RT-01, RT-04)', async () => {
+  it('offers "+" only with a community, and publishes the related ones apart from the body (RT-01, specs/backend-answer-1020 BA-06)', async () => {
     renderEditor({ community: null })
     expect(screen.queryByRole('combobox', { name: /Add a related/ })).toBeNull()
     actions.searchCommunities.mockResolvedValue({
@@ -381,7 +383,7 @@ describe('PostEditor related ones (specs/related-tags)', () => {
     await userEvent.type(body(), 'Cheap.')
     await userEvent.click(publish())
     expect(actions.createPost).toHaveBeenCalledWith(
-      expect.objectContaining({ body: 'Cheap.\n\n$GGAL #macro' }),
+      expect.objectContaining({ body: 'Cheap.', related: ['$GGAL', '#macro'] }),
     )
   })
 
@@ -523,6 +525,7 @@ describe('PostEditor drafts (specs/drafts-tags DT-01 to DT-05)', () => {
     imageAlt: '',
     tag: 'Analysis',
     community: { ...DEFI, slug: 'macro', handle: '#macro', name: 'Macro', tags: ['Analysis'] },
+    related: [],
     updatedAt: new Date().toISOString(),
   }
 

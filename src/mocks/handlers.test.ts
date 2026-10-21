@@ -81,30 +81,18 @@ describe('mock handlers behave like the contract', () => {
 
   it('marks as missing only what the backend does not have: the proposals', () => {
     const missing = MOCK_ROUTES.filter((route) => !route.implemented).map((route) => route.path)
-    // The profile's new fields (P-019, P-020) go alone: the rest of that endpoint is the backend's.
-    // Searching comments (P-014) is the backend's since 2026-10-13.
+    // "Open to" (P-026) goes alone: the rest of that endpoint is the backend's. The profile's fields
+    // and uploads (P-019 to P-021, P-024) and where a person publishes (P-027) are the backend's
+    // since 2026-10-20 (specs/backend-answer-1020).
     expect(missing.toSorted()).toEqual(
       [
         '/api/v1/users/:userId',
-        '/api/v1/uploads/avatar',
-        // P-022 (specs/drafts-tags): drafts.
-        '/api/v1/users/:userId/drafts',
-        '/api/v1/drafts',
-        '/api/v1/drafts/:draftId',
-        '/api/v1/drafts/:draftId',
-        '/api/v1/uploads/profile-banner',
         // P-028 and P-029 (specs/community-widgets): a group's widgets and their images.
         '/api/v1/communities/:slug/widgets',
         '/api/v1/communities/:slug/widgets',
         '/api/v1/uploads/community-image',
         // P-030 (specs/profile-achievements): a person's trophy case.
         '/api/v1/users/:userId/achievements',
-        // P-027 (specs/profile-aside): where a person publishes.
-        '/api/v1/users/:userId/active-communities',
-        // P-025 (specs/profile-showcase): featured.
-        '/api/v1/users/:userId/featured',
-        '/api/v1/users/:userId/featured',
-        '/api/v1/users/:userId/featured/:kind/:id',
       ].toSorted(),
     )
   })
@@ -160,11 +148,11 @@ describe('mock handlers behave like the contract', () => {
     const code = async (body: Record<string, unknown>) =>
       ((await patch(body)).body as { error?: { code: string } }).error?.code
 
-    it('mocks a PATCH only when it brings a proposed field', () => {
+    it('mocks a PATCH only when it brings "open to" (P-026, specs/backend-answer-1020 BA-01)', () => {
       const proposal = MOCK_ROUTES.find((route) => route.kind === 'proposal' && route.when)!
-      expect(proposal.when!({}, { headline: 'x' })).toBe(true)
-      expect(proposal.when!({}, { links: [] })).toBe(true)
-      expect(proposal.when!({}, { bio: 'x', displayName: 'y' })).toBe(false)
+      expect(proposal.when!({}, { openTo: [] })).toBe(true)
+      expect(proposal.when!({}, { headline: 'x', links: [] })).toBe(false)
+      expect(proposal.when!({}, { bio: 'x'.repeat(2000), displayName: 'y' })).toBe(false)
     })
 
     it('saves the headline, city, links and banner, and removes them with ""', async () => {
@@ -194,12 +182,7 @@ describe('mock handlers behave like the contract', () => {
       )
     })
 
-    it('takes "open to" and an About of 2000, which only the mock can (P-024, P-026)', async () => {
-      const proposal = MOCK_ROUTES.find((route) => route.kind === 'proposal' && route.when)!
-      expect(proposal.when!({}, { openTo: [] })).toBe(true)
-      expect(proposal.when!({}, { bio: 'x'.repeat(161) })).toBe(true)
-      expect(proposal.when!({}, { bio: 'x'.repeat(160) })).toBe(false)
-
+    it('takes "open to" and an About of 2000 (P-024, P-026)', async () => {
       expect(await patch({ openTo: ['QUESTIONS', 'AMAS'], bio: 'x'.repeat(2000) })).toMatchObject({
         status: 200,
         body: { openTo: ['QUESTIONS', 'AMAS'] },

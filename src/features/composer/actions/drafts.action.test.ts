@@ -50,6 +50,7 @@ describe('draft actions (specs/drafts-tags DT-01 to DT-05)', () => {
       body: '',
       url: '',
       imageAlt: '',
+      related: [],
     })
   })
 

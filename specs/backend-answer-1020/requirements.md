@@ -33,7 +33,7 @@ Que lo que el backend ya implementó deje de mockearse, que el front use sus for
 
 ## Destacados (P-025)
 
-- [ ] **BA-04** Los destacados usan la forma real: cada uno es un ítem del feed (`POST`, `POLL` o `THESIS`) con `featuredAt`. Se puede destacar una **encuesta** desde su "⋯", como un post. Todo lo demás se ve igual (`specs/profile-showcase` PS-05 a PS-08).
+- [ ] **BA-04** Los destacados usan la forma real: cada uno es un ítem del feed (`POST`, `POLL` o `THESIS`) con `featuredAt`. Se puede destacar una **encuesta** desde su "⋯", como un post; su tarjeta lleva a la pestaña Posts del perfil (una encuesta todavía no tiene página). Todo lo demás se ve igual (`specs/profile-showcase` PS-05 a PS-08).
 
 ## Borradores (P-022)
 
@@ -43,7 +43,7 @@ Que lo que el backend ya implementó deje de mockearse, que el front use sus for
 
 - [ ] **BA-06** Las relacionadas que se eligen al crear un post (hasta 3) viajan como `relatedCommunityIds`. Se deja de escribir la línea de menciones al final del cuerpo.
 - [ ] **BA-07** (Q1) En la tarjeta del feed y en el detalle, las relacionadas son una fila de **píldoras grises** debajo del cuerpo, antes de los votos (`$GGAL`, `#macro`), cada una con link a su página. Sin relacionadas, no hay fila. Un post viejo con la línea de menciones se sigue viendo como hasta hoy.
-- [ ] **BA-08** `422 INVALID_RELATED_COMMUNITY` se dice en el editor, junto a las relacionadas, sin perder lo escrito.
+- [ ] **BA-08** `422 INVALID_RELATED_COMMUNITY` se dice en el editor, con su mensaje de error, sin perder lo escrito.
 
 ## Listas de personas (P-017, Q3)
 

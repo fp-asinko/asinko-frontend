@@ -33,6 +33,7 @@ export async function ProfileShowcase({
       )}
       <FeaturedSection
         items={featured}
+        postsPath={pagePath}
         thesesPath={`${pagePath}?tab=theses`}
         own={profile.isSelf}
       />

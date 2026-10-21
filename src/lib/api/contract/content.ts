@@ -27,6 +27,15 @@ export const communitySummarySchema = z.object({
   viewerMembership: membershipSchema.nullable(),
 })
 
+/** A related community of a post or a draft (P-018, backend 2026-10-20). */
+export const relatedCommunitySchema = communitySummarySchema.pick({
+  id: true,
+  slug: true,
+  name: true,
+  type: true,
+  avatarUrl: true,
+})
+
 export const postSchema = z.object({
   id: z.uuid(),
   communityId: z.uuid(),
@@ -40,6 +49,8 @@ export const postSchema = z.object({
   /** What the image shows (P-013, 2026-10-13): optional, only IMAGE posts. */
   imageAlt: z.string().nullable().optional(),
   tag: z.string().nullable(),
+  /** The ones its author chose, in their order (P-018); [] when deleted. Optional: older mocks. */
+  related: z.array(relatedCommunitySchema).optional(),
   /** null when creatorType is SYSTEM. */
   creator: userSummarySchema.nullable(),
   creatorType: z.enum(['USER', 'SYSTEM']),
@@ -185,6 +196,9 @@ export const draftSchema = z.object({
   imageAlt: z.string(),
   tag: z.string().nullable(),
   community: communitySummarySchema.nullable(),
+  /** As Post.related (P-018); and when it was first saved (backend 2026-10-20). */
+  related: z.array(relatedCommunitySchema).optional(),
+  createdAt: z.iso.datetime().optional(),
   updatedAt: z.iso.datetime(),
 })
 

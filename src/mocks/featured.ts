@@ -1,17 +1,23 @@
 import type { RawFeatured } from '@/lib/api/contract'
 import { DEMO_USER } from './demo-user'
 import { mockId } from './fixtures/ids'
+import { pollById } from './fixtures/polls'
 import { THESES } from './fixtures/theses'
 import { PROFILES } from './fixtures/users'
 import { findPost } from './posting'
 import type { MockResponse } from './types'
 
-// What each person put at the front of their profile (P-025, proposal, specs/profile-showcase): in
-// this process's memory, the last featured first, up to three. Only the demo user writes.
+// What each person put at the front of their profile (P-025, backend 2026-10-20): in this process's
+// memory, the last featured first, up to three. Each one a feed item ({ kind, content }) with
+// featuredAt; `kind` is POST, POLL or THESIS, in any case. Only the demo user writes.
 
 export const FEATURED_MAX = 3
 
-type Kind = 'post' | 'thesis'
+const KINDS = ['post', 'poll', 'thesis'] as const
+type Kind = (typeof KINDS)[number]
+
+const kindOf = (value: unknown): Kind | undefined =>
+  KINDS.find((kind) => typeof value === 'string' && value.toLowerCase() === kind)
 type Entry = { kind: Kind; id: string; featuredAt: string }
 
 const maria = PROFILES.find((profile) => profile.username === 'maria')!
@@ -35,18 +41,27 @@ const error = (status: number, code: string): MockResponse => ({
 
 /** The content behind an entry as the list carries it, if it is there and not deleted. */
 function featuredOf(entry: Entry): { item: RawFeatured; creatorId: string | null } | null {
+  const { featuredAt } = entry
   if (entry.kind === 'post') {
     const post = findPost(entry.id)
     if (!post || post.deleted) return null
     return {
-      item: { kind: 'post', post, featuredAt: entry.featuredAt },
+      item: { kind: 'POST', content: post, featuredAt },
       creatorId: post.creator?.id ?? null,
+    }
+  }
+  if (entry.kind === 'poll') {
+    const poll = pollById(entry.id)
+    if (!poll) return null
+    return {
+      item: { kind: 'POLL', content: poll, featuredAt },
+      creatorId: poll.creator?.id ?? null,
     }
   }
   const thesis = THESES.find((each) => each.id === entry.id)
   if (!thesis) return null
   return {
-    item: { kind: 'thesis', thesis, featuredAt: entry.featuredAt },
+    item: { kind: 'THESIS', content: thesis, featuredAt },
     creatorId: thesis.creator?.id ?? null,
   }
 }
@@ -62,10 +77,9 @@ export function listFeatured(userId: string): MockResponse {
 export function addFeatured(userId: string, body: unknown): MockResponse {
   const input = (body ?? {}) as Record<string, unknown>
   if (userId !== DEMO_USER.id || input.userId !== userId) return error(403, 'USER_MISMATCH')
-  if ((input.kind !== 'post' && input.kind !== 'thesis') || typeof input.id !== 'string') {
-    return error(422, 'VALIDATION_ERROR')
-  }
-  const entry = { kind: input.kind as Kind, id: input.id }
+  const kind = kindOf(input.kind)
+  if (!kind || typeof input.id !== 'string') return error(422, 'VALIDATION_ERROR')
+  const entry = { kind, id: input.id }
   const found = featuredOf({ ...entry, featuredAt: '' })
   if (!found) return error(404, 'NOT_FOUND')
   if (found.creatorId !== userId) return error(403, 'NOT_OWNER')
@@ -90,7 +104,7 @@ export function removeFeatured(
   const list = FEATURED.get(userId) ?? []
   FEATURED.set(
     userId,
-    list.filter((each) => !(each.kind === kind && each.id === id)),
+    list.filter((each) => !(each.kind === kindOf(kind) && each.id === id)),
   )
   return { status: 204 }
 }

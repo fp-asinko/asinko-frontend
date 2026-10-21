@@ -3,16 +3,29 @@ import { apiRequest, paginatedSchema, type ApiResult } from '@/lib/api'
 import { communitySchema, postSchema, type RawCommunity } from '@/lib/api/contract'
 import type { CommunityKind, CommunityOption } from '../composer.types'
 import type { CreatePostInput } from '../schemas/create-post.schema'
+import { relatedCommunityIds } from './related-communities'
 
-/** Publishes a post (E03). The userId always comes from the server session (api-integration.md). */
+/**
+ * Publishes a post (E03). The userId always comes from the server session (api-integration.md). Its
+ * related ones go as ids (P-018); from a draft of the account, with its draftId: the backend deletes
+ * the draft in the same operation (P-022, specs/backend-answer-1020 BA-05, BA-06).
+ */
 export async function createPostAs(
   userId: string,
-  input: CreatePostInput,
+  { related, ...input }: CreatePostInput,
+  draftId?: string,
 ): Promise<ApiResult<{ id: string; title: string }>> {
+  const ids = await relatedCommunityIds(related)
+  if (!ids.ok) return ids
   const result = await apiRequest({
     method: 'POST',
     path: '/api/v1/posts',
-    body: { userId, ...input },
+    body: {
+      userId,
+      ...input,
+      ...(ids.data.length > 0 && { relatedCommunityIds: ids.data }),
+      ...(draftId && { draftId }),
+    },
     schema: postSchema,
   })
   return result.ok ? { ok: true, data: { id: result.data.id, title: result.data.title } } : result

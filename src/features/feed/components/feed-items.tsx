@@ -26,7 +26,7 @@ export function FeedItems({
       {item.kind === 'post' ? (
         <PostCard post={item} fadeImage={later} feedCommunity={feedCommunity} menu={menus} />
       ) : (
-        <PollCard poll={item} feedCommunity={feedCommunity} />
+        <PollCard poll={item} feedCommunity={feedCommunity} menu={menus} />
       )}
     </li>
   ))

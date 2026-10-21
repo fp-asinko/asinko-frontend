@@ -1,13 +1,15 @@
 import 'server-only'
 import { apiRequest, noContentSchema, paginatedSchema, type ApiResult } from '@/lib/api'
 import { communitySchema, draftSchema, type RawDraft } from '@/lib/api/contract'
+import { mentionOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 import type { CommunityOption, SavedDraft } from '../composer.types'
 import type { DraftFields } from '../schemas/save-draft.schema'
 import { toOption } from './composer-api'
+import { relatedCommunityIds } from './related-communities'
 
-// The drafts of the account (P-022, proposal, specs/drafts-tags). The userId always comes from the
-// server session (api-integration.md).
+// The drafts of the account (P-022, backend 2026-10-20, specs/drafts-tags). The userId always comes
+// from the server session (api-integration.md).
 
 /**
  * Each draft's community as the picker's option, with its tags (P-023): the draft brings the
@@ -63,18 +65,24 @@ export async function listDraftsOf(
       imageAlt: draft.imageAlt,
       tag: draft.tag ?? '',
       community: draft.community && optionOf(draft.community),
+      related: (draft.related ?? []).map((each) => mentionOf(each).handle),
       updatedAt: draft.updatedAt,
     })),
   }
 }
 
-/** Saves a new draft, or updates the one given (DT-01, DT-03). Answers its id. */
+/**
+ * Saves a new draft, or updates the one given (DT-01, DT-03), with its related ones as ids (BA-05).
+ * Answers its id.
+ */
 export async function saveDraftAs(
   userId: string,
   draftId: string | undefined,
-  fields: DraftFields,
+  { related, ...fields }: DraftFields,
 ): Promise<ApiResult<{ id: string }>> {
-  const body = { userId, ...fields }
+  const ids = await relatedCommunityIds(related)
+  if (!ids.ok) return ids
+  const body = { userId, ...fields, relatedCommunityIds: ids.data }
   const result = draftId
     ? await apiRequest({
         method: 'PATCH',

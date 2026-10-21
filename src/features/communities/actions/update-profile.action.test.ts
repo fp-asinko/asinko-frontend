@@ -130,6 +130,17 @@ describe('updateProfile (PE-03 to PE-06, PP-08, PP-09)', () => {
     expect(await updateProfile({ links: [] })).toMatchObject({
       fieldErrors: { links: ['communities.edit.errors.link'] },
     })
+    // The backend's codes since 2026-10-20 (specs/backend-answer-1020 BA-02), each under its field.
+    for (const [code, field, key] of [
+      ['HEADLINE_TOO_LONG', 'headline', 'headlineTooLong'],
+      ['CITY_TOO_LONG', 'city', 'cityTooLong'],
+      ['TOO_MANY_LINKS', 'links', 'tooManyLinks'],
+    ] as const) {
+      refuse(code)
+      expect(await updateProfile({ bio: 'Hi' })).toMatchObject({
+        fieldErrors: { [field]: [`communities.edit.errors.${key}`] },
+      })
+    }
     refuse('HTTP', 'api.errors.UNAVAILABLE')
     expect(await updateProfile({ bio: 'Hi' })).toEqual({
       ok: false,

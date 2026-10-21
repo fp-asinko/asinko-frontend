@@ -1,5 +1,11 @@
 import { z } from 'zod'
-import { IMAGE_ALT_MAX, TAG_MAX, TITLE_MAX } from './create-post.schema'
+import {
+  IMAGE_ALT_MAX,
+  RELATED_MAX,
+  relatedHandleSchema,
+  TAG_MAX,
+  TITLE_MAX,
+} from './create-post.schema'
 
 /**
  * What "Save draft" sends (specs/drafts-tags DT-01, P-022): the editor's fields as they are, none
@@ -17,6 +23,8 @@ export const saveDraftSchema = z
     imageUrl: z.string().max(2048).default(''),
     imageAlt: z.string().trim().max(IMAGE_ALT_MAX).default(''),
     tag: z.string().trim().max(TAG_MAX).default(''),
+    /** Its related ones too (P-018, specs/backend-answer-1020 BA-05): saved as ids by the server. */
+    related: z.array(relatedHandleSchema).max(RELATED_MAX).default([]),
   })
   .refine((draft) => draft.title || draft.body || draft.url || draft.imageUrl, {
     message: 'composer.drafts.errors.empty',

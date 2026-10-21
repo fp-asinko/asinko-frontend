@@ -2,6 +2,7 @@ import type { RawFeedItem, RawUserComment } from '@/lib/api/contract'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { POLLS } from './fixtures/polls'
 import { POSTS } from './fixtures/posts'
+import { THESES } from './fixtures/theses'
 import { PROFILES } from './fixtures/users'
 import { CREATED_POSTS } from './posting'
 import { paginate } from './paginate'
@@ -55,23 +56,33 @@ export function activeCommunities(userId: string, query: Record<string, string>)
   if (!Number.isInteger(days) || days < 1 || days > 365) return invalid
   if (!Number.isInteger(limit) || limit < 1 || limit > 20) return invalid
   const since = Date.now() - days * DAY
-  const counts = new Map<string, { item: RawFeedItem; count: number; latest: string }>()
-  for (const item of items()) {
-    const { content } = item
-    if (content.creator?.id !== userId) continue
-    if ('deleted' in content && content.deleted) continue
-    if (Date.parse(content.publishedAt) < since) continue
-    const known = counts.get(content.community.id)
-    counts.set(content.community.id, {
-      item: known?.item ?? item,
+  type Published = { community: RawFeedItem['content']['community']; publishedAt: string }
+  const counts = new Map<
+    string,
+    { community: Published['community']; count: number; latest: string }
+  >()
+  // Posts, polls and theses (backend, 2026-10-20), never the personal channel: it is known.
+  const published: Published[] = [
+    ...items()
+      .map(({ content }) => content)
+      .filter((content) => content.creator?.id === userId)
+      .filter((content) => !('deleted' in content && content.deleted)),
+    ...THESES.filter((thesis) => thesis.creator?.id === userId),
+  ]
+  for (const { community, publishedAt } of published) {
+    if (community.type === 'PERSONAL_CHANNEL') continue
+    if (Date.parse(publishedAt) < since) continue
+    const known = counts.get(community.id)
+    counts.set(community.id, {
+      community,
       count: (known?.count ?? 0) + 1,
-      latest: known && known.latest > content.publishedAt ? known.latest : content.publishedAt,
+      latest: known && known.latest > publishedAt ? known.latest : publishedAt,
     })
   }
   const list = [...counts.values()]
     .sort((a, b) => b.count - a.count || b.latest.localeCompare(a.latest))
     .slice(0, limit)
-    .map(({ item, count }) => ({ community: item.content.community, postCount: count }))
+    .map(({ community, count }) => ({ community, postCount: count }))
   return { status: 200, body: { items: list } }
 }
 

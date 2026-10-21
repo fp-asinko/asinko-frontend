@@ -17,16 +17,19 @@ import { communityPath, kindOf } from '@/lib/communities/paths'
 import { postPath } from '@/lib/posts/paths'
 import type { FeaturedItem, ThesisItem } from '../communities.types'
 
-// What a person put at the front of their profile (P-025, proposal, specs/profile-showcase). The
-// userId of a write always comes from the server session (api-integration.md).
+// What a person put at the front of their profile (P-025, backend 2026-10-20, specs/profile-showcase,
+// specs/backend-answer-1020 BA-04). The userId of a write always comes from the server session.
 
 const ENDPOINT = 'GET /api/v1/users/:userId/featured'
 
 /** Up to three, as the proposal (PS-05). */
 export const FEATURED_MAX = 3
 
-/** What is featured: a post or a thesis, by its id. */
-export const featuredRefSchema = z.object({ kind: z.enum(['post', 'thesis']), id: z.uuid() })
+/** What is featured: a post, a poll or a thesis, by its id. The backend takes the kind in capitals. */
+export const featuredRefSchema = z.object({
+  kind: z.enum(['post', 'poll', 'thesis']),
+  id: z.uuid(),
+})
 export type FeaturedRef = z.infer<typeof featuredRefSchema>
 
 /** Its community as a mention: $ for an asset, @ for a personal channel, # for a group. */
@@ -42,8 +45,8 @@ function communityOf(summary: RawCommunitySummary) {
 }
 
 export function toFeaturedItem(featured: RawFeatured): FeaturedItem {
-  if (featured.kind === 'post') {
-    const { post } = featured
+  if (featured.kind === 'POST') {
+    const post = featured.content
     return {
       kind: 'post',
       id: post.id,
@@ -54,7 +57,17 @@ export function toFeaturedItem(featured: RawFeatured): FeaturedItem {
       commentCount: post.commentCount,
     }
   }
-  const { thesis } = featured
+  if (featured.kind === 'POLL') {
+    const poll = featured.content
+    return {
+      kind: 'poll',
+      id: poll.id,
+      title: poll.question,
+      community: communityOf(poll.community),
+      commentCount: poll.commentCount,
+    }
+  }
+  const thesis = featured.content
   return {
     kind: 'thesis',
     id: thesis.id,
@@ -87,7 +100,7 @@ export async function featureAs(userId: string, ref: FeaturedRef): Promise<ApiRe
     method: 'POST',
     path: '/api/v1/users/:userId/featured',
     params: { userId },
-    body: { userId, ...ref },
+    body: { userId, kind: ref.kind.toUpperCase(), id: ref.id },
     schema: featuredListSchema,
   })
   return result.ok ? { ok: true, data: null } : result
@@ -98,7 +111,7 @@ export async function unfeatureAs(userId: string, ref: FeaturedRef): Promise<Api
   const result = await apiRequest({
     method: 'DELETE',
     path: '/api/v1/users/:userId/featured/:kind/:id',
-    params: { userId, kind: ref.kind, id: ref.id },
+    params: { userId, kind: ref.kind.toUpperCase(), id: ref.id },
     query: { userId },
     schema: noContentSchema,
   })

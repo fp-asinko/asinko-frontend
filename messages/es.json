@@ -798,10 +798,13 @@
     "postMeta": "{handle} · {score, plural, one {# punto} other {# puntos}} · {comments, plural, one {# comentario} other {# comentarios}}",
     "errors": {
       "limit": "Ya tienes {max, number} destacados. Quita uno primero.",
-      "notOwner": "Solo se pueden destacar tus propios posts y tesis.",
+      "notOwner": "Solo se pueden destacar tus propios posts, encuestas y tesis.",
       "gone": "Ya no existe.",
       "general": "No se pudo cambiar. Inténtalo de nuevo."
-    }
+    },
+    "poll": "Encuesta",
+    "pollMenu": "Opciones de la encuesta {title}",
+    "pollMeta": "{handle} · {comments, plural, one {# comentario} other {# comentarios}}"
   },
   "postDetail": {
     "title": "{count, plural, =0 {Comentarios} one {# comentario} other {# comentarios}}",
@@ -903,7 +906,8 @@
       "imageTooLarge": "La imagen es demasiado grande",
       "imageUnreadable": "No se pudo leer la imagen",
       "imageRequired": "Agrega una imagen",
-      "imageAltTooLong": "Hasta 300 caracteres."
+      "imageAltTooLong": "Hasta 300 caracteres.",
+      "invalidRelated": "Una de las comunidades o activos relacionados ya no se puede etiquetar. Quítala y vuelve a intentarlo."
     },
     "cancel": "Cancelar",
     "image": {

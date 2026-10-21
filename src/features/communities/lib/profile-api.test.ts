@@ -139,25 +139,22 @@ describe('updateProfileAs (specs/profile-edit PE-03, specs/profile-presentation 
     await updateProfileAs(DEMO_USER.id, { headline: '', links: [] })
   })
 
-  it('sends the proposed fields apart, so they reach the mock while the backend lacks them', async () => {
+  it('sends "open to" apart, so it reaches the mock while the backend lacks it', async () => {
+    // The headline, city and the About of 2000 are the backend's (specs/backend-answer-1020 BA-01).
+    const about = 'x'.repeat(2000)
     await updateProfileAs(DEMO_USER.id, {
       displayName: 'Demo',
       countryCode: '',
       headline: 'Rates',
       city: 'La Plata',
+      bio: about,
     })
     expect(state.bodies).toEqual([
-      { displayName: 'Demo', countryCode: null },
-      { headline: 'Rates', city: 'La Plata' },
+      { displayName: 'Demo', countryCode: null, headline: 'Rates', city: 'La Plata', bio: about },
     ])
     state.bodies = []
-    await updateProfileAs(DEMO_USER.id, { bio: 'Hi' })
-    expect(state.bodies).toEqual([{ bio: 'Hi' }])
-    // An About past the backend's 160 and "open to" are proposals (P-024, P-026).
-    state.bodies = []
-    const about = 'x'.repeat(161)
-    await updateProfileAs(DEMO_USER.id, { displayName: 'Demo', bio: about, openTo: ['AMAS'] })
-    expect(state.bodies).toEqual([{ displayName: 'Demo' }, { bio: about, openTo: ['AMAS'] }])
+    await updateProfileAs(DEMO_USER.id, { displayName: 'Demo', openTo: ['AMAS'] })
+    expect(state.bodies).toEqual([{ displayName: 'Demo' }, { openTo: ['AMAS'] }])
     await updateProfileAs(DEMO_USER.id, { bio: '', openTo: [] })
     await updateProfileAs(DEMO_USER.id, { displayName: '', headline: '', city: '' })
   })

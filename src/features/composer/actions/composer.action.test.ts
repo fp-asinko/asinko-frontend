@@ -7,10 +7,8 @@ const deps = vi.hoisted(() => ({
   getViewer: vi.fn(),
   createPostAs: vi.fn(),
   listCommunityOptions: vi.fn(),
-  deleteDraftAs: vi.fn(),
 }))
 vi.mock('@/lib/session', () => ({ getViewer: deps.getViewer }))
-vi.mock('../lib/drafts-api', () => ({ deleteDraftAs: deps.deleteDraftAs }))
 vi.mock('../lib/composer-api', () => ({
   createPostAs: deps.createPostAs,
   listCommunityOptions: deps.listCommunityOptions,
@@ -52,36 +50,39 @@ describe('createPost (specs/post-create-detail PC-09 to PC-11)', () => {
   it('publishes with the userId of the session, never one from the form', async () => {
     deps.createPostAs.mockResolvedValue({ ok: true, data: { id: 'new', title: 'Title' } })
     const result = await createPost({ ...valid, userId: 'someone-else' })
-    expect(deps.createPostAs).toHaveBeenCalledWith(DEMO_USER.id, {
-      communityId: COMMUNITY,
-      type: 'TEXT',
-      title: 'Title',
-      body: 'Body',
-    })
+    expect(deps.createPostAs).toHaveBeenCalledWith(
+      DEMO_USER.id,
+      { communityId: COMMUNITY, type: 'TEXT', title: 'Title', body: 'Body', related: [] },
+      undefined,
+    )
     expect(result).toEqual({ ok: true, data: { id: 'new', title: 'Title' } })
   })
 
-  it('deletes the draft it was published from, and only after publishing (specs/drafts-tags DT-03)', async () => {
+  it('publishes a draft with its id, the backend deletes it (specs/backend-answer-1020 BA-05)', async () => {
     const draft = '00000000-0000-4000-8000-000000000901'
-    deps.createPostAs.mockResolvedValue(failure('RATE_LIMITED'))
-    await createPost(valid, draft)
-    expect(deps.deleteDraftAs).not.toHaveBeenCalled()
-
     deps.createPostAs.mockResolvedValue({ ok: true, data: { id: 'new', title: 'Title' } })
-    // A failed delete leaves the post published.
-    deps.deleteDraftAs.mockResolvedValue(failure('HTTP'))
     expect(await createPost(valid, draft)).toMatchObject({ ok: true })
-    expect(deps.deleteDraftAs).toHaveBeenCalledWith(DEMO_USER.id, draft)
-
-    deps.deleteDraftAs.mockClear()
+    expect(deps.createPostAs).toHaveBeenCalledWith(DEMO_USER.id, expect.any(Object), draft)
+    // Not a uuid: as without a draft.
+    deps.createPostAs.mockClear()
     await createPost(valid, '../x')
-    expect(deps.deleteDraftAs).not.toHaveBeenCalled()
+    expect(deps.createPostAs).toHaveBeenCalledWith(DEMO_USER.id, expect.any(Object), undefined)
+  })
+
+  it('publishes anyway when its draft is gone (deleted from another device)', async () => {
+    const draft = '00000000-0000-4000-8000-000000000901'
+    deps.createPostAs
+      .mockResolvedValueOnce(failure('NOT_FOUND'))
+      .mockResolvedValueOnce({ ok: true, data: { id: 'new', title: 'Title' } })
+    expect(await createPost(valid, draft)).toMatchObject({ ok: true })
+    expect(deps.createPostAs).toHaveBeenLastCalledWith(DEMO_USER.id, expect.any(Object))
   })
 
   it('explains the backend refusals in the editor words', async () => {
     for (const [code, error] of [
       ['PERSONAL_CHANNEL_OWNER_ONLY', 'composer.errors.ownProfileOnly'],
       ['INVALID_COMMUNITY', 'composer.errors.invalidCommunity'],
+      ['INVALID_RELATED_COMMUNITY', 'composer.errors.invalidRelated'],
       ['VALIDATION_ERROR', 'composer.errors.invalid'],
     ]) {
       deps.createPostAs.mockResolvedValue(failure(code!, 'api.errors.UNKNOWN'))

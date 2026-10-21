@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import { FeaturedMenuContext } from '@/components/organisms/featured'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { pollItem } from '../feed-items.fixture'
 import { PollCard } from './poll-card'
@@ -12,6 +13,21 @@ vi.mock('../actions/vote-comment.action', () => ({ voteComment: vi.fn() }))
 vi.mock('../actions/vote-poll.action', () => ({ votePoll: vi.fn() }))
 
 describe('PollCard (H-13)', () => {
+  it('offers "⋯" to feature it only on your own profile (specs/backend-answer-1020 BA-04)', () => {
+    const name = 'Options for the poll Where does $BTC close 2026?'
+    const { unmount } = renderWithIntl(<PollCard poll={pollItem()} />)
+    expect(screen.queryByRole('button', { name })).toBeNull()
+    unmount()
+    renderWithIntl(
+      <FeaturedMenuContext
+        value={{ isFeatured: () => false, full: false, max: 3, pending: false, set: vi.fn() }}
+      >
+        <PollCard poll={pollItem()} menu />
+      </FeaturedMenuContext>,
+    )
+    expect(screen.getByRole('button', { name })).toHaveAttribute('aria-haspopup', 'menu')
+  })
+
   it('shows the question, options with their share and the totals', () => {
     renderWithIntl(<PollCard poll={pollItem()} />)
 

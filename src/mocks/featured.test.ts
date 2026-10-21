@@ -13,15 +13,33 @@ const kinds = (userId: string) =>
   (listFeatured(userId).body as { items: Array<{ kind: string }> }).items.map((item) => item.kind)
 const add = (id: string) => addFeatured(me, { userId: me, kind: 'post', id })
 
-describe('featured mock (P-025, specs/profile-showcase)', () => {
-  it("lists someone's featured, a thesis and a post, the last featured first", () => {
-    expect(kinds(maria)).toEqual(['thesis', 'post'])
+describe('featured mock (P-025, backend 2026-10-20, specs/backend-answer-1020 BA-04)', () => {
+  it("lists someone's featured as feed items, a thesis and a post, the last featured first", () => {
+    expect(kinds(maria)).toEqual(['THESIS', 'POST'])
+    const [first] = (listFeatured(maria).body as { items: Array<{ content: { id: string } }> })
+      .items
+    expect(first!.content.id).toBe(mockId(9, 3))
+  })
+
+  it("takes the kind in any case, a poll too; someone else's poll is not yours", () => {
+    expect(addFeatured(me, { userId: me, kind: 'POST', id: DEMO_POST_ID })).toMatchObject({
+      status: 201,
+    })
+    expect(removeFeatured(me, 'POST', DEMO_POST_ID, me)).toEqual({ status: 204 })
+    expect(kinds(me)).toEqual([])
+    expect(addFeatured(me, { userId: me, kind: 'poll', id: mockId(5, 2) })).toMatchObject({
+      status: 403,
+      body: { error: { code: 'NOT_OWNER' } },
+    })
+    expect(addFeatured(me, { userId: me, kind: 'story', id: DEMO_POST_ID })).toMatchObject({
+      status: 422,
+    })
   })
 
   it('features your own content, once, and takes it out', () => {
     expect(add(DEMO_POST_ID)).toMatchObject({ status: 201 })
     expect(add(DEMO_POST_ID)).toMatchObject({ status: 200 })
-    expect(kinds(me)).toEqual(['post'])
+    expect(kinds(me)).toEqual(['POST'])
     expect(removeFeatured(me, 'post', DEMO_POST_ID, me)).toEqual({ status: 204 })
     expect(kinds(me)).toEqual([])
   })

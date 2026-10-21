@@ -187,6 +187,14 @@ export type FeaturedItem =
       commentCount: number
     }
   | {
+      /** A poll has no page yet: its card leads to the profile's posts. */
+      kind: 'poll'
+      id: string
+      title: string
+      community: FeaturedCommunity
+      commentCount: number
+    }
+  | {
       kind: 'thesis'
       id: string
       claim: string

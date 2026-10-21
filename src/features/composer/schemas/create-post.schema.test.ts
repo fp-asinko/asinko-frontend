@@ -31,6 +31,7 @@ describe('createPostSchema (specs/post-create-detail PC-08, PC-09)', () => {
       type: 'TEXT',
       title: 'A title',
       body: 'A body',
+      related: [],
     })
   })
 
@@ -71,6 +72,7 @@ describe('createPostSchema (specs/post-create-detail PC-08, PC-09)', () => {
       title: 'A title',
       body: 'A body',
       imageUrl: image,
+      related: [],
     })
     expect(
       createPostSchema.safeParse({ ...valid, type: 'IMAGE', imageUrl: '/mocks/chart-btc.svg' })
@@ -108,12 +110,11 @@ describe('createPostSchema (specs/post-create-detail PC-08, PC-09)', () => {
 })
 
 describe('createPostSchema related (specs/related-tags RT-02, RT-04)', () => {
-  it('adds the related ones as mentions on a last line of the body', () => {
+  it('keeps the related ones apart, never on a last line of the body (specs/backend-answer-1020 BA-06)', () => {
     expect(
       createPostSchema.parse({ ...valid, related: ['$GGAL', '#macro', '$BRK.B'] }),
-    ).toMatchObject({ body: 'A body\n\n$GGAL #macro $BRK.B' })
-    expect(createPostSchema.parse({ ...valid, related: [] })).toMatchObject({ body: 'A body' })
-    expect(createPostSchema.parse(valid)).not.toHaveProperty('related')
+    ).toMatchObject({ body: 'A body', related: ['$GGAL', '#macro', '$BRK.B'] })
+    expect(createPostSchema.parse(valid)).toMatchObject({ body: 'A body', related: [] })
   })
 
   it(`takes up to ${RELATED_MAX}, mentions only, without repeats`, () => {

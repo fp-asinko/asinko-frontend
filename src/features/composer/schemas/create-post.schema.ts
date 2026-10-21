@@ -74,14 +74,11 @@ export const createPostSchema = z
       ctx.addIssue({ code: 'custom', path: ['imageUrl'], message: 'composer.errors.imageRequired' })
     }
   })
-  // The related communities and assets go as mentions on a last line of the body (specs/related-tags
-  // RT-04): the backend resolves them as any mention. The description only with an image, and only
-  // when written (the backend rejects it on other types, specs/backend-answer-1013 BA-04).
-  .transform(({ url, imageUrl, imageAlt, related, tag, ...rest }) => {
-    const tagged = tag ? { ...rest, tag } : rest
-    const post = related.length
-      ? { ...tagged, body: `${tagged.body}\n\n${related.join(' ')}` }
-      : tagged
+  // The related ones stay as handles: the server sends them as ids (relatedCommunityIds, P-018,
+  // specs/backend-answer-1020 BA-06), no longer as mentions on a last line of the body. The
+  // description only with an image, and only when written (specs/backend-answer-1013 BA-04).
+  .transform(({ url, imageUrl, imageAlt, tag, ...rest }) => {
+    const post = tag ? { ...rest, tag } : rest
     return post.type === 'LINK'
       ? { ...post, url }
       : post.type === 'IMAGE'

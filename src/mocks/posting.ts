@@ -7,6 +7,7 @@ import { postById } from './fixtures/posts'
 import { summary } from './fixtures/users'
 import type { MockResponse } from './types'
 import { MOCK_POST_IMAGE } from './post-image'
+import { deleteDraft, draftOf } from './drafts'
 
 // Creating posts and comments, and voting comments (E03, E05), for the demo viewer
 // (specs/post-create-detail § 6). Validates as the backend does. Created posts and comments live
@@ -53,6 +54,22 @@ export function createPost(body: unknown): MockResponse {
   if (input.tag !== undefined && !(community.tags ?? []).includes(input.tag as string)) {
     return error(422, 'INVALID_TAG')
   }
+  // P-018 (backend 2026-10-20): up to 3, distinct, not the main one, existing, no personal channel.
+  const relatedIds = input.relatedCommunityIds ?? []
+  const related = Array.isArray(relatedIds) ? relatedIds.map((id) => communityById(String(id))) : []
+  if (
+    !Array.isArray(relatedIds) ||
+    relatedIds.length > 3 ||
+    new Set(relatedIds).size !== relatedIds.length ||
+    relatedIds.includes(community.id) ||
+    related.some((each) => !each || each.type === 'PERSONAL_CHANNEL')
+  ) {
+    return error(422, 'INVALID_RELATED_COMMUNITY')
+  }
+  // P-022 (backend 2026-10-20): a draft of the user, deleted in the same operation; none, 404.
+  if (input.draftId !== undefined && !draftOf(String(input.draftId), DEMO_USER.id)) {
+    return error(404, 'NOT_FOUND')
+  }
 
   created += 1
   const now = new Date().toISOString()
@@ -67,6 +84,11 @@ export function createPost(body: unknown): MockResponse {
     imageUrl: type === 'IMAGE' ? MOCK_POST_IMAGE : null,
     imageAlt: type === 'IMAGE' ? imageAlt : null,
     tag: typeof input.tag === 'string' ? input.tag : null,
+    related: related.flatMap((each) => {
+      if (!each) return []
+      const { id, slug, name, type, avatarUrl } = each
+      return [{ id, slug, name, type, avatarUrl }]
+    }),
     creator: summary(DEMO_USER.username),
     creatorType: 'USER',
     score: 0,
@@ -79,6 +101,7 @@ export function createPost(body: unknown): MockResponse {
     entities: [],
   }
   CREATED_POSTS.unshift(post)
+  if (input.draftId !== undefined) deleteDraft(String(input.draftId), DEMO_USER.id)
   return { status: 201, body: post }
 }
 

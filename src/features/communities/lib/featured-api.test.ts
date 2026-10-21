@@ -4,7 +4,14 @@ import { MOCK_ROUTES } from '@/mocks/handlers'
 import { mockId } from '@/mocks/fixtures/ids'
 import { PROFILES } from '@/mocks/fixtures/users'
 import { DEMO_POST_ID } from '@/mocks/posting'
-import { featureAs, getFeatured, getProfileFeatured, unfeatureAs } from './featured-api'
+import { pollById } from '@/mocks/fixtures/polls'
+import {
+  featureAs,
+  getFeatured,
+  getProfileFeatured,
+  toFeaturedItem,
+  unfeatureAs,
+} from './featured-api'
 
 // The real client against the mock routes (P-025); a route left out reaches a fetch that fails.
 vi.mock('@/lib/api', async () => {
@@ -46,6 +53,19 @@ describe('featured-api (P-025, specs/profile-showcase PS-05, PS-07)', () => {
         community: { handle: '$BTC', path: '/asset/BTC' },
       },
     ])
+  })
+
+  it('maps a featured poll by its question, without a page of its own (BA-04)', () => {
+    const poll = pollById(mockId(5, 2))!
+    expect(
+      toFeaturedItem({ kind: 'POLL', content: poll, featuredAt: '2026-10-20T00:00:00.000Z' }),
+    ).toEqual({
+      kind: 'poll',
+      id: poll.id,
+      title: poll.question,
+      community: expect.objectContaining({ handle: expect.stringMatching(/^[#$@]/) }),
+      commentCount: poll.commentCount,
+    })
   })
 
   it('features and takes out your own post', async () => {

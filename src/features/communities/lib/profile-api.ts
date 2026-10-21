@@ -72,21 +72,19 @@ export const getProfileDetails = cache(async function getProfileDetails(
     : result
 })
 
-/** Fields the backend has (E01, P-011) and the ones proposed (P-019, P-020, P-026): sent apart. */
-const PROPOSED: readonly string[] = ['headline', 'city', 'links', 'bannerUrl', 'openTo']
+/**
+ * What the backend lacks, sent apart: "open to" (P-026). The headline, city, links, banner and the
+ * About of 2000 are the backend's since 2026-10-20 (specs/backend-answer-1020).
+ */
+const PROPOSED: readonly string[] = ['openTo']
 
-/** The bio the backend takes today (E01); a longer one is the About of P-024. */
-const BACKEND_BIO_MAX = 160
-
-const isProposed = (key: string, value: unknown) =>
-  PROPOSED.includes(key) ||
-  (key === 'bio' && typeof value === 'string' && value.length > BACKEND_BIO_MAX)
+const isProposed = (key: string) => PROPOSED.includes(key)
 
 /**
  * Edits the viewer's own profile (E01, specs/profile-edit, specs/profile-presentation PP-08): only
  * what changed. The userId always comes from the server session (api-integration.md). The proposed
  * fields go in a request of their own, so they reach the mock while the backend lacks them and the
- * rest still reaches the backend; once P-019 and P-020 exist, it is one request. An empty country
+ * rest still reaches the backend; once P-026 exists, it is one request. An empty country
  * removes it (null), as an empty text does ("").
  */
 export async function updateProfileAs(
@@ -98,9 +96,7 @@ export async function updateProfileAs(
     ...rest,
     ...(countryCode !== undefined && { countryCode: countryCode || null }),
   }
-  const proposed = Object.fromEntries(
-    Object.entries(body).filter(([key, value]) => isProposed(key, value)),
-  )
+  const proposed = Object.fromEntries(Object.entries(body).filter(([key]) => isProposed(key)))
   const known = Object.fromEntries(Object.entries(body).filter(([key]) => !(key in proposed)))
 
   for (const part of [known, proposed]) {

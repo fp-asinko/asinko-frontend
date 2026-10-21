@@ -21,6 +21,7 @@ const DRAFT: SavedDraft = {
   imageAlt: '',
   tag: '',
   community: null,
+  related: [],
   updatedAt: new Date().toISOString(),
 }
 

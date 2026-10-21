@@ -8,8 +8,6 @@ import type { MockResponse } from './types'
 // P-024 and P-026 propose); what is saved lives in this process's memory, so an e2e can save it
 // and see it.
 
-/** The backend's bio today (E01); a longer one is the "About" of P-024. */
-export const BACKEND_BIO_MAX = 160
 const BIO_MAX = 2000
 const OPEN_TO = ['QUESTIONS', 'COLLABORATIONS', 'MENTORING', 'AMAS', 'COMMISSIONED_ANALYSIS']
 const DISPLAY_NAME_MAX = 50
@@ -17,17 +15,16 @@ const HEADLINE_MAX = 100
 const CITY_MAX = 60
 const LINKS_MAX = 5
 
-/** The fields of P-019, P-020 and P-026: a PATCH with any of them goes to the mock (`when`). */
-export const PROPOSED_USER_FIELDS = ['headline', 'city', 'links', 'bannerUrl', 'openTo'] as const
+/**
+ * What the backend cannot take yet: "open to" (P-026). A PATCH with it goes to the mock (`when`),
+ * whole: with API_MOCKS=missing, what goes with it is saved only in the mock. The headline, city,
+ * links, banner and the long About are the backend's since 2026-10-20 (specs/backend-answer-1020).
+ */
+export const PROPOSED_USER_FIELDS = ['openTo'] as const
 
-/** A PATCH the backend cannot take yet: a proposed field, or a bio past today's 160 (P-024). */
 export function isProposedUserChange(body: unknown) {
   if (typeof body !== 'object' || body === null) return false
-  const input = body as Record<string, unknown>
-  return (
-    PROPOSED_USER_FIELDS.some((field) => field in input) ||
-    (typeof input.bio === 'string' && input.bio.length > BACKEND_BIO_MAX)
-  )
+  return PROPOSED_USER_FIELDS.some((field) => field in body)
 }
 
 const isHttpUrl = (value: unknown) => {

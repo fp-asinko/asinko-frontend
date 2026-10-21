@@ -23,6 +23,8 @@ const DRAFTS: RawDraft[] = [
     imageAlt: '',
     tag: 'Analysis',
     community: communitySummary('macro'),
+    related: [],
+    createdAt: new Date(Date.now() - 3 * 60 * 60_000).toISOString(),
     updatedAt: new Date(Date.now() - 2 * 60 * 60_000).toISOString(),
   },
 ]
@@ -36,13 +38,24 @@ const error = (status: number, code: string): MockResponse => ({
 const text = (value: unknown) => (typeof value === 'string' ? value : '')
 
 /** The fields a draft takes, checked as the backend would; null when something is off. */
-function fields(input: Record<string, unknown>): Omit<RawDraft, 'id' | 'updatedAt'> | null {
+function fields(
+  input: Record<string, unknown>,
+): Omit<RawDraft, 'id' | 'createdAt' | 'updatedAt'> | null {
   const type = input.type ?? 'TEXT'
   if (type !== 'TEXT' && type !== 'LINK' && type !== 'IMAGE') return null
   if (text(input.title).length > 300) return null
   const community =
     typeof input.communityId === 'string' ? communityById(input.communityId) : undefined
   if (input.communityId !== undefined && input.communityId !== null && !community) return null
+  // P-018 (backend 2026-10-20): its related ones, up to 3, checked fully when it is published.
+  const ids = Array.isArray(input.relatedCommunityIds) ? input.relatedCommunityIds : []
+  if (ids.length > 3) return null
+  const related = ids.flatMap((id) => {
+    const each = communityById(String(id))
+    if (!each) return []
+    const { slug, name, type, avatarUrl } = each
+    return [{ id: each.id, slug, name, type, avatarUrl }]
+  })
   return {
     type,
     title: text(input.title),
@@ -52,6 +65,7 @@ function fields(input: Record<string, unknown>): Omit<RawDraft, 'id' | 'updatedA
     imageAlt: text(input.imageAlt),
     tag: typeof input.tag === 'string' ? input.tag : null,
     community: community ? communitySummary(community.slug) : null,
+    related,
   }
 }
 
@@ -69,7 +83,8 @@ export function createDraft(body: unknown): MockResponse {
   const values = fields(input)
   if (!values) return error(422, 'VALIDATION_ERROR')
   created += 1
-  const draft: RawDraft = { id: mockId(8, created), ...values, updatedAt: new Date().toISOString() }
+  const now = new Date().toISOString()
+  const draft: RawDraft = { id: mockId(8, created), ...values, createdAt: now, updatedAt: now }
   DRAFTS.unshift(draft)
   return { status: 201, body: draft }
 }
@@ -82,11 +97,21 @@ export function updateDraft(draftId: string, body: unknown): MockResponse {
   if (index === -1) return error(404, 'NOT_FOUND')
   const values = fields(input)
   if (!values) return error(422, 'VALIDATION_ERROR')
-  const draft: RawDraft = { id: draftId, ...values, updatedAt: new Date().toISOString() }
+  const draft: RawDraft = {
+    id: draftId,
+    ...values,
+    createdAt: DRAFTS[index]!.createdAt,
+    updatedAt: new Date().toISOString(),
+  }
   // The newest first: an updated draft goes to the top.
   DRAFTS.splice(index, 1)
   DRAFTS.unshift(draft)
   return { status: 200, body: draft }
+}
+
+/** The user's draft by its id, if there is one (publishing it with POST /posts, P-022). */
+export function draftOf(draftId: string, userId: string): RawDraft | undefined {
+  return userId === DEMO_USER.id ? DRAFTS.find((each) => each.id === draftId) : undefined
 }
 
 /** DELETE /drafts/{draftId}?userId= */

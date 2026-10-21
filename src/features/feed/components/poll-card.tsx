@@ -1,5 +1,6 @@
 import { ChartBarIcon, MessageCircleIcon } from 'lucide-react'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
+import { FeatureMenu } from '@/components/organisms/featured'
 import type { PollItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
@@ -13,12 +14,16 @@ import { SeeAllComments } from './see-all-comments'
 export function PollCard({
   poll,
   feedCommunity,
+  menu = false,
 }: {
   poll: PollItem
   /** The community the feed is filtered by: no join button for it (CP-07). */
   feedCommunity?: string
+  /** "⋯" to feature it, on your own profile (specs/backend-answer-1020 BA-04). */
+  menu?: boolean
 }) {
   const t = useTranslations('feed.poll')
+  const tf = useTranslations('featured')
   const tc = useTranslations('feed.card')
   const format = useFormatter()
   const now = useNow()
@@ -33,20 +38,31 @@ export function PollCard({
       className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
       aria-labelledby={`poll-${poll.id}`}
     >
-      <div className="mb-2">
-        <CardByline
-          author={poll.author}
-          community={poll.community}
-          publishedAt={poll.publishedAt}
-          titleId={`poll-${poll.id}`}
-          canJoin={poll.community?.slug !== feedCommunity}
-          badge={
-            <span className="inline-flex min-h-6 shrink-0 items-center gap-1.25 type-action font-extrabold uppercase">
-              <ChartBarIcon aria-hidden className="size-3.5" />
-              {t('badge')}
-            </span>
-          }
-        />
+      <div className="mb-2 flex items-center gap-2.5">
+        <div className="min-w-0 flex-1">
+          <CardByline
+            author={poll.author}
+            community={poll.community}
+            publishedAt={poll.publishedAt}
+            titleId={`poll-${poll.id}`}
+            canJoin={poll.community?.slug !== feedCommunity}
+            badge={
+              <span className="inline-flex min-h-6 shrink-0 items-center gap-1.25 type-action font-extrabold uppercase">
+                <ChartBarIcon aria-hidden className="size-3.5" />
+                {t('badge')}
+              </span>
+            }
+          />
+        </div>
+        {menu && (
+          <div className="relative -my-2">
+            <FeatureMenu
+              kind="poll"
+              id={poll.id}
+              label={tf('pollMenu', { title: poll.question })}
+            />
+          </div>
+        )}
       </div>
 
       {/* The community avatar moved to the header (specs/community-first § 1). */}

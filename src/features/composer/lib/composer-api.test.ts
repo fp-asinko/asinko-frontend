@@ -3,6 +3,8 @@ import { DEMO_USER } from '@/mocks/demo-user'
 import { COMMUNITIES } from '@/mocks/fixtures/communities'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
+import { createDraft } from '@/mocks/drafts'
+import { findPost } from '@/mocks/posting'
 import { createPostAs, listCommunityOptions } from './composer-api'
 
 // The real client against the mock routes; a route left out reaches a fetch that always fails.
@@ -102,8 +104,55 @@ describe('createPostAs (PC-10)', () => {
       title: 'A link',
       body: 'Worth a read',
       url: 'https://example.com',
+      related: [],
     })
     expect(result).toMatchObject({ ok: true, data: { id: expect.any(String), title: 'A link' } })
+  })
+
+  it('sends the related ones as ids, the body as written (specs/backend-answer-1020 BA-06)', async () => {
+    const result = await createPostAs(DEMO_USER.id, {
+      communityId: defi.id,
+      type: 'TEXT',
+      title: 'Related',
+      body: 'Only this.',
+      related: ['#macro', '$BTC'],
+    })
+    if (!result.ok) throw new Error('expected ok')
+    const post = findPost(result.data.id)!
+    expect(post.body).toBe('Only this.')
+    expect(post.related?.map((each) => each.slug)).toEqual(['macro', 'BTC'])
+  })
+
+  it('refuses a related one that cannot be tagged, before asking the backend (BA-08)', async () => {
+    for (const related of [['#nobody-here'], ['@maria'], ['$NOPE']]) {
+      expect(
+        await createPostAs(DEMO_USER.id, {
+          communityId: defi.id,
+          type: 'TEXT',
+          title: 'A',
+          body: 'B',
+          related,
+        }),
+      ).toMatchObject({ ok: false, code: 'INVALID_RELATED_COMMUNITY' })
+    }
+  })
+
+  it('publishes a draft with its id: the backend deletes it (BA-05)', async () => {
+    const draft = createDraft({ userId: DEMO_USER.id, type: 'TEXT', title: 'Half' }).body as {
+      id: string
+    }
+    const input = {
+      communityId: defi.id,
+      type: 'TEXT' as const,
+      title: 'Half',
+      body: 'Done',
+      related: [],
+    }
+    expect(await createPostAs(DEMO_USER.id, input, draft.id)).toMatchObject({ ok: true })
+    expect(await createPostAs(DEMO_USER.id, input, draft.id)).toMatchObject({
+      ok: false,
+      code: 'NOT_FOUND',
+    })
   })
 
   it('passes the backend failure through, with its code', async () => {
@@ -113,6 +162,7 @@ describe('createPostAs (PC-10)', () => {
         type: 'TEXT',
         title: 'A',
         body: 'B',
+        related: [],
       }),
     ).toMatchObject({ ok: false, code: 'USER_MISMATCH' })
   })

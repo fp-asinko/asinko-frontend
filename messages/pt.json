@@ -798,10 +798,13 @@
     "postMeta": "{handle} · {score, plural, one {# ponto} other {# pontos}} · {comments, plural, one {# comentário} other {# comentários}}",
     "errors": {
       "limit": "Você já tem {max, number} destaques. Remova um primeiro.",
-      "notOwner": "Só dá para destacar seus próprios posts e teses.",
+      "notOwner": "Só dá para destacar seus próprios posts, enquetes e teses.",
       "gone": "Não existe mais.",
       "general": "Não foi possível mudar. Tente de novo."
-    }
+    },
+    "poll": "Enquete",
+    "pollMenu": "Opções da enquete {title}",
+    "pollMeta": "{handle} · {comments, plural, one {# comentário} other {# comentários}}"
   },
   "postDetail": {
     "title": "{count, plural, =0 {Comentários} one {# comentário} other {# comentários}}",
@@ -903,7 +906,8 @@
       "imageTooLarge": "A imagem é grande demais",
       "imageUnreadable": "Não foi possível ler a imagem",
       "imageRequired": "Adicione uma imagem",
-      "imageAltTooLong": "Até 300 caracteres."
+      "imageAltTooLong": "Até 300 caracteres.",
+      "invalidRelated": "Uma das comunidades ou ativos relacionados não pode mais ser marcada. Remova e tente de novo."
     },
     "cancel": "Cancelar",
     "image": {

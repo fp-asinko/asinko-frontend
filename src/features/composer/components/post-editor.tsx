@@ -69,6 +69,7 @@ const ERROR_NAMES = [
   'ownProfileOnly',
   'invalidCommunity',
   'invalidTag',
+  'invalidRelated',
   'invalid',
   'imageRequired',
   'imageType',
@@ -201,7 +202,17 @@ export function PostEditor({
     name: ['title', 'body', 'url', 'type', 'imageUrl', 'related', 'tag', 'communityId', 'imageAlt'],
   })
   // What a draft of the account keeps (DT-01): "Saved" holds while the form still says it.
-  const snapshot = JSON.stringify([communityId, current, title, body, url, imageUrl, imageAlt, tag])
+  const snapshot = JSON.stringify([
+    communityId,
+    current,
+    title,
+    body,
+    url,
+    imageUrl,
+    imageAlt,
+    tag,
+    related,
+  ])
   const savedNow = saved.savedAs === snapshot
 
   useEffect(() => {
@@ -274,7 +285,7 @@ export function PostEditor({
     focusTitle()
   }
 
-  // A draft of the account takes the form's place (DT-03): the related ones are not kept there.
+  // A draft of the account takes the form's place (DT-03), its related ones too (BA-05).
   function openSaved(draft: SavedDraft) {
     form.reset({
       communityId: draft.community?.id ?? '',
@@ -284,7 +295,7 @@ export function PostEditor({
       url: draft.url,
       imageUrl: draft.imageUrl ?? '',
       imageAlt: draft.imageAlt,
-      related: [],
+      related: draft.related,
       tag: draft.community?.tags?.includes(draft.tag) ? draft.tag : '',
     })
     setChosen(draft.community)
@@ -292,7 +303,7 @@ export function PostEditor({
     setServerError(null)
     saved.open(draft.id)
     onCommunityChange?.(draft.community)
-    onRelatedChange?.([])
+    onRelatedChange?.(draft.related)
     setAnswered(true)
     focusTitle()
   }
@@ -738,8 +749,8 @@ export function PostEditor({
               aria-disabled={unsaveable || undefined}
               onClick={() => {
                 if (unsaveable) return
-                const { related: _, ...fields } = getValues()
-                saved.save(fields, snapshot)
+                // With its related ones (P-018, specs/backend-answer-1020 BA-05).
+                saved.save(getValues(), snapshot)
               }}
               className={cn(PILL, 'bg-muted text-foreground hover:bg-muted-hover')}
             >
