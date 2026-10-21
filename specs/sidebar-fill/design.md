@@ -26,7 +26,7 @@
   | 960 a 1200         | 4      | 3        | 2 filas | las que entran           |
   | más de 1200        | 6      | 5        | 3 filas | las que entran           |
 
-- Se aplica con `[&>li:nth-child(n+K)]:hidden` (Tailwind con variantes `@max-[…]/column:`), en cada lista. El "more" ya está en cada sección.
+- Se aplica en cada lista escondiendo los `li` desde el número que corresponde (`nth-child`), con las variantes `column-short`, `column-mid` y `column-tall` de `globals.css`. El "more" ya está en cada sección.
 - Por debajo del mínimo, la columna conserva `overflow-y-auto`: aparece el scroll (SF-04).
 
 ## 4. Tests
