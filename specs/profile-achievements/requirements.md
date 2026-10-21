@@ -32,7 +32,7 @@ Que el historial de una persona se vea de un vistazo, en lo que logró, y que en
 
 ### En la columna derecha (Q2)
 
-- [x] **AC-03** En un perfil, debajo de la tarjeta de reputación (`specs/profile-aside` PA-01), una tarjeta **Logros** con cuántos ganó ("Logros · 7") y los **4 últimos** ganados, del más nuevo al más viejo: el ícono y el nombre debajo. La descripción y la fecha están en la lista completa (un aviso al pasar el mouse sumaría JavaScript, AC-10). Abajo, **Ver todos**.
+- [x] **AC-03** En un perfil, debajo de la tarjeta de reputación (`specs/profile-aside` PA-01), una tarjeta **Logros** con cuántos ganó ("Logros · 7") y los **4 últimos** ganados, del más nuevo al más viejo: una fila cada uno, como la vitrina de Reddit: el ícono, el nombre y cuándo se ganó (mes y año). _Cambio del PO (2026-10-21): antes iban en una grilla de 4 con el nombre debajo, y en la columna de 300 px los nombres se cortaban desparejos._ La descripción está en la lista completa. Arriba, **Ver todos**.
 - [x] **AC-04** Sin logros ganados, la tarjeta no aparece en el perfil de otra persona. En el tuyo dice "Todavía no tienes logros" y muestra el más cercano a ganarse, con su progreso.
 - [x] **AC-05** Por debajo de `lg` la tarjeta va en la página, después de la tarjeta de reputación, como en PA-03: el contenido es el mismo en mobile y desktop.
 

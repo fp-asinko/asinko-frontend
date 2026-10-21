@@ -19,7 +19,7 @@ test.describe('Achievements, as Reddit’s trophy case', () => {
     const card = where.getByRole('region', { name: 'Achievements · 11' })
     await expect(card).toBeVisible()
     await expect(card.getByRole('listitem')).toHaveCount(4)
-    await expect(card.getByRole('listitem').first()).toHaveText('100 votes')
+    await expect(card.getByRole('listitem').first()).toContainText('100 votes')
     await expect(trophies(page)).toHaveCount(1)
   })
 

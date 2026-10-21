@@ -1,4 +1,4 @@
-import { useTranslations } from 'next-intl'
+import { useFormatter, useTranslations } from 'next-intl'
 import { AsideCard } from '@/components/molecules/aside-card'
 import { Link } from '@/i18n/navigation'
 import type { Achievement } from '../communities.types'
@@ -42,6 +42,7 @@ export function AchievementsCard({
   className?: string
 }) {
   const t = useTranslations('communities.achievements')
+  const format = useFormatter()
   const achievementName = useAchievementName()
   const earned = achievements?.filter((each) => each.earnedAt) ?? []
   const closest = achievements && earned.length === 0 ? closestAchievement(achievements) : undefined
@@ -68,11 +69,22 @@ export function AchievementsCard({
       {achievements === null ? (
         <p className="type-meta text-muted-foreground">{t('loadError')}</p>
       ) : earned.length > 0 ? (
-        <ul className="mt-1.5 grid grid-cols-4 gap-2">
+        // A row each, as Reddit's trophy case (PO, 2026-10-21): its mark, its name and when.
+        <ul className="mt-1.5 flex flex-col gap-3">
           {earned.slice(0, SHOWN).map((each) => (
-            <li key={each.code} className="flex min-w-0 flex-col items-center gap-1.5 text-center">
-              <AchievementBadge code={each.code} earned />
-              <span className="line-clamp-2 type-caption">{achievementName(each)}</span>
+            <li key={each.code} className="flex items-center gap-3">
+              <AchievementBadge code={each.code} earned className="size-9 [&_svg]:size-4.5" />
+              <div className="min-w-0">
+                <p className="truncate type-small font-semibold">{achievementName(each)}</p>
+                <time dateTime={each.earnedAt!} className="type-meta text-muted-foreground">
+                  {t('earnedOn', {
+                    date: format.dateTime(new Date(each.earnedAt!), {
+                      month: 'short',
+                      year: 'numeric',
+                    }),
+                  })}
+                </time>
+              </div>
             </li>
           ))}
         </ul>

@@ -29,7 +29,17 @@ describe('AchievementsCard (specs/profile-achievements AC-03, AC-04)', () => {
       within(card)
         .getAllByRole('listitem')
         .map((item) => item.textContent),
-    ).toEqual(['Streak of 3', '2 years on Asinko', 'Moderates a group', 'First hit'])
+    ).toEqual([
+      'Streak of 3Earned Oct 2026',
+      '2 years on AsinkoEarned Sep 2026',
+      'Moderates a groupEarned Sep 2026',
+      'First hitEarned Aug 2026',
+    ])
+    // A row each, with when it was earned (PO, 2026-10-21).
+    expect(within(card).getAllByRole('listitem')[0]!.querySelector('time')).toHaveAttribute(
+      'datetime',
+      '2026-10-10T12:00:00.000Z',
+    )
     expect(
       within(card).getByRole('link', { name: "See all of María's achievements" }),
     ).toHaveAttribute('href', '/user/maria/achievements')
