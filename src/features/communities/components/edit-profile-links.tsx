@@ -36,10 +36,13 @@ export function LinksField({
   control,
   register,
   errors,
+  legendClassName = 'mb-1.5 type-action',
 }: {
   control: Control<EditProfileForm, unknown, EditProfileInput>
   register: UseFormRegister<EditProfileForm>
   errors: FieldErrors<EditProfileForm>['links']
+  /** `sr-only` under a section that already shows the same title (specs/profile-edit-flow EF-09). */
+  legendClassName?: string
 }) {
   const t = useTranslations('communities.edit')
   const ids = useId()
@@ -61,7 +64,7 @@ export function LinksField({
 
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="mb-1.5 type-action">{t('links')}</legend>
+      <legend className={legendClassName}>{t('links')}</legend>
       {fields.map((item, index) => {
         const value = values[index]?.url ?? ''
         const site = toProfileLink(value)?.site ?? 'web'

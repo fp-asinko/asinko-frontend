@@ -33,7 +33,7 @@ vi.mock('react-easy-crop', () => ({
 const file = new File(['x'], 'me.png', { type: 'image/png' })
 
 function renderCropper(kind: 'avatar' | 'banner' = 'avatar') {
-  const onApply = vi.fn()
+  const onApply = vi.fn().mockResolvedValue(true)
   const onBack = vi.fn()
   renderWithIntl(
     <ImageCropper kind={kind} file={file} source="blob:file" onApply={onApply} onBack={onBack} />,
@@ -89,6 +89,14 @@ describe('ImageCropper (specs/profile-presentation PP-07)', () => {
     const sent = deps.uploadProfileImage.mock.calls[0]![0] as FormData
     expect(sent.get('kind')).toBe('banner')
     expect(onApply).toHaveBeenCalledWith({ imageUrl: '/a.webp', preview: 'blob:x' })
+  })
+
+  it('stays, said, when saving it in the profile fails (specs/profile-edit-flow EF-04)', async () => {
+    const { onApply } = renderCropper()
+    onApply.mockResolvedValue(false)
+    await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not save the image')
+    expect(screen.getByRole('button', { name: 'Apply' })).not.toHaveAttribute('aria-disabled')
   })
 
   it('says why it could not, and goes back without uploading', async () => {

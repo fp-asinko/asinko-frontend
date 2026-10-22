@@ -18,7 +18,7 @@ vi.mock('./image-cropper', () => ({
     onBack,
   }: {
     kind: string
-    onApply: (image: object) => void
+    onApply: (image: object) => Promise<boolean>
     onBack: () => void
   }) => (
     <div>
@@ -26,7 +26,7 @@ vi.mock('./image-cropper', () => ({
       <button
         type="button"
         onClick={() =>
-          onApply({ imageUrl: '/mocks/avatar-demo.svg', preview: '/mocks/avatar-demo.svg' })
+          void onApply({ imageUrl: '/mocks/avatar-demo.svg', preview: '/mocks/avatar-demo.svg' })
         }
       >
         Apply crop
@@ -72,8 +72,16 @@ function renderDialog(
 
 const box = (name: string) => screen.getByRole('textbox', { name })
 const save = () => screen.getByRole('button', { name: 'Save' })
+const fileInput = () => document.querySelector('input[type="file"]') as HTMLInputElement
 
-describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-05 to PP-09)', () => {
+/** The camera over an image, then Upload image, then the file (specs/profile-edit-flow EF-01). */
+async function pickImage(name: 'Change photo' | 'Change banner') {
+  await userEvent.click(screen.getByRole('button', { name }))
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Upload image' }))
+  await userEvent.upload(fileInput(), new File(['x'], 'me.png', { type: 'image/png' }))
+}
+
+describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation, specs/profile-edit-flow)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     action.updateProfile.mockResolvedValue({ ok: true, data: null })
@@ -82,6 +90,15 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
   it('opens with what the profile has, in its sections, the focus on the name', async () => {
     renderDialog()
     expect(screen.getByRole('dialog', { name: 'Edit profile' })).toBeInTheDocument()
+    // Three titled sections (specs/profile-edit-flow EF-09).
+    for (const name of ['Profile', 'About you', 'Links']) {
+      expect(screen.getByRole('region', { name })).toBeInTheDocument()
+    }
+    expect(
+      within(screen.getByRole('region', { name: 'About you' })).getByRole('textbox', {
+        name: 'About',
+      }),
+    ).toBeInTheDocument()
     expect(box('Name')).toHaveValue('Juan')
     expect(box('Headline')).toHaveValue('')
     expect(screen.getByRole('group', { name: 'Location' })).toBeInTheDocument()
@@ -194,8 +211,22 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
     expect(box('About')).toHaveValue('On-chain analyst. More.')
   })
 
-  it('asks before discarding changes, and closes at once without any (PE-03)', async () => {
+  it('waits dimmed until something changed, in the footer with Cancel (EF-06, EF-07)', async () => {
+    renderDialog()
+    expect(save()).toHaveAttribute('aria-disabled', 'true')
+    await userEvent.click(save())
+    expect(action.updateProfile).not.toHaveBeenCalled()
+    // One change, the first: Save is ready at once (a bug: isValid stayed stale behind an ||).
+    await userEvent.click(screen.getByRole('checkbox', { name: 'AMAs' }))
+    expect(save()).not.toHaveAttribute('aria-disabled')
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()
+  })
+
+  it('asks before discarding changes, and closes at once without any (PE-03, EF-08)', async () => {
     const view = renderDialog()
+    await userEvent.click(screen.getByRole('button', { name: 'Close' }))
+    expect(view.onOpenChange).toHaveBeenCalledWith(false)
+    view.onOpenChange.mockClear()
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(view.onOpenChange).toHaveBeenCalledWith(false)
 
@@ -208,28 +239,85 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
     expect(view.onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('crops a picked photo in the window, and Save sends it (PP-07)', async () => {
-    renderDialog({ bannerUrl: '/mocks/banner-demo.svg' })
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement
-    await userEvent.click(screen.getByRole('button', { name: 'Change photo' }))
-    await userEvent.upload(input, new File(['x'], 'me.png', { type: 'image/png' }))
+  it('saves a cropped photo as it is applied, without Save, and says so (EF-02, EF-05)', async () => {
+    const { onSaved, onOpenChange } = renderDialog()
+    await pickImage('Change photo')
     expect(await screen.findByText('Cropping avatar')).toBeInTheDocument()
-    // The form waits behind: Save too.
-    expect(save()).toHaveAttribute('aria-disabled', 'true')
+    // The footer gives way to the cropper's own Back and Apply.
+    expect(screen.queryByRole('button', { name: 'Save' })).toBeNull()
     await userEvent.click(screen.getByRole('button', { name: 'Apply crop' }))
-    await userEvent.click(screen.getByRole('button', { name: 'Remove banner' }))
-    await userEvent.click(save())
-    expect(action.updateProfile).toHaveBeenCalledWith({
-      avatarUrl: '/mocks/avatar-demo.svg',
-      bannerUrl: null,
-    })
+    expect(action.updateProfile).toHaveBeenCalledWith({ avatarUrl: '/mocks/avatar-demo.svg' })
+    expect(onSaved).toHaveBeenCalledOnce()
+    expect(await screen.findByText('Photo updated.')).toBeInTheDocument()
+    expect(screen.queryByText('Cropping avatar')).toBeNull()
+    // Already saved: nothing is left for Save, and closing does not ask.
+    expect(save()).toHaveAttribute('aria-disabled', 'true')
+    await userEvent.click(screen.getByRole('button', { name: 'Close' }))
+    expect(onOpenChange).toHaveBeenCalledWith(false)
   })
 
-  it('takes the focus back to the Change that started cropping; Esc there is Back (WCAG 2.4.3)', async () => {
-    const { onOpenChange } = renderDialog()
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement
+  it('stays in the cropper when the image could not be saved (EF-04)', async () => {
+    action.updateProfile.mockResolvedValue({ ok: false, error: 'api.errors.UNAVAILABLE' })
+    const { onSaved } = renderDialog()
+    await userEvent.type(box('Headline'), 'Rates')
+    await pickImage('Change banner')
+    await userEvent.click(await screen.findByRole('button', { name: 'Apply crop' }))
+    expect(screen.getByText('Cropping banner')).toBeInTheDocument()
+    expect(onSaved).not.toHaveBeenCalled()
+    await userEvent.click(screen.getByRole('button', { name: 'Back from crop' }))
+    expect(box('Headline')).toHaveValue('Rates')
+  })
+
+  it('removes an image after asking, and saves it at once (EF-03)', async () => {
+    const { onSaved } = renderDialog({ bannerUrl: '/mocks/banner-demo.svg' })
     await userEvent.click(screen.getByRole('button', { name: 'Change banner' }))
-    await userEvent.upload(input, new File(['x'], 'me.png', { type: 'image/png' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Remove' }))
+    const confirm = await screen.findByRole('alertdialog', { name: 'Remove your banner?' })
+    expect(action.updateProfile).not.toHaveBeenCalled()
+    await userEvent.click(within(confirm).getByRole('button', { name: 'Remove' }))
+    expect(action.updateProfile).toHaveBeenCalledWith({ bannerUrl: null })
+    expect(onSaved).toHaveBeenCalledOnce()
+    expect(await screen.findByText('Banner updated.')).toBeInTheDocument()
+    await vi.waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Change banner' })).toHaveFocus(),
+    )
+  })
+
+  it('keeps the image when its removal is not confirmed, the focus back on its camera (EF-03)', async () => {
+    renderDialog({ avatarUrl: '/mocks/avatar-demo.svg' })
+    await userEvent.click(screen.getByRole('button', { name: 'Change photo' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Remove' }))
+    const confirm = await screen.findByRole('alertdialog', { name: 'Remove your photo?' })
+    expect(confirm).toHaveAccessibleDescription(/your initials/)
+    await userEvent.click(within(confirm).getByRole('button', { name: 'Keep it' }))
+    expect(action.updateProfile).not.toHaveBeenCalled()
+    await vi.waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Change photo' })).toHaveFocus(),
+    )
+  })
+
+  it('leaves only the cropper Back while cropping, not a × that would read the same', async () => {
+    renderDialog()
+    await pickImage('Change photo')
+    await screen.findByText('Cropping avatar')
+    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: 'Back from crop' }))
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument()
+  })
+
+  it('says a removal that failed, by the images (EF-04)', async () => {
+    action.updateProfile.mockResolvedValue({ ok: false, error: 'api.errors.UNAVAILABLE' })
+    renderDialog({ avatarUrl: '/mocks/avatar-demo.svg' })
+    await userEvent.click(screen.getByRole('button', { name: 'Change photo' }))
+    await userEvent.click(await screen.findByRole('menuitem', { name: 'Remove' }))
+    const confirm = await screen.findByRole('alertdialog', { name: 'Remove your photo?' })
+    await userEvent.click(within(confirm).getByRole('button', { name: 'Remove' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not save the image')
+  })
+
+  it('takes the focus back to the camera that started cropping; Esc there is Back (WCAG 2.4.3)', async () => {
+    const { onOpenChange } = renderDialog()
+    await pickImage('Change banner')
     await screen.findByText('Cropping banner')
     await userEvent.keyboard('{Escape}')
     expect(onOpenChange).not.toHaveBeenCalled()
@@ -237,8 +325,7 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
       expect(screen.getByRole('button', { name: 'Change banner' })).toHaveFocus(),
     )
 
-    await userEvent.click(screen.getByRole('button', { name: 'Change photo' }))
-    await userEvent.upload(input, new File(['x'], 'me.png', { type: 'image/png' }))
+    await pickImage('Change photo')
     await userEvent.click(await screen.findByRole('button', { name: 'Apply crop' }))
     await vi.waitFor(() =>
       expect(screen.getByRole('button', { name: 'Change photo' })).toHaveFocus(),
@@ -248,8 +335,7 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
   it('goes back from cropping with what was written', async () => {
     renderDialog()
     await userEvent.type(box('Headline'), 'Rates')
-    const input = document.querySelector('input[type="file"]') as HTMLInputElement
-    await userEvent.upload(input, new File(['x'], 'me.png', { type: 'image/png' }))
+    await pickImage('Change photo')
     await userEvent.click(await screen.findByRole('button', { name: 'Back from crop' }))
     expect(box('Headline')).toHaveValue('Rates')
   })
@@ -294,8 +380,9 @@ describe('EditProfileDialog (specs/profile-edit, specs/profile-presentation PP-0
     ['openTo', () => screen.getByRole('checkbox', { name: 'Questions' })],
     ['bio', () => box('About')],
     ['location', () => screen.getByRole('combobox', { name: 'Country' })],
-    ['avatar', () => screen.getByRole('button', { name: /Change photo/ })],
-  ] as const)('opens on %s when a step asks (PS-02)', async (field, target) => {
+    ['avatar', () => screen.getByRole('button', { name: 'Change photo' })],
+    ['banner', () => screen.getByRole('button', { name: 'Change banner' })],
+  ] as const)('opens on %s when a step asks (PS-02, EF-10)', async (field, target) => {
     renderDialog({}, field)
     await vi.waitFor(() => expect(target()).toHaveFocus())
   })

@@ -21,29 +21,37 @@ function renderImages(images: { avatar?: string | null; banner?: string | null }
   return { onPick, onRemove, input }
 }
 
-describe('ProfileImages (specs/profile-presentation PP-07)', () => {
-  it('picks an image for the photo or the banner, only JPEG, PNG or WebP', async () => {
+async function openMenu(name: string) {
+  await userEvent.click(screen.getByRole('button', { name }))
+  return screen.findByRole('menu')
+}
+
+describe('ProfileImages (specs/profile-edit-flow EF-01)', () => {
+  it('uploads an image for the banner or the photo from the camera over each, only JPEG, PNG or WebP', async () => {
     const { onPick, input } = renderImages()
     expect(screen.getByRole('group', { name: 'Photo and banner' })).toBeInTheDocument()
     expect(input).toHaveAttribute('accept', 'image/jpeg,image/png,image/webp')
     const photo = new File(['x'], 'me.png', { type: 'image/png' })
 
-    await userEvent.click(screen.getByRole('button', { name: 'Change banner' }))
+    await openMenu('Change banner')
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Upload image' }))
     await userEvent.upload(input, photo)
     expect(onPick).toHaveBeenLastCalledWith('banner', photo)
-    await userEvent.click(screen.getByRole('button', { name: 'Change photo' }))
+
+    await openMenu('Change photo')
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Upload image' }))
     await userEvent.upload(input, photo)
     expect(onPick).toHaveBeenLastCalledWith('avatar', photo)
   })
 
   it('offers Remove only for what there is', async () => {
     const { onRemove } = renderImages({ banner: '/mocks/banner-demo.svg' })
-    expect(screen.queryByRole('button', { name: 'Remove photo' })).toBeNull()
-    await userEvent.click(screen.getByRole('button', { name: 'Remove banner' }))
+    await openMenu('Change photo')
+    expect(screen.queryByRole('menuitem', { name: 'Remove' })).toBeNull()
+    await userEvent.keyboard('{Escape}')
+
+    await openMenu('Change banner')
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Remove' }))
     expect(onRemove).toHaveBeenCalledWith('banner')
-    // Remove goes away with the image: the focus goes to its Change (WCAG 2.4.3).
-    await vi.waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Change banner' })).toHaveFocus(),
-    )
   })
 })

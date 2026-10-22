@@ -1,9 +1,9 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeftIcon, XIcon } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useId, useRef, useState, type RefObject } from 'react'
+import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from 'react'
 import dynamic from 'next/dynamic'
 import { useForm, useWatch } from 'react-hook-form'
 import { useRouter } from '@/i18n/navigation'
@@ -52,9 +52,12 @@ const IMAGE_FIELD = { avatar: 'avatarUrl', banner: 'bannerUrl' } as const
 const SHEET =
   'inset-0 flex h-dvh max-h-dvh w-full max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none p-0 pt-[env(safe-area-inset-top)] sm:max-w-none data-open:slide-in-from-bottom-10 data-open:zoom-in-100 data-closed:slide-out-to-bottom-10 data-closed:zoom-out-100'
 
-/** Desktop: a window near the top, as LinkedIn's "Edit intro"; its body scrolls, not the page. */
+/**
+ * Desktop: a window near the top, as LinkedIn's "Edit intro", wide enough for two columns that fit
+ * without scrolling (specs/profile-edit-flow EF-09); its body scrolls if not, never the page.
+ */
 const MODAL =
-  'top-[8dvh] flex max-h-[84dvh] w-[calc(100%-2rem)] max-w-140 -translate-y-0 flex-col gap-0 rounded-2xl p-0 sm:max-w-140'
+  'top-[8dvh] flex max-h-[84dvh] w-[calc(100%-2rem)] max-w-220 -translate-y-0 flex-col gap-0 rounded-2xl p-0 sm:max-w-220'
 
 const PILL =
   'inline-flex h-11 tap items-center rounded-full px-4 type-action font-bold outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-50 aria-disabled:active:scale-100 md:h-9'
@@ -62,13 +65,37 @@ const PILL =
 /** The fields the window's sections hold, in their order. */
 type Name = Exclude<keyof EditProfileForm, 'links'>
 
+/** A titled part of the window (specs/profile-edit-flow EF-09); its line, from who places it. */
+function Section({
+  id,
+  title,
+  className,
+  children,
+}: {
+  id: string
+  title: string
+  className?: string
+  children: ReactNode
+}) {
+  return (
+    <section aria-labelledby={id} className={cn('flex flex-col gap-5', className)}>
+      <h3 id={id} className="type-section text-muted-foreground">
+        {title}
+      </h3>
+      {children}
+    </section>
+  )
+}
+
 /**
  * "Edit profile", as LinkedIn's "Edit intro" (specs/profile-edit, specs/profile-presentation PP-05
- * to PP-09): one window with the name, the headline, the location, the bio and the links. Save
- * sends only what changed and closes; the page shows it after `onSaved` refreshes it. A refusal
- * about a field is said under it, and what is written stays. Cancel, × or Esc close, asking first
- * if something changed. A window in desktop, the full screen in phones, Save always at hand on top.
- * Loaded on first use (EditProfileProvider); opened on a field when a prompt asked (PP-04).
+ * to PP-09, specs/profile-edit-flow): one window in three sections. The photo and the banner are
+ * saved as soon as they are applied or removed (EF-02, EF-03); Save, in a footer always at hand,
+ * sends only the rest that changed and closes, and waits dimmed until something did (EF-07). The
+ * page shows it after `onSaved` refreshes it. A refusal about a field is said under it, and what
+ * is written stays. Cancel, × or Esc close, asking first if something is unsaved. A window in
+ * desktop, the full screen in phones. Loaded on first use (EditProfileProvider); opened on a field
+ * when a prompt asked (PP-04).
  */
 export function EditProfileDialog({
   layout,
@@ -109,8 +136,19 @@ export function EditProfileDialog({
     file: File
     source: string
   } | null>(null)
-  // What was cut, shown at once (the uploaded URL may be the mocks' fixture).
-  const [previews, setPreviews] = useState<Partial<Record<ProfileImageKind, string | null>>>({})
+  // The images as saved: saved apart from the form, at once (EF-02). What was cut is shown, not
+  // its URL (the mocks' fixture).
+  const [images, setImages] = useState<Record<ProfileImageKind, string | null>>({
+    avatar: profile.avatarUrl,
+    banner: profile.bannerUrl,
+  })
+  // Removing an image, while its confirmation is open (EF-03).
+  const [removing, setRemoving] = useState<ProfileImageKind | null>(null)
+  // Which one, still while its confirmation closes: its title and where the focus goes back.
+  const [removed, setRemoved] = useState<ProfileImageKind>('avatar')
+  const [imageStatus, setImageStatus] = useState('')
+  const [imageBusy, setImageBusy] = useState(false)
+  const [imageError, setImageError] = useState<string | null>(null)
   const form = useForm<EditProfileForm, unknown, EditProfileInput>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
@@ -126,12 +164,15 @@ export function EditProfileDialog({
     },
     mode: 'onChange',
   })
-  const { register, handleSubmit, formState, control, setError, setValue } = form
-  const [displayName = '', headline = '', city = '', bio = '', avatarUrl, bannerUrl] = useWatch({
+  const { register, handleSubmit, formState, control, setError } = form
+  const [displayName = '', headline = '', city = '', bio = ''] = useWatch({
     control,
-    name: ['displayName', 'headline', 'city', 'bio', 'avatarUrl', 'bannerUrl'],
+    name: ['displayName', 'headline', 'city', 'bio'],
   })
-  const blocked = !formState.isValid || formState.isSubmitting || cropping !== null
+  // Each read on every render: react-hook-form only keeps what was read up to date, and a `||`
+  // that stops at !isDirty would leave isValid unread, stale after the first change.
+  const { isDirty, isValid, isSubmitting } = formState
+  const blocked = !isDirty || !isValid || isSubmitting || cropping !== null
   const modal = layout === 'modal'
   const id = (name: string) => `${ids}-${name}`
   // A schema key is the window's own: communities.edit.errors.x is errors.x.
@@ -147,7 +188,8 @@ export function EditProfileDialog({
 
   async function save(values: EditProfileInput) {
     setServerError(null)
-    // Only what changed (PP-08): a removed link marks the list as changed too.
+    // Only what changed (PP-08): a removed link marks the list as changed too. The images are
+    // never here: they were saved on their own (EF-02).
     const dirty = formState.dirtyFields as Partial<Record<keyof EditProfileInput, unknown>>
     const changes = Object.fromEntries(
       Object.entries(values).filter(([key]) => dirty[key as keyof EditProfileInput]),
@@ -170,7 +212,35 @@ export function EditProfileDialog({
     if (fields.length === 0) setServerError(t('errors.general'))
   }
 
-  // Back from cropping, the focus goes to the "Change" that started it (WCAG 2.4.3), once the
+  /** Saves an image (or its removal) in the profile at once (EF-02, EF-03); false if it failed. */
+  async function saveImage(
+    kind: ProfileImageKind,
+    imageUrl: string | null,
+    preview: string | null,
+  ) {
+    setImageStatus(t('saving'))
+    setImageError(null)
+    setImageBusy(true)
+    const result = await updateProfile({ [IMAGE_FIELD[kind]]: imageUrl })
+    setImageBusy(false)
+    if (!result.ok) {
+      setImageStatus('')
+      return false
+    }
+    setImages((current) => ({ ...current, [kind]: preview }))
+    onSaved()
+    setImageStatus(kind === 'avatar' ? t('photoUpdated') : t('bannerUpdated'))
+    return true
+  }
+
+  async function confirmRemove() {
+    if (!removing) return
+    const kind = removing
+    setRemoving(null)
+    if (!(await saveImage(kind, null, null))) setImageError(t('errors.imageSave'))
+  }
+
+  // Back from cropping, the focus goes to the camera that started it (WCAG 2.4.3), once the
   // form shows again: a hidden button cannot take it.
   const refocus = useRef<string | null>(null)
   useEffect(() => {
@@ -184,11 +254,6 @@ export function EditProfileDialog({
     URL.revokeObjectURL(cropping.source)
     refocus.current = changeImageId(`${ids}-images`, cropping.kind)
     setCropping(null)
-  }
-
-  function setImage(kind: ProfileImageKind, imageUrl: string | null, preview: string | null) {
-    setValue(IMAGE_FIELD[kind], imageUrl, { shouldDirty: true })
-    setPreviews((current) => ({ ...current, [kind]: preview }))
   }
 
   // Into the field a prompt or a step offered (PP-04, specs/profile-showcase PS-02), else the name.
@@ -219,43 +284,25 @@ export function EditProfileDialog({
         showCloseButton={false}
         initialFocus={initialFocus}
         finalFocus={returnFocusTo}
+        // Without the page blurred behind: a window this large stuttered while it opened and
+        // closed, the blur redrawn on every frame (EF-12).
+        overlay="solid"
         className={modal ? MODAL : SHEET}
       >
-        <div className="flex h-14 shrink-0 items-center gap-2 border-b px-2">
-          {modal ? (
+        {/* The title and ×; Cancel and Save wait in the footer (EF-06). */}
+        <div className="flex h-14 shrink-0 items-center justify-between gap-2 border-b pr-2 pl-4">
+          <DialogTitle className="min-w-0 truncate type-post-title">{t('title')}</DialogTitle>
+          {/* Gone while cropping: the cropper has its own Back, and two would read the same. */}
+          {!cropping && (
             <button
               type="button"
-              aria-label={t('cancel')}
+              aria-label={t('close')}
               onClick={requestClose}
-              className="inline-flex size-9 tap items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="ml-auto inline-flex size-11 tap items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 md:size-9"
             >
               <XIcon aria-hidden className="size-5" />
             </button>
-          ) : (
-            <button
-              type="button"
-              onClick={requestClose}
-              className="inline-flex h-11 tap items-center gap-1.5 rounded-full px-3 type-action text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              <ArrowLeftIcon aria-hidden className="size-4" />
-              {t('cancel')}
-            </button>
           )}
-          <DialogTitle className="min-w-0 truncate type-post-title">{t('title')}</DialogTitle>
-          <div className="ml-auto pr-2">
-            <button
-              type="submit"
-              form={`${ids}-form`}
-              aria-disabled={blocked || undefined}
-              className={cn(PILL, 'bg-primary text-primary-foreground hover:bg-primary/85')}
-            >
-              {formState.isSubmitting ? t('saving') : t('save')}
-            </button>
-            {/* What the button says while saving, also announced (PP-08). */}
-            <span role="status" className="sr-only">
-              {formState.isSubmitting ? t('saving') : ''}
-            </span>
-          </div>
         </div>
 
         <form
@@ -274,67 +321,103 @@ export function EditProfileDialog({
               file={cropping.file}
               source={cropping.source}
               onBack={stopCropping}
-              onApply={({ imageUrl, preview }) => {
-                setImage(cropping.kind, imageUrl, preview)
-                stopCropping()
+              onApply={async ({ imageUrl, preview }) => {
+                const saved = await saveImage(cropping.kind, imageUrl, preview)
+                if (saved) stopCropping()
+                return saved
               }}
             />
           )}
           {/* Hidden, not gone, while cropping: what is written stays (PP-08). */}
           <div hidden={cropping !== null} className="contents">
-            <ProfileImages
-              idPrefix={`${ids}-images`}
-              username={profile.username}
-              avatar={previews.avatar !== undefined ? previews.avatar : avatarUrl}
-              banner={previews.banner !== undefined ? previews.banner : bannerUrl}
-              onPick={(kind, file) =>
-                setCropping({ kind, file, source: URL.createObjectURL(file) })
-              }
-              onRemove={(kind) => setImage(kind, null, null)}
-            />
-            <CountedField
-              id={id('displayName')}
-              label={t('name')}
-              max={DISPLAY_NAME_MAX}
-              value={displayName}
-              field={register('displayName')}
-              error={error('displayName')}
-            />
-            <CountedField
-              id={id('headline')}
-              label={t('headline')}
-              placeholder={t('headlinePlaceholder')}
-              max={HEADLINE_MAX}
-              value={headline}
-              field={register('headline')}
-              error={error('headline')}
-            />
-            <fieldset className="grid gap-3 sm:grid-cols-2">
-              <legend className="mb-1.5 type-action">{t('location')}</legend>
-              <CountryField id={id('countryCode')} field={register('countryCode')} />
-              <CountedField
-                id={id('city')}
-                label={t('city')}
-                max={CITY_MAX}
-                value={city}
-                field={register('city')}
-                error={error('city')}
-              />
-            </fieldset>
-            <CountedField
-              id={id('bio')}
-              label={t('bio')}
-              placeholder={t('bioPlaceholder')}
-              max={BIO_MAX}
-              value={bio}
-              field={register('bio')}
-              error={error('bio')}
-              multiline
-              alwaysCount
-            />
-            <OpenToField id={id('openTo')} field={register('openTo')} error={error('openTo')} />
-            <div id={id('links')}>
-              <LinksField control={control} register={register} errors={formState.errors.links} />
+            <div className="flex flex-col gap-5 md:grid md:grid-cols-2 md:items-start md:gap-x-8">
+              <Section id={id('profile')} title={t('sections.profile')}>
+                <div className="flex flex-col gap-2">
+                  <ProfileImages
+                    idPrefix={`${ids}-images`}
+                    username={profile.username}
+                    avatar={images.avatar}
+                    banner={images.banner}
+                    onPick={(kind, file) => {
+                      if (imageBusy) return
+                      setCropping({ kind, file, source: URL.createObjectURL(file) })
+                    }}
+                    onRemove={(kind) => {
+                      if (imageBusy) return
+                      setRemoved(kind)
+                      setRemoving(kind)
+                    }}
+                  />
+                  {imageError && (
+                    <p role="alert" className="type-small text-destructive">
+                      {imageError}
+                    </p>
+                  )}
+                </div>
+                <CountedField
+                  id={id('displayName')}
+                  label={t('name')}
+                  max={DISPLAY_NAME_MAX}
+                  value={displayName}
+                  field={register('displayName')}
+                  error={error('displayName')}
+                />
+                <CountedField
+                  id={id('headline')}
+                  label={t('headline')}
+                  placeholder={t('headlinePlaceholder')}
+                  max={HEADLINE_MAX}
+                  value={headline}
+                  field={register('headline')}
+                  error={error('headline')}
+                />
+                <fieldset className="grid gap-3 sm:grid-cols-2">
+                  <legend className="mb-1.5 type-action">{t('location')}</legend>
+                  <CountryField id={id('countryCode')} field={register('countryCode')} />
+                  <CountedField
+                    id={id('city')}
+                    label={t('city')}
+                    max={CITY_MAX}
+                    value={city}
+                    field={register('city')}
+                    error={error('city')}
+                  />
+                </fieldset>
+              </Section>
+              <div className="flex flex-col gap-5 border-t pt-5 md:border-t-0 md:border-l md:pt-0 md:pl-8">
+                <Section id={id('about')} title={t('sections.about')}>
+                  <CountedField
+                    id={id('bio')}
+                    label={t('bio')}
+                    placeholder={t('bioPlaceholder')}
+                    max={BIO_MAX}
+                    value={bio}
+                    field={register('bio')}
+                    error={error('bio')}
+                    multiline
+                    alwaysCount
+                  />
+                  <OpenToField
+                    id={id('openTo')}
+                    field={register('openTo')}
+                    error={error('openTo')}
+                  />
+                </Section>
+                <Section
+                  id={id('links-title')}
+                  title={t('sections.links')}
+                  className="border-t pt-5"
+                >
+                  <div id={id('links')}>
+                    <LinksField
+                      control={control}
+                      register={register}
+                      errors={formState.errors.links}
+                      legendClassName="sr-only"
+                    />
+                  </div>
+                </Section>
+              </div>
             </div>
             {serverError && (
               <p role="alert" className="type-small text-destructive">
@@ -371,6 +454,37 @@ export function EditProfileDialog({
           </div>
         </form>
 
+        {/* Always at hand, out of the scroll (EF-06); the cropper has its own Back and Apply. */}
+        <div
+          hidden={cropping !== null}
+          className="flex shrink-0 justify-end gap-2 border-t px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]"
+        >
+          <button
+            type="button"
+            onClick={requestClose}
+            className={cn(PILL, 'bg-muted hover:bg-muted-hover')}
+          >
+            {t('cancel')}
+          </button>
+          <button
+            type="submit"
+            form={`${ids}-form`}
+            aria-disabled={blocked || undefined}
+            className={cn(PILL, 'bg-primary text-primary-foreground hover:bg-primary/85')}
+          >
+            {formState.isSubmitting ? t('saving') : t('save')}
+          </button>
+          {/* What the button says while saving, also announced (PP-08). */}
+          <span role="status" className="sr-only">
+            {formState.isSubmitting ? t('saving') : ''}
+          </span>
+        </div>
+        {/* An image saved, said without moving the focus (EF-02). Out of what hides while cropping:
+            a live region that shows up already with its text is not read. */}
+        <p role="status" className="sr-only">
+          {imageStatus}
+        </p>
+
         <AlertDialog open={confirming} onOpenChange={setConfirming}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -387,6 +501,32 @@ export function EditProfileDialog({
                 }}
               >
                 {t('discard.confirm')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Removing saves at once: asked first (EF-03, security.md § 7). */}
+        <AlertDialog open={removing !== null} onOpenChange={(next) => !next && setRemoving(null)}>
+          <AlertDialogContent
+            finalFocus={() => document.getElementById(changeImageId(`${ids}-images`, removed))}
+          >
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {removed === 'banner'
+                  ? t('removeConfirm.bannerTitle')
+                  : t('removeConfirm.photoTitle')}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {removed === 'banner'
+                  ? t('removeConfirm.bannerBody')
+                  : t('removeConfirm.photoBody')}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t('removeConfirm.cancel')}</AlertDialogCancel>
+              <AlertDialogAction variant="destructive" onClick={() => void confirmRemove()}>
+                {t('removeConfirm.confirm')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

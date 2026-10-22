@@ -29,7 +29,8 @@ const PILL =
  * Crops the photo or the banner before it is uploaded (specs/profile-presentation PP-07, Q3): the
  * image moves under a round (photo) or 4:1 (banner) frame with a finger, the mouse or the arrow
  * keys, and zooms with two fingers, the wheel or the slider. Apply cuts that part, prepares it as a
- * post image and uploads it; the profile gets its URL and a preview of what was cut. Back drops it.
+ * post image and uploads it; then onApply saves it in the profile (specs/profile-edit-flow EF-02),
+ * and a failure stays here, said (EF-04). Back drops it.
  */
 export function ImageCropper({
   kind,
@@ -42,7 +43,8 @@ export function ImageCropper({
   file: File
   /** The file as a URL to show (its owner revokes it). */
   source: string
-  onApply: (image: { imageUrl: string; preview: string }) => void
+  /** Saves it; false when that failed. */
+  onApply: (image: { imageUrl: string; preview: string }) => Promise<boolean>
   onBack: () => void
 }) {
   const t = useTranslations('communities.edit')
@@ -51,7 +53,8 @@ export function ImageCropper({
   const title = useRef<HTMLHeadingElement>(null)
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
-  const [working, setWorking] = useState(false)
+  // Uploading the image, then saving it in the profile: what Apply says meanwhile.
+  const [working, setWorking] = useState<'uploading' | 'saving' | null>(null)
   const [error, setError] = useState<string | null>(null)
   const area = useRef<Area | null>(null)
 
@@ -60,25 +63,30 @@ export function ImageCropper({
 
   async function apply() {
     if (working || !area.current) return
-    setWorking(true)
+    setWorking('uploading')
     setError(null)
     const prepared = await cropImage(file, area.current, SIZE[kind])
     if (!prepared.ok) {
-      setWorking(false)
+      setWorking(null)
       return setError(t(ERRORS[prepared.error]))
     }
     const form = new FormData()
     form.set('kind', kind)
     form.set('file', prepared.blob)
     const result = await uploadProfileImage(form)
-    setWorking(false)
     if (!result.ok) {
+      setWorking(null)
       const key = result.error.replace(/^communities\.edit\./, '') as 'errors.imageUpload'
       return setError(
         result.error.startsWith('communities.edit.') ? t(key) : t('errors.imageUpload'),
       )
     }
-    onApply({ imageUrl: result.data.imageUrl, preview: URL.createObjectURL(prepared.blob) })
+    setWorking('saving')
+    const preview = URL.createObjectURL(prepared.blob)
+    if (await onApply({ imageUrl: result.data.imageUrl, preview })) return
+    URL.revokeObjectURL(preview)
+    setWorking(null)
+    setError(t('errors.imageSave'))
   }
 
   return (
@@ -131,7 +139,7 @@ export function ImageCropper({
       </div>
       {/* What Apply says while it works, also announced (PP-08). */}
       <p role="status" className="sr-only">
-        {working ? t('uploading') : ''}
+        {working ? t(working) : ''}
       </p>
       {error && (
         <p role="alert" className="type-small text-destructive">
@@ -149,10 +157,10 @@ export function ImageCropper({
         <button
           type="button"
           onClick={() => void apply()}
-          aria-disabled={working || undefined}
+          aria-disabled={working !== null || undefined}
           className={cn(PILL, 'bg-primary text-primary-foreground hover:bg-primary/85')}
         >
-          {working ? t('uploading') : t('apply')}
+          {working ? t(working) : t('apply')}
         </button>
       </div>
     </section>

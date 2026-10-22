@@ -621,7 +621,8 @@
         "imageTooLarge": "The image is too large",
         "imageUnreadable": "Could not read the image",
         "imageUpload": "Could not upload the image",
-        "openTo": "Choose each option once, from the list"
+        "openTo": "Choose each option once, from the list",
+        "imageSave": "Could not save the image. Try again."
       },
       "discard": {
         "title": "Discard changes?",
@@ -643,9 +644,7 @@
       "removeLink": "Remove link {number}",
       "images": "Photo and banner",
       "changePhoto": "Change photo",
-      "removePhoto": "Remove photo",
       "changeBanner": "Change banner",
-      "removeBanner": "Remove banner",
       "cropPhoto": "Crop your photo",
       "cropBanner": "Crop your banner",
       "cropArea": "Image to crop. Drag it, or move it with the arrow keys.",
@@ -654,7 +653,25 @@
       "apply": "Apply",
       "uploading": "Uploading…",
       "showChecklist": "Show \"Complete your profile\"",
-      "checklistShown": "You will see it again on your profile."
+      "checklistShown": "You will see it again on your profile.",
+      "close": "Close",
+      "sections": {
+        "profile": "Profile",
+        "about": "About you",
+        "links": "Links"
+      },
+      "uploadImage": "Upload image",
+      "remove": "Remove",
+      "photoUpdated": "Photo updated.",
+      "bannerUpdated": "Banner updated.",
+      "removeConfirm": {
+        "photoTitle": "Remove your photo?",
+        "bannerTitle": "Remove your banner?",
+        "photoBody": "Your profile will show your initials instead, right away.",
+        "bannerBody": "Your profile will show its color instead, right away.",
+        "confirm": "Remove",
+        "cancel": "Keep it"
+      }
     },
     "follows": {
       "close": "Close",

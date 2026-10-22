@@ -621,7 +621,8 @@
         "imageTooLarge": "A imagem é grande demais",
         "imageUnreadable": "Não foi possível ler a imagem",
         "imageUpload": "Não foi possível enviar a imagem",
-        "openTo": "Escolha cada opção uma vez, da lista"
+        "openTo": "Escolha cada opção uma vez, da lista",
+        "imageSave": "Não foi possível salvar a imagem. Tente de novo."
       },
       "discard": {
         "title": "Descartar as alterações?",
@@ -643,9 +644,7 @@
       "removeLink": "Remover o link {number}",
       "images": "Foto e banner",
       "changePhoto": "Alterar foto",
-      "removePhoto": "Remover foto",
       "changeBanner": "Alterar banner",
-      "removeBanner": "Remover banner",
       "cropPhoto": "Recorte sua foto",
       "cropBanner": "Recorte seu banner",
       "cropArea": "Imagem para recortar. Arraste-a ou mova-a com as setas.",
@@ -654,7 +653,25 @@
       "apply": "Aplicar",
       "uploading": "Enviando…",
       "showChecklist": "Mostrar \"Complete seu perfil\"",
-      "checklistShown": "Você vai vê-la de novo no seu perfil."
+      "checklistShown": "Você vai vê-la de novo no seu perfil.",
+      "close": "Fechar",
+      "sections": {
+        "profile": "Perfil",
+        "about": "Sobre você",
+        "links": "Links"
+      },
+      "uploadImage": "Enviar imagem",
+      "remove": "Remover",
+      "photoUpdated": "Foto atualizada.",
+      "bannerUpdated": "Banner atualizado.",
+      "removeConfirm": {
+        "photoTitle": "Remover sua foto?",
+        "bannerTitle": "Remover seu banner?",
+        "photoBody": "Seu perfil vai mostrar suas iniciais no lugar, na hora.",
+        "bannerBody": "Seu perfil vai mostrar a cor dele no lugar, na hora.",
+        "confirm": "Remover",
+        "cancel": "Manter"
+      }
     },
     "follows": {
       "close": "Fechar",

@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { expectNoA11yViolations } from './fixtures/axe'
 
 // specs/profile-edit and specs/profile-presentation against the production build with
@@ -11,6 +11,15 @@ const PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAACgAAAAUCAIAAABwJOjsAAAAKUlEQVR4nGO4Y2NDNpKzOUE2Yhi1eNTiUYtHLR61eNTiUYtHLR45FgMA6H7YjhVQF48AAAAASUVORK5CYII=',
   'base64',
 )
+
+/** The camera over an image, then Upload image, then the file (EF-01). */
+async function pickImage(page: Page, name: 'Change photo' | 'Change banner') {
+  const dialog = page.getByRole('dialog', { name: 'Edit profile' })
+  await dialog.getByRole('button', { name }).click()
+  const chooser = page.waitForEvent('filechooser')
+  await page.getByRole('menuitem', { name: 'Upload image' }).click()
+  await (await chooser).setFiles({ name: 'me.png', mimeType: 'image/png', buffer: PNG })
+}
 
 test.describe('Edit profile', () => {
   test('writes a bio and the profile shows it without reloading (PE-01 to PE-03)', async ({
@@ -53,7 +62,7 @@ test.describe('Edit profile', () => {
   for (const theme of ['light', 'dark'] as const) {
     test(`fits 360px as the full screen and stays accessible in ${theme} (PE-08)`, async ({
       page,
-    }) => {
+    }, testInfo) => {
       await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
       await page.setViewportSize({ width: 360, height: 740 })
       await page.goto('/en/user/demo')
@@ -63,14 +72,28 @@ test.describe('Edit profile', () => {
       await expect(dialog.getByRole('textbox', { name: 'Name' })).toBeFocused()
       const box = (await dialog.boundingBox())!
       expect(box.width).toBeLessThanOrEqual(360)
+      // The footer stays in view, out of the scroll (specs/profile-edit-flow EF-06).
+      await expect(dialog.getByRole('button', { name: 'Save' })).toBeInViewport()
       await expectNoA11yViolations(page)
 
-      // A word of 160 characters, saved: it wraps instead of widening the page (PE-07).
-      await dialog.getByRole('textbox', { name: 'About' }).fill('x'.repeat(160))
+      // The camera's menu, by keyboard and accessible (EF-01, EF-11).
+      const camera = dialog.getByRole('button', { name: 'Change photo' })
+      await camera.focus()
+      await page.keyboard.press('Enter')
+      await expect(page.getByRole('menuitem', { name: 'Upload image' })).toBeFocused()
+      await expectNoA11yViolations(page)
+      await page.keyboard.press('Escape')
+      await expect(camera).toBeFocused()
+
+      // A word of 160 characters, saved: it wraps instead of widening the page (PE-07). Each project
+      // and theme its own: they share the server, and a bio already there would leave nothing to
+      // save, Save waiting (specs/profile-edit-flow EF-07).
+      const word = `${testInfo.project.name}-${theme}-`.padEnd(160, 'x')
+      await dialog.getByRole('textbox', { name: 'About' }).fill(word)
       await dialog.getByRole('button', { name: 'Save' }).click()
       await expect(dialog).toBeHidden()
       await expect(page.getByRole('button', { name: 'Edit profile' })).toBeFocused()
-      await expect(page.getByRole('main').getByText('x'.repeat(160))).toBeVisible()
+      await expect(page.getByRole('main').getByText(word)).toBeVisible()
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
       )
@@ -147,9 +170,7 @@ test.describe('Profile presentation', () => {
       await page.goto('/en/user/demo')
       await page.getByRole('button', { name: 'Edit profile' }).click()
       const dialog = page.getByRole('dialog', { name: 'Edit profile' })
-      const chooser = page.waitForEvent('filechooser')
-      await dialog.getByRole('button', { name: 'Change banner' }).click()
-      await (await chooser).setFiles({ name: 'me.png', mimeType: 'image/png', buffer: PNG })
+      await pickImage(page, 'Change banner')
       await expect(dialog.getByRole('heading', { name: 'Crop your banner' })).toBeFocused()
       await expect(dialog.getByRole('button', { name: 'Apply' })).toBeInViewport()
       await expect(dialog.getByRole('button', { name: 'Back' })).toBeInViewport()
@@ -158,35 +179,71 @@ test.describe('Profile presentation', () => {
       )
       expect(overflow).toBeLessThanOrEqual(0)
       await expectNoA11yViolations(page)
-      // Esc is Back: the window stays, the focus on Change banner.
+      // Esc is Back: the window stays, the focus on the banner's camera.
       await page.keyboard.press('Escape')
       await expect(dialog.getByRole('button', { name: 'Change banner' })).toBeFocused()
     })
   }
 
-  test('crops a photo and Save shows it on the profile (PP-07)', async ({ page, isMobile }) => {
+  test('a cropped photo is saved as it is applied, without Save (PP-07, specs/profile-edit-flow EF-02, EF-03)', async ({
+    page,
+    isMobile,
+  }) => {
     test.skip(isMobile, "Changes the demo's presentation: desktop only")
     await page.goto('/en/user/demo')
     await page.getByRole('button', { name: 'Edit profile' }).click()
     const dialog = page.getByRole('dialog', { name: 'Edit profile' })
-    const chooser = page.waitForEvent('filechooser')
+    // The menu of the camera, accessible while open (EF-11).
     await dialog.getByRole('button', { name: 'Change photo' }).click()
-    await (await chooser).setFiles({ name: 'me.png', mimeType: 'image/png', buffer: PNG })
+    await expect(page.getByRole('menuitem', { name: 'Upload image' })).toBeVisible()
+    await expectNoA11yViolations(page)
+    await page.keyboard.press('Escape')
+    await pickImage(page, 'Change photo')
 
     await expect(dialog.getByRole('heading', { name: 'Crop your photo' })).toBeVisible()
     await expect(dialog.getByRole('slider', { name: 'Zoom' })).toBeVisible()
     await expectNoA11yViolations(page)
     await dialog.getByRole('button', { name: 'Apply' }).click()
-    await expect(dialog.getByRole('button', { name: 'Remove photo' })).toBeVisible()
-    await dialog.getByRole('button', { name: 'Save' }).click()
+    await expect(dialog.getByText('Photo updated.')).toBeAttached()
+    // Already saved: the profile behind shows it, and the window closes without asking.
+    // With mocks, the uploaded photo is the mock's fixture; the header's (the card repeats it
+    // under lg, specs/profile-aside PA-03).
+    await dialog.getByRole('button', { name: 'Close' }).click()
     await expect(dialog).toBeHidden()
-    // With mocks, the uploaded photo is the mock's fixture.
-    // The header's (the card repeats it under lg, specs/profile-aside PA-03).
     await expect(page.getByRole('main').locator('img[src*="avatar-demo"]').first()).toBeVisible()
 
     await page.getByRole('button', { name: 'Edit profile' }).click()
-    await dialog.getByRole('button', { name: 'Remove photo' }).click()
-    await dialog.getByRole('button', { name: 'Save' }).click()
+    await dialog.getByRole('button', { name: 'Change photo' }).click()
+    await page.getByRole('menuitem', { name: 'Remove' }).click()
+    const confirm = page.getByRole('alertdialog', { name: 'Remove your photo?' })
+    await confirm.getByRole('button', { name: 'Remove' }).click()
+    await expect(dialog.getByText('Photo updated.')).toBeAttached()
+    await dialog.getByRole('button', { name: 'Close' }).click()
     await expect(dialog).toBeHidden()
+    await expect(page.getByRole('main').locator('img[src*="avatar-demo"]')).toHaveCount(0)
+  })
+
+  test('fits a desktop window without scrolling, in two columns (EF-06, EF-09)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'The two columns are from md')
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/en/user/demo')
+    await page.getByRole('button', { name: 'Edit profile' }).click()
+    const dialog = page.getByRole('dialog', { name: 'Edit profile' })
+    const form = dialog.locator('form')
+    await expect(dialog.getByRole('region', { name: 'Links' })).toBeVisible()
+    // The page behind is not blurred: it stuttered while the window animated (EF-12).
+    const blur = await page
+      .locator('[data-slot="dialog-overlay"]')
+      .evaluate((node) => getComputedStyle(node).backdropFilter)
+    expect(blur).toBe('none')
+    const overflow = await form.evaluate((node) => node.scrollHeight - node.clientHeight)
+    expect(overflow).toBeLessThanOrEqual(0)
+    const profile = await dialog.getByRole('region', { name: 'Profile' }).boundingBox()
+    const about = await dialog.getByRole('region', { name: 'About you' }).boundingBox()
+    expect(about!.x).toBeGreaterThan(profile!.x + profile!.width)
+    await expect(dialog.getByRole('button', { name: 'Save' })).toBeInViewport()
   })
 })

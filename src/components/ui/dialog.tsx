@@ -42,15 +42,28 @@ function DialogContent({
   children,
   showCloseButton = true,
   closeLabel,
+  overlay = 'default',
   ...props
-}: DialogPrimitive.Popup.Props &
+}: DialogPrimitive.Popup.Props & {
+  /**
+   * asinko: `solid` for a window too large for the backdrop's blur, redrawn on every frame of
+   * its animation (specs/profile-edit-flow EF-12): a darker veil, without blur.
+   */
+  overlay?: 'default' | 'solid'
+} &
   // asinko: the close button needs a translated accessible name (i18n.md, WCAG 4.1.2).
   (
     { showCloseButton?: true; closeLabel: string } | { showCloseButton: false; closeLabel?: never }
   )) {
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay
+        className={
+          overlay === 'solid'
+            ? 'bg-black/25 supports-backdrop-filter:backdrop-blur-none'
+            : undefined
+        }
+      />
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
