@@ -70,7 +70,7 @@ describe('SiteHeader (H-05)', () => {
 })
 
 describe('SiteHeader: Create (specs/submit-page SU-02)', () => {
-  it('goes to the page to create a post from "+ Create", with or without a session', () => {
+  it('goes to the page to create a post from "+ Create", only with a session (PO, 2026-10-21)', () => {
     for (const signedIn of [true, false]) {
       const { unmount } = renderWithIntl(
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
@@ -81,8 +81,12 @@ describe('SiteHeader: Create (specs/submit-page SU-02)', () => {
           </AuthGateProvider>
         </ThemeProvider>,
       )
-      // Without a session the page itself says how to get in (SU-06).
-      expect(screen.getByRole('link', { name: 'Create' })).toHaveAttribute('href', '/submit')
+      if (signedIn) {
+        expect(screen.getByRole('link', { name: 'Create' })).toHaveAttribute('href', '/submit')
+      } else {
+        // Sign up and Log in say the way in.
+        expect(screen.queryByRole('link', { name: 'Create' })).toBeNull()
+      }
       unmount()
     }
   })

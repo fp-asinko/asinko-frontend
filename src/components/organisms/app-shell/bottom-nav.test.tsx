@@ -62,4 +62,19 @@ describe('BottomNav', () => {
     const names = screen.getAllByRole('listitem').map((item) => item.textContent)
     expect(names.slice(1)).toEqual(['Search', 'Create', 'Notif', 'Profile'])
   })
+
+  it('has no Create without a session (PO, 2026-10-21)', () => {
+    renderWithIntl(
+      <AuthGateProvider signedIn={false}>
+        <BottomNav items={ITEMS} />
+      </AuthGateProvider>,
+    )
+    expect(screen.queryByRole('link', { name: 'Create' })).toBeNull()
+    expect(screen.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
+      'Home',
+      'Search',
+      'Notif',
+      'Profile',
+    ])
+  })
 })

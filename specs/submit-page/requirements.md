@@ -19,7 +19,7 @@ Publicar en una página propia, como Reddit: la comunidad elegida arriba (y se p
 ### La página
 
 - [x] **SU-01** Una página propia para crear un post, con su URL (Q2): `/en/submit`, `/es/publicar`, `/pt/publicar`, con la comunidad en la URL (`?community=defi`). Se puede recargar y compartir; "atrás" vuelve a donde estabas.
-- [x] **SU-02** (Q1) Todos los "Crear" llevan a la página: barra superior, barra inferior, encabezado de un grupo, activo o perfil propio, y el estado vacío del feed. Desde una comunidad, llega con ella elegida.
+- [x] **SU-02** (Q1) Todos los "Crear" llevan a la página: barra superior, barra inferior, encabezado de un grupo, activo o perfil propio, y el estado vacío del feed. Desde una comunidad, llega con ella elegida. _Cambio del PO (2026-10-21): sin sesión, el "Crear" de la barra superior y el de la inferior no aparecen (los botones de cuenta ya dicen cómo entrar)._
 - [x] **SU-03** Arriba, el **selector de comunidad** (el de hoy: tus comunidades, tu perfil y la búsqueda, con grupos y activos). Cambiarla actualiza la URL y la tarjeta de la derecha, sin perder lo escrito.
 - [x] **SU-04** El formulario es el de hoy: formatos Texto, Link e Imagen (con su descripción), título con contador, cuerpo con menciones y emojis, y Publicar. Publicar lleva al post nuevo, como hoy.
 - [x] **SU-05** Lo escrito no se pierde al salir: queda como borrador local (SU-12). Cancelar con algo escrito pregunta antes de descartar (el aviso de hoy, que borra el borrador). Cerrar o recargar la pestaña no avisa: el borrador ya lo guardó (cambio de la implementación, 2026-10-15).

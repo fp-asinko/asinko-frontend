@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ComingSoon } from '@/components/molecules/coming-soon'
 import { NavLink } from '@/components/molecules/nav-link'
-import { GatedComingSoon } from '@/components/organisms/auth-gate'
+import { GatedComingSoon, SignedInOnly } from '@/components/organisms/auth-gate'
 import { ComposeTrigger } from '@/components/organisms/compose'
 import { cn } from '@/lib/utils'
 import type { NavItem } from './nav-item.types'
@@ -52,12 +52,15 @@ export function BottomNav({
           </li>
         ))}
         {soon(t('search'), <SearchIcon />)}
-        <li>
-          <ComposeTrigger className={cn(CREATE_ITEM, 'tap')}>
-            <CirclePlusIcon aria-hidden className="size-6" />
-            {t('create')}
-          </ComposeTrigger>
-        </li>
+        {/* Only with a session, as the top bar's (PO, 2026-10-21). */}
+        <SignedInOnly>
+          <li>
+            <ComposeTrigger className={cn(CREATE_ITEM, 'tap')}>
+              <CirclePlusIcon aria-hidden className="size-6" />
+              {t('create')}
+            </ComposeTrigger>
+          </li>
+        </SignedInOnly>
         {soon(t('notificationsShort'), <BellIcon />)}
         <li>
           {profileHref ? (

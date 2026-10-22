@@ -2,7 +2,7 @@ import { BellIcon, PlusIcon, SearchIcon, UserIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ComingSoon } from '@/components/molecules/coming-soon'
-import { AccountButtons } from '@/components/organisms/auth-gate'
+import { AccountButtons, SignedInOnly } from '@/components/organisms/auth-gate'
 import { ComposeTrigger } from '@/components/organisms/compose'
 import { AsinkoLogo } from '@/components/ui/asinko-logo'
 import { Link } from '@/i18n/navigation'
@@ -20,7 +20,7 @@ const ICON_BUTTON =
  * Language and dark mode live in "⋯" (HR-03). Search and notifications are not in the MVP: disabled
  * (H-26). Profile takes you to your own page (HR-02, since specs/profile-track-record). Without a session the actions are Sign up and Log in (G-02, HR-02).
  * "+ Create" stays at hand from md, at every scroll, and opens the editor in a window over the page,
- * as X's "Post" (specs/post-create-detail PC-01); without a session it opens the account modal.
+ * as X's "Post" (specs/post-create-detail PC-01); without a session it is not there (PO, 2026-10-21).
  */
 export function SiteHeader({
   menu,
@@ -75,10 +75,13 @@ export function SiteHeader({
             </ComingSoon>
           </span>
           {devTools}
-          <ComposeTrigger className="hidden h-10 tap items-center gap-1.5 rounded-full bg-muted pr-4 pl-3 type-action text-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex">
-            <PlusIcon aria-hidden className="size-4.5" />
-            {t('nav.create')}
-          </ComposeTrigger>
+          {/* Only with a session (PO, 2026-10-21): without one, Sign up and Log in say the way in. */}
+          <SignedInOnly>
+            <ComposeTrigger className="hidden h-10 tap items-center gap-1.5 rounded-full bg-muted pr-4 pl-3 type-action text-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex">
+              <PlusIcon aria-hidden className="size-4.5" />
+              {t('nav.create')}
+            </ComposeTrigger>
+          </SignedInOnly>
           <AccountButtons>
             {/* With a session: notifications and profile from md (HR-02, Q2). */}
             <span className="hidden items-center gap-1 md:flex">

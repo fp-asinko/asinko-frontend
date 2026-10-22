@@ -37,6 +37,12 @@ export function AccountButtons({ children }: { children: ReactNode }) {
   )
 }
 
+/** Only with a session: without one, nothing (the bars' "Create", PO 2026-10-21). */
+export function SignedInOnly({ children }: { children: ReactNode }) {
+  const { signedIn } = useAuthGate()
+  return signedIn ? children : null
+}
+
 /** "Create account" and "Log in", side by side: the Join card and the Following empty state. */
 export function GateButtons({ className }: { className?: string }) {
   const { openGate } = useAuthGate()
