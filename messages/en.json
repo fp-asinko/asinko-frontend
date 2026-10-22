@@ -128,6 +128,10 @@
     },
     "card": {
       "system": "Asinko",
+      "reason": {
+        "similar": "Because you follow <community>{handle}</community>",
+        "country": "Popular in {country}"
+      },
       "edited": "edited",
       "deleted": "[deleted]",
       "accuracy": "{value} accuracy, {tier, select, high {high} mid {medium} other {low}}",

@@ -13,6 +13,7 @@ import type { PostItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
 import { CardLink } from './card-link'
+import { FeedReasonLine } from './feed-reason-line'
 import { FadeImage } from '@/components/ui/fade-image'
 import { CommentsToggle } from './comments-toggle'
 import { PostMarkdown } from './post-markdown'
@@ -97,6 +98,8 @@ export function PostCard({
       )}
       aria-labelledby={`post-${post.id}`}
     >
+      {/* Why Explore shows it (specs/explore-v1): a card's, never the post's own page. */}
+      {!detail && !preview && post.reason && <FeedReasonLine reason={post.reason} />}
       {/* The post's own page breathes more than a card, as Reddit's (specs/post-detail-refresh
           PD-17): more room between the header, the title, the paragraphs and the votes. */}
       <div className={cn('flex items-center gap-2.5', detail ? 'mb-3.5' : 'mb-2')}>

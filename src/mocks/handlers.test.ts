@@ -48,7 +48,50 @@ describe('mock handlers behave like the contract', () => {
 
   it('answers an empty page for an unknown community, like the backend dev branch', async () => {
     const response = await call('GET', '/api/v1/feed/explore', { query: { community: 'nope' } })
-    expect(response).toEqual({ status: 200, body: { items: [], nextCursor: null } })
+    expect(response).toEqual({
+      status: 200,
+      body: { items: [], nextCursor: null, requestId: null },
+    })
+  })
+
+  it("says why Explore shows each item, only on the Home's Explore (specs/explore-v1)", async () => {
+    type Reasoned = { items: Array<{ reason: { type: string } | null }>; requestId: string }
+    const explore = (await call('GET', '/api/v1/feed/explore')).body as Reasoned
+    expect(new Set(explore.items.map((item) => item.reason?.type))).toEqual(
+      new Set(['SIMILAR', 'COUNTRY', 'TRENDING', 'FOLLOWING']),
+    )
+    const community = (await call('GET', '/api/v1/feed/explore', { query: { community: 'BTC' } }))
+      .body as Reasoned
+    const following = (await call('GET', '/api/v1/feed/following')).body as Reasoned
+    for (const page of [community, following]) {
+      expect(page.items.every((item) => item.reason === null)).toBe(true)
+    }
+  })
+
+  it('gives every feed page its own requestId (specs/explore-v1)', async () => {
+    const ids = await Promise.all(
+      [
+        call('GET', '/api/v1/feed/explore'),
+        call('GET', '/api/v1/feed/explore', { query: { cursor: btoa('20') } }),
+        call('GET', '/api/v1/feed/explore', { query: { community: 'BTC' } }),
+        call('GET', '/api/v1/feed/following'),
+      ].map(async (response) => ((await response).body as { requestId: string }).requestId),
+    )
+    for (const id of ids) expect(id).toMatch(/^[0-9a-f-]{36}$/)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('takes impressions with 204, and refuses a malformed batch (specs/explore-v1)', async () => {
+    const event = { contentId: POSTS[0]!.id, type: 'OPEN' }
+    const requestId = '00000000-0000-4000-8000-000000000001'
+    const ok = await call('POST', '/api/v1/feed/impressions', {
+      body: { userId: null, requestId, events: [event] },
+    })
+    expect(ok.status).toBe(204)
+    const empty = await call('POST', '/api/v1/feed/impressions', {
+      body: { userId: null, requestId, events: [] },
+    })
+    expect(empty.status).toBe(422)
   })
 
   it('narrows both feeds by kind, ignoring unknown kinds', async () => {

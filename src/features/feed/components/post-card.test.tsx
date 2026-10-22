@@ -42,6 +42,19 @@ describe('PostCard (H-12)', () => {
     expect(comments.compareDocumentPosition(share) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
+  it('says why Explore shows it above the header, never on its own page (specs/explore-v1)', () => {
+    const reason = { type: 'country', countryCode: 'AR' } as const
+    const { unmount } = renderWithIntl(<PostCard post={{ ...postItem(), reason }} />)
+    const line = screen.getByText('Popular in Argentina')
+    const byline = screen.getByText('@maria')
+    // Read first: before the byline in the document.
+    expect(line.compareDocumentPosition(byline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    unmount()
+
+    renderWithIntl(<PostCard post={{ ...postItem(), reason }} variant="detail" />)
+    expect(screen.queryByText('Popular in Argentina')).not.toBeInTheDocument()
+  })
+
   it('links the community in the byline', () => {
     renderWithIntl(<PostCard post={postItem({ body: 'No mentions here.' })} />)
     expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/asset/BTC')

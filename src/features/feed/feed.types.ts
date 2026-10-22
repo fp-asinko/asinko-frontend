@@ -33,6 +33,14 @@ export type CardCommunity = CommunityRef & {
   viewerIsMember: boolean | null
 }
 
+/**
+ * Why Explore shows a card (specs/explore-v1): only the reasons the card does not tell by itself
+ * (Q1). A community the viewer follows brought it, or it is popular in their country.
+ */
+export type FeedReason =
+  | { type: 'similar'; community: { handle: string; path: string } }
+  | { type: 'country'; countryCode: string }
+
 export type PostMedia =
   /** `alt`: what the image shows, written by its author (imageAlt); null without one. */
   | { type: 'image'; url: string; alt: string | null }
@@ -62,6 +70,8 @@ export type PostItem = {
   tag: string | null
   /** The communities and assets its author tagged it with (P-018), as mentions with their page. */
   related: { handle: string; path: string }[]
+  /** Why the Home's Explore shows it (specs/explore-v1); absent or null anywhere else. */
+  reason?: FeedReason | null
 }
 
 export type PollOption = {
@@ -91,6 +101,8 @@ export type PollItem = {
   author: Author | null
   community: CardCommunity | null
   publishedAt: string
+  /** Why the Home's Explore shows it (specs/explore-v1); absent or null anywhere else. */
+  reason?: FeedReason | null
 }
 
 /** What changes in a poll after voting. */
@@ -115,6 +127,8 @@ export type FeedPage = {
   nextCursor: string | null
   /** The filtered community (?community=), when there is one. */
   community: CommunityRef | null
+  /** The page the impressions refer to (specs/explore-v1); null for an empty page or a profile. */
+  requestId: string | null
 }
 
 /** A comment of a post's page, with its replies (specs/post-create-detail § 4). */

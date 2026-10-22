@@ -27,8 +27,15 @@ export function knownKinds(items: readonly unknown[]): unknown[] {
   })
 }
 
-/** Items are validated one by one (keepValidItems), so the envelope accepts anything (H-20). */
-const looseListSchema = z.object({ items: z.array(z.unknown()), nextCursor: z.string().nullable() })
+/**
+ * Items are validated one by one (keepValidItems), so the envelope accepts anything (H-20). The
+ * page's requestId is for the impressions (specs/explore-v1): an odd one only turns them off.
+ */
+const looseListSchema = z.object({
+  items: z.array(z.unknown()),
+  nextCursor: z.string().nullable(),
+  requestId: z.uuid().nullable().optional().catch(null),
+})
 
 /** Opaque cursor from a previous page: checked before the request, never sent as-is if odd. */
 const cursorSchema = z.string().regex(/^[A-Za-z0-9_\-=.:]{1,512}$/)
@@ -123,7 +130,10 @@ export async function getFeed(
   const known = communities?.ok ? [...communities.data.items] : []
   if (filtered?.ok) known.push(filtered.data)
   const mentions = indexCommunities(known)
-  const items = valid.map((item) => toFeedItem(item, mentions, signedIn))
+  // Only the Home's Explore says why it shows a card (specs/explore-v1 EX-03), whatever the
+  // backend sends elsewhere.
+  const explained = endpoint === EXPLORE && !params.community
+  const items = valid.map((item) => toFeedItem(item, mentions, signedIn, explained))
 
   return {
     ok: true,
@@ -131,6 +141,8 @@ export async function getFeed(
       items,
       nextCursor: feed.data.nextCursor,
       community: filtered?.ok ? toCommunityRef(filtered.data) : null,
+      // A profile's content carries none: no impressions there.
+      requestId: feed.data.requestId ?? null,
     },
   }
 }
