@@ -24,7 +24,7 @@ describe('EditWidgetsButton (specs/community-widgets CW-08)', () => {
     const button = screen.getByRole('button', { name: 'Edit widgets' })
     expect(button).toHaveAttribute('aria-haspopup', 'dialog')
     await userEvent.click(button)
-    const dialog = await screen.findByRole('dialog', { name: 'Edit widgets' }, { timeout: 3000 })
+    const dialog = await screen.findByRole('dialog', { name: 'Edit widgets' }, { timeout: 8000 })
     expect(dialog).toHaveTextContent('Welcome')
     await userEvent.keyboard('{Escape}')
     await vi.waitFor(() => expect(button).toHaveFocus())

@@ -13,6 +13,10 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    // Components that load a part lazily (panels, dialogs) take 1 to 2 s alone and pass 5 s with
+    // the whole suite in parallel on a loaded machine (the pre-push hook, a dev server running).
+    // A longer limit, not slower checks: a test that hangs still fails.
+    testTimeout: 15_000,
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     // next-intl imports 'next/navigation' without extension; let Vite resolve it.

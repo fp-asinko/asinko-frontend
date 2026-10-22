@@ -28,7 +28,7 @@ describe('ShareButton (specs/comment-threads CT-11)', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Link copied')
 
     expect(
-      await screen.findByRole('button', { name: 'Share' }, { timeout: 3000 }),
+      await screen.findByRole('button', { name: 'Share' }, { timeout: 8000 }),
     ).toBeInTheDocument()
   })
 
@@ -80,7 +80,7 @@ describe('ShareButton with a post (specs/share-menu SM-01 to SM-05)', () => {
     const button = screen.getByRole('button', { name: 'Share' })
     expect(button).toHaveAttribute('aria-haspopup', 'dialog')
     await user.click(button)
-    const dialog = await screen.findByRole('dialog', { name: 'Share post' }, { timeout: 3000 })
+    const dialog = await screen.findByRole('dialog', { name: 'Share post' }, { timeout: 8000 })
     // The image other apps will show, named by the post (SM-02).
     expect(within(dialog).getByRole('img', { name: 'The Fed cuts' })).toHaveAttribute(
       'src',
@@ -123,7 +123,7 @@ describe('ShareButton with a post (specs/share-menu SM-01 to SM-05)', () => {
     )
     const button = screen.getByRole('button', { name: 'Share' })
     await user.click(button)
-    await screen.findByRole('dialog', { name: 'Share post' }, { timeout: 3000 })
+    await screen.findByRole('dialog', { name: 'Share post' }, { timeout: 8000 })
     await user.keyboard('{Escape}')
     await vi.waitFor(() => expect(button).toHaveFocus())
   })

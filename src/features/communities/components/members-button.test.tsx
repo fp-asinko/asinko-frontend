@@ -28,7 +28,7 @@ describe('MembersButton (specs/community-members CM-01, CM-06)', () => {
     const dialog = await screen.findByRole(
       'dialog',
       { name: 'Members of #defi' },
-      { timeout: 3000 },
+      { timeout: 8000 },
     )
     // The focus goes into the window (CM-06).
     await vi.waitFor(() =>

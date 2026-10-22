@@ -37,7 +37,7 @@ describe('EditProfileButton (specs/profile-edit PE-01)', () => {
     expect(button).toHaveAttribute('aria-haspopup', 'dialog')
     await userEvent.click(button)
     expect(
-      await screen.findByRole('dialog', { name: 'Edit profile' }, { timeout: 3000 }),
+      await screen.findByRole('dialog', { name: 'Edit profile' }, { timeout: 8000 }),
     ).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'About' })).toHaveValue('On-chain analyst.')
   })
@@ -47,7 +47,7 @@ describe('EditProfilePrompt (specs/profile-presentation PP-04)', () => {
   it('opens the window on its field', async () => {
     renderOwn()
     await userEvent.click(screen.getByRole('button', { name: 'Add a headline' }))
-    const headline = await screen.findByRole('textbox', { name: 'Headline' }, { timeout: 3000 })
+    const headline = await screen.findByRole('textbox', { name: 'Headline' }, { timeout: 8000 })
     await vi.waitFor(() => expect(headline).toHaveFocus())
   })
 

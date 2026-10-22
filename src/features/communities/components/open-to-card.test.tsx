@@ -46,7 +46,7 @@ describe('OpenToCard (specs/profile-showcase PS-10)', () => {
       </EditProfileProvider>,
     )
     await userEvent.click(screen.getByRole('button', { name: 'Edit what you are open to' }))
-    const dialog = await screen.findByRole('dialog', { name: 'Edit profile' }, { timeout: 3000 })
+    const dialog = await screen.findByRole('dialog', { name: 'Edit profile' }, { timeout: 8000 })
     await vi.waitFor(() =>
       expect(within(dialog).getByRole('checkbox', { name: 'Questions' })).toHaveFocus(),
     )

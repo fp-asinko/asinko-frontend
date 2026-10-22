@@ -33,7 +33,7 @@ describe('FollowCounts and FollowListDialog (specs/follow-lists FL-01, FL-06)', 
   it('opens the lists on the tab touched, with real tabs that the arrows move', async () => {
     renderCounts()
     await userEvent.click(screen.getByRole('button', { name: '3 following' }))
-    const dialog = await screen.findByRole('dialog', { name: '@maria' }, { timeout: 3000 })
+    const dialog = await screen.findByRole('dialog', { name: '@maria' }, { timeout: 8000 })
     const following = within(dialog).getByRole('tab', { name: 'Following' })
     expect(following).toHaveAttribute('aria-selected', 'true')
     expect(await within(dialog).findByText('following row')).toBeInTheDocument()
@@ -51,7 +51,7 @@ describe('FollowCounts and FollowListDialog (specs/follow-lists FL-01, FL-06)', 
     renderCounts()
     const followers = screen.getByRole('button', { name: '12 followers' })
     await userEvent.click(followers)
-    const dialog = await screen.findByRole('dialog', { name: '@maria' }, { timeout: 3000 })
+    const dialog = await screen.findByRole('dialog', { name: '@maria' }, { timeout: 8000 })
     await userEvent.click(within(dialog).getByRole('button', { name: 'Close' }))
     await vi.waitFor(() => expect(followers).toHaveFocus())
   })

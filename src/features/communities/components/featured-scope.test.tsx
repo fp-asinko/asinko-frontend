@@ -19,7 +19,7 @@ async function feature() {
   await userEvent.click(screen.getByRole('button', { name: 'Options for the post Rates' }))
   // The menu is loaded on the first open (deferred): give it time under load.
   await userEvent.click(
-    await screen.findByRole('menuitem', { name: 'Feature on your profile' }, { timeout: 3000 }),
+    await screen.findByRole('menuitem', { name: 'Feature on your profile' }, { timeout: 8000 }),
   )
 }
 

@@ -108,7 +108,7 @@ describe('CommentComposer (specs/post-create-detail PC-15)', () => {
     await userEvent.click(box())
     await userEvent.click(screen.getByRole('button', { name: 'Add emoji' }))
     // Downloaded on demand: more time than the default when the whole suite runs.
-    const panel = await screen.findByRole('dialog', { name: 'Emojis' }, { timeout: 3000 })
+    const panel = await screen.findByRole('dialog', { name: 'Emojis' }, { timeout: 8000 })
     expect(send()).toBeInTheDocument()
     await userEvent.click(within(panel).getByRole('button', { name: /^rocket/ }))
     expect(box()).toHaveValue('🚀')

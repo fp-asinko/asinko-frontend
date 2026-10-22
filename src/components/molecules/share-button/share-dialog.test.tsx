@@ -47,7 +47,7 @@ describe('ShareDialog (specs/share-menu SM-02 to SM-05)', () => {
     expect(within(dialog).getByRole('button', { name: 'Could not copy' })).toBeInTheDocument()
     expect(within(dialog).getByRole('status')).toHaveTextContent('Could not copy')
     expect(
-      await within(dialog).findByRole('button', { name: 'Copy link' }, { timeout: 3000 }),
+      await within(dialog).findByRole('button', { name: 'Copy link' }, { timeout: 8000 }),
     ).toBeInTheDocument()
   })
 

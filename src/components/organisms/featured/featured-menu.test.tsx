@@ -25,7 +25,7 @@ function renderMenu(featured: string[] = [], state: Partial<FeaturedMenuState> =
 
 const open = async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Options for the post Rates' }))
-  return screen.findByRole('menuitem', {}, { timeout: 3000 })
+  return screen.findByRole('menuitem', {}, { timeout: 8000 })
 }
 
 describe('FeatureMenu (specs/profile-showcase PS-07)', () => {
@@ -56,7 +56,7 @@ describe('FeatureMenu (specs/profile-showcase PS-07)', () => {
       </FeaturedMenuContext>,
     )
     await userEvent.click(screen.getByRole('button', { name: 'Options for the poll Rates' }))
-    await userEvent.click(await screen.findByRole('menuitem', {}, { timeout: 3000 }))
+    await userEvent.click(await screen.findByRole('menuitem', {}, { timeout: 8000 }))
     expect(set).toHaveBeenCalledWith('poll', 'q1', true)
   })
 

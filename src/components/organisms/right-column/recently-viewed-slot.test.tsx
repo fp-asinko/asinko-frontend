@@ -21,7 +21,7 @@ describe('RecentlyViewedSlot (specs/recently-viewed RV-08)', () => {
     screenWidth(true)
     renderWithIntl(<RecentlyViewedSlot />)
     expect(
-      await screen.findByRole('region', { name: 'Recently viewed' }, { timeout: 3000 }),
+      await screen.findByRole('region', { name: 'Recently viewed' }, { timeout: 8000 }),
     ).toBeInTheDocument()
   })
 

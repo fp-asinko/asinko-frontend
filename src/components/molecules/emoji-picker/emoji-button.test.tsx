@@ -25,9 +25,12 @@ function Harness({ initial = '' }: { initial?: string }) {
 
 const body = () => screen.getByRole('textbox', { name: 'Body' }) as HTMLTextAreaElement
 
+/** The panel comes lazily: under the whole suite's load, past findByRole's default 1 s. */
+const PANEL_WAIT = { timeout: 8000 }
+
 async function openPanel() {
   await userEvent.click(screen.getByRole('button', { name: 'Add emoji' }))
-  return screen.findByRole('dialog', { name: 'Emojis' })
+  return screen.findByRole('dialog', { name: 'Emojis' }, PANEL_WAIT)
 }
 
 // The whole panel (every category) renders in each test: ~1 s alone, past Vitest's 5 s under the
@@ -110,7 +113,7 @@ describe('EmojiButton (specs/emoji-picker)', { timeout: 15_000 }, () => {
   it('names emojis in the page language', async () => {
     renderWithIntl(<Harness />, { locale: 'es' })
     await userEvent.click(screen.getByRole('button', { name: 'Agregar emoji' }))
-    const panel = await screen.findByRole('dialog', { name: 'Emojis' })
+    const panel = await screen.findByRole('dialog', { name: 'Emojis' }, PANEL_WAIT)
     await userEvent.type(within(panel).getByRole('searchbox', { name: 'Buscar emoji' }), 'fuego')
     expect(within(panel).getByRole('button', { name: /^fuego/ })).toBeInTheDocument()
   })
