@@ -45,7 +45,12 @@ function read(key: string): string | null {
   }
 }
 
+// Drafts discarded on the way out: a save still pending (the typing had not rested) must not write
+// them back. The key opens again when the editor leaves (forgetOpenedDraft).
+const discarded = new Set<string>()
+
 export function writeDraft(key: string, draft: PostDraftInput) {
+  if (discarded.has(key)) return
   try {
     window.localStorage.setItem(key, JSON.stringify(draft))
   } catch {
@@ -72,9 +77,16 @@ const subscribe = () => () => {}
 // The draft as it was when the page opened, per key: what is saved while writing is not offered back.
 const opened = new Map<string, string | null>()
 
-/** The editor left: the next visit reads the draft again. */
+/** Discards the draft on the way out: gone, and no pending save brings it back (a bug, 2026-10-22). */
+export function discardDraft(key: string) {
+  clearDraft(key)
+  discarded.add(key)
+}
+
+/** The editor left: the next visit reads the draft again, and keeps a new one. */
 export function forgetOpenedDraft(key: string) {
   opened.delete(key)
+  discarded.delete(key)
 }
 
 function openedDraft(key: string): string | null {

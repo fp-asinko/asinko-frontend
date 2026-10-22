@@ -122,6 +122,17 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12)', () => {
     expect(localStorage.getItem(KEY)).toBeNull()
   })
 
+  it('never writes back a draft discarded before its pending save (a bug)', async () => {
+    renderWithIntl(<SubmitEditor type="TEXT" community={DEFI} storageKey={KEY} />)
+    await userEvent.type(title(), 'Gone')
+    // Right away, before the save that waits for the typing to rest.
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Discard', hidden: false }))
+    // Past that wait: still nothing (the page here does not leave: router.push is a mock).
+    await new Promise((done) => setTimeout(done, 1200))
+    expect(localStorage.getItem(KEY)).toBeNull()
+  })
+
   it('keeps what is written as the draft a moment after the typing rests', async () => {
     renderWithIntl(<SubmitEditor type="TEXT" community={DEFI} storageKey={KEY} />)
     await userEvent.type(title(), 'Saved')

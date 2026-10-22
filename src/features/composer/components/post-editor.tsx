@@ -28,6 +28,7 @@ import {
 } from '../schemas/create-post.schema'
 import {
   clearDraft,
+  discardDraft,
   forgetOpenedDraft,
   hasText,
   useStoredDraft,
@@ -330,7 +331,8 @@ export function PostEditor({
     setServerError(null)
     const result = await (saved.draftId ? createPost(values, saved.draftId) : createPost(values))
     if (result.ok) {
-      if (storageKey) clearDraft(storageKey)
+      // Published: gone, and no save still pending brings it back as a draft.
+      if (storageKey) discardDraft(storageKey)
       onPublished(postPath(result.data.id, result.data.title))
       return
     }

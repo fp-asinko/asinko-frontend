@@ -6,7 +6,7 @@ import type { Locale } from '@/i18n/routing'
 import { useRouter } from '@/i18n/navigation'
 import { submitPath } from '@/i18n/submit-path'
 import type { CommunityOption } from '../composer.types'
-import { clearDraft } from '../hooks/use-post-draft'
+import { discardDraft } from '../hooks/use-post-draft'
 import { DiscardDialog } from './discard-dialog'
 import type { PreviewAction } from './body-tabs'
 import { PostEditor } from './post-editor'
@@ -73,7 +73,7 @@ export function SubmitEditor({
         open={discarding}
         onOpenChange={setDiscarding}
         onDiscard={() => {
-          if (storageKey) clearDraft(storageKey)
+          if (storageKey) discardDraft(storageKey)
           leave()
         }}
       />
