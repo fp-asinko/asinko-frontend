@@ -28,10 +28,10 @@ export async function SubmitAside({
   related?: readonly string[]
 }) {
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex flex-1 flex-col">
       <Cards community={community} />
       <Related community={community} related={related} />
-      <SiteFooter className="mt-auto" />
+      <SiteFooter className="mt-auto pb-6" />
     </div>
   )
 }

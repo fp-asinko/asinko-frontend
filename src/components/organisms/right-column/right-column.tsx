@@ -9,9 +9,11 @@ import { SiteFooter } from './site-footer'
  */
 export function RightColumn({ children }: { children?: ReactNode }) {
   return (
-    <div className="flex min-h-full flex-col">
-      {children}
-      <SiteFooter className="mt-auto" />
+    <div className="flex flex-1 flex-col">
+      {/* Air between the last card and the footer's line, and under the footer: the column ends
+          at the bottom of the screen (StickyColumn, PO 2026-10-21). */}
+      <div className="pb-3.5">{children}</div>
+      <SiteFooter className="mt-auto pb-6" />
     </div>
   )
 }

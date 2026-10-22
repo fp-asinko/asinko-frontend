@@ -4,6 +4,7 @@ import { BottomNav } from './bottom-nav'
 import { MobileSidebar } from './mobile-sidebar'
 import type { NavItem } from './nav-item.types'
 import { SiteHeader } from './site-header'
+import { StickyColumn } from './sticky-column'
 
 /*
  * Layout of the prototype (specs/home/design.md §3), mobile first:
@@ -76,15 +77,18 @@ export function AppShell({
           >
             {children}
           </main>
-          {/* Right column (RC-01): fixed under the 60px bar like the left one, with its own scroll.
-              Without content it stays an empty div: no empty landmark. */}
+          {/* Right column (RC-01): no scroll of its own, as Reddit's (PO, 2026-10-21): it scrolls
+              with the page and stays at the bottom once its end shows (StickyColumn). At least the
+              screen's height, so a short one keeps its footer at the bottom. Without content it
+              stays an empty div: no empty landmark. overflow-x: clip, not a scroll container (sticky still
+              works): the edge a "Coming soon" bubble keeps inside. */}
           {right ? (
-            <aside
-              aria-label={tr('label')}
-              className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] w-75 shrink-0 self-start overflow-y-auto border-l lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:block lg:group-has-[main>[data-hero]]/row:row-span-1 lg:group-has-[main>[data-hero]]/row:row-start-2"
+            <StickyColumn
+              label={tr('label')}
+              className="sticky top-15 hidden min-h-[calc(100dvh-3.75rem)] w-75 shrink-0 flex-col self-start overflow-x-clip border-l lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:flex lg:group-has-[main>[data-hero]]/row:row-span-1 lg:group-has-[main>[data-hero]]/row:row-start-2"
             >
               {right}
-            </aside>
+            </StickyColumn>
           ) : (
             <div className="hidden w-75 shrink-0 border-l lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:block lg:group-has-[main>[data-hero]]/row:row-span-1 lg:group-has-[main>[data-hero]]/row:row-start-2" />
           )}

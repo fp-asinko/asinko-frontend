@@ -24,7 +24,7 @@ El Product Owner decidió, el 2026-10-04:
 
 ## Criterios de aceptación
 
-- [x] **RC-01** **Columna con contenido:** desde `lg` (1024 px), la columna derecha de 300 px muestra la tarjeta de tokens y el pie, en ese orden. Queda fija al hacer scroll, como la izquierda, y si no entra en la pantalla tiene scroll propio.
+- [x] **RC-01** _Cambio del PO (2026-10-21): sin scroll propio, como Reddit: la columna baja con la página y, cuando su final llega abajo, queda pegada ahí (`StickyColumn`); con aire entre la última tarjeta y el pie, y bajo el pie._ **Columna con contenido:** desde `lg` (1024 px), la columna derecha de 300 px muestra la tarjeta de tokens y el pie, en ese orden. Queda fija al hacer scroll, como la izquierda, y si no entra en la pantalla tiene scroll propio.
 - [x] **RC-02** **Tokens de temporada como "Próximamente":** la tarjeta tiene el estilo del prototipo, con fondo `--surface`, borde, radio de 12 px, el título "Season tokens" y la explicación de cómo se ganan y se gastan. No muestra saldo, temporada ni días restantes (Q1). Un sello "Coming soon" deja claro que todavía no existe.
 - [x] **RC-03** **Pie:** muestra Rules, Privacy, Terms, Accessibility, About, Careers y Press, más el copyright. Cada link funciona como un elemento deshabilitado de H-26: se puede enfocar, se anuncia como no disponible y al activarlo muestra "Coming soon".
 - [x] **RC-04** **Accesibilidad:**
