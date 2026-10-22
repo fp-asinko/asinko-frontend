@@ -10,6 +10,7 @@ import { ComposerPlaceholder } from './composer-placeholder'
 import { FeedFilters } from './feed-filters'
 import { FeedTabs } from './feed-tabs'
 import { FeedItems } from './feed-items'
+import { Impressions } from './impression-tracker'
 import { LoadMore } from './load-more'
 import {
   ChartBarIcon,
@@ -26,6 +27,8 @@ export type FeedState =
       status: 'ok'
       items: FeedItem[]
       nextCursor: string | null
+      /** The page the impressions refer to (specs/explore-v1); none, none reported. */
+      requestId?: string | null
     }
   | { status: 'needs-account' }
 
@@ -85,13 +88,15 @@ export function FeedListView({
           <EmptyFeed params={params} communityHandle={communityHandle} />
         ) : (
           <>
-            <ul className="divide-y">
-              <FeedItems
-                items={items}
-                feedCommunity={params.community}
-                menus={Boolean(params.author)}
-              />
-            </ul>
+            <Impressions requestId={state.status === 'ok' ? state.requestId : null}>
+              <ul className="divide-y">
+                <FeedItems
+                  items={items}
+                  feedCommunity={params.community}
+                  menus={Boolean(params.author)}
+                />
+              </ul>
+            </Impressions>
             {state.status === 'ok' && state.nextCursor && (
               <LoadMore params={params} cursor={state.nextCursor} />
             )}

@@ -36,7 +36,8 @@ export function FeedReasonLine({ reason }: { reason: FeedReason }) {
               community: (chunks) => (
                 <Link
                   href={reason.community.path}
-                  className="rounded-sm font-semibold text-foreground outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+                  // The ring is cut by the line's truncate: the underline carries the focus too.
+                  className="rounded-sm font-semibold text-foreground underline-offset-2 outline-none hover:underline focus-visible:underline focus-visible:decoration-2 focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
                   {chunks}
                 </Link>

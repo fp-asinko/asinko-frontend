@@ -68,6 +68,7 @@ async function CommunityFeedList({ params, handle }: { params: FeedParams; handl
         status: 'ok',
         items: page.items,
         nextCursor: page.nextCursor,
+        requestId: page.requestId,
       }}
       communityHandle={handle}
     />

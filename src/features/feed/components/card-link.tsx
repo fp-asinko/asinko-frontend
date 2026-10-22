@@ -5,8 +5,11 @@ import type { ComponentProps, MouseEvent } from 'react'
 import { useRouter } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 
-/** What keeps its own click inside a card: its buttons, links, fields and the comments preview. */
-const OWN_CLICK =
+/**
+ * What keeps its own click inside a card: its buttons, links, fields and the comments preview.
+ * The impressions read it too, to tell a click that opens the post (specs/explore-v1 EX-06).
+ */
+export const OWN_CLICK =
   'a, button, input, textarea, select, summary, label, [role="button"], [role="menuitem"], [data-card-own-click]'
 
 /**

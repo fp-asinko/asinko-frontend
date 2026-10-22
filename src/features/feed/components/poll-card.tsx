@@ -38,6 +38,8 @@ export function PollCard({
     <article
       className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
       aria-labelledby={`poll-${poll.id}`}
+      // Seen in the impressions; a poll has no page to open yet (specs/explore-v1).
+      data-content-id={poll.id}
     >
       {/* Why Explore shows it (specs/explore-v1). */}
       {poll.reason && <FeedReasonLine reason={poll.reason} />}

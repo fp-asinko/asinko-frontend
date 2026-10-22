@@ -67,7 +67,7 @@ Por eso las impresiones van por una **ruta propia de Next**, `POST /api/impressi
 
 La ruta:
 
-1. Acepta solo `POST` con `Content-Type: application/json` (el `Blob` del beacon lo manda así) y un cuerpo de hasta 16 KB. Más grande: `413`.
+1. Acepta solo `POST` con `Content-Type: text/plain` o `application/json` y un cuerpo de hasta 16 KB. Más grande: `413`; otro tipo: `415`. _Cambio al implementar (2026-10-22): el beacon va como `text/plain`, el único tipo que todos los navegadores aceptan en `sendBeacon`; la protección es el chequeo de origen del paso 2, no el tipo._
 2. Verifica que `Origin` sea el propio sitio, como Next hace con las Server Actions (CSRF). Si no: `403`.
 3. Valida el cuerpo con `impressionsSchema` (zod): `{ requestId: uuid, events: [{ contentId: uuid, type: 'SEEN' | 'OPEN', dwellMs?: int 0–3.600.000 }] }`, de 1 a 100 eventos. Si no cumple: `400`.
 4. Lee la sesión con `getViewer()` y llama a `reportImpressions(viewer?.id ?? null, body)` de `features/feed/lib/impressions-api.ts` (`server-only`), que hace `POST /api/v1/feed/impressions` con `noContentSchema`. El `userId` nunca viene del navegador (EX-08).
@@ -125,5 +125,5 @@ El tracker y la cola son unas 120 líneas sin dependencias, cargadas en toda rut
 ## 6. Accesibilidad
 
 - La línea es texto dentro del `article`, antes del título: se lee primero y no cambia los encabezados.
-- El link de la comunidad tiene su nombre accesible del texto (`#macro`) y foco visible. A 360 px la línea se corta en una sola línea con `truncate`, y el link conserva un área táctil de al menos 24 px de alto.
+- El link de la comunidad tiene su nombre accesible del texto (`#macro`) y foco visible: el anillo y, como `truncate` lo recorta, también el subrayado. A 360 px la línea se corta en una sola línea con `truncate`. El link mide lo que su texto (unos 18 px): cumple WCAG 2.5.8 por la excepción de link dentro de una oración y por su separación (la línea tiene 24 px de alto y nada más que tocar alrededor).
 - Sin animación propia.

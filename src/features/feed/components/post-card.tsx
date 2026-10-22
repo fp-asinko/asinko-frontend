@@ -82,6 +82,9 @@ export function PostCard({
       ? {}
       : {
           href: post.path,
+          // What the impressions read: which post, and the path that opens it (specs/explore-v1).
+          'data-content-id': post.id,
+          'data-content-path': post.path,
           // A rounded box, as Reddit's: the text 12px inside it and 4px clear of the lines between
           // cards (from md). Inside the column, not past it: the list clips what overflows.
           className:

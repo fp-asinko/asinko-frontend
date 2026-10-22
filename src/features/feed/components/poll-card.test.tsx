@@ -13,6 +13,17 @@ vi.mock('../actions/vote-comment.action', () => ({ voteComment: vi.fn() }))
 vi.mock('../actions/vote-poll.action', () => ({ votePoll: vi.fn() }))
 
 describe('PollCard (H-13)', () => {
+  it('says why Explore shows it before the header, and carries its id for the impressions (specs/explore-v1)', () => {
+    const poll = pollItem({ reason: { type: 'country', countryCode: 'AR' } })
+    renderWithIntl(<PollCard poll={poll} />)
+    const line = screen.getByText('Popular in Argentina')
+    const article = screen.getByRole('article')
+    expect(article.firstElementChild).toContainElement(line)
+    expect(article).toHaveAttribute('data-content-id', poll.id)
+    // A poll has no page to open yet: no path.
+    expect(article).not.toHaveAttribute('data-content-path')
+  })
+
   it('offers "⋯" to feature it only on your own profile (specs/backend-answer-1020 BA-04)', () => {
     const name = 'Options for the poll Where does $BTC close 2026?'
     const { unmount } = renderWithIntl(<PollCard poll={pollItem()} />)

@@ -8,7 +8,13 @@ import { FeedItems } from '../components/feed-items'
 import { getFeed } from '../lib/feed-api'
 import { loadMoreSchema } from '../schemas/load-more.schema'
 
-type NextPage = { items: ReactNode; count: number; nextCursor: string | null }
+type NextPage = {
+  items: ReactNode
+  count: number
+  nextCursor: string | null
+  /** This page's own, for its impressions (specs/explore-v1 EX-07). */
+  requestId: string | null
+}
 
 /**
  * The next page of the Home feed (H-16), already rendered on the server: the cards, their
@@ -24,7 +30,7 @@ export async function loadMoreFeed(raw: unknown): Promise<ActionResult<NextPage>
   const result = await getFeed(params, cursor, { signedIn })
   if (!result.ok) return { ok: false, error: result.errorKey }
 
-  const { items, nextCursor } = result.data
+  const { items, nextCursor, requestId } = result.data
   return {
     ok: true,
     data: {
@@ -38,6 +44,7 @@ export async function loadMoreFeed(raw: unknown): Promise<ActionResult<NextPage>
       ),
       count: items.length,
       nextCursor,
+      requestId,
     },
   }
 }

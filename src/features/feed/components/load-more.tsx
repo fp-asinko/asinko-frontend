@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react'
 import { loadMoreFeed } from '../actions/load-more-feed.action'
 import type { FeedParams } from '../schemas/feed-params.schema'
+import { Impressions } from './impression-tracker'
 
 /**
  * Infinite scroll of the feed (H-16). When the button comes into view (IntersectionObserver) or is
@@ -16,7 +17,8 @@ import type { FeedParams } from '../schemas/feed-params.schema'
 export function LoadMore({ params, cursor }: { params: FeedParams; cursor: string }) {
   const t = useTranslations('feed.loadMore')
   const locale = useLocale()
-  const [pages, setPages] = useState<ReactNode[]>([])
+  // Each page with its own requestId, for its impressions (specs/explore-v1 EX-07).
+  const [pages, setPages] = useState<{ items: ReactNode; requestId: string | null }[]>([])
   const [next, setNext] = useState<string | null>(cursor)
   const [announcement, setAnnouncement] = useState('')
   const [failed, setFailed] = useState(false)
@@ -35,7 +37,8 @@ export function LoadMore({ params, cursor }: { params: FeedParams; cursor: strin
         setFailed(true)
         return
       }
-      setPages((loaded) => [...loaded, result.data.items])
+      const { items, requestId } = result.data
+      setPages((loaded) => [...loaded, { items, requestId }])
       setNext(result.data.nextCursor)
       setAnnouncement(t('loaded', { count: result.data.count }))
     })
@@ -67,13 +70,14 @@ export function LoadMore({ params, cursor }: { params: FeedParams; cursor: strin
   return (
     <>
       {pages.map((page, index) => (
-        <ul
-          key={index}
-          ref={index === pages.length - 1 ? lastPage : undefined}
-          className="stagger divide-y border-t [&_article]:outline-none [&_article:focus-visible]:ring-3 [&_article:focus-visible]:ring-ring/50 [&_article:focus-visible]:ring-inset"
-        >
-          {page}
-        </ul>
+        <Impressions key={index} requestId={page.requestId}>
+          <ul
+            ref={index === pages.length - 1 ? lastPage : undefined}
+            className="stagger divide-y border-t [&_article]:outline-none [&_article:focus-visible]:ring-3 [&_article:focus-visible]:ring-ring/50 [&_article:focus-visible]:ring-inset"
+          >
+            {page.items}
+          </ul>
+        </Impressions>
       ))}
       <p role="status" className="sr-only">
         {announcement}

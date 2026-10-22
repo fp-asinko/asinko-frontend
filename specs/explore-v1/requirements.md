@@ -1,6 +1,6 @@
 # Explore v1: "por qué ves esto" e impresiones — Requirements
 
-> **Estado:** aprobado por el PO el 2026-10-22, con Q1 a Q4 como se recomendaron. Pedido del mismo día para cerrar el batch 1 (MVP-201 y MVP-144, sprint MVP-2): es lo que `specs/backend-answer-1020` dejó fuera de alcance (su Q2).
+> **Estado:** implementado y cerrado el 2026-10-22. Aprobado por el PO el mismo día, con Q1 a Q4 como se recomendaron. Pedido del mismo día para cerrar el batch 1 (MVP-201 y MVP-144, sprint MVP-2): es lo que `specs/backend-answer-1020` dejó fuera de alcance (su Q2).
 > **Fuente:** `docs/references/api/responses/2026-10-20-backend.md` § 7 y `HANDOFF-frontend.md` de `asinko-app` (rama `dev`, 2026-10-22).
 > **Verificado contra `dev` el 2026-10-22** (con `GET` públicos y leyendo el código del backend):
 >
@@ -34,18 +34,18 @@ Que el Home explique por qué muestra cada post de Explore, y que el backend sep
 
 ### Impresiones (Q4)
 
-- [ ] **EX-05** **Visto (`SEEN`):** una tarjeta de un feed con `requestId` (Q4) que estuvo visible al menos al 50 % durante 1 segundo seguido cuenta como vista, una vez por tarjeta y por página cargada. `dwellMs` es el tiempo que estuvo visible.
-- [ ] **EX-06** **Abierto (`OPEN`):** abrir el post desde su tarjeta (la tarjeta, el título, la imagen o los comentarios) cuenta como abierto. Votar, compartir, unirse o seguir un link de la tarjeta (una mención, la comunidad, el autor) no lo es.
-- [ ] **EX-07** Los eventos se mandan **en lotes** de hasta 100, cada uno con el `requestId` de su página: una página cargada con "Cargar más" lleva el suyo. Lo visto **no se pierde al salir**: cambiar de pestaña, navegar a otra página de Asinko o cerrar la pestaña manda lo pendiente.
-- [ ] **EX-08** El navegador nunca llama a la API (`api-integration.md`): los eventos pasan por el servidor de `asinko-web`. El `userId` sale de la sesión en el servidor, nunca del navegador; sin sesión va `null`. El cuerpo se valida con zod antes de mandarlo.
-- [ ] **EX-09** Una impresión que falla **no se nota**: ni un mensaje ni un cambio en la página, y no se reintenta en bucle. Una página sin `requestId` (vacía) no manda nada.
-- [ ] **EX-10** Sin datos personales: solo los ids del contenido, el tipo de evento y el tiempo. Nada en logs ni en Sentry más allá del endpoint y el código de error.
+- [x] **EX-05** **Visto (`SEEN`):** una tarjeta de un feed con `requestId` (Q4) que estuvo visible al menos al 50 % durante 1 segundo seguido cuenta como vista, una vez por tarjeta y por página cargada. `dwellMs` es el tiempo que estuvo visible.
+- [x] **EX-06** **Abierto (`OPEN`):** abrir el post desde su tarjeta (la tarjeta, el título, la imagen o los comentarios) cuenta como abierto. Votar, compartir, unirse o seguir un link de la tarjeta (una mención, la comunidad, el autor) no lo es.
+- [x] **EX-07** Los eventos se mandan **en lotes** de hasta 100, cada uno con el `requestId` de su página: una página cargada con "Cargar más" lleva el suyo. Lo visto **no se pierde al salir**: cambiar de pestaña, navegar a otra página de Asinko o cerrar la pestaña manda lo pendiente.
+- [x] **EX-08** El navegador nunca llama a la API (`api-integration.md`): los eventos pasan por el servidor de `asinko-web`. El `userId` sale de la sesión en el servidor, nunca del navegador; sin sesión va `null`. El cuerpo se valida con zod antes de mandarlo.
+- [x] **EX-09** Una impresión que falla **no se nota**: ni un mensaje ni un cambio en la página, y no se reintenta en bucle. Una página sin `requestId` (vacía) no manda nada.
+- [x] **EX-10** Sin datos personales: solo los ids del contenido, el tipo de evento y el tiempo. Nada en logs ni en Sentry más allá del endpoint y el código de error.
 
 ### Calidad
 
-- [ ] **EX-11** Mobile first a 360 px; axe sin violaciones en claro y oscuro; `prefers-reduced-motion` respetado (la línea no se anima).
-- [ ] **EX-12** Presupuesto de JS (`seo.md`): el observador de impresiones es código cliente en todas las rutas con feed. Se mide antes y después, y la ruta más pesada (perfil, 231,7 KB) sigue por debajo de 240 KB.
-- [ ] **EX-13** Los mocks (`API_MOCKS=true`) traen `reason` variados y `requestId`, y simulan `POST /feed/impressions` (`204`). `pnpm api:smoke` valida `reason` y `requestId` contra `dev`. El snapshot del contrato suma lo adoptado.
+- [x] **EX-11** Mobile first a 360 px; axe sin violaciones en claro y oscuro; `prefers-reduced-motion` respetado (la línea no se anima).
+- [x] **EX-12** Presupuesto de JS (`seo.md`): el observador de impresiones es código cliente en todas las rutas con feed. Se mide antes y después, y la ruta más pesada (perfil, 231,7 KB) sigue por debajo de 240 KB.
+- [x] **EX-13** Los mocks (`API_MOCKS=true`) traen `reason` variados y `requestId`, y simulan `POST /feed/impressions` (`204`). `pnpm api:smoke` valida `reason` y `requestId` contra `dev`. El snapshot del contrato suma lo adoptado.
 
 ## Fuera de alcance
 

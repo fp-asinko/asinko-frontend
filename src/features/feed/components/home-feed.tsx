@@ -83,6 +83,7 @@ async function FeedList({
         status: 'ok',
         items: result.data.items,
         nextCursor: result.data.nextCursor,
+        requestId: result.data.requestId,
       }
     : { status: 'needs-account' }
 

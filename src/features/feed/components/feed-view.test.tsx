@@ -1,4 +1,5 @@
 import { screen, within } from '@testing-library/react'
+import type { ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { pollItem, postItem } from '../feed-items.fixture'
@@ -38,6 +39,10 @@ vi.mock('../actions/load-comments-preview.action', () => ({ loadCommentsPreview:
 vi.mock('../actions/vote-post.action', () => ({ votePost: vi.fn() }))
 vi.mock('../actions/vote-comment.action', () => ({ voteComment: vi.fn() }))
 vi.mock('../actions/vote-poll.action', () => ({ votePoll: vi.fn() }))
+vi.mock('./impression-tracker', () => ({
+  Impressions: ({ requestId, children }: { requestId?: string | null; children: ReactNode }) =>
+    requestId ? <div data-impressions={requestId}>{children}</div> : children,
+}))
 vi.mock('../actions/load-more-feed.action', () => ({ loadMoreFeed: vi.fn() }))
 
 const params = (raw: Record<string, string> = {}) => parseFeedParams(raw)
@@ -55,6 +60,26 @@ describe('FeedTop and FeedListView, as the page composes them', () => {
     const cards = screen.getAllByRole('article')
     expect(cards).toHaveLength(2)
     expect(within(cards[1]!).getByText('Poll')).toBeInTheDocument()
+  })
+
+  it('reports the impressions of a page with a requestId only (specs/explore-v1)', () => {
+    const params = parseFeedParams({})
+    const { container, rerender } = renderWithIntl(
+      <FeedListView
+        params={params}
+        state={{ status: 'ok', items: [postItem()], nextCursor: null, requestId: 'page-1' }}
+      />,
+    )
+    const tracked = container.querySelector('[data-impressions="page-1"]')
+    expect(tracked?.querySelector('ul article')).toBeInTheDocument()
+
+    rerender(
+      <FeedListView
+        params={params}
+        state={{ status: 'ok', items: [postItem()], nextCursor: null, requestId: null }}
+      />,
+    )
+    expect(container.querySelector('[data-impressions]')).toBeNull()
   })
 
   it('offers to load more only when there is a next page (H-16)', () => {

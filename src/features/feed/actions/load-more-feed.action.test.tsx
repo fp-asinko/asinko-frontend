@@ -31,7 +31,12 @@ describe('loadMoreFeed (H-16)', () => {
   it('asks for the next page with the validated feed state and renders it', async () => {
     deps.getFeed.mockResolvedValue({
       ok: true,
-      data: { items: [postItem(), postItem({ id: 'post-2' })], nextCursor: 'c3', community: null },
+      data: {
+        items: [postItem(), postItem({ id: 'post-2' })],
+        nextCursor: 'c3',
+        community: null,
+        requestId: 'page-2',
+      },
     })
     const result = await loadMoreFeed({ feed: 'nope', filter: 'polls', cursor: 'c2', locale: 'es' })
 
@@ -41,7 +46,11 @@ describe('loadMoreFeed (H-16)', () => {
       'c2',
       { signedIn: false },
     )
-    expect(result).toMatchObject({ ok: true, data: { count: 2, nextCursor: 'c3' } })
+    // Its own requestId, for its impressions (specs/explore-v1 EX-07).
+    expect(result).toMatchObject({
+      ok: true,
+      data: { count: 2, nextCursor: 'c3', requestId: 'page-2' },
+    })
   })
 
   it('tells getFeed whether there is a session, for the join buttons (CF-12)', async () => {

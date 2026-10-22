@@ -1,5 +1,6 @@
 import { act, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { parseFeedParams } from '../schemas/feed-params.schema'
@@ -7,6 +8,12 @@ import { LoadMore } from './load-more'
 
 const action = vi.hoisted(() => ({ loadMoreFeed: vi.fn() }))
 vi.mock('../actions/load-more-feed.action', () => action)
+// Which page reports its impressions, and with which requestId (specs/explore-v1 EX-07).
+vi.mock('./impression-tracker', () => ({
+  Impressions: ({ requestId, children }: { requestId: string | null; children: ReactNode }) => (
+    <div data-impressions={requestId ?? 'none'}>{children}</div>
+  ),
+}))
 
 /** jsdom has no IntersectionObserver: a stand-in that lets the test scroll the button into view. */
 const observers: Array<(entries: Array<{ isIntersecting: boolean }>) => void> = []
@@ -18,9 +25,9 @@ class FakeObserver {
   disconnect() {}
 }
 
-const page = (label: string, nextCursor: string | null) => ({
+const page = (label: string, nextCursor: string | null, requestId: string | null = null) => ({
   ok: true,
-  data: { items: <li>{label}</li>, count: 1, nextCursor },
+  data: { items: <li>{label}</li>, count: 1, nextCursor, requestId },
 })
 
 describe('LoadMore (H-16)', () => {
@@ -57,6 +64,20 @@ describe('LoadMore (H-16)', () => {
     await act(async () => observers.at(-1)!([{ isIntersecting: true }]))
     expect(await screen.findByText('Card 41')).toBeInTheDocument()
     expect(action.loadMoreFeed).toHaveBeenLastCalledWith(expect.objectContaining({ cursor: 'c2' }))
+  })
+
+  it('reports each page with its own requestId, and none without one (specs/explore-v1)', async () => {
+    action.loadMoreFeed.mockResolvedValueOnce(page('Card 21', 'c2', 'page-2'))
+    action.loadMoreFeed.mockResolvedValueOnce(page('Card 41', null, null))
+    const { container } = renderWithIntl(<LoadMore params={parseFeedParams({})} cursor="c1" />)
+
+    await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
+    await screen.findByText('Card 21')
+    await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
+    await screen.findByText('Card 41')
+    const pages = [...container.querySelectorAll('[data-impressions]')]
+    expect(pages.map((each) => each.getAttribute('data-impressions'))).toEqual(['page-2', 'none'])
+    expect(pages[0]).toHaveTextContent('Card 21')
   })
 
   it('disappears when there are no more pages', async () => {

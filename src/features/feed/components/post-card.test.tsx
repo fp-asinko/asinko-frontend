@@ -55,6 +55,18 @@ describe('PostCard (H-12)', () => {
     expect(screen.queryByText('Popular in Argentina')).not.toBeInTheDocument()
   })
 
+  it('carries its id and path for the impressions on a card, not on its own page (specs/explore-v1)', () => {
+    const post = postItem()
+    const { unmount } = renderWithIntl(<PostCard post={post} />)
+    const card = screen.getByRole('article')
+    expect(card).toHaveAttribute('data-content-id', post.id)
+    expect(card).toHaveAttribute('data-content-path', post.path)
+    unmount()
+
+    renderWithIntl(<PostCard post={post} variant="detail" />)
+    expect(screen.getByRole('article')).not.toHaveAttribute('data-content-id')
+  })
+
   it('links the community in the byline', () => {
     renderWithIntl(<PostCard post={postItem({ body: 'No mentions here.' })} />)
     expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/asset/BTC')

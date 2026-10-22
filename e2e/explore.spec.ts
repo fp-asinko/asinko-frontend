@@ -41,7 +41,12 @@ test.describe('Explore: why it shows a card', () => {
     await expectNoA11yViolations(page)
 
     // The community's link leads to its page, not to the post.
-    await feed.getByRole('link', { name: '#macro' }).first().click()
+    // The line's own link, not the card header's (both go to the group).
+    await feed
+      .getByText(/^Because you follow #macro$/)
+      .first()
+      .getByRole('link', { name: '#macro' })
+      .click()
     await expect(page).toHaveURL(/\/en\/hub\/macro$/)
   })
 
