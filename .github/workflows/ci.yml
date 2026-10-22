@@ -84,6 +84,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
+          # setup-node v5 caches on its own when package.json has packageManager: off here.
+          package-manager-cache: false
       # No pnpm cache here: this job never installs, so the store does not exist and the cache
       # post step fails. pnpm audit only reads the lockfile.
       # A high or critical vulnerability blocks the merge (libraries.md).
