@@ -8,7 +8,9 @@ import type { CommunityWidget } from '../../../communities.types'
 
 /** The window comes on first use: only a moderator ever opens it (seo.md). */
 const loadDialog = () => import('./edit-widgets-dialog').then((module) => module.EditWidgetsDialog)
-const EditWidgetsDialog = dynamic(loadDialog)
+// ssr: false gives it its own Suspense: while its code comes, the nearest one (a feed's) does not
+// go back to its skeleton (the PO saw Share "loading", 2026-10-21). It opens on a click: no SSR.
+const EditWidgetsDialog = dynamic(loadDialog, { ssr: false })
 
 /** From lg the window; under it the full screen, as "Edit profile". */
 const DESKTOP = '(min-width: 1024px)'

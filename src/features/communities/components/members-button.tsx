@@ -5,7 +5,9 @@ import { useRef, useState, type ReactNode } from 'react'
 
 /** The window comes on first use: most visits never open it (seo.md). */
 const loadDialog = () => import('./follow-list-dialog').then((module) => module.FollowListDialog)
-const FollowListDialog = dynamic(loadDialog)
+// ssr: false gives it its own Suspense: while its code comes, the nearest one (a feed's) does not
+// go back to its skeleton (the PO saw Share "loading", 2026-10-21). It opens on a click: no SSR.
+const FollowListDialog = dynamic(loadDialog, { ssr: false })
 
 const DESKTOP = '(min-width: 48rem)'
 

@@ -10,7 +10,9 @@ import type { EditableProfile, EditProfileField } from '../communities.types'
 
 /** The window comes on first use: nobody else's profile pays for it (seo.md). */
 const loadDialog = () => import('./edit-profile-dialog').then((module) => module.EditProfileDialog)
-const EditProfileDialog = dynamic(loadDialog)
+// ssr: false gives it its own Suspense: while its code comes, the nearest one (a feed's) does not
+// go back to its skeleton (the PO saw Share "loading", 2026-10-21). It opens on a click: no SSR.
+const EditProfileDialog = dynamic(loadDialog, { ssr: false })
 
 /** From md the window; under it the full screen, as the post editor. */
 const DESKTOP = '(min-width: 768px)'

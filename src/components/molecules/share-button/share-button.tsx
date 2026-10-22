@@ -7,7 +7,9 @@ import { useEffect, useRef, useState, type ComponentProps } from 'react'
 
 /** The window comes on first use (specs/share-menu SM-07). */
 const loadDialog = () => import('./share-dialog').then((module) => module.ShareDialog)
-const ShareDialog = dynamic(loadDialog)
+// ssr: false gives it its own Suspense: while its code comes, the nearest one (a feed's) does not
+// go back to its skeleton (the PO saw Share "loading", 2026-10-21). It opens on a click: no SSR.
+const ShareDialog = dynamic(loadDialog, { ssr: false })
 
 type State = 'idle' | 'copied' | 'failed'
 

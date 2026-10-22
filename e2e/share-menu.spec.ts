@@ -47,6 +47,29 @@ test.describe('Share window', () => {
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(link)
   })
 
+  test('from the feed it opens over it: the feed never goes back to its skeleton (a bug)', async ({
+    page,
+  }) => {
+    await page.goto('/en')
+    const feed = page.getByRole('main')
+    await feed.getByRole('article').first().waitFor()
+    // Watched from the click on: a skeleton of the feed at any moment is the bug.
+    await page.evaluate(() => {
+      const seen = { skeleton: false }
+      ;(window as unknown as { seen: typeof seen }).seen = seen
+      new MutationObserver(() => {
+        if (document.querySelector('main [data-slot=skeleton]')) seen.skeleton = true
+      }).observe(document.body, { childList: true, subtree: true })
+    })
+    await feed.getByRole('button', { name: 'Share' }).first().click()
+    await expect(page.getByRole('dialog', { name: 'Share post' })).toBeVisible()
+    expect(
+      await page.evaluate(
+        () => (window as unknown as { seen: { skeleton: boolean } }).seen.skeleton,
+      ),
+    ).toBe(false)
+  })
+
   test('Esc closes it and the focus goes back to Share (SM-05)', async ({ page }) => {
     const { share, dialog } = await openWindow(page)
     await page.keyboard.press('Escape')
