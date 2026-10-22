@@ -2,6 +2,7 @@ import { WIDGET_LIMITS as L, WIDGET_TYPES, type RawWidget } from '@/lib/api/cont
 import { MOCK_STORAGE_HOST } from '@/lib/uploads/mock-storage'
 import { DEMO_USER } from './demo-user'
 import { communityById, communityBySlug, communitySummary } from './fixtures/communities'
+import { GROUP_WIDGETS } from './fixtures/widget-seeds'
 import type { MockResponse } from './types'
 
 // A group's widgets (P-028, proposal, specs/community-widgets): in this process's memory, by
@@ -10,6 +11,8 @@ import type { MockResponse } from './types'
 
 /** The image a mocked widget upload answers (P-029): a fixture, nothing leaves the server. */
 export const MOCK_WIDGET_IMAGE = '/mocks/chart-m2.svg'
+
+export type StoredWidget = Stored
 
 type Stored =
   | Exclude<RawWidget, { type: 'COMMUNITIES' }>
@@ -112,20 +115,8 @@ const SEEDS: Record<string, Stored[]> = {
       ],
     },
   ],
-  macro: [
-    {
-      id: 'w-macro-text',
-      type: 'TEXT',
-      title: 'About macro',
-      body: 'Rates, inflation and central banks. **Cite your sources.**',
-    },
-    {
-      id: 'w-macro-buttons',
-      type: 'BUTTONS',
-      title: 'Useful links',
-      buttons: [{ label: 'FRED', url: 'https://fred.stlouisfed.org' }],
-    },
-  ],
+  // The rest of the groups, as their moderators would have them (fixtures/widget-seeds.ts).
+  ...GROUP_WIDGETS,
 }
 
 const WIDGETS = new Map<string, Stored[]>(Object.entries(SEEDS))

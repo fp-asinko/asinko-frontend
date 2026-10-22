@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { widgetSchema } from '@/lib/api/contract'
 import { DEMO_USER } from './demo-user'
 import { communityBySlug } from './fixtures/communities'
+import { GROUP_WIDGETS } from './fixtures/widget-seeds'
 import { listWidgets, saveWidgets, signCommunityImageUpload } from './widgets'
 
 const me = DEMO_USER.id
@@ -23,9 +24,25 @@ describe('widgets mock (P-028, specs/community-widgets)', () => {
       'CALENDAR',
     ])
     for (const widget of list) expect(widgetSchema.safeParse(widget).success).toBe(true)
-    expect(items('latam')).toEqual([])
+    expect(items('a-group-without-any')).toEqual([])
     // A group of the real backend (the DEV deploy): none yet.
     expect(listWidgets('nowhere')).toEqual({ status: 200, body: { items: [] } })
+  })
+
+  it("seeds dev's real groups and the fixtures' with widgets in the contract", () => {
+    for (const slug of Object.keys(GROUP_WIDGETS)) {
+      const list = items(slug)
+      expect(list.length, slug).toBeGreaterThan(0)
+      for (const widget of list)
+        expect(widgetSchema.safeParse(widget).success, widget.id).toBe(true)
+    }
+    // A list of communities comes resolved, never empty.
+    const crypto = (
+      listWidgets('crypto').body as { items: Array<{ type: string; communities?: unknown[] }> }
+    ).items
+    expect(
+      crypto.find((widget) => widget.type === 'COMMUNITIES')?.communities?.length,
+    ).toBeGreaterThan(0)
   })
 
   it("keeps a real group's widgets in memory for any session's user (phase 3 of the backend)", () => {
