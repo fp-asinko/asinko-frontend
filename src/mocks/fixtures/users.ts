@@ -198,14 +198,20 @@ export function userByUsername(username: string) {
   return PROFILES.find((each) => each.username === username)
 }
 
-/** Short shape embedded in posts and comments. */
+/**
+ * Short shape embedded in posts and comments. The photo is read when the content is read, as the
+ * backend does: a post written before a photo changes shows the new one, never a copy (a race
+ * between e2e tests that change the demo's photo and tests that post).
+ */
 export function summary(username: string): RawUserSummary {
   const user = userByUsername(username)
   if (!user) throw new Error(`Unknown mock user ${username}`)
   return {
     id: user.id,
     username: user.username,
-    avatarUrl: user.avatarUrl,
+    get avatarUrl() {
+      return user.avatarUrl
+    },
     accuracyRate: user.accuracyRate,
   }
 }

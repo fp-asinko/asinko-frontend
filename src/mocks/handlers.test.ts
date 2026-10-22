@@ -460,6 +460,22 @@ describe('mock writes (stateless, demo viewer)', () => {
       expect((await call('GET', '/api/v1/posts/:id', { params: { id } })).status).toBe(200)
     })
 
+    it("shows the author's photo of now, not the one they had when posting (as the backend)", async () => {
+      const demo = PROFILES.find((each) => each.id === DEMO_USER.id)!
+      const before = demo.avatarUrl
+      try {
+        demo.avatarUrl = 'https://example.com/avatar-demo.png'
+        const id = ((await create(valid)).body as { id: string }).id
+        demo.avatarUrl = null
+        const read = await call('GET', '/api/v1/posts/:id', { params: { id } })
+        expect((read.body as { creator: { avatarUrl: string | null } }).creator.avatarUrl).toBe(
+          null,
+        )
+      } finally {
+        demo.avatarUrl = before
+      }
+    })
+
     it('validates as the backend: community, personal channels, title, body and url', async () => {
       const other = PERSONAL_CHANNELS.find((each) => each.slug === 'maria')!
       const own = PERSONAL_CHANNELS.find((each) => each.slug === 'demo')!

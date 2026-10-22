@@ -19,9 +19,16 @@ function community(slug: string) {
   return { communityId: contentCommunity.id, community: contentCommunity }
 }
 
+/** Without accuracyRate; the photo stays read when the poll is (summary). */
 function creator(username: string) {
-  const { accuracyRate: _omit, ...rest } = summary(username)
-  return rest
+  const user = summary(username)
+  return {
+    id: user.id,
+    username: user.username,
+    get avatarUrl() {
+      return user.avatarUrl
+    },
+  }
 }
 
 // Covers: open with visible results, open with results hidden until voting, closed, and voted.
