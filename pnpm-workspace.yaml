@@ -4,3 +4,16 @@ allowBuilds:
   lefthook: false
   sharp: false
   unrs-resolver: false
+
+# Patched versions of transitive dev dependencies that their parents have not picked up yet
+# (pnpm audit in CI). Remove each one once `pnpm why <name>` shows the parent ships the fix.
+overrides:
+  'handlebars@<4.7.10': ^4.7.10 # GHSA-8r5x-fm3f-whwj, GHSA-p8wg-vrv2-v86f, via eslint-plugin-boundaries
+
+# Advisories without a fix yet. Each one only reaches dev tooling, never the site; review them when
+# their package ships a patch.
+auditConfig:
+  ignoreGhsas:
+    # braces <=3.0.3, stack exhaustion with deeply nested patterns (2026-09-18). No patched version
+    # exists. It only expands our own globs (ESLint, shadcn CLI), never user input.
+    - GHSA-vfj7-8cjw-p6xm

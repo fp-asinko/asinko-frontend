@@ -44,9 +44,11 @@ El umbral es un **piso, no un objetivo**: la regla principal sigue siendo "cada 
 ### Stack
 
 ```bash
-pnpm add -D vitest @vitest/coverage-v8 @vitejs/plugin-react jsdom \
+pnpm add -D vitest vite @vitest/coverage-v8 @vitejs/plugin-react jsdom \
   @testing-library/react @testing-library/dom @testing-library/user-event @testing-library/jest-dom
 ```
+
+`vite` va como dependencia directa aunque ya lo traen `vitest` y `@vitejs/plugin-react`: llega como peer, y los `overrides` de pnpm no la alcanzan. Es la forma de fijar una versión parcheada (`pnpm audit`, 2026-10-22).
 
 ```ts
 // vitest.config.mts
