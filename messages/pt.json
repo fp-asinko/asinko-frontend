@@ -221,7 +221,8 @@
         "careers": "Carreiras",
         "press": "Imprensa"
       },
-      "copyright": "Asinko, Inc. © {year}. Todos os direitos reservados."
+      "copyright": "Asinko, Inc. © {year}. Todos os direitos reservados.",
+      "version": "Versão {version}"
     },
     "recent": {
       "title": "Vistos recentemente",

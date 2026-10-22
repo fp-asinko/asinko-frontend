@@ -1,12 +1,14 @@
 import { useNow, useTranslations } from 'next-intl'
 import { ComingSoon } from '@/components/molecules/coming-soon'
+import { APP_VERSION } from '@/lib/app-version'
 import { cn } from '@/lib/utils'
 
 const LINKS = ['rules', 'privacy', 'terms', 'accessibility', 'about', 'careers', 'press'] as const
 
 /**
  * The legal and company links of the prototype (RC-03). None of those pages exists yet: each one is
- * a "Coming soon" control (H-26), opening upwards because it sits at the end of the column.
+ * a "Coming soon" control (H-26), opening upwards because it sits at the end of the column. Then
+ * the copyright and the version running.
  */
 export function SiteFooter({ className }: { className?: string }) {
   const t = useTranslations('rightColumn.footer')
@@ -28,6 +30,10 @@ export function SiteFooter({ className }: { className?: string }) {
         ))}
       </ul>
       <p className="mt-3 type-meta text-muted-foreground">{t('copyright', { year })}</p>
+      {/* Which version is running (PO, 2026-10-21). */}
+      <p className="mt-1 type-meta text-muted-foreground tabular-nums">
+        {t('version', { version: APP_VERSION })}
+      </p>
     </footer>
   )
 }
