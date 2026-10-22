@@ -130,6 +130,8 @@ Además:
 
 ## Ambientes
 
+Qué variable va en cada uno, y la configuración de DEV paso a paso: [`docs/deploy/environment.md`](docs/deploy/environment.md).
+
 | Rama      | Ambiente   | `APP_ENV`     | `API_MOCKS` |
 | --------- | ---------- | ------------- | ----------- |
 | `develop` | DEV        | `development` | `missing`   |
