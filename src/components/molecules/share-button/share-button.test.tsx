@@ -32,6 +32,24 @@ describe('ShareButton (specs/comment-threads CT-11)', () => {
     ).toBeInTheDocument()
   })
 
+  it('keeps an icon alone as it is: a check, and the text in a bubble under it (a bug: it overflowed)', async () => {
+    pointer(false)
+    vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue()
+    renderWithIntl(
+      <ShareButton href="/user/maria" aria-label="Share profile" className="size-8">
+        <svg data-testid="icon" />
+      </ShareButton>,
+    )
+    const button = screen.getByRole('button', { name: 'Share profile' })
+    await userEvent.click(button)
+    // Its name stays; what happened is said once, by the status.
+    expect(screen.getByRole('button', { name: 'Share profile' })).toBe(button)
+    expect(screen.getByRole('status')).toHaveTextContent('Link copied')
+    expect(button).toHaveClass('relative', 'size-8')
+    expect(within(button).getByText('Link copied')).toHaveAttribute('aria-hidden', 'true')
+    expect(within(button).queryByTestId('icon')).toBeNull()
+  })
+
   it("links a comment of this page by its fragment, without the page's query", async () => {
     pointer(false)
     window.history.replaceState(null, '', '/en/post/1/hello?sort=new')

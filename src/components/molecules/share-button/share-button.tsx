@@ -4,6 +4,7 @@ import { CheckIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useRef, useState, type ComponentProps } from 'react'
+import { cn } from '@/lib/utils'
 
 /** The window comes on first use (specs/share-menu SM-07). */
 const loadDialog = () => import('./share-dialog').then((module) => module.ShareDialog)
@@ -19,7 +20,8 @@ type State = 'idle' | 'copied' | 'failed'
  * SM-01); anything else (a comment) goes to the clipboard and the button says so for 2s (announced
  * too). `href` and `post.preview` are paths of the site without the locale (a post's path:
  * /post/1/slug), which get the page's; `href` can also be a fragment of this page (#comment-1). The
- * look comes from where it sits.
+ * look comes from where it sits. An icon alone (named by `aria-label`, as a profile's) keeps its
+ * shape: a check inside, and what happened in a bubble under it (the text overflowed the circle).
  */
 export function ShareButton({
   href,
@@ -43,6 +45,7 @@ export function ShareButton({
     return () => clearTimeout(timer)
   }, [state])
 
+  const iconOnly = Boolean(props['aria-label'])
   const localized = (path: string) => (path.startsWith('/') ? `/${locale}${path}` : path)
 
   async function share() {
@@ -74,12 +77,25 @@ export function ShareButton({
         type="button"
         aria-haspopup={post ? 'dialog' : undefined}
         {...props}
+        // The bubble hangs from the button.
+        className={cn(iconOnly && 'relative', props.className)}
         onClick={share}
         onPointerEnter={post ? () => void loadDialog() : undefined}
         onFocus={post ? () => void loadDialog() : undefined}
       >
         {state === 'idle' ? (
           children
+        ) : iconOnly ? (
+          <>
+            {state === 'copied' ? <CheckIcon aria-hidden /> : children}
+            {/* Said by the status below: here only seen. */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute top-full right-0 z-10 mt-1.5 animate-fade-in rounded-md bg-primary px-2 py-1 type-meta font-semibold whitespace-nowrap text-primary-foreground"
+            >
+              {t(state)}
+            </span>
+          </>
         ) : (
           <>
             {state === 'copied' && <CheckIcon aria-hidden className="size-4" />}
