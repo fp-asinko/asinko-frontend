@@ -25,12 +25,12 @@ Que el Home explique por qué muestra cada post de Explore, y que el backend sep
 
 ### La etiqueta (Q1 a Q3)
 
-- [ ] **EX-01** En el Explore del Home, una tarjeta con un motivo que se muestra (Q1) lleva una línea arriba de la cabecera (Q2):
+- [x] **EX-01** En el Explore del Home, una tarjeta con un motivo que se muestra (Q1) lleva una línea arriba de la cabecera (Q2):
   - `SIMILAR`: "Porque sigues {comunidad}", con el handle de la comunidad de `via` (`#macro`, `$AAPL`) como link a su página;
   - `COUNTRY`: "Popular en {país}" (Q3).
-- [ ] **EX-02** Sin motivo no hay línea, ni espacio reservado: `reason` en `null`, `FOLLOWING` y `TRENDING` (Q1), un `SIMILAR` sin `via` o un `COUNTRY` sin `countryCode`. Un `type` desconocido no rompe la tarjeta: se trata como sin motivo.
-- [ ] **EX-03** Following, los feeds de grupo y de activo, el perfil y el detalle de un post nunca muestran la línea.
-- [ ] **EX-04** La línea se entiende sin color: ícono + texto. Un lector de pantalla la lee como parte de la tarjeta, antes del título. Textos en en, es y pt; el nombre del país sale de `Intl` en el idioma de la página, nunca de una lista propia.
+- [x] **EX-02** Sin motivo no hay línea, ni espacio reservado: `reason` en `null`, `FOLLOWING` y `TRENDING` (Q1), un `SIMILAR` sin `via` o un `COUNTRY` sin `countryCode`. Un `type` desconocido no rompe la tarjeta: se trata como sin motivo.
+- [x] **EX-03** Following, los feeds de grupo y de activo, el perfil y el detalle de un post nunca muestran la línea.
+- [x] **EX-04** La línea se entiende sin color: ícono + texto. Un lector de pantalla la lee como parte de la tarjeta, antes del título. Textos en en, es y pt; el nombre del país sale de `Intl` en el idioma de la página, nunca de una lista propia.
 
 ### Impresiones (Q4)
 
