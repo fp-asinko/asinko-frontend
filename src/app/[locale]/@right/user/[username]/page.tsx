@@ -29,15 +29,15 @@ export default async function ProfileRight({ params }: PageProps<'/[locale]/user
         communities={communities}
         idPrefix="profile-card-aside"
         className="m-3.5 mb-0"
-      />
-      <AchievementsCard
-        achievements={achievements}
-        isSelf={profile.isSelf}
-        name={profile.displayName ?? `@${profile.username}`}
-        achievementsPath={`${communityPath('user', profile.username)}/achievements`}
-        idPrefix="achievements-aside"
-        className="m-3.5 mb-0"
-      />
+      >
+        <AchievementsCard
+          achievements={achievements}
+          isSelf={profile.isSelf}
+          name={profile.displayName ?? `@${profile.username}`}
+          achievementsPath={`${communityPath('user', profile.username)}/achievements`}
+          idPrefix="achievements-aside"
+        />
+      </ProfileCard>
     </RightColumn>
   )
 }

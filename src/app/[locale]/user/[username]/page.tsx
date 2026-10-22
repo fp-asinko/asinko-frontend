@@ -57,15 +57,16 @@ export default async function UserPage({
       <CommunityTop page={page} profile={profile} />
       {/* Without the right column (under lg), the person's card and achievements go here (PA-03,
           specs/profile-achievements AC-05). */}
-      <div className="flex flex-col gap-3 border-b px-4 py-4 sm:px-0 lg:hidden">
-        <ProfileCard profile={profile} communities={communities} idPrefix="profile-card-page" />
-        <AchievementsCard
-          achievements={achievements}
-          isSelf={profile.isSelf}
-          name={profile.displayName ?? `@${profile.username}`}
-          achievementsPath={`${path}/achievements`}
-          idPrefix="achievements-page"
-        />
+      <div className="border-b px-4 py-4 sm:px-0 lg:hidden">
+        <ProfileCard profile={profile} communities={communities} idPrefix="profile-card-page">
+          <AchievementsCard
+            achievements={achievements}
+            isSelf={profile.isSelf}
+            name={profile.displayName ?? `@${profile.username}`}
+            achievementsPath={`${path}/achievements`}
+            idPrefix="achievements-page"
+          />
+        </ProfileCard>
       </div>
       <ProfileShowcase profile={profile} featured={featured} pagePath={path} />
       {/* Theses · Posts · Replies, as X (specs/profile-track-record PT-04, specs/backend-adoption). */}

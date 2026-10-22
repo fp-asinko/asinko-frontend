@@ -19,7 +19,7 @@ Que al entrar a un perfil se vea de un vistazo cuánto acierta la persona y de q
 
 ### La tarjeta (desde desktop, en la columna derecha)
 
-- [x] **PA-01** En un perfil, la columna derecha empieza con una tarjeta: la foto chica y el nombre (o el `@usuario`); debajo, en una grilla de dos columnas, **Precisión**, **Racha**, **Acertadas**, **Erradas**, **Puntos** y **Miembro desde** (mes y año). Sin tesis resueltas, la precisión dice "—" con "Sin tesis resueltas". Después, **Participa en** (PA-05) y, como hoy, "Vistos recientemente" y el pie. Season Tokens no va en el perfil.
+- [x] **PA-01** _Cambio del PO (2026-10-21): sin la foto ni el nombre, que la cabecera ya muestra, y con fondo gris (`--surface`) como las demás tarjetas de la columna, como Reddit; los logros van dentro de la misma tarjeta, después de "Participa en"._ En un perfil, la columna derecha empieza con una tarjeta: la foto chica y el nombre (o el `@usuario`); debajo, en una grilla de dos columnas, **Precisión**, **Racha**, **Acertadas**, **Erradas**, **Puntos** y **Miembro desde** (mes y año). Sin tesis resueltas, la precisión dice "—" con "Sin tesis resueltas". Después, **Participa en** (PA-05) y, como hoy, "Vistos recientemente" y el pie. Season Tokens no va en el perfil.
 - [x] **PA-02** (Q1) Bajo el nombre quedan solo **seguidores** y **seguidos** (siguen abriendo sus listas). La racha y la precisión pasan a la tarjeta.
 
 ### En el teléfono y la tablet

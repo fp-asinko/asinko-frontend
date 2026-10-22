@@ -45,9 +45,11 @@ function stat(card: HTMLElement, label: string) {
 }
 
 describe('ProfileCard (specs/profile-aside PA-01)', () => {
-  it('shows who it is and the numbers of their reputation', () => {
+  it('shows the numbers of their reputation, without repeating the photo and name (PO, 2026-10-21)', () => {
     const card = renderCard()
-    expect(within(card).getByText('@maria')).toBeInTheDocument()
+    // Named for who navigates by regions, but not shown: the header already does.
+    expect(within(card).getByRole('heading', { level: 2 })).toHaveClass('sr-only')
+    expect(within(card).queryByRole('img')).toBeNull()
     expect(stat(card, 'Accuracy')).toHaveTextContent('74%')
     expect(stat(card, 'Streak')).toHaveTextContent('3')
     expect(stat(card, 'Correct')).toHaveTextContent('17')
@@ -59,6 +61,15 @@ describe('ProfileCard (specs/profile-aside PA-01)', () => {
   it('says there is no resolved thesis instead of an accuracy', () => {
     const card = renderCard({ accuracyRate: null })
     expect(stat(card, 'Accuracy')).toHaveTextContent('No resolved theses')
+  })
+
+  it('takes more sections at its end (the achievements)', () => {
+    renderWithIntl(
+      <ProfileCard profile={profileDetails()} communities={[]} idPrefix="t">
+        <section aria-label="More">More</section>
+      </ProfileCard>,
+    )
+    expect(screen.getByRole('region', { name: 'More' })).toBeInTheDocument()
   })
 
   it('shows where they publish, with how many posts', () => {

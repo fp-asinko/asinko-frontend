@@ -1,6 +1,5 @@
 import { useFormatter, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
-import { UserAvatar } from '@/components/molecules/user-avatar'
 import { cn } from '@/lib/utils'
 import type { ActiveCommunity, ProfileDetails } from '../communities.types'
 import { ActiveCommunities } from './active-communities'
@@ -28,9 +27,10 @@ function Stat({ label, children }: { label: string; children: ReactNode }) {
 }
 
 /**
- * A person's card, as Reddit's profile card (specs/profile-aside PA-01, PA-05): who it is, then the
- * numbers of their reputation (accuracy, streak, right and wrong theses, points,
- * member since) and where they publish. In the right column from lg, and in the page under it
+ * A person's card, as Reddit's profile card (specs/profile-aside PA-01, PA-05): the numbers of
+ * their reputation (accuracy, streak, right and wrong theses, points, member since), where they
+ * publish and, after it, their achievements. One gray card, without the photo and name the header
+ * already shows (PO, 2026-10-21). In the right column from lg, and in the page under it
  * (PA-03): the same card, so phones and desktop show the same.
  */
 export function ProfileCard({
@@ -38,9 +38,12 @@ export function ProfileCard({
   communities,
   idPrefix,
   className,
+  children,
 }: {
   profile: CardProfile
   communities: ActiveCommunity[]
+  /** More sections at its end, each after a line (the achievements). */
+  children?: ReactNode
   /** The card shows twice (the page in phones, the column from lg): ids of their own. */
   idPrefix: string
   className?: string
@@ -54,26 +57,15 @@ export function ProfileCard({
   return (
     <section
       aria-labelledby={titleId}
-      className={cn('rounded-xl border bg-card px-3.5 py-4', className)}
+      className={cn('rounded-xl border bg-surface px-3.5 py-4', className)}
     >
-      <div className="flex items-center gap-2.5">
-        <UserAvatar
-          name={`@${profile.username}`}
-          colorKey={profile.username}
-          imageUrl={profile.avatarUrl}
-          size="md"
-        />
-        <div className="min-w-0 flex-1">
-          <h2 id={titleId} className="truncate type-small font-bold">
-            {name}
-          </h2>
-          {profile.displayName && (
-            <p className="truncate type-meta text-muted-foreground">@{profile.username}</p>
-          )}
-        </div>
-      </div>
+      {/* Its photo and name are the header's, right there: not again (PO, 2026-10-21). Still
+          named, for who navigates by regions. */}
+      <h2 id={titleId} className="sr-only">
+        {name}
+      </h2>
 
-      <dl className="mt-4 grid grid-cols-2 gap-x-3 gap-y-3.5 border-t pt-3.5">
+      <dl className="grid grid-cols-2 gap-x-3 gap-y-3.5">
         <Stat label={t('accuracy')}>
           {profile.accuracyRate === null ? (
             <>
@@ -98,6 +90,8 @@ export function ProfileCard({
       </dl>
 
       <ActiveCommunities communities={communities} idPrefix={idPrefix} />
+      {/* More sections of the same card: the achievements (specs/profile-achievements). */}
+      {children}
     </section>
   )
 }

@@ -1,6 +1,6 @@
 import { useFormatter, useTranslations } from 'next-intl'
-import { AsideCard } from '@/components/molecules/aside-card'
 import { Link } from '@/i18n/navigation'
+import { cn } from '@/lib/utils'
 import type { Achievement } from '../communities.types'
 import { AchievementBadge, AchievementProgress, useAchievementName } from './achievement-badge'
 
@@ -50,11 +50,13 @@ export function AchievementsCard({
   const titleId = `${idPrefix}-title`
 
   return (
-    <AsideCard
-      id={titleId}
-      title={earned.length > 0 ? t('cardTitle', { count: earned.length }) : t('title')}
-      action={
-        achievements && (
+    // A section of the profile's card, after a line, as "Participates in" (PO, 2026-10-21).
+    <section aria-labelledby={titleId} className={cn('mt-4 border-t pt-3.5', className)}>
+      <div className="flex min-h-6 items-center justify-between gap-2 pl-2">
+        <h3 id={titleId} className="min-w-0 type-section text-muted-foreground">
+          {earned.length > 0 ? t('cardTitle', { count: earned.length }) : t('title')}
+        </h3>
+        {achievements && (
           <Link
             href={achievementsPath}
             aria-label={t('seeAllLabel', { name })}
@@ -62,56 +64,57 @@ export function AchievementsCard({
           >
             {t('seeAll')}
           </Link>
-        )
-      }
-      className={className}
-    >
-      {achievements === null ? (
-        <p className="type-meta text-muted-foreground">{t('loadError')}</p>
-      ) : earned.length > 0 ? (
-        // A row each, as Reddit's trophy case (PO, 2026-10-21): its mark, its name and when.
-        <ul className="mt-1.5 flex flex-col gap-3">
-          {earned.slice(0, SHOWN).map((each) => (
-            <li key={each.code} className="flex items-center gap-3">
-              <AchievementBadge code={each.code} earned className="size-9 [&_svg]:size-4.5" />
-              <div className="min-w-0">
-                <p className="truncate type-small font-semibold">{achievementName(each)}</p>
-                <time dateTime={each.earnedAt!} className="type-meta text-muted-foreground">
-                  {t('earnedOn', {
-                    date: format.dateTime(new Date(each.earnedAt!), {
-                      month: 'short',
-                      year: 'numeric',
-                    }),
-                  })}
-                </time>
+        )}
+      </div>
+      {/* Aligned with "Participates in": its rows have 8px inside. */}
+      <div className="mt-2 px-2">
+        {achievements === null ? (
+          <p className="type-meta text-muted-foreground">{t('loadError')}</p>
+        ) : earned.length > 0 ? (
+          // A row each, as Reddit's trophy case (PO, 2026-10-21): its mark, its name and when.
+          <ul className="mt-1.5 flex flex-col gap-3">
+            {earned.slice(0, SHOWN).map((each) => (
+              <li key={each.code} className="flex items-center gap-3">
+                <AchievementBadge code={each.code} earned className="size-9 [&_svg]:size-4.5" />
+                <div className="min-w-0">
+                  <p className="truncate type-small font-semibold">{achievementName(each)}</p>
+                  <time dateTime={each.earnedAt!} className="type-meta text-muted-foreground">
+                    {t('earnedOn', {
+                      date: format.dateTime(new Date(each.earnedAt!), {
+                        month: 'short',
+                        year: 'numeric',
+                      }),
+                    })}
+                  </time>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <>
+            <p className="type-meta text-muted-foreground">{t('empty')}</p>
+            {closest && (
+              <div className="mt-3 flex items-center gap-3 border-t pt-3">
+                <AchievementBadge code={closest.code} earned={false} />
+                <div className="min-w-0 flex-1">
+                  <p className="type-meta text-muted-foreground">{t('closest')}</p>
+                  <p className="truncate type-small font-semibold">
+                    {achievementName(closest)}
+                    <span className="sr-only">, {t('locked')}</span>
+                  </p>
+                  {closest.progress && (
+                    <AchievementProgress
+                      code={closest.code}
+                      progress={closest.progress}
+                      className="mt-1"
+                    />
+                  )}
+                </div>
               </div>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <>
-          <p className="type-meta text-muted-foreground">{t('empty')}</p>
-          {closest && (
-            <div className="mt-3 flex items-center gap-3 border-t pt-3">
-              <AchievementBadge code={closest.code} earned={false} />
-              <div className="min-w-0 flex-1">
-                <p className="type-meta text-muted-foreground">{t('closest')}</p>
-                <p className="truncate type-small font-semibold">
-                  {achievementName(closest)}
-                  <span className="sr-only">, {t('locked')}</span>
-                </p>
-                {closest.progress && (
-                  <AchievementProgress
-                    code={closest.code}
-                    progress={closest.progress}
-                    className="mt-1"
-                  />
-                )}
-              </div>
-            </div>
-          )}
-        </>
-      )}
-    </AsideCard>
+            )}
+          </>
+        )}
+      </div>
+    </section>
   )
 }
