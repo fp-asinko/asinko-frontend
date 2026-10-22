@@ -9,6 +9,7 @@ import {
   needsMentionLookup,
   toCardCommunity,
   toFeedItem,
+  toFeedReason,
   toPollItem,
   toPostItem,
 } from './mappers'
@@ -191,5 +192,56 @@ describe('needsMentionLookup (BC-02)', () => {
     expect(needsMentionLookup([{ kind: 'POST', content: post(1) }])).toBe(true)
     const plain = { ...post(1), entities: [] }
     expect(needsMentionLookup([{ kind: 'POST', content: plain }])).toBe(false)
+  })
+})
+
+describe('toFeedReason (specs/explore-v1 Q1, EX-02)', () => {
+  const macro = COMMUNITIES.find((each) => each.slug === 'macro')!
+  const btc = COMMUNITIES.find((each) => each.slug === 'BTC')!
+  const via = (community: typeof macro) => {
+    const { id, slug, name, type, avatarUrl } = community
+    return { id, slug, name, type, avatarUrl }
+  }
+
+  it('names the followed community that brought it, a group or an asset', () => {
+    expect(toFeedReason({ type: 'SIMILAR', via: via(macro), countryCode: null })).toEqual({
+      type: 'similar',
+      community: { handle: '#macro', path: '/hub/macro' },
+    })
+    expect(toFeedReason({ type: 'SIMILAR', via: via(btc), countryCode: null })).toEqual({
+      type: 'similar',
+      community: { handle: '$BTC', path: '/asset/BTC' },
+    })
+  })
+
+  it('keeps the country code of a popular item in the country', () => {
+    expect(toFeedReason({ type: 'COUNTRY', via: null, countryCode: 'AR' })).toEqual({
+      type: 'country',
+      countryCode: 'AR',
+    })
+  })
+
+  it('has no line for what the card already says, nor for an incomplete or unknown reason', () => {
+    for (const reason of [
+      { type: 'FOLLOWING', via: null, countryCode: null },
+      { type: 'TRENDING', via: null, countryCode: null },
+      { type: 'SIMILAR', via: null, countryCode: null },
+      { type: 'COUNTRY', via: null, countryCode: null },
+      { type: 'NEW_POOL', via: via(macro), countryCode: 'AR' },
+      null,
+      undefined,
+    ]) {
+      expect(toFeedReason(reason)).toBeNull()
+    }
+  })
+
+  it('reaches the card only when the feed explains itself', () => {
+    const reason = { type: 'COUNTRY', via: null, countryCode: 'AR' }
+    const item = { kind: 'POST' as const, content: post(1), reason }
+    expect(toFeedItem(item, communities, false, true).reason).toEqual({
+      type: 'country',
+      countryCode: 'AR',
+    })
+    expect(toFeedItem(item, communities).reason).toBeNull()
   })
 })

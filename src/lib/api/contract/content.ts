@@ -137,11 +137,59 @@ export const commentSchema: z.ZodType<RawComment> = z.lazy(() =>
 
 export const commentListSchema = z.object({ items: z.array(commentSchema) })
 
+/**
+ * Why Explore shows an item (backend 2026-10-20, specs/explore-v1 § 1): `via` only with SIMILAR,
+ * `countryCode` only with COUNTRY. `type` stays a string: a new one is no reason, not a broken item.
+ */
+export const feedReasonSchema = z.object({
+  type: z.string(),
+  via: communitySummarySchema.omit({ viewerMembership: true }).nullable(),
+  countryCode: z
+    .string()
+    .regex(/^[A-Z]{2}$/)
+    .nullable()
+    .catch(null),
+})
+
+/** A label, not the content: a malformed reason leaves the item without one (EX-02). */
+const reasonField = feedReasonSchema.nullable().optional().catch(null)
+
 /** Feed item: discriminated by kind (E04). THESIS arrives in phase 2. */
 export const feedItemSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('POST'), content: postSchema }),
-  z.object({ kind: z.literal('POLL'), content: pollSchema }),
+  z.object({ kind: z.literal('POST'), content: postSchema, reason: reasonField }),
+  z.object({ kind: z.literal('POLL'), content: pollSchema, reason: reasonField }),
 ])
+
+/**
+ * A feed page (E04): Following, Explore and a community's feed carry `requestId`, the page the
+ * impressions refer to; null for an empty page. A profile's content does not carry it.
+ */
+export const feedPageSchema = z.object({
+  items: z.array(feedItemSchema),
+  nextCursor: z.string().nullable(),
+  requestId: z.uuid().nullable().optional(),
+})
+
+/** What was seen or opened of a feed page (E4-04): one or both per item, merged by the backend. */
+export const impressionEventSchema = z.object({
+  contentId: z.uuid(),
+  type: z.enum(['SEEN', 'OPEN']),
+  dwellMs: z
+    .number()
+    .int()
+    .min(0)
+    .max(60 * 60 * 1000)
+    .optional(),
+})
+
+export const MAX_IMPRESSION_EVENTS = 100
+
+/** POST /api/v1/feed/impressions: `userId` is the session's, null without one. Answers 204. */
+export const impressionsRequestSchema = z.object({
+  userId: z.uuid().nullable(),
+  requestId: z.uuid(),
+  events: z.array(impressionEventSchema).min(1).max(MAX_IMPRESSION_EVENTS),
+})
 
 /**
  * GET /api/v1/users/{userId}/comments (P-012, backend 2026-10-13): a person's comments, newest
@@ -208,3 +256,6 @@ export type RawPoll = z.infer<typeof pollSchema>
 export type RawEntity = z.infer<typeof entitySchema>
 export type RawCommunitySummary = z.infer<typeof communitySummarySchema>
 export type RawFeedItem = z.infer<typeof feedItemSchema>
+export type RawFeedReason = z.infer<typeof feedReasonSchema>
+export type ImpressionEvent = z.infer<typeof impressionEventSchema>
+export type ImpressionsRequest = z.infer<typeof impressionsRequestSchema>

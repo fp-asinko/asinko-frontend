@@ -5,6 +5,7 @@ import type {
   RawCommunity,
   RawCommunitySummary,
   RawFeedItem,
+  RawFeedReason,
   RawPoll,
   RawPost,
   RawUserSummary,
@@ -14,6 +15,7 @@ import type {
   CardCommunity,
   CommunityRef,
   FeedItem,
+  FeedReason,
   PollItem,
   PollResults,
   PostItem,
@@ -159,10 +161,33 @@ export function toPollResults(poll: RawPoll): PollResults {
   return { options, totalVotes, viewerOptionId, resultsVisible }
 }
 
-export function toFeedItem(item: RawFeedItem, mentions: MentionLookup, signedIn = false): FeedItem {
+/**
+ * The reason a card shows (specs/explore-v1 Q1, EX-02): a community the viewer follows brought it
+ * (SIMILAR, with its `via`), or it is popular in their country (COUNTRY, with its code). FOLLOWING
+ * is already in the card's header and TRENDING is most of the feed: no line for them, nor for
+ * anything incomplete or unknown.
+ */
+export function toFeedReason(reason: RawFeedReason | null | undefined): FeedReason | null {
+  if (reason?.type === 'SIMILAR' && reason.via) {
+    return { type: 'similar', community: mentionOf(reason.via) }
+  }
+  if (reason?.type === 'COUNTRY' && reason.countryCode) {
+    return { type: 'country', countryCode: reason.countryCode }
+  }
+  return null
+}
+
+/** `explained`: the Home's Explore, the only feed that says why it shows a card (EX-03). */
+export function toFeedItem(
+  item: RawFeedItem,
+  mentions: MentionLookup,
+  signedIn = false,
+  explained = false,
+): FeedItem {
+  const reason = explained ? toFeedReason(item.reason) : null
   return item.kind === 'POST'
-    ? toPostItem(item.content, mentions, signedIn)
-    : toPollItem(item.content, signedIn)
+    ? { ...toPostItem(item.content, mentions, signedIn), reason }
+    : { ...toPollItem(item.content, signedIn), reason }
 }
 
 /** Whether a page has mentions that need community slugs to link ($ and #, not @). */

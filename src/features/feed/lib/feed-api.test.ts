@@ -89,6 +89,55 @@ describe('getFeed', () => {
     expect(result.ok).toBe(true)
   })
 
+  it("says why only on the Home's Explore, and passes every page's requestId (specs/explore-v1)", async () => {
+    const explore = await getFeed(parseFeedParams({}))
+    if (!explore.ok) throw new Error('expected ok')
+    const types = new Set(explore.data.items.map((item) => item.reason?.type ?? null))
+    expect(types).toEqual(new Set(['similar', 'country', null]))
+    expect(explore.data.requestId).toMatch(/^[0-9a-f-]{36}$/)
+
+    const elsewhere = [
+      parseFeedParams({ community: 'BTC' }),
+      parseFeedParams({ feed: 'following' }),
+    ]
+    for (const params of elsewhere) {
+      const result = await getFeed(params)
+      if (!result.ok) throw new Error('expected ok')
+      expect(result.data.items.every((item) => item.reason === null)).toBe(true)
+      expect(result.data.requestId).toMatch(/^[0-9a-f-]{36}$/)
+    }
+  })
+
+  it('never shows a reason the backend sends outside Explore (EX-03)', async () => {
+    const reason = { type: 'COUNTRY', via: null, countryCode: 'AR' }
+    state.routes = withRoute('/api/v1/feed/following', {
+      items: [{ kind: 'POST', content: POSTS[0], reason }],
+      nextCursor: null,
+      requestId: null,
+    })
+    const result = await getFeed(parseFeedParams({ feed: 'following' }))
+    if (!result.ok) throw new Error('expected ok')
+    expect(result.data.items[0]?.reason).toBeNull()
+    expect(result.data.requestId).toBeNull()
+  })
+
+  it('has no requestId on a profile, and turns an odd one off instead of failing', async () => {
+    const maria = PROFILES.find((each) => each.username === 'maria')!
+    const profile = await getFeed({ ...parseFeedParams({}), community: 'maria', author: maria.id })
+    if (!profile.ok) throw new Error('expected ok')
+    expect(profile.data.requestId).toBeNull()
+
+    state.routes = withRoute('/api/v1/feed/explore', {
+      items: [{ kind: 'POST', content: POSTS[0] }],
+      nextCursor: null,
+      requestId: 'not-a-uuid',
+    })
+    const odd = await getFeed(parseFeedParams({}))
+    if (!odd.ok) throw new Error('expected ok')
+    expect(odd.data.items).toHaveLength(1)
+    expect(odd.data.requestId).toBeNull()
+  })
+
   it('asks only for posts and polls: theses arrive in phase 2', async () => {
     const queries: Record<string, string>[] = []
     state.routes = MOCK_ROUTES.map((route) =>
@@ -113,7 +162,10 @@ describe('getFeed', () => {
       nextCursor: null,
     })
     const result = await getFeed(parseFeedParams({}))
-    expect(result).toEqual({ ok: true, data: { items: [], nextCursor: null, community: null } })
+    expect(result).toEqual({
+      ok: true,
+      data: { items: [], nextCursor: null, community: null, requestId: null },
+    })
     expect(state.dropped).toEqual([2])
   })
 

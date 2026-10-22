@@ -4,6 +4,7 @@ import { FeatureMenu } from '@/components/organisms/featured'
 import type { PollItem } from '../feed.types'
 import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
+import { FeedReasonLine } from './feed-reason-line'
 import { PollVoting } from './poll-voting'
 import { SeeAllComments } from './see-all-comments'
 
@@ -38,6 +39,8 @@ export function PollCard({
       className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
       aria-labelledby={`poll-${poll.id}`}
     >
+      {/* Why Explore shows it (specs/explore-v1). */}
+      {poll.reason && <FeedReasonLine reason={poll.reason} />}
       <div className="mb-2 flex items-center gap-2.5">
         <div className="min-w-0 flex-1">
           <CardByline

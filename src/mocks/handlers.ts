@@ -7,6 +7,8 @@ import {
   communitySchema,
   favoriteResponseSchema,
   feedItemSchema,
+  feedPageSchema,
+  impressionsRequestSchema,
   joinResponseSchema,
   pollSchema,
   postImageUploadSchema,
@@ -26,12 +28,13 @@ import {
   userSummarySchema,
   voteResultSchema,
   type RawFeedItem,
+  type RawFeedReason,
 } from '@/lib/api/contract'
 import { noContentSchema, paginatedSchema } from '@/lib/api/schemas'
 import { DEMO_USER } from './demo-user'
 import { ASSETS, assetBySymbol } from './fixtures/assets'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
-import { COMMUNITIES, communityBySlug } from './fixtures/communities'
+import { COMMUNITIES, communityBySlug, communitySummary } from './fixtures/communities'
 import { POLLS, pollById } from './fixtures/polls'
 import { POSTS } from './fixtures/posts'
 import { PROFILES, summary } from './fixtures/users'
@@ -89,6 +92,30 @@ function byKind(items: RawFeedItem[], raw: string | undefined) {
 
 /** Communities the demo viewer belongs to (drives the Following feed). */
 const MEMBER_OF = new Set(COMMUNITIES.filter((c) => c.viewerMembership).map((c) => c.id))
+
+/** A page's requestId (specs/explore-v1): a stable uuid per feed and cursor, as opaque as the real one. */
+function requestIdOf(feed: number, cursor: string | undefined) {
+  const offset = cursor ? Number(atob(cursor)) || 0 : 0
+  return `00000000-0000-4000-8000-${String(feed * 1e6 + offset).padStart(12, '0')}`
+}
+
+/** Explore's reasons, in turn (specs/explore-v1 § 4): the four types, as the backend mixes them. */
+function withReason(item: RawFeedItem, index: number): RawFeedItem {
+  const { id, slug, name, type, avatarUrl } = communitySummary('macro')
+  const reasons: RawFeedReason[] = [
+    { type: 'SIMILAR', via: { id, slug, name, type, avatarUrl }, countryCode: null },
+    { type: 'COUNTRY', via: null, countryCode: 'AR' },
+    { type: 'TRENDING', via: null, countryCode: null },
+    { type: 'FOLLOWING', via: null, countryCode: null },
+  ]
+  return { ...item, reason: reasons[index % reasons.length] }
+}
+
+/** A page of a feed, with its requestId; null for an empty one, as the backend. */
+function feedPage(feed: number, items: RawFeedItem[], cursor: string | undefined) {
+  const page = paginate(items, cursor)
+  return { ...page, requestId: page.items.length ? requestIdOf(feed, cursor) : null }
+}
 
 // Registry of mocked endpoints (api-integration.md § Mocks). Handlers follow what the backend does
 // on its dev branch (asinko-app 0cdf243), not only the written contract. API_MOCKS=missing mocks only
@@ -397,20 +424,28 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     path: '/api/v1/feed/explore',
     kind: 'contract',
     implemented: true,
-    schema: paginatedSchema(feedItemSchema),
+    schema: feedPageSchema,
     example: noRequest,
-    // The feed the Home asks for: checks Post and Poll (community, commentCount) on the real API.
+    // The feed the Home asks for: checks Post and Poll (community, commentCount), reason and
+    // requestId on the real API.
     liveExample: { ...noRequest, query: { kind: 'POST,POLL' } },
     handler: ({ query }) => {
       // Backend dev: an unknown community answers an empty page, not a 404.
       if (query.community && !communityBySlug(query.community)) {
-        return { status: 200, body: { items: [], nextCursor: null } }
+        return { status: 200, body: { items: [], nextCursor: null, requestId: null } }
       }
       const community = query.community ? communityBySlug(query.community) : undefined
+      // A community's feed has no reason: only the Home's Explore says why (specs/explore-v1).
       const items = community
-        ? FEED.filter((item) => item.content.communityId === community.id)
-        : FEED
-      return { status: 200, body: paginate(byKind(items, query.kind), query.cursor) }
+        ? FEED.filter((item) => item.content.communityId === community.id).map((item) => ({
+            ...item,
+            reason: null,
+          }))
+        : FEED.map(withReason)
+      return {
+        status: 200,
+        body: feedPage(community ? 2 : 1, byKind(items, query.kind), query.cursor),
+      }
     },
   },
   {
@@ -418,13 +453,34 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     path: '/api/v1/feed/following',
     kind: 'contract',
     implemented: true,
-    schema: paginatedSchema(feedItemSchema),
+    schema: feedPageSchema,
     example: noRequest,
     // With mocks the viewer is always the demo user (src/lib/session.ts).
     handler: ({ query }) => {
-      const items = FEED.filter((item) => MEMBER_OF.has(item.content.communityId))
-      return { status: 200, body: paginate(byKind(items, query.kind), query.cursor) }
+      const items = FEED.filter((item) => MEMBER_OF.has(item.content.communityId)).map((item) => ({
+        ...item,
+        reason: null,
+      }))
+      return { status: 200, body: feedPage(3, byKind(items, query.kind), query.cursor) }
     },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/feed/impressions',
+    kind: 'contract',
+    implemented: true,
+    schema: noContentSchema,
+    example: {
+      ...noRequest,
+      body: {
+        userId: DEMO_USER.id,
+        requestId: requestIdOf(1, undefined),
+        events: [{ contentId: POSTS[0]!.id, type: 'SEEN', dwellMs: 1200 }],
+      },
+    },
+    // Auth is optional; what does not belong to the requestId is ignored without an error.
+    handler: ({ body }) =>
+      impressionsRequestSchema.safeParse(body).success ? { status: 204 } : validationError,
   },
 
   // E03 (entities on reads: proposal P-001)
