@@ -15,8 +15,13 @@ test.describe('Right column', () => {
     await expect(column).toBeVisible()
     await expect(column.getByRole('heading', { name: 'Season tokens' })).toBeVisible()
 
-    await page.mouse.wheel(0, 2500)
-    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(1000)
+    // The feed streams in after the column: a wheel before it arrives scrolls a short page and
+    // stops at the top (CI, 2026-10-22). Wait for the cards, and wheel again until it is down.
+    await expect(page.getByRole('main').getByRole('article').first()).toBeVisible()
+    await expect(async () => {
+      await page.mouse.wheel(0, 2500)
+      expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(1000)
+    }).toPass()
     const box = await column.boundingBox()
     expect(box?.y).toBeLessThanOrEqual(61)
     await expect(column.getByRole('heading', { name: 'Season tokens' })).toBeInViewport()
