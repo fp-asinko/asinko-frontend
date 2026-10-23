@@ -65,8 +65,9 @@ export function AppShell({
           {/* Its full width while the column slides (clipped, never squeezed), fading out as it
               folds and in as it opens; folded, invisible: out of reach and of what is read (SL-06).
               Room on the right, as Reddit's (PO, 2026-10-23, SL-13): the content ends 28px from
-              the line, clear of the toggle that sits on it, with a little air before it. */}
-          <div className="h-full w-65 overflow-y-auto py-2.5 pr-7 pl-2 transition-[opacity,visibility] duration-200 ease-out left-folded:invisible left-folded:opacity-0 left-folded:duration-150">
+              the line, clear of the toggle that sits on it, with a little air before it. Its
+              scrollbar shows on hover, as Reddit's (SL-14). */}
+          <div className="h-full w-65 scrollbar-on-hover overflow-y-auto py-2.5 pr-7 pl-2 transition-[opacity,visibility] duration-200 ease-out left-folded:invisible left-folded:opacity-0 left-folded:duration-150">
             {sidebar}
           </div>
         </div>

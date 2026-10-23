@@ -30,6 +30,8 @@ Que la columna izquierda ("Tus intereses") se pueda cerrar y abrir desde cualqui
 
 - [x] **SL-13** **Cambio con el PO (2026-10-23):** el contenido de la columna termina unos 28 px antes de su línea, como en Reddit: el botón queda en un espacio libre, con un poco de aire, y no tapa nada de la columna.
 
+- [x] **SL-14** **Cambio con el PO (2026-10-23):** si la columna tiene más de lo que entra, su barra de scroll aparece solo al pasar el mouse por encima (o con el foco adentro), fina y en el gris de los bordes, como en Reddit. En pantallas táctiles queda la del sistema.
+
 ### Recordarlo
 
 - [x] **SL-08** Arranca **abierta** en todo el sitio. Si la persona la pliega, queda plegada en todas las páginas de ese navegador, también al recargar, hasta que la abra.

@@ -385,6 +385,20 @@
 
 /* Hover and press feedback for everything interactive (M-06, M-07): colors in 150ms like the
    prototype's hovers, a 0.97 press in 120ms. */
+/* A scrollbar that shows only while the pointer is over its area or the focus is inside, as
+   Reddit's left column (specs/sidebar-toggle SL-14). Thin, in the borders' gray. Only where there
+   is a pointer that hovers: on touch screens the system's bar already shows while scrolling. */
+@utility scrollbar-on-hover {
+  @media (hover: hover) {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    &:hover,
+    &:focus-within {
+      scrollbar-color: var(--border-strong) transparent;
+    }
+  }
+}
+
 /* The left column's toggle repeats this list to fold in 150ms (left-column-toggle.tsx): change both. */
 @utility tap {
   transition-property: color, background-color, border-color, translate, scale;

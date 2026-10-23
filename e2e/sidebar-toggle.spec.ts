@@ -16,6 +16,10 @@ const shadowed = (page: Page) =>
     }),
   )
 
+/** A color nobody sees: the scrollbar's thumb before hovering. */
+const isClear = (color: string | undefined) =>
+  color === 'transparent' || color === 'rgba(0, 0, 0, 0)'
+
 /** The toggle's center, against the column's right edge. */
 async function centerOffEdge(page: Page) {
   const button = (await toggle(page).boundingBox())!
@@ -57,6 +61,22 @@ test.describe('Left column toggle', () => {
     await toggle(page).click()
     await expect(region(page)).toBeVisible()
     await expect.poll(async () => (await column(page).boundingBox())!.width).toBeCloseTo(260, 0)
+  })
+
+  test('shows its scrollbar only while the pointer is over it (SL-14)', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 600 })
+    await page.goto('/en')
+    const scroller = column(page).locator('> div')
+    const thumb = () =>
+      scroller.evaluate(
+        (el) => getComputedStyle(el).scrollbarColor.split(/ (?=rgb|transparent)/)[0],
+      )
+    // There is more than fits, so there is a scrollbar to show.
+    expect(await scroller.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true)
+    await page.mouse.move(900, 300)
+    await expect.poll(async () => isClear(await thumb())).toBe(true)
+    await scroller.hover()
+    await expect.poll(async () => isClear(await thumb())).toBe(false)
   })
 
   test('works with the keyboard, and Tab skips the folded column (SL-03, SL-06)', async ({
