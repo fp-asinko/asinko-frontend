@@ -2,7 +2,7 @@ import { HouseIcon } from 'lucide-react'
 import { Suspense } from 'react'
 import type { Metadata, Viewport } from 'next'
 import { Figtree } from 'next/font/google'
-import { headers } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { hasLocale, NextIntlClientProvider } from 'next-intl'
 import { getMessages, getTranslations } from 'next-intl/server'
@@ -21,6 +21,7 @@ import { pickClientMessages } from '@/i18n/client-messages'
 import { routing } from '@/i18n/routing'
 import { isIndexable } from '@/lib/seo/robots'
 import { communityPath } from '@/lib/communities/paths'
+import { LEFT_COLUMN_COOKIE, siteFolded } from '@/lib/left-column'
 import { getViewer } from '@/lib/session'
 import { isDevLoginEnabled } from '@/lib/auth/dev-session'
 import { DevLoginButton } from '@/features/dev-login'
@@ -74,6 +75,8 @@ export default async function LocaleLayout({ children, right, params }: LayoutPr
   // Who can act: without a session, actions open the account modal (specs/guest-experience).
   const viewer = await getViewer()
   const signedIn = viewer !== null
+  // The left column as the viewer left it: drawn so on the server, nothing jumps (specs/sidebar-toggle).
+  const leftFolded = siteFolded((await cookies()).get(LEFT_COLUMN_COOKIE)?.value)
   // Development login (specs/dev-login): off in production and with every route mocked.
   const devTools =
     isDevLoginEnabled() && env.API_MOCKS !== 'all' ? (
@@ -111,6 +114,7 @@ export default async function LocaleLayout({ children, right, params }: LayoutPr
                     devTools={devTools}
                     // Your own page, from the bars' "Profile" (specs/header-refresh HR-02).
                     profileHref={viewer && communityPath('user', viewer.username)}
+                    leftFolded={leftFolded}
                   >
                     {children}
                   </AppShell>

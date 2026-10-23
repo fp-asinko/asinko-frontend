@@ -60,7 +60,7 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
 - **Píldora gris** (como Reddit): todo lo que se toca dentro de una tarjeta (votos, comentarios, compartir, chips, "Join", botones secundarios) va `rounded-full bg-muted hover:bg-muted-hover`, relleno y **sin borde**. Las opciones de encuesta son cajas `bg-surface`. El borde queda para separar capas, no para dibujar botones.
 - **Texto secundario**: `--muted-foreground` (`#5C5D60`). **`--faint` (`#8A8B8E`) no es para texto chico** (3,4:1): solo íconos, separadores y texto de 18 px o más.
 - **Verde en texto** (`--success`/`--bullish`) sobre fondos blancos, no sobre `--surface`. El color nunca es la única señal: siempre con flecha, ícono o texto.
-- **Sin sombras**: las capas se separan con borde. Única excepción, aprobada por el PO: las tarjetas que flotan al pasar el mouse (`shadow-float`, `specs/mention-preview`), con borde además. Radios de 4 / 8 / 12 / 16 px y `rounded-full` para píldoras.
+- **Sin sombras**: las capas se separan con borde. Dos excepciones, aprobadas por el PO: las tarjetas que flotan al pasar el mouse (`shadow-float`, `specs/mention-preview`), con borde además, y la columna izquierda abierta, una sombra corta hacia el contenido como Reddit (`shadow-rail`, `specs/sidebar-toggle`, 2026-10-23). Radios de 4 / 8 / 12 / 16 px y `rounded-full` para píldoras.
 - **Bordes de campos activos** con `--input` (3:1); el borde suave del prototipo solo en elementos deshabilitados o decorativos.
 - `src/test/tokens-contrast.test.ts` mide cada par en los dos temas: un token que baja del mínimo rompe el build.
 

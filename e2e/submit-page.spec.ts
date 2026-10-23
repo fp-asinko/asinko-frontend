@@ -393,31 +393,30 @@ test.describe('Tools of the page to create a post (specs/submit-tools)', () => {
     expect(Math.abs(row.y + row.height - bar.y)).toBeLessThanOrEqual(1)
   })
 
-  test('folds the left column to write, and remembers the choice (ST-08, ST-09)', async ({
+  test('folds the left column to write, remembering it apart from the site (ST-08, specs/sidebar-toggle SL-09)', async ({
     page,
     isMobile,
   }) => {
     test.skip(isMobile, 'The left column exists from md')
     await page.goto('/en/submit')
-    const fold = page.getByRole('button', { name: 'Your interests' })
-    await expect(fold).toHaveAttribute('aria-expanded', 'false')
-    await expect(page.getByText('Your interests', { exact: false }).first()).toBeHidden()
+    const toggle = page.getByRole('button', { name: 'Your interests' })
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    await expect(page.getByRole('region', { name: 'Your interests' })).toBeHidden()
     // The editor comes after the page: measured once it is there, not while it fades in.
     await expect(community(page)).toBeFocused()
     await expectNoA11yViolations(page)
 
-    await fold.click()
-    await expect(fold).toHaveAttribute('aria-expanded', 'true')
-    // Open, only what is under the button scrolls: nothing passes beneath it (WCAG 2.4.11).
-    const button = (await fold.boundingBox())!
-    const scroller = page.locator('#left-column > div')
-    await scroller.evaluate((element) => element.scrollTo(0, 400))
-    const top = await scroller.evaluate((element) => element.getBoundingClientRect().top)
-    expect(top).toBeGreaterThanOrEqual(button.y + button.height)
+    await toggle.click()
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true')
     await page.reload()
-    await expect(fold).toHaveAttribute('aria-expanded', 'true')
-    // Elsewhere, as always.
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    await expect(page.getByRole('region', { name: 'Your interests' })).toBeVisible()
+    // Folded again here; elsewhere, the site's choice, open.
+    await toggle.click()
     await page.goto('/en')
-    await expect(page.getByRole('button', { name: 'Your interests' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Your interests' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    )
   })
 })

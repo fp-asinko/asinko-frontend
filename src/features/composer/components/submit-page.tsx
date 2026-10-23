@@ -1,11 +1,12 @@
 import { ChevronDownIcon, ScrollTextIcon, UserRoundPlusIcon } from 'lucide-react'
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { z } from 'zod'
 import { PageColumns } from '@/components/organisms/app-shell'
 // By its path: from the shell's index, every route would load it (seo.md).
-import { LeftColumnFold } from '@/components/organisms/app-shell/left-column-fold'
+import { LeftColumnScope } from '@/components/organisms/app-shell/left-column-toggle'
 import { GateButtons } from '@/components/organisms/auth-gate'
 import { EmptyState } from '@/components/organisms/empty-state'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -13,6 +14,7 @@ import type { Locale } from '@/i18n/routing'
 import { permanentRedirect } from '@/i18n/navigation'
 import { assetSymbolSchema } from '@/lib/communities/asset-symbol.schema'
 import { communitySlugSchema } from '@/lib/communities/community-slug.schema'
+import { LEFT_COLUMN_SUBMIT_COOKIE, submitOpen } from '@/lib/left-column'
 import { getViewer } from '@/lib/session'
 import { SUBMIT_SEGMENT } from '@/i18n/submit-path'
 import { draftKey } from '../lib/draft-key'
@@ -128,8 +130,11 @@ export async function SubmitPage({
 
   return (
     <PageColumns>
-      {/* Writing with the left column folded (specs/submit-tools ST-08). */}
-      <LeftColumnFold />
+      {/* Writing with the left column folded, unless opened here before (specs/submit-tools ST-08,
+          specs/sidebar-toggle SL-09). */}
+      <LeftColumnScope
+        initialOpen={submitOpen((await cookies()).get(LEFT_COLUMN_SUBMIT_COOKIE)?.value)}
+      />
       <h1 className="px-4 pt-4 type-page-title md:px-0">{t('title')}</h1>
       {community?.rules && (
         // Where there is no right column, the rules fold under the title (SU-08).

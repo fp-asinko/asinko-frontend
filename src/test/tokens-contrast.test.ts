@@ -127,3 +127,13 @@ describe.each(Object.entries(THEMES))('%s theme tokens', (_name, theme) => {
     expect(contrast(theme, fg, bg)).toBeGreaterThanOrEqual(3)
   })
 })
+
+// specs/sidebar-toggle SL-05: the open left column's shadow, the second exception to "no shadows".
+describe('rail shadow', () => {
+  it('exists in both themes, with a darker one of its own in dark', () => {
+    expect(light['rail-shadow']).toMatch(/^4px 0 16px -8px rgb\(/)
+    expect(readBlock('.dark')['rail-shadow']).toBeDefined()
+    expect(readBlock('.dark')['rail-shadow']).not.toBe(light['rail-shadow'])
+    expect(css).toContain('--shadow-rail: var(--rail-shadow);')
+  })
+})

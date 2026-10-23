@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { BottomNav } from './bottom-nav'
+import { LeftColumnToggle } from './left-column-toggle'
 import { MobileSidebar } from './mobile-sidebar'
 import type { NavItem } from './nav-item.types'
 import { SiteHeader } from './site-header'
@@ -19,8 +20,11 @@ export function AppShell({
   right,
   devTools,
   profileHref = null,
+  leftFolded = false,
   children,
 }: {
+  /** The left column folded, as the viewer left it (the cookie, specs/sidebar-toggle SL-08). */
+  leftFolded?: boolean
   navItems: NavItem[]
   sidebar: ReactNode
   right?: ReactNode
@@ -46,20 +50,23 @@ export function AppShell({
         profileHref={profileHref}
         menu={<MobileSidebar>{sidebar}</MobileSidebar>}
       />
-      {/* A page can fold the left column (LeftColumnFold, specs/submit-tools ST-08): while its
-          button says so, the column is a 56px strip and its content is hidden, by CSS alone, so
-          the other pages carry no code for it. Its width slides, as a drawer: 200ms to open and
-          150 to close (design-system.md § Motion; no motion with prefers-reduced-motion). */}
-      <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)] md:transition-[grid-template-columns] md:duration-200 md:ease-out md:[html:has([data-left-fold=folded])_&]:grid-cols-[3.5rem_minmax(0,1fr)] md:[html:has([data-left-fold=folded])_&]:duration-150">
+      {/* The left column opens and folds, as Reddit's (specs/sidebar-toggle): folded, a 32px
+          strip with its line. `left-folded:` (globals.css) reads the toggle's state and a page's
+          own choice from the HTML, so the server's first paint is already right. Its width slides,
+          as a drawer: 200ms to open and 150 to close (design-system.md § Motion; no motion with
+          prefers-reduced-motion). */}
+      <LeftColumnToggle initialFolded={leftFolded} />
+      <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)] md:transition-[grid-template-columns] md:duration-200 md:ease-out md:left-folded:grid-cols-[2rem_minmax(0,1fr)] md:left-folded:duration-150">
         <div
           id="left-column"
-          // With the fold button, the top 56px stay for it and only the content below scrolls:
-          // nothing passes under the button (WCAG 2.4.11).
-          className="sticky top-15 hidden h-[calc(100dvh-3.75rem)] overflow-y-auto border-r px-2 py-2.5 md:block [html:has([data-left-fold])_&]:overflow-hidden [html:has([data-left-fold])_&]:p-0 [html:has([data-left-fold])_&]:pt-14"
+          // Open, a short shadow towards the content (SL-05), over the center's cards (z-10).
+          className="sticky top-15 z-10 hidden h-[calc(100dvh-3.75rem)] overflow-hidden border-r bg-background md:block md:shadow-rail md:left-folded:shadow-none"
         >
           {/* Its full width while the column slides (clipped, never squeezed), fading out as it
-              folds and in as it opens; folded, invisible: out of reach and of what is read. */}
-          <div className="h-full [html:has([data-left-fold=folded])_&]:invisible [html:has([data-left-fold=folded])_&]:opacity-0 [html:has([data-left-fold=folded])_&]:duration-150 [html:has([data-left-fold])_&]:w-65 [html:has([data-left-fold])_&]:overflow-y-auto [html:has([data-left-fold])_&]:px-2 [html:has([data-left-fold])_&]:pb-2.5 [html:has([data-left-fold])_&]:transition-[opacity,visibility] [html:has([data-left-fold])_&]:duration-200 [html:has([data-left-fold])_&]:ease-out">
+              folds and in as it opens; folded, invisible: out of reach and of what is read (SL-06).
+              The toggle covers the right 16px of a row passing under it, never a whole one
+              (WCAG 2.4.11 at AA, specs/sidebar-toggle § 4). */}
+          <div className="h-full w-65 overflow-y-auto px-2 py-2.5 transition-[opacity,visibility] duration-200 ease-out left-folded:invisible left-folded:opacity-0 left-folded:duration-150">
             {sidebar}
           </div>
         </div>

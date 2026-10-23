@@ -23,6 +23,28 @@ function renderShell(right?: ReactNode) {
 }
 
 describe('AppShell', () => {
+  it('opens and folds the left column from its toggle, starting as the cookie said (specs/sidebar-toggle)', async () => {
+    renderWithIntl(
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+        <AppShell navItems={[]} sidebar={<a href="#x">A group</a>} leftFolded>
+          <h1>Page</h1>
+        </AppShell>
+      </ThemeProvider>,
+    )
+    const toggle = screen.getByRole('button', { name: 'Your interests' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(document.getElementById(toggle.getAttribute('aria-controls')!)).toBeInTheDocument()
+
+    await userEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    // Folding with the focus in the column: it comes back to the toggle.
+    screen.getByRole('link', { name: 'A group' }).focus()
+    await userEvent.click(toggle)
+    expect(toggle).toHaveFocus()
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    document.cookie = 'asinko-left-column=; path=/; max-age=0'
+  })
+
   it('starts with a skip link to the main content (F-26)', async () => {
     const user = userEvent.setup()
     renderShell()
