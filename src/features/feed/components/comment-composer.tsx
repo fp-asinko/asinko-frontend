@@ -13,6 +13,7 @@ import {
 import { EmojiButton } from '@/components/molecules/emoji-picker'
 import { MentionField } from '@/components/molecules/mention-assist'
 import { useAuthGate } from '@/components/organisms/auth-gate'
+import type { ActionResult } from '@/lib/result'
 import { cn } from '@/lib/utils'
 import { Textarea } from '@/components/ui/textarea'
 import { searchMentions } from '@/lib/mentions/search-mentions.action'
@@ -38,13 +39,23 @@ export function CommentComposer({
   parentId = null,
   onCancel,
   onSent,
+  send = createComment,
+  boxId = COMMENT_BOX,
 }: {
   postId: string
   parentId?: string | null
   /** Replies only: closes the box (Esc or Cancel). */
   onCancel?: () => void
-  /** Replies only: closes the box once the reply is in. */
-  onSent?: () => void
+  /** Once the comment is in: a reply closes its box; a card shows it (specs/card-comment). */
+  onSent?: (comment: { id: string; body: string }) => void
+  /** Where it goes: the post page's action by default; a card's, from it (specs/card-comment). */
+  send?: (input: {
+    postId: string
+    parentCommentId: string | null
+    body: string
+  }) => Promise<ActionResult<{ id: string }>>
+  /** The field's id, which the post page's "comment" links point to; none on a card (many). */
+  boxId?: string | null
 }) {
   const t = useTranslations('comments')
   const { addPending } = useThread()
@@ -81,10 +92,11 @@ export function CommentComposer({
     const key = `${parentId ?? 'post'}-${sent.current}`
     startTransition(async () => {
       addPending({ key, parentId, body })
-      const result = await createComment({ postId, parentCommentId: parentId, body })
+      const result = await send({ postId, parentCommentId: parentId, body })
       if (result.ok) {
         setAnnouncement(t('sent'))
-        if (onSent) startTransition(onSent)
+        const comment = { id: result.data.id, body }
+        if (onSent) startTransition(() => onSent(comment))
         return
       }
       setAnnouncement('')
@@ -127,7 +139,7 @@ export function CommentComposer({
       {/* $ # @ suggest assets, communities and people (specs/mention-autocomplete). */}
       <div className="relative">
         <Textarea
-          id={reply ? undefined : COMMENT_BOX}
+          id={reply || boxId === null ? undefined : boxId}
           value={text}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={onKeyDown}

@@ -25,11 +25,11 @@ describe('loadCommentsPreview', () => {
     expect(deps.getCommentsPreview).not.toHaveBeenCalled()
   })
 
-  it('sets the locale and returns the rendered preview', async () => {
+  it('sets the locale and returns the rendered preview, saying when it is empty (specs/card-comment)', async () => {
     deps.getCommentsPreview.mockResolvedValue({ ok: true, data: [] })
-    const result = await loadCommentsPreview({ kind: 'post', id: ID, locale: 'es' })
+    const result = await loadCommentsPreview({ kind: 'poll', id: ID, locale: 'es' })
     expect(deps.setRequestLocale).toHaveBeenCalledWith('es')
-    expect(result.ok).toBe(true)
+    expect(result).toMatchObject({ ok: true, data: { empty: true } })
   })
 
   it('returns the translation key of a failure, never a backend message', async () => {

@@ -1,6 +1,6 @@
 import { ArrowBigUpIcon, ArrowUpRightIcon, ForwardIcon, MessageCircleIcon } from 'lucide-react'
 import Image from 'next/image'
-import { useFormatter, useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ShareButton } from '@/components/molecules/share-button'
 import { FeatureMenu } from '@/components/organisms/featured'
@@ -10,11 +10,11 @@ import { postImageRoute } from '@/lib/share-image/share-metadata'
 import { cn } from '@/lib/utils'
 import { CARD_ACTION } from './card-action'
 import type { PostItem } from '../feed.types'
-import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
 import { CardLink } from './card-link'
 import { FeedReasonLine } from './feed-reason-line'
 import { FadeImage } from '@/components/ui/fade-image'
+import { CommentCount } from './comment-count'
 import { CommentsToggle } from './comments-toggle'
 import { PostMarkdown } from './post-markdown'
 import { RelatedPills } from './related-pills'
@@ -62,15 +62,14 @@ export function PostCard({
   const PostImage = fadeImage ? FadeImage : Image
   const t = useTranslations('feed.card')
   const tf = useTranslations('featured')
-  const format = useFormatter()
   const detail = variant === 'detail'
   const preview = variant === 'preview'
   const Title = detail ? 'h1' : 'h2'
   const commentCount = (
     <>
       <MessageCircleIcon aria-hidden className="size-4" />
-      <span aria-hidden>{format.number(post.commentCount, countFormat(post.commentCount))}</span>
-      <span className="sr-only">{t('comments', { count: post.commentCount })}</span>
+      {/* It goes up with each comment sent from the card (specs/card-comment CC-03). */}
+      <CommentCount base={post.commentCount} />
     </>
   )
 

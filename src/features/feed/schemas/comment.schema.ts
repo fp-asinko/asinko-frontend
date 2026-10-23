@@ -12,3 +12,15 @@ export const createCommentSchema = z.object({
 })
 
 export type CreateCommentInput = z.infer<typeof createCommentSchema>
+
+/**
+ * Input of commentFromCard (specs/card-comment): a comment on a post or a poll, from its card. The
+ * same body rule as above; never a userId.
+ */
+export const cardCommentSchema = z.object({
+  kind: z.enum(['post', 'poll']),
+  id: z.uuid(),
+  body: z.string().trim().min(1),
+})
+
+export type CardCommentInput = z.infer<typeof cardCommentSchema>

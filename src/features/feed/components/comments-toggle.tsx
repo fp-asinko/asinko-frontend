@@ -1,12 +1,18 @@
 'use client'
 
 import { ChevronDownIcon } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useEffectEvent, useId, useState, useTransition, type ReactNode } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
 import { CARD_ACTION } from './card-action'
 import { loadCommentsPreview } from '../actions/load-comments-preview.action'
+import { AddedComments } from './comment-count'
+
+// The panel with the box to comment from the card (specs/card-comment CC-07): its code loads the
+// first time 💬 opens, never with the page.
+const CardComments = dynamic(() => import('./card-comments').then((mod) => mod.CardComments))
 
 /**
  * The 💬 button of a card (H-28). The first time it opens, it asks the server for the comments
@@ -37,9 +43,11 @@ export function CommentsToggle({
   const [open, setOpen] = useState(false)
   // Mounted from the first opening on, so closing can animate too (M-03).
   const [mounted, setMounted] = useState(false)
-  const [preview, setPreview] = useState<ReactNode>(null)
+  const [preview, setPreview] = useState<{ preview: ReactNode; empty: boolean } | null>(null)
   const [failed, setFailed] = useState(false)
   const [pending, startTransition] = useTransition()
+  // Comments sent from this card in this visit: its count goes up (specs/card-comment CC-03).
+  const [added, setAdded] = useState(0)
 
   const openFromOutside = useEffectEvent(() => {
     if (!open) toggle()
@@ -61,7 +69,7 @@ export function CommentsToggle({
   }
 
   return (
-    <>
+    <AddedComments value={{ added, add: () => setAdded((count) => count + 1) }}>
       <button
         type="button"
         aria-expanded={open}
@@ -122,13 +130,17 @@ export function CommentsToggle({
                   {t('error')}
                 </p>
               ) : (
-                preview
+                preview && (
+                  <CardComments kind={kind} id={id} empty={preview.empty}>
+                    {preview.preview}
+                  </CardComments>
+                )
               )}
               {!pending && seeAll}
             </div>
           </div>
         </div>
       )}
-    </>
+    </AddedComments>
   )
 }

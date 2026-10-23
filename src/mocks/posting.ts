@@ -3,6 +3,7 @@ import { DEMO_USER } from './demo-user'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { communityById, communityBySlug, communitySummary } from './fixtures/communities'
 import { mockId } from './fixtures/ids'
+import { pollById } from './fixtures/polls'
 import { postById } from './fixtures/posts'
 import { summary } from './fixtures/users'
 import type { MockResponse } from './types'
@@ -136,8 +137,9 @@ function allComments(): RawComment[] {
   return flat
 }
 
+/** On a post or a poll (E05): the backend takes both (specs/card-comment). */
 export function createComment(contentId: string, body: unknown): MockResponse {
-  if (!findPost(contentId)) return error(404, 'NOT_FOUND')
+  if (!findPost(contentId) && !pollById(contentId)) return error(404, 'NOT_FOUND')
   const input = (body ?? {}) as Record<string, unknown>
   if (input.userId !== DEMO_USER.id) return error(403, 'USER_MISMATCH')
   if (typeof input.body !== 'string' || !input.body.trim()) return error(422, 'VALIDATION_ERROR')

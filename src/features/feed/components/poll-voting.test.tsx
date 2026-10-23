@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -11,6 +12,10 @@ import { PollVoting } from './poll-voting'
 const action = vi.hoisted(() => ({ votePoll: vi.fn() }))
 vi.mock('../actions/vote-poll.action', () => action)
 const comments = vi.hoisted(() => ({ loadCommentsPreview: vi.fn() }))
+// The card's panel (specs/card-comment) as its children: it brings the comment action and env.
+vi.mock('./card-comments', () => ({
+  CardComments: ({ children }: { children: ReactNode }) => children,
+}))
 vi.mock('../actions/load-comments-preview.action', () => comments)
 
 const hidden = pollItem({
@@ -328,7 +333,10 @@ describe('PollVoting (H-13, H-15)', () => {
     })
 
     it('opens the comments from the note (FC-27)', async () => {
-      comments.loadCommentsPreview.mockResolvedValue({ ok: true, data: <p>First comment</p> })
+      comments.loadCommentsPreview.mockResolvedValue({
+        ok: true,
+        data: { preview: <p>First comment</p>, empty: false },
+      })
       renderPoll(pollItem({ viewerOptionId: 'b' }))
       await userEvent.click(screen.getByRole('button', { name: 'Tell us why' }))
       expect(screen.getByRole('button', { name: 'Comments' })).toHaveAttribute(

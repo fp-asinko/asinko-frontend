@@ -709,6 +709,19 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     handler: ({ params, body }) => createComment(params.id ?? '', body),
   },
   {
+    method: 'POST',
+    path: '/api/v1/polls/:id/comments',
+    kind: 'contract',
+    implemented: true,
+    schema: commentSchema,
+    example: {
+      ...noRequest,
+      params: { id: POLLS[0]!.id },
+      body: { userId: DEMO_USER.id, body: 'I voted the middle one.' },
+    },
+    handler: ({ params, body }) => createComment(params.id ?? '', body),
+  },
+  {
     method: 'PUT',
     path: '/api/v1/comments/:id/vote',
     kind: 'contract',

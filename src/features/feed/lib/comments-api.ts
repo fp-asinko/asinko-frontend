@@ -133,10 +133,12 @@ export async function searchComments(postId: string, q: string): Promise<ApiResu
 export async function createCommentAs(
   userId: string,
   { postId, parentCommentId, body }: CreateCommentInput,
+  // A poll's too, from its card (specs/card-comment): the backend takes both (E05).
+  kind: 'post' | 'poll' = 'post',
 ): Promise<ApiResult<{ id: string }>> {
   const result = await apiRequest({
     method: 'POST',
-    path: '/api/v1/posts/:id/comments',
+    path: kind === 'poll' ? '/api/v1/polls/:id/comments' : '/api/v1/posts/:id/comments',
     params: { id: postId },
     body: { userId, body, parentCommentId },
     schema: commentSchema,

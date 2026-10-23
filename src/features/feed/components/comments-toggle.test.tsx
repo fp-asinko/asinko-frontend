@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -5,6 +6,10 @@ import { renderWithIntl } from '@/test/render-with-intl'
 import { CommentsToggle } from './comments-toggle'
 
 const action = vi.hoisted(() => ({ loadCommentsPreview: vi.fn() }))
+// The card's panel (specs/card-comment) as its children: it brings the comment action and env.
+vi.mock('./card-comments', () => ({
+  CardComments: ({ children }: { children: ReactNode }) => children,
+}))
 vi.mock('../actions/load-comments-preview.action', () => action)
 
 const ID = '00000000-0000-4000-8000-000000000001'
@@ -21,7 +26,10 @@ describe('CommentsToggle (H-28)', () => {
   beforeEach(() => action.loadCommentsPreview.mockReset())
 
   it('loads the preview the first time it opens, with the locale', async () => {
-    action.loadCommentsPreview.mockResolvedValue({ ok: true, data: <p>First comment</p> })
+    action.loadCommentsPreview.mockResolvedValue({
+      ok: true,
+      data: { preview: <p>First comment</p>, empty: false },
+    })
     renderToggle()
     const button = screen.getByRole('button', { name: /6 comments/ })
     expect(button).toHaveAttribute('aria-expanded', 'false')
@@ -43,13 +51,16 @@ describe('CommentsToggle (H-28)', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Loading comments…')
     expect(screen.getByTestId('comments-skeleton')).toHaveAttribute('aria-hidden', 'true')
 
-    answer({ ok: true, data: <p>First comment</p> })
+    answer({ ok: true, data: { preview: <p>First comment</p>, empty: false } })
     expect(await screen.findByText('First comment')).toBeInTheDocument()
     expect(screen.queryByTestId('comments-skeleton')).toBeNull()
   })
 
   it('reuses the preview when toggled again; closed, it stays mounted but inert (M-03)', async () => {
-    action.loadCommentsPreview.mockResolvedValue({ ok: true, data: <p>First comment</p> })
+    action.loadCommentsPreview.mockResolvedValue({
+      ok: true,
+      data: { preview: <p>First comment</p>, empty: false },
+    })
     renderToggle()
     const button = screen.getByRole('button', { name: /6 comments/ })
 
@@ -71,7 +82,7 @@ describe('CommentsToggle (H-28)', () => {
   it('says when it fails and retries on the next open', async () => {
     action.loadCommentsPreview
       .mockResolvedValueOnce({ ok: false, error: 'api.errors.UNAVAILABLE' })
-      .mockResolvedValueOnce({ ok: true, data: <p>Back</p> })
+      .mockResolvedValueOnce({ ok: true, data: { preview: <p>Back</p>, empty: false } })
     renderToggle()
     const button = screen.getByRole('button', { name: /6 comments/ })
 
@@ -83,7 +94,10 @@ describe('CommentsToggle (H-28)', () => {
   })
 
   it('opens and loads when asked from outside, and stays open on the next request (FC-27)', async () => {
-    action.loadCommentsPreview.mockResolvedValue({ ok: true, data: <p>First comment</p> })
+    action.loadCommentsPreview.mockResolvedValue({
+      ok: true,
+      data: { preview: <p>First comment</p>, empty: false },
+    })
     const view = renderWithIntl(
       <CommentsToggle kind="poll" id={ID} openRequest={0}>
         6 comments
@@ -123,7 +137,7 @@ describe('CommentsToggle: all comments (specs/post-create-detail PC-17)', () => 
     )
     await userEvent.click(screen.getByRole('button', { name: /6 comments/ }))
     expect(screen.queryByText('See all')).not.toBeInTheDocument()
-    answer({ ok: true, data: <p>First comment</p> })
+    answer({ ok: true, data: { preview: <p>First comment</p>, empty: false } })
     expect(await screen.findByText('See all')).toBeInTheDocument()
   })
 })

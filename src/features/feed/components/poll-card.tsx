@@ -2,8 +2,8 @@ import { ChartBarIcon, MessageCircleIcon } from 'lucide-react'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { FeatureMenu } from '@/components/organisms/featured'
 import type { PollItem } from '../feed.types'
-import { countFormat } from '../lib/count-format'
 import { CardByline } from './card-byline'
+import { CommentCount } from './comment-count'
 import { FeedReasonLine } from './feed-reason-line'
 import { PollVoting } from './poll-voting'
 import { SeeAllComments } from './see-all-comments'
@@ -25,7 +25,6 @@ export function PollCard({
 }) {
   const t = useTranslations('feed.poll')
   const tf = useTranslations('featured')
-  const tc = useTranslations('feed.card')
   const format = useFormatter()
   const now = useNow()
   const closing = poll.isClosed
@@ -95,10 +94,8 @@ export function PollCard({
           // Same as a post's (P-006): the compact count, and the full sentence for screen readers.
           <>
             <MessageCircleIcon aria-hidden className="size-4" />
-            <span aria-hidden>
-              {format.number(poll.commentCount, countFormat(poll.commentCount))}
-            </span>
-            <span className="sr-only">{tc('comments', { count: poll.commentCount })}</span>
+            {/* It goes up with each comment sent from the card (specs/card-comment CC-03). */}
+            <CommentCount base={poll.commentCount} />
           </>
         }
       />

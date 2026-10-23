@@ -12,7 +12,9 @@ import { commentsTargetSchema } from '../schemas/comments-preview.schema'
  * already rendered on the server: the feed makes no extra requests and react-markdown stays off
  * the browser. Public read: no session needed.
  */
-export async function loadCommentsPreview(raw: unknown): Promise<ActionResult<ReactNode>> {
+export async function loadCommentsPreview(
+  raw: unknown,
+): Promise<ActionResult<{ preview: ReactNode; empty: boolean }>> {
   const parsed = commentsTargetSchema.safeParse(raw)
   if (!parsed.success) return { ok: false, error: 'api.errors.INVALID' }
 
@@ -20,5 +22,12 @@ export async function loadCommentsPreview(raw: unknown): Promise<ActionResult<Re
   setRequestLocale(parsed.data.locale)
   const result = await getCommentsPreview(parsed.data)
   if (!result.ok) return { ok: false, error: result.errorKey }
-  return { ok: true, data: <CommentsPreview comments={result.data} /> }
+  // `empty`: the card's panel drops its empty state once something is sent (specs/card-comment).
+  return {
+    ok: true,
+    data: {
+      preview: <CommentsPreview comments={result.data} />,
+      empty: result.data.length === 0,
+    },
+  }
 }
