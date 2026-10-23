@@ -38,7 +38,20 @@ export function CommunityHeader({
   moderation?: ReactNode
 }) {
   const t = useTranslations('communities')
-  const title = profile?.displayName ?? page.handle
+  // A group's # much smaller and in gray, the name the protagonist (specs/byline-handles BH-03);
+  // one string for assistive tech, "#crypto". An asset keeps its $, a profile its name (Q1).
+  const title =
+    profile?.displayName ??
+    (page.kind === 'group' ? (
+      <>
+        <span className="mr-0.5 align-baseline text-[0.75em] font-semibold text-muted-foreground">
+          {page.handle.slice(0, 1)}
+        </span>
+        {page.handle.slice(1)}
+      </>
+    ) : (
+      page.handle
+    ))
   const subtitle = profile ? (profile.displayName ? page.handle : null) : page.subtitle
   const description = profile ? profile.bio : page.description
   // Anyone posts in a group or an asset; in a profile, only its owner (PC-03).

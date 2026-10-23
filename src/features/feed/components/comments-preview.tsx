@@ -30,7 +30,8 @@ export function CommentsPreview({ comments }: { comments: CommentPreview[] }) {
           />
           <div className="min-w-0 flex-1 wrap-anywhere">
             <p className="mb-0.75 flex gap-1.25 type-meta text-muted-foreground">
-              <span className="font-bold text-foreground">{comment.author.handle}</span>
+              {/* Without the @, as the card's author (specs/byline-handles BH-01). */}
+              <span className="font-bold text-foreground">{comment.author.username}</span>
               <span aria-hidden>·</span>
               <time dateTime={comment.createdAt}>
                 {format.relativeTime(new Date(comment.createdAt), now)}

@@ -11,8 +11,11 @@ test.describe('Profile activity (specs/backend-adoption)', () => {
     await page.goto('/en/user/maria')
     const posts = page.getByRole('main').getByRole('article')
     await expect(posts.first()).toBeVisible()
-    // In groups: the card's header names a group (#…) rather than the person's channel.
-    await expect(posts.getByRole('link', { name: /^#/ }).first()).toBeVisible()
+    // In groups: the card's header links to a group rather than the person's channel. Its name has
+    // no # anymore (specs/byline-handles BH-01), so the link is told by where it leads.
+    await expect(
+      posts.getByRole('link').and(page.locator('[href^="/en/hub/"]')).first(),
+    ).toBeVisible()
   })
 
   test('Replies lists their comments, each saying where it is and leading to it (BK-03)', async ({

@@ -227,7 +227,8 @@ test.describe('Profile pages (CP-11 to CP-13, CP-21)', () => {
 
   test('the author of a card links to the profile (CP-21)', async ({ page }) => {
     await page.goto('/en')
-    await page.getByRole('main').getByRole('link', { name: '@maria' }).first().click()
+    // The author by their name, without the @ (specs/byline-handles BH-01).
+    await page.getByRole('main').getByRole('link', { name: 'maria', exact: true }).first().click()
     await expect(page).toHaveURL(/\/en\/user\/maria$/)
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
   })

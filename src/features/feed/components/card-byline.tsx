@@ -132,14 +132,18 @@ export function CardByline({
 /** The group's handle, a link to its page with its hover card (specs/mention-preview MP-01). */
 function GroupName({ group, linked }: { group: CardCommunity; linked: boolean }) {
   const className = 'inline-flex min-h-6 min-w-0 items-center type-ui font-bold text-foreground'
-  // The symbol (# or $) in gray: the name is the protagonist. Both inside one span: as two flex
-  // items the browser would name the link "# crypto", with a space.
-  const name = (
-    <span className="truncate">
-      <span className="font-normal text-muted-foreground">{group.handle.slice(0, 1)}</span>
-      {group.handle.slice(1)}
-    </span>
-  )
+  // A group by its name alone, "crypto" (specs/byline-handles BH-01); an asset keeps its $ in gray,
+  // the known way to write a ticker (Q1). Both inside one span: as two flex items the browser
+  // would name the link "$ BTC", with a space.
+  const name =
+    group.kind === 'asset' ? (
+      <span className="truncate">
+        <span className="font-normal text-muted-foreground">{group.handle.slice(0, 1)}</span>
+        {group.handle.slice(1)}
+      </span>
+    ) : (
+      <span className="truncate">{group.slug}</span>
+    )
   if (!linked) return <span className={className}>{name}</span>
   return (
     <Link
@@ -152,7 +156,10 @@ function GroupName({ group, linked }: { group: CardCommunity; linked: boolean })
   )
 }
 
-/** The author's @handle, a link to the profile; a system item ("Asinko") has none. */
+/**
+ * The author by their username, without the @ (specs/byline-handles BH-01), a link to the profile;
+ * a system item ("Asinko") has none.
+ */
 function AuthorName({
   author,
   fallback,
@@ -165,7 +172,7 @@ function AuthorName({
   className?: string
 }) {
   if (!author || !linked) {
-    return <span className={cn('min-w-0 truncate', className)}>{author?.handle ?? fallback}</span>
+    return <span className={cn('min-w-0 truncate', className)}>{author?.username ?? fallback}</span>
   }
   return (
     // pb-2 -mb-2: a 24px target (WCAG 2.5.8) on a 16px line, without moving it. Only downwards,
@@ -175,7 +182,7 @@ function AuthorName({
       {...previewProps('user', author.username)}
       className={cn('-mb-2 inline-block min-w-0 truncate pb-2 hover:underline', className)}
     >
-      {author.handle}
+      {author.username}
     </Link>
   )
 }

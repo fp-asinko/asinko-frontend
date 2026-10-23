@@ -20,7 +20,7 @@ describe('CommentsPreview (H-28)', () => {
         ]}
       />,
     )
-    expect(screen.getByRole('listitem')).toHaveTextContent('@maria')
+    expect(screen.getByRole('listitem')).toHaveTextContent('maria')
     expect(screen.getByText('1 hour ago').tagName).toBe('TIME')
     expect(screen.getByText('data').tagName).toBe('STRONG')
     expect(document.querySelector('script')).toBeNull()

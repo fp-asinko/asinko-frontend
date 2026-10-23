@@ -20,7 +20,7 @@ describe('PostCard (H-12)', () => {
     expect(
       screen.getByRole('article', { name: 'Whales accumulated 48,000 $BTC' }),
     ).toBeInTheDocument()
-    expect(screen.getByText('@maria')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'maria' })).toBeInTheDocument()
     expect(screen.getByText('74% accuracy, high')).toBeInTheDocument()
     expect(screen.getByText('2 hours ago')).toBeInTheDocument()
     // The byline community and the body mention both link to the filtered Home.
@@ -46,7 +46,7 @@ describe('PostCard (H-12)', () => {
     const reason = { type: 'country', countryCode: 'AR' } as const
     const { unmount } = renderWithIntl(<PostCard post={{ ...postItem(), reason }} />)
     const line = screen.getByText('Popular in Argentina')
-    const byline = screen.getByText('@maria')
+    const byline = screen.getByRole('link', { name: 'maria' })
     // Read first: before the byline in the document.
     expect(line.compareDocumentPosition(byline) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     unmount()

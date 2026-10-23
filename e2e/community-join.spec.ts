@@ -12,7 +12,11 @@ test.describe('The group first on each card', () => {
     await page.goto('/en')
     const card = feed(page).getByRole('article').filter({ hasText: 'Whales accumulated' })
     const header = await card.getByRole('link', { name: '$BTC' }).first().boundingBox()
-    const author = await card.getByText('@maria', { exact: true }).boundingBox()
+    // The author by their name, without the @ (specs/byline-handles BH-01).
+    const author = await card
+      .getByRole('link', { name: 'maria', exact: true })
+      .first()
+      .boundingBox()
     // The group sits on the first line, the author below it.
     expect(header!.y).toBeLessThan(author!.y)
   })

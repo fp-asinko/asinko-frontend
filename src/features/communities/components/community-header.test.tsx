@@ -27,7 +27,10 @@ describe('CommunityHeader (specs/community-pages CP-04)', () => {
 
   it('titles the page with the handle and shows description, members and the way back', () => {
     renderWithIntl(<CommunityHeader page={communityPage()} />)
-    expect(screen.getByRole('heading', { level: 1, name: '#macro' })).toBeInTheDocument()
+    const title = screen.getByRole('heading', { level: 1, name: '#macro' })
+    // The # much smaller and in gray; one name for assistive tech (specs/byline-handles BH-03).
+    expect(title.querySelector('span')).toHaveTextContent('#')
+    expect(title.querySelector('span')).toHaveClass('text-muted-foreground', 'text-[0.75em]')
     expect(screen.getByText('Rates, inflation and central banks.')).toBeInTheDocument()
     // The number in bold, the label gray (prototype): one sentence for screen readers.
     expect(screen.getByText('1,204').closest('p')).toHaveTextContent('1,204 members')

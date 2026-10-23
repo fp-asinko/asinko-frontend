@@ -23,16 +23,30 @@ const defi = (overrides: Partial<CardCommunity> = {}): CardCommunity => ({
 })
 
 describe('CardByline (specs/community-first)', () => {
+  it("keeps an asset's $, in gray (specs/byline-handles Q1)", () => {
+    renderWithIntl(
+      <CardByline
+        author={MARIA}
+        community={defi({ slug: 'BTC', handle: '$BTC', kind: 'asset', path: '/asset/BTC' })}
+        publishedAt={hourAgo()}
+        titleId="t"
+      />,
+    )
+    const asset = screen.getByRole('link', { name: '$BTC' })
+    expect(asset.querySelector('span span')).toHaveTextContent('$')
+    expect(asset.querySelector('span span')).toHaveClass('text-muted-foreground')
+  })
+
   it('puts the group first and the author second, without a photo (CF-01, CF-02)', () => {
     renderWithIntl(
       <CardByline author={MARIA} community={defi()} publishedAt={hourAgo()} titleId="t" />,
     )
-    const group = screen.getByRole('link', { name: '#defi' })
+    // By their names alone, without # or @ (specs/byline-handles BH-01).
+    const group = screen.getByRole('link', { name: 'defi' })
     expect(group).toHaveAttribute('href', '/hub/defi')
-    // The symbol is gray, the name keeps the text color.
-    expect(group.querySelector('span span')).toHaveTextContent('#')
-    expect(group.querySelector('span span')).toHaveClass('text-muted-foreground')
-    const author = screen.getByText('@maria')
+    expect(group).not.toHaveTextContent('#')
+    const author = screen.getByRole('link', { name: 'maria' })
+    expect(author).toHaveAttribute('href', '/user/maria')
     // The group comes before the author in reading order.
     expect(group.compareDocumentPosition(author) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
     expect(screen.getByText('74% accuracy, high')).toBeInTheDocument()
@@ -94,7 +108,7 @@ describe('CardByline (specs/community-first)', () => {
       />,
     )
     // The only link is the author, to the profile (CP-21): no group, no join.
-    expect(screen.getByRole('link', { name: '@maria' })).toHaveAttribute('href', '/user/maria')
+    expect(screen.getByRole('link', { name: 'maria' })).toHaveAttribute('href', '/user/maria')
     expect(screen.getAllByRole('link')).toHaveLength(1)
     expect(screen.queryByRole('button')).toBeNull()
     expect(screen.getByTestId('user-avatar')).toHaveTextContent('MA')
