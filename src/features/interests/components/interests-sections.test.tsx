@@ -131,12 +131,14 @@ describe('InterestsSections', () => {
     expect(screen.getByText('1,200 members')).toBeInTheDocument()
   })
 
-  it('shows a coming-soon "more" for assets, people and groups (H-26)', () => {
+  it('gives the lists of groups, people and assets an id for their "more" (specs/sidebar-more)', () => {
     renderWithIntl(<InterestsSections interests={interests} />)
-
-    for (const name of ['More assets', 'More people', 'More groups']) {
-      expect(screen.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
+    for (const name of ['Groups', 'People', 'Assets']) {
+      const list = screen.getByRole('region', { name }).querySelector('ul')
+      expect(list?.id).toMatch(/.+/)
     }
+    // Nothing is hidden without the column's height (jsdom): no "more" yet.
+    expect(screen.queryByRole('button', { name: /^more:/ })).toBeNull()
   })
 
   it('joins for real, while create group stays coming soon (specs/community-first CF-10)', async () => {

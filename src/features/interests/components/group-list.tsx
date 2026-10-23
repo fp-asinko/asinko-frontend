@@ -9,12 +9,16 @@ import { CommunityLink } from './community-link'
  * description, else its members. The link's name is its content: handle, MOD and the line below.
  * The current page shows with a gray background, as the people (no outline).
  */
-export function GroupList({ groups }: { groups: Group[] }) {
+export function GroupList({ groups, id }: { groups: Group[]; id?: string }) {
   const t = useTranslations('interests')
 
   return (
     // As many as the column's height takes (specs/sidebar-fill SF-03): 6, 4, 3, at least 2.
-    <ul className="flex flex-col gap-0.5 column-short:[&>li:nth-child(n+3)]:hidden column-mid:[&>li:nth-child(n+4)]:hidden column-tall:[&>li:nth-child(n+5)]:hidden [&>li:nth-child(n+7)]:hidden">
+    // All of them while the section's "more" is open (specs/sidebar-more).
+    <ul
+      id={id}
+      className="flex flex-col gap-0.5 group-has-data-[more=open]/section:[&>li]:block! column-short:[&>li:nth-child(n+3)]:hidden column-mid:[&>li:nth-child(n+4)]:hidden column-tall:[&>li:nth-child(n+5)]:hidden [&>li:nth-child(n+7)]:hidden"
+    >
       {groups.map((group) => (
         <li key={group.slug}>
           <CommunityLink

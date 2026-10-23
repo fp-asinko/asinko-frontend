@@ -58,9 +58,9 @@ export function InterestsSections({ interests }: { interests: Interests }) {
         result={interests.groups}
         empty={t('empty.groups')}
         emptyIcon={<HashIcon />}
-        moreLabel={t('moreGroups')}
+        more
       >
-        {(groups) => <GroupList groups={groups} />}
+        {(groups, listId) => <GroupList id={listId} groups={groups} />}
       </SidebarSection>
       {/* After the groups' "more", as in the prototype; shown even without groups. A column flex
           container so the coming-soon wrapper (and its button) spans the width. */}
@@ -78,18 +78,18 @@ export function InterestsSections({ interests }: { interests: Interests }) {
         result={interests.people}
         empty={t('empty.people')}
         emptyIcon={<UsersIcon />}
-        moreLabel={t('morePeople')}
+        more
       >
-        {(people) => <PeopleList people={people} />}
+        {(people, listId) => <PeopleList id={listId} people={people} />}
       </SidebarSection>
       <SidebarSection
         title={t('assets')}
         result={interests.assets}
         empty={t('empty.assets')}
         emptyIcon={<CoinsIcon />}
-        moreLabel={t('moreAssets')}
+        more
       >
-        {(tiles) => <AssetTiles tiles={tiles} />}
+        {(tiles, listId) => <AssetTiles id={listId} tiles={tiles} />}
       </SidebarSection>
       {/* At the bottom of the column, after a short, soft line (as without a session). */}
       <hr className="mx-1 mb-6 shrink-0 border-border/60" />

@@ -12,15 +12,19 @@ import { CommunityLink } from './community-link'
  * Motion (S-02): lifts on hover and focus, presses on tap; the community the feed shows is
  * marked as current (S-04).
  */
-export function AssetTiles({ tiles }: { tiles: AssetTile[] }) {
+export function AssetTiles({ tiles, id }: { tiles: AssetTile[]; id?: string }) {
   const t = useTranslations('interests')
   const format = useFormatter()
 
   return (
     <>
       <p className="mb-1.5 text-right text-[0.5625rem] text-muted-foreground">{t('period')}</p>
-      {/* As many rows as the column's height takes (specs/sidebar-fill SF-03): 3, 2, at least 1. */}
-      <ul className="grid grid-cols-3 gap-1.25 [&>li:nth-child(n+10)]:hidden column-mid:[&>li:nth-child(n+4)]:hidden column-tall:[&>li:nth-child(n+7)]:hidden">
+      {/* As many rows as the column's height takes (specs/sidebar-fill SF-03): 3, 2, at least 1.
+          All of them while the section's "more" is open (specs/sidebar-more). */}
+      <ul
+        id={id}
+        className="grid grid-cols-3 gap-1.25 group-has-data-[more=open]/section:[&>li]:block! [&>li:nth-child(n+10)]:hidden column-mid:[&>li:nth-child(n+4)]:hidden column-tall:[&>li:nth-child(n+7)]:hidden"
+      >
         {tiles.map((tile) => {
           const change = tile.changePct ?? 0
           return (

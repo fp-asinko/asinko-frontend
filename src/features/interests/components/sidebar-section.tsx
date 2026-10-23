@@ -1,6 +1,6 @@
 import { ChevronDownIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { ComingSoon } from '@/components/molecules/coming-soon'
+import { MoreToggle } from '@/components/molecules/more-toggle'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { useId, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
@@ -20,7 +20,7 @@ export function SidebarSection<T>({
   result,
   empty,
   emptyIcon,
-  moreLabel,
+  more = false,
   fill = false,
   className,
   children,
@@ -30,21 +30,24 @@ export function SidebarSection<T>({
   empty?: string
   /** The empty state's icon (specs/empty-states). */
   emptyIcon?: ReactNode
-  /** Accessible name of the section's "more" link (coming soon, H-26), e.g. "More assets". */
-  moreLabel?: string
+  /** "more" under its list, while some item is out of sight (specs/sidebar-more). */
+  more?: boolean
   /** Takes the column's height left (specs/sidebar-fill SF-02): its list fills it. */
   fill?: boolean
   className?: string
-  children: (data: T[]) => ReactNode
+  /** The list, with the id "more" controls. */
+  children: (data: T[], listId: string) => ReactNode
 }) {
   const t = useTranslations('interests')
   const headingId = useId()
+  const listId = useId()
 
   return (
     <section
       aria-labelledby={headingId}
       className={cn(
-        'mb-4', // At least its title and one whole item: below it, the column scrolls (SF-04).
+        // `group/section`: its list shows everything while "more" is open (specs/sidebar-more).
+        'group/section mb-4', // At least its title and one whole item: below it, the column scrolls (SF-04).
         fill && 'md:flex md:min-h-24 md:flex-1 md:flex-col',
         className,
       )}
@@ -84,16 +87,15 @@ export function SidebarSection<T>({
               <EmptyState icon={emptyIcon} title={empty} size="inline" className="px-1" />
             ) : (
               <>
-                {children(result.data)}
-                {moreLabel && (
-                  <div className="mt-1 flex justify-end">
-                    <ComingSoon
-                      label={moreLabel}
-                      placement="below-end"
-                      className="h-6 tap rounded-sm px-1.5 text-[0.625rem] font-medium text-muted-foreground hover:text-foreground"
-                    >
-                      {t('more')}
-                    </ComingSoon>
+                {children(result.data, listId)}
+                {more && (
+                  <div className="mt-1 flex justify-end empty:hidden">
+                    <MoreToggle
+                      controls={listId}
+                      section={title}
+                      more={t('more')}
+                      less={t('less')}
+                    />
                   </div>
                 )}
               </>

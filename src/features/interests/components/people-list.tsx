@@ -10,13 +10,17 @@ import { CommunityLink } from './community-link'
  * suggestions (specs/interests-refresh IR-03, IR-04), with the accuracy in its tier's color, as on
  * the feed's cards.
  */
-export function PeopleList({ people }: { people: Person[] }) {
+export function PeopleList({ people, id }: { people: Person[]; id?: string }) {
   const t = useTranslations('interests')
   const format = useFormatter()
 
   return (
     // As many as the column's height takes (specs/sidebar-fill SF-03): 5, 3, 2, at least 1.
-    <ul className="flex flex-col gap-0.5 column-short:[&>li:nth-child(n+2)]:hidden column-mid:[&>li:nth-child(n+3)]:hidden column-tall:[&>li:nth-child(n+4)]:hidden [&>li:nth-child(n+6)]:hidden">
+    // All of them while the section's "more" is open (specs/sidebar-more).
+    <ul
+      id={id}
+      className="flex flex-col gap-0.5 group-has-data-[more=open]/section:[&>li]:block! column-short:[&>li:nth-child(n+2)]:hidden column-mid:[&>li:nth-child(n+3)]:hidden column-tall:[&>li:nth-child(n+4)]:hidden [&>li:nth-child(n+6)]:hidden"
+    >
       {people.map((person) => (
         <li key={person.id}>
           <CommunityLink

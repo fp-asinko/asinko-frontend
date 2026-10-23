@@ -5,10 +5,21 @@ import { renderWithIntl } from '@/test/render-with-intl'
 import type { SectionResult } from '../interests.types'
 import { SidebarSection } from './sidebar-section'
 
-function renderSection(result: SectionResult<string[]>, moreLabel?: string) {
+function renderSection(result: SectionResult<string[]>, more = false, hidden: string[] = []) {
   return renderWithIntl(
-    <SidebarSection title="Assets" result={result} empty="Nothing yet" moreLabel={moreLabel}>
-      {(items) => <p>{items.join(', ')}</p>}
+    <SidebarSection title="Assets" result={result} empty="Nothing yet" more={more}>
+      {(items, listId) => (
+        <>
+          <p>{items.join(', ')}</p>
+          <ul id={listId}>
+            {items.map((item) => (
+              <li key={item} style={hidden.includes(item) ? { display: 'none' } : undefined}>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </SidebarSection>,
   )
 }
@@ -57,16 +68,18 @@ describe('SidebarSection', () => {
     expect(screen.getByText('Could not load this section.')).toBeInTheDocument()
   })
 
-  it('shows the empty message, and the coming-soon "more" when there are items (H-26)', () => {
-    const { unmount } = renderSection({ ok: true, data: [] }, 'More assets')
+  it('shows the empty message, and "more" only while its list hides something (specs/sidebar-more)', async () => {
+    const { unmount } = renderSection({ ok: true, data: [] }, true)
     expect(screen.getByText('Nothing yet')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'More assets' })).toBeNull()
+    expect(screen.queryByRole('button', { name: /more/ })).toBeNull()
     unmount()
 
-    renderSection({ ok: true, data: ['BTC'] }, 'More assets')
-    expect(screen.getByRole('button', { name: 'More assets' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    )
+    const all = renderSection({ ok: true, data: ['BTC', 'ETH'] }, true)
+    expect(screen.queryByRole('button', { name: /more/ })).toBeNull()
+    all.unmount()
+
+    renderSection({ ok: true, data: ['BTC', 'ETH'] }, true, ['ETH'])
+    const more = await screen.findByRole('button', { name: 'more: Assets' })
+    expect(more).toHaveAttribute('aria-controls', screen.getByRole('list').id)
   })
 })
