@@ -37,6 +37,10 @@ test.describe('Left column toggle', () => {
     expect((await column(page).boundingBox())!.width).toBeCloseTo(260, 0)
     expect(await shadowed(page)).toBe(true)
     await expect.poll(() => centerOffEdge(page)).toBeLessThanOrEqual(1)
+    // The content ends before the toggle, with some air, as Reddit's (SL-13).
+    const content = (await region(page).boundingBox())!
+    const button = (await toggle(page).boundingBox())!
+    expect(content.x + content.width).toBeLessThanOrEqual(button.x - 8)
     const main = (await page.getByRole('main').boundingBox())!
 
     await toggle(page).click()

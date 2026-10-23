@@ -57,7 +57,7 @@ En `AppShell`, desde `md`:
   Se mueve con `transform` (200 / 150 ms, como la columna) y la variante `left-folded:` decide la posición. Así sigue a la columna también antes de hidratar.
 
 - `aria-controls="left-column"`, `aria-expanded` y el nombre "Your interests" (`common.leftColumn.label`, que ya existe). `hidden md:inline-flex`.
-- Tapa los 16 px de la derecha de la fila que pasa por debajo al hacer scroll en la columna, nunca una fila entera: se cumple WCAG 2.4.11 (AA pide que no quede _totalmente_ tapado). _Cambio al implementar: se descartó un `pr-4` para despejarlo; no alcanzaba (hacía falta `pr-8`) y le quitaba a la columna el ancho que midió `sidebar-fill`._
+- **No tapa nada de la columna** (SL-13, pedido del PO el 2026-10-23): el contenido tiene `pr-7`, así termina en los 232 px y el botón empieza en los 244. Quedan 12 px de aire, como en Reddit. Con eso se cumple WCAG 2.4.11 de sobra. La columna pierde 20 px de ancho útil, y `sidebar-fill` lo verifica: nada queda cortado.
 - **Antes de hidratar, en crear post**, el botón dice `aria-expanded="true"` (la cookie del sitio) mientras el CSS ya dibuja la columna plegada: unos milisegundos, hasta que la marca de la página se registra. Se acepta (revisión de UI, 2026-10-23).
 
 ## 5. Peso (SL-12)
