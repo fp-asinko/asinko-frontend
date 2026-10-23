@@ -11,16 +11,16 @@ export default function Loading() {
     <PageColumns>
       <div aria-hidden>
         {/* Same boxes as ComposerPlaceholder, so the feed does not move when it arrives. */}
-        <div className="border-b bg-card px-4 py-3.5 md:px-0">
-          <div className="flex h-10.75 items-center gap-3">
+        <div className="border-b bg-card px-4 py-3.5 sm:flex sm:items-center sm:gap-3 md:px-0">
+          <div className="flex h-10.75 items-center gap-3 sm:min-w-0 sm:flex-1">
             <Skeleton className="size-10 rounded-full" />
             <Skeleton className="h-5 w-48 rounded-md" />
           </div>
-          <div className="mt-3 flex items-center gap-0.5 border-t pt-2.5">
+          <div className="mt-3 flex items-center gap-0.5 border-t pt-2.5 sm:mt-0 sm:shrink-0 sm:border-t-0 sm:pt-0">
             {[0, 1, 2, 3].map((action) => (
               <Skeleton key={action} className="size-9 rounded-full" />
             ))}
-            <Skeleton className="ml-auto h-9 w-20 rounded-full" />
+            <Skeleton className="ml-auto h-9 w-20 rounded-full sm:ml-1.5" />
           </div>
         </div>
         <div className="px-2 pt-4 sm:px-0">

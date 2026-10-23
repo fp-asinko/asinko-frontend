@@ -33,9 +33,10 @@ export function ComposerPlaceholder({
   ] as const
 
   return (
-    // The cards' edges: the whole column from md, as the posts and their images below.
-    <div className="border-b bg-card px-4 py-3.5 md:px-0">
-      <div className="flex items-center gap-3">
+    // The cards' edges: the whole column from md, as the posts and their images below. From sm,
+    // one row: the prompt on the left, the formats and Publish on the right (specs/composer-row).
+    <div className="border-b bg-card px-4 py-3.5 sm:flex sm:items-center sm:gap-3 md:px-0">
+      <div className="flex items-center gap-3 sm:min-w-0 sm:flex-1">
         <UserAvatar
           name={viewerName ?? '?'}
           tone={viewerName ? 'identity' : 'neutral'}
@@ -50,8 +51,8 @@ export function ComposerPlaceholder({
           <span className="truncate">{prompt}</span>
         </ComposeTrigger>
       </div>
-      {/* Edge to edge, as the editor's footer. */}
-      <div className="mt-3 flex items-center gap-0.5 border-t pt-2.5">
+      {/* On a phone, its own row under a line, edge to edge as the editor's footer (CR-02). */}
+      <div className="mt-3 flex items-center gap-0.5 border-t pt-2.5 sm:mt-0 sm:shrink-0 sm:border-t-0 sm:pt-0">
         <ComposeTrigger
           type="link"
           community={communitySlug}
@@ -80,7 +81,7 @@ export function ComposerPlaceholder({
           community={communitySlug}
           aria-hidden
           tabIndex={-1}
-          className="ml-auto inline-flex h-9 tap items-center rounded-full bg-muted px-4 type-action font-bold text-muted-foreground outline-none hover:bg-muted-hover hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="ml-auto inline-flex h-9 tap items-center rounded-full bg-muted px-4 type-action font-bold text-muted-foreground outline-none hover:bg-muted-hover hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 sm:ml-1.5"
         >
           {t('publish')}
         </ComposeTrigger>
