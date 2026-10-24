@@ -99,16 +99,7 @@ test.describe('Post detail refresh', () => {
     await expect(page.getByRole('button', { name: 'Sort by: Best' })).toBeVisible()
   })
 
-  test('places no ads of its own: not in the feed, the post nor its comments (specs/backend-answer-1013 BA-06)', async ({
-    page,
-  }) => {
-    // The backend will send them inside the feed (P-015): the front does not place them.
-    for (const path of ['/en', ETH_PATH]) {
-      await page.goto(path)
-      await expect(page.getByRole('main').getByRole('article').first()).toBeVisible()
-      await expect(page.getByRole('region', { name: /^Ad: / })).toHaveCount(0)
-    }
-  })
+  // Ads: where the backend puts them, in the feed and with the comments (specs/ads, e2e/ads.spec.ts).
 
   for (const theme of ['light', 'dark'] as const) {
     test(`fits 360px and stays accessible in ${theme} (PD-12, PD-13)`, async ({

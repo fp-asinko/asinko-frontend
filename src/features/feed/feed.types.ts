@@ -111,7 +111,22 @@ export type PollResults = Pick<
   'options' | 'totalVotes' | 'viewerOptionId' | 'resultsVisible'
 >
 
-export type FeedItem = PostItem | PollItem
+/**
+ * An ad where the backend puts it: in a feed, or after a comment (specs/ads). Only http(s) links,
+ * with the real domain to show (AD-06).
+ */
+export type AdItem = {
+  kind: 'ad'
+  id: string
+  advertiser: string
+  logoUrl: string | null
+  body: string | null
+  url: string
+  domain: string
+  image: { src: string; width: number; height: number; alt: string } | null
+}
+
+export type FeedItem = PostItem | PollItem | AdItem
 
 /** A comment of the card's preview (H-28): top level only, never deleted. */
 export type CommentPreview = {
@@ -144,6 +159,8 @@ export type CommentNode = {
   score: number
   viewerVote: 1 | -1 | null
   replies: CommentNode[]
+  /** The ad that goes right after it, before its replies (specs/ads AD-04). */
+  ad?: AdItem
 }
 
 /** A person's comment on their profile, out of its thread (specs/backend-adoption BK-03). */

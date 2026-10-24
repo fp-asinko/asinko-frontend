@@ -64,6 +64,30 @@ Lo que necesita sesión está en [Por verificar con datos reales](#por-verificar
 - `"tags": string[]` en el `Community`: hasta 20, de 1 a 24 caracteres; `[]` si no tiene. Las definen sus moderadores (más adelante, con `PATCH /communities`); mientras tanto, del seed.
 - `POST /posts` con un `tag` que no está en las de su comunidad: `422 INVALID_TAG`.
 
+### P-031: Anuncios en el feed y en el detalle de un post
+
+**Estado:** propuesta (2026-10-24), mockeada (`specs/ads`). Parte de lo que respondió el backend sobre P-015 el 2026-10-13: los anuncios vienen dentro del feed y el front no decide dónde van.
+
+**Motivo:** el PO pidió volver a mostrar anuncios en los feeds y también en el detalle de un post, con piezas gráficas terminadas (traen su texto, su logo y sus avisos legales adentro, en tamaños distintos: 4:5, 1:1, 1,91:1 y banners de 970×250).
+
+**Cambio:**
+
+- **El `Ad`**: el de P-015, con el texto propio opcional y la imagen con su tamaño (para reservar el lugar, sin saltos al cargar) y su texto alternativo:
+
+  ```json
+  {
+    "id": "uuid",
+    "advertiser": { "name": "string", "logoUrl": "string | null" },
+    "body": "string (hasta 280) | null",
+    "url": "https://…",
+    "image": { "url": "string", "width": 1200, "height": 1500, "alt": "string" } | null
+  }
+  ```
+
+- **En el feed** (Explore, Following, `?community=` y `/users/{id}/content`): un ítem más de la lista, `{ "kind": "AD", "content": Ad }`, donde el backend lo ponga. El front lo dibuja ahí y no lo cuenta. El mock pone uno después de cada 10 ítems de cada página.
+- **En el detalle**: `GET /posts/{id}/comments` (el árbol, sin `?q` ni `?limit`) suma `"ads": [{ "afterCommentId": "uuid | null", "ad": Ad }]`. `null` va debajo del post; si no, va después de ese comentario, en el orden de lectura y antes de sus respuestas. El backend elige las posiciones. El mock pone uno debajo del post y uno cada 10 comentarios, contando respuestas. La búsqueda (`?q=`) y la vista previa de una tarjeta (`?limit`) no traen `ads`.
+- **El link**: solo `http(s)`. El front descarta otro esquema y abre el link en otra pestaña con `rel="sponsored"`.
+
 ### `best` de los comentarios (P-014)
 
 **Estado:** el backend acepta `sort=best` y por ahora responde cronológico; la fórmula está en definición.

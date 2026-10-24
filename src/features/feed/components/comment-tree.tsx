@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import type { CommentNode } from '../feed.types'
 import { FOLD_DEPTH } from '../lib/comment-fold'
 import { CommentAnchor } from './comment-anchor'
+import { CommentAd } from './comment-ad'
 import { CollapseButton, CommentFold, RepliesFold } from './comment-fold'
 import { COMMENT_ACTION, CommentReply } from './comment-reply'
 import { PendingComments } from './comment-thread'
@@ -140,6 +141,12 @@ function CommentItem({
           viewerVote={comment.viewerVote}
         />
       </CommentReply>
+      {/* The ad the backend put after this comment, before its replies (specs/ads AD-04). */}
+      {comment.ad && (
+        <div className="mt-4">
+          <CommentAd ad={comment.ad} />
+        </div>
+      )}
     </>
   )
 

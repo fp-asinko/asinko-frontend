@@ -1093,5 +1093,11 @@
     },
     "loadError": "Could not load the community.",
     "related": "Related ({count, number})"
+  },
+  "ads": {
+    "label": "Ad",
+    "cta": "Learn more",
+    "ctaLabel": "Learn more about {advertiser} (opens in a new tab)",
+    "region": "Ad: {advertiser}"
   }
 }

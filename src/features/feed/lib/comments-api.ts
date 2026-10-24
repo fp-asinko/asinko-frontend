@@ -1,11 +1,16 @@
 import 'server-only'
-import { apiRequest, type ApiResult } from '@/lib/api'
-import { commentListSchema, createdCommentSchema, type RawComment } from '@/lib/api/contract'
-import type { CommentNode, CommentPreview } from '../feed.types'
+import { apiRequest, keepValidItems, type ApiResult } from '@/lib/api'
+import {
+  commentAdSchema,
+  commentListSchema,
+  createdCommentSchema,
+  type RawComment,
+} from '@/lib/api/contract'
+import type { AdItem, CommentNode, CommentPreview } from '../feed.types'
 import type { CreateCommentInput } from '../schemas/comment.schema'
 import type { CommentSort } from '../schemas/comments-query.schema'
 import type { CommentsTarget } from '../schemas/comments-preview.schema'
-import { toAuthor } from './mappers'
+import { toAdItem, toAuthor } from './mappers'
 import { communityPath } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 
@@ -95,7 +100,7 @@ function toCommentNode(comment: RawComment): CommentNode | null {
 export async function getCommentTree(
   postId: string,
   sort?: CommentSort,
-): Promise<ApiResult<CommentNode[]>> {
+): Promise<ApiResult<{ comments: CommentNode[]; postAd: AdItem | null }>> {
   const result = await apiRequest({
     method: 'GET',
     path: '/api/v1/posts/:id/comments',
@@ -104,7 +109,38 @@ export async function getCommentTree(
     schema: commentListSchema,
   })
   if (!result.ok) return result
-  return { ok: true, data: result.data.items.flatMap((comment) => toCommentNode(comment) ?? []) }
+  const comments = result.data.items.flatMap((comment) => toCommentNode(comment) ?? [])
+  // Its ads, where the backend puts them (P-031, specs/ads AD-04): a malformed one is left out and
+  // reported, not the comments (AD-08); one with a link that is not http(s) too (AD-06).
+  const ads = keepValidItems(
+    result.data.ads ?? [],
+    commentAdSchema,
+    'GET /api/v1/posts/:id/comments',
+  )
+    .map(({ afterCommentId, ad }) => ({ afterCommentId, ad: toAdItem(ad) }))
+    .filter((each): each is { afterCommentId: string | null; ad: AdItem } => each.ad !== null)
+  const after = new Map(
+    ads.flatMap((each) => (each.afterCommentId ? [[each.afterCommentId, each.ad]] : [])),
+  )
+  return {
+    ok: true,
+    data: {
+      comments: withCommentAds(comments, after),
+      postAd: ads.find((each) => each.afterCommentId === null)?.ad ?? null,
+    },
+  }
+}
+
+/** Each ad hung on the comment it goes after; an ad for a comment that is not there is left out. */
+function withCommentAds(
+  comments: readonly CommentNode[],
+  after: ReadonlyMap<string, AdItem>,
+): CommentNode[] {
+  if (after.size === 0) return [...comments]
+  return comments.map((comment) => {
+    const ad = after.get(comment.id)
+    return { ...comment, replies: withCommentAds(comment.replies, after), ...(ad && { ad }) }
+  })
 }
 
 /**

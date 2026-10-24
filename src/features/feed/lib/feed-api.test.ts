@@ -4,7 +4,12 @@ import { PROFILES } from '@/mocks/fixtures/users'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
 import { parseFeedParams } from '../schemas/feed-params.schema'
+import type { FeedItem, PollItem, PostItem } from '../feed.types'
 import { getFeed, getFilteredCommunity } from './feed-api'
+
+/** The users' content of a page, without its ads (specs/ads). */
+const content = (items: FeedItem[]) =>
+  items.filter((item): item is PostItem | PollItem => item.kind !== 'ad')
 
 // The real client against the mock routes; a route left out reaches a fetch that always fails.
 const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[], dropped: [] as number[] }))
@@ -44,16 +49,18 @@ describe('getFeed', () => {
   it('returns the first page of For you with resolved communities', async () => {
     const result = await getFeed(parseFeedParams({}))
     if (!result.ok) throw new Error('expected ok')
-    expect(result.data.items).toHaveLength(20)
+    expect(content(result.data.items)).toHaveLength(20)
     expect(result.data.nextCursor).toEqual(expect.any(String))
-    expect(result.data.items.every((item) => item.community !== null)).toBe(true)
+    // The ads where the backend put them, as cards of their own (specs/ads AD-01).
+    expect(result.data.items[10]).toMatchObject({ kind: 'ad', domain: expect.any(String) })
+    expect(content(result.data.items).every((item) => item.community !== null)).toBe(true)
   })
 
   it('filters For you by community and returns that community for the chip', async () => {
     const result = await getFeed(parseFeedParams({ community: 'BTC' }))
     if (!result.ok) throw new Error('expected ok')
     expect(result.data.items.length).toBeGreaterThan(0)
-    expect(result.data.items.every((item) => item.community?.slug === 'BTC')).toBe(true)
+    expect(content(result.data.items).every((item) => item.community?.slug === 'BTC')).toBe(true)
     expect(result.data.community).toEqual({ slug: 'BTC', name: 'Bitcoin', handle: '$BTC' })
   })
 
@@ -61,7 +68,7 @@ describe('getFeed', () => {
     state.routes = MOCK_ROUTES.filter((route) => route.path !== '/api/v1/communities')
     const result = await getFeed(parseFeedParams({ community: 'BTC' }))
     if (!result.ok) throw new Error('expected ok')
-    expect(result.data.items.every((item) => item.community?.slug === 'BTC')).toBe(true)
+    expect(content(result.data.items).every((item) => item.community?.slug === 'BTC')).toBe(true)
   })
 
   it('returns NOT_FOUND for an unknown community, although Explore answers an empty page', async () => {
@@ -79,7 +86,9 @@ describe('getFeed', () => {
     ).toBe(true)
     // Not only their channel: groups too.
     const communities = new Set(
-      result.data.items.map((item) => (item.kind === 'post' ? item.community?.slug : null)),
+      content(result.data.items).map((item) =>
+        item.kind === 'post' ? item.community?.slug : null,
+      ),
     )
     expect(communities.size).toBeGreaterThan(1)
   })
@@ -92,7 +101,7 @@ describe('getFeed', () => {
   it("says why only on the Home's Explore, and passes every page's requestId (specs/explore-v1)", async () => {
     const explore = await getFeed(parseFeedParams({}))
     if (!explore.ok) throw new Error('expected ok')
-    const types = new Set(explore.data.items.map((item) => item.reason?.type ?? null))
+    const types = new Set(content(explore.data.items).map((item) => item.reason?.type ?? null))
     expect(types).toEqual(new Set(['similar', 'country', null]))
     expect(explore.data.requestId).toMatch(/^[0-9a-f-]{36}$/)
 
@@ -103,7 +112,7 @@ describe('getFeed', () => {
     for (const params of elsewhere) {
       const result = await getFeed(params)
       if (!result.ok) throw new Error('expected ok')
-      expect(result.data.items.every((item) => item.reason === null)).toBe(true)
+      expect(content(result.data.items).every((item) => item.reason === null)).toBe(true)
       expect(result.data.requestId).toMatch(/^[0-9a-f-]{36}$/)
     }
   })
@@ -117,7 +126,7 @@ describe('getFeed', () => {
     })
     const result = await getFeed(parseFeedParams({ feed: 'following' }))
     if (!result.ok) throw new Error('expected ok')
-    expect(result.data.items[0]?.reason).toBeNull()
+    expect(content(result.data.items)[0]?.reason).toBeNull()
     expect(result.data.requestId).toBeNull()
   })
 
@@ -169,12 +178,12 @@ describe('getFeed', () => {
     expect(state.dropped).toEqual([2])
   })
 
-  it('leaves out, without reporting, the kinds it does not draw: theses, ads (BA-07)', async () => {
+  it('leaves out, without reporting, the kinds it does not draw: theses, new ones (BA-07)', async () => {
     state.routes = withRoute('/api/v1/feed/explore', {
       items: [
-        { kind: 'AD', content: { id: 'ad-1' } },
         { kind: 'POST', content: POSTS[0] },
         { kind: 'THESIS', content: {} },
+        { kind: 'LIVE', content: {} },
       ],
       nextCursor: null,
     })
@@ -184,11 +193,41 @@ describe('getFeed', () => {
     expect(state.dropped).toEqual([])
   })
 
+  it('keeps an ad where it comes; drops and reports a malformed one, and one that is not http(s) (specs/ads)', async () => {
+    const ad = (id: string, url: string) => ({
+      kind: 'AD',
+      content: {
+        id,
+        advertiser: { name: 'eToro', logoUrl: null },
+        body: null,
+        url,
+        image: null,
+      },
+    })
+    state.routes = withRoute('/api/v1/feed/explore', {
+      items: [
+        { kind: 'POST', content: POSTS[0] },
+        ad('00000000-0000-4000-8000-000000031001', 'https://www.etoro.com/'),
+        ad('00000000-0000-4000-8000-000000031002', 'javascript:alert(1)'),
+        { kind: 'AD', content: { id: 'broken' } },
+      ],
+      nextCursor: null,
+    })
+    const result = await getFeed(parseFeedParams({}))
+    if (!result.ok) throw new Error('expected ok')
+    expect(result.data.items.map((item) => item.kind)).toEqual(['post', 'ad'])
+    expect(result.data.items[1]).toMatchObject({
+      domain: 'etoro.com',
+      url: 'https://www.etoro.com/',
+    })
+    expect(state.dropped).toEqual([1])
+  })
+
   it('keeps every card named when communities fail: the content carries it (BC-01)', async () => {
     state.routes = MOCK_ROUTES.filter((route) => route.path !== '/api/v1/communities')
     const result = await getFeed(parseFeedParams({}))
     if (!result.ok) throw new Error('expected ok')
-    expect(result.data.items.every((item) => item.community !== null)).toBe(true)
+    expect(content(result.data.items).every((item) => item.community !== null)).toBe(true)
   })
 
   describe('community data from each summary (P-010)', () => {
@@ -227,8 +266,10 @@ describe('getFeed', () => {
       const guest = await getFeed(parseFeedParams({}))
       const signedIn = await getFeed(parseFeedParams({}), undefined, { signedIn: true })
       if (!guest.ok || !signedIn.ok) throw new Error('expected ok')
-      expect(guest.data.items.every((item) => item.community?.viewerIsMember === null)).toBe(true)
-      const members = signedIn.data.items.map((item) => item.community?.viewerIsMember)
+      expect(
+        content(guest.data.items).every((item) => item.community?.viewerIsMember === null),
+      ).toBe(true)
+      const members = content(signedIn.data.items).map((item) => item.community?.viewerIsMember)
       expect(members).toContain(true)
       expect(members).toContain(false)
     })

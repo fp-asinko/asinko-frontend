@@ -27,11 +27,14 @@ import {
   userSchema,
   userSummarySchema,
   voteResultSchema,
+  type RawComment,
+  type RawContentFeedItem,
   type RawFeedItem,
   type RawFeedReason,
 } from '@/lib/api/contract'
 import { noContentSchema, paginatedSchema } from '@/lib/api/schemas'
 import { DEMO_USER } from './demo-user'
+import { AD_EVERY, adAt } from './fixtures/ads'
 import { ASSETS, assetBySymbol } from './fixtures/assets'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { COMMUNITIES, communityBySlug, communitySummary } from './fixtures/communities'
@@ -74,7 +77,7 @@ const validationError = {
 const noRequest: MockContext = { params: {}, query: {}, body: undefined }
 
 /** Newest first, posts and polls mixed (E04). Deleted posts stay: the UI shows them as deleted. */
-const FEED: RawFeedItem[] = [
+const FEED: RawContentFeedItem[] = [
   ...POSTS.map((content) => ({ kind: 'POST' as const, content })),
   ...POLLS.map((content) => ({ kind: 'POLL' as const, content })),
 ].sort((a, b) => b.content.publishedAt.localeCompare(a.content.publishedAt))
@@ -82,7 +85,7 @@ const FEED: RawFeedItem[] = [
 const FEED_KINDS = ['POST', 'THESIS', 'POLL']
 
 /** ?kind=POST or ?kind=POST,POLL narrows the feed; unknown values are ignored (backend dev). */
-function byKind(items: RawFeedItem[], raw: string | undefined) {
+function byKind(items: RawContentFeedItem[], raw: string | undefined) {
   const kinds = (raw ?? '')
     .split(',')
     .map((each) => each.trim().toUpperCase())
@@ -100,7 +103,7 @@ function requestIdOf(feed: number, cursor: string | undefined) {
 }
 
 /** Explore's reasons, in turn (specs/explore-v1 § 4): the four types, as the backend mixes them. */
-function withReason(item: RawFeedItem, index: number): RawFeedItem {
+function withReason(item: RawContentFeedItem, index: number): RawContentFeedItem {
   const { id, slug, name, type, avatarUrl } = communitySummary('macro')
   const reasons: RawFeedReason[] = [
     { type: 'SIMILAR', via: { id, slug, name, type, avatarUrl }, countryCode: null },
@@ -111,10 +114,51 @@ function withReason(item: RawFeedItem, index: number): RawFeedItem {
   return { ...item, reason: reasons[index % reasons.length] }
 }
 
-/** A page of a feed, with its requestId; null for an empty one, as the backend. */
-function feedPage(feed: number, items: RawFeedItem[], cursor: string | undefined) {
+/**
+ * An ad after every 10 items of a page, where the backend would put them (P-031, specs/ads AD-01),
+ * in turn from the page's offset, so the pages after show other ones.
+ */
+function withFeedAds(items: readonly RawFeedItem[], cursor: string | undefined): RawFeedItem[] {
+  const offset = cursor ? Number(atob(cursor)) || 0 : 0
+  return items.flatMap((item, index) =>
+    (index + 1) % AD_EVERY === 0
+      ? [
+          item,
+          { kind: 'AD' as const, content: adAt((offset + index + 1) / AD_EVERY - 1), reason: null },
+        ]
+      : [item],
+  )
+}
+
+/** A page of a feed, with its requestId (null for an empty one) and its ads, as the backend. */
+function feedPage(feed: number, items: RawContentFeedItem[], cursor: string | undefined) {
   const page = paginate(items, cursor)
-  return { ...page, requestId: page.items.length ? requestIdOf(feed, cursor) : null }
+  return {
+    ...page,
+    items: withFeedAds(page.items, cursor),
+    requestId: page.items.length ? requestIdOf(feed, cursor) : null,
+  }
+}
+
+/**
+ * A post's comment tree with its ads (P-031, specs/ads AD-04): one under the post and one after
+ * every 10 comments in reading order, replies included. Never in a search nor a card's preview.
+ */
+function treeAds(tree: readonly RawComment[]) {
+  const order: string[] = []
+  const walk = (list: readonly RawComment[]) => {
+    for (const comment of list) {
+      order.push(comment.id)
+      walk(comment.replies)
+    }
+  }
+  walk(tree)
+  return [
+    { afterCommentId: null, ad: adAt(0) },
+    ...order
+      .filter((_, index) => (index + 1) % AD_EVERY === 0)
+      .map((id, index) => ({ afterCommentId: id, ad: adAt(index + 1) })),
+  ]
 }
 
 // Registry of mocked endpoints (api-integration.md § Mocks). Handlers follow what the backend does
@@ -193,7 +237,14 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     implemented: true,
     schema: paginatedSchema(feedItemSchema),
     example: { ...noRequest, params: { userId: PROFILES[1]!.id }, query: { kind: 'POST,POLL' } },
-    handler: ({ params, query }) => userContent(params.userId ?? '', query),
+    handler: ({ params, query }) => {
+      const response = userContent(params.userId ?? '', query)
+      const body = response.body as { items?: RawFeedItem[] } | undefined
+      // A profile's posts carry ads too, as every feed (specs/ads AD-01).
+      return response.status === 200 && body?.items
+        ? { ...response, body: { ...body, items: withFeedAds(body.items, query.cursor) } }
+        : response
+    },
   },
   {
     method: 'GET',
@@ -690,10 +741,12 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       params: { id: POSTS[0]!.id },
       query: { limit: '3', replies: 'false' },
     },
-    handler: ({ params, query }) =>
-      params.id && findPost(params.id)
-        ? { status: 200, body: { items: commentTree(commentsOf(params.id), query) } }
-        : notFound,
+    handler: ({ params, query }) => {
+      if (!params.id || !findPost(params.id)) return notFound
+      const items = commentTree(commentsOf(params.id), query)
+      // The whole tree carries its ads; a card's preview (?limit) does not.
+      return { status: 200, body: query.limit ? { items } : { items, ads: treeAds(items) } }
+    },
   },
   {
     method: 'POST',

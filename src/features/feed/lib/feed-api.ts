@@ -12,8 +12,8 @@ import type { CommunityRef, FeedPage } from '../feed.types'
 import type { FeedParams } from '../schemas/feed-params.schema'
 import { indexCommunities, needsMentionLookup, toCommunityRef, toFeedItem } from './mappers'
 
-/** The kinds this front draws. THESIS waits for phase 2; ads will come as a kind of their own. */
-const KNOWN_KINDS = new Set(['POST', 'POLL'])
+/** The kinds this front draws. THESIS waits for phase 2; AD, where the backend puts it (specs/ads). */
+const KNOWN_KINDS = new Set(['POST', 'POLL', 'AD'])
 
 /**
  * Leaves out, in silence, the items of a kind this front does not know (P-015, specs/backend-answer-
@@ -133,7 +133,8 @@ export async function getFeed(
   // Only the Home's Explore says why it shows a card (specs/explore-v1 EX-03), whatever the
   // backend sends elsewhere.
   const explained = endpoint === EXPLORE && !params.community
-  const items = valid.map((item) => toFeedItem(item, mentions, signedIn, explained))
+  // An ad whose link is not http(s) is left out (specs/ads AD-06).
+  const items = valid.flatMap((item) => toFeedItem(item, mentions, signedIn, explained) ?? [])
 
   return {
     ok: true,

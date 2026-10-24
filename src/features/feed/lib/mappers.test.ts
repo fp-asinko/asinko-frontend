@@ -4,10 +4,12 @@ import type { RawPost } from '@/lib/api/contract'
 import { COMMUNITIES } from '@/mocks/fixtures/communities'
 import { POLLS } from '@/mocks/fixtures/polls'
 import { POSTS } from '@/mocks/fixtures/posts'
+import type { PostItem } from '../feed.types'
 import {
   indexCommunities,
   needsMentionLookup,
   toCardCommunity,
+  toAdItem,
   toFeedItem,
   toFeedReason,
   toPollItem,
@@ -137,8 +139,8 @@ describe('toPollItem', () => {
   })
 
   it('maps through the feed item kind', () => {
-    expect(toFeedItem({ kind: 'POLL', content: POLLS[2]! }, communities).kind).toBe('poll')
-    expect(toFeedItem({ kind: 'POST', content: post(2) }, communities).kind).toBe('post')
+    expect(toFeedItem({ kind: 'POLL', content: POLLS[2]! }, communities)?.kind).toBe('poll')
+    expect(toFeedItem({ kind: 'POST', content: post(2) }, communities)?.kind).toBe('post')
   })
 
   it('treats a poll with no votes as 0% each', () => {
@@ -238,10 +240,39 @@ describe('toFeedReason (specs/explore-v1 Q1, EX-02)', () => {
   it('reaches the card only when the feed explains itself', () => {
     const reason = { type: 'COUNTRY', via: null, countryCode: 'AR' }
     const item = { kind: 'POST' as const, content: post(1), reason }
-    expect(toFeedItem(item, communities, false, true).reason).toEqual({
+    expect((toFeedItem(item, communities, false, true) as PostItem).reason).toEqual({
       type: 'country',
       countryCode: 'AR',
     })
-    expect(toFeedItem(item, communities).reason).toBeNull()
+    expect((toFeedItem(item, communities) as PostItem).reason).toBeNull()
+  })
+})
+
+describe('toAdItem (specs/ads AD-06)', () => {
+  const raw = {
+    id: '00000000-0000-4000-8000-000000031001',
+    advertiser: { name: 'eToro', logoUrl: null },
+    body: null,
+    url: 'https://www.etoro.com/crypto/',
+    image: { url: '/mocks/ads/etoro-crypto.jpg', width: 480, height: 320, alt: 'Buy crypto' },
+  }
+
+  it('takes an http(s) ad, with its real domain and its image size', () => {
+    expect(toAdItem(raw)).toEqual({
+      kind: 'ad',
+      id: raw.id,
+      advertiser: 'eToro',
+      logoUrl: null,
+      body: null,
+      url: 'https://www.etoro.com/crypto/',
+      domain: 'etoro.com',
+      image: { src: '/mocks/ads/etoro-crypto.jpg', width: 480, height: 320, alt: 'Buy crypto' },
+    })
+  })
+
+  it('leaves out any other link', () => {
+    for (const url of ['javascript:alert(1)', 'data:text/html,hi', 'ftp://x.com', 'not a url']) {
+      expect(toAdItem({ ...raw, url })).toBeNull()
+    }
   })
 })

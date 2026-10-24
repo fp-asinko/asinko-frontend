@@ -19,7 +19,10 @@ const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[] }))
 vi.mock('@/lib/api', async () => {
   const { createApiClient } = await import('@/lib/api/create-client')
   const failingFetch = () => Promise.reject(new Error('offline'))
+  const { keepValidItems } = await import('@/lib/api/helpers')
   return {
+    keepValidItems: (items: unknown[], schema: Parameters<typeof keepValidItems>[1]) =>
+      keepValidItems(items, schema, () => {}),
     apiRequest: (request: Parameters<ReturnType<typeof createApiClient>>[0]) =>
       createApiClient({ baseUrl: 'http://mock', fetch: failingFetch, mocks: state.routes })(
         request,
@@ -103,13 +106,13 @@ describe('getCommentTree (specs/post-create-detail PC-14)', () => {
     const post = POSTS[0]!
     const result = await getCommentTree(post.id)
     if (!result.ok) throw new Error('expected ok')
-    expect(result.data.map((each) => each.id)).toEqual(
+    expect(result.data.comments.map((each) => each.id)).toEqual(
       COMMENTS_BY_CONTENT[post.id]!.map((each) => each.id),
     )
-    const deleted = result.data.find((each) => each.deleted)!
+    const deleted = result.data.comments.find((each) => each.deleted)!
     expect(deleted).toMatchObject({ author: null, body: '' })
     expect(deleted.replies).toHaveLength(1)
-    expect(result.data[0]!.replies[0]!.replies[0]!.author?.path).toBe('/user/quantsimula')
+    expect(result.data.comments[0]!.replies[0]!.replies[0]!.author?.path).toBe('/user/quantsimula')
   })
 
   it('drops a deleted comment without replies', async () => {
@@ -126,7 +129,79 @@ describe('getCommentTree (specs/post-create-detail PC-14)', () => {
           }
         : route,
     )
-    expect(await getCommentTree(post.id)).toEqual({ ok: true, data: [] })
+    expect(await getCommentTree(post.id)).toEqual({
+      ok: true,
+      data: { comments: [], postAd: null },
+    })
+  })
+})
+
+describe('the ads of a post (specs/ads AD-04 to AD-06, AD-08)', () => {
+  beforeEach(() => {
+    state.routes = MOCK_ROUTES
+  })
+
+  const ad = (id: string, url = 'https://www.etoro.com/') => ({
+    id,
+    advertiser: { name: 'eToro', logoUrl: null },
+    body: null,
+    url,
+    image: { url: '/mocks/ads/etoro-crypto.jpg', width: 480, height: 320, alt: 'Buy crypto' },
+  })
+  const withAds = (ads: unknown[]) => {
+    const post = POSTS[0]!
+    const tree = COMMENTS_BY_CONTENT[post.id]!
+    state.routes = MOCK_ROUTES.map((route) =>
+      route.path === '/api/v1/posts/:id/comments' && route.method === 'GET' && !route.when
+        ? { ...route, handler: () => ({ status: 200, body: { items: tree, ads } }) }
+        : route,
+    )
+    return { post, tree }
+  }
+
+  it('puts one under the post and the others after the comment the backend says', async () => {
+    const second = COMMENTS_BY_CONTENT[POSTS[0]!.id]![1]!
+    const { post } = withAds([
+      { afterCommentId: null, ad: ad('00000000-0000-4000-8000-000000031001') },
+      { afterCommentId: second.id, ad: ad('00000000-0000-4000-8000-000000031002') },
+    ])
+    const result = await getCommentTree(post.id)
+    if (!result.ok) throw new Error('expected ok')
+    expect(result.data.postAd).toMatchObject({
+      kind: 'ad',
+      advertiser: 'eToro',
+      domain: 'etoro.com',
+    })
+    expect(result.data.comments[1]!.ad?.id).toBe('00000000-0000-4000-8000-000000031002')
+    expect(result.data.comments[0]!.ad).toBeUndefined()
+  })
+
+  it('leaves out a malformed ad, one with a link that is not http(s), and one for no comment', async () => {
+    const { post } = withAds([
+      { afterCommentId: null, ad: { id: 'nope' } },
+      {
+        afterCommentId: null,
+        ad: ad('00000000-0000-4000-8000-000000031003', 'javascript:alert(1)'),
+      },
+      {
+        afterCommentId: '00000000-0000-4000-8000-0000000fffff',
+        ad: ad('00000000-0000-4000-8000-000000031004'),
+      },
+    ])
+    const result = await getCommentTree(post.id)
+    if (!result.ok) throw new Error('expected ok')
+    expect(result.data.postAd).toBeNull()
+    expect(result.data.comments.some((each) => each.ad)).toBe(false)
+  })
+
+  it('carries the mock ads only in the whole tree, never in a search (AD-05)', async () => {
+    const post = POSTS[0]!
+    const tree = await getCommentTree(post.id)
+    if (!tree.ok) throw new Error('expected ok')
+    expect(tree.data.postAd?.kind).toBe('ad')
+    const found = await searchComments(post.id, 'flows')
+    if (!found.ok) throw new Error('expected ok')
+    expect(found.data.some((each) => each.ad)).toBe(false)
   })
 })
 
@@ -139,7 +214,7 @@ describe('sorted and searched (specs/post-detail-refresh P-014)', () => {
   it('asks the backend for the order: every level comes sorted', async () => {
     const result = await getCommentTree(debate, 'top')
     if (!result.ok) throw new Error('expected ok')
-    const scores = result.data.map((each) => each.score)
+    const scores = result.data.comments.map((each) => each.score)
     expect(scores).toEqual([...scores].sort((a, b) => b - a))
   })
 

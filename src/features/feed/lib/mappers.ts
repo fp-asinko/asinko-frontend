@@ -4,6 +4,7 @@ import { postPath } from '@/lib/posts/paths'
 import type {
   RawCommunity,
   RawCommunitySummary,
+  RawAd,
   RawFeedItem,
   RawFeedReason,
   RawPoll,
@@ -14,6 +15,7 @@ import type {
   Author,
   CardCommunity,
   CommunityRef,
+  AdItem,
   FeedItem,
   FeedReason,
   PollItem,
@@ -177,13 +179,44 @@ export function toFeedReason(reason: RawFeedReason | null | undefined): FeedReas
   return null
 }
 
+/**
+ * An ad as the UI draws it (specs/ads): only an http(s) link, with its real domain to show (AD-06,
+ * security.md § 1). null for any other link: the ad is left out.
+ */
+export function toAdItem(ad: RawAd): AdItem | null {
+  let url: URL
+  try {
+    url = new URL(ad.url)
+  } catch {
+    return null
+  }
+  if (url.protocol !== 'https:' && url.protocol !== 'http:') return null
+  return {
+    kind: 'ad',
+    id: ad.id,
+    advertiser: ad.advertiser.name,
+    logoUrl: ad.advertiser.logoUrl,
+    body: ad.body,
+    url: url.href,
+    domain: url.hostname.replace(/^www./, ''),
+    image: ad.image && {
+      src: ad.image.url,
+      width: ad.image.width,
+      height: ad.image.height,
+      alt: ad.image.alt,
+    },
+  }
+}
+
 /** `explained`: the Home's Explore, the only feed that says why it shows a card (EX-03). */
 export function toFeedItem(
   item: RawFeedItem,
   mentions: MentionLookup,
   signedIn = false,
   explained = false,
-): FeedItem {
+): FeedItem | null {
+  // An ad as it comes (specs/ads AD-01); null when its link is not http(s) (AD-06).
+  if (item.kind === 'AD') return toAdItem(item.content)
   const reason = explained ? toFeedReason(item.reason) : null
   return item.kind === 'POST'
     ? { ...toPostItem(item.content, mentions, signedIn), reason }

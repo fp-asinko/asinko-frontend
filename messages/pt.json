@@ -1093,5 +1093,11 @@
     },
     "loadError": "Não foi possível carregar a comunidade.",
     "related": "Relacionados ({count, number})"
+  },
+  "ads": {
+    "label": "Anúncio",
+    "cta": "Saiba mais",
+    "ctaLabel": "Saiba mais sobre {advertiser} (abre em outra aba)",
+    "region": "Anúncio: {advertiser}"
   }
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { adSchema } from './ads'
 import { communityTypeSchema, membershipSchema } from './communities'
 import { userSummarySchema } from './users'
 
@@ -143,7 +144,14 @@ export const commentSchema: z.ZodType<RawComment> = z.lazy(() =>
  */
 export const createdCommentSchema = z.object(commentFields)
 
-export const commentListSchema = z.object({ items: z.array(commentSchema) })
+/**
+ * A post's comments. The tree (not ?q=) may carry its ads, each with where it goes (P-031,
+ * specs/ads): one ad that does not hold the shape is left out, not the comments (AD-08).
+ */
+export const commentListSchema = z.object({
+  items: z.array(commentSchema),
+  ads: z.array(z.unknown()).optional(),
+})
 
 /**
  * Why Explore shows an item (backend 2026-10-20, specs/explore-v1 § 1): `via` only with SIMILAR,
@@ -166,6 +174,8 @@ const reasonField = feedReasonSchema.nullable().optional().catch(null)
 export const feedItemSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('POST'), content: postSchema, reason: reasonField }),
   z.object({ kind: z.literal('POLL'), content: pollSchema, reason: reasonField }),
+  // An ad, where the backend puts it (P-015, P-031, specs/ads AD-01).
+  z.object({ kind: z.literal('AD'), content: adSchema, reason: reasonField }),
 ])
 
 /**
@@ -264,6 +274,8 @@ export type RawPoll = z.infer<typeof pollSchema>
 export type RawEntity = z.infer<typeof entitySchema>
 export type RawCommunitySummary = z.infer<typeof communitySummarySchema>
 export type RawFeedItem = z.infer<typeof feedItemSchema>
+/** A user's content in a feed: a post or a poll, not an ad (specs/ads). */
+export type RawContentFeedItem = Extract<RawFeedItem, { kind: 'POST' | 'POLL' }>
 export type RawFeedReason = z.infer<typeof feedReasonSchema>
 export type ImpressionEvent = z.infer<typeof impressionEventSchema>
 export type ImpressionsRequest = z.infer<typeof impressionsRequestSchema>

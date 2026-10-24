@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server'
 import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getCommentTree, searchComments } from '../lib/comments-api'
+import { CommentAd } from './comment-ad'
 import type { CommentsQuery } from '../schemas/comments-query.schema'
 import { CommentComposer } from './comment-composer'
 import { CommentSearchResults } from './comment-search-results'
@@ -81,9 +82,16 @@ async function LoadedComments({
   const t = await getTranslations('postDetail')
   const result = await getCommentTree(postId, sort)
   if (!result.ok) return <Failed />
+  const { comments, postAd } = result.data
   return (
     <>
-      {result.data.length === 0 && (
+      {/* The ad under the post, before its comments, where the backend puts it (specs/ads AD-04). */}
+      {postAd && (
+        <div className="mb-5">
+          <CommentAd ad={postAd} />
+        </div>
+      )}
+      {comments.length === 0 && (
         <EmptyState
           icon={<MessageCircleIcon />}
           title={t('empty')}
@@ -94,7 +102,7 @@ async function LoadedComments({
           }
         />
       )}
-      <CommentTree postId={postId} comments={result.data} />
+      <CommentTree postId={postId} comments={comments} />
     </>
   )
 }

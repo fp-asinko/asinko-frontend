@@ -12,6 +12,9 @@ type Page = {
   nextCursor: string | null
 }
 
+/** A user's content, not an ad (specs/ads). */
+const notAd = (item: { kind?: string }) => item.kind !== 'AD'
+
 function call(method: string, path: string, context: Partial<MockContext> = {}) {
   // As the client: the first route that matches, `when` included.
   const query = context.query ?? {}
@@ -28,7 +31,10 @@ function call(method: string, path: string, context: Partial<MockContext> = {}) 
 describe('mock handlers behave like the contract', () => {
   it('paginates the explore feed with an opaque cursor, 20 per page', async () => {
     const first = (await call('GET', '/api/v1/feed/explore')).body as Page
-    expect(first.items).toHaveLength(20)
+    expect(first.items.filter(notAd)).toHaveLength(20)
+    // An ad after every 10 items, where the backend would put it (specs/ads AD-01).
+    expect(first.items.filter((item) => !notAd(item))).toHaveLength(2)
+    expect(first.items[10]).toMatchObject({ kind: 'AD' })
     expect(first.nextCursor).toEqual(expect.any(String))
 
     const second = (
@@ -43,7 +49,7 @@ describe('mock handlers behave like the contract', () => {
     const page = (await call('GET', '/api/v1/feed/explore', { query: { community: 'BTC' } }))
       .body as Page
     expect(page.items.length).toBeGreaterThan(0)
-    for (const item of page.items) expect(item.content?.communityId).toBe(btc.id)
+    for (const item of page.items.filter(notAd)) expect(item.content?.communityId).toBe(btc.id)
   })
 
   it('answers an empty page for an unknown community, like the backend dev branch', async () => {
@@ -55,16 +61,19 @@ describe('mock handlers behave like the contract', () => {
   })
 
   it("says why Explore shows each item, only on the Home's Explore (specs/explore-v1)", async () => {
-    type Reasoned = { items: Array<{ reason: { type: string } | null }>; requestId: string }
+    type Reasoned = {
+      items: Array<{ kind?: string; reason: { type: string } | null }>
+      requestId: string
+    }
     const explore = (await call('GET', '/api/v1/feed/explore')).body as Reasoned
-    expect(new Set(explore.items.map((item) => item.reason?.type))).toEqual(
+    expect(new Set(explore.items.filter(notAd).map((item) => item.reason?.type))).toEqual(
       new Set(['SIMILAR', 'COUNTRY', 'TRENDING', 'FOLLOWING']),
     )
     const community = (await call('GET', '/api/v1/feed/explore', { query: { community: 'BTC' } }))
       .body as Reasoned
     const following = (await call('GET', '/api/v1/feed/following')).body as Reasoned
     for (const page of [community, following]) {
-      expect(page.items.every((item) => item.reason === null)).toBe(true)
+      expect(page.items.filter(notAd).every((item) => item.reason === null)).toBe(true)
     }
   })
 
@@ -98,13 +107,13 @@ describe('mock handlers behave like the contract', () => {
     const polls = (await call('GET', '/api/v1/feed/explore', { query: { kind: 'POLL' } }))
       .body as Page
     expect(polls.items.length).toBeGreaterThan(0)
-    expect(polls.items.every((item) => item.kind === 'POLL')).toBe(true)
+    expect(polls.items.filter(notAd).every((item) => item.kind === 'POLL')).toBe(true)
     const following = (await call('GET', '/api/v1/feed/following', { query: { kind: 'POLL' } }))
       .body as Page
-    expect(following.items.every((item) => item.kind === 'POLL')).toBe(true)
+    expect(following.items.filter(notAd).every((item) => item.kind === 'POLL')).toBe(true)
     const unknown = (await call('GET', '/api/v1/feed/explore', { query: { kind: 'NOPE' } }))
       .body as Page
-    expect(unknown.items).toHaveLength(20)
+    expect(unknown.items.filter(notAd)).toHaveLength(20)
   })
 
   it('searches communities without minding case, an asset slug too', async () => {
@@ -148,7 +157,7 @@ describe('mock handlers behave like the contract', () => {
 
     it('lists only what the person published, newest first, by kind', async () => {
       const page = await body('/api/v1/users/:userId/content', { kind: 'POST' })
-      const items = page.items as Array<{
+      const items = page.items.filter(notAd) as Array<{
         kind: string
         content: { creator: { id: string }; publishedAt: string }
       }>
@@ -338,7 +347,8 @@ describe('mock handlers behave like the contract', () => {
     const memberOf = new Set(COMMUNITIES.filter((c) => c.viewerMembership).map((c) => c.id))
     const page = (await call('GET', '/api/v1/feed/following')).body as Page
     expect(page.items.length).toBeGreaterThan(0)
-    for (const item of page.items) expect(memberOf.has(item.content!.communityId)).toBe(true)
+    for (const item of page.items.filter(notAd))
+      expect(memberOf.has(item.content!.communityId)).toBe(true)
   })
 
   it('searches communities by name or slug, never listing personal channels', async () => {

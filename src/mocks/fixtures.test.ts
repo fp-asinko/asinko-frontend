@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  adSchema,
   assetSchema,
   commentSchema,
   communitySchema,
@@ -8,6 +9,7 @@ import {
   profileSchema,
   type RawComment,
 } from '@/lib/api/contract'
+import { ADS } from './fixtures/ads'
 import { ASSETS } from './fixtures/assets'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { COMMUNITIES } from './fixtures/communities'
@@ -25,6 +27,8 @@ describe('mock fixtures match the contract schemas', () => {
     ['posts', POSTS, postSchema],
     ['polls', POLLS, pollSchema],
     ['comments', Object.values(COMMENTS_BY_CONTENT).flat(), commentSchema],
+    // P-031 (specs/ads): the six pieces, each with its file and its size.
+    ['ads', ADS, adSchema],
   ] as const)('%s', (_name, records, schema) => {
     for (const record of records) {
       const parsed = schema.safeParse(record)
@@ -107,6 +111,17 @@ describe('mock data is internally consistent', () => {
     for (const comment of flatten(Object.values(COMMENTS_BY_CONTENT).flat())) {
       expect(comment.replyCount).toBe(comment.replies.length)
       for (const reply of comment.replies) expect(reply.parentCommentId).toBe(comment.id)
+    }
+  })
+})
+
+describe('mock ads (specs/ads)', () => {
+  it('point at pieces that exist, with their real size', async () => {
+    const { existsSync } = await import('node:fs')
+    const path = await import('node:path')
+    for (const ad of ADS) {
+      expect(existsSync(path.resolve(process.cwd(), 'public', ad.image!.url.slice(1)))).toBe(true)
+      expect(ad.image!.alt.length).toBeGreaterThan(0)
     }
   })
 })

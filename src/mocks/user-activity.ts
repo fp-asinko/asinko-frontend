@@ -1,4 +1,4 @@
-import type { RawFeedItem, RawUserComment } from '@/lib/api/contract'
+import type { RawContentFeedItem, RawUserComment } from '@/lib/api/contract'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { POLLS } from './fixtures/polls'
 import { POSTS } from './fixtures/posts'
@@ -22,7 +22,7 @@ const invalid: MockResponse = {
 }
 
 /** Read on each request: the posts created in this process count too (specs/profile-showcase). */
-const items = (): RawFeedItem[] => [
+const items = (): RawContentFeedItem[] => [
   ...CREATED_POSTS.map((content) => ({ kind: 'POST' as const, content })),
   ...POSTS.map((content) => ({ kind: 'POST' as const, content })),
   ...POLLS.map((content) => ({ kind: 'POLL' as const, content })),
@@ -56,7 +56,7 @@ export function activeCommunities(userId: string, query: Record<string, string>)
   if (!Number.isInteger(days) || days < 1 || days > 365) return invalid
   if (!Number.isInteger(limit) || limit < 1 || limit > 20) return invalid
   const since = Date.now() - days * DAY
-  type Published = { community: RawFeedItem['content']['community']; publishedAt: string }
+  type Published = { community: RawContentFeedItem['content']['community']; publishedAt: string }
   const counts = new Map<
     string,
     { community: Published['community']; count: number; latest: string }
