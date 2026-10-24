@@ -1,6 +1,6 @@
 import 'server-only'
 import { apiRequest, type ApiResult } from '@/lib/api'
-import { commentListSchema, commentSchema, type RawComment } from '@/lib/api/contract'
+import { commentListSchema, createdCommentSchema, type RawComment } from '@/lib/api/contract'
 import type { CommentNode, CommentPreview } from '../feed.types'
 import type { CreateCommentInput } from '../schemas/comment.schema'
 import type { CommentSort } from '../schemas/comments-query.schema'
@@ -141,7 +141,7 @@ export async function createCommentAs(
     path: kind === 'poll' ? '/api/v1/polls/:id/comments' : '/api/v1/posts/:id/comments',
     params: { id: postId },
     body: { userId, body, parentCommentId },
-    schema: commentSchema,
+    schema: createdCommentSchema,
   })
   return result.ok ? { ok: true, data: { id: result.data.id } } : result
 }

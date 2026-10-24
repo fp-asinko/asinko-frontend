@@ -118,22 +118,30 @@ export type RawComment = {
  * Comments come with their replies nested inline (E05). With ?replies=false (P-007) only the top
  * level, each with `replies: []` (never absent) and `replyCount` still counting them.
  */
+const commentFields = {
+  id: z.uuid(),
+  author: userSummarySchema,
+  body: z.string(),
+  parentCommentId: z.uuid().nullable(),
+  side: z.enum(['PRO', 'CONTRA']).nullable(),
+  score: z.number().int(),
+  viewerVote: z.union([z.literal(1), z.literal(-1)]).nullable(),
+  replyCount: z.number().int(),
+  editedAt: z.iso.datetime().nullable(),
+  deleted: z.boolean(),
+  createdAt: z.iso.datetime(),
+}
+
 export const commentSchema: z.ZodType<RawComment> = z.lazy(() =>
-  z.object({
-    id: z.uuid(),
-    author: userSummarySchema,
-    body: z.string(),
-    parentCommentId: z.uuid().nullable(),
-    side: z.enum(['PRO', 'CONTRA']).nullable(),
-    score: z.number().int(),
-    viewerVote: z.union([z.literal(1), z.literal(-1)]).nullable(),
-    replyCount: z.number().int(),
-    editedAt: z.iso.datetime().nullable(),
-    deleted: z.boolean(),
-    createdAt: z.iso.datetime(),
-    replies: z.array(commentSchema),
-  }),
+  z.object({ ...commentFields, replies: z.array(commentSchema) }),
 )
+
+/**
+ * POST /api/v1/{posts|polls}/{id}/comments answers the new comment without `replies` (asinko-app
+ * dev, serializeOne; lists always carry the key). Requiring it failed every comment sent against
+ * the real backend, though the backend had saved it (bug, 2026-10-24).
+ */
+export const createdCommentSchema = z.object(commentFields)
 
 export const commentListSchema = z.object({ items: z.array(commentSchema) })
 

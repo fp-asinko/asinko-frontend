@@ -62,7 +62,7 @@ En la práctica, tres rutas con la misma forma:
 **Usuario:** sin ownership, `userId` explícito — `userId` (body) debe coincidir con la sesión.
 
 **Request body:** `userId`, `body`, `parentCommentId?`, `side?` (obligatorio si el contenido padre es una Thesis)
-**Respuesta `201`:** el `Comment` creado.
+**Respuesta `201`:** el `Comment` creado, **sin la clave `replies`** (dev, `serializeOne`; verificado el 2026-10-24). Las listas sí la traen siempre.
 **Errores:** `403 USER_MISMATCH` · `422`.
 
 ### `PATCH /api/v1/comments/{id}`

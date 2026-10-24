@@ -2,7 +2,7 @@ import {
   assetCatalogSchema,
   assetPageSchema,
   commentListSchema,
-  commentSchema,
+  createdCommentSchema,
   communityMemberSchema,
   communitySchema,
   favoriteResponseSchema,
@@ -700,7 +700,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     path: '/api/v1/posts/:id/comments',
     kind: 'contract',
     implemented: true,
-    schema: commentSchema,
+    schema: createdCommentSchema,
     example: {
       ...noRequest,
       params: { id: POSTS[0]!.id },
@@ -713,7 +713,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     path: '/api/v1/polls/:id/comments',
     kind: 'contract',
     implemented: true,
-    schema: commentSchema,
+    schema: createdCommentSchema,
     example: {
       ...noRequest,
       params: { id: POLLS[0]!.id },

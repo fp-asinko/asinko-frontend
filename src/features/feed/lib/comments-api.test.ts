@@ -166,6 +166,34 @@ describe('createCommentAs (PC-15)', () => {
     expect(result).toMatchObject({ ok: true, data: { id: expect.any(String) } })
   })
 
+  it('takes the new comment as the backend answers it: without `replies` (bug, 2026-10-24)', async () => {
+    // asinko-app dev, serializeOne: the created comment has no `replies` key (lists always do).
+    const created = {
+      id: '00000000-0000-4000-8000-0000000c0001',
+      author: { id: DEMO_USER.id, username: 'demo', avatarUrl: null, accuracyRate: null },
+      body: 'prueba',
+      parentCommentId: null,
+      side: null,
+      score: 0,
+      viewerVote: null,
+      replyCount: 0,
+      editedAt: null,
+      deleted: false,
+      createdAt: '2026-10-24T10:00:00.000Z',
+    }
+    state.routes = MOCK_ROUTES.map((route) =>
+      route.method === 'POST' && route.path === '/api/v1/posts/:id/comments'
+        ? { ...route, handler: () => ({ status: 201, body: created }) }
+        : route,
+    )
+    const result = await createCommentAs(DEMO_USER.id, {
+      postId: POSTS[0]!.id,
+      parentCommentId: null,
+      body: 'prueba',
+    })
+    expect(result).toEqual({ ok: true, data: { id: created.id } })
+  })
+
   it('passes the backend failure through', async () => {
     expect(
       await createCommentAs('someone-else', {
