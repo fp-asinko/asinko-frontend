@@ -26,8 +26,8 @@ const noOverflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)
 
 test.describe('Composer box in one row', () => {
-  for (const width of [640, 1280]) {
-    test(`is one row at ${width}px: the prompt left, the formats and Publish right (CR-01)`, async ({
+  for (const width of [1280, 1440]) {
+    test(`is one row at ${width}px, where it fits: the prompt left, the formats and Publish right (CR-01, CR-06)`, async ({
       page,
     }) => {
       await page.setViewportSize({ width, height: 900 })
@@ -38,17 +38,45 @@ test.describe('Composer box in one row', () => {
       const text = (await prompt(page).boundingBox())!
       const icon = (await linkIcon(page).boundingBox())!
       expect(icon.x).toBeGreaterThan(text.x + text.width - 1)
+      // The prompt whole, not cut.
+      const span = prompt(page).locator('span')
+      expect(await span.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
       expect(await noOverflow(page)).toBe(true)
     })
   }
 
-  test('stays two rows on a phone, the prompt whole (CR-02)', async ({ page }) => {
+  for (const width of [640, 1024]) {
+    test(`goes back to two rows at ${width}px, where the row would cut the prompt (CR-06)`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 900 })
+      await page.goto('/en')
+      await expect(prompt(page)).toBeVisible()
+      expect(await sameRow(page)).toBe(false)
+      expect(await noOverflow(page)).toBe(true)
+    })
+  }
+
+  test('stays two rows on a phone, the prompt whole, the seven formats and Publish in (CR-02, CR-05)', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 360, height: 740 })
     await page.goto('/en')
     await expect(prompt(page)).toBeVisible()
     expect(await sameRow(page)).toBe(false)
     const span = prompt(page).locator('span')
     expect(await span.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
+    for (const name of ['Duel', 'Portfolio', 'Thought']) {
+      await expect(page.getByRole('main').getByRole('button', { name })).toBeVisible()
+    }
+    // Publish inside the box, after the last format.
+    const last = (await page
+      .getByRole('main')
+      .getByRole('button', { name: 'Thought' })
+      .boundingBox())!
+    const pub = (await publish(page).boundingBox())!
+    expect(pub.x).toBeGreaterThanOrEqual(last.x + last.width)
+    expect(pub.x + pub.width).toBeLessThanOrEqual(360)
     expect(await noOverflow(page)).toBe(true)
   })
 
@@ -57,7 +85,7 @@ test.describe('Composer box in one row', () => {
       page,
     }) => {
       await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
-      await page.setViewportSize({ width: 640, height: 900 })
+      await page.setViewportSize({ width: 1280, height: 900 })
       await page.goto('/pt')
       await expect(prompt(page)).toBeVisible()
       expect(await sameRow(page)).toBe(true)

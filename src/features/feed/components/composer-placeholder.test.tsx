@@ -36,11 +36,17 @@ describe('ComposerPlaceholder (H-09; specs/submit-page SU-02, Q1)', () => {
     )
   })
 
-  it('keeps Thesis and Live as coming soon', () => {
+  it('keeps Thesis, Live, Duel, Portfolio and Thought as coming soon, in that order (CR-05)', () => {
     renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
-    for (const name of ['Thesis', 'Live']) {
+    const soon = ['Thesis', 'Live', 'Duel', 'Portfolio', 'Thought']
+    for (const name of soon) {
       expect(screen.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
     }
+    const order = screen
+      .getAllByRole('button')
+      .map((button) => button.getAttribute('aria-label') ?? button.textContent)
+      .filter((name) => soon.includes(name ?? ''))
+    expect(order).toEqual(soon)
   })
 
   it('opens the account modal from Thesis without a session (G-04)', async () => {
