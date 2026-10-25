@@ -50,8 +50,12 @@ describe('PreviewPopover (specs/mention-preview § 2, MP-08)', () => {
     answer({ ok: true, data: preview('macro') })
     expect(await screen.findByRole('link', { name: '#macro' })).toBeInTheDocument()
     expect(action.getPreview).toHaveBeenCalledWith({ kind: 'group', slug: 'macro' })
-    const summary = document.getElementById(anchor.getAttribute('aria-describedby')!)
-    expect(summary).toHaveTextContent('About it.')
+    // Set in an effect, and the card's summary may render a moment later (slow CI): wait for both.
+    await waitFor(() =>
+      expect(
+        document.getElementById(anchor.getAttribute('aria-describedby') ?? ''),
+      ).toHaveTextContent('About it.'),
+    )
   })
 
   it('shows no card when the data fails', async () => {
