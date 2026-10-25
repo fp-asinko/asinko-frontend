@@ -89,5 +89,15 @@ export const ADS: RawAd[] = [
 /** One ad after every this many items or comments, where the backend would put them. */
 export const AD_EVERY = 10
 
-/** The ad for a place, in turn: a page shows different ones. */
-export const adAt = (place: number): RawAd => ADS[place % ADS.length]!
+/**
+ * Ads for a page, one per place, at random on every request, as a real ad server would vary them
+ * (PO, 2026-10-24): never the same one twice in a row. `random` is for tests.
+ */
+export function randomAds(count: number, random: () => number = Math.random): RawAd[] {
+  const picked: RawAd[] = []
+  for (let place = 0; place < count; place++) {
+    const options = ADS.filter((ad) => ad.id !== picked.at(-1)?.id)
+    picked.push(options[Math.floor(random() * options.length)]!)
+  }
+  return picked
+}

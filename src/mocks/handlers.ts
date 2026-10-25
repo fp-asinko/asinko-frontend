@@ -34,7 +34,7 @@ import {
 } from '@/lib/api/contract'
 import { noContentSchema, paginatedSchema } from '@/lib/api/schemas'
 import { DEMO_USER } from './demo-user'
-import { AD_EVERY, adAt } from './fixtures/ads'
+import { AD_EVERY, randomAds } from './fixtures/ads'
 import { ASSETS, assetBySymbol } from './fixtures/assets'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { COMMUNITIES, communityBySlug, communitySummary } from './fixtures/communities'
@@ -116,16 +116,13 @@ function withReason(item: RawContentFeedItem, index: number): RawContentFeedItem
 
 /**
  * An ad after every 10 items of a page, where the backend would put them (P-031, specs/ads AD-01),
- * in turn from the page's offset, so the pages after show other ones.
+ * chosen at random on every request.
  */
-function withFeedAds(items: readonly RawFeedItem[], cursor: string | undefined): RawFeedItem[] {
-  const offset = cursor ? Number(atob(cursor)) || 0 : 0
+function withFeedAds(items: readonly RawFeedItem[]): RawFeedItem[] {
+  const ads = randomAds(Math.floor(items.length / AD_EVERY))
   return items.flatMap((item, index) =>
     (index + 1) % AD_EVERY === 0
-      ? [
-          item,
-          { kind: 'AD' as const, content: adAt((offset + index + 1) / AD_EVERY - 1), reason: null },
-        ]
+      ? [item, { kind: 'AD' as const, content: ads[(index + 1) / AD_EVERY - 1]!, reason: null }]
       : [item],
   )
 }
@@ -135,7 +132,7 @@ function feedPage(feed: number, items: RawContentFeedItem[], cursor: string | un
   const page = paginate(items, cursor)
   return {
     ...page,
-    items: withFeedAds(page.items, cursor),
+    items: withFeedAds(page.items),
     requestId: page.items.length ? requestIdOf(feed, cursor) : null,
   }
 }
@@ -153,11 +150,11 @@ function treeAds(tree: readonly RawComment[]) {
     }
   }
   walk(tree)
+  const after = order.filter((_, index) => (index + 1) % AD_EVERY === 0)
+  const [first, ...rest] = randomAds(after.length + 1)
   return [
-    { afterCommentId: null, ad: adAt(0) },
-    ...order
-      .filter((_, index) => (index + 1) % AD_EVERY === 0)
-      .map((id, index) => ({ afterCommentId: id, ad: adAt(index + 1) })),
+    { afterCommentId: null, ad: first! },
+    ...after.map((id, index) => ({ afterCommentId: id, ad: rest[index]! })),
   ]
 }
 
@@ -242,7 +239,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       const body = response.body as { items?: RawFeedItem[] } | undefined
       // A profile's posts carry ads too, as every feed (specs/ads AD-01).
       return response.status === 200 && body?.items
-        ? { ...response, body: { ...body, items: withFeedAds(body.items, query.cursor) } }
+        ? { ...response, body: { ...body, items: withFeedAds(body.items) } }
         : response
     },
   },

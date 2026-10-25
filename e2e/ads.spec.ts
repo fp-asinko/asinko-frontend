@@ -13,7 +13,8 @@ test.describe('Ads', () => {
   }) => {
     await page.goto('/en')
     const feed = page.getByRole('main')
-    const ad = feed.getByRole('region', { name: 'Ad: AvaTrade' }).first()
+    // The mocks pick them at random: any advertiser.
+    const ad = feed.getByRole('region', { name: /^Ad: / }).first()
     await expect(ad).toBeVisible()
     // After the first ten cards.
     const before = await ad.evaluate((section) => {
@@ -22,20 +23,20 @@ test.describe('Ads', () => {
     })
     expect(before).toBe(10)
 
-    // The tall piece (4:5) stops at 540px, whole, and its place was held before it loaded.
-    const image = ad.getByRole('img', { name: /Indices trading/ })
+    // Whole, at most 540px tall (a 4:5 piece stops there), its place held before it loaded.
+    const image = ad.getByRole('img')
     await expect(image).toBeVisible()
     const box = (await image.boundingBox())!
     expect(box.height).toBeLessThanOrEqual(541)
-    expect(box.height).toBeGreaterThan(300)
+    expect(box.height).toBeGreaterThan(50)
     expect(await image.evaluate((img: HTMLImageElement) => getComputedStyle(img).objectFit)).toBe(
       'contain',
     )
 
-    const link = ad.getByRole('link', { name: /Learn more about AvaTrade/ })
+    const link = ad.getByRole('link', { name: /^Learn more about / })
     await expect(link).toHaveAttribute('rel', 'sponsored noopener noreferrer')
     await expect(link).toHaveAttribute('target', '_blank')
-    await expect(ad.getByText('avatrade.com')).toBeVisible()
+    await expect(ad.getByText(/^(avatrade|pepperstone|etoro).com$/)).toBeVisible()
   })
 
   test('in a post: one under it, with its comments; none in a search (AD-04, AD-05)', async ({

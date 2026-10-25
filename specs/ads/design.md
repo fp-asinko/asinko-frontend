@@ -22,7 +22,7 @@ El `Ad` sale de P-015, con dos cambios: el texto propio pasa a ser opcional (las
 - `src/lib/api/contract/ads.ts`: `adSchema`. En `content.ts`, `feedItemSchema` suma la rama `AD`, y `commentListSchema` suma `ads` opcional.
 - `knownKinds` (`feed-api.ts`) suma `AD`.
 - **Mocks** (`src/mocks/fixtures/ads.ts`): seis anuncios con las piezas en `public/mocks/ads/`.
-  - Explore, Following y el contenido de un perfil ponen uno **después de cada 10 ítems** de cada página, rotando.
+  - Explore, Following y el contenido de un perfil ponen uno **después de cada 10 ítems** de cada página. _Cambio con el PO (2026-10-24): al azar en cada pedido, sin repetir el anterior, como los variaría un servidor de anuncios._
   - El árbol de comentarios pone uno con `afterCommentId: null` y uno después de cada 10 comentarios en orden de lectura, contando respuestas.
 
 ## 3. Dominio

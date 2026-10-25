@@ -125,3 +125,18 @@ describe('mock ads (specs/ads)', () => {
     }
   })
 })
+
+describe('random mock ads (specs/ads, PO 2026-10-24)', () => {
+  it('picks one per place at random, never the same one twice in a row', async () => {
+    const { randomAds } = await import('./fixtures/ads')
+    // A random that always says "the first": the second pick has to skip it.
+    const ads = randomAds(4, () => 0)
+    expect(ads).toHaveLength(4)
+    for (let index = 1; index < ads.length; index++) {
+      expect(ads[index]!.id).not.toBe(ads[index - 1]!.id)
+    }
+    // Over many pages, every piece shows up.
+    const seen = new Set(Array.from({ length: 200 }, () => randomAds(1)[0]!.id))
+    expect(seen.size).toBe(ADS.length)
+  })
+})
