@@ -1099,5 +1099,10 @@
     "cta": "Más información",
     "ctaLabel": "Más información sobre {advertiser} (se abre en otra pestaña)",
     "region": "Anuncio: {advertiser}"
+  },
+  "glossary": {
+    "label": "Glosario",
+    "region": "Glosario: {term}",
+    "example": "Ejemplo"
   }
 }

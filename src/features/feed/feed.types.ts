@@ -126,7 +126,17 @@ export type AdItem = {
   image: { src: string; width: number; height: number; alt: string } | null
 }
 
-export type FeedItem = PostItem | PollItem | AdItem
+/** A glossary term, the platform's own content, in the Home's feeds (specs/glossary). */
+export type GlossaryItem = {
+  kind: 'glossary'
+  id: string
+  term: string
+  category: string
+  definition: string
+  example: string | null
+}
+
+export type FeedItem = PostItem | PollItem | AdItem | GlossaryItem
 
 /** A comment of the card's preview (H-28): top level only, never deleted. */
 export type CommentPreview = {

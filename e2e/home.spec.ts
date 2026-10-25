@@ -4,6 +4,7 @@ import { collectConsoleErrors, expectNoA11yViolations } from './fixtures/axe'
 // specs/home: the feed against the production build with API_MOCKS=true (deterministic data from
 // src/mocks/fixtures: 23 posts and 3 polls, 20 per page). Runs on mobile and desktop.
 
+// The posts and polls, and the glossary terms of the Home: 2 in the first page (specs/glossary).
 const articles = (page: Page) => page.getByRole('article')
 const card = (page: Page, text: string) => articles(page).filter({ hasText: text })
 
@@ -19,7 +20,7 @@ async function pressComingSoon(button: ReturnType<Page['getByRole']>) {
 test.describe('Home feed', () => {
   test('shows the first page with posts and polls (H-12, H-13)', async ({ page }) => {
     await page.goto('/en')
-    await expect(articles(page)).toHaveCount(20)
+    await expect(articles(page)).toHaveCount(22)
     await expect(
       page.getByRole('heading', { name: 'Whales accumulated 48,000 $BTC in two weeks' }),
     ).toBeVisible()
@@ -126,9 +127,9 @@ test.describe('Home feed', () => {
 
   test('loads the next page when scrolling, until the end (H-16)', async ({ page }) => {
     await page.goto('/en')
-    await expect(articles(page)).toHaveCount(20)
+    await expect(articles(page)).toHaveCount(22)
     await page.getByRole('button', { name: 'Load more' }).scrollIntoViewIfNeeded()
-    await expect(articles(page)).toHaveCount(26)
+    await expect(articles(page)).toHaveCount(28)
     await expect(page.getByRole('button', { name: 'Load more' })).toBeHidden()
   })
 
@@ -213,7 +214,7 @@ test.describe('Home health', () => {
       .click()
     await expect(page.getByRole('link', { name: 'Ver todos los comentarios' })).toBeVisible()
     await page.getByRole('button', { name: 'Cargar más' }).scrollIntoViewIfNeeded()
-    await expect(articles(page)).toHaveCount(26)
+    await expect(articles(page)).toHaveCount(28)
     expect(errors).toEqual([])
   })
 })

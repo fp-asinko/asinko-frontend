@@ -101,7 +101,7 @@ test.describe('Home motion', () => {
       .getByRole('button', { name: /6 comments/ })
       .click()
     await page.getByRole('button', { name: 'Load more' }).scrollIntoViewIfNeeded()
-    await expect(articles(page)).toHaveCount(26)
+    await expect(articles(page)).toHaveCount(28)
 
     expect(await cls()).toBeLessThan(0.1)
   })
@@ -133,7 +133,7 @@ test.describe('Home motion with reduced motion (G-01)', () => {
     expect(await longestMotion(panel.locator('..'))).toBeLessThanOrEqual(1)
 
     await page.getByRole('button', { name: 'Load more' }).scrollIntoViewIfNeeded()
-    await expect(articles(page)).toHaveCount(26)
+    await expect(articles(page)).toHaveCount(28)
     expect(await longestMotion(page.locator('.stagger > li').first())).toBeLessThanOrEqual(1)
     expect(
       await longestMotion(

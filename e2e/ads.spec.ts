@@ -16,12 +16,12 @@ test.describe('Ads', () => {
     // The mocks pick them at random: any advertiser.
     const ad = feed.getByRole('region', { name: /^Ad: / }).first()
     await expect(ad).toBeVisible()
-    // After the first ten cards.
+    // After the first ten cards, and the glossary term that goes after 8 of them (specs/glossary).
     const before = await ad.evaluate((section) => {
       const item = section.closest('li')!
       return [...item.parentElement!.children].indexOf(item)
     })
-    expect(before).toBe(10)
+    expect(before).toBe(11)
 
     // Whole, at most 540px tall (a 4:5 piece stops there), its place held before it loaded.
     const image = ad.getByRole('img')

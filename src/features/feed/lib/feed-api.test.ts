@@ -9,7 +9,7 @@ import { getFeed, getFilteredCommunity } from './feed-api'
 
 /** The users' content of a page, without its ads (specs/ads). */
 const content = (items: FeedItem[]) =>
-  items.filter((item): item is PostItem | PollItem => item.kind !== 'ad')
+  items.filter((item): item is PostItem | PollItem => item.kind === 'post' || item.kind === 'poll')
 
 // The real client against the mock routes; a route left out reaches a fetch that always fails.
 const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[], dropped: [] as number[] }))
@@ -52,7 +52,9 @@ describe('getFeed', () => {
     expect(content(result.data.items)).toHaveLength(20)
     expect(result.data.nextCursor).toEqual(expect.any(String))
     // The ads where the backend put them, as cards of their own (specs/ads AD-01).
-    expect(result.data.items[10]).toMatchObject({ kind: 'ad', domain: expect.any(String) })
+    expect(result.data.items[11]).toMatchObject({ kind: 'ad', domain: expect.any(String) })
+    // And in the Home, a glossary term after every 8 posts (specs/glossary GL-01).
+    expect(result.data.items[8]).toMatchObject({ kind: 'glossary', term: expect.any(String) })
     expect(content(result.data.items).every((item) => item.community !== null)).toBe(true)
   })
 

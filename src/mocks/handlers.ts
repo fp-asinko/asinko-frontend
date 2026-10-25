@@ -35,6 +35,7 @@ import {
 import { noContentSchema, paginatedSchema } from '@/lib/api/schemas'
 import { DEMO_USER } from './demo-user'
 import { AD_EVERY, randomAds } from './fixtures/ads'
+import { GLOSSARY_EVERY, randomGlossary } from './fixtures/glossary'
 import { ASSETS, assetBySymbol } from './fixtures/assets'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { COMMUNITIES, communityBySlug, communitySummary } from './fixtures/communities'
@@ -127,12 +128,37 @@ function withFeedAds(items: readonly RawFeedItem[]): RawFeedItem[] {
   )
 }
 
-/** A page of a feed, with its requestId (null for an empty one) and its ads, as the backend. */
-function feedPage(feed: number, items: RawContentFeedItem[], cursor: string | undefined) {
+/**
+ * A glossary term after every 8 posts of a Home page, ads not counted (P-032, specs/glossary
+ * GL-01), chosen at random on every request.
+ */
+function withGlossary(items: readonly RawFeedItem[]): RawFeedItem[] {
+  const content = items.filter((item) => item.kind !== 'AD').length
+  const terms = randomGlossary(Math.floor(content / GLOSSARY_EVERY))
+  let seen = 0
+  return items.flatMap((item): RawFeedItem[] => {
+    if (item.kind === 'AD') return [item]
+    seen++
+    const term = seen % GLOSSARY_EVERY === 0 ? terms[seen / GLOSSARY_EVERY - 1] : undefined
+    return term ? [item, { kind: 'GLOSSARY' as const, content: term, reason: null }] : [item]
+  })
+}
+
+/**
+ * A page of a feed, with its requestId (null for an empty one) and its ads, as the backend. The
+ * Home's (Explore and Following, no community) also carries glossary terms.
+ */
+function feedPage(
+  feed: number,
+  items: RawContentFeedItem[],
+  cursor: string | undefined,
+  home = false,
+) {
   const page = paginate(items, cursor)
+  const withAds = withFeedAds(page.items)
   return {
     ...page,
-    items: withFeedAds(page.items),
+    items: home ? withGlossary(withAds) : withAds,
     requestId: page.items.length ? requestIdOf(feed, cursor) : null,
   }
 }
@@ -492,7 +518,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
         : FEED.map(withReason)
       return {
         status: 200,
-        body: feedPage(community ? 2 : 1, byKind(items, query.kind), query.cursor),
+        body: feedPage(community ? 2 : 1, byKind(items, query.kind), query.cursor, !community),
       }
     },
   },
@@ -509,7 +535,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
         ...item,
         reason: null,
       }))
-      return { status: 200, body: feedPage(3, byKind(items, query.kind), query.cursor) }
+      return { status: 200, body: feedPage(3, byKind(items, query.kind), query.cursor, true) }
     },
   },
   {

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { adSchema } from './ads'
+import { glossaryTermSchema } from './glossary'
 import { communityTypeSchema, membershipSchema } from './communities'
 import { userSummarySchema } from './users'
 
@@ -176,6 +177,8 @@ export const feedItemSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('POLL'), content: pollSchema, reason: reasonField }),
   // An ad, where the backend puts it (P-015, P-031, specs/ads AD-01).
   z.object({ kind: z.literal('AD'), content: adSchema, reason: reasonField }),
+  // A glossary term, in the Home's feeds (P-032, specs/glossary GL-01).
+  z.object({ kind: z.literal('GLOSSARY'), content: glossaryTermSchema, reason: reasonField }),
 ])
 
 /**

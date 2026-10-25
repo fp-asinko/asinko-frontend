@@ -12,8 +12,8 @@ type Page = {
   nextCursor: string | null
 }
 
-/** A user's content, not an ad (specs/ads). */
-const notAd = (item: { kind?: string }) => item.kind !== 'AD'
+/** A user's content, not an ad nor a glossary term (specs/ads, specs/glossary). */
+const notAd = (item: { kind?: string }) => item.kind !== 'AD' && item.kind !== 'GLOSSARY'
 
 function call(method: string, path: string, context: Partial<MockContext> = {}) {
   // As the client: the first route that matches, `when` included.
@@ -29,12 +29,23 @@ function call(method: string, path: string, context: Partial<MockContext> = {}) 
 }
 
 describe('mock handlers behave like the contract', () => {
+  it('puts glossary terms only in the Home: Explore and Following, never a community (GL-01)', async () => {
+    const kinds = async (path: string, query: Record<string, string> = {}) =>
+      ((await call('GET', path, { query })).body as Page).items.map((item) => item.kind)
+    expect(await kinds('/api/v1/feed/following')).toContain('GLOSSARY')
+    expect(await kinds('/api/v1/feed/explore', { community: 'BTC' })).not.toContain('GLOSSARY')
+  })
+
   it('paginates the explore feed with an opaque cursor, 20 per page', async () => {
     const first = (await call('GET', '/api/v1/feed/explore')).body as Page
     expect(first.items.filter(notAd)).toHaveLength(20)
-    // An ad after every 10 items, where the backend would put it (specs/ads AD-01).
-    expect(first.items.filter((item) => !notAd(item))).toHaveLength(2)
-    expect(first.items[10]).toMatchObject({ kind: 'AD' })
+    // An ad after every 10 items, where the backend would put it (specs/ads AD-01), and in the
+    // Home a glossary term after every 8 posts, ads not counted (specs/glossary GL-01).
+    expect(first.items.filter((item) => item.kind === 'AD')).toHaveLength(2)
+    expect(first.items.filter((item) => item.kind === 'GLOSSARY')).toHaveLength(2)
+    expect(first.items[8]).toMatchObject({ kind: 'GLOSSARY' })
+    expect(first.items[11]).toMatchObject({ kind: 'AD' })
+    expect(first.items[18]).toMatchObject({ kind: 'GLOSSARY' })
     expect(first.nextCursor).toEqual(expect.any(String))
 
     const second = (
