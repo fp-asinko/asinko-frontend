@@ -7,7 +7,7 @@ import { POSTS } from '@/mocks/fixtures/posts'
 import type { PostItem } from '../feed.types'
 import {
   indexCommunities,
-  needsMentionLookup,
+  mentionEntities,
   toCardCommunity,
   toAdItem,
   toFeedItem,
@@ -189,11 +189,12 @@ describe('toCardCommunity (specs/community-first CF-04, P-010)', () => {
   })
 })
 
-describe('needsMentionLookup (BC-02)', () => {
-  it('is true only when a post has $ or # mentions to link', () => {
-    expect(needsMentionLookup([{ kind: 'POST', content: post(1) }])).toBe(true)
-    const plain = { ...post(1), entities: [] }
-    expect(needsMentionLookup([{ kind: 'POST', content: plain }])).toBe(false)
+describe('mentionEntities (BC-02)', () => {
+  it('takes only the $ and # mentions of the posts, the ones that need a community to link', () => {
+    const entities = mentionEntities([{ kind: 'POST', content: post(1) }])
+    expect(entities.length).toBeGreaterThan(0)
+    expect(entities.every((entity) => entity.type !== 'MENTION')).toBe(true)
+    expect(mentionEntities([{ kind: 'POST', content: { ...post(1), entities: [] } }])).toEqual([])
   })
 })
 

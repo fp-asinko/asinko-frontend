@@ -4,6 +4,7 @@ import { postPath } from '@/lib/posts/paths'
 import type {
   RawCommunity,
   RawCommunitySummary,
+  RawEntity,
   RawAd,
   RawGlossaryTerm,
   RawFeedItem,
@@ -238,11 +239,11 @@ export function toFeedItem(
     : { ...toPollItem(item.content, signedIn), reason }
 }
 
-/** Whether a page has mentions that need community slugs to link ($ and #, not @). */
-export function needsMentionLookup(items: readonly RawFeedItem[]): boolean {
-  return items.some(
-    (item) =>
-      item.kind === 'POST' &&
-      (item.content.entities ?? []).some((entity) => entity.type !== 'MENTION'),
+/** The mentions of a page that need a community slug to link: $ and #, not @ (lookupMentions). */
+export function mentionEntities(items: readonly RawFeedItem[]): RawEntity[] {
+  return items.flatMap((item) =>
+    item.kind === 'POST'
+      ? (item.content.entities ?? []).filter((entity) => entity.type !== 'MENTION')
+      : [],
   )
 }

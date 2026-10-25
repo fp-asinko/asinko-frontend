@@ -252,16 +252,17 @@ describe('getFeed', () => {
       expect(queries.some((query) => query.mine === 'true')).toBe(false)
     })
 
-    it('links $ and # mentions with GET /communities (BC-02)', async () => {
+    it('links $ and # mentions one by one, never with the paginated list (BC-02)', async () => {
+      // GET /communities comes 20 at a time: most assets were past it (mention-preview, 2026-10-25).
       const queries = communityQueries()
       const result = await getFeed(parseFeedParams({}))
       if (!result.ok) throw new Error('expected ok')
-      expect(queries).toEqual([{}])
-      expect(
-        result.data.items.some(
-          (item) => item.kind === 'post' && item.body.includes('asinko:community/'),
-        ),
-      ).toBe(true)
+      expect(queries).toEqual([])
+      const bodies = content(result.data.items).flatMap((item) =>
+        item.kind === 'post' ? [item.body] : [],
+      )
+      expect(bodies.some((body) => body.includes('asinko:community/'))).toBe(true)
+      expect(bodies.some((body) => body.includes('asinko:asset/'))).toBe(true)
     })
 
     it('gives each card its membership only with a session', async () => {
@@ -323,7 +324,14 @@ describe('getFilteredCommunity (specs/feed-navigation § 2)', () => {
     let lookups = 0
     state.routes = MOCK_ROUTES.map((route) =>
       route.path === '/api/v1/communities/:slug'
-        ? { ...route, handler: (context) => (lookups++, route.handler(context)) }
+        ? {
+            ...route,
+            // The filtered one; the page's # mentions are looked up on their own.
+            handler: (context) => (
+              context.params.slug === 'BTC' && lookups++,
+              route.handler(context)
+            ),
+          }
         : route,
     )
     await getFeed(parseFeedParams({ community: 'BTC' }), undefined, { communityResolved: true })

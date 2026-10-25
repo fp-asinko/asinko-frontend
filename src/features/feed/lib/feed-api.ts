@@ -1,16 +1,11 @@
 import 'server-only'
 import { z } from 'zod'
-import {
-  apiRequest,
-  invalidInput,
-  keepValidItems,
-  paginatedSchema,
-  type ApiResult,
-} from '@/lib/api'
+import { apiRequest, invalidInput, keepValidItems, type ApiResult } from '@/lib/api'
 import { communitySchema, feedItemSchema } from '@/lib/api/contract'
 import type { CommunityRef, FeedPage } from '../feed.types'
 import type { FeedParams } from '../schemas/feed-params.schema'
-import { indexCommunities, needsMentionLookup, toCommunityRef, toFeedItem } from './mappers'
+import { mentionEntities, toCommunityRef, toFeedItem } from './mappers'
+import { lookupMentions } from './mention-lookup'
 
 /** The kinds this front draws. THESIS waits for phase 2; AD, where the backend puts it (specs/ads). */
 const KNOWN_KINDS = new Set(['POST', 'POLL', 'AD', 'GLOSSARY'])
@@ -97,8 +92,8 @@ export async function getFilteredCommunity(
  * - Explore answers an empty page for an unknown community, so the community is fetched in
  *   parallel: NOT_FOUND there makes the page a 404 (backend dev).
  * - Each item carries its community, with its avatar and the viewer's role (P-004, P-010).
- *   GET /communities is asked only when the page has $ or # mentions to link (`entities` by id,
- *   P-001): with the real backend today, never. If it fails, mentions stay plain text.
+ *   Each $ or # mention is resolved on its own (lookupMentions, `entities` by id, P-001). If one
+ *   fails, it stays plain text.
  */
 export async function getFeed(
   params: FeedParams,
@@ -120,16 +115,8 @@ export async function getFeed(
   if (!feed.ok) return feed
 
   const valid = keepValidItems(knownKinds(feed.data.items), feedItemSchema, `GET ${endpoint}`)
-  const communities = needsMentionLookup(valid)
-    ? await apiRequest({
-        method: 'GET',
-        path: '/api/v1/communities',
-        schema: paginatedSchema(communitySchema),
-      })
-    : null
-  const known = communities?.ok ? [...communities.data.items] : []
-  if (filtered?.ok) known.push(filtered.data)
-  const mentions = indexCommunities(known)
+  // $ and # mentions, each one resolved on its own; if one fails, it stays plain text.
+  const mentions = await lookupMentions(mentionEntities(valid))
   // Only the Home's Explore says why it shows a card (specs/explore-v1 EX-03), whatever the
   // backend sends elsewhere.
   const explained = endpoint === EXPLORE && !params.community
