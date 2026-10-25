@@ -252,6 +252,25 @@ describe('mocks (F-36)', () => {
     expect(fetchMock).toHaveBeenCalledOnce()
   })
 
+  it('adds a proposal on top of the real answer, and validates the result (specs/glossary GL-07)', async () => {
+    const fetchMock = respond(200, { id: 'u4', username: 'real' })
+    const extend = vi.fn((response: { status: number; body?: unknown }) => ({
+      ...response,
+      body: { ...(response.body as object), username: 'extended' },
+    }))
+    const api = createApiClient({
+      baseUrl: BASE_URL,
+      fetch: fetchMock,
+      extensions: [{ method: 'GET', path: '/api/v1/profiles/:identifier', extend }],
+    })
+    expect(await api(getProfile)).toEqual({ ok: true, data: { id: 'u4', username: 'extended' } })
+    expect(fetchMock).toHaveBeenCalledOnce()
+    expect(extend).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 200 }),
+      expect.objectContaining({ params: { identifier: 'juan' } }),
+    )
+  })
+
   it('applies the same error mapping to mocked errors', async () => {
     const api = createApiClient({ baseUrl: BASE_URL, fetch: respond(500), mocks: [profileMock] })
     expect(await api({ ...getProfile, params: { identifier: 'nobody' } })).toMatchObject({

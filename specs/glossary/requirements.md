@@ -23,6 +23,7 @@
 - [x] **GL-04** Un lector de pantalla oye que es un término del glosario y cuál es. El término es un heading.
 - [x] **GL-05** Si un término viene mal formado, se descarta solo y el resto del feed se ve igual (`api-integration.md § Listas`).
 - [x] **GL-06** Textos de la interfaz en en, es y pt. A 360 px sin scroll horizontal. Axe sin violaciones en claro y oscuro. Presupuesto de JS dentro de 240 KB: la tarjeta no suma JavaScript.
+- [x] **GL-07** También con `API_MOCKS=missing` (desarrollo y `develop`, contra el backend real): los glosarios y los anuncios se suman al feed real, en los mismos lugares. Pedido del PO el 2026-10-25 ("no veo los glossary"): con el feed del backend no se veían.
 
 ## Fuera de alcance
 

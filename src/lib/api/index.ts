@@ -4,7 +4,7 @@ import type { z } from 'zod'
 import { env } from '@/env'
 import type { MocksMode } from '@/lib/env-schema'
 import { getAccessToken } from '@/lib/session'
-import { MOCK_ROUTES } from '@/mocks/handlers'
+import { MOCK_EXTENSIONS, MOCK_ROUTES } from '@/mocks/handlers'
 import { createApiClient } from './create-client'
 import { keepValidItems as keepValid } from './helpers'
 
@@ -20,6 +20,8 @@ export const apiRequest = createApiClient({
   baseUrl: env.API_BASE_URL,
   // Never in production: src/env.ts rejects any API_MOCKS but false there (F-30).
   mocks: mockedRoutes(env.API_MOCKS),
+  // The ads and the glossary on top of the real feeds (specs/glossary GL-07).
+  extensions: env.API_MOCKS === 'missing' ? MOCK_EXTENSIONS : undefined,
   timeoutMs: env.API_TIMEOUT_MS,
   // The session's token as Bearer on every backend call (P-002, specs/dev-login DL-04).
   getHeaders: async (): Promise<Record<string, string>> => {

@@ -56,7 +56,7 @@ import { isProposedUserChange, updateUser } from './profile-edit'
 import { signProfileImageUpload } from './profile-image'
 import { paginate } from './paginate'
 import { signPostImageUpload } from './post-image'
-import type { MockContext, MockRoute } from './types'
+import type { MockContext, MockExtension, MockResponse, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
 import {
   commentsOf,
@@ -115,13 +115,17 @@ function withReason(item: RawContentFeedItem, index: number): RawContentFeedItem
   return { ...item, reason: reasons[index % reasons.length] }
 }
 
+/** An ad of a page, whether it came from a mock or from the backend. */
+const isAd = (item: unknown) =>
+  typeof item === 'object' && item !== null && 'kind' in item && item.kind === 'AD'
+
 /**
  * An ad after every 10 items of a page, where the backend would put them (P-031, specs/ads AD-01),
  * chosen at random on every request.
  */
-function withFeedAds(items: readonly RawFeedItem[]): RawFeedItem[] {
+function withFeedAds<T>(items: readonly T[]): (T | RawFeedItem)[] {
   const ads = randomAds(Math.floor(items.length / AD_EVERY))
-  return items.flatMap((item, index) =>
+  return items.flatMap((item, index): (T | RawFeedItem)[] =>
     (index + 1) % AD_EVERY === 0
       ? [item, { kind: 'AD' as const, content: ads[(index + 1) / AD_EVERY - 1]!, reason: null }]
       : [item],
@@ -132,12 +136,12 @@ function withFeedAds(items: readonly RawFeedItem[]): RawFeedItem[] {
  * A glossary term after every 8 posts of a Home page, ads not counted (P-032, specs/glossary
  * GL-01), chosen at random on every request.
  */
-function withGlossary(items: readonly RawFeedItem[]): RawFeedItem[] {
-  const content = items.filter((item) => item.kind !== 'AD').length
+function withGlossary<T>(items: readonly T[]): (T | RawFeedItem)[] {
+  const content = items.filter((item) => !isAd(item)).length
   const terms = randomGlossary(Math.floor(content / GLOSSARY_EVERY))
   let seen = 0
-  return items.flatMap((item): RawFeedItem[] => {
-    if (item.kind === 'AD') return [item]
+  return items.flatMap((item): (T | RawFeedItem)[] => {
+    if (isAd(item)) return [item]
     seen++
     const term = seen % GLOSSARY_EVERY === 0 ? terms[seen / GLOSSARY_EVERY - 1] : undefined
     return term ? [item, { kind: 'GLOSSARY' as const, content: term, reason: null }] : [item]
@@ -915,5 +919,41 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
         },
       }
     },
+  },
+]
+
+/**
+ * The page of a real feed with its proposals on top: the ads (P-031) and, in the Home, the glossary
+ * terms (P-032). Its items are left as they came: the client validates them afterwards.
+ */
+function extendFeed(response: MockResponse, home: boolean): MockResponse {
+  const body = response.body
+  if (response.status !== 200 || typeof body !== 'object' || body === null) return response
+  if (!('items' in body) || !Array.isArray(body.items)) return response
+  const withAds = withFeedAds(body.items)
+  return { ...response, body: { ...body, items: home ? withGlossary(withAds) : withAds } }
+}
+
+/**
+ * Proposals on top of implemented endpoints, with API_MOCKS=missing: the backend answers and these
+ * add what it does not send yet (api-integration.md § Mocks), so the ads and the glossary show
+ * with real data in development and in develop (specs/glossary GL-07). With every route mocked the
+ * handlers above already add them.
+ */
+export const MOCK_EXTENSIONS: readonly MockExtension[] = [
+  {
+    method: 'GET',
+    path: '/api/v1/feed/explore',
+    extend: (response, { query }) => extendFeed(response, !query.community),
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/feed/following',
+    extend: (response) => extendFeed(response, true),
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/users/:userId/content',
+    extend: (response) => extendFeed(response, false),
   },
 ]

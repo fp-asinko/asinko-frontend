@@ -126,6 +126,7 @@ Cuando una ruta se mockea, el cliente la responde desde `src/mocks/` en vez de l
 - Todo el resto del camino corre igual que con datos reales: validación zod, mapeo de errores, `ActionResult`. Pasar a datos reales es **apagar el mock de esa ruta**, sin tocar el feature.
 - **Mock por endpoint**, no todo o nada. Lo que el backend ya tiene (hoy, E01) va siempre contra la API real.
 - **Mock por parámetro** cuando una propuesta suma un parámetro a un endpoint que ya existe (por ejemplo `?q=` en los comentarios, P-014): la ruta lleva `when` y solo atiende los pedidos con ese parámetro; el resto sigue yendo al backend.
+- **Propuesta encima de una respuesta real** cuando el backend ya tiene el endpoint pero no manda algo que proponemos. Por ejemplo, los anuncios y los glosarios del feed (P-031, P-032). Con `missing`, un `MockExtension` (`MOCK_EXTENSIONS`) agrega lo propuesto a la respuesta del backend antes de validarla (`specs/glossary` GL-07).
 - `src/env.ts` **rechaza `API_MOCKS` distinto de `false` en producción**: el build falla.
 - Cada ruta declara `implemented`: si el backend ya la tiene (rama `dev` de `asinko-app`). Al implementarse una ruta en el backend, se marca `implemented: true` y deja de mockearse con `missing`.
 - El usuario demo (`getViewer`) existe solo con `true`: con el backend real, las escrituras piden login. En ese modo, la cookie `asinko-mock-guest=1` lo apaga en un navegador, para probar la experiencia sin sesión (`specs/guest-experience`).

@@ -58,6 +58,17 @@ Textos en `glossary.*`:
 | `region`  | Glossary: {term} | Glosario: {term} | Glossário: {term} |
 | `example` | Example          | Ejemplo          | Exemplo           |
 
-## 5. Peso
+## 5. Sobre el feed real (GL-07)
+
+Con `API_MOCKS=missing` el feed viene del backend, que todavía no manda glosarios ni anuncios. Por eso se suman sobre la respuesta real.
+
+- `MockExtension` (`src/mocks/types.ts`): `{ method, path, extend(response, context) }`. Es una propuesta encima de un endpoint implementado.
+- `MOCK_EXTENSIONS` (`handlers.ts`) cubre tres endpoints, con las mismas funciones que los handlers:
+  - Explore: anuncios, y glosarios sin `?community=`;
+  - Following: anuncios y glosarios;
+  - el contenido de un perfil: solo anuncios.
+- El cliente HTTP (`extensions`) aplica la extensión a la respuesta de la red **antes** de validarla. Solo con `missing`: con `true`, los handlers ya los ponen; en producción `API_MOCKS` es `false`.
+
+## 6. Peso
 
 Server Component, sin JavaScript nuevo. `BookOpenTextIcon` se dibuja en el servidor.
