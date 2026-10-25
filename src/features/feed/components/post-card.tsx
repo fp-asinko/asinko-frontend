@@ -128,7 +128,7 @@ export function PostCard({
             badge={
               post.thought ? (
                 <span className="inline-flex min-h-6 shrink-0 items-center gap-1.25 type-action font-extrabold uppercase">
-                  <QuoteIcon aria-hidden className="size-3.5 fill-current" />
+                  <QuoteIcon aria-hidden className="size-3.5" />
                   {t('thought')}
                 </span>
               ) : undefined
@@ -187,23 +187,27 @@ export function PostCard({
             'group/body',
             post.thought
               ? // A quote, as the prototype's thought: big quote marks, larger and in italics.
+                // Room around it, as the prototype's: it reads as a quote, not a block of text.
                 cn(
-                  'relative pl-8 italic',
+                  'relative pl-9 italic',
                   detail
-                    ? 'mt-1 text-[1.375rem] leading-snug'
-                    : 'mt-1 text-[1.0625rem] leading-relaxed',
+                    ? 'mt-3 mb-2 text-[1.375rem] leading-snug'
+                    : 'mt-3 mb-1.5 text-[1.0625rem] leading-relaxed',
                 )
               : cn('type-post-body', detail ? 'mt-3' : 'mt-1.5'),
           )}
         >
           {post.thought && (
-            <QuoteIcon
+            // A typographic quote mark, light and thin, as the prototype's (not an icon).
+            <span
               aria-hidden
               className={cn(
-                'absolute top-0.5 left-0 fill-current text-faint',
-                detail ? 'size-6' : 'size-5',
+                'absolute -top-1 left-0 leading-none font-extrabold text-faint not-italic select-none',
+                detail ? 'text-[3rem]' : 'text-[2.5rem]',
               )}
-            />
+            >
+              “
+            </span>
           )}
           {!detail && isLong(post.body) ? (
             <>

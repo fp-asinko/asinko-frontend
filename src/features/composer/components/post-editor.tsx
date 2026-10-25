@@ -50,10 +50,10 @@ const BARE =
 
 /**
  * A format, as Reddit's tabs: its name, a line under the chosen one (SF-02), on the row's border
- * (shadcn's sits 5px below it).
+ * (shadcn's sits 5px below it). Narrower in phones: the four fit 360px in every language.
  */
 const FORMAT =
-  'h-10 flex-none gap-1.5 rounded-none border-0 px-3 type-action text-muted-foreground hover:text-foreground data-active:text-foreground group-data-horizontal/tabs:after:-bottom-px [&_svg]:size-4'
+  'h-10 flex-none gap-1.5 rounded-none border-0 px-2 type-action text-muted-foreground hover:text-foreground data-active:text-foreground group-data-horizontal/tabs:after:-bottom-px sm:px-3 [&_svg]:size-4'
 
 /** A field in its own box, as Reddit's title (SF-03, SF-05): the border darkens while writing. */
 const FIELD_BOX =
@@ -579,6 +579,12 @@ export function PostEditor({
             aria-label={t('type.label')}
             className="h-auto w-full justify-start gap-1 border-b p-0"
           >
+            {/* First, as the prototype's; Text stays the one chosen on arrival. Only its text, no
+                title (specs/thoughts TH-03). */}
+            <TabsTrigger value="THOUGHT" className={FORMAT}>
+              <QuoteIcon aria-hidden />
+              {t('type.thought')}
+            </TabsTrigger>
             <TabsTrigger value="TEXT" className={FORMAT}>
               <AlignLeftIcon aria-hidden />
               {t('type.text')}
@@ -590,11 +596,6 @@ export function PostEditor({
             <TabsTrigger value="IMAGE" className={FORMAT}>
               <ImageIcon aria-hidden />
               {t('type.image')}
-            </TabsTrigger>
-            {/* Only its text, no title (specs/thoughts TH-03). */}
-            <TabsTrigger value="THOUGHT" className={FORMAT}>
-              <QuoteIcon aria-hidden />
-              {t('type.thought')}
             </TabsTrigger>
           </TabsList>
 
@@ -735,11 +736,14 @@ export function PostEditor({
                   invalid('body') && 'border-destructive',
                 )}
               >
-                <div className="relative pl-8">
-                  <QuoteIcon
+                <div className="relative pl-9">
+                  {/* The card's quote mark (PostCard): typographic, light. */}
+                  <span
                     aria-hidden
-                    className="absolute top-0.5 left-0 size-6 fill-current text-faint"
-                  />
+                    className="absolute -top-1 left-0 text-[2.5rem] leading-none font-extrabold text-faint not-italic select-none"
+                  >
+                    “
+                  </span>
                   {bodyInput}
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2 border-t pt-2.5">

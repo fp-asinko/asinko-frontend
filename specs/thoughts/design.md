@@ -18,7 +18,8 @@
 
 Con `post.thought`:
 
-- La cabecera de siempre (`CardByline`), con la marca **THOUGHT** a la derecha (`QuoteIcon` + "THOUGHT", con el mismo estilo que el badge POLL).
+- La cabecera de siempre (`CardByline`), con la marca **THOUGHT** a la derecha (`QuoteIcon` sin relleno + "THOUGHT", con el mismo estilo que el badge POLL).
+- **Comillas sutiles** (pedido del PO, 2026-10-25): la comilla de la cita es el carácter “ de Figtree, extrabold y en `text-faint`, como el prototipo; no el `QuoteIcon` relleno. La cita lleva más aire (`mt-3`, `mb-1.5`, sangría de 36 px). Lo mismo en el campo del editor.
 - Sin título. El texto es una **cita**: un `<blockquote>` con unas comillas grandes en `text-faint` (decorativas, `aria-hidden`), el texto en itálica a 17 px y `PostMarkdown` (menciones y Markdown, TH-07). El corte en ~6 líneas con "Ver más" es el mismo de hoy.
 - El nombre del `article` (`aria-labelledby`) es el texto de la cita, como hoy lo es el título. Sin `<h2>` vacío.
 - Votos, comentarios (con la caja de `specs/card-comment`) y compartir: lo mismo de un post.
@@ -39,7 +40,7 @@ Con `post.thought`:
   `saveDraftSchema`, `use-post-draft` y `preview-post` suman `THOUGHT`.
 
 - **`PostEditor`:**
-  - una pestaña **Thought** después de Image, con `QuoteIcon`;
+  - una pestaña **Thought** primera, como el prototipo (pedido del PO, 2026-10-25), con `QuoteIcon`; al llegar sigue elegida Text;
   - con Thought, se ocultan el título, el link y la imagen, y el campo del texto pasa a ser el principal (lo enfocado al llegar), con su propio placeholder ("Share a thought");
   - Publicar se habilita con texto (Thought) o con título (los demás).
   - **El campo del thought** (captura del PO, 2026-10-25), como el prototipo: una caja propia (sin la barra de formato ni Vista previa), `QuoteIcon` grande en `text-faint`, el texto a 18 px en itálica y semibold, y abajo, tras un borde, "Frases breves y memorables" y lo que queda de **250** caracteres (`THOUGHT_MAX`, en rojo al pasarse). Es el mismo `textarea` del cuerpo: cambiar de pestaña no pierde lo escrito, y las menciones se sugieren igual.

@@ -122,6 +122,17 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
     expect(publish()).not.toHaveAttribute('aria-disabled')
   })
 
+  it('shows Thought first, as the prototype, and starts on Text (specs/thoughts TH-03)', () => {
+    renderEditor()
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+      'Thought',
+      'Text',
+      'Link',
+      'Image',
+    ])
+    expect(screen.getByRole('tab', { name: 'Text' })).toHaveAttribute('aria-selected', 'true')
+  })
+
   it('writes a thought: only its text, no title, and publishes it (specs/thoughts TH-03, TH-05)', async () => {
     actions.createPost.mockResolvedValue({ ok: true, data: { id: 'abc', title: '' } })
     const { onPublished } = renderEditor({ type: 'THOUGHT' })
