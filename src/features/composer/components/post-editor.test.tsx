@@ -46,7 +46,7 @@ const DEFI: CommunityOption = {
 
 function renderEditor({
   community = DEFI as CommunityOption | null,
-  type = 'TEXT' as 'TEXT' | 'LINK',
+  type = 'TEXT' as 'TEXT' | 'LINK' | 'THOUGHT',
   signedIn = true,
 } = {}) {
   const onPublished = vi.fn()
@@ -116,11 +116,34 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
     await userEvent.click(publish())
     expect(actions.createPost).not.toHaveBeenCalled()
 
+    // A title is enough: the body is optional since 2026-10-23 (specs/thoughts TH-01).
     await userEvent.type(title(), 'A title')
     expect(draftRef.current?.()).toBe(true)
-    expect(publish()).toHaveAttribute('aria-disabled', 'true')
-    await userEvent.type(body(), 'A body')
     expect(publish()).not.toHaveAttribute('aria-disabled')
+  })
+
+  it('writes a thought: only its text, no title, and publishes it (specs/thoughts TH-03, TH-05)', async () => {
+    actions.createPost.mockResolvedValue({ ok: true, data: { id: 'abc', title: '' } })
+    const { onPublished } = renderEditor({ type: 'THOUGHT' })
+    expect(screen.getByRole('tab', { name: 'Thought' })).toHaveAttribute('aria-selected', 'true')
+    // No title to fill: hidden, so not in the way of the keyboard nor of what is read.
+    expect(screen.queryByRole('textbox', { name: 'Title' })).toBeNull()
+    expect(publish()).toHaveAttribute('aria-disabled', 'true')
+    // Its own box, as the prototype's: what makes a good one and how much room is left.
+    expect(screen.getByText('Brief and memorable phrases')).toBeInTheDocument()
+    expect(screen.getByText('250/250')).toBeInTheDocument()
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Thought' }),
+      'Rates first, risk later.',
+    )
+    expect(screen.getByText('226/250')).toBeInTheDocument()
+    expect(publish()).not.toHaveAttribute('aria-disabled')
+    await userEvent.click(publish())
+    expect(actions.createPost).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'THOUGHT', title: '', body: 'Rates first, risk later.' }),
+    )
+    // Its page, with a path read from its text.
+    expect(onPublished).toHaveBeenCalledWith('/post/abc/rates-first-risk-later')
   })
 
   it('counts the title near its limit, and explains each field once Publish is pressed', async () => {
@@ -138,11 +161,13 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
     expect(
       screen.getByText('Enter a link that starts with http:// or https://'),
     ).toBeInTheDocument()
-    expect(screen.getByText('Write something in the body')).toBeInTheDocument()
+    // The body is optional (TH-01): nothing to say about it.
+    expect(screen.queryByText('Write something in the body')).not.toBeInTheDocument()
     expect(title()).toHaveAttribute('aria-invalid', 'true')
     // Then the errors follow the typing.
-    await userEvent.type(body(), 'Now there is a body')
-    expect(screen.queryByText('Write something in the body')).not.toBeInTheDocument()
+    await userEvent.clear(title())
+    await userEvent.type(title(), 'A shorter title')
+    expect(screen.queryByText('Keep the title within 300 characters')).not.toBeInTheDocument()
   })
 
   it('says what is missing when Post is pressed too early (WCAG 3.3.1)', async () => {
@@ -154,7 +179,7 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
       'Choose a community',
     )
     expect(screen.getByText('Add a title')).toBeInTheDocument()
-    expect(screen.getByText('Write something in the body')).toBeInTheDocument()
+    expect(screen.queryByText('Write something in the body')).not.toBeInTheDocument()
     expect(title()).toHaveAccessibleDescription(/Add a title/)
   })
 

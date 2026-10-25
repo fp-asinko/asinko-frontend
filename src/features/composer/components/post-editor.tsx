@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlignLeftIcon, ImageIcon, LinkIcon } from 'lucide-react'
+import { AlignLeftIcon, ImageIcon, LinkIcon, QuoteIcon } from 'lucide-react'
 import { useFormatter, useLocale, useNow, useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type RefObject } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
@@ -22,6 +22,7 @@ import type { CommunityOption, SavedDraft } from '../composer.types'
 import {
   createPostSchema,
   IMAGE_ALT_MAX,
+  THOUGHT_MAX,
   TITLE_MAX,
   type CreatePostForm,
   type CreatePostInput,
@@ -66,6 +67,8 @@ const ERROR_NAMES = [
   'titleRequired',
   'titleTooLong',
   'bodyRequired',
+  'thoughtRequired',
+  'thoughtTooLong',
   'url',
   'ownProfileOnly',
   'invalidCommunity',
@@ -128,7 +131,7 @@ export function PostEditor({
 }: {
   /** The feed's card for the post being written (specs/submit-tools ST-01): from the page. */
   preview?: PreviewAction
-  type: 'TEXT' | 'LINK' | 'IMAGE'
+  type: 'TEXT' | 'LINK' | 'IMAGE' | 'THOUGHT'
   community: CommunityOption | null
   /** The related ones on arrival, as handles (the page's URL, specs/related-aside RA-04). */
   related?: string[]
@@ -202,6 +205,8 @@ export function PostEditor({
     control,
     name: ['title', 'body', 'url', 'type', 'imageUrl', 'related', 'tag', 'communityId', 'imageAlt'],
   })
+  // A thought: only its text, no title (specs/thoughts TH-03).
+  const thought = current === 'THOUGHT'
   // What a draft of the account keeps (DT-01): "Saved" holds while the form still says it.
   const snapshot = JSON.stringify([
     communityId,
@@ -260,7 +265,9 @@ export function PostEditor({
   // On arrival the focus goes where the person starts (SU-09): the title, or the community when
   // none is chosen yet. Once: the page is opened, not re-rendered.
   useEffect(() => {
-    document.getElementById(chosen ? `${ids}-title` : `${ids}-community`)?.focus()
+    // A thought starts at its text: it has no title (TH-03).
+    const field = current === 'THOUGHT' ? 'body' : 'title'
+    document.getElementById(chosen ? `${ids}-${field}` : `${ids}-community`)?.focus()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on arrival
   }, [])
 
@@ -315,10 +322,10 @@ export function PostEditor({
     focusTitle()
   }
   // Publish waits until nothing is missing, and while sending (PC-10, no double posts).
+  // A thought needs its text; a post, its title, and its body is optional (specs/thoughts).
   const complete = Boolean(
     chosen &&
-    title.trim() &&
-    body.trim() &&
+    (thought ? body.trim() : title.trim()) &&
     (current !== 'LINK' || url.trim()) &&
     (current !== 'IMAGE' || imageUrl),
   )
@@ -333,7 +340,8 @@ export function PostEditor({
     if (result.ok) {
       // Published: gone, and no save still pending brings it back as a draft.
       if (storageKey) discardDraft(storageKey)
-      onPublished(postPath(result.data.id, result.data.title))
+      // A thought's readable path comes from its text, as its page will (TH-05, TH-08).
+      onPublished(postPath(result.data.id, values.type === 'THOUGHT' ? values.body : values.title))
       return
     }
     if (result.error === 'api.errors.UNAUTHENTICATED') {
@@ -356,7 +364,9 @@ export function PostEditor({
         message:
           key === 'titleTooLong'
             ? t('errors.titleTooLong', { max: TITLE_MAX })
-            : t(`errors.${key}`),
+            : key === 'thoughtTooLong'
+              ? t('errors.thoughtTooLong', { max: THOUGHT_MAX })
+              : t(`errors.${key}`),
       },
     ]
   }
@@ -367,7 +377,8 @@ export function PostEditor({
   // missing, so the preview says so.
   function draftForPreview() {
     const values = getValues()
-    if (!values.title.trim() || !values.body.trim()) return null
+    const isThought = values.type === 'THOUGHT'
+    if (isThought ? !values.body.trim() : !values.title.trim()) return null
     return {
       title: values.title,
       body: values.body,
@@ -384,6 +395,45 @@ export function PostEditor({
   }
   // Where an emoji goes: the last field used, title or body; the body until one is focused.
   const emojiTarget = useRef<TextField | null>(null)
+  // A thought: how much room is left, as the prototype's (TH-03).
+  const thoughtLeft = THOUGHT_MAX - body.trim().length
+
+  // The same field for a post's body and a thought's text: switching keeps what was typed.
+  // $ # @ suggest assets, communities and people (specs/mention-autocomplete).
+  const bodyInput = (
+    <div className="relative">
+      <Textarea
+        id={`${ids}-body`}
+        placeholder={thought ? t('fields.thoughtPlaceholder') : t('fields.bodyPlaceholder')}
+        aria-required={thought || undefined}
+        {...bodyField}
+        ref={(element) => {
+          bodyField.ref(element)
+          bodyRef.current = element
+          emojiTarget.current ??= element
+        }}
+        onFocus={(event) => (emojiTarget.current = event.currentTarget)}
+        // Ctrl/⌘ + B, I and K format the chosen text (ST-05).
+        onKeyDown={(event) => {
+          const kind = formatShortcut(event)
+          if (!kind) return
+          event.preventDefault()
+          applyFormat(event.currentTarget, kind)
+        }}
+        aria-invalid={invalid('body') || undefined}
+        aria-describedby={`${ids}-body-help ${ids}-body-error`}
+        className={cn(
+          BARE,
+          'resize-none text-base md:text-base',
+          // A thought reads as a quote, as its card (the prototype's: 18 px, italic).
+          thought
+            ? 'min-h-32 text-lg leading-normal font-semibold italic md:text-lg'
+            : 'min-h-36 leading-[1.55]',
+        )}
+      />
+      <MentionField fieldRef={bodyRef} search={searchMentions} />
+    </div>
+  )
 
   return (
     <form
@@ -455,7 +505,9 @@ export function PostEditor({
       <Tabs
         value={current}
         onValueChange={(next) => {
-          if (next === 'TEXT' || next === 'LINK' || next === 'IMAGE') setValue('type', next)
+          if (next === 'TEXT' || next === 'LINK' || next === 'IMAGE' || next === 'THOUGHT') {
+            setValue('type', next)
+          }
         }}
         className="flex flex-1 flex-col gap-0"
       >
@@ -539,9 +591,16 @@ export function PostEditor({
               <ImageIcon aria-hidden />
               {t('type.image')}
             </TabsTrigger>
+            {/* Only its text, no title (specs/thoughts TH-03). */}
+            <TabsTrigger value="THOUGHT" className={FORMAT}>
+              <QuoteIcon aria-hidden />
+              {t('type.thought')}
+            </TabsTrigger>
           </TabsList>
 
-          <Field data-invalid={invalid('title') || undefined} className="gap-1">
+          {/* A thought has no title: hidden, still mounted, so what was typed is back on a switch
+              (the action leaves it out of a thought, TH-03). */}
+          <Field data-invalid={invalid('title') || undefined} hidden={thought} className="gap-1">
             <FieldLabel htmlFor={`${ids}-title`} className="sr-only">
               {t('fields.title')}
             </FieldLabel>
@@ -582,6 +641,7 @@ export function PostEditor({
           {/* Title and body stay outside the panels, mounted across formats: a field remounted
               on a switch could drop what was just typed. Link only adds its URL. */}
           <TabsContent value="TEXT" />
+          <TabsContent value="THOUGHT" />
           <TabsContent value="LINK">
             <Field data-invalid={invalid('url') || undefined} className="gap-1">
               <FieldLabel htmlFor={`${ids}-url`} className="sr-only">
@@ -664,55 +724,65 @@ export function PostEditor({
 
           <Field data-invalid={invalid('body') || undefined} className="gap-1">
             <FieldLabel htmlFor={`${ids}-body`} className="sr-only">
-              {t('fields.body')}
+              {thought ? t('fields.thought') : t('fields.body')}
             </FieldLabel>
-            {/* Write, with its format toolbar, and Preview (specs/submit-tools). */}
-            <BodyTabs
-              preview={preview}
-              draft={draftForPreview}
-              // The format toolbar and the emojis, inside the box on top (SF-04). Emojis go into
-              // the title or the body, the last one used, at its caret (EP-01).
-              toolbar={
-                <div className="flex items-center gap-0.5">
-                  <FormatToolbar fieldRef={bodyRef} />
-                  <EmojiButton fieldRef={emojiTarget} />
+            {thought ? (
+              // A thought, as the prototype's: its own box, a big quote mark, the text and, under
+              // a line, what makes a good one and how much room is left (TH-03).
+              <div
+                className={cn(
+                  'rounded-2xl border border-input px-5 pt-4 pb-3 transition-colors duration-150 focus-within:border-foreground/60',
+                  invalid('body') && 'border-destructive',
+                )}
+              >
+                <div className="relative pl-8">
+                  <QuoteIcon
+                    aria-hidden
+                    className="absolute top-0.5 left-0 size-6 fill-current text-faint"
+                  />
+                  {bodyInput}
                 </div>
-              }
-            >
-              {/* $ # @ suggest assets, communities and people (specs/mention-autocomplete). */}
-              <div className="relative">
-                <Textarea
-                  id={`${ids}-body`}
-                  placeholder={t('fields.bodyPlaceholder')}
-                  {...bodyField}
-                  ref={(element) => {
-                    bodyField.ref(element)
-                    bodyRef.current = element
-                    emojiTarget.current ??= element
-                  }}
-                  onFocus={(event) => (emojiTarget.current = event.currentTarget)}
-                  // Ctrl/⌘ + B, I and K format the chosen text (ST-05).
-                  onKeyDown={(event) => {
-                    const kind = formatShortcut(event)
-                    if (!kind) return
-                    event.preventDefault()
-                    applyFormat(event.currentTarget, kind)
-                  }}
-                  aria-invalid={invalid('body') || undefined}
-                  aria-describedby={`${ids}-body-help ${ids}-body-error`}
-                  className={cn(BARE, 'min-h-36 resize-none text-base leading-[1.55] md:text-base')}
-                />
-                <MentionField fieldRef={bodyRef} search={searchMentions} />
+                <div className="mt-2 flex items-center justify-between gap-2 border-t pt-2.5">
+                  <p id={`${ids}-body-help`} className="type-caption text-muted-foreground">
+                    {t('fields.thoughtHelp')}
+                  </p>
+                  <span
+                    className={cn(
+                      'type-meta font-bold tabular-nums',
+                      thoughtLeft < 0 ? 'text-destructive' : 'text-muted-foreground',
+                    )}
+                  >
+                    {t('fields.counter', { count: thoughtLeft, max: THOUGHT_MAX })}
+                  </span>
+                </div>
               </div>
-            </BodyTabs>
+            ) : (
+              // Write, with its format toolbar, and Preview (specs/submit-tools).
+              <BodyTabs
+                preview={preview}
+                draft={draftForPreview}
+                // The format toolbar and the emojis, inside the box on top (SF-04). Emojis go into
+                // the title or the body, the last one used, at its caret (EP-01).
+                toolbar={
+                  <div className="flex items-center gap-0.5">
+                    <FormatToolbar fieldRef={bodyRef} />
+                    <EmojiButton fieldRef={emojiTarget} />
+                  </div>
+                }
+              >
+                {bodyInput}
+              </BodyTabs>
+            )}
             <FieldError
               id={`${ids}-body-error`}
               errors={fieldError('body')}
               className="type-meta"
             />
-            <p id={`${ids}-body-help`} className="px-1 type-meta text-muted-foreground">
-              {t('fields.bodyHelp')}
-            </p>
+            {!thought && (
+              <p id={`${ids}-body-help`} className="px-1 type-meta text-muted-foreground">
+                {t('fields.bodyHelp')}
+              </p>
+            )}
           </Field>
         </div>
 

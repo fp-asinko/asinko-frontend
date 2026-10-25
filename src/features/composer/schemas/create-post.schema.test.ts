@@ -5,6 +5,7 @@ import {
   IMAGE_ALT_MAX,
   RELATED_MAX,
   TAG_MAX,
+  THOUGHT_MAX,
   TITLE_MAX,
 } from './create-post.schema'
 
@@ -50,7 +51,7 @@ describe('createPostSchema (specs/post-create-detail PC-08, PC-09)', () => {
     }
   })
 
-  it('asks for a community, a title up to 300 characters and a body', () => {
+  it('asks for a community and a title up to 300 characters; the body is optional (TH-01)', () => {
     expect(errors({ ...valid, communityId: '' })).toEqual({
       communityId: 'composer.errors.community',
     })
@@ -59,7 +60,26 @@ describe('createPostSchema (specs/post-create-detail PC-08, PC-09)', () => {
       title: 'composer.errors.titleTooLong',
     })
     expect(errors({ ...valid, title: 'x'.repeat(TITLE_MAX) })).toEqual({})
-    expect(errors({ ...valid, body: '' })).toEqual({ body: 'composer.errors.bodyRequired' })
+    expect(errors({ ...valid, body: '' })).toEqual({})
+  })
+
+  it('takes a thought with only its text, and never sends a title (specs/thoughts TH-03)', () => {
+    expect(errors({ ...valid, type: 'THOUGHT', title: '', body: '' })).toEqual({
+      body: 'composer.errors.thoughtRequired',
+    })
+    // Brief: up to 250 characters, as the prototype's (ours: the backend has no limit).
+    expect(errors({ ...valid, type: 'THOUGHT', body: 'x'.repeat(THOUGHT_MAX) })).toEqual({})
+    expect(errors({ ...valid, type: 'THOUGHT', body: 'x'.repeat(THOUGHT_MAX + 1) })).toEqual({
+      body: 'composer.errors.thoughtTooLong',
+    })
+    // A title typed before choosing Thought is left out, not refused.
+    expect(
+      createPostSchema.parse({ ...valid, type: 'THOUGHT', title: 'Typed before' }),
+    ).toMatchObject({
+      type: 'THOUGHT',
+      title: '',
+      body: 'A body',
+    })
   })
 
   it('takes an Image post with its uploaded image, and leaves the url out (specs/post-image)', () => {

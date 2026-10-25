@@ -44,7 +44,7 @@ export type SubmitCommunity = {
 /** A post saved in the account to finish later (P-022, specs/drafts-tags): what the editor had. */
 export type SavedDraft = {
   id: string
-  type: 'TEXT' | 'LINK' | 'IMAGE'
+  type: 'TEXT' | 'LINK' | 'IMAGE' | 'THOUGHT'
   title: string
   body: string
   url: string

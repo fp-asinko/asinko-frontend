@@ -12,7 +12,7 @@ export const SUBMIT_SEGMENT: Record<Locale, 'submit' | 'publicar'> = {
 }
 
 /** The format the page opens on (`?type=`). */
-export type SubmitType = 'text' | 'link' | 'image'
+export type SubmitType = 'text' | 'link' | 'image' | 'thought'
 
 /**
  * Where "Create" goes: the page of the locale, with the community (its slug), the related ones

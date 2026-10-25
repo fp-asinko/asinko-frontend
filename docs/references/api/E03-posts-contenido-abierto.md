@@ -11,9 +11,9 @@
   "id": "uuid",
   "communityId": "uuid",
   "community": { "id": "uuid", "slug": "string", "name": "string", "type": "CommunityType" }, // P-004 (dev, 3cfff41)
-  "type": "TEXT | LINK | IMAGE",
+  "type": "TEXT | LINK | IMAGE | THOUGHT", // THOUGHT (dev, 9924924, 2026-10-23): sin título (""), solo body
   "title": "string",
-  "body": "string",          // markdown
+  "body": "string",          // markdown; "" en un post sin cuerpo (2026-10-23)
   "url": "string | null",    // solo type = LINK
   "imageUrl": "string | null", // solo type = IMAGE
   "tag": "string | null",
@@ -36,7 +36,9 @@
 
 **Request body:** `userId`, `communityId`, `type`, `title` (≤300), `body`, `url?` (si `type=LINK`), `imageUrl?` (si `type=IMAGE`), `tag?`, `relatedCommunityIds?` (hasta 3, distintos de `communityId`, sin canales personales; P-018), `draftId?` (publica ese borrador y lo borra en la misma operación; P-022)
 **Respuesta `201`:** el `Post` creado, más `entities: [{ type: "TICKER"|"MENTION"|"COMMUNITY", raw: string, resolvedId: string, position: [number, number] }]`.
-**Errores:** `403 USER_MISMATCH` · `422` si `title`/`body` vacíos o exceden el límite, o si `communityId` no existe · `422 INVALID_RELATED_COMMUNITY` (más de 3, repetidas, la principal, inexistente o un canal personal) · `404` si `draftId` no existe o es ajeno (no publica nada).
+**Cuerpo y título por tipo (dev, `9924924`, 2026-10-23):** un post `TEXT`, `LINK` o `IMAGE` exige `title` y puede no tener `body` (solo título, o título e imagen). Un `THOUGHT` es lo contrario: sin `title` (no se manda, o `""`), con `body` obligatorio y sin límite de caracteres, y sin `url` ni `imageUrl`; se guarda con `title: ""`. Se vota, se comenta y se edita con los mismos endpoints de `/posts/{id}`, pero su `body` no se puede vaciar.
+
+**Errores:** `403 USER_MISMATCH` · `422` si falta el `title` de un post o el `body` de un thought, si un thought trae `title`, o si exceden el límite, o si `communityId` no existe · `422 INVALID_RELATED_COMMUNITY` (más de 3, repetidas, la principal, inexistente o un canal personal) · `404` si `draftId` no existe o es ajeno (no publica nada).
 **Relacionadas:** el post aparece también en `GET /feed/explore?community=` de cada una y en Following de quien sigue alguna (una sola vez). No se editan después: `PATCH /posts/{id}` con `relatedCommunityIds` da `422`.
 
 ## Borradores (P-022, implementado el 2026-10-20)
@@ -46,7 +48,7 @@ Todos con sesión: el `userId` (body o query) se compara con ella.
 ```jsonc
 // Draft
 {
-  "id": "uuid", "type": "TEXT | LINK | IMAGE",
+  "id": "uuid", "type": "TEXT | LINK | IMAGE | THOUGHT",
   "title": "", "body": "", "url": "", "imageUrl": null, "imageAlt": "", "tag": null,
   "community": null, // CommunitySummary | null
   "related": [],     // como Post.related

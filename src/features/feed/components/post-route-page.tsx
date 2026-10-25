@@ -8,7 +8,7 @@ import { permanentRedirect } from '@/i18n/navigation'
 import { safeLocale } from '@/i18n/safe-locale'
 import { postImagePath, shareImage } from '@/lib/share-image/share-metadata'
 import { getOrThrow } from '@/lib/api'
-import { postPath, postSlug } from '@/lib/posts/paths'
+import { postSlug } from '@/lib/posts/paths'
 import type { PostItem } from '../feed.types'
 import { getPost } from '../lib/post-api'
 import { postExcerpt } from '../lib/post-excerpt'
@@ -30,23 +30,31 @@ export async function postMetadata(id: string, rawLocale: string): Promise<Metad
   const alternates = buildAlternates(
     env.NEXT_PUBLIC_SITE_URL,
     locale,
-    postPath(post.id, post.title),
+    // A thought's path comes from its text (specs/thoughts TH-08): the mapper already built it.
+    post.path,
   )
   if (post.deleted) {
-    const t = await getTranslations({ locale, namespace: 'feed.card' })
-    return { title: t('deleted'), alternates, robots: { index: false } }
+    const deleted = await getTranslations({ locale, namespace: 'feed.card' })
+    return { title: deleted('deleted'), alternates, robots: { index: false } }
   }
-  const description = postExcerpt(post.body) || undefined
+  // Without a body, its title says it (TH-02); a thought, its own text (TH-08).
+  const description = postExcerpt(post.body) || post.title || undefined
+  const t = await getTranslations({ locale, namespace: 'feed.card' })
+  const title = post.thought
+    ? post.author
+      ? t('thoughtBy', { author: post.author.username })
+      : t('thought')
+    : post.title
   // The page's openGraph replaces the layout's: the site's name goes again (specs/share-preview).
   const site = await getTranslations({ locale, namespace: 'metadata' })
   // Its own image, named here: the page's openGraph would drop one from the parent segment.
-  const image = shareImage(postImagePath(locale, post.id), post.title)
+  const image = shareImage(postImagePath(locale, post.id), title)
   return {
-    title: post.title,
+    title,
     description,
     alternates,
     openGraph: {
-      title: post.title,
+      title,
       description,
       siteName: site('title'),
       locale: OG_LOCALES[locale],
@@ -70,8 +78,10 @@ export async function resolvePostRoute(
   const result = await getPost(id)
   if (!result.ok && (result.code === 'NOT_FOUND' || result.code === 'INVALID')) notFound()
   const post = getOrThrow(result)
-  if (slug?.length !== 1 || slug[0] !== postSlug(post.title)) {
-    permanentRedirect({ href: postPath(post.id, post.title), locale: safeLocale(locale) })
+  // Its canonical path, the mapper's: from the title, or a thought's text (specs/thoughts TH-08).
+  const canonical = postSlug(post.thought ? post.body : post.title)
+  if (slug?.length !== 1 || slug[0] !== canonical) {
+    permanentRedirect({ href: post.path, locale: safeLocale(locale) })
   }
   return post
 }

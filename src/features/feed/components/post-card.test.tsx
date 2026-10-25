@@ -258,3 +258,50 @@ describe('PostCard as a preview (specs/submit-tools ST-01, ST-02)', () => {
     expect(screen.getByRole('button', { name })).toHaveAttribute('aria-haspopup', 'menu')
   })
 })
+
+describe('PostCard: thoughts and posts without a body (specs/thoughts)', () => {
+  const thought = (overrides = {}) =>
+    postItem({
+      thought: true,
+      title: '',
+      path: '/post/post-1/the-market-can-stay-irrational',
+      body: 'The market can stay irrational longer than you can stay solvent.',
+      media: null,
+      ...overrides,
+    })
+
+  it('shows a thought as a quote with its badge, named for who cannot see it (TH-06)', () => {
+    renderWithIntl(<PostCard post={thought()} />)
+    const card = screen.getByRole('article', { name: 'Thought by maria' })
+    expect(card).toHaveTextContent('Thought')
+    const quote = screen.getByText(/The market can stay irrational/)
+    expect(quote.closest('.italic')).not.toBeNull()
+    // The keyboard's way into its page, as a post's title.
+    expect(screen.getByRole('link', { name: 'Thought by maria' })).toHaveAttribute(
+      'href',
+      '/post/post-1/the-market-can-stay-irrational',
+    )
+    // Votes and comments, as a post.
+    expect(screen.getByRole('button', { name: /comments/ })).toBeInTheDocument()
+  })
+
+  it('cuts a long thought with "See more" (TH-07)', () => {
+    renderWithIntl(<PostCard post={thought({ body: 'Patience. '.repeat(80) })} />)
+    expect(screen.getByText('See more')).toBeInTheDocument()
+  })
+
+  it('on its own page, its heading names it and the quote shows whole (TH-08)', () => {
+    renderWithIntl(<PostCard post={thought()} variant="detail" />)
+    expect(screen.getByRole('heading', { level: 1, name: 'Thought by maria' })).toHaveClass(
+      'sr-only',
+    )
+    expect(screen.getByText(/The market can stay irrational/)).toBeVisible()
+  })
+
+  it('shows a post without a body by its title alone, with no empty paragraph (TH-02)', () => {
+    const { container } = renderWithIntl(<PostCard post={postItem({ body: '', media: null })} />)
+    expect(screen.getByRole('heading', { name: 'Whales accumulated 48,000 $BTC' })).toBeVisible()
+    expect(container.querySelector('.type-post-body')).toBeNull()
+    expect(screen.queryByText('See more')).toBeNull()
+  })
+})

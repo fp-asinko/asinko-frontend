@@ -28,7 +28,7 @@ type SearchParams = Record<string, string | string[] | undefined>
 /** The page's query: user input, checked; anything odd is left out (SU-01). */
 const querySchema = z.object({
   community: z.string().min(1).max(64).optional().catch(undefined),
-  type: z.enum(['text', 'link', 'image']).optional().catch(undefined),
+  type: z.enum(['text', 'link', 'image', 'thought']).optional().catch(undefined),
 })
 
 /** A related one's slug (specs/related-aside RA-04): a group's or an asset's. */
@@ -120,7 +120,14 @@ export async function SubmitPage({
 
   const found = query.community ? await getSubmitCommunity(query.community, viewer.username) : null
   const community = found?.ok && found.data.postable ? found.data : null
-  const type = query.type === 'link' ? 'LINK' : query.type === 'image' ? 'IMAGE' : 'TEXT'
+  const type =
+    query.type === 'link'
+      ? 'LINK'
+      : query.type === 'image'
+        ? 'IMAGE'
+        : query.type === 'thought'
+          ? 'THOUGHT'
+          : 'TEXT'
   // The related ones of the URL that exist and can be tagged: groups and assets (RA-04).
   const related = (
     await Promise.all(query.related.map((slug) => getSubmitCommunity(slug, viewer.username)))

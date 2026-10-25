@@ -1,4 +1,10 @@
-import { ArrowBigUpIcon, ArrowUpRightIcon, ForwardIcon, MessageCircleIcon } from 'lucide-react'
+import {
+  ArrowBigUpIcon,
+  ArrowUpRightIcon,
+  ForwardIcon,
+  MessageCircleIcon,
+  QuoteIcon,
+} from 'lucide-react'
 import Image from 'next/image'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
@@ -65,6 +71,8 @@ export function PostCard({
   const detail = variant === 'detail'
   const preview = variant === 'preview'
   const Title = detail ? 'h1' : 'h2'
+  // A thought's name, with no title of its own: "Thought by jeppe" (specs/thoughts TH-06).
+  const heading = post.author ? t('thoughtBy', { author: post.author.username }) : t('thought')
   const commentCount = (
     <>
       <MessageCircleIcon aria-hidden className="size-4" />
@@ -116,6 +124,15 @@ export function PostCard({
             canJoin={!preview && !post.deleted && post.community?.slug !== feedCommunity}
             // A preview leads nowhere: leaving would interrupt the post being written.
             linked={!preview}
+            // A thought says so, as a poll does (specs/thoughts TH-06).
+            badge={
+              post.thought ? (
+                <span className="inline-flex min-h-6 shrink-0 items-center gap-1.25 type-action font-extrabold uppercase">
+                  <QuoteIcon aria-hidden className="size-3.5 fill-current" />
+                  {t('thought')}
+                </span>
+              ) : undefined
+            }
           />
         </div>
         {menu && !preview && !post.deleted && (
@@ -133,14 +150,23 @@ export function PostCard({
         id={`post-${post.id}`}
         // Focus target when the join button disappears (CF-14); not in the tab order.
         tabIndex={-1}
-        className={
+        className={cn(
           post.deleted
             ? 'type-post-title text-muted-foreground outline-none'
-            : 'type-post-title outline-none'
-        }
+            : 'type-post-title outline-none',
+          // A thought has no title: its heading names it for assistive tech and the keyboard, and
+          // the quote below is what shows (specs/thoughts TH-06, TH-08).
+          post.thought && !post.deleted && 'sr-only',
+        )}
       >
         {post.deleted ? (
           t('deleted')
+        ) : post.thought ? (
+          detail || preview ? (
+            heading
+          ) : (
+            <Link href={post.path}>{heading}</Link>
+          )
         ) : detail || preview ? (
           post.title
         ) : (
@@ -156,7 +182,29 @@ export function PostCard({
       </Title>
 
       {!post.deleted && post.body && (
-        <div className={cn('group/body type-post-body', detail ? 'mt-3' : 'mt-1.5')}>
+        <div
+          className={cn(
+            'group/body',
+            post.thought
+              ? // A quote, as the prototype's thought: big quote marks, larger and in italics.
+                cn(
+                  'relative pl-8 italic',
+                  detail
+                    ? 'mt-1 text-[1.375rem] leading-snug'
+                    : 'mt-1 text-[1.0625rem] leading-relaxed',
+                )
+              : cn('type-post-body', detail ? 'mt-3' : 'mt-1.5'),
+          )}
+        >
+          {post.thought && (
+            <QuoteIcon
+              aria-hidden
+              className={cn(
+                'absolute top-0.5 left-0 fill-current text-faint',
+                detail ? 'size-6' : 'size-5',
+              )}
+            />
+          )}
           {!detail && isLong(post.body) ? (
             <>
               <div className="line-clamp-6 group-has-[details[open]]/body:line-clamp-none">

@@ -66,13 +66,17 @@ test.describe('Composer box in one row', () => {
     expect(await sameRow(page)).toBe(false)
     const span = prompt(page).locator('span')
     expect(await span.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
-    for (const name of ['Duel', 'Portfolio', 'Thought']) {
+    for (const name of ['Duel', 'Portfolio']) {
       await expect(page.getByRole('main').getByRole('button', { name })).toBeVisible()
     }
+    // Thought is no longer coming soon: a link to create one (specs/thoughts TH-04).
+    await expect(
+      page.getByRole('main').getByRole('link', { name: 'Thought', exact: true }),
+    ).toBeVisible()
     // Publish inside the box, after the last format.
     const last = (await page
       .getByRole('main')
-      .getByRole('button', { name: 'Thought' })
+      .getByRole('link', { name: 'Thought', exact: true })
       .boundingBox())!
     const pub = (await publish(page).boundingBox())!
     expect(pub.x).toBeGreaterThanOrEqual(last.x + last.width)

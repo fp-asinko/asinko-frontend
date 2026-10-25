@@ -107,7 +107,7 @@
       "live": "Live",
       "duel": "Duelo",
       "portfolio": "Portfolio",
-      "thought": "Pensamiento",
+      "thought": "Thought",
       "postIn": "Publicar en {handle}",
       "link": "Link",
       "image": "Imagen",
@@ -143,7 +143,9 @@
       "share": "Compartir",
       "newTab": "(se abre en una pestaña nueva)",
       "linkDomain": "({domain})",
-      "related": "Relacionadas"
+      "related": "Relacionadas",
+      "thought": "Thought",
+      "thoughtBy": "Thought de {author}"
     },
     "poll": {
       "badge": "Encuesta",
@@ -892,7 +894,8 @@
       "label": "Tipo de post",
       "text": "Texto",
       "link": "Link",
-      "image": "Imagen"
+      "image": "Imagen",
+      "thought": "Thought"
     },
     "fields": {
       "title": "Título",
@@ -904,7 +907,10 @@
       "titlePlaceholder": "Título *",
       "bodyPlaceholder": "Comparte tu análisis, idea o pregunta...",
       "imageAlt": "Descripción de la imagen (opcional)",
-      "imageAltPlaceholder": "Qué muestra la imagen, para quien no la puede ver"
+      "imageAltPlaceholder": "Qué muestra la imagen, para quien no la puede ver",
+      "thought": "Thought",
+      "thoughtPlaceholder": "Escribe tu thought...",
+      "thoughtHelp": "Frases breves y memorables"
     },
     "submit": "Publicar",
     "submitting": "Publicando…",
@@ -931,7 +937,9 @@
       "imageUnreadable": "No se pudo leer la imagen",
       "imageRequired": "Agrega una imagen",
       "imageAltTooLong": "Hasta 300 caracteres.",
-      "invalidRelated": "Una de las relacionadas ya no se puede etiquetar. Quítala y vuelve a intentarlo."
+      "invalidRelated": "Una de las relacionadas ya no se puede etiquetar. Quítala y vuelve a intentarlo.",
+      "thoughtRequired": "Escribe tu thought",
+      "thoughtTooLong": "El thought puede tener hasta {max} caracteres"
     },
     "cancel": "Cancelar",
     "image": {

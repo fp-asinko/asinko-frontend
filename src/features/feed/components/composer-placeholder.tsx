@@ -23,8 +23,8 @@ const ICON =
  * The composer box at the top of a feed (H-09), as X's: the avatar and the prompt without a box;
  * below, the formats as icons and Publish on the right. Each part goes to the page to create a
  * post (specs/submit-page SU-02, Q1), on its format: the prompt and Publish on Text, the link and
- * the image icons on theirs. Thesis, Live, Duel, Portfolio and Thought are coming soon (H-26,
- * specs/composer-row CR-05). On a community's page it says
+ * the image icons on theirs, and Thought on its own (specs/thoughts TH-04). Thesis, Live, Duel and
+ * Portfolio are coming soon (H-26, specs/composer-row CR-05). On a community's page it says
  * where the post goes: "Post in #defi", and the page arrives with it chosen.
  */
 export function ComposerPlaceholder({
@@ -44,7 +44,6 @@ export function ComposerPlaceholder({
     { key: 'live', icon: RadioIcon },
     { key: 'duel', icon: SwordsIcon },
     { key: 'portfolio', icon: ChartColumnIcon },
-    { key: 'thought', icon: QuoteIcon },
   ] as const
 
   return (
@@ -91,6 +90,15 @@ export function ComposerPlaceholder({
               <Icon aria-hidden />
             </GatedComingSoon>
           ))}
+          {/* Thoughts are here (specs/thoughts TH-04): to create one, as the link and the image. */}
+          <ComposeTrigger
+            type="thought"
+            community={communitySlug}
+            aria-label={t('thought')}
+            className={ICON}
+          >
+            <QuoteIcon aria-hidden />
+          </ComposeTrigger>
           {/* As X: Publish waits on the right, quiet (the gray pill: white on a light black would
             not reach 4.5:1). The same place as the prompt: one link for assistive tech and the
             keyboard (WCAG 2.4.4). */}

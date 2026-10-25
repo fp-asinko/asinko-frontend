@@ -30,7 +30,7 @@ export function SubmitEditor({
 }: {
   /** The preview's Server Action (specs/submit-tools ST-01). */
   preview?: PreviewAction
-  type: 'TEXT' | 'LINK' | 'IMAGE'
+  type: 'TEXT' | 'LINK' | 'IMAGE' | 'THOUGHT'
   community: CommunityOption | null
   storageKey: string | null
   /** The related ones of the URL, as handles (specs/related-aside RA-04). */

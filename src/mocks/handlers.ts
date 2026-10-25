@@ -76,13 +76,20 @@ const validationError = {
 
 const noRequest: MockContext = { params: {}, query: {}, body: undefined }
 
-/** Newest first, posts and polls mixed (E04). Deleted posts stay: the UI shows them as deleted. */
+/**
+ * Newest first, posts, thoughts and polls mixed (E04). Deleted posts stay: the UI shows them as
+ * deleted. A post of type THOUGHT is its own kind, as the backend (2026-10-23, specs/thoughts).
+ */
 const FEED: RawContentFeedItem[] = [
-  ...POSTS.map((content) => ({ kind: 'POST' as const, content })),
+  ...POSTS.map((content) =>
+    content.type === 'THOUGHT'
+      ? { kind: 'THOUGHT' as const, content }
+      : { kind: 'POST' as const, content },
+  ),
   ...POLLS.map((content) => ({ kind: 'POLL' as const, content })),
 ].sort((a, b) => b.content.publishedAt.localeCompare(a.content.publishedAt))
 
-const FEED_KINDS = ['POST', 'THESIS', 'POLL']
+const FEED_KINDS = ['POST', 'THESIS', 'POLL', 'THOUGHT']
 
 /** ?kind=POST or ?kind=POST,POLL narrows the feed; unknown values are ignored (backend dev). */
 function byKind(items: RawContentFeedItem[], raw: string | undefined) {
@@ -476,7 +483,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     example: noRequest,
     // The feed the Home asks for: checks Post and Poll (community, commentCount), reason and
     // requestId on the real API.
-    liveExample: { ...noRequest, query: { kind: 'POST,POLL' } },
+    liveExample: { ...noRequest, query: { kind: 'POST,POLL,THOUGHT' } },
     handler: ({ query }) => {
       // Backend dev: an unknown community answers an empty page, not a 404.
       if (query.community && !communityBySlug(query.community)) {

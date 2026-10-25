@@ -36,9 +36,9 @@ describe('ComposerPlaceholder (H-09; specs/submit-page SU-02, Q1)', () => {
     )
   })
 
-  it('keeps Thesis, Live, Duel, Portfolio and Thought as coming soon, in that order (CR-05)', () => {
+  it('keeps Thesis, Live, Duel and Portfolio as coming soon, in that order (CR-05)', () => {
     renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
-    const soon = ['Thesis', 'Live', 'Duel', 'Portfolio', 'Thought']
+    const soon = ['Thesis', 'Live', 'Duel', 'Portfolio']
     for (const name of soon) {
       expect(screen.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
     }
@@ -47,6 +47,13 @@ describe('ComposerPlaceholder (H-09; specs/submit-page SU-02, Q1)', () => {
       .map((button) => button.getAttribute('aria-label') ?? button.textContent)
       .filter((name) => soon.includes(name ?? ''))
     expect(order).toEqual(soon)
+  })
+
+  it('creates a thought from its quotes, on the Thought tab (specs/thoughts TH-04)', () => {
+    renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
+    const thought = screen.getByRole('link', { name: 'Thought' })
+    expect(thought).toHaveAttribute('href', expect.stringMatching(/type=thought/))
+    expect(thought).not.toHaveAttribute('aria-disabled')
   })
 
   it('opens the account modal from Thesis without a session (G-04)', async () => {

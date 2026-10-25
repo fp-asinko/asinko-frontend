@@ -15,29 +15,34 @@ import { PostCard } from '../components/post-card'
 import type { PostItem } from '../feed.types'
 import { markDraftMentions } from '../lib/mentions'
 
-/** The post being written, as the editor has it (specs/submit-tools ST-01). */
-const previewSchema = z.object({
-  title: z.string().trim().min(1).max(300),
-  body: z.string().trim().min(1).max(40_000),
-  type: z.enum(['TEXT', 'LINK', 'IMAGE']),
-  url: z.string().trim().max(2048).optional(),
-  imageUrl: z.string().max(2048).optional(),
-  tag: z.string().trim().max(24).optional(),
-  imageAlt: z.string().trim().max(300).optional(),
-  community: z
-    .object({
-      // A group's slug or an asset's symbol (BRK.B, XAU/USD): only for its path, encoded.
-      slug: z.union([communitySlugSchema, assetSymbolSchema]),
-      handle: z
-        .string()
-        .regex(/^[$#@]/)
-        .max(65),
-      name: z.string().max(100),
-      own: z.boolean(),
-    })
-    .nullable(),
-  locale: z.enum(routing.locales),
-})
+/**
+ * The post being written, as the editor has it (specs/submit-tools ST-01): a post needs its title
+ * and may have no body; a thought, only its text (specs/thoughts TH-01, TH-03).
+ */
+const previewSchema = z
+  .object({
+    title: z.string().trim().max(300),
+    body: z.string().trim().max(40_000),
+    type: z.enum(['TEXT', 'LINK', 'IMAGE', 'THOUGHT']),
+    url: z.string().trim().max(2048).optional(),
+    imageUrl: z.string().max(2048).optional(),
+    tag: z.string().trim().max(24).optional(),
+    imageAlt: z.string().trim().max(300).optional(),
+    community: z
+      .object({
+        // A group's slug or an asset's symbol (BRK.B, XAU/USD): only for its path, encoded.
+        slug: z.union([communitySlugSchema, assetSymbolSchema]),
+        handle: z
+          .string()
+          .regex(/^[$#@]/)
+          .max(65),
+        name: z.string().max(100),
+        own: z.boolean(),
+      })
+      .nullable(),
+    locale: z.enum(routing.locales),
+  })
+  .refine((post) => (post.type === 'THOUGHT' ? post.body !== '' : post.title !== ''))
 
 const KIND: Record<string, CommunityKind> = { $: 'asset', '#': 'group', '@': 'user' }
 
@@ -68,7 +73,8 @@ export async function previewPost(raw: unknown): Promise<ActionResult<{ card: Re
   const post: PostItem = {
     kind: 'post',
     id: 'preview',
-    title,
+    thought: type === 'THOUGHT',
+    title: type === 'THOUGHT' ? '' : title,
     path: '',
     body: markDraftMentions(body),
     author: {

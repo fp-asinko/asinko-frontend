@@ -538,7 +538,17 @@ describe('mock writes (stateless, demo viewer)', () => {
       )
       expect((await create({ ...valid, communityId: own.id })).status).toBe(201)
       expect(await errorCode(create({ ...valid, title: 'x'.repeat(301) }))).toBe('VALIDATION_ERROR')
-      expect(await errorCode(create({ ...valid, body: ' ' }))).toBe('VALIDATION_ERROR')
+      // A post may have no body (2026-10-23); a thought needs its text and has no title.
+      expect((await create({ ...valid, body: '' })).status).toBe(201)
+      expect(
+        (await create({ ...valid, type: 'THOUGHT', title: '', body: 'Rates first.' })).status,
+      ).toBe(201)
+      expect(await errorCode(create({ ...valid, type: 'THOUGHT', title: '', body: ' ' }))).toBe(
+        'VALIDATION_ERROR',
+      )
+      expect(await errorCode(create({ ...valid, type: 'THOUGHT', body: 'Rates first.' }))).toBe(
+        'VALIDATION_ERROR',
+      )
       expect(await errorCode(create({ ...valid, url: 'https://x.com' }))).toBe('VALIDATION_ERROR')
       expect((await create({ ...valid, type: 'LINK', url: 'https://x.com' })).status).toBe(201)
     })

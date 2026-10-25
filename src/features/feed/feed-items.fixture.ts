@@ -14,6 +14,7 @@ export function postItem(overrides: Partial<PostItem> = {}): PostItem {
   return {
     kind: 'post',
     id: 'post-1',
+    thought: false,
     title: 'Whales accumulated 48,000 $BTC',
     path: '/post/post-1/whales-accumulated-48-000-btc',
     body: 'Long [$BTC](asinko:asset/BTC) for now.',

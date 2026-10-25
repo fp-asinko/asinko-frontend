@@ -23,8 +23,11 @@ const invalid: MockResponse = {
 
 /** Read on each request: the posts created in this process count too (specs/profile-showcase). */
 const items = (): RawContentFeedItem[] => [
-  ...CREATED_POSTS.map((content) => ({ kind: 'POST' as const, content })),
-  ...POSTS.map((content) => ({ kind: 'POST' as const, content })),
+  ...[...CREATED_POSTS, ...POSTS].map((content) =>
+    content.type === 'THOUGHT'
+      ? { kind: 'THOUGHT' as const, content }
+      : { kind: 'POST' as const, content },
+  ),
   ...POLLS.map((content) => ({ kind: 'POLL' as const, content })),
 ]
 
@@ -92,10 +95,11 @@ export function userComments(userId: string, cursor: string | undefined): MockRe
   const comments: RawUserComment[] = []
   for (const item of items()) {
     if ('deleted' in item.content && item.content.deleted) continue
+    // A thought is a post to the backend's content (kind POST), its title "" (2026-10-23).
     const where = {
-      kind: item.kind,
+      kind: item.kind === 'THOUGHT' ? ('POST' as const) : item.kind,
       id: item.content.id,
-      title: item.kind === 'POST' ? item.content.title : item.content.question,
+      title: item.kind === 'POLL' ? item.content.question : item.content.title,
       community: item.content.community,
     }
     const walk = (list: (typeof COMMENTS_BY_CONTENT)[string]) => {

@@ -8,6 +8,7 @@ import { clampTitle, shareFonts } from '@/lib/share-image/share-image'
 import { SHARE_CONTENT_TYPE, SHARE_SIZE } from '@/lib/share-image/share-size'
 import { LOGO_SRC } from '../../_share/brand'
 import { GenericShareCard } from '../../_share/generic-card'
+import { postExcerpt } from '@/features/feed/lib/post-excerpt'
 
 // A post's image for other apps (specs/share-preview SP-01, SP-06). In post/[id], not in
 // [[...slug]]: the same image with or without the slug. The post is the page's public read (bots
@@ -56,7 +57,8 @@ export default async function Image({ params }: { params: Promise<Params> }) {
   return new ImageResponse(
     <ShareCard
       logoSrc={LOGO_SRC}
-      title={clampTitle(post.title)}
+      // A thought shows its text: it has no title (specs/thoughts TH-08).
+      title={clampTitle(post.thought ? postExcerpt(post.body) : post.title)}
       community={
         community
           ? {

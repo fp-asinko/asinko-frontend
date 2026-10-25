@@ -37,10 +37,21 @@ export function createPost(body: unknown): MockResponse {
     return error(403, 'PERSONAL_CHANNEL_OWNER_ONLY')
   }
   const type = input.type
-  if (type !== 'TEXT' && type !== 'LINK' && type !== 'IMAGE') return error(422, 'VALIDATION_ERROR')
+  if (type !== 'TEXT' && type !== 'LINK' && type !== 'IMAGE' && type !== 'THOUGHT') {
+    return error(422, 'VALIDATION_ERROR')
+  }
+  // As the backend (2026-10-23, specs/thoughts): a thought has no title and needs its text; any
+  // other post needs its title and may have no body.
   const title = typeof input.title === 'string' ? input.title : ''
-  if (!title.trim() || title.length > TITLE_MAX) return error(422, 'VALIDATION_ERROR')
-  if (typeof input.body !== 'string' || !input.body.trim()) return error(422, 'VALIDATION_ERROR')
+  if (type === 'THOUGHT') {
+    if (title !== '') return error(422, 'VALIDATION_ERROR')
+    if (typeof input.body !== 'string' || !input.body.trim()) return error(422, 'VALIDATION_ERROR')
+  } else {
+    if (!title.trim() || title.length > TITLE_MAX) return error(422, 'VALIDATION_ERROR')
+    if (input.body !== undefined && typeof input.body !== 'string') {
+      return error(422, 'VALIDATION_ERROR')
+    }
+  }
   if (input.url !== undefined && type !== 'LINK') return error(422, 'VALIDATION_ERROR')
   // As the backend: an image only with IMAGE, and only one of its bucket (here, the fixture the
   // mocked upload answers, specs/post-image).
@@ -80,7 +91,7 @@ export function createPost(body: unknown): MockResponse {
     community: communitySummary(community.slug),
     type,
     title,
-    body: input.body,
+    body: typeof input.body === 'string' ? input.body : '',
     url: type === 'LINK' && typeof input.url === 'string' ? input.url : null,
     imageUrl: type === 'IMAGE' ? MOCK_POST_IMAGE : null,
     imageAlt: type === 'IMAGE' ? imageAlt : null,

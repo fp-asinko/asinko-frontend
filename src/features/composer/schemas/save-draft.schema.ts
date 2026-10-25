@@ -16,7 +16,7 @@ export const saveDraftSchema = z
   .object({
     draftId: z.uuid().optional(),
     communityId: z.union([z.uuid(), z.literal('')]).default(''),
-    type: z.enum(['TEXT', 'LINK', 'IMAGE']),
+    type: z.enum(['TEXT', 'LINK', 'IMAGE', 'THOUGHT']),
     title: z.string().trim().max(TITLE_MAX).default(''),
     body: z.string().trim().max(40_000).default(''),
     url: z.string().trim().max(2048).default(''),

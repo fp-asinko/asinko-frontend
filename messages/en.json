@@ -143,7 +143,9 @@
       "share": "Share",
       "newTab": "(opens in a new tab)",
       "linkDomain": "({domain})",
-      "related": "Related"
+      "related": "Related",
+      "thought": "Thought",
+      "thoughtBy": "Thought by {author}"
     },
     "poll": {
       "badge": "Poll",
@@ -892,7 +894,8 @@
       "label": "Post type",
       "text": "Text",
       "link": "Link",
-      "image": "Image"
+      "image": "Image",
+      "thought": "Thought"
     },
     "fields": {
       "title": "Title",
@@ -904,7 +907,10 @@
       "titlePlaceholder": "Title *",
       "bodyPlaceholder": "Share your analysis, idea or question...",
       "imageAlt": "Image description (optional)",
-      "imageAltPlaceholder": "What the image shows, for those who cannot see it"
+      "imageAltPlaceholder": "What the image shows, for those who cannot see it",
+      "thought": "Thought",
+      "thoughtPlaceholder": "Write your thought...",
+      "thoughtHelp": "Brief and memorable phrases"
     },
     "submit": "Publish",
     "submitting": "Posting…",
@@ -931,7 +937,9 @@
       "imageUnreadable": "Could not read the image",
       "imageRequired": "Add an image",
       "imageAltTooLong": "Up to 300 characters.",
-      "invalidRelated": "One of the related communities or assets can no longer be tagged. Remove it and try again."
+      "invalidRelated": "One of the related communities or assets can no longer be tagged. Remove it and try again.",
+      "thoughtRequired": "Write your thought",
+      "thoughtTooLong": "Keep the thought within {max} characters"
     },
     "cancel": "Cancel",
     "image": {

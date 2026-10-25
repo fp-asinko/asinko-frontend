@@ -10,7 +10,7 @@ Union discriminada por `kind`:
 
 ```
 {
-  "kind": "POST" | "THESIS" | "POLL",
+  "kind": "POST" | "THESIS" | "POLL" | "THOUGHT" | "AD",   // THOUGHT: un post de tipo THOUGHT (2026-10-23); AD: propuesta P-031
   "content": Post | Thesis | Poll
 }
 ```
@@ -35,7 +35,7 @@ Union discriminada por `kind`:
 ### `GET /api/v1/feed/explore`
 **Público.** Mismo shape de respuesta que Following. Sin `?community` es el feed rankeado (lo popular de lo que seguís, comunidades parecidas, tu país y lo popular), con `reason` en cada ítem; con `?community`, la pestaña de una comunidad, cronológica.
 
-**Query params:** `cursor?`, `community?` (slug, filtra Explore a una sola comunidad)
+**Query params:** `cursor?`, `community?` (slug, filtra Explore a una sola comunidad), `kind?` (`POST`, `POLL`, `THESIS`, `THOUGHT`, separados por coma). `kind=POST` no incluye los thoughts: hay que pedir `THOUGHT` (2026-10-23).
 
 ### `POST /api/v1/feed/impressions`
 **Auth:** opcional. Con sesión, `userId` tiene que ser el de la sesión; sin sesión, `null`.

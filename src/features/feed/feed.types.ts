@@ -50,6 +50,8 @@ export type PostMedia =
 export type PostItem = {
   kind: 'post'
   id: string
+  /** A thought (specs/thoughts): no title (""), its text as a quote, its own card and badge. */
+  thought: boolean
   title: string
   /** Its page: /post/{id}/{slug} (specs/post-create-detail § 1). */
   path: string

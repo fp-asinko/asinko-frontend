@@ -128,7 +128,7 @@ test.describe('Home feed', () => {
     await page.goto('/en')
     await expect(articles(page)).toHaveCount(20)
     await page.getByRole('button', { name: 'Load more' }).scrollIntoViewIfNeeded()
-    await expect(articles(page)).toHaveCount(26)
+    await expect(articles(page)).toHaveCount(30)
     await expect(page.getByRole('button', { name: 'Load more' })).toBeHidden()
   })
 
@@ -213,7 +213,7 @@ test.describe('Home health', () => {
       .click()
     await expect(page.getByRole('link', { name: 'Ver todos los comentarios' })).toBeVisible()
     await page.getByRole('button', { name: 'Cargar más' }).scrollIntoViewIfNeeded()
-    await expect(articles(page)).toHaveCount(26)
+    await expect(articles(page)).toHaveCount(30)
     expect(errors).toEqual([])
   })
 })

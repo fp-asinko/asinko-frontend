@@ -270,6 +270,52 @@ export const POSTS: RawPost[] = [
     commentCount: 0,
     publishedAt: hoursAgo(81),
   }),
+  // Thoughts (backend 2026-10-23, specs/thoughts): no title, only their text; one long, for "See
+  // more". And a post with only its title, its body "" (TH-02).
+  post(24, {
+    community: 'BTC',
+    author: 'jeppe',
+    type: 'THOUGHT',
+    title: '',
+    body: 'The market can stay irrational longer than you can stay solvent. Patience is not waiting — it is knowing what to do while you wait.',
+    score: 412,
+    commentCount: 0,
+    publishedAt: minutesAgo(20),
+  }),
+  post(25, {
+    community: 'macro',
+    author: 'maria',
+    type: 'THOUGHT',
+    title: '',
+    body: 'Rates first, risk later. Every cycle someone says *this time is different*, and every cycle the curve has the last word.',
+    score: 87,
+    commentCount: 0,
+    publishedAt: hoursAgo(5),
+  }),
+  post(26, {
+    community: 'defi',
+    author: 'federico',
+    type: 'THOUGHT',
+    title: '',
+    body: [
+      'Yield is never free. When a protocol pays you 20% for doing nothing, you are the product, the liquidity or the exit.',
+      'Read where the yield comes from before you read how much it is. Emissions, fees, borrowing demand: only one of those survives a bear market.',
+      'Ask who is on the other side of the trade, and what they know that you do not. If you cannot name them, it is probably you.',
+      'And remember that a smart contract audit is a snapshot, not a guarantee.',
+    ].join('\n\n'),
+    score: 56,
+    commentCount: 0,
+    publishedAt: hoursAgo(9),
+  }),
+  post(27, {
+    community: 'macro',
+    author: 'federico',
+    title: 'CPI comes out Thursday: what is your number?',
+    body: '',
+    score: 23,
+    commentCount: 0,
+    publishedAt: hoursAgo(3),
+  }),
 ]
 
 export function postById(id: string) {

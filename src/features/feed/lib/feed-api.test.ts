@@ -147,7 +147,7 @@ describe('getFeed', () => {
     expect(odd.data.requestId).toBeNull()
   })
 
-  it('asks only for posts and polls: theses arrive in phase 2', async () => {
+  it('asks only for posts, thoughts and polls: theses arrive in phase 2', async () => {
     const queries: Record<string, string>[] = []
     state.routes = MOCK_ROUTES.map((route) =>
       route.path === '/api/v1/feed/explore'
@@ -155,7 +155,8 @@ describe('getFeed', () => {
         : route,
     )
     await getFeed(parseFeedParams({}))
-    expect(queries[0]).toMatchObject({ kind: 'POST,POLL' })
+    // Thoughts too: ?kind=POST does not bring them (backend 2026-10-23, specs/thoughts TH-09).
+    expect(queries[0]).toMatchObject({ kind: 'POST,POLL,THOUGHT' })
   })
 
   it('asks the backend for polls only with the Polls filter (P-005)', async () => {

@@ -107,8 +107,10 @@ export function toPostItem(post: RawPost, mentions: MentionLookup, signedIn = fa
   return {
     kind: 'post',
     id: post.id,
+    thought: post.type === 'THOUGHT',
     title: post.title,
-    path: postPath(post.id, post.title),
+    // A thought has no title: its readable path comes from its text (specs/thoughts TH-08).
+    path: postPath(post.id, post.type === 'THOUGHT' ? post.body : post.title),
     body: post.deleted ? '' : markMentions(post.body, post.entities, mentions),
     author: post.creatorType === 'SYSTEM' ? null : toAuthor(post.creator),
     community: toCardCommunity(post.community, signedIn),
@@ -218,16 +220,17 @@ export function toFeedItem(
   // An ad as it comes (specs/ads AD-01); null when its link is not http(s) (AD-06).
   if (item.kind === 'AD') return toAdItem(item.content)
   const reason = explained ? toFeedReason(item.reason) : null
-  return item.kind === 'POST'
-    ? { ...toPostItem(item.content, mentions, signedIn), reason }
-    : { ...toPollItem(item.content, signedIn), reason }
+  // A thought is a post with its own card (specs/thoughts): toPostItem reads its type.
+  return item.kind === 'POLL'
+    ? { ...toPollItem(item.content, signedIn), reason }
+    : { ...toPostItem(item.content, mentions, signedIn), reason }
 }
 
 /** Whether a page has mentions that need community slugs to link ($ and #, not @). */
 export function needsMentionLookup(items: readonly RawFeedItem[]): boolean {
   return items.some(
     (item) =>
-      item.kind === 'POST' &&
+      (item.kind === 'POST' || item.kind === 'THOUGHT') &&
       (item.content.entities ?? []).some((entity) => entity.type !== 'MENTION'),
   )
 }

@@ -41,9 +41,10 @@ export const postSchema = z.object({
   id: z.uuid(),
   communityId: z.uuid(),
   community: communitySummarySchema,
-  type: z.enum(['TEXT', 'LINK', 'IMAGE']),
+  /** THOUGHT (backend 2026-10-23, specs/thoughts): no title (""), only its text. */
+  type: z.enum(['TEXT', 'LINK', 'IMAGE', 'THOUGHT']),
   title: z.string(),
-  /** Markdown. Empty when deleted (P-008). */
+  /** Markdown. Empty when deleted (P-008), or a post without a body (2026-10-23). */
   body: z.string(),
   url: z.string().nullable(),
   imageUrl: z.string().nullable(),
@@ -174,6 +175,8 @@ const reasonField = feedReasonSchema.nullable().optional().catch(null)
 export const feedItemSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('POST'), content: postSchema, reason: reasonField }),
   z.object({ kind: z.literal('POLL'), content: pollSchema, reason: reasonField }),
+  // A post of type THOUGHT, its own card and filter (backend 2026-10-23, specs/thoughts).
+  z.object({ kind: z.literal('THOUGHT'), content: postSchema, reason: reasonField }),
   // An ad, where the backend puts it (P-015, P-031, specs/ads AD-01).
   z.object({ kind: z.literal('AD'), content: adSchema, reason: reasonField }),
 ])
@@ -254,7 +257,7 @@ export type RawActiveCommunity = z.infer<typeof activeCommunitySchema>
  */
 export const draftSchema = z.object({
   id: z.uuid(),
-  type: z.enum(['TEXT', 'LINK', 'IMAGE']),
+  type: z.enum(['TEXT', 'LINK', 'IMAGE', 'THOUGHT']),
   title: z.string(),
   body: z.string(),
   url: z.string(),
@@ -275,7 +278,7 @@ export type RawEntity = z.infer<typeof entitySchema>
 export type RawCommunitySummary = z.infer<typeof communitySummarySchema>
 export type RawFeedItem = z.infer<typeof feedItemSchema>
 /** A user's content in a feed: a post or a poll, not an ad (specs/ads). */
-export type RawContentFeedItem = Extract<RawFeedItem, { kind: 'POST' | 'POLL' }>
+export type RawContentFeedItem = Extract<RawFeedItem, { kind: 'POST' | 'POLL' | 'THOUGHT' }>
 export type RawFeedReason = z.infer<typeof feedReasonSchema>
 export type ImpressionEvent = z.infer<typeof impressionEventSchema>
 export type ImpressionsRequest = z.infer<typeof impressionsRequestSchema>

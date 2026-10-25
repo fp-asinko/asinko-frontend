@@ -5,6 +5,12 @@ import { communitySlugSchema } from '@/lib/communities/community-slug.schema'
 /** The backend's limit for a title (POST /posts, E03). */
 export const TITLE_MAX = 300
 
+/**
+ * The longest thought: brief and memorable, as the prototype's (specs/thoughts TH-03). The backend
+ * has no limit (2026-10-23): this one is ours.
+ */
+export const THOUGHT_MAX = 250
+
 /** The backend's limit for an image's description (imageAlt, P-013, 2026-10-13). */
 export const IMAGE_ALT_MAX = 300
 
@@ -42,13 +48,11 @@ function isHttpUrl(value: string) {
 export const createPostSchema = z
   .object({
     communityId: z.uuid({ message: 'composer.errors.community' }),
-    type: z.enum(['TEXT', 'LINK', 'IMAGE']),
-    title: z
-      .string()
-      .trim()
-      .min(1, { message: 'composer.errors.titleRequired' })
-      .max(TITLE_MAX, { message: 'composer.errors.titleTooLong' }),
-    body: z.string().trim().min(1, { message: 'composer.errors.bodyRequired' }),
+    type: z.enum(['TEXT', 'LINK', 'IMAGE', 'THOUGHT']),
+    // Required by type below: a post needs its title, a thought its text (specs/thoughts).
+    title: z.string().trim().max(TITLE_MAX, { message: 'composer.errors.titleTooLong' }),
+    /** Optional in a post since 2026-10-23 (TH-01): only a title, or a title and an image. */
+    body: z.string().trim(),
     url: z.string().trim().optional(),
     imageUrl: z.string().trim().optional(),
     imageAlt: z
@@ -65,6 +69,16 @@ export const createPostSchema = z
     tag: z.string().trim().max(TAG_MAX).optional(),
   })
   .superRefine((post, ctx) => {
+    // A thought is only its text, without a title; any other post, its title (TH-01, TH-03).
+    if (post.type === 'THOUGHT' && !post.body) {
+      ctx.addIssue({ code: 'custom', path: ['body'], message: 'composer.errors.thoughtRequired' })
+    }
+    if (post.type === 'THOUGHT' && post.body.length > THOUGHT_MAX) {
+      ctx.addIssue({ code: 'custom', path: ['body'], message: 'composer.errors.thoughtTooLong' })
+    }
+    if (post.type !== 'THOUGHT' && !post.title) {
+      ctx.addIssue({ code: 'custom', path: ['title'], message: 'composer.errors.titleRequired' })
+    }
     if (post.type === 'LINK' && !(post.url && isHttpUrl(post.url))) {
       ctx.addIssue({ code: 'custom', path: ['url'], message: 'composer.errors.url' })
     }
@@ -79,6 +93,8 @@ export const createPostSchema = z
   // description only with an image, and only when written (specs/backend-answer-1013 BA-04).
   .transform(({ url, imageUrl, imageAlt, tag, ...rest }) => {
     const post = tag ? { ...rest, tag } : rest
+    // The backend refuses a thought with a title: whatever was typed before choosing it goes.
+    if (post.type === 'THOUGHT') return { ...post, title: '' }
     return post.type === 'LINK'
       ? { ...post, url }
       : post.type === 'IMAGE'

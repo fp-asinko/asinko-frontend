@@ -22,7 +22,7 @@ const draftSchema = z.object({
     .nullable(),
   // Checked as on Publish: a broken one would make it fail without saying why.
   related: z.array(relatedHandleSchema).max(RELATED_MAX).default([]),
-  type: z.enum(['TEXT', 'LINK', 'IMAGE']),
+  type: z.enum(['TEXT', 'LINK', 'IMAGE', 'THOUGHT']),
   title: z.string(),
   body: z.string(),
   url: z.string(),

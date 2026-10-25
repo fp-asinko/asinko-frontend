@@ -13,7 +13,7 @@ import type { FeedParams } from '../schemas/feed-params.schema'
 import { indexCommunities, needsMentionLookup, toCommunityRef, toFeedItem } from './mappers'
 
 /** The kinds this front draws. THESIS waits for phase 2; AD, where the backend puts it (specs/ads). */
-const KNOWN_KINDS = new Set(['POST', 'POLL', 'AD'])
+const KNOWN_KINDS = new Set(['POST', 'POLL', 'THOUGHT', 'AD'])
 
 /**
  * Leaves out, in silence, the items of a kind this front does not know (P-015, specs/backend-answer-
@@ -46,7 +46,7 @@ const FOLLOWING = '/api/v1/feed/following'
 const USER_CONTENT = '/api/v1/users/:userId/content'
 
 /** Theses arrive in phase 2: the feed asks only for what it shows, so a page keeps its 20 items. */
-const KINDS = { new: 'POST,POLL', polls: 'POLL' } as const
+const KINDS = { new: 'POST,POLL,THOUGHT', polls: 'POLL' } as const
 
 function requestFeed(params: FeedParams, cursor: string | undefined) {
   const query: Record<string, string> = { kind: KINDS[params.filter] }
