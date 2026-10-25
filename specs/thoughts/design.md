@@ -19,7 +19,7 @@
 Con `post.thought`:
 
 - La cabecera de siempre (`CardByline`), con la marca **THOUGHT** a la derecha (`QuoteIcon` sin relleno + "THOUGHT", con el mismo estilo que el badge POLL).
-- **Comillas sutiles** (pedido del PO, 2026-10-25): la comilla de la cita es el carácter “ de Figtree, extrabold y en `text-faint`, como el prototipo; no el `QuoteIcon` relleno. La cita lleva más aire (`mt-3`, `mb-1.5`, sangría de 36 px). Lo mismo en el campo del editor.
+- **Comillas sutiles** (pedido del PO, 2026-10-25): la comilla de la cita es el carácter “ de Figtree, extrabold y en `text-faint`, como el prototipo; no el `QuoteIcon` relleno. La cita lleva más aire: 16 px arriba y abajo en la tarjeta, 20 en su página (`my-4`, `my-5`), y sangría de 36 px. Lo mismo en el campo del editor.
 - Sin título. El texto es una **cita**: un `<blockquote>` con unas comillas grandes en `text-faint` (decorativas, `aria-hidden`), el texto en itálica a 17 px y `PostMarkdown` (menciones y Markdown, TH-07). El corte en ~6 líneas con "Ver más" es el mismo de hoy.
 - El nombre del `article` (`aria-labelledby`) es el texto de la cita, como hoy lo es el título. Sin `<h2>` vacío.
 - Votos, comentarios (con la caja de `specs/card-comment`) y compartir: lo mismo de un post.
