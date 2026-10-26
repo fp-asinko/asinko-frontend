@@ -27,7 +27,6 @@ import {
   userSchema,
   userSummarySchema,
   voteResultSchema,
-  type RawComment,
   type RawContentFeedItem,
   type RawFeedItem,
   type RawFeedReason,
@@ -171,12 +170,14 @@ function feedPage(
  * A post's comment tree with its ads (P-031, specs/ads AD-04): one under the post and one after
  * every 10 comments in reading order, replies included. Never in a search nor a card's preview.
  */
-function treeAds(tree: readonly RawComment[]) {
+function treeAds(tree: readonly unknown[]) {
   const order: string[] = []
-  const walk = (list: readonly RawComment[]) => {
+  // A mock's tree or the backend's, before it is validated: only what has an id counts.
+  const walk = (list: readonly unknown[]) => {
     for (const comment of list) {
-      order.push(comment.id)
-      walk(comment.replies)
+      if (typeof comment !== 'object' || comment === null) continue
+      if ('id' in comment && typeof comment.id === 'string') order.push(comment.id)
+      if ('replies' in comment && Array.isArray(comment.replies)) walk(comment.replies)
     }
   }
   walk(tree)
@@ -936,7 +937,7 @@ function extendFeed(response: MockResponse, home: boolean): MockResponse {
 
 /**
  * Proposals on top of implemented endpoints, with API_MOCKS=missing: the backend answers and these
- * add what it does not send yet (api-integration.md § Mocks), so the ads and the glossary show
+ * add what it does not send yet (the ads of feeds and of a post's comments) (api-integration.md § Mocks), so the ads and the glossary show
  * with real data in development and in develop (specs/glossary GL-07). With every route mocked the
  * handlers above already add them.
  */
@@ -955,5 +956,20 @@ export const MOCK_EXTENSIONS: readonly MockExtension[] = [
     method: 'GET',
     path: '/api/v1/users/:userId/content',
     extend: (response) => extendFeed(response, false),
+  },
+  {
+    // A post's whole tree carries its ads (P-031, specs/ads AD-04); a search (?q) or a card's
+    // preview (?limit) does not.
+    method: 'GET',
+    path: '/api/v1/posts/:id/comments',
+    extend: (response, { query }) => {
+      const body = response.body
+      if (query.q !== undefined || query.limit !== undefined || response.status !== 200) {
+        return response
+      }
+      if (typeof body !== 'object' || body === null || !('items' in body)) return response
+      if (!Array.isArray(body.items)) return response
+      return { ...response, body: { ...body, ads: treeAds(body.items) } }
+    },
   },
 ]
