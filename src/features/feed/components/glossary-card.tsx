@@ -28,7 +28,7 @@ export function GlossaryCard({ term }: { term: GlossaryItem }) {
       <h2 className="text-2xl leading-tight font-extrabold tracking-tight">{term.term}</h2>
       <p className="mt-2.5 type-post-body">{term.definition}</p>
       {term.example && (
-        <div className="mt-3.5 rounded-lg border-l-3 border-foreground bg-surface px-4 py-3">
+        <div className="mt-3.5 rounded-lg border-l-3 border-muted-foreground bg-surface px-4 py-3">
           <p className="type-section text-muted-foreground">{t('example')}</p>
           <p className="mt-1 type-post-body italic">{term.example}</p>
         </div>
