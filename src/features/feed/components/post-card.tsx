@@ -188,10 +188,10 @@ export function PostCard({
             post.thought
               ? // A quote, as the prototype's thought: big quote marks, larger and in italics.
                 // Room around it, as the prototype's: it reads as a quote, not a block of text.
-                // Dark and a little heavier: a thin italic read too light. In a gray box ruled
-                // left and right, as the glossary's example: it gives it character (PO, 2026-10-26).
+                // Dark and a little heavier: a thin italic read too light. In a gray box, as the
+                // glossary's example, without its rules (PO, 2026-10-26).
                 cn(
-                  'relative rounded-lg border-x-3 border-foreground bg-surface pr-5 pl-14 font-medium text-foreground italic',
+                  'relative rounded-lg bg-surface pr-5 pl-14 font-medium text-foreground italic',
                   detail
                     ? 'my-5 py-5 text-[1.625rem] leading-snug'
                     : 'my-4 py-4 text-[1.3125rem] leading-relaxed',
