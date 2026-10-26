@@ -188,12 +188,13 @@ export function PostCard({
             post.thought
               ? // A quote, as the prototype's thought: big quote marks, larger and in italics.
                 // Room around it, as the prototype's: it reads as a quote, not a block of text.
-                // Dark and a little heavier: a thin italic read too light (PO, 2026-10-26).
+                // Dark and a little heavier: a thin italic read too light. In a gray box ruled
+                // left and right, as the glossary's example: it gives it character (PO, 2026-10-26).
                 cn(
-                  'relative pl-9 font-medium text-foreground italic',
+                  'relative rounded-lg border-x-3 border-foreground bg-surface pr-5 pl-14 font-medium text-foreground italic',
                   detail
-                    ? 'my-5 text-[1.625rem] leading-snug'
-                    : 'my-4 text-[1.3125rem] leading-relaxed',
+                    ? 'my-5 py-5 text-[1.625rem] leading-snug'
+                    : 'my-4 py-4 text-[1.3125rem] leading-relaxed',
                 )
               : cn('type-post-body', detail ? 'mt-3' : 'mt-1.5'),
           )}
@@ -204,8 +205,8 @@ export function PostCard({
               aria-hidden
               className={cn(
                 // Raised to the top of the first line: the glyph sits low in its box (PO, 2026-10-26).
-                'absolute left-0 leading-none font-extrabold text-faint not-italic select-none',
-                detail ? '-top-4 text-[3rem]' : '-top-3.5 text-[2.5rem]',
+                'absolute left-5 leading-none font-extrabold text-faint not-italic select-none',
+                detail ? 'top-1 text-[3rem]' : 'top-0.5 text-[2.5rem]',
               )}
             >
               “
