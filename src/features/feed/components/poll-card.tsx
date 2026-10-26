@@ -35,7 +35,8 @@ export function PollCard({
 
   return (
     <article
-      className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
+      // The text where a post's is: 12px inside, 4px clear of the lines between cards (PostCard).
+      className="px-4 py-4.5 wrap-anywhere md:my-1 md:px-3 md:py-5.5"
       aria-labelledby={`poll-${poll.id}`}
       // Seen in the impressions; a poll has no page to open yet (specs/explore-v1).
       data-content-id={poll.id}

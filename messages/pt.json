@@ -153,9 +153,9 @@
       "hidden": "Vote para ver os resultados",
       "yourVote": "Seu voto",
       "note": {
-        "title": "{percent} pensam como você.",
-        "minority": "Os outros {rest} apostaram diferente. O que eles veem que você não vê?",
-        "majority": "Você está com a maioria. O que os outros {rest} podem estar vendo?",
+        "title": "{rest} não compartilham sua visão.",
+        "minority": "Só {mine} votaram como você. O que eles veem que você não vê?",
+        "majority": "Você está com a maioria ({mine}). O que o resto pode estar vendo?",
         "tie": "Está empatado. O que desempata?",
         "cta": "Conte por quê"
       }
