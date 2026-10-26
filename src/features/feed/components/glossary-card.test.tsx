@@ -14,11 +14,12 @@ const TERM: GlossaryItem = {
 }
 
 describe('GlossaryCard', () => {
-  it('says it is a glossary term, with its group, the term as a heading and its example (GL-02, GL-04)', () => {
+  it('says it is a glossary term, with the term as a heading and its example (GL-02, GL-04)', () => {
     renderWithIntl(<GlossaryCard term={TERM} />)
     expect(screen.getByRole('article', { name: 'Glossary: Short selling' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: 'Short selling' })).toBeInTheDocument()
-    expect(screen.getByText('Trading')).toBeInTheDocument()
+    // No group above the term (PO, 2026-10-26).
+    expect(screen.queryByText('Trading')).toBeNull()
     expect(screen.getByText('Glossary')).toBeInTheDocument()
     expect(screen.getByText(TERM.definition)).toBeInTheDocument()
     expect(screen.getByText('Example')).toBeInTheDocument()
