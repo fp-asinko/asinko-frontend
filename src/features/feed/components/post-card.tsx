@@ -192,8 +192,8 @@ export function PostCard({
                 cn(
                   'relative pl-9 font-medium text-foreground italic',
                   detail
-                    ? 'my-5 text-[1.375rem] leading-snug'
-                    : 'my-4 text-[1.0625rem] leading-relaxed',
+                    ? 'my-5 text-[1.625rem] leading-snug'
+                    : 'my-4 text-[1.3125rem] leading-relaxed',
                 )
               : cn('type-post-body', detail ? 'mt-3' : 'mt-1.5'),
           )}

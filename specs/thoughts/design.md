@@ -21,10 +21,10 @@ Con `post.thought`:
 - La cabecera de siempre (`CardByline`), con la marca **THOUGHT** a la derecha (`QuoteIcon` sin relleno + "THOUGHT", con el mismo estilo que el badge POLL).
 - **Comillas sutiles** (pedido del PO, 2026-10-25): la comilla de la cita es el carácter “ de Figtree, extrabold y en `text-faint`, como el prototipo; no el `QuoteIcon` relleno. Va arriba de la primera línea, y el texto en `text-foreground` con `font-medium` (PO, 2026-10-26: la itálica fina se leía clara). La cita lleva más aire: 16 px arriba y abajo en la tarjeta, 20 en su página (`my-4`, `my-5`), y sangría de 36 px. Lo mismo en el campo del editor.
 - **Firma** (PO, 2026-10-26): debajo de la cita, "— {nombre visible}" o "— @username" si no tiene, en gris y sin itálica. El backend todavía no manda el nombre visible del autor en los posts: hoy sale el @.
-- Sin título. El texto es una **cita**: un `<blockquote>` con unas comillas grandes en `text-faint` (decorativas, `aria-hidden`), el texto en itálica a 17 px y `PostMarkdown` (menciones y Markdown, TH-07). El corte en ~6 líneas con "Ver más" es el mismo de hoy.
+- Sin título. El texto es una **cita**: un `<blockquote>` con unas comillas grandes en `text-faint` (decorativas, `aria-hidden`), el texto en itálica a 21 px (17 + 4, PO 2026-10-26) y `PostMarkdown` (menciones y Markdown, TH-07). El corte en ~6 líneas con "Ver más" es el mismo de hoy.
 - El nombre del `article` (`aria-labelledby`) es el texto de la cita, como hoy lo es el título. Sin `<h2>` vacío.
 - Votos, comentarios (con la caja de `specs/card-comment`) y compartir: lo mismo de un post.
-- **En su página** (`variant="detail"`), la cita va a 22 px, entera.
+- **En su página** (`variant="detail"`), la cita va a 26 px (22 + 4, PO 2026-10-26), entera.
 
 > **Cambio al implementar:** el `<h2>` (o el `<h1>` en su página) no es la cita sino "Thought de {autor}", solo para lectores de pantalla (`sr-only`), y la cita se ve debajo. El Markdown y las menciones de la cita no pueden ir dentro de un heading ni de un link; así el `article` se nombra igual que un post y el heading lleva el link a su página.
 
