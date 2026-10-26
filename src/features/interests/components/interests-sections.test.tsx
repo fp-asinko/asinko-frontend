@@ -104,20 +104,17 @@ describe('InterestsSections', () => {
   it('links assets and groups to their pages (specs/community-pages CP-14)', () => {
     renderWithIntl(<InterestsSections interests={interests} />)
 
-    expect(screen.getByRole('link', { name: /^Bitcoin \$BTC/ })).toHaveAttribute(
-      'href',
-      '/asset/BTC',
-    )
-    expect(screen.getByRole('link', { name: /^#trading MOD On-chain/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^Bitcoin BTC/ })).toHaveAttribute('href', '/asset/BTC')
+    expect(screen.getByRole('link', { name: /^trading MOD On-chain/ })).toHaveAttribute(
       'href',
       '/hub/trading',
     )
   })
 
-  it('shows every entity with its mention symbol (H-07)', () => {
+  it('shows every entity by its name alone, without its symbol (H-07, PO 2026-10-26)', () => {
     renderWithIntl(<InterestsSections interests={interests} />)
 
-    for (const handle of ['$BTC', '$AVAX', '@maria', '#trading', '#nft']) {
+    for (const handle of ['BTC', 'AVAX', 'maria', 'trading', 'nft']) {
       expect(screen.getByText(handle)).toBeInTheDocument()
     }
   })
@@ -155,7 +152,7 @@ describe('InterestsSections', () => {
     renderWithIntl(<InterestsSections interests={{ ...interests, people: { ok: false } }} />)
 
     expect(screen.getAllByText('Could not load this section.')).toHaveLength(1)
-    expect(screen.getByRole('link', { name: /^Bitcoin \$BTC/ })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /^Bitcoin BTC/ })).toBeInTheDocument()
   })
 
   it('shows the empty message of each section', () => {
@@ -182,7 +179,7 @@ describe('InterestsSections', () => {
     it('shows only communities: no assets, people, groups or create group', () => {
       renderWithIntl(<InterestsSections interests={guest} />)
       expect(screen.getByRole('region', { name: 'Communities' })).toBeInTheDocument()
-      expect(screen.getByRole('link', { name: /#nft/ })).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: /nft/ })).toBeInTheDocument()
       for (const name of ['Assets', 'People', 'Groups']) {
         expect(screen.queryByRole('heading', { name })).toBeNull()
       }

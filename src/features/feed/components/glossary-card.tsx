@@ -18,23 +18,20 @@ export function GlossaryCard({ term }: { term: GlossaryItem }) {
       // The text where a post's is: 12px inside, 4px clear of the lines between cards (PostCard).
       className="px-4 py-4.5 wrap-anywhere md:my-1 md:px-3 md:py-5.5"
     >
-      {/* Only the mark, on the right: no group above the term (PO, 2026-10-26). */}
-      <div className="mb-2 flex min-h-6 items-center justify-end">
+      {/* The term and, on its row, the mark: no group above it (PO, 2026-10-26). */}
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="min-w-0 text-2xl leading-tight font-extrabold tracking-tight">
+          {term.term}
+        </h2>
         {/* The mark of a poll or a thought (feed-cards). */}
         <span className="inline-flex shrink-0 items-center gap-1.25 type-action font-extrabold uppercase">
           <BookOpenTextIcon aria-hidden className="size-3.5" />
           {t('label')}
         </span>
       </div>
-      <h2 className="text-2xl leading-tight font-extrabold tracking-tight">{term.term}</h2>
       <p className="mt-2.5 type-post-body">{term.definition}</p>
       {term.example && (
-        <div className="relative mt-3.5 overflow-hidden rounded-lg bg-surface px-4 py-3">
-          {/* Its rule on the left, fading from top to bottom (PO, 2026-10-26). */}
-          <span
-            aria-hidden
-            className="absolute inset-y-0 left-0 w-0.75 bg-linear-to-b from-faint to-transparent"
-          />
+        <div className="mt-3.5 rounded-lg border-l-3 border-border-strong bg-surface px-4 py-3">
           <p className="type-section text-muted-foreground">{t('example')}</p>
           <p className="mt-1 type-post-body italic">{term.example}</p>
         </div>

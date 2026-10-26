@@ -5,6 +5,7 @@ import { HideWhenJoined, JoinButton } from '@/components/organisms/join'
 import { joinCommunity } from '@/lib/communities/join-community.action'
 import type { Suggestion } from '../interests.types'
 import { CommunityLink } from './community-link'
+import { plainHandle } from '@/lib/plain-handle'
 
 /**
  * Communities to join (specs/community-first CF-10): the same join as the cards. A joined row
@@ -34,7 +35,9 @@ export function SuggestedCommunities({ suggestions }: { suggestions: Suggestion[
                 className="size-8 rounded-md transition-[scale] duration-200 ease-out group-hover:scale-105"
               />
               <span className="min-w-0">
-                <span className="block truncate type-small font-bold">{suggestion.handle}</span>{' '}
+                <span className="block truncate type-small font-bold">
+                  {plainHandle(suggestion.handle)}
+                </span>{' '}
                 <span className="block truncate type-meta text-muted-foreground">
                   {suggestion.topPostTitle ??
                     suggestion.description ??

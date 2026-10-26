@@ -29,18 +29,18 @@ describe('SuggestedCommunities, what it is about (specs/interests-refresh IR-02)
         suggestions={[{ ...nft, topPostTitle: 'Floor prices this week', description: 'Art' }]}
       />,
     )
-    expect(screen.getByRole('link')).toHaveAccessibleName('#nft Floor prices this week')
+    expect(screen.getByRole('link')).toHaveAccessibleName('nft Floor prices this week')
     rerender(<SuggestedCommunities suggestions={[{ ...nft, description: 'Digital art' }]} />)
-    expect(screen.getByRole('link')).toHaveAccessibleName('#nft Digital art')
+    expect(screen.getByRole('link')).toHaveAccessibleName('nft Digital art')
     rerender(<SuggestedCommunities suggestions={[nft]} />)
-    expect(screen.getByRole('link')).toHaveAccessibleName('#nft 1,200 members')
+    expect(screen.getByRole('link')).toHaveAccessibleName('nft 1,200 members')
   })
 })
 
 describe('SuggestedCommunities (H-07)', () => {
   it('links each suggestion, named by its handle and member count', () => {
     renderWithIntl(<SuggestedCommunities suggestions={[nft]} />)
-    expect(screen.getByRole('link', { name: '#nft 1,200 members' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'nft 1,200 members' })).toHaveAttribute(
       'href',
       '/hub/nft',
     )
@@ -59,7 +59,7 @@ describe('SuggestedCommunities (H-07)', () => {
     expect(join).not.toHaveAttribute('aria-disabled')
     await userEvent.click(join)
     expect(deps.joinCommunity).toHaveBeenCalledWith('nft')
-    expect(screen.queryByRole('link', { name: '#nft 1,200 members' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'nft 1,200 members' })).toBeNull()
   })
 
   it('builds the join label as a whole message in each locale', () => {

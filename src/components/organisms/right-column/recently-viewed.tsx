@@ -7,6 +7,7 @@ import { Link } from '@/i18n/navigation'
 import { clearRecent, readRecent, readRecentOnServer, subscribeRecent } from '@/lib/recently-viewed'
 import { HistoryIcon } from 'lucide-react'
 import { EmptyState } from '../empty-state'
+import { plainHandle } from '@/lib/plain-handle'
 
 /** When it was seen; within the last minute, "now" (not "1s ago", which looks like a counter). */
 const seen = (viewedAt: string, now: Date) => {
@@ -76,7 +77,9 @@ export function RecentlyViewed() {
                 className="block rounded-md px-1 py-2 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
               >
                 <span className="mb-1 flex items-center gap-1.5 type-caption">
-                  <span className="truncate font-bold text-muted-foreground">{item.label}</span>
+                  <span className="truncate font-bold text-muted-foreground">
+                    {plainHandle(item.label)}
+                  </span>
                   <span className="sr-only">:</span>{' '}
                   <span className="ml-auto shrink-0 text-muted-foreground">
                     {format.relativeTime(seen(item.viewedAt, now), { now, style: 'narrow' })}

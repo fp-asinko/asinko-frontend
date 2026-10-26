@@ -46,7 +46,9 @@ test.describe('Recently viewed', () => {
     const links = recent(page).getByRole('link')
     await expect(links).toHaveCount(2)
     await expect(links.first()).toContainText('The Fed cuts 25 bps')
-    await expect(links.first()).toContainText('#macro')
+    // The group by its name alone, without its # (PO, 2026-10-26).
+    await expect(links.first()).toContainText('macro')
+    await expect(links.first()).not.toContainText('#macro')
     await expect(links.nth(1)).toContainText('ETH/BTC at a 4-year low')
 
     await links.nth(1).click()
