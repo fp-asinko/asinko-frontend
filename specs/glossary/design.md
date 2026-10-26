@@ -66,7 +66,8 @@ Con `API_MOCKS=missing` el feed viene del backend, que todavía no manda glosari
 - `MOCK_EXTENSIONS` (`handlers.ts`) cubre tres endpoints, con las mismas funciones que los handlers:
   - Explore: anuncios, y glosarios sin `?community=`;
   - Following: anuncios y glosarios;
-  - el contenido de un perfil: solo anuncios.
+  - el contenido de un perfil: solo anuncios;
+  - el árbol de comentarios de un post (sin `?q` ni `?limit`): sus anuncios, `ads` (P-031, AD-04).
 - El cliente HTTP (`extensions`) aplica la extensión a la respuesta de la red **antes** de validarla. Solo con `missing`: con `true`, los handlers ya los ponen; en producción `API_MOCKS` es `false`.
 
 ## 6. Peso

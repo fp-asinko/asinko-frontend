@@ -56,6 +56,23 @@ describe('MOCK_EXTENSIONS (specs/glossary GL-07)', () => {
     )
   })
 
+  it('adds the ads to a post real comment tree, never to a search nor a preview (AD-04)', () => {
+    const comments = extension('/api/v1/posts/:id/comments')
+    const tree = {
+      status: 200,
+      body: {
+        items: Array.from({ length: 10 }, (_, n) => ({ id: `c${n}`, replies: [] })),
+      },
+    }
+    const ads = (response: { body?: unknown }) => (response.body as { ads?: unknown[] }).ads
+    expect(ads(comments.extend(tree, context()))).toEqual([
+      expect.objectContaining({ afterCommentId: null }),
+      expect.objectContaining({ afterCommentId: 'c9' }),
+    ])
+    expect(ads(comments.extend(tree, context({ q: 'eth' })))).toBeUndefined()
+    expect(ads(comments.extend(tree, context({ limit: '3' })))).toBeUndefined()
+  })
+
   it('only ads in a community and a profile, and leaves an error as it came', () => {
     const community = kinds(
       extension('/api/v1/feed/explore').extend(real(20), context({ community: 'BTC' })),
