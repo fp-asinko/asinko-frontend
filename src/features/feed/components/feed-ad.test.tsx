@@ -60,12 +60,14 @@ for (const [name, Card] of [
 }
 
 describe('FeedAd height (AD-03)', () => {
-  it('caps a tall piece, whole and centered, holding its place before it loads', () => {
+  it('caps a tall piece in phones only, whole, holding its place before it loads', () => {
     renderWithIntl(
       <FeedAd ad={ad({ image: { src: '/a.jpg', width: 1200, height: 1500, alt: 'Indices' } })} />,
     )
     expect(screen.getByRole('img', { name: 'Indices' })).toHaveClass(
       'max-h-135',
+      // From md, the width of the column and the height the piece needs (PO, 2026-10-26).
+      'md:max-h-none',
       'w-full',
       'object-contain',
     )

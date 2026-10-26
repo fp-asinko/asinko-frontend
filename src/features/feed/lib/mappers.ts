@@ -4,7 +4,9 @@ import { postPath } from '@/lib/posts/paths'
 import type {
   RawCommunity,
   RawCommunitySummary,
+  RawEntity,
   RawAd,
+  RawGlossaryTerm,
   RawFeedItem,
   RawFeedReason,
   RawPoll,
@@ -16,6 +18,7 @@ import type {
   CardCommunity,
   CommunityRef,
   AdItem,
+  GlossaryItem,
   FeedItem,
   FeedReason,
   PollItem,
@@ -210,6 +213,18 @@ export function toAdItem(ad: RawAd): AdItem | null {
   }
 }
 
+/** A glossary term as the card draws it (specs/glossary GL-02). */
+export function toGlossaryItem(term: RawGlossaryTerm): GlossaryItem {
+  return {
+    kind: 'glossary',
+    id: term.id,
+    term: term.term,
+    category: term.category,
+    definition: term.definition,
+    example: term.example,
+  }
+}
+
 /** `explained`: the Home's Explore, the only feed that says why it shows a card (EX-03). */
 export function toFeedItem(
   item: RawFeedItem,
@@ -219,6 +234,7 @@ export function toFeedItem(
 ): FeedItem | null {
   // An ad as it comes (specs/ads AD-01); null when its link is not http(s) (AD-06).
   if (item.kind === 'AD') return toAdItem(item.content)
+  if (item.kind === 'GLOSSARY') return toGlossaryItem(item.content)
   const reason = explained ? toFeedReason(item.reason) : null
   // A thought is a post with its own card (specs/thoughts): toPostItem reads its type.
   return item.kind === 'POLL'
@@ -226,11 +242,11 @@ export function toFeedItem(
     : { ...toPostItem(item.content, mentions, signedIn), reason }
 }
 
-/** Whether a page has mentions that need community slugs to link ($ and #, not @). */
-export function needsMentionLookup(items: readonly RawFeedItem[]): boolean {
-  return items.some(
-    (item) =>
-      (item.kind === 'POST' || item.kind === 'THOUGHT') &&
-      (item.content.entities ?? []).some((entity) => entity.type !== 'MENTION'),
+/** The mentions of a page that need a community slug to link: $ and #, not @ (lookupMentions). */
+export function mentionEntities(items: readonly RawFeedItem[]): RawEntity[] {
+  return items.flatMap((item) =>
+    item.kind === 'POST' || item.kind === 'THOUGHT'
+      ? (item.content.entities ?? []).filter((entity) => entity.type !== 'MENTION')
+      : [],
   )
 }

@@ -1,6 +1,6 @@
 import 'server-only'
 import type { z } from 'zod'
-import type { MockRoute } from '@/mocks/types'
+import type { MockExtension, MockRoute } from '@/mocks/types'
 import {
   isExpectedStatus,
   toExpectedFailure,
@@ -30,6 +30,8 @@ export type ApiClientOptions = {
   timeoutMs?: number
   /** Mocked routes (API_MOCKS). A registered route never reaches the network (F-36). */
   mocks?: readonly MockRoute[]
+  /** Proposals on top of real responses (API_MOCKS=missing): what the backend does not send yet. */
+  extensions?: readonly MockExtension[]
   /** Extra headers for every network request, e.g. the session's Bearer token (specs/dev-login). */
   getHeaders?: () => Promise<Record<string, string>> | Record<string, string>
   /** Called for every unexpected failure (5xx, network, timeout, contract drift): reporting. */
@@ -61,6 +63,7 @@ export function createApiClient({
   fetch: fetchImpl = fetch,
   timeoutMs = DEFAULT_TIMEOUT_MS,
   mocks,
+  extensions,
   getHeaders,
   onUnexpected,
 }: ApiClientOptions) {
@@ -107,11 +110,18 @@ export function createApiClient({
         (!route.when || route.when(request.query ?? {}, request.body)),
     )
 
+    const context = { params, query: request.query ?? {}, body: request.body }
+    const extension = mock
+      ? undefined
+      : extensions?.find((each) => each.method === request.method && each.path === request.path)
+
     let raw: RawResponse
     try {
       raw = mock
-        ? await mock.handler({ params, query: request.query ?? {}, body: request.body })
+        ? await mock.handler(context)
         : await callNetwork(request.method, path, request.query, request.body)
+      // Validated as any other answer: the proposal's shape too.
+      if (extension) raw = extension.extend(raw, context)
     } catch (cause) {
       const timedOut = cause instanceof DOMException && cause.name === 'TimeoutError'
       return fail(unexpectedFailure(endpoint, timedOut ? 'TIMEOUT' : 'NETWORK'), cause)

@@ -46,8 +46,11 @@ describe('getPost (specs/post-create-detail § 4)', () => {
     expect(result.ok && result.data.body).toContain('asinko:asset/')
   })
 
-  it('leaves mentions as plain text if the communities fail', async () => {
-    state.routes = MOCK_ROUTES.filter((route) => route.path !== '/api/v1/communities')
+  it('leaves mentions as plain text if their lookup fails', async () => {
+    state.routes = MOCK_ROUTES.filter(
+      (route) =>
+        route.path !== '/api/v1/assets/:symbol' && route.path !== '/api/v1/communities/:slug',
+    )
     const result = await getPost(withMention.id)
     expect(result.ok && result.data.body).not.toContain('asinko:asset/')
   })

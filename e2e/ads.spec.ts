@@ -8,27 +8,37 @@ const WHALES =
   '/en/post/00000000-0000-4000-8000-000000004001/whales-accumulated-48-000-btc-in-two-weeks'
 
 test.describe('Ads', () => {
-  test('in the Home: where the feed puts it, the piece whole and capped, the link sponsored (AD-01 to AD-03, AD-06)', async ({
+  test('in the Home: where the feed puts it, the piece whole and capped in phones, the link sponsored (AD-01 to AD-03, AD-06)', async ({
     page,
+    isMobile,
   }) => {
     await page.goto('/en')
     const feed = page.getByRole('main')
     // The mocks pick them at random: any advertiser.
     const ad = feed.getByRole('region', { name: /^Ad: / }).first()
     await expect(ad).toBeVisible()
-    // After the first ten cards.
+    // After the first ten cards, and the glossary term that goes after 8 of them (specs/glossary).
     const before = await ad.evaluate((section) => {
       const item = section.closest('li')!
       return [...item.parentElement!.children].indexOf(item)
     })
-    expect(before).toBe(10)
+    expect(before).toBe(11)
 
-    // Whole, at most 540px tall (a 4:5 piece stops there), its place held before it loaded.
+    // Whole, its place held before it loaded. In phones at most 540px tall (a 4:5 piece stops
+    // there); from md, the column's width and the height its proportion needs (PO, 2026-10-26).
     const image = ad.getByRole('img')
     await expect(image).toBeVisible()
     const box = (await image.boundingBox())!
-    expect(box.height).toBeLessThanOrEqual(541)
     expect(box.height).toBeGreaterThan(50)
+    if (isMobile) {
+      expect(box.height).toBeLessThanOrEqual(541)
+    } else {
+      const [width, height] = await image.evaluate((img: HTMLImageElement) => [
+        Number(img.getAttribute('width')),
+        Number(img.getAttribute('height')),
+      ])
+      expect(Math.abs(box.height - (box.width * height!) / width!)).toBeLessThanOrEqual(2)
+    }
     expect(await image.evaluate((img: HTMLImageElement) => getComputedStyle(img).objectFit)).toBe(
       'contain',
     )

@@ -2,6 +2,7 @@
 // domain types (api-integration.md § esquema crudo + mapper); mocks validate against them.
 export * from './achievements'
 export * from './ads'
+export * from './glossary'
 export * from './assets'
 export * from './communities'
 export * from './content'

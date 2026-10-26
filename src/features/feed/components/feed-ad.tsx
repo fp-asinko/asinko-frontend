@@ -41,9 +41,10 @@ export function FeedAd({ ad }: { ad: AdItem }) {
             width={ad.image.width}
             height={ad.image.height}
             sizes="(min-width: 768px) 748px, 100vw"
-            // Its own proportion holds the place before it loads (lazy, below): full width, a tall
-            // one stopping at 540px, whole and centered on the gray (AD-03).
-            className="h-auto max-h-135 w-full object-contain"
+            // Its own proportion holds the place before it loads (lazy, below): full width. In phones
+            // a tall one stops at 540px, whole and centered on the gray; from md, the whole width
+            // and the height it needs, never cut (AD-03, PO 2026-10-26).
+            className="h-auto max-h-135 w-full object-contain md:max-h-none"
           />
         </div>
       )}

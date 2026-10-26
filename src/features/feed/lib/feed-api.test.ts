@@ -9,7 +9,7 @@ import { getFeed, getFilteredCommunity } from './feed-api'
 
 /** The users' content of a page, without its ads (specs/ads). */
 const content = (items: FeedItem[]) =>
-  items.filter((item): item is PostItem | PollItem => item.kind !== 'ad')
+  items.filter((item): item is PostItem | PollItem => item.kind === 'post' || item.kind === 'poll')
 
 // The real client against the mock routes; a route left out reaches a fetch that always fails.
 const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[], dropped: [] as number[] }))
@@ -52,7 +52,9 @@ describe('getFeed', () => {
     expect(content(result.data.items)).toHaveLength(20)
     expect(result.data.nextCursor).toEqual(expect.any(String))
     // The ads where the backend put them, as cards of their own (specs/ads AD-01).
-    expect(result.data.items[10]).toMatchObject({ kind: 'ad', domain: expect.any(String) })
+    expect(result.data.items[11]).toMatchObject({ kind: 'ad', domain: expect.any(String) })
+    // And in the Home, a glossary term after every 8 posts (specs/glossary GL-01).
+    expect(result.data.items[8]).toMatchObject({ kind: 'glossary', term: expect.any(String) })
     expect(content(result.data.items).every((item) => item.community !== null)).toBe(true)
   })
 
@@ -251,16 +253,17 @@ describe('getFeed', () => {
       expect(queries.some((query) => query.mine === 'true')).toBe(false)
     })
 
-    it('links $ and # mentions with GET /communities (BC-02)', async () => {
+    it('links $ and # mentions one by one, never with the paginated list (BC-02)', async () => {
+      // GET /communities comes 20 at a time: most assets were past it (mention-preview, 2026-10-25).
       const queries = communityQueries()
       const result = await getFeed(parseFeedParams({}))
       if (!result.ok) throw new Error('expected ok')
-      expect(queries).toEqual([{}])
-      expect(
-        result.data.items.some(
-          (item) => item.kind === 'post' && item.body.includes('asinko:community/'),
-        ),
-      ).toBe(true)
+      expect(queries).toEqual([])
+      const bodies = content(result.data.items).flatMap((item) =>
+        item.kind === 'post' ? [item.body] : [],
+      )
+      expect(bodies.some((body) => body.includes('asinko:community/'))).toBe(true)
+      expect(bodies.some((body) => body.includes('asinko:asset/'))).toBe(true)
     })
 
     it('gives each card its membership only with a session', async () => {
@@ -322,7 +325,14 @@ describe('getFilteredCommunity (specs/feed-navigation § 2)', () => {
     let lookups = 0
     state.routes = MOCK_ROUTES.map((route) =>
       route.path === '/api/v1/communities/:slug'
-        ? { ...route, handler: (context) => (lookups++, route.handler(context)) }
+        ? {
+            ...route,
+            // The filtered one; the page's # mentions are looked up on their own.
+            handler: (context) => (
+              context.params.slug === 'BTC' && lookups++,
+              route.handler(context)
+            ),
+          }
         : route,
     )
     await getFeed(parseFeedParams({ community: 'BTC' }), undefined, { communityResolved: true })

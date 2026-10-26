@@ -4,7 +4,7 @@ import { COMMENTS_BY_CONTENT } from './fixtures/comments'
 import { COMMUNITIES, PERSONAL_CHANNELS } from './fixtures/communities'
 import { POSTS } from './fixtures/posts'
 import { PROFILES } from './fixtures/users'
-import { MOCK_ROUTES } from './handlers'
+import { MOCK_EXTENSIONS, MOCK_ROUTES } from './handlers'
 import type { MockContext } from './types'
 
 type Page = {
@@ -12,8 +12,8 @@ type Page = {
   nextCursor: string | null
 }
 
-/** A user's content, not an ad (specs/ads). */
-const notAd = (item: { kind?: string }) => item.kind !== 'AD'
+/** A user's content, not an ad nor a glossary term (specs/ads, specs/glossary). */
+const notAd = (item: { kind?: string }) => item.kind !== 'AD' && item.kind !== 'GLOSSARY'
 
 function call(method: string, path: string, context: Partial<MockContext> = {}) {
   // As the client: the first route that matches, `when` included.
@@ -28,13 +28,63 @@ function call(method: string, path: string, context: Partial<MockContext> = {}) 
   return route.handler({ params: {}, query: {}, body: undefined, ...context })
 }
 
+describe('MOCK_EXTENSIONS (specs/glossary GL-07)', () => {
+  const extension = (path: string) => MOCK_EXTENSIONS.find((each) => each.path === path)!
+  const real = (count: number) => ({
+    status: 200,
+    body: {
+      items: Array.from({ length: count }, (_, n) => ({
+        kind: 'POST',
+        content: { id: String(n) },
+      })),
+      nextCursor: null,
+      requestId: null,
+    },
+  })
+  const kinds = (response: { body?: unknown }) =>
+    (response.body as { items: { kind: string }[] }).items.map((item) => item.kind)
+  const context = (query: Record<string, string> = {}) => ({ params: {}, query, body: undefined })
+
+  it('adds the ads and the glossary to the real Home, keeping its items', () => {
+    const home = kinds(extension('/api/v1/feed/explore').extend(real(20), context()))
+    expect(home.filter((kind) => kind === 'POST')).toHaveLength(20)
+    expect(home.filter((kind) => kind === 'AD')).toHaveLength(2)
+    expect(home.filter((kind) => kind === 'GLOSSARY')).toHaveLength(2)
+    expect(home[8]).toBe('GLOSSARY')
+    expect(kinds(extension('/api/v1/feed/following').extend(real(20), context()))).toContain(
+      'GLOSSARY',
+    )
+  })
+
+  it('only ads in a community and a profile, and leaves an error as it came', () => {
+    const community = kinds(
+      extension('/api/v1/feed/explore').extend(real(20), context({ community: 'BTC' })),
+    )
+    expect(community).toContain('AD')
+    expect(community).not.toContain('GLOSSARY')
+    const failure = { status: 503, body: { error: { code: 'X', message: 'down' } } }
+    expect(extension('/api/v1/feed/explore').extend(failure, context())).toBe(failure)
+  })
+})
+
 describe('mock handlers behave like the contract', () => {
+  it('puts glossary terms only in the Home: Explore and Following, never a community (GL-01)', async () => {
+    const kinds = async (path: string, query: Record<string, string> = {}) =>
+      ((await call('GET', path, { query })).body as Page).items.map((item) => item.kind)
+    expect(await kinds('/api/v1/feed/following')).toContain('GLOSSARY')
+    expect(await kinds('/api/v1/feed/explore', { community: 'BTC' })).not.toContain('GLOSSARY')
+  })
+
   it('paginates the explore feed with an opaque cursor, 20 per page', async () => {
     const first = (await call('GET', '/api/v1/feed/explore')).body as Page
     expect(first.items.filter(notAd)).toHaveLength(20)
-    // An ad after every 10 items, where the backend would put it (specs/ads AD-01).
-    expect(first.items.filter((item) => !notAd(item))).toHaveLength(2)
-    expect(first.items[10]).toMatchObject({ kind: 'AD' })
+    // An ad after every 10 items, where the backend would put it (specs/ads AD-01), and in the
+    // Home a glossary term after every 8 posts, ads not counted (specs/glossary GL-01).
+    expect(first.items.filter((item) => item.kind === 'AD')).toHaveLength(2)
+    expect(first.items.filter((item) => item.kind === 'GLOSSARY')).toHaveLength(2)
+    expect(first.items[8]).toMatchObject({ kind: 'GLOSSARY' })
+    expect(first.items[11]).toMatchObject({ kind: 'AD' })
+    expect(first.items[18]).toMatchObject({ kind: 'GLOSSARY' })
     expect(first.nextCursor).toEqual(expect.any(String))
 
     const second = (

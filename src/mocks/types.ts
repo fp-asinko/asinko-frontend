@@ -42,3 +42,14 @@ export type MockRoute = {
   liveExample?: MockContext
   handler: (context: MockContext) => MockResponse | Promise<MockResponse>
 }
+
+/**
+ * A proposal on top of an implemented endpoint (API_MOCKS=missing): the backend answers, and
+ * `extend` adds what it does not send yet, e.g. the ads and the glossary terms of a feed (P-031,
+ * P-032). Never in production: src/env.ts refuses any API_MOCKS but false there.
+ */
+export type MockExtension = {
+  method: HttpMethod
+  path: EndpointPattern
+  extend: (response: MockResponse, context: MockContext) => MockResponse
+}

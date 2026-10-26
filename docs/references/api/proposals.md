@@ -88,6 +88,28 @@ Lo que necesita sesión está en [Por verificar con datos reales](#por-verificar
 - **En el detalle**: `GET /posts/{id}/comments` (el árbol, sin `?q` ni `?limit`) suma `"ads": [{ "afterCommentId": "uuid | null", "ad": Ad }]`. `null` va debajo del post; si no, va después de ese comentario, en el orden de lectura y antes de sus respuestas. El backend elige las posiciones. El mock pone uno debajo del post y uno cada 10 comentarios, contando respuestas. La búsqueda (`?q=`) y la vista previa de una tarjeta (`?limit`) no traen `ads`.
 - **El link**: solo `http(s)`. El front descarta otro esquema y abre el link en otra pestaña con `rel="sponsored"`.
 
+### P-032: Glosario en el Home
+
+**Estado:** propuesta (2026-10-25), mockeada (`specs/glossary`). Es contenido de la plataforma (`overview.md § Creados por la plataforma`).
+
+**Motivo:** el PO pidió tarjetas de glosario en el Home, una cada 8 posts. Cada término tiene su grupo, su definición y un ejemplo. No se vota, no se comenta y no tiene página.
+
+**Cambio:**
+
+- **El `GlossaryTerm`:**
+
+  ```json
+  {
+    "id": "uuid",
+    "term": "string",
+    "category": "string",
+    "definition": "string",
+    "example": "string | null"
+  }
+  ```
+
+- **En el feed:** solo en el Home (`/feed/explore` sin `?community=` y `/feed/following`), un ítem más de la lista, `{ "kind": "GLOSSARY", "content": GlossaryTerm }`, donde el backend lo ponga, como los anuncios (P-031). El front lo dibuja ahí. El mock pone uno después de cada 8 posts de cada página, sin contar los anuncios, elegido al azar.
+
 ### `best` de los comentarios (P-014)
 
 **Estado:** el backend acepta `sort=best` y por ahora responde cronológico; la fórmula está en definición.

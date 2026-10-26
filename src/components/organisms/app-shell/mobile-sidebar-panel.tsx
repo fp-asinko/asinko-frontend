@@ -28,11 +28,13 @@ export function MobileSidebarPanel({
         showCloseButton={false}
         // The trigger lives outside the Dialog, so focus is returned to it explicitly.
         finalFocus={returnFocusTo}
-        // data-[side=left] overrides the 3/4 width from sheet.tsx (same specificity).
-        className="px-3 pt-[calc(0.5rem+env(safe-area-inset-top))] pb-6 data-[side=left]:w-72 motion-reduce:transition-none"
+        // data-[side=left] overrides the 3/4 width from sheet.tsx (same specificity). The content
+        // scrolls inside, under the close button: the page behind is locked while it is open.
+        className="gap-0 pt-[calc(0.25rem+env(safe-area-inset-top))] data-[side=left]:w-72 motion-reduce:transition-none"
       >
-        <div className="flex items-center justify-between">
-          <SheetTitle className="px-3 type-ui font-semibold">{t('menu')}</SheetTitle>
+        <div className="flex shrink-0 items-center justify-end px-3">
+          {/* Only for screen readers: the dialog's name. Nothing to read on screen (PO, 2026-10-26). */}
+          <SheetTitle className="sr-only">{t('menu')}</SheetTitle>
           <SheetClose
             render={
               <Button variant="ghost" size="icon" className="size-11" aria-label={t('closeMenu')} />
@@ -41,7 +43,9 @@ export function MobileSidebarPanel({
             <XIcon aria-hidden />
           </SheetClose>
         </div>
-        {children}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+          {children}
+        </div>
       </SheetContent>
     </Sheet>
   )

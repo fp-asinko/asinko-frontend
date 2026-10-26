@@ -1,11 +1,12 @@
 import 'server-only'
 import { cache } from 'react'
 import { z } from 'zod'
-import { apiRequest, invalidInput, paginatedSchema, type ApiResult } from '@/lib/api'
-import { communitySchema, postSchema } from '@/lib/api/contract'
+import { apiRequest, invalidInput, type ApiResult } from '@/lib/api'
+import { postSchema } from '@/lib/api/contract'
 import { getViewer } from '@/lib/session'
 import type { PostItem } from '../feed.types'
-import { indexCommunities, needsMentionLookup, toPostItem } from './mappers'
+import { mentionEntities, toPostItem } from './mappers'
+import { lookupMentions } from './mention-lookup'
 
 const ENDPOINT = 'GET /api/v1/posts/:id'
 
@@ -25,14 +26,7 @@ export const getPost = cache(async function getPost(id: string): Promise<ApiResu
   ])
   if (!result.ok) return result
 
-  // $ and # mentions need the community slugs (P-001); if they fail, mentions stay plain text.
-  const communities = needsMentionLookup([{ kind: 'POST', content: result.data }])
-    ? await apiRequest({
-        method: 'GET',
-        path: '/api/v1/communities',
-        schema: paginatedSchema(communitySchema),
-      })
-    : null
-  const mentions = indexCommunities(communities?.ok ? communities.data.items : [])
+  // $ and # mentions, each one resolved on its own (P-001); if one fails, it stays plain text.
+  const mentions = await lookupMentions(mentionEntities([{ kind: 'POST', content: result.data }]))
   return { ok: true, data: toPostItem(result.data, mentions, viewer !== null) }
 })
