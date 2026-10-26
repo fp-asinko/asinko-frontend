@@ -68,6 +68,11 @@ describe('recently viewed (specs/recently-viewed)', () => {
     expect(readRecent()).toEqual([])
   })
 
+  it('keeps a thought, its text as its title (specs/thoughts)', () => {
+    recordRecent(item('t', { kind: 'thought', title: 'Rates first, risk later.' }))
+    expect(readRecent()).toEqual([expect.objectContaining({ id: 't', kind: 'thought' })])
+  })
+
   it('keeps a post whose title has no letters (its slug is empty: /post/{id}/)', () => {
     recordRecent(item('emoji', { href: '/post/emoji/', title: '🚀🚀🚀' }))
     expect(readRecent().map((each) => each.id)).toEqual(['emoji'])

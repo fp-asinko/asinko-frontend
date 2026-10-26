@@ -124,8 +124,9 @@ function recentItem(post: PostItem) {
     id: post.id,
     href: post.path,
     label,
-    title: post.title,
-    kind: 'post' as const,
+    // A thought has no title: its text, as its page's description (specs/thoughts, PO 2026-10-26).
+    title: post.thought ? postExcerpt(post.body) : post.title,
+    kind: post.thought ? ('thought' as const) : ('post' as const),
     score: post.score,
     comments: post.commentCount,
   }

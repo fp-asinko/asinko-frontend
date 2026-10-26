@@ -1,5 +1,8 @@
-/** What can be in the list: posts today; polls, theses and alerts when they have a page. */
-export type RecentKind = 'post'
+/**
+ * What can be in the list: posts and thoughts today (specs/thoughts); polls, theses and alerts when
+ * they have a page.
+ */
+export type RecentKind = 'post' | 'thought'
 
 /** A post opened lately (specs/recently-viewed § 2): what the right column shows of it. */
 export type RecentItem = {
@@ -41,7 +44,7 @@ function isRecentItem(value: unknown): value is RecentItem {
     item.label.length <= TEXT_MAX &&
     typeof item.title === 'string' &&
     item.title.length <= TEXT_MAX &&
-    item.kind === 'post' &&
+    (item.kind === 'post' || item.kind === 'thought') &&
     Number.isFinite(item.score) &&
     Number.isFinite(item.comments) &&
     typeof item.viewedAt === 'string' &&

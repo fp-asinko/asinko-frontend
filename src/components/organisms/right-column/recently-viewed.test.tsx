@@ -44,6 +44,14 @@ describe('RecentlyViewed (specs/recently-viewed)', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
+  it('marks a thought as such, with its text (specs/thoughts)', () => {
+    recordRecent({ ...post('t', 'Rates first, risk later.', '@maria'), kind: 'thought' as const })
+    renderWithIntl(<RecentlyViewed />)
+    expect(screen.getByRole('link')).toHaveAccessibleName(
+      /^maria: .* Rates first, risk later. .*Thought$/,
+    )
+  })
+
   it('says "now" within the last minute', () => {
     recordRecent(post('a', 'Just opened'), new Date(Date.now() - 20_000))
     renderWithIntl(<RecentlyViewed />)

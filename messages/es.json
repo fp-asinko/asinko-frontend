@@ -239,7 +239,8 @@
       "votes": "{count, plural, one {# voto} other {# votos}}",
       "comments": "{count, plural, one {# comentario} other {# comentarios}}",
       "kinds": {
-        "post": "Post"
+        "post": "Post",
+        "thought": "Thought"
       },
       "emptyBody": "Los posts que abras aparecerán aquí."
     }
