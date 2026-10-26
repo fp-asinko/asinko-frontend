@@ -740,7 +740,7 @@ export function PostEditor({
                   {/* The card's quote mark (PostCard): typographic, light. */}
                   <span
                     aria-hidden
-                    className="absolute -top-1 left-0 text-[2.5rem] leading-none font-extrabold text-faint not-italic select-none"
+                    className="absolute -top-3 left-0 text-[2.5rem] leading-none font-extrabold text-faint not-italic select-none"
                   >
                     “
                   </span>
