@@ -29,11 +29,11 @@ describe('PeopleList (H-07)', () => {
         ]}
       />,
     )
-    expect(screen.getByText('@maria')).toBeInTheDocument()
-    expect(screen.getByText('@ana')).toBeInTheDocument()
+    expect(screen.getByText('maria')).toBeInTheDocument()
+    expect(screen.getByText('ana')).toBeInTheDocument()
     expect(screen.getByText('74% accuracy')).toBeInTheDocument()
     expect(screen.getAllByText(/accuracy/)).toHaveLength(1)
-    expect(screen.getByRole('link', { name: /@maria/ })).toHaveAttribute('href', '/user/maria')
+    expect(screen.getByRole('link', { name: /maria/ })).toHaveAttribute('href', '/user/maria')
   })
 })
 

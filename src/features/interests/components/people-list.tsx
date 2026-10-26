@@ -4,6 +4,7 @@ import { ACCURACY_CLASSES, accuracyTier } from '@/lib/accuracy-tier'
 import { cn } from '@/lib/utils'
 import type { Person } from '../interests.types'
 import { CommunityLink } from './community-link'
+import { plainHandle } from '@/lib/plain-handle'
 
 /**
  * People I follow, each a link to the profile (specs/community-pages CP-21), in the size of the
@@ -33,7 +34,9 @@ export function PeopleList({ people, id }: { people: Person[]; id?: string }) {
               size="md"
               className="size-8 transition-[scale] duration-200 ease-out group-hover:scale-105"
             />
-            <span className="min-w-0 flex-1 truncate type-small font-bold">{person.handle}</span>
+            <span className="min-w-0 flex-1 truncate type-small font-bold">
+              {plainHandle(person.handle)}
+            </span>
             {person.accuracyRate !== null && (
               <span
                 data-tier={accuracyTier(person.accuracyRate)}

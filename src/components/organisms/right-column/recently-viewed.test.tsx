@@ -29,7 +29,7 @@ describe('RecentlyViewed (specs/recently-viewed)', () => {
     const links = within(section).getAllByRole('link')
     expect(links.map((link) => link.getAttribute('href'))).toEqual(['/post/b/slug', '/post/a/slug'])
     expect(links[1]).toHaveAccessibleName(
-      /^\$BTC: 1h ago Can BTC close above \$100K\? 892 votes 156 comments Post$/,
+      /^BTC: 1h ago Can BTC close above \$100K\? 892 votes 156 comments Post$/,
     )
     expect(within(links[1]!).getByText('892')).toBeInTheDocument()
   })
@@ -47,7 +47,7 @@ describe('RecentlyViewed (specs/recently-viewed)', () => {
   it('says "now" within the last minute', () => {
     recordRecent(post('a', 'Just opened'), new Date(Date.now() - 20_000))
     renderWithIntl(<RecentlyViewed />)
-    expect(screen.getByRole('link')).toHaveAccessibleName(/^\$BTC: now Just opened/)
+    expect(screen.getByRole('link')).toHaveAccessibleName(/^BTC: now Just opened/)
   })
 
   it('shows nothing that another page wrote into the storage (untrusted)', () => {

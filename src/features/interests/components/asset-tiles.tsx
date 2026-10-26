@@ -4,6 +4,7 @@ import { Delta } from '@/components/molecules/delta'
 import { cn } from '@/lib/utils'
 import type { AssetTile } from '../interests.types'
 import { CommunityLink } from './community-link'
+import { plainHandle } from '@/lib/plain-handle'
 
 /**
  * Prototype tiles: 3-column grid, $handle, daily change, bottom border in the change's color.
@@ -39,7 +40,7 @@ export function AssetTiles({ tiles, id }: { tiles: AssetTile[]; id?: string }) {
                 )}
               >
                 <span className="sr-only">{tile.name}</span>{' '}
-                <span className="type-small font-bold">{tile.handle}</span>{' '}
+                <span className="type-small font-bold">{plainHandle(tile.handle)}</span>{' '}
                 {tile.changePct !== null && (
                   <Delta value={tile.changePct} className="text-[0.625rem]" />
                 )}{' '}

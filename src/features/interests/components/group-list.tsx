@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import type { Group } from '../interests.types'
 import { CommunityLink } from './community-link'
+import { plainHandle } from '@/lib/plain-handle'
 
 /**
  * Groups I belong to, in the suggestions' row (specs/interests-refresh IR-01, IR-05): avatar and #handle,
@@ -34,7 +35,9 @@ export function GroupList({ groups, id }: { groups: Group[]; id?: string }) {
             />
             <span className="min-w-0 flex-1">
               <span className="flex items-center gap-1.5">
-                <span className="min-w-0 truncate type-small font-bold">{group.handle}</span>{' '}
+                <span className="min-w-0 truncate type-small font-bold">
+                  {plainHandle(group.handle)}
+                </span>{' '}
                 {group.isModerator && (
                   <span className="rounded-sm border border-border-strong px-1 text-[0.5625rem] leading-[0.6875rem] font-extrabold">
                     {t('mod')}
