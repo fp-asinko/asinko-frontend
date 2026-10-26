@@ -9,6 +9,8 @@ export type Author = {
   path: string
   /** How it is mentioned: @maria */
   handle: string
+  /** Their visible name, when the backend sends it; the feeds do not yet (P-011). */
+  displayName?: string | null
   avatarUrl: string | null
   accuracyRate: number | null
 }

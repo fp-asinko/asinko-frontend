@@ -285,6 +285,22 @@ describe('PostCard: thoughts and posts without a body (specs/thoughts)', () => {
     expect(screen.getByRole('button', { name: /comments/ })).toBeInTheDocument()
   })
 
+  it('signs a thought with the name, else the @ (PO, 2026-10-26)', () => {
+    const { unmount } = renderWithIntl(<PostCard post={thought()} />)
+    expect(screen.getByText('— @maria')).toBeInTheDocument()
+    unmount()
+    const named = thought()
+    renderWithIntl(
+      <PostCard post={{ ...named, author: { ...named.author!, displayName: 'María Gómez' } }} />,
+    )
+    expect(screen.getByText('— María Gómez')).toBeInTheDocument()
+  })
+
+  it('does not sign a post', () => {
+    renderWithIntl(<PostCard post={postItem({})} />)
+    expect(screen.queryByText(/^— /)).toBeNull()
+  })
+
   it('cuts a long thought with "See more" (TH-07)', () => {
     renderWithIntl(<PostCard post={thought({ body: 'Patience. '.repeat(80) })} />)
     expect(screen.getByText('See more')).toBeInTheDocument()

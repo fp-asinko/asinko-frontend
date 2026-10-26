@@ -71,7 +71,10 @@ export function toCardCommunity(summary: RawCommunitySummary, signedIn: boolean)
   }
 }
 
-type RawAuthor = Pick<RawUserSummary, 'username' | 'avatarUrl'> & { accuracyRate?: number | null }
+type RawAuthor = Pick<RawUserSummary, 'username' | 'avatarUrl'> & {
+  accuracyRate?: number | null
+  displayName?: string | null
+}
 
 export function toAuthor(user: RawAuthor | null): Author | null {
   if (!user) return null
@@ -79,6 +82,7 @@ export function toAuthor(user: RawAuthor | null): Author | null {
     username: user.username,
     path: communityPath('user', user.username),
     handle: `@${user.username}`,
+    displayName: user.displayName?.trim() || null,
     avatarUrl: allowedImageUrl(user.avatarUrl),
     accuracyRate: user.accuracyRate ?? null,
   }

@@ -226,6 +226,19 @@ export function PostCard({
           ) : (
             <PostMarkdown className={detail ? 'gap-4' : undefined}>{post.body}</PostMarkdown>
           )}
+          {post.thought && post.author && (
+            // Signed, as a quote: the name when there is one, else the @ (PO, 2026-10-26). The
+            // byline above already says who for a screen reader.
+            <p
+              aria-hidden
+              className={cn(
+                'mt-2 font-normal text-muted-foreground not-italic',
+                detail ? 'type-ui' : 'type-small',
+              )}
+            >
+              — {post.author.displayName ?? post.author.handle}
+            </p>
+          )}
         </div>
       )}
 
