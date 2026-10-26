@@ -49,7 +49,8 @@ export type AdItem = {
 
 - **`FeedAd`** (`features/feed/components/feed-ad.tsx`): un `<section aria-label="Ad: AvaTrade">`, con la cabecera chica, la imagen y "Learn more". La imagen va con `next/image` a su `width` y `height`, dentro de una caja `bg-surface`: `w-full h-auto max-h-135 object-contain md:max-h-none`. Reserva su lugar por su proporción antes de cargar. En el teléfono una alta se frena en 540 px, entera y centrada; desde `md` ocupa todo el ancho de la columna con el alto que pida su proporción (AD-03; _cambio del PO, 2026-10-26: en desktop el tope dejaba la pieza chica entre franjas grises_). _Cambio al implementar: con `w-auto` una imagen diferida medía 0×0 hasta cargar, y la página saltaba._
 - **`CommentAd`**: con la forma de un comentario. La pieza va debajo de "Anunciante · Ad", al ancho del comentario, entera y hasta 320 px de alto. _Cambio al implementar: primero iba a la derecha, chica (128 px), y el texto que trae la pieza no se leía._
-- **Dónde va cada uno:** `FeedItems` dibuja `FeedAd` para `kind: 'ad'`. `CommentTree` dibuja `CommentAd` después de un comentario con `ad`. `PostComments` dibuja el anuncio del post arriba del árbol.
+  _Cambio del PO (2026-10-26): la pieza ocupa el ancho del comentario con el alto que necesite, sin tope ni franjas grises._
+- **Dónde va cada uno:** `FeedItems` dibuja `FeedAd` para `kind: 'ad'`. `CommentTree` dibuja `CommentAd` después de un comentario con `ad`. `PostComments` dibuja el anuncio del post como `FeedAd`, debajo de las acciones del post y antes de la sección de comentarios (cambio del PO, 2026-10-26). `getCommentTree` se cachea por request: el anuncio y los comentarios salen del mismo pedido.
 - Textos en `ads.*`: `label` (Ad / Anuncio / Anúncio), `region` ("Ad: {advertiser}"), `cta` (Learn more / Más información / Saiba mais) y `ctaLabel`.
 
 ## 5. Imágenes

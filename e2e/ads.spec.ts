@@ -49,16 +49,29 @@ test.describe('Ads', () => {
     await expect(ad.getByText(/^(avatrade|pepperstone|etoro).com$/)).toBeVisible()
   })
 
-  test('in a post: one under it, with its comments; none in a search (AD-04, AD-05)', async ({
+  test('in a post: one under its actions, before the comments; none in a search (AD-04, AD-05)', async ({
     page,
   }) => {
     await page.goto(WHALES)
-    const comments = page.getByRole('region', { name: /comments/i })
-    const ad = comments.getByRole('region', { name: /^Ad: / }).first()
+    const main = page.getByRole('main')
+    const ad = main.getByRole('region', { name: /^Ad: / }).first()
     await expect(ad).toBeVisible()
-    // Before the first comment.
-    const firstComment = comments.getByRole('listitem').first()
-    expect((await ad.boundingBox())!.y).toBeLessThan((await firstComment.boundingBox())!.y)
+    // Below the post's votes and share, above the comments' heading (PO, 2026-10-26).
+    const share = main.getByRole('article').first().getByRole('button', { name: 'Share' })
+    const heading = page.getByRole('heading', { name: /comments/i, level: 2 })
+    const adTop = (await ad.boundingBox())!.y
+    expect(adTop).toBeGreaterThan((await share.boundingBox())!.y)
+    expect(adTop).toBeLessThan((await heading.boundingBox())!.y)
+    // Whole, with no gray bands: the height its proportion needs.
+    const image = ad.getByRole('img')
+    const box = (await image.boundingBox())!
+    const [width, height] = await image.evaluate((img: HTMLImageElement) => [
+      Number(img.getAttribute('width')),
+      Number(img.getAttribute('height')),
+    ])
+    if (box.width > 700) {
+      expect(Math.abs(box.height - (box.width * height!) / width!)).toBeLessThanOrEqual(2)
+    }
 
     await page.goto(`${WHALES}?q=flows`)
     await expect(page.getByRole('region', { name: /comments/i })).toBeVisible()

@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server'
 import { Suspense } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { getCommentTree, searchComments } from '../lib/comments-api'
-import { CommentAd } from './comment-ad'
+import { FeedAd } from './feed-ad'
 import type { CommentsQuery } from '../schemas/comments-query.schema'
 import { CommentComposer } from './comment-composer'
 import { CommentSearchResults } from './comment-search-results'
@@ -40,28 +40,48 @@ export async function PostComments({
 }) {
   const t = await getTranslations('postDetail')
   return (
-    <section
-      id="comments"
-      aria-labelledby="comments-title"
-      className="flex flex-col gap-5 border-t px-4 pt-5 pb-10 md:px-0"
-    >
-      <h2 id="comments-title" className="type-ui font-bold">
-        {t('title', { count })}
-      </h2>
-      {!closed && <CommentComposer postId={postId} />}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        {!query.q && <CommentsSort current={query.sort} />}
-        <CommentsSearch query={query.q} />
-      </div>
-      <p id={ANNOUNCER} role="status" className="sr-only" />
-      <Suspense key={`${query.sort}:${query.q ?? ''}`} fallback={<CommentsSkeleton />}>
-        {query.q ? (
-          <SearchedComments postId={postId} q={query.q} allHref={path} />
-        ) : (
-          <LoadedComments postId={postId} sort={query.sort} closed={closed} />
-        )}
-      </Suspense>
-    </section>
+    <>
+      {/* The ad under the post, below its actions and before its comments, where the backend puts
+          it (specs/ads AD-04, PO 2026-10-26). A search has none (AD-05). */}
+      {!query.q && (
+        <Suspense key={query.sort} fallback={null}>
+          <PostAd postId={postId} sort={query.sort} />
+        </Suspense>
+      )}
+      <section
+        id="comments"
+        aria-labelledby="comments-title"
+        className="flex flex-col gap-5 border-t px-4 pt-5 pb-10 md:px-0"
+      >
+        <h2 id="comments-title" className="type-ui font-bold">
+          {t('title', { count })}
+        </h2>
+        {!closed && <CommentComposer postId={postId} />}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          {!query.q && <CommentsSort current={query.sort} />}
+          <CommentsSearch query={query.q} />
+        </div>
+        <p id={ANNOUNCER} role="status" className="sr-only" />
+        <Suspense key={`${query.sort}:${query.q ?? ''}`} fallback={<CommentsSkeleton />}>
+          {query.q ? (
+            <SearchedComments postId={postId} q={query.q} allHref={path} />
+          ) : (
+            <LoadedComments postId={postId} sort={query.sort} closed={closed} />
+          )}
+        </Suspense>
+      </section>
+    </>
+  )
+}
+
+/** The post's own ad, as in a feed: the width of the column. Nothing if it fails. */
+async function PostAd({ postId, sort }: { postId: string; sort: CommentsQuery['sort'] }) {
+  const result = await getCommentTree(postId, sort)
+  if (!result.ok || !result.data.postAd) return null
+  return (
+    <div className="border-t">
+      <FeedAd ad={result.data.postAd} />
+    </div>
   )
 }
 
@@ -82,15 +102,9 @@ async function LoadedComments({
   const t = await getTranslations('postDetail')
   const result = await getCommentTree(postId, sort)
   if (!result.ok) return <Failed />
-  const { comments, postAd } = result.data
+  const { comments } = result.data
   return (
     <>
-      {/* The ad under the post, before its comments, where the backend puts it (specs/ads AD-04). */}
-      {postAd && (
-        <div className="mb-5">
-          <CommentAd ad={postAd} />
-        </div>
-      )}
       {comments.length === 0 && (
         <EmptyState
           icon={<MessageCircleIcon />}
