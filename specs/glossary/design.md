@@ -45,10 +45,10 @@ Un `<article>` con el nombre "Glossary: {term}" (`aria-label`), así el lector d
 - **Término:** `text-2xl font-extrabold`, 24 px. El prototipo lo pone más grande que un título de post.
 - **Texto:** `type-post-body`.
 - **Ejemplo:**
-  - una caja `rounded-lg bg-surface` con `border-l-3 border-muted-foreground` (gris oscuro, no negro: PO 2026-10-26) y padding de 12 × 16;
+  - una caja `rounded-lg bg-surface` con `border-l-3 border-border-strong` (un gris claro, tenue contra el fondo; ni negro ni gris oscuro: PO 2026-10-26) y padding de 12 × 16;
   - la etiqueta "Example" con `type-section text-muted-foreground`;
   - el texto `type-post-body italic`.
-- El mismo padding que las tarjetas del feed. Sin acciones.
+- El mismo padding que un post en el feed: el texto 12 px adentro (`md:px-3 md:my-1`), alineado con el de los posts (PO, 2026-10-26). Sin acciones.
 
 Textos en `glossary.*`:
 
