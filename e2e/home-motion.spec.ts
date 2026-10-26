@@ -83,7 +83,7 @@ test.describe('Home motion', () => {
     await page.goto('/en/asset/BTC')
     if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click()
     const column = page.getByRole('region', { name: 'Your interests' }).filter({ visible: true })
-    await expect(column.getByRole('link', { name: /^Bitcoin \$BTC/ })).toHaveAttribute(
+    await expect(column.getByRole('link', { name: /^Bitcoin BTC/ })).toHaveAttribute(
       'aria-current',
       'page',
     )

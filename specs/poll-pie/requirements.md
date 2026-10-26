@@ -7,7 +7,7 @@
 > - **Q3:** la interactividad es resaltar al pasar el mouse o tocar, más una animación de entrada.
 > - **Q4:** va en la **tarjeta del feed y en el detalle**.
 >
-> Se trabaja en una rama local, sin push, hasta que el PO lo diga.
+> Se trabajó en una rama local y se subió a `develop` el 2026-10-26.
 
 ## Criterios de aceptación
 

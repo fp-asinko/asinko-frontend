@@ -1,6 +1,6 @@
 # Resultados de encuesta en pie 3D — Tasks
 
-Rama: `feature/poll-pie`, desde `develop`. **Local, sin push** hasta que el PO lo diga.
+Rama: `feature/poll-pie`, desde `develop`. Se subió a `develop` el 2026-10-26 (PO: "pushea todo a develop").
 
 - [x] **T-01 (M)** `poll-pie.ts`: la geometría (porciones, caras, lados) y los tonos por puesto, como funciones puras, con sus tests. → PP-01, PP-02
 - [x] **T-02 (M)** `PollPie` (SVG, resaltar, entrada) y `PollVoting` con el pie, la leyenda y sin barras. `animate-pie-in`. Tests. → PP-03 a PP-06

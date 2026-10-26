@@ -33,15 +33,24 @@ test.describe('Feed impressions', () => {
   }) => {
     const sent = batches(page)
     await page.goto('/en')
-    const card = page.getByRole('main').locator('article[data-content-path]').first()
+    // A card with a visible title: a thought's is for screen readers only (specs/thoughts).
+    const card = page
+      .getByRole('main')
+      .locator('article[data-content-path]:has(h2:not(.sr-only))')
+      .first()
     await expect(card).toBeVisible()
     const id = await card.getAttribute('data-content-id')
+    // On screen: the thought above it can push it down.
+    await card.scrollIntoViewIfNeeded()
 
     // Leaving the tab sends what was on screen for a second or more; before that, nothing.
     await expect(async () => {
       await switchTabs(page)
-      const seen = sent.flatMap((each) => each.events).find((each) => each.type === 'SEEN')
-      expect(seen?.contentId).toBe(id)
+      // Its own: the cards above it (a thought) are reported too.
+      const seen = sent
+        .flatMap((each) => each.events)
+        .find((each) => each.type === 'SEEN' && each.contentId === id)
+      expect(seen).toBeDefined()
       expect(seen?.dwellMs).toBeGreaterThanOrEqual(1000)
     }).toPass({ intervals: [1_100, 1_500, 2_000] })
     expect(sent[0]!.requestId).toMatch(/^[0-9a-f-]{36}$/)

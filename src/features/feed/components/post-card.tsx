@@ -156,7 +156,8 @@ export function PostCard({
             : 'type-post-title outline-none',
           // A thought has no title: its heading names it for assistive tech and the keyboard, and
           // the quote below is what shows (specs/thoughts TH-06, TH-08).
-          post.thought && !post.deleted && 'sr-only',
+          // Shown while its link has the keyboard's focus: a focus never goes unseen (WCAG 2.4.7).
+          post.thought && !post.deleted && 'sr-only has-[:focus-visible]:not-sr-only',
         )}
       >
         {post.deleted ? (

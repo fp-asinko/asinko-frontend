@@ -8,7 +8,7 @@
 > - En los feeds, la búsqueda, el perfil y los destacados llega como `kind: "THOUGHT"`, con el mismo contenido que un post (`type: "THOUGHT"`). `?kind=THOUGHT` lo filtra; `?kind=POST` no lo incluye.
 > - Se vota, se comenta y se edita con los mismos endpoints de `/posts/{id}`. Su cuerpo no se puede vaciar.
 >
-> **No se pushea a `develop` hasta que el PO lo diga** (2026-10-25).
+> Se trabajó local y se subió a `develop` el 2026-10-26, a pedido del PO.
 
 ## Criterios de aceptación
 

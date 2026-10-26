@@ -301,6 +301,14 @@ describe('PostCard: thoughts and posts without a body (specs/thoughts)', () => {
     expect(screen.queryByText(/^— /)).toBeNull()
   })
 
+  it('shows its hidden title while the keyboard focuses its link (WCAG 2.4.7)', () => {
+    renderWithIntl(<PostCard post={thought()} />)
+    expect(screen.getByRole('heading', { name: 'Thought by maria' })).toHaveClass(
+      'sr-only',
+      'has-[:focus-visible]:not-sr-only',
+    )
+  })
+
   it('cuts a long thought with "See more" (TH-07)', () => {
     renderWithIntl(<PostCard post={thought({ body: 'Patience. '.repeat(80) })} />)
     expect(screen.getByText('See more')).toBeInTheDocument()

@@ -1,6 +1,6 @@
 # Thoughts y posts sin cuerpo — Tasks
 
-Rama: `feature/thoughts-and-bodyless-posts`, desde `develop`. **Solo local: no se pushea ni se mergea hasta que el PO lo diga.**
+Rama: `feature/thoughts-and-bodyless-posts`, desde `develop`. Se subió a `develop` el 2026-10-26, cuando el PO lo pidió ("pushea todo a develop").
 
 - [x] **T-01 (M)** Contrato (`THOUGHT` en post, feed y borrador; cuerpo opcional), snapshot, mocks (fixtures, filtro por `kind`, `POST /posts`). Tests. → TH-09, TH-11
 - [x] **T-02 (S)** Dominio: `thought` en `PostItem`, `toFeedItem`, el slug y la descripción. Tests. → TH-02, TH-08
