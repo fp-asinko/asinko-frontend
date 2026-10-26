@@ -9,7 +9,7 @@
 
 - [x] **AD-01** Un anuncio llega dentro de la lista del feed como un ítem `kind: "AD"` (propuesta P-031) y se dibuja donde viene: en el Home (Para vos y Siguiendo), los grupos, los activos y el perfil, también en las páginas de "Cargar más". El front no lo mueve ni lo cuenta.
 - [x] **AD-02** Su tarjeta: arriba, chico, el logo y "**Anunciante · Ad**"; la **imagen entera**, a su proporción, sin recortar su texto (Q2); si trae un texto propio, debajo; y "**Learn more**" con el dominio real del destino.
-- [x] **AD-03** Una imagen alta no pasa de unos **540 px** de alto: se ve entera, centrada sobre el gris de fondo (Q3). Un banner o una cuadrada se ven a su tamaño. El lugar se reserva con su ancho y alto: nada salta al cargar.
+- [x] **AD-03** En el teléfono, una imagen alta no pasa de unos **540 px** de alto: se ve entera, centrada sobre el gris de fondo (Q3). Desde tablet, ocupa todo el ancho de la columna con el alto que necesite su proporción (cambio del PO, 2026-10-26). Un banner o una cuadrada se ven a su tamaño. El lugar se reserva con su ancho y alto: nada salta al cargar.
 
 ### En el detalle
 
