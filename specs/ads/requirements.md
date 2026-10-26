@@ -13,7 +13,7 @@
 
 ### En el detalle
 
-- [x] **AD-04** En el detalle de un post, los anuncios llegan con los comentarios, cada uno con el comentario después del cual va (propuesta P-031): uno **debajo del post**, antes de los comentarios, y los demás **entre los comentarios**, con la forma de un comentario (logo, "Anunciante · Ad", la pieza al ancho del comentario, hasta 320 px de alto, y "Learn more").
+- [x] **AD-04** En el detalle de un post, los anuncios llegan con los comentarios, cada uno con el comentario después del cual va (propuesta P-031): uno **debajo del post**, después de sus acciones (votos, comentarios, compartir) y antes de la sección de comentarios, al ancho de la columna como en el feed (PO, 2026-10-26), y los demás **entre los comentarios**, con la forma de un comentario (logo, "Anunciante · Ad", la pieza al ancho del comentario con el alto que necesite, y "Learn more").
 - [x] **AD-05** En la búsqueda de comentarios no hay anuncios.
 
 ### Para todos

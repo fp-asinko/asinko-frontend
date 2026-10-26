@@ -1,4 +1,5 @@
 import 'server-only'
+import { cache } from 'react'
 import { apiRequest, keepValidItems, type ApiResult } from '@/lib/api'
 import {
   commentAdSchema,
@@ -95,9 +96,10 @@ function toCommentNode(comment: RawComment): CommentNode | null {
 
 /**
  * Every comment of a post, nested (PC-14), in the order asked (P-014, specs/post-detail-refresh
- * PD-03): the backend sorts every level. Without an order, the backend's (oldest first).
+ * PD-03): the backend sorts every level. Without an order, the backend's (oldest first). Cached per
+ * request: the ad under the post and the comments come from the same answer (specs/ads AD-04).
  */
-export async function getCommentTree(
+export const getCommentTree = cache(async function getCommentTree(
   postId: string,
   sort?: CommentSort,
 ): Promise<ApiResult<{ comments: CommentNode[]; postAd: AdItem | null }>> {
@@ -129,7 +131,7 @@ export async function getCommentTree(
       postAd: ads.find((each) => each.afterCommentId === null)?.ad ?? null,
     },
   }
-}
+})
 
 /** Each ad hung on the comment it goes after; an ad for a comment that is not there is left out. */
 function withCommentAds(

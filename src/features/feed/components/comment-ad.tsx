@@ -5,8 +5,8 @@ import type { AdItem } from '../feed.types'
 
 /**
  * An ad with a post's comments, shaped as a comment (specs/ads AD-04): the logo and "Advertiser ·
- * Ad", then the piece across the comment's width, whole and up to 320px tall (its text must read:
- * the image leads, Q2), its own text if it has one, and "Learn more" with the real domain. A
+ * Ad", then the piece across the comment's width, whole, as tall as it needs (its text must read:
+ * the image leads, Q2; no gray bands, PO 2026-10-26), its own text if it has one, and "Learn more" with the real domain. A
  * section named "Ad: Advertiser" (AD-07); the link opens in another tab, sponsored (AD-06). A
  * Server Component: no JavaScript.
  */
@@ -23,15 +23,16 @@ export function CommentAd({ ad }: { ad: AdItem }) {
           <span>{t('label')}</span>
         </p>
         {ad.image && (
-          // Its own proportion holds the place before it loads; a tall one stops at 320px, whole.
-          <div className="overflow-hidden rounded-lg border bg-surface">
+          // Its own proportion holds the place before it loads: the width of the comment and the
+          // height the piece needs.
+          <div className="overflow-hidden rounded-lg border">
             <Image
               src={ad.image.src}
               alt={ad.image.alt}
               width={ad.image.width}
               height={ad.image.height}
               sizes="(min-width: 768px) 640px, 100vw"
-              className="h-auto max-h-80 w-full object-contain"
+              className="h-auto w-full"
             />
           </div>
         )}
