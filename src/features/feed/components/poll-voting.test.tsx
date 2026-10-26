@@ -259,11 +259,13 @@ describe('PollVoting (H-13, H-15)', () => {
       const row = screen.getByText('Below 150K').closest('li')!
       await userEvent.hover(row)
       const [below, above] = slices(container)
-      expect((above as SVGElement).style.opacity).toBe('0.45')
       expect((below as SVGElement).style.transform).toMatch(/^translate/)
+      // The rest stay as they are: no fading (PO, 2026-10-26).
+      expect((above as SVGElement).style.transform).toBe('')
+      expect((above as SVGElement).style.opacity).toBe('')
       expect(row.firstElementChild).toHaveClass('bg-muted')
       await userEvent.unhover(row)
-      expect((above as SVGElement).style.opacity).toBe('1')
+      expect((below as SVGElement).style.transform).toBe('')
     })
 
     it('marks the viewer vote with their avatar even when it does not lead (FC-24)', () => {
