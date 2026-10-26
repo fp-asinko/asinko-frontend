@@ -15,7 +15,8 @@ export function GlossaryCard({ term }: { term: GlossaryItem }) {
   return (
     <article
       aria-label={t('region', { term: term.term })}
-      className="px-4 py-4.5 wrap-anywhere md:px-0 md:py-5.5"
+      // The text where a post's is: 12px inside, 4px clear of the lines between cards (PostCard).
+      className="px-4 py-4.5 wrap-anywhere md:my-1 md:px-3 md:py-5.5"
     >
       <div className="mb-2 flex min-h-6 items-center justify-between gap-3">
         <p className="min-w-0 truncate type-meta text-muted-foreground">{term.category}</p>
@@ -28,7 +29,7 @@ export function GlossaryCard({ term }: { term: GlossaryItem }) {
       <h2 className="text-2xl leading-tight font-extrabold tracking-tight">{term.term}</h2>
       <p className="mt-2.5 type-post-body">{term.definition}</p>
       {term.example && (
-        <div className="mt-3.5 rounded-lg border-l-3 border-muted-foreground bg-surface px-4 py-3">
+        <div className="mt-3.5 rounded-lg border-l-3 border-border-strong bg-surface px-4 py-3">
           <p className="type-section text-muted-foreground">{t('example')}</p>
           <p className="mt-1 type-post-body italic">{term.example}</p>
         </div>
