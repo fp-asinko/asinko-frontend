@@ -41,11 +41,11 @@ export type GlossaryItem = {
 
 Un `<article>` con el nombre "Glossary: {term}" (`aria-label`), así el lector de pantalla oye qué es antes de leerlo. Adentro, el término es el `<h2>`.
 
-- **Cabecera:** solo la marca, a la derecha, con `BookOpenTextIcon` y "Glossary", con el estilo de la de POLL (`type-action font-extrabold uppercase`). El grupo no se muestra (PO, 2026-10-26).
+- **Cabecera:** el término y, en su misma fila a la derecha, la marca con `BookOpenTextIcon` y "Glossary", con el estilo de la de POLL (`type-action font-extrabold uppercase`). El grupo no se muestra (PO, 2026-10-26).
 - **Término:** `text-2xl font-extrabold`, 24 px. El prototipo lo pone más grande que un título de post.
 - **Texto:** `type-post-body`.
 - **Ejemplo:**
-  - una caja `rounded-lg bg-surface`, con una regla de 3 px a la izquierda en degradé de `--faint` a transparente, de arriba hacia abajo (PO, 2026-10-26); ni negro ni gris oscuro: PO 2026-10-26) y padding de 12 × 16;
+  - una caja `rounded-lg bg-surface`, con `border-l-3 border-border-strong`, un gris claro y tenue contra el fondo (PO, 2026-10-26; se probó un degradé y volvió a este); ni negro ni gris oscuro: PO 2026-10-26) y padding de 12 × 16;
   - la etiqueta "Example" con `type-section text-muted-foreground`;
   - el texto `type-post-body italic`.
 - El mismo padding que un post en el feed: el texto 12 px adentro (`md:px-3 md:my-1`), alineado con el de los posts (PO, 2026-10-26). Sin acciones.
