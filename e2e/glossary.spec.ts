@@ -9,7 +9,7 @@ const noOverflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
 
 test.describe('Glossary in the Home', () => {
-  test('a term after every 8 posts, with its group, mark and example, and nothing to press (GL-01, GL-02, GL-04)', async ({
+  test('a term after every 8 posts, with its mark and example, and nothing to press (GL-01, GL-02, GL-04)', async ({
     page,
   }) => {
     await page.goto('/en')
@@ -23,7 +23,6 @@ test.describe('Glossary in the Home', () => {
     const term = terms(page).first()
     const name = (await term.getAttribute('aria-label'))!.replace('Glossary: ', '')
     await expect(term.getByRole('heading', { level: 2, name })).toBeVisible()
-    await expect(term.getByText(/^(Trading|Macro and bonds)$/)).toBeVisible()
     await expect(term.getByText('Glossary', { exact: true })).toBeVisible()
     await expect(term.getByText('Example', { exact: true })).toBeVisible()
     await expect(term.getByRole('button')).toHaveCount(0)

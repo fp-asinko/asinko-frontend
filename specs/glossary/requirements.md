@@ -12,10 +12,10 @@
 
 - [x] **GL-01** En el Home (Para vos y Siguiendo) aparece una tarjeta de glosario **cada 8 posts**. Los anuncios no cuentan para esos 8. Llega dentro de la lista del feed como un ítem `kind: "GLOSSARY"` (propuesta P-032) y se dibuja donde viene, también en las páginas de "Cargar más". El front no la mueve.
 - [x] **GL-02** La tarjeta, siguiendo el prototipo con nuestro sistema:
-  - arriba, el grupo ("Trading", "Macro and bonds") en gris chico, y a la derecha la marca **GLOSSARY** con su ícono, como POLL y THOUGHT;
+  - arriba a la derecha, la marca **GLOSSARY** con su ícono, como POLL y THOUGHT (el grupo, "Trading" o "Macro and bonds", se sacó el 2026-10-26 a pedido del PO; sigue en los datos);
   - el término como título grande;
   - el texto;
-  - el **ejemplo** en una caja gris con un borde a la izquierda, con la etiqueta "EXAMPLE" y el texto en itálica.
+  - el **ejemplo** en una caja gris con un borde a la izquierda que se desvanece de arriba hacia abajo (PO, 2026-10-26), con la etiqueta "EXAMPLE" y el texto en itálica.
 
   Sin votos, comentarios, compartir ni link: no tiene página.
 
