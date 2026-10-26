@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Suspense, type ReactNode } from 'react'
-import { PageColumns } from '@/components/organisms/app-shell'
+import { PageColumns, PageHero } from '@/components/organisms/app-shell'
 import { communityMetadata, CommunityTop, resolveProfileRoute } from '@/features/communities'
 import { ComposeScope } from '@/features/composer'
 // By its path, not the feature's index: the index also brings the post page's client parts (seo.md).
@@ -54,7 +54,6 @@ export default async function UserPage({
       {profile.isSelf && (
         <ComposeScope id={page.id} slug={page.slug} handle={page.handle} name={page.handle} own />
       )}
-      <CommunityTop page={page} profile={profile} />
       {/* Without the right column (under lg), the person's card and achievements go here (PA-03,
           specs/profile-achievements AC-05). */}
       <div className="border-b px-4 py-4 sm:px-0 lg:hidden">
@@ -100,18 +99,25 @@ export default async function UserPage({
   )
 
   return (
-    <PageColumns>
-      {/* Your own profile: "⋯" on your posts and theses features them (PS-07). */}
-      {profile.isSelf ? (
-        <FeaturedScope
-          featured={featured.map((item) => `${item.kind}:${item.id}`)}
-          max={FEATURED_MAX}
-        >
-          {content}
-        </FeaturedScope>
-      ) : (
-        content
-      )}
-    </PageColumns>
+    <>
+      {/* The banner and the header over both columns from lg, as a group's (specs/community-widgets
+          CW-01, PO 2026-10-26); the rest and the right column under them. */}
+      <PageHero>
+        <CommunityTop page={page} profile={profile} />
+      </PageHero>
+      <PageColumns>
+        {/* Your own profile: "⋯" on your posts and theses features them (PS-07). */}
+        {profile.isSelf ? (
+          <FeaturedScope
+            featured={featured.map((item) => `${item.kind}:${item.id}`)}
+            max={FEATURED_MAX}
+          >
+            {content}
+          </FeaturedScope>
+        ) : (
+          content
+        )}
+      </PageColumns>
+    </>
   )
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { PageColumns } from '@/components/organisms/app-shell'
+import { PageColumns, PageHero } from '@/components/organisms/app-shell'
 import {
   AssetWithoutCommunity,
   communityMetadata,
@@ -35,20 +35,26 @@ export default async function AssetPage({
   }
   const { page, path } = route
   return (
-    <PageColumns>
-      <ComposeScope
-        id={page.id}
-        slug={page.slug}
-        handle={page.handle}
-        name={page.subtitle ?? page.handle}
-      />
-      <CommunityTop page={page} />
-      <CommunityFeed
-        slug={page.slug}
-        handle={page.handle}
-        pagePath={path}
-        searchParams={searchParams}
-      />
-    </PageColumns>
+    <>
+      {/* The banner and the header over both columns from lg, as a group's (specs/community-widgets
+          CW-01, PO 2026-10-26); the feed and the right column under them. */}
+      <PageHero>
+        <CommunityTop page={page} />
+      </PageHero>
+      <PageColumns>
+        <ComposeScope
+          id={page.id}
+          slug={page.slug}
+          handle={page.handle}
+          name={page.subtitle ?? page.handle}
+        />
+        <CommunityFeed
+          slug={page.slug}
+          handle={page.handle}
+          pagePath={path}
+          searchParams={searchParams}
+        />
+      </PageColumns>
+    </>
   )
 }
