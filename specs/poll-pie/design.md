@@ -21,9 +21,9 @@ Componente cliente que vive dentro de `PollVoting`, que ya es cliente. Recibe `s
 
 **Resaltar (PP-04):**
 
-- Cada porción es un `<g>` con su cara y su lado: se mueve y se atenúa entera.
+- Cada porción es un `<g>` con su cara y su lado: se mueve entera.
 - La porción activa se corre unos 8 px hacia afuera, en la dirección de su ángulo medio (`translate`, 150 ms `ease-out`).
-- Las demás bajan al 45 % de opacidad.
+- Las demás no cambian: atenuarlas se veía como una sombra (PO, 2026-10-26).
 - Funciona con `pointerenter`/`pointerleave` en cada porción y en cada fila de la lista; un toque en el teléfono hace lo mismo.
 
 **Entrada (PP-05):** la utilidad `animate-pie-in` (keyframes en `globals.css`) gira el disco desde −25°, lo escala desde 0,92 y lo trae desde opacidad 0, en 500 ms con `--ease-out`. La red global de "reducir movimiento" la anula.

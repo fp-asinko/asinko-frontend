@@ -21,7 +21,7 @@
 
   En pantallas medianas o más, el pie va a la izquierda y la lista a la derecha. En el teléfono, el pie va arriba y la lista abajo, sin scroll horizontal a 360 px.
 
-- [x] **PP-04** Al **pasar el mouse** (o tocar) por una porción o por su fila de la lista, esa porción se separa un poco del centro y las demás se atenúan; su fila se resalta. Al salir, todo vuelve.
+- [x] **PP-04** Al **pasar el mouse** (o tocar) por una porción o por su fila de la lista, esa porción se separa un poco del centro y su fila se resalta. Las demás quedan igual (_PO, 2026-10-26: atenuarlas se veía como una sombra_). Al salir, todo vuelve.
 - [x] **PP-05** Al aparecer los resultados (al cargar la encuesta o al votar), el pie **entra con una animación** corta. Con "reducir movimiento" aparece sin animar.
 - [x] **PP-06** **Accesibilidad:**
   - el pie es decorativo para el lector de pantalla, que lee la lista igual que hoy;

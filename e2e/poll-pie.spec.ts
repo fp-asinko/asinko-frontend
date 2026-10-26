@@ -29,7 +29,9 @@ test.describe('Poll pie', () => {
     if (!isMobile) {
       const first = poll.getByRole('listitem').first()
       await first.hover()
-      await expect(pie.locator('[data-slice]').nth(1)).toHaveCSS('opacity', '0.45')
+      // Its slice moves out; the rest stay as they are.
+      await expect(pie.locator('[data-slice]').first()).not.toHaveCSS('transform', 'none')
+      await expect(pie.locator('[data-slice]').nth(1)).toHaveCSS('transform', 'none')
     }
   })
 

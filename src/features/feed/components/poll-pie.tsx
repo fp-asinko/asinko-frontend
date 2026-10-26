@@ -39,8 +39,8 @@ export const PIE_SWATCHES = [
 /**
  * A poll's results as a tilted 3D disc (specs/poll-pie): one soft-colored slice per option with
  * votes (PP-02). Decorative for a screen reader: the list beside it says the same in words (PP-06).
- * The slice of `active` moves out and the rest fade, each slice as a whole with its side, so
- * nothing shows through (PP-04). It enters turning once (PP-05, off with reduced motion).
+ * The slice of `active` moves out, as a whole with its side; the rest stay as they are (PP-04: fading
+ * them read as a shadow, PO 2026-10-26). It enters turning once (PP-05, off with reduced motion).
  */
 export function PollPie({
   options,
@@ -73,9 +73,8 @@ export function PollPie({
             data-slice={slice.id}
             onPointerEnter={() => onActive(slice.id)}
             onClick={() => onActive(slice.id)}
-            className="transition-[transform,opacity] duration-150 ease-out"
+            className="transition-transform duration-150 ease-out"
             style={{
-              opacity: active && !lifted ? 0.45 : 1,
               transform: lifted
                 ? `translate(${Math.cos(slice.mid) * LIFT}px, ${Math.sin(slice.mid) * LIFT * TILT}px)`
                 : undefined,
