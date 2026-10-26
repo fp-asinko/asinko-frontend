@@ -77,6 +77,27 @@ test.describe('layout by width (F-23, F-26)', () => {
     await expect(page.getByRole('button', { name: 'Open menu' })).toBeFocused()
   })
 
+  test('mobile: the menu panel scrolls to its end, with no visible title (PO, 2026-10-26)', async ({
+    page,
+    context,
+    baseURL,
+  }) => {
+    // A guest: the "New to Asinko?" card on top pushes the communities past the screen.
+    await context.addCookies([{ name: 'asinko-mock-guest', value: '1', url: baseURL! }])
+    await page.setViewportSize({ width: 360, height: 640 })
+    await page.goto('/en')
+    await page.getByRole('button', { name: 'Open menu' }).click()
+    const panel = page.getByRole('dialog', { name: 'Menu' })
+    await expect(panel).toBeVisible()
+    await expect(panel.getByText('Menu', { exact: true })).toHaveClass(/sr-only/)
+
+    const last = panel.getByRole('link').last()
+    await last.scrollIntoViewIfNeeded()
+    await expect(last).toBeInViewport()
+    // Scrolled inside the panel: the page behind stays where it was.
+    expect(await page.evaluate(() => window.scrollY)).toBe(0)
+  })
+
   test('desktop: fixed left column, no menu button or bottom bar', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/en')

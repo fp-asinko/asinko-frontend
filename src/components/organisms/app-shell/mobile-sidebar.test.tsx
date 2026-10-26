@@ -27,6 +27,8 @@ describe('MobileSidebar', () => {
 
     const panel = await screen.findByRole('dialog', { name: 'Menu' })
     expect(panel).toBeInTheDocument()
+    // Its name is for screen readers only: nothing to read on screen (PO, 2026-10-26).
+    expect(screen.getByText('Menu')).toHaveClass('sr-only')
     expect(screen.getByRole('region', { name: 'Your interests' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Bitcoin' })).toBeInTheDocument()
   })
