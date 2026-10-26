@@ -319,6 +319,8 @@
   --animate-count-up: count-up 180ms var(--ease-out);
   --animate-count-down: count-down 180ms var(--ease-out);
   --animate-bar-grow: bar-grow 600ms var(--ease-bars);
+  /* A poll's 3D pie as its results appear (specs/poll-pie PP-05). */
+  --animate-pie-in: pie-in 500ms var(--ease-out) backwards;
   --animate-fade-up: fade-up 200ms var(--ease-out) backwards;
   --animate-fade-in: fade-in 200ms var(--ease-out);
   /* A shared comment opened from its link (specs/comment-threads CT-12): a tint that fades out.
@@ -342,6 +344,12 @@
     from {
       opacity: 0;
       transform: translateY(-60%);
+    }
+  }
+  @keyframes pie-in {
+    from {
+      opacity: 0;
+      transform: rotate(-25deg) scale(0.92);
     }
   }
   @keyframes bar-grow {

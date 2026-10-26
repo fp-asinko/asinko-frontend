@@ -9,6 +9,9 @@ import { pollItem } from '../feed-items.fixture'
 import type { PollItem } from '../feed.types'
 import { PollVoting } from './poll-voting'
 
+/** The top faces of the pie, in the options' order (specs/poll-pie). */
+const slices = (container: HTMLElement) => [...container.querySelectorAll('[data-slice]')]
+
 const action = vi.hoisted(() => ({ votePoll: vi.fn() }))
 vi.mock('../actions/vote-poll.action', () => action)
 const comments = vi.hoisted(() => ({ loadCommentsPreview: vi.fn() }))
@@ -163,7 +166,7 @@ describe('PollVoting (H-13, H-15)', () => {
       expect(container.querySelector('ul')).not.toHaveAttribute('data-revealed')
     })
 
-    it('grows the bars from 0 when a vote reveals the results', async () => {
+    it('shows the 3D pie, entering, when a vote reveals the results (specs/poll-pie PP-01, PP-05)', async () => {
       action.votePoll.mockResolvedValue({
         ok: true,
         data: {
@@ -180,7 +183,9 @@ describe('PollVoting (H-13, H-15)', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Yes' }))
       expect((await screen.findByText('100%')).parentElement).toHaveClass('animate-fade-in')
       expect(container.querySelector('ul')).toHaveAttribute('data-revealed', 'true')
-      expect(container.querySelector('[data-bar].animate-bar-grow')).not.toBeNull()
+      expect(container.querySelector('[data-poll-pie]')).toHaveClass('animate-pie-in')
+      // Only the option with votes has a slice.
+      expect(slices(container).map((slice) => slice.getAttribute('data-slice'))).toEqual(['a'])
     })
   })
 
@@ -197,27 +202,42 @@ describe('PollVoting (H-13, H-15)', () => {
         resultsVisible: true,
       },
     })
-    const fills = (container: HTMLElement) => [...container.querySelectorAll('[data-bar]')]
+    /** The identity hue of a slice: --avatar-N, softened (specs/poll-pie PP-02). */
+    const hue = (slice: Element) =>
+      /var\(--avatar-(\d)\)/.exec(slice.querySelector('path')!.getAttribute('class')!)?.[1]
     const consensusOf = (container: HTMLElement) => container.querySelector('[data-consensus]')
 
-    it('shows the clean boxes, without fills, while the results are hidden (FC-18)', () => {
+    it('shows the clean boxes, without a pie, while the results are hidden (FC-18)', () => {
       const { container } = renderPoll()
       expect(screen.getByRole('button', { name: 'Yes' })).toBeInTheDocument()
-      expect(fills(container)).toHaveLength(0)
+      expect(container.querySelector('[data-poll-pie]')).toBeNull()
+      expect(container.querySelector('[data-swatch]')).toBeNull()
     })
 
-    it('fills each box to its share and highlights the leading option, the rest softer (FC-20, FC-21)', () => {
+    it('draws a soft slice per option, the most voted first, with the list as its legend (PP-02, PP-03)', () => {
       const { container } = renderPoll(pollItem())
-      const [below, above] = fills(container)
-      // Above 150K has 25%, Below 150K 75%: Below leads.
-      expect(below).toHaveStyle({ transform: 'scaleX(0.25)' })
-      expect(below).toHaveClass('opacity-50')
-      expect(above).toHaveStyle({ transform: 'scaleX(0.75)' })
-      expect(above).not.toHaveClass('opacity-50')
+      // Above 150K has 25%, Below 150K 75%: Below first, in the pie and in the list.
+      expect(slices(container).map((slice) => slice.getAttribute('data-slice'))).toEqual(['b', 'a'])
+      expect(screen.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
+        expect.stringContaining('Below 150K'),
+        expect.stringContaining('Above 150K'),
+      ])
+      const [first, second] = slices(container)
+      expect(hue(first!)).toBe('0')
+      expect(hue(second!)).toBe('6')
+      // Each row says the color of its slice.
+      const swatches = [...container.querySelectorAll('[data-swatch]')]
+      expect(swatches[0]!.className).toContain('var(--avatar-0)')
+      expect(swatches[1]!.className).toContain('var(--avatar-6)')
+      // And each box still fills to its share (PO, 2026-10-26).
+      const bars = [...container.querySelectorAll('[data-bar]')]
+      expect(bars[0]).toHaveStyle({ transform: 'scaleX(0.75)' })
+      expect(bars[1]).toHaveStyle({ transform: 'scaleX(0.25)' })
+      expect(bars[1]).toHaveClass('opacity-50')
+      // Decorative for a screen reader: the list says it in words (PP-06).
+      expect(container.querySelector('[data-poll-pie]')).toHaveAttribute('aria-hidden', 'true')
       expect(screen.getByText('Below 150K')).toHaveClass('font-semibold')
       expect(screen.getByText('Above 150K')).toHaveClass('text-muted-foreground')
-      // One color for every option: no per-option tokens.
-      expect(container.innerHTML).not.toMatch(/bg-poll-/)
     })
 
     it('highlights every option tied at the top', () => {
@@ -230,7 +250,20 @@ describe('PollVoting (H-13, H-15)', () => {
           totalVotes: 10,
         }),
       )
-      for (const fill of fills(container)) expect(fill).not.toHaveClass('opacity-50')
+      // Both lead in the list; in the pie each its own color, to read apart.
+      expect(slices(container).map(hue)).toEqual(['0', '6'])
+    })
+
+    it('highlights an option in the pie and in the list together (PP-04)', async () => {
+      const { container } = renderPoll(pollItem())
+      const row = screen.getByText('Below 150K').closest('li')!
+      await userEvent.hover(row)
+      const [below, above] = slices(container)
+      expect((above as SVGElement).style.opacity).toBe('0.45')
+      expect((below as SVGElement).style.transform).toMatch(/^translate/)
+      expect(row.firstElementChild).toHaveClass('bg-muted')
+      await userEvent.unhover(row)
+      expect((above as SVGElement).style.opacity).toBe('1')
     })
 
     it('marks the viewer vote with their avatar even when it does not lead (FC-24)', () => {
@@ -281,9 +314,9 @@ describe('PollVoting (H-13, H-15)', () => {
       await screen.findByText('20%')
       const note = consensusOf(container)!
       expect(note).toHaveAttribute('data-consensus', 'minority')
-      expect(note).toHaveTextContent('20% share your view.')
+      expect(note).toHaveTextContent("80% don't share your view.")
       expect(note).toHaveTextContent(
-        'The other 80% bet differently. What are they seeing that you are not?',
+        'Only 20% voted like you. What are they seeing that you are not?',
       )
       // Above the options, unfolding after the bars.
       const list = container.querySelector('ul')!
@@ -297,7 +330,7 @@ describe('PollVoting (H-13, H-15)', () => {
           .getAllByRole('status')
           .some((status) =>
             status.textContent?.startsWith(
-              'Vote saved. 20% share your view. The other 80% bet differently.',
+              "Vote saved. 80% don't share your view. Only 20% voted like you.",
             ),
           ),
       ).toBe(true)
@@ -307,9 +340,9 @@ describe('PollVoting (H-13, H-15)', () => {
       action.votePoll.mockResolvedValue(results('a'))
       const { container } = renderPoll()
       await userEvent.click(screen.getByRole('button', { name: 'Yes' }))
-      await screen.findByText('80% share your view.')
+      await screen.findByText("20% don't share your view.")
       expect(consensusOf(container)).toHaveTextContent(
-        'You are with the majority. What could the other 20% be seeing?',
+        'You are with the majority (80%). What could the rest be seeing?',
       )
     })
 
@@ -318,16 +351,16 @@ describe('PollVoting (H-13, H-15)', () => {
       const { container } = renderPoll()
 
       await userEvent.click(screen.getByRole('button', { name: 'No' }))
-      await screen.findByText('20% share your view.')
+      await screen.findByText("80% don't share your view.")
       await userEvent.click(screen.getByRole('button', { name: /Yes/ }))
-      await screen.findByText('80% share your view.')
+      await screen.findByText("20% don't share your view.")
       expect(consensusOf(container)!.parentElement!.parentElement).not.toHaveClass('delay-400')
     })
 
     it('shows the note of a vote cast earlier from the start (FC-28)', () => {
       const { container } = renderPoll(pollItem({ viewerOptionId: 'b' }))
       const note = consensusOf(container)!
-      expect(note).toHaveTextContent('75% share your view.')
+      expect(note).toHaveTextContent("25% don't share your view.")
       expect(note.parentElement!.parentElement).toHaveClass('grid-rows-[1fr]')
       expect(note.parentElement!.parentElement).not.toHaveClass('delay-400')
     })

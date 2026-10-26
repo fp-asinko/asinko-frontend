@@ -8,7 +8,9 @@ import { cn } from '@/lib/utils'
 import { votePoll } from '../actions/vote-poll.action'
 import type { PollItem, PollResults } from '../feed.types'
 import { pollConsensus } from '../lib/poll-consensus'
+import { pieColors } from '../lib/poll-pie'
 import { CommentsToggle } from './comments-toggle'
+import { PIE_SWATCHES, PollPie } from './poll-pie'
 
 type Props = Pick<
   PollItem,
@@ -69,6 +71,8 @@ export function PollVoting({
   const [consensusEntry, setConsensusEntry] = useState<'after-bars' | 'now' | null>(null)
   // FC-27: "Tell us why" opens the comments panel of this poll.
   const [commentsRequest, setCommentsRequest] = useState(0)
+  // The option highlighted in the pie and in the list (specs/poll-pie PP-04).
+  const [active, setActive] = useState<string | null>(null)
 
   const canVote = !isClosed && (results.viewerOptionId === null || allowVoteChange)
   // Decided once: a poll that loads votable keeps its buttons for the whole visit.
@@ -103,15 +107,25 @@ export function PollVoting({
   const consensus = pollConsensus(results)
   const asPercent = (share: number) =>
     format.number(share, { style: 'percent', maximumFractionDigits: 0 })
+  // Said the other way round: how many do not share the viewer's view, and below how many do
+  // (PO, 2026-10-26: "80% don't share your view", not "20% share it").
   const note = consensus
     ? {
-        title: t('note.title', { percent: asPercent(consensus.share) }),
-        question: t(`note.${consensus.tier}`, { rest: asPercent(1 - consensus.share) }),
+        title: t('note.title', { rest: asPercent(1 - consensus.share) }),
+        question: t(`note.${consensus.tier}`, { mine: asPercent(consensus.share) }),
       }
     : null
   const consensusText = note ? `${note.title} ${note.question}` : null
   // FC-21: the leading share (every option tied at the top leads).
   const top = Math.max(0, ...shown.options.map((option) => option.share ?? 0))
+  // With results, a 3D pie beside the list, its legend (specs/poll-pie PP-01, PP-03).
+  const withPie = shown.options.some((option) => (option.share ?? 0) > 0)
+  const colors = pieColors(shown.options)
+  // With results, the most voted first, in the pie and in its legend (PO, 2026-10-26). Stable: a
+  // tie keeps the poll's order. Keyed by id, so a focused option stays the same element.
+  const ordered = withPie
+    ? [...shown.options].sort((a, b) => (b.share ?? 0) - (a.share ?? 0))
+    : shown.options
 
   const footer = [
     !shown.resultsVisible && !isClosed ? t('hidden') : null,
@@ -139,8 +153,9 @@ export function PollVoting({
                 pending && 'opacity-60',
               )}
             >
-              <p className="type-ui font-bold">{note.title}</p>
-              <p className="mt-0.5 type-meta text-muted-foreground">{note.question}</p>
+              {/* Larger than the rest of the card: it is the point of having voted (PO, 2026-10-26). */}
+              <p className="type-post-title">{note.title}</p>
+              <p className="mt-1 type-ui text-muted-foreground">{note.question}</p>
               <button
                 type="button"
                 onClick={() => setCommentsRequest((count) => count + 1)}
@@ -153,126 +168,153 @@ export function PollVoting({
           )}
         </div>
       </div>
-      <ul data-revealed={revealed || undefined} className="mt-3.5 flex flex-col gap-2">
-        {shown.options.map((option) => {
-          const mine = option.id === shown.viewerOptionId
-          const leading = option.share !== null && top > 0 && option.share === top
-          const percent =
-            option.share === null
-              ? null
-              : format.number(option.share, { style: 'percent', maximumFractionDigits: 0 })
-          const text =
-            option.share === null
-              ? null
-              : leading
-                ? 'font-semibold text-foreground'
-                : 'text-muted-foreground'
-          const content = (
-            <>
-              {option.share !== null && (
-                <span
-                  aria-hidden
-                  data-bar
-                  // FC-20: the background fills to the share, on the GPU. Grows from 0 when
-                  // revealed; a later vote transitions it. FC-21: softer unless leading.
-                  className={cn(
-                    'absolute inset-0 origin-left bg-primary/10 transition-[transform,opacity] duration-600 ease-bars',
-                    !leading && 'opacity-50',
-                    revealed && 'animate-bar-grow',
-                  )}
-                  style={{ transform: `scaleX(${option.share})` }}
-                />
-              )}
-              <span className="relative flex items-center justify-between gap-3">
-                <span className="flex min-w-0 items-center gap-1.5">
-                  <span className={cn('min-w-0', text)}>{option.label}</span>
-                  {mine &&
-                    // FC-24: the viewer's avatar on their vote, whether it leads or not; it pops
-                    // on the tap. Without a known viewer (no provider), the check of FC-22.
-                    (viewerAvatar ? (
+      <div className={cn('mt-3.5', withPie && 'flex flex-col gap-4 sm:flex-row sm:items-center')}>
+        {withPie && (
+          <PollPie options={ordered} active={active} onActive={setActive} className="self-center" />
+        )}
+        <ul data-revealed={revealed || undefined} className="flex min-w-0 flex-1 flex-col gap-2">
+          {ordered.map((option) => {
+            const mine = option.id === shown.viewerOptionId
+            const leading = option.share !== null && top > 0 && option.share === top
+            const percent =
+              option.share === null
+                ? null
+                : format.number(option.share, { style: 'percent', maximumFractionDigits: 0 })
+            const text =
+              option.share === null
+                ? null
+                : leading
+                  ? 'font-semibold text-foreground'
+                  : 'text-muted-foreground'
+            const content = (
+              <>
+                {option.share !== null && (
+                  <span
+                    aria-hidden
+                    data-bar
+                    // FC-20: the background fills to the share, on the GPU, also beside the pie (PO,
+                    // 2026-10-26). Grows from 0 when revealed; a later vote transitions it. FC-21:
+                    // softer unless leading.
+                    className={cn(
+                      'absolute inset-0 origin-left bg-primary/10 transition-[transform,opacity] duration-600 ease-bars',
+                      !leading && 'opacity-50',
+                      revealed && 'animate-bar-grow',
+                    )}
+                    style={{ transform: `scaleX(${option.share})` }}
+                  />
+                )}
+                <span className="relative flex items-center justify-between gap-3">
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    {withPie && (
+                      // The legend: the color of its slice; none without votes (PP-03).
                       <span
-                        data-mine
-                        className={cn(
-                          'relative inline-flex shrink-0',
-                          lastVotedId === option.id && 'animate-vote-pop',
-                        )}
-                      >
-                        {viewerAvatar}
-                        {/* The check of Reddit, small over the avatar's corner (10px, no ring). */}
-                        <span
-                          aria-hidden
-                          data-mine-check
-                          className="absolute -right-0.5 -bottom-0.5 flex size-2.5 items-center justify-center rounded-full bg-foreground text-background"
-                        >
-                          <CheckIcon className="size-1.75" strokeWidth={4} />
-                        </span>
-                      </span>
-                    ) : (
-                      <CheckIcon
                         aria-hidden
-                        data-mine
+                        data-swatch
                         className={cn(
-                          'size-4 shrink-0 text-foreground',
-                          lastVotedId === option.id && 'animate-vote-pop',
+                          'size-2.5 shrink-0 rounded-xs',
+                          colors.has(option.id)
+                            ? PIE_SWATCHES[colors.get(option.id)!]
+                            : 'border border-border-strong',
                         )}
                       />
-                    ))}
-                  {mine && !asButtons && <span className="sr-only">({t('yourVote')})</span>}
+                    )}
+                    <span className={cn('min-w-0', text)}>{option.label}</span>
+                    {mine &&
+                      // FC-24: the viewer's avatar on their vote, whether it leads or not; it pops
+                      // on the tap. Without a known viewer (no provider), the check of FC-22.
+                      (viewerAvatar ? (
+                        <span
+                          data-mine
+                          className={cn(
+                            'relative inline-flex shrink-0',
+                            lastVotedId === option.id && 'animate-vote-pop',
+                          )}
+                        >
+                          {viewerAvatar}
+                          {/* The check of Reddit, small over the avatar's corner (10px, no ring). */}
+                          <span
+                            aria-hidden
+                            data-mine-check
+                            className="absolute -right-0.5 -bottom-0.5 flex size-2.5 items-center justify-center rounded-full bg-foreground text-background"
+                          >
+                            <CheckIcon className="size-1.75" strokeWidth={4} />
+                          </span>
+                        </span>
+                      ) : (
+                        <CheckIcon
+                          aria-hidden
+                          data-mine
+                          className={cn(
+                            'size-4 shrink-0 text-foreground',
+                            lastVotedId === option.id && 'animate-vote-pop',
+                          )}
+                        />
+                      ))}
+                    {mine && !asButtons && <span className="sr-only">({t('yourVote')})</span>}
+                  </span>
+                  {percent && (
+                    // FC-25: the votes, and the share smaller and gray beside them.
+                    <span
+                      className={cn(
+                        'flex shrink-0 items-baseline gap-1.5 tabular-nums',
+                        revealed && 'animate-fade-in',
+                      )}
+                    >
+                      {option.votes !== null && (
+                        <span className={text ?? undefined}>{format.number(option.votes)}</span>
+                      )}
+                      <span
+                        className={
+                          option.votes !== null
+                            ? 'type-meta font-normal text-muted-foreground'
+                            : (text ?? undefined)
+                        }
+                      >
+                        {percent}
+                      </span>
+                    </span>
+                  )}
                 </span>
-                {percent && (
-                  // FC-25: the votes, and the share smaller and gray beside them.
-                  <span
+              </>
+            )
+            const box = cn(
+              // A locked option does not press in: nothing happens when tapped.
+              // HR-09: a gray box, no border, like Reddit; the fill darkens it to the share.
+              'tap relative block w-full overflow-hidden rounded-lg bg-surface px-3.5 py-2.5 text-left type-ui font-medium transition-colors duration-150 aria-disabled:active:scale-100',
+              // Its slice highlighted in the pie, and the other way round (PP-04).
+              active === option.id && 'bg-muted',
+            )
+            const highlight = withPie
+              ? {
+                  onPointerEnter: () => setActive(option.id),
+                  onPointerLeave: () => setActive(null),
+                }
+              : {}
+            return (
+              <li key={option.id} {...highlight}>
+                {asButtons ? (
+                  <button
+                    type="button"
+                    aria-pressed={mine}
+                    aria-disabled={pending || !canVote || undefined}
+                    onClick={() => vote(option.id)}
                     className={cn(
-                      'flex shrink-0 items-baseline gap-1.5 tabular-nums',
-                      revealed && 'animate-fade-in',
+                      box,
+                      'outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+                      canVote && 'hover:bg-muted',
+                      pending && 'cursor-wait',
                     )}
                   >
-                    {option.votes !== null && (
-                      <span className={text ?? undefined}>{format.number(option.votes)}</span>
-                    )}
-                    <span
-                      className={
-                        option.votes !== null
-                          ? 'type-meta font-normal text-muted-foreground'
-                          : (text ?? undefined)
-                      }
-                    >
-                      {percent}
-                    </span>
-                  </span>
+                    {content}
+                  </button>
+                ) : (
+                  <div className={box}>{content}</div>
                 )}
-              </span>
-            </>
-          )
-          const box = cn(
-            // A locked option does not press in: nothing happens when tapped.
-            // HR-09: a gray box, no border, like Reddit; the fill darkens it to the share.
-            'tap relative block w-full overflow-hidden rounded-lg bg-surface px-3.5 py-2.5 text-left type-ui font-medium aria-disabled:active:scale-100',
-          )
-          return (
-            <li key={option.id}>
-              {asButtons ? (
-                <button
-                  type="button"
-                  aria-pressed={mine}
-                  aria-disabled={pending || !canVote || undefined}
-                  onClick={() => vote(option.id)}
-                  className={cn(
-                    box,
-                    'outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                    canVote && 'hover:bg-muted',
-                    pending && 'cursor-wait',
-                  )}
-                >
-                  {content}
-                </button>
-              ) : (
-                <div className={box}>{content}</div>
-              )}
-            </li>
-          )
-        })}
-      </ul>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
       {/* Two whole sentences, never fragments of one: "Vote saved." and the consensus (WCAG 4.1.3). */}
       <p role="status" className="sr-only">
         {saved && (

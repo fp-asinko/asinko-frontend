@@ -8,7 +8,7 @@ const card = (page: Page, text: string) => articles(page).filter({ hasText: text
 const DEFI = 'How much of your portfolio is in DeFi?'
 // The note of revision 4 (FC-26). It unfolds inside a grid two levels up (FC-28).
 const noteOf = (poll: Locator) =>
-  poll.locator('[data-consensus]').filter({ hasText: /\d+% share your view\./ })
+  poll.locator('[data-consensus]').filter({ hasText: /\d+% don't share your view\./ })
 const unfoldStyle = (note: Locator) =>
   note.evaluate((el) => {
     const style = getComputedStyle(el.parentElement!.parentElement!)
