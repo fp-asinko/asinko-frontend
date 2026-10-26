@@ -19,7 +19,7 @@ Que la página de un grupo se sienta como su sitio: un banner que la abre de lad
 
 ### El banner, a lo ancho (desde desktop)
 
-- [x] **CW-01** En la página de un grupo, desde `lg`, el banner, el avatar, el nombre y las acciones (Crear post, Unirse o la estrella) ocupan el ancho de las dos columnas, como Reddit. Debajo, el feed a la izquierda y la columna derecha al lado. En el teléfono y la tablet se ve como hoy, de arriba hacia abajo.
+- [x] **CW-01** En la página de un grupo, desde `lg`, el banner, el avatar, el nombre y las acciones (Crear post, Unirse o la estrella) ocupan el ancho de las dos columnas, como Reddit. Debajo, el feed a la izquierda y la columna derecha al lado. En el teléfono y la tablet se ve como hoy, de arriba hacia abajo. _Extendido por el PO (2026-10-26): los perfiles y los activos toman la misma estructura; su cabecera completa (`CommunityTop`) va en `PageHero`._
 
 ### La columna derecha de cada página (Q1)
 
