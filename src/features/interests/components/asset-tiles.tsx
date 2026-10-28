@@ -31,11 +31,16 @@ export function AssetTiles({ tiles, id }: { tiles: AssetTile[]; id?: string }) {
           const change = tile.changePct ?? 0
           return (
             // Its star in the corner, small and bare (specs/favorites FV-02, PO 2026-10-28).
-            <li key={tile.symbol} className="group/row relative">
+            // The tile and its star lift together: going to the star does not drop it (PO,
+            // 2026-10-28; the lift was the link's, the star beside it).
+            <li
+              key={tile.symbol}
+              className="group/row relative transition-transform duration-150 ease-out hover:-translate-y-0.5 has-[:focus-visible]:-translate-y-0.5 has-[a:active]:translate-y-0"
+            >
               <CommunityLink
                 href={tile.path}
                 className={cn(
-                  'flex min-h-19.5 tap flex-col items-center justify-center gap-0.5 rounded-md border border-b-3 bg-card p-1 text-center outline-none hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-0',
+                  'flex min-h-19.5 tap flex-col items-center justify-center gap-0.5 rounded-md border border-b-3 bg-card p-1 text-center outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
                   // The page shown: a gray background, as a group's or a person's row (PO, 2026-10-28).
                   'aria-[current=page]:bg-muted',
                   change > 0 && 'border-b-bullish',
