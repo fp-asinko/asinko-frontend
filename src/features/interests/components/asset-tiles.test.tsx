@@ -37,4 +37,12 @@ describe('AssetTiles (H-07, H-21)', () => {
     renderWithIntl(<AssetTiles tiles={[{ ...tile, stale: true }]} />)
     expect(screen.getByRole('link')).toHaveAccessibleName(/Outdated price/)
   })
+
+  it('marks it a favorite from its corner, small and bare (specs/favorites FV-02)', () => {
+    renderWithIntl(<AssetTiles tiles={[{ ...tile, favorite: true }]} />)
+    const star = screen.getByRole('button', { name: 'Remove $BTC from favorites' })
+    expect(star).toHaveAttribute('aria-pressed', 'true')
+    expect(star).toHaveClass('absolute', 'size-6')
+    expect(star).not.toHaveClass('hover:bg-muted')
+  })
 })

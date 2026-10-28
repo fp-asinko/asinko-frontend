@@ -1,9 +1,10 @@
-import { ClockAlertIcon, StarIcon } from 'lucide-react'
+import { ClockAlertIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { Delta } from '@/components/molecules/delta'
 import { cn } from '@/lib/utils'
 import type { AssetTile } from '../interests.types'
 import { CommunityLink } from './community-link'
+import { FavoriteStar } from './favorite-star'
 import { plainHandle } from '@/lib/plain-handle'
 
 /**
@@ -29,29 +30,20 @@ export function AssetTiles({ tiles, id }: { tiles: AssetTile[]; id?: string }) {
         {tiles.map((tile) => {
           const change = tile.changePct ?? 0
           return (
-            <li key={tile.symbol}>
+            // Its star in the corner, small and bare (specs/favorites FV-02, PO 2026-10-28).
+            <li key={tile.symbol} className="group/row relative">
               <CommunityLink
                 href={tile.path}
                 className={cn(
                   'flex min-h-19.5 tap flex-col items-center justify-center gap-0.5 rounded-md border border-b-3 bg-card p-1 text-center outline-none hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-0',
-                  'aria-[current=page]:border-x-foreground aria-[current=page]:border-t-foreground',
+                  // The page shown: a gray background, as a group's or a person's row (PO, 2026-10-28).
+                  'aria-[current=page]:bg-muted',
                   change > 0 && 'border-b-bullish',
                   change < 0 && 'border-b-bearish',
                 )}
               >
                 <span className="sr-only">{tile.name}</span>{' '}
-                <span className="inline-flex items-center gap-0.5 type-small font-bold">
-                  {plainHandle(tile.handle)}
-                  {/* A favorite, said by its star: marked from the asset's page, so the tile stays
-                      clean (specs/favorites FV-01, PO 2026-10-28). */}
-                  {tile.favorite && (
-                    <StarIcon
-                      aria-label={t('favorite')}
-                      role="img"
-                      className="size-3 fill-current"
-                    />
-                  )}
-                </span>{' '}
+                <span className="type-small font-bold">{plainHandle(tile.handle)}</span>{' '}
                 {tile.changePct !== null && (
                   <Delta value={tile.changePct} className="text-[0.625rem]" />
                 )}{' '}
@@ -72,6 +64,12 @@ export function AssetTiles({ tiles, id }: { tiles: AssetTile[]; id?: string }) {
                   </span>
                 )}
               </CommunityLink>
+              <FavoriteStar
+                slug={tile.communitySlug}
+                handle={tile.handle}
+                initial={tile.favorite}
+                placement="corner"
+              />
             </li>
           )
         })}

@@ -8,23 +8,32 @@ import { setFavorite } from '@/lib/communities/set-favorite.action'
 import { cn } from '@/lib/utils'
 
 /**
- * A row's favorite star in "Your interests" (specs/favorites FV-01, FV-02), as Reddit's: black and
- * always there on a favorite; empty, only on the row's hover or keyboard focus, on the rest. The
- * row is `group/row`. Shown at once; the column reorders when the page refreshes after it. If it
- * fails, it goes back and says so (FV-04).
+ * Where it sits: beside a row's link (a round button), or in an asset tile's corner, small and with
+ * no background so it covers nothing (PO, 2026-10-28). Both at least 24px to tap (WCAG 2.5.8).
+ */
+const PLACEMENT = {
+  row: 'size-7 rounded-full hover:bg-muted [&_svg]:size-3.5',
+  corner: 'absolute top-0.5 right-0.5 size-6 rounded-md [&_svg]:size-3',
+} as const
+
+/**
+ * A favorite star in "Your interests" (specs/favorites FV-01, FV-02), as Reddit's: black and always
+ * there on a favorite; empty, only on the row's hover or keyboard focus, on the rest. The row (or
+ * the tile) is `group/row`. Shown at once; the column reorders when the page refreshes after it. If
+ * it fails, it goes back and says so (FV-04).
  */
 export function FavoriteStar({
   slug,
   handle,
   initial,
-  className,
+  placement = 'row',
 }: {
   /** The community: a group, an asset's, or a person's channel. */
   slug: string
   /** How it is said: #macro, $BTC, @maria. */
   handle: string
   initial: boolean
-  className?: string
+  placement?: keyof typeof PLACEMENT
 }) {
   const t = useTranslations('communities.actions')
   const router = useRouter()
@@ -57,14 +66,14 @@ export function FavoriteStar({
         aria-label={t(favorite ? 'favoriteRemove' : 'favoriteAdd', { handle })}
         onClick={toggle}
         className={cn(
-          'inline-flex size-7 shrink-0 tap items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:opacity-100 focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:cursor-wait',
+          'inline-flex shrink-0 tap items-center justify-center text-muted-foreground outline-none hover:text-foreground focus-visible:opacity-100 focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:cursor-wait',
+          PLACEMENT[placement],
           favorite
             ? 'text-foreground'
             : 'opacity-0 group-focus-within/row:opacity-100 group-hover/row:opacity-100',
-          className,
         )}
       >
-        <StarIcon aria-hidden className={cn('size-3.5', favorite && 'fill-current')} />
+        <StarIcon aria-hidden className={cn(favorite && 'fill-current')} />
       </button>
       <span role="alert" className="sr-only">
         {failed ? t('error') : ''}
