@@ -13,7 +13,8 @@ import { cn } from '@/lib/utils'
  */
 const PLACEMENT = {
   row: 'size-7 rounded-full hover:bg-muted [&_svg]:size-3.5',
-  corner: 'absolute top-0.5 right-0.5 size-6 rounded-md [&_svg]:size-3',
+  // The icon in the very corner, away from the symbol; the 24px to tap around it (PO, 2026-10-28).
+  corner: 'absolute top-0 right-0 size-6 items-start! justify-end! rounded-md p-1 [&_svg]:size-2.5',
 } as const
 
 /**

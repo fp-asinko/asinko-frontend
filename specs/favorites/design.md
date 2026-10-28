@@ -26,7 +26,7 @@ Antes de subirlo conviene avisarle al backend que se favoritean canales personal
   - si no: vacía, con `opacity-0` hasta el hover o el foco de la fila;
   - es optimista: refresca la página para reordenar y, si falla, vuelve atrás y lo anuncia (`role="alert"`).
 - **Grupos y Personas:** la estrella a la derecha de la fila. En Personas va después de la precisión.
-- **Activos** (PO, 2026-10-28): `FavoriteStar` con `placement="corner"`, en la esquina de la tarjeta. Es chica (12 px, en 24 px para tocarla) y sin fondo. La tarjeta de la página actual va con `bg-muted`, ya no con borde negro. Se probó primero una estrella junto al símbolo, sin botón: no gustó.
+- **Activos** (PO, 2026-10-28): `FavoriteStar` con `placement="corner"`, en la esquina de la tarjeta. Es chica (10 px, pegada a la esquina, a 4 px del borde, dentro de 24 px para tocarla) y sin fondo. La tarjeta de la página actual va con `bg-muted`, ya no con borde negro. Se probó primero una estrella junto al símbolo, sin botón: no gustó.
 - **Cabecera de un perfil seguido:** `CommunityActions` muestra la estrella también con `variant="user"` (FV-03).
 
 ## 4. Mocks
