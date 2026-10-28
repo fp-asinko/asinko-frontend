@@ -21,7 +21,7 @@ export function PeopleList({ people, id }: { people: Person[]; id?: string }) {
     // All of them while the section's "more" is open (specs/sidebar-more).
     <ul
       id={id}
-      className="flex flex-col gap-0.5 group-has-data-[more=open]/section:[&>li]:block! column-short:[&>li:nth-child(n+2)]:hidden column-mid:[&>li:nth-child(n+3)]:hidden column-tall:[&>li:nth-child(n+4)]:hidden [&>li:nth-child(n+6)]:hidden"
+      className="flex flex-col gap-0.5 group-has-data-[more=open]/section:[&>li]:flex! column-short:[&>li:nth-child(n+2)]:hidden column-mid:[&>li:nth-child(n+3)]:hidden column-tall:[&>li:nth-child(n+4)]:hidden [&>li:nth-child(n+6)]:hidden"
     >
       {people.map((person) => (
         // Following a person is being a member of their channel: its favorite is theirs (FV-01).

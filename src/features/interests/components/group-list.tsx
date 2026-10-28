@@ -19,7 +19,7 @@ export function GroupList({ groups, id }: { groups: Group[]; id?: string }) {
     // All of them while the section's "more" is open (specs/sidebar-more).
     <ul
       id={id}
-      className="flex flex-col gap-0.5 group-has-data-[more=open]/section:[&>li]:block! column-short:[&>li:nth-child(n+3)]:hidden column-mid:[&>li:nth-child(n+4)]:hidden column-tall:[&>li:nth-child(n+5)]:hidden [&>li:nth-child(n+7)]:hidden"
+      className="flex flex-col gap-0.5 group-has-data-[more=open]/section:[&>li]:flex! column-short:[&>li:nth-child(n+3)]:hidden column-mid:[&>li:nth-child(n+4)]:hidden column-tall:[&>li:nth-child(n+5)]:hidden [&>li:nth-child(n+7)]:hidden"
     >
       {groups.map((group) => (
         // The star beside the link, as Reddit's (specs/favorites FV-01, FV-02).

@@ -35,6 +35,22 @@ test.describe('Favorites', () => {
     })
   })
 
+  test('each star stays on its row with "more" open (FV-02)', async ({ page }) => {
+    // Short: Groups hides some, so it has "more".
+    await page.setViewportSize({ width: 1280, height: 640 })
+    await page.goto('/en')
+    const groups = column(page).getByRole('region', { name: 'Groups' })
+    await groups.getByRole('button', { name: 'more: Groups' }).click()
+    for (const row of await groups.getByRole('listitem').all()) {
+      const link = (await row.getByRole('link').boundingBox())!
+      const star = (await row.getByRole('button').boundingBox())!
+      // On the link's line, to its right: not wrapped under it (PO, 2026-10-28).
+      expect(star.y).toBeGreaterThanOrEqual(link.y - 1)
+      expect(star.y + star.height).toBeLessThanOrEqual(link.y + link.height + 1)
+      expect(star.x).toBeGreaterThanOrEqual(link.x + link.width - 1)
+    }
+  })
+
   test('a followed profile has its star by "Following" (FV-03)', async ({ page }) => {
     await page.goto('/en/user/maria')
     await expect(
