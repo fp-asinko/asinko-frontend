@@ -29,12 +29,23 @@ Antes de subirlo conviene avisarle al backend que se favoritean canales personal
 - **Activos** (PO, 2026-10-28): `FavoriteStar` con `placement="corner"`, en la esquina de la tarjeta. Es chica (10 px, pegada a la esquina, a 4 px del borde, dentro de 24 px para tocarla) y sin fondo. La tarjeta de la página actual va con `bg-muted`, ya no con borde negro. Se probó primero una estrella junto al símbolo, sin botón: no gustó.
 - **Cabecera de un perfil seguido:** `CommunityActions` muestra la estrella también con `variant="user"` (FV-03).
 
-## 4. Mocks
+## 4. El reordenamiento animado (FV-06)
+
+- **`FavoriteOrder`** (cliente, `features/interests/components/favorite-order.tsx`):
+  - recibe las filas ya dibujadas en el servidor (`{ slug, favorite, node }`) y el `className` de cada `<li>`, y las dibuja en orden: favoritas primero y, dentro de cada grupo, el orden del servidor;
+  - da un contexto, y `FavoriteStar` le avisa el cambio al tocar la estrella y otra vez si falla, para volver.
+- **FLIP:**
+  - antes del cambio mide cada `<li>`; después del render (`useLayoutEffect`) anima desde la posición vieja con la Web Animations API (`translate`, 250 ms, `--ease-out`);
+  - con `prefers-reduced-motion` no anima: la regla global de CSS no alcanza a la Web Animations API.
+- Cuando vuelven los datos del servidor (`router.refresh`), las marcas locales se descartan y manda el servidor; el orden ya es el mismo, así que no se mueve nada.
+- Las reglas de "más" (`nth-child`) siguen funcionando: los `<li>` se reordenan en el DOM.
+
+## 5. Mocks
 
 - `GET /communities?mine=true` suma los canales personales que el usuario demo sigue, con las favoritas primero, como el backend.
 - `maria` y `$BTC` están marcados como favoritos para verlo en desarrollo.
 - El mock de `favorite` no guarda nada: al recargar, se vuelve a ver lo de los fixtures (como los votos).
 
-## 5. Peso
+## 6. Peso
 
 `FavoriteStar` es un componente cliente chico dentro de la columna, que está en el layout y por eso viaja en todas las rutas. Lo controla `performance.spec.ts`.

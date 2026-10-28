@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import type { Group } from '../interests.types'
 import { CommunityLink } from './community-link'
+import { FavoriteOrder } from './favorite-order'
 import { FavoriteStar } from './favorite-star'
 import { plainHandle } from '@/lib/plain-handle'
 
@@ -21,41 +22,47 @@ export function GroupList({ groups, id }: { groups: Group[]; id?: string }) {
       id={id}
       className="flex flex-col gap-0.5 group-has-data-[more=open]/section:[&>li]:flex! column-short:[&>li:nth-child(n+3)]:hidden column-mid:[&>li:nth-child(n+4)]:hidden column-tall:[&>li:nth-child(n+5)]:hidden [&>li:nth-child(n+7)]:hidden"
     >
-      {groups.map((group) => (
-        // The star beside the link, as Reddit's (specs/favorites FV-01, FV-02).
-        <li key={group.slug} className="group/row flex items-center gap-0.5">
-          <CommunityLink
-            href={group.path}
-            className="group flex min-w-0 flex-1 tap items-center gap-2 rounded-md px-1 py-1.5 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted"
-          >
-            <UserAvatar
-              name={group.name}
-              colorKey={group.slug}
-              imageUrl={group.avatarUrl}
-              size="md"
-              className="size-8 rounded-md transition-[scale] duration-200 ease-out group-hover:scale-105"
-            />
-            <span className="min-w-0 flex-1">
-              <span className="flex items-center gap-1.5">
-                <span className="min-w-0 truncate type-small font-bold">
-                  {plainHandle(group.handle)}
-                </span>{' '}
-                {group.isModerator && (
-                  <span className="rounded-sm border border-border-strong px-1 text-[0.5625rem] leading-[0.6875rem] font-extrabold">
-                    {t('mod')}
+      <FavoriteOrder
+        itemClassName="group/row flex items-center gap-0.5"
+        rows={groups.map((group) => ({
+          slug: group.slug,
+          favorite: group.favorite,
+          node: (
+            <>
+              <CommunityLink
+                href={group.path}
+                className="group flex min-w-0 flex-1 tap items-center gap-2 rounded-md px-1 py-1.5 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted"
+              >
+                <UserAvatar
+                  name={group.name}
+                  colorKey={group.slug}
+                  imageUrl={group.avatarUrl}
+                  size="md"
+                  className="size-8 rounded-md transition-[scale] duration-200 ease-out group-hover:scale-105"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="flex items-center gap-1.5">
+                    <span className="min-w-0 truncate type-small font-bold">
+                      {plainHandle(group.handle)}
+                    </span>{' '}
+                    {group.isModerator && (
+                      <span className="rounded-sm border border-border-strong px-1 text-[0.5625rem] leading-[0.6875rem] font-extrabold">
+                        {t('mod')}
+                      </span>
+                    )}
+                  </span>{' '}
+                  <span className="block truncate type-meta text-muted-foreground">
+                    {group.topPostTitle ??
+                      group.description ??
+                      t('members', { count: group.memberCount })}
                   </span>
-                )}
-              </span>{' '}
-              <span className="block truncate type-meta text-muted-foreground">
-                {group.topPostTitle ??
-                  group.description ??
-                  t('members', { count: group.memberCount })}
-              </span>
-            </span>
-          </CommunityLink>
-          <FavoriteStar slug={group.slug} handle={group.handle} initial={group.favorite} />
-        </li>
-      ))}
+                </span>
+              </CommunityLink>
+              <FavoriteStar slug={group.slug} handle={group.handle} initial={group.favorite} />
+            </>
+          ),
+        }))}
+      />
     </ul>
   )
 }

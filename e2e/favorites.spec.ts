@@ -20,12 +20,16 @@ test.describe('Favorites', () => {
     ).toHaveAttribute('aria-pressed', 'true')
 
     const groups = column(page).getByRole('region', { name: 'Groups' })
-    const row = groups.getByRole('listitem').first()
+    // The second group: marked, it goes up first at once, sliding (FV-06).
+    const row = groups.getByRole('listitem').nth(1)
+    const name = (await row.getByRole('link').textContent())!.trim().split(/s/)[0]!
     await row.hover()
     const star = row.getByRole('button', { name: /^Add .* to favorites$/ })
     await expect(star).toHaveCSS('opacity', '1')
     await star.click()
-    await expect(row.getByRole('button', { name: /^Remove .* from favorites$/ })).toHaveAttribute(
+    const first = groups.getByRole('listitem').first()
+    await expect(first).toContainText(name)
+    await expect(first.getByRole('button', { name: /^Remove .* from favorites$/ })).toHaveAttribute(
       'aria-pressed',
       'true',
     )

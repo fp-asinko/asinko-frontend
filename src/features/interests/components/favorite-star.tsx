@@ -6,6 +6,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from '@/i18n/navigation'
 import { setFavorite } from '@/lib/communities/set-favorite.action'
 import { cn } from '@/lib/utils'
+import { useFavoriteOrder } from './favorite-order'
 
 /**
  * Where it sits: beside a row's link (a round button), or in an asset tile's corner, small and with
@@ -38,6 +39,8 @@ export function FavoriteStar({
 }) {
   const t = useTranslations('communities.actions')
   const router = useRouter()
+  // Its list moves it at once (specs/favorites FV-06); none in a test or outside a list.
+  const reorder = useFavoriteOrder()
   const [favorite, setFavoriteState] = useState(initial)
   const [failed, setFailed] = useState(false)
   const [pending, startTransition] = useTransition()
@@ -47,6 +50,7 @@ export function FavoriteStar({
     const next = !favorite
     setFailed(false)
     setFavoriteState(next)
+    reorder?.(slug, next)
     startTransition(async () => {
       const result = await setFavorite({ slug, favorite: next })
       if (result.ok) {
@@ -54,6 +58,7 @@ export function FavoriteStar({
         return
       }
       setFavoriteState(!next)
+      reorder?.(slug, !next)
       setFailed(true)
     })
   }

@@ -4,6 +4,7 @@ import { Delta } from '@/components/molecules/delta'
 import { cn } from '@/lib/utils'
 import type { AssetTile } from '../interests.types'
 import { CommunityLink } from './community-link'
+import { FavoriteOrder } from './favorite-order'
 import { FavoriteStar } from './favorite-star'
 import { plainHandle } from '@/lib/plain-handle'
 
@@ -27,57 +28,61 @@ export function AssetTiles({ tiles, id }: { tiles: AssetTile[]; id?: string }) {
         id={id}
         className="grid grid-cols-3 gap-1.25 group-has-data-[more=open]/section:[&>li]:block! [&>li:nth-child(n+10)]:hidden column-mid:[&>li:nth-child(n+4)]:hidden column-tall:[&>li:nth-child(n+7)]:hidden"
       >
-        {tiles.map((tile) => {
-          const change = tile.changePct ?? 0
-          return (
-            // Its star in the corner, small and bare (specs/favorites FV-02, PO 2026-10-28).
-            // The tile and its star lift together: going to the star does not drop it (PO,
-            // 2026-10-28; the lift was the link's, the star beside it).
-            <li
-              key={tile.symbol}
-              className="group/row relative transition-transform duration-150 ease-out hover:-translate-y-0.5 has-[:focus-visible]:-translate-y-0.5 has-[a:active]:translate-y-0"
-            >
-              <CommunityLink
-                href={tile.path}
-                className={cn(
-                  'flex min-h-19.5 tap flex-col items-center justify-center gap-0.5 rounded-md border border-b-3 bg-card p-1 text-center outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                  // The page shown: a gray background, as a group's or a person's row (PO, 2026-10-28).
-                  'aria-[current=page]:bg-muted',
-                  change > 0 && 'border-b-bullish',
-                  change < 0 && 'border-b-bearish',
-                )}
-              >
-                <span className="sr-only">{tile.name}</span>{' '}
-                <span className="type-small font-bold">{plainHandle(tile.handle)}</span>{' '}
-                {tile.changePct !== null && (
-                  <Delta value={tile.changePct} className="text-[0.625rem]" />
-                )}{' '}
-                {tile.price !== null && (
-                  <span className="text-[0.625rem] text-muted-foreground tabular-nums">
-                    {format.number(tile.price, {
-                      style: 'currency',
-                      currency: 'USD',
-                      notation: tile.price >= 10000 ? 'compact' : 'standard',
-                      maximumFractionDigits: tile.price < 1 ? 4 : 2,
-                    })}
-                  </span>
-                )}{' '}
-                {tile.stale && (
-                  <span className="inline-flex items-center gap-0.5 text-[0.625rem] text-muted-foreground">
-                    <ClockAlertIcon aria-hidden className="size-3" />
-                    <span className="sr-only">{t('stale')}</span>
-                  </span>
-                )}
-              </CommunityLink>
-              <FavoriteStar
-                slug={tile.communitySlug}
-                handle={tile.handle}
-                initial={tile.favorite}
-                placement="corner"
-              />
-            </li>
-          )
-        })}
+        {/* Its star in the corner, small and bare (specs/favorites FV-02, PO 2026-10-28). The tile
+            and its star lift together: going to the star does not drop it (the lift was the
+            link's, the star beside it). Reordered at once, sliding (FV-06). */}
+        <FavoriteOrder
+          itemClassName="group/row relative transition-transform duration-150 ease-out hover:-translate-y-0.5 has-[:focus-visible]:-translate-y-0.5 has-[a:active]:translate-y-0"
+          rows={tiles.map((tile) => {
+            const change = tile.changePct ?? 0
+            return {
+              slug: tile.communitySlug,
+              favorite: tile.favorite,
+              node: (
+                <>
+                  <CommunityLink
+                    href={tile.path}
+                    className={cn(
+                      'flex min-h-19.5 tap flex-col items-center justify-center gap-0.5 rounded-md border border-b-3 bg-card p-1 text-center outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+                      // The page shown: a gray background, as a group's or a person's row (PO, 2026-10-28).
+                      'aria-[current=page]:bg-muted',
+                      change > 0 && 'border-b-bullish',
+                      change < 0 && 'border-b-bearish',
+                    )}
+                  >
+                    <span className="sr-only">{tile.name}</span>{' '}
+                    <span className="type-small font-bold">{plainHandle(tile.handle)}</span>{' '}
+                    {tile.changePct !== null && (
+                      <Delta value={tile.changePct} className="text-[0.625rem]" />
+                    )}{' '}
+                    {tile.price !== null && (
+                      <span className="text-[0.625rem] text-muted-foreground tabular-nums">
+                        {format.number(tile.price, {
+                          style: 'currency',
+                          currency: 'USD',
+                          notation: tile.price >= 10000 ? 'compact' : 'standard',
+                          maximumFractionDigits: tile.price < 1 ? 4 : 2,
+                        })}
+                      </span>
+                    )}{' '}
+                    {tile.stale && (
+                      <span className="inline-flex items-center gap-0.5 text-[0.625rem] text-muted-foreground">
+                        <ClockAlertIcon aria-hidden className="size-3" />
+                        <span className="sr-only">{t('stale')}</span>
+                      </span>
+                    )}
+                  </CommunityLink>
+                  <FavoriteStar
+                    slug={tile.communitySlug}
+                    handle={tile.handle}
+                    initial={tile.favorite}
+                    placement="corner"
+                  />
+                </>
+              ),
+            }
+          })}
+        />
       </ul>
     </>
   )
