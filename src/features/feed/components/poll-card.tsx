@@ -86,6 +86,7 @@ export function PollCard({
         totalVotes={poll.totalVotes}
         viewerOptionId={poll.viewerOptionId}
         resultsVisible={poll.resultsVisible}
+        resultsVisibility={poll.resultsVisibility}
         isClosed={poll.isClosed}
         allowVoteChange={poll.allowVoteChange}
         closing={closing}

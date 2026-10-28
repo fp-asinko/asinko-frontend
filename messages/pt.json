@@ -173,6 +173,7 @@
       "closes": "Fecha {time}",
       "closed": "Encerrada",
       "hidden": "Vote para ver os resultados",
+      "hiddenUntilClose": "Resultados ao encerrar",
       "yourVote": "Seu voto",
       "note": {
         "title": "{rest} não compartilham sua visão.",

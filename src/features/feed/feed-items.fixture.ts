@@ -55,6 +55,7 @@ export function pollItem(overrides: Partial<PollItem> = {}): PollItem {
     viewerOptionId: null,
     allowVoteChange: true,
     resultsVisible: true,
+    resultsVisibility: 'ALWAYS',
     isClosed: false,
     closesAt: new Date(Date.now() + 4 * 86400_000).toISOString(),
     commentCount: 12,

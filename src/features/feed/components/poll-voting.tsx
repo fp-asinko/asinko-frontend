@@ -19,6 +19,7 @@ type Props = Pick<
   | 'totalVotes'
   | 'viewerOptionId'
   | 'resultsVisible'
+  | 'resultsVisibility'
   | 'isClosed'
   | 'allowVoteChange'
 > & {
@@ -47,6 +48,7 @@ type Props = Pick<
 export function PollVoting({
   id,
   isClosed,
+  resultsVisibility,
   allowVoteChange,
   closing,
   commentsLabel,
@@ -128,7 +130,10 @@ export function PollVoting({
     : shown.options
 
   const footer = [
-    !shown.resultsVisible && !isClosed ? t('hidden') : null,
+    // Why the results are hidden: a vote shows them, or only the close (ON_CLOSE: voting does not).
+    !shown.resultsVisible && !isClosed
+      ? t(resultsVisibility === 'ON_CLOSE' ? 'hiddenUntilClose' : 'hidden')
+      : null,
     shown.totalVotes !== null ? t('votes', { count: shown.totalVotes }) : null,
     closing,
   ].filter((part): part is string => part !== null)

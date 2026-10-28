@@ -98,6 +98,11 @@ export type PollItem = {
   allowVoteChange: boolean
   /** False when the results stay hidden until voting (ON_VOTE) or closing (ON_CLOSE). */
   resultsVisible: boolean
+  /**
+   * When its results show: always, once the viewer votes, or only when it closes (E03). Says why
+   * they are hidden: "vote to see" is wrong for one that shows them only at the close.
+   */
+  resultsVisibility: 'ALWAYS' | 'ON_VOTE' | 'ON_CLOSE'
   isClosed: boolean
   closesAt: string | null
   /** Without deleted comments (P-006). */

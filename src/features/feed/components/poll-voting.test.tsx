@@ -38,6 +38,7 @@ function renderPoll(poll: PollItem = hidden, { viewerName }: { viewerName?: stri
       totalVotes={poll.totalVotes}
       viewerOptionId={poll.viewerOptionId}
       resultsVisible={poll.resultsVisible}
+      resultsVisibility={poll.resultsVisibility}
       isClosed={poll.isClosed}
       allowVoteChange={poll.allowVoteChange}
       closing="Closes in 3 days"
@@ -93,6 +94,18 @@ describe('PollVoting (H-13, H-15)', () => {
     expect(screen.getByRole('button', { name: 'No' })).toHaveAttribute('aria-pressed', 'false')
   })
 
+  it('says the results come at the close, not with a vote, when the poll keeps them until then', () => {
+    // The backend's ON_CLOSE: a vote does not show them (a voted one says so too).
+    renderPoll({ ...hidden, resultsVisibility: 'ON_CLOSE', viewerOptionId: 'a' })
+    expect(screen.getByText('Results when it closes')).toBeInTheDocument()
+    expect(screen.queryByText('Vote to see the results')).toBeNull()
+  })
+
+  it('asks for a vote to see them when a vote shows them', () => {
+    renderPoll({ ...hidden, resultsVisibility: 'ON_VOTE' })
+    expect(screen.getByText('Vote to see the results')).toBeInTheDocument()
+  })
+
   it('opens the account modal without a session, marking and sending nothing (G-04)', async () => {
     renderWithIntl(
       <AuthGateProvider signedIn={false}>
@@ -102,6 +115,7 @@ describe('PollVoting (H-13, H-15)', () => {
           totalVotes={hidden.totalVotes}
           viewerOptionId={null}
           resultsVisible={false}
+          resultsVisibility="ON_VOTE"
           isClosed={false}
           allowVoteChange
           closing={null}

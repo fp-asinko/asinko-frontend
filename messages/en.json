@@ -173,6 +173,7 @@
       "closes": "Closes {time}",
       "closed": "Closed",
       "hidden": "Vote to see the results",
+      "hiddenUntilClose": "Results when it closes",
       "yourVote": "Your vote",
       "note": {
         "title": "{rest} don't share your view.",

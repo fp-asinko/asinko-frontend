@@ -157,6 +157,7 @@ export function toPollItem(poll: RawPoll, signedIn = false): PollItem {
     viewerOptionId: poll.viewerOptionId,
     allowVoteChange: poll.allowVoteChange,
     resultsVisible,
+    resultsVisibility: poll.resultsVisibility,
     isClosed: poll.isClosed,
     closesAt: poll.closesAt,
     commentCount: poll.commentCount,
