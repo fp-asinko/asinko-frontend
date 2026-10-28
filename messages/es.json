@@ -111,7 +111,16 @@
       "postIn": "Publicar en {handle}",
       "link": "Link",
       "image": "Imagen",
-      "publish": "Publicar"
+      "publish": "Publicar",
+      "hints": {
+        "thought": "Compartir un thought breve",
+        "link": "Publicar un link",
+        "image": "Publicar una imagen",
+        "thesis": "Publicar una tesis · Próximamente",
+        "live": "Transmitir en vivo · Próximamente",
+        "duel": "Iniciar un duelo · Próximamente",
+        "portfolio": "Compartir un portfolio · Próximamente"
+      }
     },
     "tabs": {
       "label": "Feed",

@@ -10,6 +10,7 @@ import {
 import { useTranslations } from 'next-intl'
 import { GatedComingSoon } from '@/components/organisms/auth-gate'
 import { ComposeTrigger } from '@/components/organisms/compose'
+import { HoverHint } from '@/components/molecules/hover-hint'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 
 /**
@@ -67,38 +68,48 @@ export function ComposerPlaceholder({
             <span className="truncate">{prompt}</span>
           </ComposeTrigger>
         </div>
-        {/* On a phone, its own row under a line, edge to edge as the editor's footer (CR-02). */}
+        {/* On a phone, its own row under a line, edge to edge as the editor's footer (CR-02). Each
+            format says what it does on hover (HoverHint, PO 2026-10-27). */}
         <div className="mt-3 flex items-center gap-0.5 border-t pt-2.5 @[39rem]:mt-0 @[39rem]:shrink-0 @[39rem]:border-t-0 @[39rem]:pt-0">
-          <ComposeTrigger
-            type="link"
-            community={communitySlug}
-            aria-label={t('link')}
-            className={ICON}
-          >
-            <LinkIcon aria-hidden />
-          </ComposeTrigger>
-          <ComposeTrigger
-            type="image"
-            community={communitySlug}
-            aria-label={t('image')}
-            className={ICON}
-          >
-            <ImageIcon aria-hidden />
-          </ComposeTrigger>
+          {/* Thoughts are here (specs/thoughts TH-04), first as on the page to create a post (PO,
+              2026-10-27): to create one, as the link and the image. */}
+          <HoverHint label={t('hints.thought')}>
+            <ComposeTrigger
+              type="thought"
+              community={communitySlug}
+              aria-label={t('thought')}
+              className={ICON}
+            >
+              <QuoteIcon aria-hidden />
+            </ComposeTrigger>
+          </HoverHint>
+          <HoverHint label={t('hints.link')}>
+            <ComposeTrigger
+              type="link"
+              community={communitySlug}
+              aria-label={t('link')}
+              className={ICON}
+            >
+              <LinkIcon aria-hidden />
+            </ComposeTrigger>
+          </HoverHint>
+          <HoverHint label={t('hints.image')}>
+            <ComposeTrigger
+              type="image"
+              community={communitySlug}
+              aria-label={t('image')}
+              className={ICON}
+            >
+              <ImageIcon aria-hidden />
+            </ComposeTrigger>
+          </HoverHint>
           {soon.map(({ key, icon: Icon }) => (
-            <GatedComingSoon key={key} action="post" label={t(key)} className={ICON}>
-              <Icon aria-hidden />
-            </GatedComingSoon>
+            <HoverHint key={key} label={t(`hints.${key}`)}>
+              <GatedComingSoon action="post" label={t(key)} className={ICON}>
+                <Icon aria-hidden />
+              </GatedComingSoon>
+            </HoverHint>
           ))}
-          {/* Thoughts are here (specs/thoughts TH-04): to create one, as the link and the image. */}
-          <ComposeTrigger
-            type="thought"
-            community={communitySlug}
-            aria-label={t('thought')}
-            className={ICON}
-          >
-            <QuoteIcon aria-hidden />
-          </ComposeTrigger>
           {/* As X: Publish waits on the right, quiet (the gray pill: white on a light black would
             not reach 4.5:1). The same place as the prompt: one link for assistive tech and the
             keyboard (WCAG 2.4.4). */}

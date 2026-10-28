@@ -73,10 +73,10 @@ test.describe('Composer box in one row', () => {
     await expect(
       page.getByRole('main').getByRole('link', { name: 'Thought', exact: true }),
     ).toBeVisible()
-    // Publish inside the box, after the last format.
+    // Publish inside the box, after the last format (Portfolio: Thought goes first, 2026-10-27).
     const last = (await page
       .getByRole('main')
-      .getByRole('link', { name: 'Thought', exact: true })
+      .getByRole('button', { name: 'Portfolio' })
       .boundingBox())!
     const pub = (await publish(page).boundingBox())!
     expect(pub.x).toBeGreaterThanOrEqual(last.x + last.width)

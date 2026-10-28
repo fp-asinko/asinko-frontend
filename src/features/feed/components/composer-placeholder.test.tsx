@@ -51,6 +51,12 @@ describe('ComposerPlaceholder (H-09; specs/submit-page SU-02, Q1)', () => {
 
   it('creates a thought from its quotes, on the Thought tab (specs/thoughts TH-04)', () => {
     renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
+    // The first format, as on the page to create a post (PO, 2026-10-27).
+    const formats = screen
+      .getAllByRole('link')
+      .map((link) => link.getAttribute('aria-label'))
+      .filter(Boolean)
+    expect(formats.slice(0, 3)).toEqual(['Thought', 'Link', 'Image'])
     const thought = screen.getByRole('link', { name: 'Thought' })
     expect(thought).toHaveAttribute('href', expect.stringMatching(/type=thought/))
     expect(thought).not.toHaveAttribute('aria-disabled')

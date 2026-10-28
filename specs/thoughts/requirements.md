@@ -20,7 +20,7 @@
 ### Crear un thought
 
 - [x] **TH-03** La página de crear post suma la pestaña **Thought**: sin título, sin link ni imagen, con un solo campo para el texto, obligatorio. Se elige la comunidad como en los demás formatos; las relacionadas y la marca, igual. El campo es el del prototipo (captura del PO, 2026-10-25): su propia caja, comillas grandes, el texto en itálica, y abajo, tras una línea, "Frases breves y memorables" y los caracteres que quedan, de **250**. El límite es nuestro: el backend no tiene (`design.md § 4`).
-- [x] **TH-04** El ícono de comillas de la caja de publicar deja de ser "Próximamente" y lleva a crear post con la pestaña Thought elegida (Q2), como el link y la imagen.
+- [x] **TH-04** El ícono de comillas de la caja de publicar deja de ser "Próximamente" y lleva a crear post con la pestaña Thought elegida (Q2), como el link y la imagen. Va primero en la fila, como en la página de crear post (PO, 2026-10-27). Cada ícono de la fila dice qué hace en un globo al pasar el mouse o con el foco del teclado (`HoverHint`, PO 2026-10-27).
 - [x] **TH-05** Al publicar, se llega a la página del thought.
 
 ### Verlo
