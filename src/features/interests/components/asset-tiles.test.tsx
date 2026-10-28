@@ -3,6 +3,9 @@ import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { AssetTiles } from './asset-tiles'
 
+// Its stars call a Server Action, which needs the env: not here (testing.md § Mocks).
+vi.mock('@/lib/communities/set-favorite.action', () => ({ setFavorite: vi.fn() }))
+
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 const tile = {
@@ -13,6 +16,7 @@ const tile = {
   price: 64000,
   stale: false,
   communitySlug: 'BTC',
+  favorite: false,
   path: '/asset/BTC',
 }
 

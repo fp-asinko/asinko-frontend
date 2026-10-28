@@ -38,7 +38,10 @@ export function CommunityActions({
   membership: CommunityPage['viewerMembership']
   /** null: no star, as in a hover card (specs/mention-preview MP-03). */
   favorite: boolean | null
-  /** A profile follows (joins the personal channel), with no favorite star (CP-12). */
+  /**
+   * A profile follows (joins the personal channel); followed, its star as a group's (specs/favorites
+   * FV-03: CP-12 had none).
+   */
   variant?: 'community' | 'user'
   /** Where the focus goes when Join turns into "Joined" under it (as the cards, CF-14). */
   focusFallbackId?: string
@@ -98,9 +101,7 @@ export function CommunityActions({
 
   return (
     <div className="relative flex items-center gap-2">
-      {!user && favorite !== null && (
-        <FavoriteButton slug={slug} handle={handle} initial={favorite} />
-      )}
+      {favorite !== null && <FavoriteButton slug={slug} handle={handle} initial={favorite} />}
       <button
         type="button"
         aria-disabled={pending || undefined}

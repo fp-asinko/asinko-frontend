@@ -145,16 +145,18 @@ test.describe('Joining, leaving and favorites (CP-05, CP-06)', () => {
     page,
   }) => {
     await page.goto('/en/hub/defi')
-    const star = page.getByRole('button', { name: 'Add #defi to favorites' })
+    // The page's own star: the column has one per group too (specs/favorites).
+    const main = page.getByRole('main')
+    const star = main.getByRole('button', { name: 'Add #defi to favorites' })
     await star.click()
-    await expect(page.getByRole('button', { name: 'Remove #defi from favorites' })).toHaveAttribute(
+    await expect(main.getByRole('button', { name: 'Remove #defi from favorites' })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
 
     await page.goto('/en/hub/memecoins')
     await expect(page.getByRole('button', { name: 'Join #memecoins' }).first()).toBeVisible()
-    await expect(page.getByRole('button', { name: /favorites/ })).toHaveCount(0)
+    await expect(page.getByRole('main').getByRole('button', { name: /favorites/ })).toHaveCount(0)
   })
 
   test('without a session, joining opens the account modal', async ({ page, context, baseURL }) => {
@@ -201,7 +203,8 @@ test.describe('Profile pages (CP-11 to CP-13, CP-21)', () => {
     // Tier and rating come after the MVP (backend, 2026-10-07).
     await expect(header.getByText('Creator')).toHaveCount(0)
     await expect(header.getByText(/followers/)).toBeVisible()
-    await expect(header.getByRole('button', { name: /favorites/ })).toHaveCount(0)
+    // Followed: its star by "Following" (specs/favorites FV-03).
+    await expect(header.getByRole('button', { name: 'Add @federico to favorites' })).toBeVisible()
 
     await header.getByRole('button', { name: /^Following/ }).click()
     const dialog = page.getByRole('dialog', { name: 'Unfollow @federico?' })

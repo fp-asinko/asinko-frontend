@@ -11,6 +11,8 @@ import type { Viewer } from '@/lib/session'
 import type { Interests, SectionResult } from '../interests.types'
 import {
   SUGGESTION_COUNT,
+  favoritesFirst,
+  followedChannels,
   memberAssetCommunities,
   toAssetTile,
   toGroups,
@@ -63,7 +65,13 @@ export async function getInterests(
       : Promise.resolve(emptyPage),
   ])
 
-  const people = following.ok ? section(following.data.items.map(toPerson)) : failed
+  // Whom the viewer marked as a favorite, by their channel (specs/favorites FV-01).
+  const channels = followedChannels(mine.ok ? mine.data.items : [])
+  const people = following.ok
+    ? section(
+        favoritesFirst(following.data.items.map((user) => toPerson(user, channels.get(user.id)))),
+      )
+    : failed
   const signedIn = viewer !== null
   const count = signedIn ? SUGGESTION_COUNT.signedIn : SUGGESTION_COUNT.guest
   const suggested = all.ok ? section(toSuggestions(all.data.items, count)) : failed
@@ -73,6 +81,7 @@ export async function getInterests(
   const members = memberAssetCommunities(mine.data.items).map((community) => ({
     slug: community.slug,
     symbol: assetSymbolOf(community),
+    favorite: community.viewerIsFavorite === true,
   }))
   const chosen =
     members.length > 0 || !signedIn
@@ -91,8 +100,10 @@ export async function getInterests(
   )
 
   // A missing asset drops only its tile; the section fails only if every asset failed.
-  const tiles = assetPages.flatMap((page, index) =>
-    page.ok ? [toAssetTile(page.data, assetSlugs[index]!)] : [],
+  const tiles = favoritesFirst(
+    assetPages.flatMap((page, index) =>
+      page.ok ? [toAssetTile(page.data, assetSlugs[index]!, chosen[index]!.favorite)] : [],
+    ),
   )
   const assets = tiles.length === 0 && assetPages.length > 0 ? failed : section(tiles)
 
@@ -103,6 +114,7 @@ export async function getInterests(
 function sampleAssetsOf(symbols: readonly string[], communities: readonly RawCommunity[]) {
   return symbols.map((symbol) => ({
     symbol,
+    favorite: false,
     slug:
       communities.find(
         (community) => community.type === 'SYSTEM_ASSET' && assetSymbolOf(community) === symbol,

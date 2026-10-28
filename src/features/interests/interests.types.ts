@@ -13,6 +13,8 @@ export type AssetTile = {
   communitySlug: string
   /** The asset's page: /asset/{SYMBOL} (specs/community-pages CP-14). */
   path: string
+  /** Marked as a favorite (specs/favorites FV-01): first, with its star. */
+  favorite: boolean
 }
 
 export type Person = {
@@ -24,6 +26,10 @@ export type Person = {
   username: string
   avatarUrl: string | null
   accuracyRate: number | null
+  /** Their personal channel: following them is being its member, and its favorite is theirs. */
+  channelSlug: string
+  /** Marked as a favorite (specs/favorites FV-01). */
+  favorite: boolean
 }
 
 export type Group = {
@@ -40,6 +46,8 @@ export type Group = {
   memberCount: number
   avatarUrl: string | null
   isModerator: boolean
+  /** Marked as a favorite (specs/favorites FV-01). */
+  favorite: boolean
 }
 
 export type Suggestion = {

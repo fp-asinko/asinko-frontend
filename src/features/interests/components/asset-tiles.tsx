@@ -1,4 +1,4 @@
-import { ClockAlertIcon } from 'lucide-react'
+import { ClockAlertIcon, StarIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { Delta } from '@/components/molecules/delta'
 import { cn } from '@/lib/utils'
@@ -40,7 +40,18 @@ export function AssetTiles({ tiles, id }: { tiles: AssetTile[]; id?: string }) {
                 )}
               >
                 <span className="sr-only">{tile.name}</span>{' '}
-                <span className="type-small font-bold">{plainHandle(tile.handle)}</span>{' '}
+                <span className="inline-flex items-center gap-0.5 type-small font-bold">
+                  {plainHandle(tile.handle)}
+                  {/* A favorite, said by its star: marked from the asset's page, so the tile stays
+                      clean (specs/favorites FV-01, PO 2026-10-28). */}
+                  {tile.favorite && (
+                    <StarIcon
+                      aria-label={t('favorite')}
+                      role="img"
+                      className="size-3 fill-current"
+                    />
+                  )}
+                </span>{' '}
                 {tile.changePct !== null && (
                   <Delta value={tile.changePct} className="text-[0.625rem]" />
                 )}{' '}

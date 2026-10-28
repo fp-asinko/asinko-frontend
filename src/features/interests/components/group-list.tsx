@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import type { Group } from '../interests.types'
 import { CommunityLink } from './community-link'
+import { FavoriteStar } from './favorite-star'
 import { plainHandle } from '@/lib/plain-handle'
 
 /**
@@ -21,10 +22,11 @@ export function GroupList({ groups, id }: { groups: Group[]; id?: string }) {
       className="flex flex-col gap-0.5 group-has-data-[more=open]/section:[&>li]:block! column-short:[&>li:nth-child(n+3)]:hidden column-mid:[&>li:nth-child(n+4)]:hidden column-tall:[&>li:nth-child(n+5)]:hidden [&>li:nth-child(n+7)]:hidden"
     >
       {groups.map((group) => (
-        <li key={group.slug}>
+        // The star beside the link, as Reddit's (specs/favorites FV-01, FV-02).
+        <li key={group.slug} className="group/row flex items-center gap-0.5">
           <CommunityLink
             href={group.path}
-            className="group flex tap items-center gap-2 rounded-md px-1 py-1.5 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted"
+            className="group flex min-w-0 flex-1 tap items-center gap-2 rounded-md px-1 py-1.5 outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted"
           >
             <UserAvatar
               name={group.name}
@@ -51,6 +53,7 @@ export function GroupList({ groups, id }: { groups: Group[]; id?: string }) {
               </span>
             </span>
           </CommunityLink>
+          <FavoriteStar slug={group.slug} handle={group.handle} initial={group.favorite} />
         </li>
       ))}
     </ul>

@@ -91,9 +91,9 @@ describe('Profile header (specs/community-pages CP-11, CP-12)', () => {
     expect(ask).toHaveAttribute('aria-disabled', 'true')
   })
 
-  it('follows instead of joining, with no favorite star, and asks before unfollowing', async () => {
+  it('follows instead of joining, with its favorite star, and asks before unfollowing (specs/favorites FV-03)', async () => {
     renderHeader(profile(), 'MEMBER')
-    expect(screen.queryByRole('button', { name: /favorites/ })).toBeNull()
+    expect(screen.getByRole('button', { name: 'Add @federico to favorites' })).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: /^Following/ }))
     expect(await screen.findByRole('dialog', { name: 'Unfollow @federico?' })).toBeInTheDocument()
   })

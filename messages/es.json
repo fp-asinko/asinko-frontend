@@ -107,7 +107,8 @@
       "assets": "Únete a la comunidad de un activo para verlo aquí.",
       "people": "Todavía no sigues a nadie.",
       "groups": "Todavía no estás en ningún grupo."
-    }
+    },
+    "favorite": "Favorito"
   },
   "feed": {
     "composer": {

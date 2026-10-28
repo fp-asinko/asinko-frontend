@@ -3,6 +3,9 @@ import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { PeopleList } from './people-list'
 
+// Its stars call a Server Action, which needs the env: not here (testing.md § Mocks).
+vi.mock('@/lib/communities/set-favorite.action', () => ({ setFavorite: vi.fn() }))
+
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 describe('PeopleList (H-07)', () => {
@@ -17,6 +20,8 @@ describe('PeopleList (H-07)', () => {
             username: 'maria',
             avatarUrl: null,
             accuracyRate: 0.74,
+            channelSlug: 'maria',
+            favorite: false,
           },
           {
             handle: '@ana',
@@ -25,6 +30,8 @@ describe('PeopleList (H-07)', () => {
             username: 'ana',
             avatarUrl: null,
             accuracyRate: null,
+            channelSlug: 'maria',
+            favorite: false,
           },
         ]}
       />,
@@ -45,6 +52,8 @@ describe('PeopleList, the accuracy in its tier (specs/interests-refresh IR-04)',
     username: id,
     avatarUrl: null,
     accuracyRate,
+    channelSlug: id,
+    favorite: false,
   })
 
   it('tints it green from 70%, amber from 50% and red below, as the cards', () => {

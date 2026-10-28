@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import type { RawCommunity } from '@/lib/api/contract'
 import { COMMUNITIES } from '@/mocks/fixtures/communities'
 import {
+  favoritesFirst,
+  followedChannels,
   memberAssetCommunities,
   SUGGESTION_COUNT,
   toGroups,
@@ -106,5 +108,33 @@ describe('what each community is about (specs/interests-refresh IR-01, IR-02)', 
   it('works without the field, as the backend today', () => {
     const { topPost: _absent, ...today } = { ...group, topPost: undefined }
     expect(toGroups([today as RawCommunity])[0]).toMatchObject({ topPostTitle: null })
+  })
+})
+
+describe('favorites (specs/favorites FV-01)', () => {
+  it('finds whom the viewer follows by their channel, with its favorite', () => {
+    const channels = followedChannels([
+      {
+        ...COMMUNITIES[0]!,
+        slug: 'maria',
+        type: 'PERSONAL_CHANNEL',
+        createdByProfileId: '00000000-0000-4000-8000-000000000001',
+        viewerMembership: 'MEMBER',
+        viewerIsFavorite: true,
+      },
+    ])
+    expect(channels.get('00000000-0000-4000-8000-000000000001')).toEqual({
+      slug: 'maria',
+      favorite: true,
+    })
+  })
+
+  it('puts favorites first and keeps the rest in their order', () => {
+    const items = [
+      { id: 'a', favorite: false },
+      { id: 'b', favorite: true },
+      { id: 'c', favorite: false },
+    ]
+    expect(favoritesFirst(items).map((each) => each.id)).toEqual(['b', 'a', 'c'])
   })
 })

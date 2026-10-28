@@ -4,6 +4,9 @@ import { identityIndex } from '@/lib/identity-color'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { GroupList } from './group-list'
 
+// Its stars call a Server Action, which needs the env: not here (testing.md § Mocks).
+vi.mock('@/lib/communities/set-favorite.action', () => ({ setFavorite: vi.fn() }))
+
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 const group = {
@@ -16,6 +19,7 @@ const group = {
   memberCount: 12,
   avatarUrl: null,
   isModerator: false,
+  favorite: false,
 }
 
 describe('GroupList (H-07)', () => {

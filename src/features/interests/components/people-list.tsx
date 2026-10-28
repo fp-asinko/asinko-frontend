@@ -4,6 +4,7 @@ import { ACCURACY_CLASSES, accuracyTier } from '@/lib/accuracy-tier'
 import { cn } from '@/lib/utils'
 import type { Person } from '../interests.types'
 import { CommunityLink } from './community-link'
+import { FavoriteStar } from './favorite-star'
 import { plainHandle } from '@/lib/plain-handle'
 
 /**
@@ -23,10 +24,11 @@ export function PeopleList({ people, id }: { people: Person[]; id?: string }) {
       className="flex flex-col gap-0.5 group-has-data-[more=open]/section:[&>li]:block! column-short:[&>li:nth-child(n+2)]:hidden column-mid:[&>li:nth-child(n+3)]:hidden column-tall:[&>li:nth-child(n+4)]:hidden [&>li:nth-child(n+6)]:hidden"
     >
       {people.map((person) => (
-        <li key={person.id}>
+        // Following a person is being a member of their channel: its favorite is theirs (FV-01).
+        <li key={person.id} className="group/row flex items-center gap-0.5">
           <CommunityLink
             href={person.path}
-            className="group flex min-h-10 tap items-center gap-2 rounded-md px-1 py-1 transition-colors duration-150 ease-out outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted"
+            className="group flex min-h-10 min-w-0 flex-1 tap items-center gap-2 rounded-md px-1 py-1 transition-colors duration-150 ease-out outline-none hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50 aria-[current=page]:bg-muted"
           >
             <UserAvatar
               name={person.username}
@@ -54,6 +56,11 @@ export function PeopleList({ people, id }: { people: Person[]; id?: string }) {
               </span>
             )}
           </CommunityLink>
+          <FavoriteStar
+            slug={person.channelSlug}
+            handle={person.handle}
+            initial={person.favorite}
+          />
         </li>
       ))}
     </ul>

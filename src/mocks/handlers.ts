@@ -37,7 +37,12 @@ import { AD_EVERY, randomAds } from './fixtures/ads'
 import { GLOSSARY_EVERY, randomGlossary } from './fixtures/glossary'
 import { ASSETS, assetBySymbol } from './fixtures/assets'
 import { COMMENTS_BY_CONTENT } from './fixtures/comments'
-import { COMMUNITIES, communityBySlug, communitySummary } from './fixtures/communities'
+import {
+  COMMUNITIES,
+  communityBySlug,
+  communitySummary,
+  PERSONAL_CHANNELS,
+} from './fixtures/communities'
 import { POLLS, pollById } from './fixtures/polls'
 import { POSTS } from './fixtures/posts'
 import { PROFILES, summary } from './fixtures/users'
@@ -478,15 +483,27 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       const search = query.search?.toLowerCase()
       // ?mine=true: only the viewer's communities (requires a session; with mocks, the demo user).
       const mine = query.mine === 'true'
-      const filtered = COMMUNITIES.filter(
-        (each) =>
-          each.type !== 'PERSONAL_CHANNEL' &&
-          (!mine || each.viewerMembership !== null) &&
-          (!query.type || each.type === query.type) &&
-          (!search ||
-            each.name.toLowerCase().includes(search) ||
-            each.slug.toLowerCase().includes(search)),
-      ).sort((a, b) => b.memberCount - a.memberCount)
+      // As the backend: the viewer's memberships include the channels of whom it follows, and
+      // its favorites come first (specs/favorites).
+      const followed = mine
+        ? PERSONAL_CHANNELS.filter((each) => each.viewerMembership === 'MEMBER')
+        : []
+      const filtered = [...COMMUNITIES, ...followed]
+        .filter(
+          (each) =>
+            (each.type !== 'PERSONAL_CHANNEL' || mine) &&
+            (!mine || each.viewerMembership !== null) &&
+            (!query.type || each.type === query.type) &&
+            (!search ||
+              each.name.toLowerCase().includes(search) ||
+              each.slug.toLowerCase().includes(search)),
+        )
+        .sort(
+          (a, b) =>
+            (mine
+              ? Number(b.viewerIsFavorite === true) - Number(a.viewerIsFavorite === true)
+              : 0) || b.memberCount - a.memberCount,
+        )
       // P-016 (backend, 2026-10-13): each with its main post.
       return { status: 200, body: paginate(filtered.map(withTopPost), query.cursor) }
     },

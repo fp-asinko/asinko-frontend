@@ -5,6 +5,9 @@ import { renderWithIntl } from '@/test/render-with-intl'
 import type { Interests } from '../interests.types'
 import { InterestsSections } from './interests-sections'
 
+// Its stars call a Server Action, which needs the env: not here (testing.md § Mocks).
+vi.mock('@/lib/communities/set-favorite.action', () => ({ setFavorite: vi.fn() }))
+
 vi.mock('@/lib/communities/join-community.action', () => ({ joinCommunity: vi.fn() }))
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
@@ -21,6 +24,7 @@ const interests: Interests = {
         price: 64000,
         stale: false,
         communitySlug: 'BTC',
+        favorite: false,
         path: '/asset/BTC',
       },
       {
@@ -31,6 +35,7 @@ const interests: Interests = {
         price: 30,
         stale: true,
         communitySlug: 'avax',
+        favorite: false,
         path: '/asset/AVAX',
       },
     ],
@@ -45,6 +50,8 @@ const interests: Interests = {
         username: 'maria',
         avatarUrl: null,
         accuracyRate: 0.74,
+        channelSlug: 'maria',
+        favorite: false,
       },
     ],
   },
@@ -61,6 +68,7 @@ const interests: Interests = {
         memberCount: 3,
         avatarUrl: null,
         isModerator: true,
+        favorite: false,
       },
     ],
   },

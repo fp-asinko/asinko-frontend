@@ -49,6 +49,8 @@ export const COMMUNITIES: RawCommunity[] = [
       'All things Bitcoin: on-chain, cycles, ETFs and the halving.',
     ),
     viewerMembership: 'MEMBER',
+    // An asset marked as a favorite, to see its star in the column (specs/favorites).
+    viewerIsFavorite: true,
     mainUrl: 'https://bitcoin.org',
   },
   {
@@ -144,6 +146,8 @@ export const PERSONAL_CHANNELS: RawCommunity[] = PROFILES.map((profile, index) =
         : profile.isFollowedByViewer
           ? 'MEMBER'
           : null,
+    // A person marked as a favorite, to see the star in the column (specs/favorites).
+    viewerIsFavorite: profile.isFollowedByViewer ? profile.username === 'maria' : null,
   }),
 )
 
