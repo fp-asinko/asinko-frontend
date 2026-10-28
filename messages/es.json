@@ -50,6 +50,16 @@
     "back": "Volver",
     "leftColumn": {
       "label": "Tus intereses"
+    },
+    "hints": {
+      "home": "Ir al inicio",
+      "search": "Buscar · Próximamente",
+      "notifications": "Notificaciones · Próximamente",
+      "profile": "Tu perfil",
+      "more": "Configuración: idioma y tema",
+      "create": "Crear un post",
+      "hideColumn": "Ocultar la columna lateral",
+      "showColumn": "Mostrar la columna lateral"
     }
   },
   "errors": {
@@ -119,7 +129,8 @@
         "thesis": "Publicar una tesis · Próximamente",
         "live": "Transmitir en vivo · Próximamente",
         "duel": "Iniciar un duelo · Próximamente",
-        "portfolio": "Compartir un portfolio · Próximamente"
+        "portfolio": "Compartir un portfolio · Próximamente",
+        "publish": "Crear un post"
       }
     },
     "tabs": {

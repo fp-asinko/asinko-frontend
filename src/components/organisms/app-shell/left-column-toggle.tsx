@@ -8,6 +8,7 @@ import {
   LEFT_COLUMN_SUBMIT_COOKIE,
   writeLeftColumnCookie,
 } from '@/lib/left-column'
+import { HintBubble } from '@/components/molecules/hover-hint'
 
 // A page with a choice of its own (the page to create a post) puts its mark while it is shown; the
 // shell's button then opens and folds that one (specs/sidebar-toggle § 2).
@@ -35,6 +36,7 @@ const noScope = () => null
  */
 export function LeftColumnToggle({ initialFolded }: { initialFolded: boolean }) {
   const t = useTranslations('common.leftColumn')
+  const th = useTranslations('common.hints')
   const [folded, setFolded] = useState(initialFolded)
   const page = useSyncExternalStore(subscribe, readScope, noScope)
   const open = page ? page.open : !folded
@@ -66,10 +68,12 @@ export function LeftColumnToggle({ initialFolded }: { initialFolded: boolean }) 
         // Centered on the column's line: at 260px open, at 32px folded. It slides with the edge
         // (`tap` animates translate in 200ms); to fold, in 150 as the column (colors, borders,
         // translate, the press: the list of `tap` in globals.css).
-        'fixed top-18 left-4 z-20 hidden size-8 translate-x-57 tap items-center justify-center rounded-full border bg-background text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex left-folded:translate-x-0 left-folded:[transition-duration:150ms,150ms,150ms,150ms,120ms] [&_svg]:size-4'
+        'group/hint fixed top-18 left-4 z-20 hidden size-8 translate-x-57 tap items-center justify-center rounded-full border bg-background text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex left-folded:translate-x-0 left-folded:[transition-duration:150ms,150ms,150ms,150ms,120ms] [&_svg]:size-4'
       }
     >
       <MenuIcon aria-hidden />
+      {/* What it does now, beside it on hover (PO, 2026-10-27). */}
+      <HintBubble label={open ? th('hideColumn') : th('showColumn')} side="right" />
     </button>
   )
 }

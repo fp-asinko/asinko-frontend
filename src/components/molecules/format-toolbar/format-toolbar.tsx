@@ -10,6 +10,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { HoverHint } from '../hover-hint'
 import { useRef, useState, type KeyboardEvent, type RefObject } from 'react'
 import { insertText } from '@/lib/insert-text'
 import { formatMarkdown, type FormatKind } from '@/lib/markdown-format'
@@ -93,26 +94,27 @@ export function FormatToolbar({
       className={cn('flex items-center gap-0.5', className)}
     >
       {BUTTONS.map(({ kind, icon: Icon, key }, index) => (
-        <button
-          key={kind}
-          ref={(element) => {
-            buttons.current[index] = element
-          }}
-          type="button"
-          tabIndex={index === active ? 0 : -1}
-          aria-label={t(kind)}
-          // Said once, by the shortcut's own attribute; Control works on every system (⌘ too on
-          // a Mac, but Meta is the Windows key elsewhere, which the browser never gets).
-          aria-keyshortcuts={key ? `Control+${key}` : undefined}
-          title={key ? t('withShortcut', { name: t(kind), key }) : t(kind)}
-          // The field keeps its selection: the press does not take the focus first.
-          onMouseDown={(event) => event.preventDefault()}
-          onFocus={() => setActive(index)}
-          onClick={() => fieldRef.current && applyFormat(fieldRef.current, kind)}
-          className="inline-flex size-8 tap items-center justify-center rounded-md text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-4"
-        >
-          <Icon aria-hidden />
-        </button>
+        // What it does and its shortcut, on hover (PO, 2026-10-27; was the native title).
+        <HoverHint key={kind} label={key ? t('withShortcut', { name: t(kind), key }) : t(kind)}>
+          <button
+            ref={(element) => {
+              buttons.current[index] = element
+            }}
+            type="button"
+            tabIndex={index === active ? 0 : -1}
+            aria-label={t(kind)}
+            // Said once, by the shortcut's own attribute; Control works on every system (⌘ too on
+            // a Mac, but Meta is the Windows key elsewhere, which the browser never gets).
+            aria-keyshortcuts={key ? `Control+${key}` : undefined}
+            // The field keeps its selection: the press does not take the focus first.
+            onMouseDown={(event) => event.preventDefault()}
+            onFocus={() => setActive(index)}
+            onClick={() => fieldRef.current && applyFormat(fieldRef.current, kind)}
+            className="inline-flex size-8 tap items-center justify-center rounded-md text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-4"
+          >
+            <Icon aria-hidden />
+          </button>
+        </HoverHint>
       ))}
     </div>
   )

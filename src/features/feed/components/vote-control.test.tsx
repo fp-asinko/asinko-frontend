@@ -134,7 +134,8 @@ describe('VoteControl (H-15)', () => {
   )
 
   describe('motion (home-motion M-01)', () => {
-    const pill = () => screen.getByRole('button', { name: 'Upvote' }).parentElement!
+    // The pill holds each button inside its hover hint (PO, 2026-10-27).
+    const pill = () => screen.getByRole('button', { name: 'Upvote' }).parentElement!.parentElement!
 
     it('does not animate on load', () => {
       renderWithIntl(<VoteControl id={ID} score={10} viewerVote={1} />)
@@ -179,6 +180,6 @@ describe('VoteControl on a comment (specs/post-create-detail PC-16)', () => {
     renderWithIntl(<VoteControl kind="comment" id={ID} size="plain" score={3} viewerVote={null} />)
     const upvote = screen.getByRole('button', { name: 'Upvote' })
     expect(upvote).toHaveClass('size-8')
-    expect(upvote.parentElement).toHaveClass('bg-transparent')
+    expect(upvote.parentElement!.parentElement).toHaveClass('bg-transparent')
   })
 })

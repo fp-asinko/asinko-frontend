@@ -113,14 +113,16 @@ export function ComposerPlaceholder({
           {/* As X: Publish waits on the right, quiet (the gray pill: white on a light black would
             not reach 4.5:1). The same place as the prompt: one link for assistive tech and the
             keyboard (WCAG 2.4.4). */}
-          <ComposeTrigger
-            community={communitySlug}
-            aria-hidden
-            tabIndex={-1}
-            className="ml-auto inline-flex h-9 tap items-center rounded-full bg-muted px-4 type-action font-bold text-muted-foreground outline-none hover:bg-muted-hover hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 @[39rem]:ml-1.5"
-          >
-            {t('publish')}
-          </ComposeTrigger>
+          <HoverHint label={t('hints.publish')} className="ml-auto @[39rem]:ml-1.5">
+            <ComposeTrigger
+              community={communitySlug}
+              aria-hidden
+              tabIndex={-1}
+              className="inline-flex h-9 tap items-center rounded-full bg-muted px-4 type-action font-bold text-muted-foreground outline-none hover:bg-muted-hover hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              {t('publish')}
+            </ComposeTrigger>
+          </HoverHint>
         </div>
       </div>
     </div>

@@ -50,6 +50,16 @@
     "back": "Back",
     "leftColumn": {
       "label": "Your interests"
+    },
+    "hints": {
+      "home": "Go to home",
+      "search": "Search · Coming soon",
+      "notifications": "Notifications · Coming soon",
+      "profile": "Your profile",
+      "more": "Settings: language and theme",
+      "create": "Create a post",
+      "hideColumn": "Hide the side column",
+      "showColumn": "Show the side column"
     }
   },
   "errors": {
@@ -119,7 +129,8 @@
         "thesis": "Publish a thesis · Coming soon",
         "live": "Go live · Coming soon",
         "duel": "Start a duel · Coming soon",
-        "portfolio": "Share a portfolio · Coming soon"
+        "portfolio": "Share a portfolio · Coming soon",
+        "publish": "Create a post"
       }
     },
     "tabs": {

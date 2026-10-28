@@ -21,4 +21,29 @@ describe('HoverHint', () => {
       'group-has-[:focus-visible]/hint:opacity-100',
     )
   })
+
+  it('goes under the control, from its end, when asked (the top bar, the right edge)', () => {
+    render(
+      <HoverHint label="Settings" side="bottom" align="end">
+        <button type="button" aria-label="More">
+          ⋯
+        </button>
+      </HoverHint>,
+    )
+    expect(screen.getByText('Settings')).toHaveClass('top-full', 'right-0')
+  })
+
+  it('steps aside while its menu is open or its "Coming soon" shows', () => {
+    render(
+      <HoverHint label="Settings">
+        <button type="button" aria-label="More" aria-expanded="true">
+          ⋯
+        </button>
+      </HoverHint>,
+    )
+    expect(screen.getByText('Settings')).toHaveClass(
+      'group-has-[[aria-expanded=true]]/hint:hidden',
+      'group-has-[[role=status]:not(:empty)]/hint:hidden',
+    )
+  })
 })

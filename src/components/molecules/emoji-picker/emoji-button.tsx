@@ -3,6 +3,7 @@
 import { SmilePlusIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
+import { HoverHint } from '../hover-hint'
 import { useRef, useState, type RefObject } from 'react'
 import { insertText, type TextField } from '@/lib/insert-text'
 import { cn } from '@/lib/utils'
@@ -43,27 +44,30 @@ export function EmojiButton({
 
   return (
     <>
-      <button
-        ref={triggerRef}
-        type="button"
-        aria-label={t('button')}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        onPointerEnter={loadPanel}
-        onFocus={loadPanel}
-        onPointerDown={() => (wasOpen.current = open)}
-        onClick={() => {
-          setRequested(true)
-          setOpen(!wasOpen.current)
-          wasOpen.current = false
-        }}
-        className={cn(
-          'inline-flex size-9 tap items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50',
-          className,
-        )}
-      >
-        <SmilePlusIcon aria-hidden className="size-4.5" />
-      </button>
+      {/* What it does, on hover (PO, 2026-10-27); it steps aside while the panel is open. */}
+      <HoverHint label={t('button')}>
+        <button
+          ref={triggerRef}
+          type="button"
+          aria-label={t('button')}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          onPointerEnter={loadPanel}
+          onFocus={loadPanel}
+          onPointerDown={() => (wasOpen.current = open)}
+          onClick={() => {
+            setRequested(true)
+            setOpen(!wasOpen.current)
+            wasOpen.current = false
+          }}
+          className={cn(
+            'inline-flex size-9 tap items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50',
+            className,
+          )}
+        >
+          <SmilePlusIcon aria-hidden className="size-4.5" />
+        </button>
+      </HoverHint>
       {requested && (
         <EmojiPanel
           anchor={triggerRef}

@@ -2,6 +2,7 @@ import { BellIcon, PlusIcon, SearchIcon, UserIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ComingSoon } from '@/components/molecules/coming-soon'
+import { HoverHint } from '@/components/molecules/hover-hint'
 import { AccountButtons, SignedInOnly } from '@/components/organisms/auth-gate'
 import { ComposeTrigger } from '@/components/organisms/compose'
 import { AsinkoLogo } from '@/components/ui/asinko-logo'
@@ -43,12 +44,15 @@ export function SiteHeader({
       <div className="flex h-15 items-center gap-1 px-2 md:gap-2 md:px-4 lg:relative lg:grid lg:grid-cols-[16.25rem_minmax(0,1fr)] lg:gap-0 lg:px-0">
         <div className="flex shrink-0 items-center md:w-60 lg:w-auto lg:px-4">
           {menu}
-          <Link
-            href="/"
-            className="flex min-h-11 shrink-0 items-center rounded-lg px-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:px-2"
-          >
-            <AsinkoLogo label={t('logo')} />
-          </Link>
+          {/* What each control does, under it on hover (PO, 2026-10-27). */}
+          <HoverHint label={t('hints.home')} side="bottom" align="start">
+            <Link
+              href="/"
+              className="flex min-h-11 shrink-0 items-center rounded-lg px-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50 md:px-2"
+            >
+              <AsinkoLogo label={t('logo')} />
+            </Link>
+          </HoverHint>
         </div>
 
         {/* Mirrors the shell's center: the main column (sm:px-4, max 780px) and the right one. */}
@@ -85,21 +89,28 @@ export function SiteHeader({
           <AccountButtons>
             {/* With a session: notifications and profile from md (HR-02, Q2). */}
             <span className="hidden items-center gap-1 md:flex">
-              <ComingSoon label={t('header.notifications')} className={ICON_BUTTON}>
-                <BellIcon aria-hidden className="size-5" />
-              </ComingSoon>
+              <HoverHint label={t('hints.notifications')} side="bottom">
+                <ComingSoon label={t('header.notifications')} className={ICON_BUTTON}>
+                  <BellIcon aria-hidden className="size-5" />
+                </ComingSoon>
+              </HoverHint>
               {profileHref && (
-                <Link
-                  href={profileHref}
-                  aria-label={t('header.profile')}
-                  className={`${ICON_BUTTON} tap outline-none focus-visible:ring-3 focus-visible:ring-ring/50`}
-                >
-                  <UserIcon aria-hidden className="size-5" />
-                </Link>
+                <HoverHint label={t('hints.profile')} side="bottom">
+                  <Link
+                    href={profileHref}
+                    aria-label={t('header.profile')}
+                    className={`${ICON_BUTTON} tap outline-none focus-visible:ring-3 focus-visible:ring-ring/50`}
+                  >
+                    <UserIcon aria-hidden className="size-5" />
+                  </Link>
+                </HoverHint>
               )}
             </span>
           </AccountButtons>
-          <MoreMenu />
+          {/* Against the window's right edge: the bubble lines up from there. */}
+          <HoverHint label={t('hints.more')} side="bottom" align="end">
+            <MoreMenu />
+          </HoverHint>
         </div>
       </div>
     </header>

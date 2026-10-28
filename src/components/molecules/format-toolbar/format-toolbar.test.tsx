@@ -36,7 +36,9 @@ describe('FormatToolbar (specs/submit-tools ST-04 to ST-06)', () => {
       'aria-keyshortcuts',
       'Control+B',
     )
-    expect(screen.getByRole('button', { name: 'Bold' })).toHaveAttribute('title', 'Bold (Ctrl+B)')
+    // Its shortcut in the hover hint, not a native title (PO, 2026-10-27).
+    expect(screen.getByText('Bold (Ctrl+B)')).toHaveAttribute('aria-hidden', 'true')
+    expect(screen.getByRole('button', { name: 'Bold' })).not.toHaveAttribute('title')
     for (const name of ['Italic', 'Link', 'List', 'Quote', 'Code']) {
       expect(screen.getByRole('button', { name })).toBeInTheDocument()
     }

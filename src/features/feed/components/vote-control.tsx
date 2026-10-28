@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { voteComment } from '../actions/vote-comment.action'
 import { votePost } from '../actions/vote-post.action'
 import { countFormat } from '../lib/count-format'
+import { HoverHint } from '@/components/molecules/hover-hint'
 
 type Vote = { score: number; viewerVote: 1 | -1 | null }
 
@@ -113,24 +114,26 @@ export function VoteControl({
           sizes.pill,
         )}
       >
-        <button
-          type="button"
-          aria-label={t('up')}
-          aria-pressed={shown.viewerVote === 1}
-          aria-disabled={pending || undefined}
-          onClick={() => vote(1)}
-          className={cn(BUTTON, sizes.button)}
-        >
-          <ArrowBigUpIcon
-            key={motion.pop === 'up' ? motion.key : 'still'}
-            aria-hidden
-            className={cn(
-              sizes.icon,
-              shown.viewerVote === 1 && 'fill-current text-foreground',
-              motion.pop === 'up' && 'animate-vote-pop',
-            )}
-          />
-        </button>
+        <HoverHint label={t('up')}>
+          <button
+            type="button"
+            aria-label={t('up')}
+            aria-pressed={shown.viewerVote === 1}
+            aria-disabled={pending || undefined}
+            onClick={() => vote(1)}
+            className={cn(BUTTON, sizes.button)}
+          >
+            <ArrowBigUpIcon
+              key={motion.pop === 'up' ? motion.key : 'still'}
+              aria-hidden
+              className={cn(
+                sizes.icon,
+                shown.viewerVote === 1 && 'fill-current text-foreground',
+                motion.pop === 'up' && 'animate-vote-pop',
+              )}
+            />
+          </button>
+        </HoverHint>
         <span
           aria-live="polite"
           className={cn(
@@ -151,24 +154,26 @@ export function VoteControl({
           </span>
           <span className="sr-only">{tc('score', { score: shown.score, vote: voteName })}</span>
         </span>
-        <button
-          type="button"
-          aria-label={t('down')}
-          aria-pressed={shown.viewerVote === -1}
-          aria-disabled={pending || undefined}
-          onClick={() => vote(-1)}
-          className={cn(BUTTON, sizes.button)}
-        >
-          <ArrowBigDownIcon
-            key={motion.pop === 'down' ? motion.key : 'still'}
-            aria-hidden
-            className={cn(
-              sizes.icon,
-              shown.viewerVote === -1 && 'fill-current text-foreground',
-              motion.pop === 'down' && 'animate-vote-pop',
-            )}
-          />
-        </button>
+        <HoverHint label={t('down')}>
+          <button
+            type="button"
+            aria-label={t('down')}
+            aria-pressed={shown.viewerVote === -1}
+            aria-disabled={pending || undefined}
+            onClick={() => vote(-1)}
+            className={cn(BUTTON, sizes.button)}
+          >
+            <ArrowBigDownIcon
+              key={motion.pop === 'down' ? motion.key : 'still'}
+              aria-hidden
+              className={cn(
+                sizes.icon,
+                shown.viewerVote === -1 && 'fill-current text-foreground',
+                motion.pop === 'down' && 'animate-vote-pop',
+              )}
+            />
+          </button>
+        </HoverHint>
       </span>
       {error && (
         <p role="alert" className="type-meta text-destructive">
