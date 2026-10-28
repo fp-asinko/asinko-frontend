@@ -1,6 +1,6 @@
 # Favoritos en grupos, personas y activos — Tasks
 
-Rama: `feature/favorites`, desde `develop`. **Local, sin push** hasta que el PO lo diga.
+Rama: `feature/favorites`, desde `develop`. Se subió a `develop` el 2026-10-28 (PO: "subí a develop estas mejoras").
 
 - [x] **T-01 (M)** Dominio: `favorite` y `channelSlug`, `followedChannels`, `favoritesFirst`. Mocks como el backend. Tests. → FV-01
 - [x] **T-02 (M)** `FavoriteStar` en Grupos y Personas; la marca en Activos; la estrella en la cabecera de un perfil seguido. Tests. → FV-02 a FV-04

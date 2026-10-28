@@ -1,6 +1,6 @@
 # Favoritos en grupos, personas y activos — Requirements
 
-> **Estado:** aprobado por el PO el 2026-10-28 ("dale"): la estrella como Reddit, sin una sección aparte, también para personas y activos. Se trabaja local, sin push, hasta que el PO lo diga.
+> **Estado:** aprobado por el PO el 2026-10-28 ("dale"): la estrella como Reddit, sin una sección aparte, también para personas y activos. Se trabajó local y se subió a `develop` el 2026-10-28, a pedido del PO.
 >
 > **Fuente:** el backend (`asinko-app` dev), revisado en su código:
 >
