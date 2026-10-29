@@ -27,7 +27,7 @@ export function SignUpForm({ onDone }: { onDone: (result: { needsProfile: boolea
   const { submit, pending, alert, error } = useAuthForm(form, signUp, onDone)
 
   return (
-    <form noValidate onSubmit={submit} className="flex flex-col gap-4">
+    <form noValidate onSubmit={submit} className="flex flex-col gap-3.5">
       <FormAlert message={alert} />
       <AuthField
         id={`${ids}-email`}
@@ -64,7 +64,7 @@ export function SignUpForm({ onDone }: { onDone: (result: { needsProfile: boolea
         size="lg"
         disabled={!accepted}
         aria-disabled={pending || undefined}
-        className="h-11 rounded-full text-[0.875rem] font-semibold"
+        className="mt-1 h-11 rounded-full text-[0.875rem] font-semibold disabled:opacity-35"
       >
         {pending ? t('signup.pending') : t('signup.submit')}
       </Button>

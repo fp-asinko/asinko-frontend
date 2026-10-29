@@ -6,6 +6,7 @@ import { useState, type ComponentProps } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
 import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 
 /**
  * A field of the auth forms (specs/auth AU-06, AU-18): label, input of 16px or more (iOS does not
@@ -35,8 +36,10 @@ export function AuthField({
   const errorId = `${id}-error`
 
   return (
-    <Field data-invalid={error ? true : undefined}>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+    <Field data-invalid={error ? true : undefined} className="gap-1.5">
+      <FieldLabel htmlFor={id} className="type-action">
+        {label}
+      </FieldLabel>
       <div className="relative">
         <Input
           id={id}
@@ -45,7 +48,8 @@ export function AuthField({
           aria-describedby={
             [hint && hintId, error && errorId].filter(Boolean).join(' ') || undefined
           }
-          className="h-11 rounded-lg text-base md:text-base"
+          // 16px: iOS does not zoom (design-system.md). Room on the right for the eye.
+          className={cn('h-11 rounded-xl px-3.5 text-base md:text-base', reveal && 'pr-11')}
           spellCheck={false}
           {...input}
           {...field}
@@ -56,7 +60,7 @@ export function AuthField({
             aria-pressed={shown}
             aria-label={t(shown ? 'hide' : 'show')}
             onClick={() => setShown((value) => !value)}
-            className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-xl text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
           >
             {shown ? (
               <EyeOffIcon aria-hidden className="size-4" />
@@ -66,8 +70,16 @@ export function AuthField({
           </button>
         )}
       </div>
-      {hint && !error && <FieldDescription id={hintId}>{hint}</FieldDescription>}
-      {error && <FieldError id={errorId}>{error}</FieldError>}
+      {hint && !error && (
+        <FieldDescription id={hintId} className="type-meta">
+          {hint}
+        </FieldDescription>
+      )}
+      {error && (
+        <FieldError id={errorId} className="type-meta">
+          {error}
+        </FieldError>
+      )}
     </Field>
   )
 }

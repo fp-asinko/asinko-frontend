@@ -26,7 +26,7 @@ export function ProfileForm({ onDone }: { onDone: () => void }) {
   const { submit, pending, alert, error } = useAuthForm(form, createProfile, onDone)
 
   return (
-    <form noValidate onSubmit={submit} className="flex flex-col gap-4">
+    <form noValidate onSubmit={submit} className="flex flex-col gap-3.5">
       <FormAlert message={alert} />
       <AuthField
         id={`${ids}-username`}
@@ -43,7 +43,7 @@ export function ProfileForm({ onDone }: { onDone: () => void }) {
         size="lg"
         disabled={!accepted}
         aria-disabled={pending || undefined}
-        className="h-11 rounded-full text-[0.875rem] font-semibold"
+        className="mt-1 h-11 rounded-full text-[0.875rem] font-semibold disabled:opacity-35"
       >
         {pending ? t('welcome.pending') : t('welcome.submit')}
       </Button>

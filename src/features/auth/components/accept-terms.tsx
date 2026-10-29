@@ -24,7 +24,11 @@ export function AcceptTerms<Values extends FieldValues & { accepted: boolean }>(
   const errorId = `${id}-error`
 
   return (
-    <Field orientation="horizontal" data-invalid={error ? true : undefined}>
+    <Field
+      orientation="horizontal"
+      data-invalid={error ? true : undefined}
+      className="items-start gap-2.5"
+    >
       <Controller
         control={control}
         name={'accepted' as Path<Values>}
@@ -38,20 +42,31 @@ export function AcceptTerms<Values extends FieldValues & { accepted: boolean }>(
             onBlur={field.onBlur}
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? errorId : undefined}
-            className="mt-0.5"
+            // On the first line of the text.
+            className="mt-0.5 size-4.5"
           />
         )}
       />
       <div className="flex flex-col gap-1">
-        <FieldLabel htmlFor={id} className="type-ui leading-snug font-normal">
+        {/* block, not the label's flex: with flex each link became a column of its own. */}
+        <FieldLabel
+          htmlFor={id}
+          className="block type-meta leading-relaxed font-normal text-muted-foreground"
+        >
           {t.rich('label', {
             terms: (chunks) => (
-              <ComingSoon label={t('terms')} className="underline underline-offset-2">
+              <ComingSoon
+                label={t('terms')}
+                className="text-foreground underline underline-offset-2"
+              >
                 {chunks}
               </ComingSoon>
             ),
             privacy: (chunks) => (
-              <ComingSoon label={t('privacy')} className="underline underline-offset-2">
+              <ComingSoon
+                label={t('privacy')}
+                className="text-foreground underline underline-offset-2"
+              >
                 {chunks}
               </ComingSoon>
             ),

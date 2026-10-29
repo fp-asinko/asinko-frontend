@@ -76,9 +76,8 @@ export function AuthGateDialog({
         <div className="flex flex-col gap-2 px-6 text-center">
           {/* Loose classes, not type-*: cn does not merge them with the base text-* (design-system.md). */}
           <DialogTitle className="text-[1.375rem] leading-tight font-bold">{title}</DialogTitle>
-          {view === 'invite' && (
-            <DialogDescription className="leading-normal">{t('value')}</DialogDescription>
-          )}
+          {/* The reason to have an account, under every title: the forms too. */}
+          <DialogDescription className="leading-normal">{t('value')}</DialogDescription>
         </div>
 
         {view === 'invite' ? (

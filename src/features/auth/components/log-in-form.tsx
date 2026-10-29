@@ -24,7 +24,7 @@ export function LogInForm({ onDone }: { onDone: (result: { needsProfile: boolean
   const { submit, pending, alert, error } = useAuthForm(form, logIn, onDone)
 
   return (
-    <form noValidate onSubmit={submit} className="flex flex-col gap-4">
+    <form noValidate onSubmit={submit} className="flex flex-col gap-3.5">
       <FormAlert message={alert} />
       <AuthField
         id={`${ids}-email`}
@@ -49,7 +49,7 @@ export function LogInForm({ onDone }: { onDone: (result: { needsProfile: boolean
         type="submit"
         size="lg"
         aria-disabled={pending || undefined}
-        className="h-11 rounded-full text-[0.875rem] font-semibold"
+        className="mt-1 h-11 rounded-full text-[0.875rem] font-semibold disabled:opacity-35"
       >
         {pending ? t('login.pending') : t('login.submit')}
       </Button>
