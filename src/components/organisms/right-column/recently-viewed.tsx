@@ -8,6 +8,7 @@ import { clearRecent, readRecent, readRecentOnServer, subscribeRecent } from '@/
 import { HistoryIcon } from 'lucide-react'
 import { EmptyState } from '../empty-state'
 import { plainHandle } from '@/lib/plain-handle'
+import { cn } from '@/lib/utils'
 
 /** When it was seen; within the last minute, "now" (not "1s ago", which looks like a counter). */
 const seen = (viewedAt: string, now: Date) => {
@@ -87,8 +88,14 @@ export function RecentlyViewed() {
                 </span>
                 {/* A space between the parts: read as one sentence, not glued together. */}{' '}
                 {/* As the prototype's (measured): 12px semibold over 11px details. */}
-                <span className="line-clamp-2 type-meta font-semibold wrap-anywhere">
-                  {item.title}
+                {/* A thought as on its card: its text in italics and in quotes (PO, 2026-10-29). */}
+                <span
+                  className={cn(
+                    'line-clamp-2 type-meta font-semibold wrap-anywhere',
+                    item.kind === 'thought' && 'italic',
+                  )}
+                >
+                  {item.kind === 'thought' ? t('quoted', { text: item.title }) : item.title}
                 </span>{' '}
                 <span className="mt-1 flex items-center gap-3 type-caption text-muted-foreground">
                   <span className="inline-flex items-center gap-1">

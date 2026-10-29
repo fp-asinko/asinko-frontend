@@ -48,8 +48,10 @@ describe('RecentlyViewed (specs/recently-viewed)', () => {
     recordRecent({ ...post('t', 'Rates first, risk later.', '@maria'), kind: 'thought' as const })
     renderWithIntl(<RecentlyViewed />)
     expect(screen.getByRole('link')).toHaveAccessibleName(
-      /^maria: .* Rates first, risk later. .*Thought$/,
+      /^maria: .* “Rates first, risk later\.” .*Thought$/,
     )
+    // As on its card: in italics and in quotes (PO, 2026-10-29).
+    expect(screen.getByText('“Rates first, risk later.”')).toHaveClass('italic')
   })
 
   it('says "now" within the last minute', () => {

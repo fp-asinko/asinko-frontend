@@ -263,7 +263,8 @@
         "post": "Post",
         "thought": "Thought"
       },
-      "emptyBody": "The posts you open will show up here."
+      "emptyBody": "The posts you open will show up here.",
+      "quoted": "“{text}”"
     }
   },
   "authGate": {
