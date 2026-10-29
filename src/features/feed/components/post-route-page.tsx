@@ -17,6 +17,7 @@ import { CommentThread } from './comment-thread'
 import { PostCard } from './post-card'
 import { PostComments } from './post-comments'
 import { RecordView } from './record-view'
+import { ScrollToTop } from './scroll-to-top'
 
 /**
  * Title, description, canonical and hreflang of a post's page (PC-12). A deleted post keeps its
@@ -99,6 +100,7 @@ export function PostDetail({
 }) {
   return (
     <CommentThread>
+      <ScrollToTop id={post.id} />
       <PostCard post={post} variant="detail" leading={<BackButton variant="plain" />} />
       {/* Into the right column's "Recently viewed" (specs/recently-viewed); a deleted post, no. */}
       {!post.deleted && <RecordView item={recentItem(post)} />}
