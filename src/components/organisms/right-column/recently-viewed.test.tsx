@@ -52,6 +52,9 @@ describe('RecentlyViewed (specs/recently-viewed)', () => {
     )
     // As on its card: in italics and in quotes (PO, 2026-10-29).
     expect(screen.getByText('“Rates first, risk later.”')).toHaveClass('italic')
+    // Its kind by the editor's icon, not a word on screen (PO, 2026-10-29).
+    expect(screen.getByRole('link').querySelector('[data-kind="thought"]')).not.toBeNull()
+    expect(screen.queryByText('THOUGHT')).toBeNull()
   })
 
   it('says "now" within the last minute', () => {

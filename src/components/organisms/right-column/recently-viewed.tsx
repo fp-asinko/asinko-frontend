@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowBigUpIcon, MessageCircleIcon } from 'lucide-react'
+import { AlignLeftIcon, ArrowBigUpIcon, MessageCircleIcon, QuoteIcon } from 'lucide-react'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { useId, useRef, useSyncExternalStore } from 'react'
 import { Link } from '@/i18n/navigation'
@@ -108,8 +108,14 @@ export function RecentlyViewed() {
                     <span aria-hidden>{compact(item.comments)}</span>
                     <span className="sr-only">{t('comments', { count: item.comments })}</span>
                   </span>{' '}
-                  <span className="ml-auto rounded-full bg-muted px-1.5 font-bold tracking-wide uppercase">
-                    {t(`kinds.${item.kind}`)}
+                  {/* What it is by its icon, the editor's (PO, 2026-10-29); its name, for screen readers. */}
+                  <span className="ml-auto inline-flex items-center">
+                    {item.kind === 'thought' ? (
+                      <QuoteIcon aria-hidden data-kind="thought" className="size-3.5" />
+                    ) : (
+                      <AlignLeftIcon aria-hidden data-kind="post" className="size-3.5" />
+                    )}
+                    <span className="sr-only">{t(`kinds.${item.kind}`)}</span>
                   </span>
                 </span>
               </Link>
