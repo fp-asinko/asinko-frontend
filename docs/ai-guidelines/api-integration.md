@@ -15,11 +15,11 @@ Navegador ──► asinko-web (Next.js)  ──HTTP──►  asinko-app /api/v
 
 ## Configuración
 
-| Variable                        | Dónde              | Para qué                                                                                                                                                     |
-| ------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `API_BASE_URL`                  | Servidor           | URL base de `asinko-app` por ambiente (sin `NEXT_PUBLIC_`). Desarrollo: `https://asinko-app-web.vercel.app` (o `http://localhost:3001` con el backend local) |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Cliente y servidor | Mismo proyecto Supabase que el backend                                                                                                                       |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Cliente y servidor | Key pública; la protección real son las políticas RLS                                                                                                        |
+| Variable            | Dónde    | Para qué                                                                                                                                                     |
+| ------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `API_BASE_URL`      | Servidor | URL base de `asinko-app` por ambiente (sin `NEXT_PUBLIC_`). Desarrollo: `https://asinko-app-web.vercel.app` (o `http://localhost:3001` con el backend local) |
+| `SUPABASE_URL`      | Servidor | Mismo proyecto Supabase que el backend (`specs/auth`). Obligatoria en producción                                                                             |
+| `SUPABASE_ANON_KEY` | Servidor | Key pública; la protección real son las políticas RLS. Solo del servidor: el navegador no habla con Supabase                                                 |
 
 Todas validadas en `src/env.ts` (ver `libraries.md`). **Nunca** usar la `service_role` key de Supabase en este repo.
 
@@ -84,7 +84,7 @@ Qué hace cada pantalla (`engineering-principles.md § Manejo de errores`):
 - **Contenido principal**: `getOrThrow(result)` → `error.tsx`. Un `NOT_FOUND` → `notFound()`.
 - **Secciones secundarias**: estado de error local; el resto de la página sigue.
 - **Server Actions**: devuelven `ActionResult` con el `errorKey`.
-- `401`: sin login todavía, la UI muestra que la acción requiere una cuenta. Cuando exista, redirige al login con `?next=` relativo (`security.md`).
+- `401`: la UI abre el modal de cuenta, que vuelve a la misma página al entrar (`?next=` relativo, `security.md`; `specs/auth`).
 
 El `message` del backend **nunca llega a la UI** (viene en español y es para debug).
 
@@ -94,11 +94,14 @@ El `message` del backend **nunca llega a la UI** (viene en español y es para de
 
 ## Sesión
 
-- El login se hace contra **el mismo proyecto Supabase** que usa el backend, con `@supabase/ssr` en este repo.
-- El backend lee la sesión **de las cookies de Supabase** (`getUser()`). El servidor de `asinko-web` reenvía el header `Cookie` de la sesión en cada llamada autenticada.
-- `src/proxy.ts` refresca la sesión **antes** de que cualquier página o action llame a la API, así lo que se reenvía siempre tiene un access token vigente. Convive con la lógica de locale de next-intl y la CSP (ver `i18n.md` y `security.md`).
+Definida en `specs/auth` (MVP-210).
 
-> ⚠️ **Riesgo conocido: rotación del refresh token.** El `proxy.ts` del backend también intenta refrescar la sesión. Si recibe un access token vencido, consume el refresh token reenviado y el `Set-Cookie` nuevo le llega al servidor de `asinko-web`, no al navegador: la sesión del usuario muere. Mitigación actual: refrescar siempre en nuestro `proxy.ts` antes de reenviar. **Solución pedida al backend:** aceptar `Authorization: Bearer <access_token>` en `/api/v1` y no refrescar en las rutas de la API. Hasta que eso exista, el diseño de auth lo trata como restricción. **Actualización (2026-10-04):** el backend ya acepta Bearer en `dev` (P-002, `3c5676c`). El login del front lo va a usar y ahí deja de valer este riesgo.
+- El login se hace contra **el mismo proyecto Supabase** que usa el backend, con su **API REST desde el servidor** (`src/lib/auth/supabase-auth.ts`): sin `supabase-js` ni `@supabase/ssr`. El navegador nunca habla con Supabase ni ve un token.
+- La sesión vive en la cookie `HttpOnly` `asinko-session` (`src/lib/auth/session.ts`): access token, refresh token, usuario y username (`null` mientras la cuenta no eligió uno).
+- Cada llamada del servidor a la API lleva **`Authorization: Bearer <access_token>`** (P-002). Con Bearer, el backend ignora sus cookies y no rota nada: el riesgo de rotación del refresh token que tenía el reenvío de cookies ya no existe.
+- `src/proxy.ts` renueva el access token en su último minuto, **antes** de que cualquier página o action llame a la API (`src/lib/auth/refresh-session.ts`). Convive con la lógica de locale de next-intl y la CSP (ver `i18n.md` y `security.md`).
+- Google usa PKCE con dos Route Handlers fuera del locale: `/auth/google` y `/auth/callback`. El proxy no corre en `/auth/`.
+- Con `API_MOCKS=true` responde un **Supabase simulado** (`src/mocks/auth.ts`): `demo@asinko.dev` / `demo-password` es el usuario demo.
 
 ## `userId` explícito
 

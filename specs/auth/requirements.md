@@ -33,58 +33,58 @@ Que cualquiera pueda crear su cuenta o entrar a Asinko, con email o con Google, 
 
 ### Entrar
 
-- [ ] **AU-01** Los botones "Log in" y "Create account" del modal de cuenta (`guest-experience`), de la barra superior y de la tarjeta "Join Asinko" **dejan de ser "Próximamente"** y abren el formulario correspondiente **dentro del modal**, sin cambiar de página. Se puede pasar de uno al otro ("¿No tenés cuenta? Creá una").
-- [ ] **AU-02** **Log in** pide email y contraseña. Con datos correctos, el modal se cierra y la misma página se ve con sesión: la campana, el perfil, la columna con sus intereses y la caja de publicar con su inicial.
-- [ ] **AU-03** **`/login`** (con su prefijo de idioma) muestra el mismo formulario como página, para los links directos y para cuando no hay JavaScript. Con `?next=` vuelve a esa ruta al entrar; sin él, al Home. `next` solo acepta rutas internas que empiezan con `/` y no con `//` (`security.md § 5`).
-- [ ] **AU-04** **Errores de log in**, en el formulario, sin el mensaje de Supabase:
+- [x] **AU-01** Los botones "Log in" y "Create account" del modal de cuenta (`guest-experience`), de la barra superior y de la tarjeta "Join Asinko" **dejan de ser "Próximamente"** y abren el formulario correspondiente **dentro del modal**, sin cambiar de página. Se puede pasar de uno al otro ("¿No tenés cuenta? Creá una").
+- [x] **AU-02** **Log in** pide email y contraseña. Con datos correctos, el modal se cierra y la misma página se ve con sesión: la campana, el perfil, la columna con sus intereses y la caja de publicar con su inicial.
+- [x] **AU-03** **`/login`** (con su prefijo de idioma) muestra el mismo formulario como página, para los links directos y para cuando no hay JavaScript. Con `?next=` vuelve a esa ruta al entrar; sin él, al Home. `next` solo acepta rutas internas que empiezan con `/` y no con `//` (`security.md § 5`).
+- [x] **AU-04** **Errores de log in**, en el formulario, sin el mensaje de Supabase:
   - email o contraseña incorrectos: un mensaje que no dice cuál de los dos falló;
   - demasiados intentos (`429`): que espere y pruebe de nuevo;
   - Supabase o el backend caídos: que pruebe en un rato.
 
 ### Crear la cuenta
 
-- [ ] **AU-05** **Create account** pide, en un solo paso: email, contraseña, username, y un checkbox "Tengo 18 años o más y acepto los Términos y la Privacidad", con sus links (Q1). El botón principal queda bloqueado hasta marcar el checkbox.
-- [ ] **AU-06** Antes de enviar, el formulario valida lo que se puede saber sin la red: email con formato válido, contraseña de 8 caracteres o más, username de 3 a 30 letras, números o `_`. Cada error va al lado de su campo.
-- [ ] **AU-07** Con datos válidos se crea la cuenta y el perfil, y se entra con sesión, como en AU-02.
-- [ ] **AU-08** **Errores del registro**, cada uno en su campo:
+- [x] **AU-05** **Create account** pide, en un solo paso: email, contraseña, username, y un checkbox "Tengo 18 años o más y acepto los Términos y la Privacidad", con sus links (Q1). El botón principal queda bloqueado hasta marcar el checkbox.
+- [x] **AU-06** Antes de enviar, el formulario valida lo que se puede saber sin la red: email con formato válido, contraseña de 8 caracteres o más, username de 3 a 30 letras, números o `_`. Cada error va al lado de su campo.
+- [x] **AU-07** Con datos válidos se crea la cuenta y el perfil, y se entra con sesión, como en AU-02.
+- [x] **AU-08** **Errores del registro**, cada uno en su campo:
   - email ya registrado;
   - username tomado (`409 USERNAME_TAKEN`);
   - username inválido (`422 INVALID_USERNAME`).
-- [ ] **AU-09** Si la cuenta de Supabase se creó y el perfil no (por ejemplo, el username se ocupó en ese instante), la persona **no queda trabada**: entra con sesión y se le pide elegir otro username (AU-11).
+- [x] **AU-09** Si la cuenta de Supabase se creó y el perfil no (por ejemplo, el username se ocupó en ese instante), la persona **no queda trabada**: entra con sesión y se le pide elegir otro username (AU-11).
 
 ### Google
 
-- [ ] **AU-10** **"Continuar con Google"** está en el modal y en `/login`, para entrar y para crear la cuenta. Al volver de Google, quien ya tiene perfil entra con sesión y vuelve a la página donde estaba.
-- [ ] **AU-11** **Elegir username:** con sesión pero sin perfil (Google por primera vez, o AU-09), se ve una pantalla para elegir el username y marcar edad y términos, con los mismos errores de AU-06 y AU-08. Hasta completarla:
+- [x] **AU-10** **"Continuar con Google"** está en el modal y en `/login`, para entrar y para crear la cuenta. Al volver de Google, quien ya tiene perfil entra con sesión y vuelve a la página donde estaba.
+- [x] **AU-11** **Elegir username:** con sesión pero sin perfil (Google por primera vez, o AU-09), se ve una pantalla para elegir el username y marcar edad y términos, con los mismos errores de AU-06 y AU-08. Hasta completarla:
   - la persona puede leer, pero toda acción que pide cuenta la lleva a esa pantalla;
   - puede cerrar sesión desde ahí.
 
   Al completarla, vuelve a donde estaba.
 
-- [ ] **AU-12** **Reddit** queda como botón "Próximamente" (MVP-206). Instagram y X se sacan del modal (G-13).
+- [x] **AU-12** **Reddit** queda como botón "Próximamente" (MVP-206). Instagram y X se sacan del modal (G-13).
 
 ### Sesión
 
-- [ ] **AU-13** La sesión **dura hasta que se cierra**: se renueva sola mientras la persona use el sitio, sin pedirle que entre de nuevo cada hora. Si ya no se puede renovar (por ejemplo, la cuenta se borró), la persona vuelve a estar sin sesión sin ver errores, y la próxima acción abre el modal.
-- [ ] **AU-14** **Cerrar sesión** está en el menú **"⋯"** de la barra superior, junto al idioma y el tema: el perfil de la barra es un link a tu página, sin menú (`design.md § 8`). Cierra la sesión y deja la misma página sin sesión.
-- [ ] **AU-15** Toda llamada del servidor a la API lleva `Authorization: Bearer` mientras haya sesión. El `userId` de las escrituras sale de la sesión, nunca del navegador (`api-integration.md § userId explícito`).
-- [ ] **AU-16** **Seguridad** (`security.md § 3`):
+- [x] **AU-13** La sesión **dura hasta que se cierra**: se renueva sola mientras la persona use el sitio, sin pedirle que entre de nuevo cada hora. Si ya no se puede renovar (por ejemplo, la cuenta se borró), la persona vuelve a estar sin sesión sin ver errores, y la próxima acción abre el modal.
+- [x] **AU-14** **Cerrar sesión** está en el menú **"⋯"** de la barra superior, junto al idioma y el tema: el perfil de la barra es un link a tu página, sin menú (`design.md § 8`). Cierra la sesión y deja la misma página sin sesión.
+- [x] **AU-15** Toda llamada del servidor a la API lleva `Authorization: Bearer` mientras haya sesión. El `userId` de las escrituras sale de la sesión, nunca del navegador (`api-integration.md § userId explícito`).
+- [x] **AU-16** **Seguridad** (`security.md § 3`):
   - los tokens viven en cookies `HttpOnly`, `SameSite=Lax` y `Secure` con https;
   - nunca llegan a `localStorage` ni al JavaScript del navegador;
   - el navegador no llama a la API.
-- [ ] **AU-17** Con `API_MOCKS=true` todo sigue como hoy (el usuario demo y la cookie de invitado). El "Dev login" convive con el login real fuera de producción.
+- [x] **AU-17** Con `API_MOCKS=true` todo sigue como hoy (el usuario demo y la cookie de invitado). El "Dev login" convive con el login real fuera de producción.
 
 ### Calidad
 
-- [ ] **AU-18** Textos en en, es y pt. A 360 px sin scroll horizontal. Teclado y lector de pantalla:
+- [x] **AU-18** Textos en en, es y pt. A 360 px sin scroll horizontal. Teclado y lector de pantalla:
   - cada campo tiene su label;
   - los errores se anuncian y quedan asociados a su campo;
   - al abrir un formulario, el foco va al primer campo.
 
   Axe sin violaciones en claro y oscuro.
 
-- [ ] **AU-19** Presupuesto de JS dentro de 240 KB en todas las rutas: el formulario se carga recién al abrirlo (`seo.md`).
-- [ ] **AU-20** En producción el sitio no arranca sin la configuración de Supabase (la URL y la clave pública), y nunca usa la `service_role`.
+- [x] **AU-19** Presupuesto de JS dentro de 240 KB en todas las rutas: el formulario se carga recién al abrirlo (`seo.md`).
+- [x] **AU-20** En producción el sitio no arranca sin la configuración de Supabase (la URL y la clave pública), y nunca usa la `service_role`.
 
 ## Fuera de alcance
 

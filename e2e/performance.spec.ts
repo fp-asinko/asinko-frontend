@@ -7,10 +7,23 @@ import { expect, test } from '@playwright/test'
 // by the PO with specs/mention-autocomplete). History in seo.md § Performance.
 const BUDGET_KB = 240
 
+// A guest (the login page sends anyone else away) and an account without a username (the page to
+// choose it): with API_MOCKS=true there is the demo user unless a cookie says otherwise.
+const GUEST = 'asinko-mock-guest=1'
+const NO_USERNAME = `asinko-session=${encodeURIComponent(
+  JSON.stringify({
+    accessToken: 'mock-access.00000000-0000-4000-8000-0000000000f1.perf',
+    refreshToken: 'mock-refresh.00000000-0000-4000-8000-0000000000f1.perf',
+    userId: '00000000-0000-4000-8000-0000000000f1',
+    username: null,
+    expiresAt: Date.now() + 3_600_000,
+  }),
+)}`
+
 test.describe('JavaScript budget', () => {
   test.skip(({ isMobile }) => isMobile, 'Same bundle on every device')
 
-  for (const path of [
+  for (const entry of [
     '/en',
     '/en?filter=polls',
     '/en?community=BTC',
@@ -34,9 +47,17 @@ test.describe('JavaScript budget', () => {
     '/en/submit?community=defi',
     // specs/post-create-detail PC-19
     '/en/post/00000000-0000-4000-8000-000000004001/whales-accumulated-48-000-btc-in-two-weeks',
-  ]) {
+    // specs/auth AU-19
+    ['/en/login', GUEST],
+    ['/en/login?mode=signup', GUEST],
+    ['/en/welcome', NO_USERNAME],
+  ].map((entry) => (typeof entry === 'string' ? [entry] : entry))) {
+    const [path, cookie] = entry as [string, string?]
     test(`${path} stays under ${BUDGET_KB} KB gzip`, async ({ request }) => {
-      const html = await (await request.get(path)).text()
+      const response = await request.get(path, cookie ? { headers: { cookie } } : undefined)
+      // The auth pages themselves, not where they would send someone else.
+      if (cookie) expect(new URL(response.url()).pathname).toBe(new URL(path, 'http://x').pathname)
+      const html = await response.text()
       const sources = [
         ...new Set([...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1])),
       ]

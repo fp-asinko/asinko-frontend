@@ -31,7 +31,7 @@ src/
 │   ├── ui/               # Átomos: shadcn (lo escribe el CLI) + átomos de marca (asinko-logo)
 │   ├── molecules/
 │   └── organisms/        # app-shell/ (layout de 3 columnas), status-message, empty-state, …
-├── features/             # Un directorio por dominio de negocio (hoy: feed, interests)
+├── features/             # Un directorio por dominio de negocio (feed, interests, auth…)
 │   └── <feature>/
 ├── hooks/                # Hooks transversales (use-mobile.ts, etc.)
 ├── i18n/                 # routing, navigation, request (next-intl), alternates (SEO) y client-messages
