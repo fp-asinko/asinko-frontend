@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { DEMO_USER } from '@/mocks/demo-user'
 
-const env = vi.hoisted(() => ({ API_MOCKS: 'off' as 'off' | 'missing' | 'all' }))
+const env = vi.hoisted(() => ({
+  API_MOCKS: 'off' as 'off' | 'missing' | 'all',
+  NEXT_PUBLIC_SITE_URL: 'http://localhost:3000',
+}))
 vi.mock('@/env', () => ({ env }))
 const jar = vi.hoisted(() => ({ guest: undefined as string | undefined }))
 vi.mock('next/headers', () => ({

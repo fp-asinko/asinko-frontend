@@ -1,11 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { DEV_LOGIN_IN_PRODUCTION_ERROR, envSchema, MOCKS_IN_PRODUCTION_ERROR } from './env-schema'
+import {
+  DEV_LOGIN_IN_PRODUCTION_ERROR,
+  envSchema,
+  MOCKS_IN_PRODUCTION_ERROR,
+  SUPABASE_REQUIRED_ERROR,
+} from './env-schema'
 
 const validPreview = {
   APP_ENV: 'preview',
   API_BASE_URL: 'https://api.example.com',
   API_MOCKS: 'true',
   NEXT_PUBLIC_SITE_URL: 'https://preview.example.com',
+}
+
+// Fake values only.
+const validProduction = {
+  ...validPreview,
+  APP_ENV: 'production',
+  API_MOCKS: 'false',
+  SUPABASE_URL: 'https://project.supabase.co',
+  SUPABASE_ANON_KEY: 'public-anon-key',
 }
 
 function issuesOf(input: Record<string, unknown>) {
@@ -62,20 +76,21 @@ describe('envSchema', () => {
     expect(envSchema.safeParse({ ...validPreview, API_TIMEOUT_MS: '500' }).success).toBe(false)
   })
 
-  it('accepts production without mocks', () => {
-    const result = envSchema.safeParse({
-      ...validPreview,
-      APP_ENV: 'production',
-      API_MOCKS: 'false',
-    })
+  it('accepts production without mocks, with Supabase', () => {
+    const result = envSchema.safeParse({ ...validProduction })
     expect(result.success).toBe(true)
+  })
+
+  it('rejects production without Supabase (specs/auth AU-20)', () => {
+    const { SUPABASE_ANON_KEY: _key, ...withoutKey } = validProduction
+    expect(issuesOf(withoutKey).map((issue) => issue.message)).toContain(SUPABASE_REQUIRED_ERROR)
+    // Outside production it stays optional: development without Supabase, the CI with mocks.
+    expect(envSchema.safeParse(validPreview).success).toBe(true)
   })
 
   it('rejects the development login in production (specs/dev-login DL-07)', () => {
     const production = {
-      ...validPreview,
-      APP_ENV: 'production',
-      API_MOCKS: 'false',
+      ...validProduction,
       DEV_LOGIN_EMAIL: 'dev@example.com',
       DEV_LOGIN_PASSWORD: 'not-a-real-password',
     }

@@ -9,7 +9,7 @@ import type { ActionResult } from '@/lib/result'
  * from the server's environment, never from the browser. Errors are translation keys; Supabase's
  * and the backend's messages never reach the UI.
  */
-export async function devLogin(): Promise<ActionResult<{ username: string }>> {
+export async function devLogin(): Promise<ActionResult<{ username: string | null }>> {
   const result = await startDevSession()
   if (!result.ok) return { ok: false, error: `devLogin.errors.${result.reason}` }
   // The whole app renders again as a signed-in user (DL-05).

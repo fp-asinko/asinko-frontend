@@ -22,6 +22,11 @@ export type ApiRequest<T, P extends EndpointPattern = EndpointPattern> = {
   schema: z.ZodType<T>
   query?: Record<string, string>
   body?: unknown
+  /**
+   * The Bearer for this request when the session cookie does not have it yet: while signing in
+   * (specs/auth). Otherwise getHeaders gives the session's.
+   */
+  accessToken?: string
 } & PathParams<P>
 
 export type ApiClientOptions = {
@@ -77,6 +82,7 @@ export function createApiClient({
     path: string,
     query: Record<string, string> | undefined,
     body: unknown,
+    accessToken: string | undefined,
   ): Promise<RawResponse> {
     const url = new URL(path, baseUrl)
     for (const [key, value] of Object.entries(query ?? {})) url.searchParams.set(key, value)
@@ -85,6 +91,7 @@ export function createApiClient({
       method,
       headers: {
         ...(getHeaders ? await getHeaders() : {}),
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         Accept: 'application/json',
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
       },
@@ -93,6 +100,11 @@ export function createApiClient({
       signal: AbortSignal.timeout(timeoutMs),
     })
     return { status: response.status, body: await readBody(response) }
+  }
+
+  async function sessionToken(): Promise<string | null> {
+    const authorization = (getHeaders ? await getHeaders() : {}).Authorization
+    return authorization?.startsWith('Bearer ') ? authorization.slice('Bearer '.length) : null
   }
 
   return async function apiRequest<T, P extends EndpointPattern>(
@@ -110,7 +122,13 @@ export function createApiClient({
         (!route.when || route.when(request.query ?? {}, request.body)),
     )
 
-    const context = { params, query: request.query ?? {}, body: request.body }
+    const context = {
+      params,
+      query: request.query ?? {},
+      body: request.body,
+      // Who calls, for the mocks that need it (the mocked POST /users, specs/auth).
+      accessToken: mock ? (request.accessToken ?? (await sessionToken())) : null,
+    }
     const extension = mock
       ? undefined
       : extensions?.find((each) => each.method === request.method && each.path === request.path)
@@ -119,7 +137,7 @@ export function createApiClient({
     try {
       raw = mock
         ? await mock.handler(context)
-        : await callNetwork(request.method, path, request.query, request.body)
+        : await callNetwork(request.method, path, request.query, request.body, request.accessToken)
       // Validated as any other answer: the proposal's shape too.
       if (extension) raw = extension.extend(raw, context)
     } catch (cause) {

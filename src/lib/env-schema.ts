@@ -20,11 +20,16 @@ export const serverEnvSchema = {
   API_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60_000).default(10_000),
   SENTRY_DSN: z.url().optional(),
   /**
-   * Development login (specs/dev-login): signs in with a test account of asinko-app and sends its
-   * token as Bearer. Server-only, never in production (refineEnv). All four or none.
+   * Supabase Auth (specs/auth): the project asinko-app uses, and its public (anon) key. Server-only:
+   * the browser never talks to Supabase. Required in production (refineEnv, AU-20); never the
+   * service_role key.
    */
   SUPABASE_URL: z.url().optional(),
   SUPABASE_ANON_KEY: z.string().min(1).optional(),
+  /**
+   * Development login (specs/dev-login): signs in with a test account of asinko-app with one tap.
+   * Never in production (refineEnv).
+   */
   DEV_LOGIN_EMAIL: z.email().optional(),
   DEV_LOGIN_PASSWORD: z.string().min(1).optional(),
 }
@@ -42,6 +47,8 @@ export const clientEnvSchema = {
 }
 
 export const MOCKS_IN_PRODUCTION_ERROR = 'API_MOCKS must be false when APP_ENV is production'
+export const SUPABASE_REQUIRED_ERROR =
+  'SUPABASE_URL and SUPABASE_ANON_KEY are required when APP_ENV is production'
 export const DEV_LOGIN_IN_PRODUCTION_ERROR =
   'DEV_LOGIN_* must not be set when APP_ENV is production'
 
@@ -52,6 +59,8 @@ export function refineEnv(
   env: {
     APP_ENV?: string
     API_MOCKS?: MocksMode
+    SUPABASE_URL?: string
+    SUPABASE_ANON_KEY?: string
     DEV_LOGIN_EMAIL?: string
     DEV_LOGIN_PASSWORD?: string
   },
@@ -59,6 +68,10 @@ export function refineEnv(
 ): void {
   if (env.APP_ENV === 'production' && env.API_MOCKS !== undefined && env.API_MOCKS !== 'off') {
     ctx.addIssue({ code: 'custom', path: ['API_MOCKS'], message: MOCKS_IN_PRODUCTION_ERROR })
+  }
+  // Logging in is not optional in production (specs/auth AU-20).
+  if (env.APP_ENV === 'production' && (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY)) {
+    ctx.addIssue({ code: 'custom', path: ['SUPABASE_URL'], message: SUPABASE_REQUIRED_ERROR })
   }
   // The development login can never reach production (specs/dev-login DL-07).
   if (env.APP_ENV === 'production' && (env.DEV_LOGIN_EMAIL || env.DEV_LOGIN_PASSWORD)) {

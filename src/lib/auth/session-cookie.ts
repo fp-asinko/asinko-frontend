@@ -1,0 +1,71 @@
+import { z } from 'zod'
+import type { AuthTokens } from './supabase-auth'
+
+/**
+ * The session cookie (specs/auth design.md § 3), pure: the proxy (before rendering) and the server
+ * code (lib/auth/session.ts) read and write it the same way. HttpOnly: the browser's JavaScript
+ * never sees a token (AU-16).
+ */
+export const SESSION_COOKIE = 'asinko-session'
+
+/** Thirty days, renewed with every refresh (AU-13). */
+export const SESSION_MAX_AGE = 60 * 60 * 24 * 30
+
+/** How long before the access token expires the proxy renews it. */
+export const REFRESH_MARGIN_MS = 60_000
+
+const sessionSchema = z.object({
+  accessToken: z.string().min(1),
+  refreshToken: z.string().min(1),
+  userId: z.uuid(),
+  /** null: an account without a profile yet (AU-09, AU-11). */
+  username: z.string().min(1).nullable(),
+  /** When the access token expires, in epoch ms. */
+  expiresAt: z.number().int(),
+})
+
+export type Session = z.infer<typeof sessionSchema>
+
+/** The session in a cookie's value, or null when there is none or it is malformed. */
+export function parseSession(raw: string | undefined): Session | null {
+  if (!raw) return null
+  try {
+    const parsed = sessionSchema.safeParse(JSON.parse(raw))
+    return parsed.success ? parsed.data : null
+  } catch {
+    return null
+  }
+}
+
+export function serializeSession(session: Session): string {
+  return JSON.stringify(session)
+}
+
+export function sessionFromTokens(
+  tokens: AuthTokens,
+  username: string | null,
+  now = Date.now(),
+): Session {
+  return {
+    accessToken: tokens.accessToken,
+    refreshToken: tokens.refreshToken,
+    userId: tokens.userId,
+    username,
+    expiresAt: now + tokens.expiresIn * 1000,
+  }
+}
+
+/** True when the access token expires within the margin: time to renew it. */
+export function needsRefresh(session: Session, now = Date.now()): boolean {
+  return session.expiresAt - now < REFRESH_MARGIN_MS
+}
+
+export function sessionCookieOptions(secure: boolean) {
+  return {
+    httpOnly: true,
+    sameSite: 'lax' as const,
+    secure,
+    path: '/',
+    maxAge: SESSION_MAX_AGE,
+  }
+}

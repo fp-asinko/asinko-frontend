@@ -2,9 +2,12 @@ import 'server-only'
 import { cookies } from 'next/headers'
 import { env } from '@/env'
 import { DEMO_USER } from '@/mocks/demo-user'
-import { readDevSession } from './auth/dev-session'
+import { readSession } from './auth/session'
 
 export type Viewer = { id: string; username: string }
+
+/** Who is looking: nobody, an account still choosing its username (AU-11), or a user. */
+export type AccountState = 'guest' | 'needs-profile' | 'ready'
 
 /**
  * Turns the demo user off in one browser, to test the experience without a session
@@ -14,22 +17,28 @@ export type Viewer = { id: string; username: string }
 export const MOCK_GUEST_COOKIE = 'asinko-mock-guest'
 
 /**
- * The current user (F-38). With every route mocked (API_MOCKS=true): the demo user, unless the
- * browser asked to be a guest. Otherwise, the development login's session (specs/dev-login) or
- * nobody, so writes get UNAUTHENTICATED. The auth spec replaces this function only
- * (api-integration.md).
+ * The current user (F-38), from the session (specs/auth): with a profile, or null. With every
+ * route mocked (API_MOCKS=true) and no session, the demo user, unless the browser asked to be a
+ * guest. Writes without a viewer get UNAUTHENTICATED.
  */
 export async function getViewer(): Promise<Viewer | null> {
+  const session = await readSession()
+  if (session) return session.username ? { id: session.userId, username: session.username } : null
   if (env.API_MOCKS === 'all') {
     const guest = (await cookies()).get(MOCK_GUEST_COOKIE)?.value === '1'
     return guest ? null : DEMO_USER
   }
-  const session = await readDevSession()
-  return session ? { id: session.userId, username: session.username } : null
+  return null
 }
 
-/** The Bearer token for the backend (P-002), or null without a session. */
+/** For the layout: the account modal for a guest, the username screen for an account without one. */
+export async function getAccountState(): Promise<AccountState> {
+  const session = await readSession()
+  if (session && !session.username) return 'needs-profile'
+  return (await getViewer()) ? 'ready' : 'guest'
+}
+
+/** The Bearer token for the backend (P-002, AU-15), or null without a session. */
 export async function getAccessToken(): Promise<string | null> {
-  if (env.API_MOCKS === 'all') return null
-  return (await readDevSession())?.accessToken ?? null
+  return (await readSession())?.accessToken ?? null
 }

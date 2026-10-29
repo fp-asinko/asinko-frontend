@@ -6,6 +6,8 @@ export type MockContext = {
   params: Record<string, string>
   query: Record<string, string>
   body: unknown
+  /** The caller's Bearer token, when the mock needs to know who calls (POST /users, specs/auth). */
+  accessToken?: string | null
 }
 
 export type MockResponse = { status: number; body?: unknown }
