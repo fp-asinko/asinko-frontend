@@ -14,7 +14,7 @@ export type AccountState = 'guest' | 'needs-profile' | 'ready'
  * (specs/guest-experience T-05). Only read with every route mocked, which src/env.ts refuses in
  * production: it can never hide a real session.
  */
-export const MOCK_GUEST_COOKIE = 'asinko-mock-guest'
+export const MOCK_GUEST_COOKIE = 'asinko-mock-guest' // also in lib/auth/session.ts
 
 /**
  * The current user (F-38), from the session (specs/auth): with a profile, or null. With every

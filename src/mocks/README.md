@@ -7,6 +7,7 @@ Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of 
 | Method | Path                                       | Kind     | Notes                                                                                                            |
 | ------ | ------------------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------- |
 | GET    | `/api/v1/profiles/:identifier`             | contract | Implemented in the backend (E01). `liveExample` for `pnpm api:smoke`                                             |
+| POST   | `/api/v1/users`                            | contract | E01. The profile of an account signing up (specs/auth), its user from the Bearer; `taken` is always taken        |
 | GET    | `/api/v1/users/:userId/following`          | contract | E01. Users the demo viewer follows (maria, federico, jeppe)                                                      |
 | GET    | `/api/v1/communities`                      | contract | E02. `search`, `type`, `cursor`                                                                                  |
 | GET    | `/api/v1/communities/:slug`                | contract | E02                                                                                                              |

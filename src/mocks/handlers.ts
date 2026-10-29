@@ -60,6 +60,7 @@ import { isProposedUserChange, updateUser } from './profile-edit'
 import { signProfileImageUpload } from './profile-image'
 import { paginate } from './paginate'
 import { signPostImageUpload } from './post-image'
+import { createMockProfile } from './sign-up'
 import type { MockContext, MockExtension, MockResponse, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
 import {
@@ -444,6 +445,24 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     },
     handler: ({ params, query }) =>
       removeFeatured(params.userId ?? '', params.kind ?? '', params.id ?? '', query.userId),
+  },
+  // E01: the profile of an account that is signing up (specs/auth), its user from the Bearer.
+  {
+    method: 'POST',
+    path: '/api/v1/users',
+    kind: 'contract',
+    implemented: true,
+    schema: userSchema,
+    // A new account each time it runs: a second profile for the same user is refused.
+    get example(): MockContext {
+      const id = crypto.randomUUID()
+      return {
+        ...noRequest,
+        body: { username: `new_${id.slice(0, 8)}`, ageConfirmed: true, termsAccepted: true },
+        accessToken: `mock-access.${id}.example`,
+      }
+    },
+    handler: createMockProfile,
   },
   // E01: editing your own profile (specs/profile-edit), for the demo viewer.
   {
