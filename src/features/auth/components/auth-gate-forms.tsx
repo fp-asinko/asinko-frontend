@@ -12,7 +12,7 @@ const LogInForm = dynamic(() => import('./log-in-form').then((mod) => mod.LogInF
 })
 const SignUpForm = dynamic(() => import('./sign-up-form').then((mod) => mod.SignUpForm), {
   ssr: false,
-  loading: () => <FormSkeleton fields={3} />,
+  loading: () => <FormSkeleton fields={2} />,
 })
 
 /**

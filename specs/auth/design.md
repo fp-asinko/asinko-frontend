@@ -120,3 +120,24 @@ Al terminar bien, `revalidatePath('/', 'layout')`: toda la página se vuelve a d
 - En Vercel hay que cargarlas con esos nombres en cada ambiente.
 - `.env.example` lo explica. `DEV_LOGIN_*` sigue igual y sigue prohibida en producción.
 - CSP sin cambios: el navegador no llama a Supabase (`connect-src` igual); Google es una navegación, no un `fetch`.
+
+## 11. Cambio del PO (2026-10-29): registro en dos pasos y foto
+
+Reemplaza lo que § 6, § 7 y § 9 dicen de `signUp` y del username al crear la cuenta.
+
+- **`signUp`** recibe `{ email, password }`: crea la cuenta en Supabase y escribe la sesión sin username. Siempre responde `needsProfile: true`, y la UI va a `/welcome`. Ya no consulta si el username está libre (`isUsernameTaken` se va): `POST /users` lo dice, y como la cuenta ya existe nunca queda huérfana.
+- **Sugerencia:** Supabase devuelve `user.email` con los tokens. Mientras no hay username, la cookie guarda `suggestion`, que sale de `suggestUsername(email)` (`lib/auth/suggest-username.ts`, puro). Toma la parte antes de la `@` en minúsculas, cambia lo que no es letra, número o `_` por `_`, junta los `_` repetidos, los recorta de los bordes y corta en 30. Con menos de 3 caracteres no sugiere. La bienvenida la pone como valor inicial del campo.
+- **Bienvenida:** `ProfileForm` con username, foto opcional y el checkbox (`profileSchema` sin cambios). Al continuar:
+  1. `createProfile` crea el perfil (sigue respondiendo `ok` si ya existe, para reintentar).
+  2. Si hay foto, `setAvatar` (`FormData`) la sube y la guarda.
+  3. Se navega a `next`.
+
+  Si la foto falla, el formulario lo dice y queda en pantalla; "Continuar" reintenta el paso 2.
+
+- **Foto:**
+  - **Navegador:** `AvatarPicker` (cliente) recorta el cuadrado central con `cropImage` de `lib/prepare-image` (400×400, WebP, sin EXIF). Es la misma preparación que "Editar perfil", sin el encuadre manual: queda para "Editar perfil".
+  - **Servidor:** `setAvatar` (action del feature `auth`) valida tamaño y bytes como `uploadProfileImage`, sube con `uploadSignedImage('/api/v1/uploads/avatar')` y guarda con `PATCH /users/{id}` `{ avatarUrl }`. Usa la URL que devuelve la subida.
+  - **Duplicado a propósito:** son unas 20 líneas que repiten `communities`, porque los features no se importan entre sí (`structure.md`). Si aparece un tercer uso, se sube a `lib/`.
+- **`SignUpForm`** queda con email y contraseña. El checkbox y su texto legal pasan a la bienvenida.
+- **Mocks:** el Supabase simulado guarda el email de cada cuenta y lo devuelve en `user.email`. La cuenta nueva de Google es `new.trader@gmail.com`, que sugiere `new_trader`.
+- **Sin logo en los formularios** (PO, 2026-10-29): el logo de Asinko queda solo arriba de la invitación del modal. Los formularios de entrar y crear cuenta, `/login` y la bienvenida empiezan por su título.

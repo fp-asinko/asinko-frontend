@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { suggestUsername } from './suggest-username'
 import type { AuthTokens } from './supabase-auth'
 
 /**
@@ -22,6 +23,8 @@ const sessionSchema = z.object({
   username: z.string().min(1).nullable(),
   /** When the access token expires, in epoch ms. */
   expiresAt: z.number().int(),
+  /** Without a username: the one the welcome screen suggests (design.md § 11). */
+  suggestion: z.string().nullish(),
 })
 
 export type Session = z.infer<typeof sessionSchema>
@@ -52,6 +55,7 @@ export function sessionFromTokens(
     userId: tokens.userId,
     username,
     expiresAt: now + tokens.expiresIn * 1000,
+    ...(username ? {} : { suggestion: suggestUsername(tokens.email) }),
   }
 }
 

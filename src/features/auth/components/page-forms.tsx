@@ -11,11 +11,11 @@ const LogInForm = dynamic(() => import('./log-in-form').then((mod) => mod.LogInF
 })
 const SignUpForm = dynamic(() => import('./sign-up-form').then((mod) => mod.SignUpForm), {
   ssr: false,
-  loading: () => <FormSkeleton fields={3} />,
+  loading: () => <FormSkeleton fields={2} />,
 })
 const ProfileForm = dynamic(() => import('./profile-form').then((mod) => mod.ProfileForm), {
   ssr: false,
-  loading: () => <FormSkeleton fields={1} />,
+  loading: () => <FormSkeleton fields={2} />,
 })
 
 /**
@@ -37,6 +37,6 @@ export function LoginPageForm({ mode, next }: { mode: 'login' | 'signup'; next: 
 }
 
 /** Choosing the username (specs/auth AU-11): back to `next` when done. */
-export function WelcomePageForm({ next }: { next: string }) {
-  return <ProfileForm onDone={() => goTo(next)} />
+export function WelcomePageForm({ next, suggestion }: { next: string; suggestion: string | null }) {
+  return <ProfileForm suggestion={suggestion} onDone={() => goTo(next)} />
 }

@@ -38,7 +38,13 @@ describe('createSupabaseAuth (specs/auth design.md § 2)', () => {
     const result = await withFetch(fetchImpl).signInWithPassword('a@b.co', 'secret-123')
     expect(result).toEqual({
       ok: true,
-      tokens: { accessToken: 'access', refreshToken: 'refresh', expiresIn: 3600, userId: USER_ID },
+      tokens: {
+        accessToken: 'access',
+        refreshToken: 'refresh',
+        expiresIn: 3600,
+        userId: USER_ID,
+        email: 'a@b.co',
+      },
     })
     const [url, init] = vi.mocked(fetchImpl).mock.calls[0]!
     expect(String(url)).toBe('https://project.supabase.co/auth/v1/token?grant_type=password')

@@ -5,6 +5,7 @@ import { splitLocale } from '@/i18n/locale-path'
 import { redirect } from '@/i18n/navigation'
 import { safeLocale } from '@/i18n/safe-locale'
 import { safeNext } from '@/lib/auth/next'
+import { readSession } from '@/lib/auth/session'
 import { getAccountState } from '@/lib/session'
 
 // Choose your username (specs/auth AU-11): only for an account without one. Outside (main) and
@@ -25,5 +26,5 @@ export default async function WelcomeRoute({
   if (state === 'ready') redirect(splitLocale(next))
   if (state === 'guest') redirect({ href: { pathname: '/login', query: { next } }, locale })
 
-  return <WelcomeView next={next} />
+  return <WelcomeView next={next} suggestion={(await readSession())?.suggestion ?? null} />
 }

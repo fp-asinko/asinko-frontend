@@ -11,6 +11,7 @@ const tokens = (accessToken: string, userId = USER_ID) => ({
   refreshToken: `${accessToken}-refresh`,
   expiresIn: 3600,
   userId,
+  email: null,
 })
 // Expires in 30 s: inside the margin.
 const expiring = sessionFromTokens({ ...tokens('old'), expiresIn: 30 }, 'maria', NOW)

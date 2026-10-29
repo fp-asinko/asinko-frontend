@@ -8,7 +8,7 @@ import { DEMO_USER } from './demo-user'
  * - demo@asinko.dev / demo-password: the demo user.
  * - taken@asinko.dev: already registered.
  * - Google comes back with `mock-google-demo` (the demo user) or `mock-google-new` (a new account
- *   without a profile).
+ *   without a profile, new.trader@gmail.com).
  */
 export const MOCK_SUPABASE_URL = 'https://supabase.mock'
 export const MOCK_DEMO_EMAIL = 'demo@asinko.dev'
@@ -16,6 +16,8 @@ export const MOCK_DEMO_PASSWORD = 'demo-password'
 export const MOCK_TAKEN_EMAIL = 'taken@asinko.dev'
 /** Codes Google "returns" with the mocks. */
 export const MOCK_GOOGLE_CODE = { demo: 'mock-google-demo', new: 'mock-google-new' } as const
+/** The email of a new Google account: the welcome screen suggests `new_trader`. */
+export const MOCK_GOOGLE_NEW_EMAIL = 'new.trader@gmail.com'
 
 type Account = { id: string; password: string }
 
@@ -33,15 +35,20 @@ export function mockTokenUser(accessToken: string | null | undefined): string | 
   return accessToken.slice(ACCESS_PREFIX.length).split('.')[0] ?? null
 }
 
-function session(userId: string) {
+function session(userId: string, email: string | null = emailOf(userId)) {
   const nonce = crypto.randomUUID()
   return {
     access_token: `${ACCESS_PREFIX}${userId}.${nonce}`,
     refresh_token: `${REFRESH_PREFIX}${userId}.${nonce}`,
     expires_in: 3600,
     token_type: 'bearer',
-    user: { id: userId },
+    user: { id: userId, email },
   }
+}
+
+function emailOf(userId: string): string | null {
+  for (const [email, account] of accounts) if (account.id === userId) return email
+  return null
 }
 
 function json(status: number, body: unknown): Response {
@@ -88,7 +95,9 @@ export async function mockSupabaseFetch(
   }
   if (route === '/auth/v1/token?grant_type=pkce') {
     if (body.auth_code === MOCK_GOOGLE_CODE.demo) return json(200, session(DEMO_USER.id))
-    if (body.auth_code === MOCK_GOOGLE_CODE.new) return json(200, session(crypto.randomUUID()))
+    if (body.auth_code === MOCK_GOOGLE_CODE.new) {
+      return json(200, session(crypto.randomUUID(), MOCK_GOOGLE_NEW_EMAIL))
+    }
     return refused(400, 'flow_state_not_found')
   }
   if (route === '/auth/v1/logout') return json(204, null)

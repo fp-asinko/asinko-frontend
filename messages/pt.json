@@ -1157,7 +1157,7 @@
     },
     "welcome": {
       "title": "Escolha seu nome de usuário",
-      "intro": "É como as pessoas encontram e mencionam você no Asinko.",
+      "intro": "É como as pessoas encontram e mencionam você no Asinko. Adicione uma foto se quiser.",
       "submit": "Continuar",
       "pending": "Salvando…"
     },
@@ -1196,7 +1196,17 @@
       "weakPassword": "Escolha uma senha mais forte",
       "usernameTaken": "Esse nome de usuário já está em uso",
       "noSession": "Sua sessão terminou. Entre de novo",
-      "google": "Não conseguimos entrar com o Google. Tente de novo"
+      "google": "Não conseguimos entrar com o Google. Tente de novo",
+      "photoType": "Use uma imagem JPEG, PNG ou WebP",
+      "photoTooLarge": "Essa imagem é grande demais",
+      "photoUpload": "Seu perfil está pronto, mas a foto não subiu. Tente de novo ou remova-a para continuar"
+    },
+    "photo": {
+      "label": "Foto de perfil (opcional)",
+      "hint": "Você pode enquadrá-la depois no seu perfil.",
+      "add": "Adicionar uma foto",
+      "change": "Trocar foto",
+      "remove": "Remover"
     }
   }
 }

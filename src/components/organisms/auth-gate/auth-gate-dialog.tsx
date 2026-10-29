@@ -69,10 +69,13 @@ export function AuthGateDialog({
         >
           <XIcon aria-hidden />
         </DialogClose>
-        {/* G-13: the brand on top. Decorative: the title says what the modal is about. */}
-        <div aria-hidden className="flex justify-center">
-          <AsinkoLogo label={t('brand')} />
-        </div>
+        {/* G-13: the brand on top of the invitation; not over the forms (PO, 2026-10-29). Decorative:
+            the title says what the modal is about. */}
+        {view === 'invite' && (
+          <div aria-hidden className="flex justify-center">
+            <AsinkoLogo label={t('brand')} />
+          </div>
+        )}
         <div className="flex flex-col gap-2 px-6 text-center">
           {/* Loose classes, not type-*: cn does not merge them with the base text-* (design-system.md). */}
           <DialogTitle className="text-[1.375rem] leading-tight font-bold">{title}</DialogTitle>

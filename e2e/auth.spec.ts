@@ -27,25 +27,56 @@ async function signedIn(page: Page) {
 }
 
 test.describe('Log in and sign up (specs/auth)', () => {
-  test('creates an account from the modal and stays on the page, signed in (AU-01, AU-05, AU-07)', async ({
+  test('creates an account with email and password, chooses the suggested username, and comes back (AU-01, AU-05, AU-07, AU-11)', async ({
     page,
   }) => {
     await page.goto('/en/hub/defi')
     const dialog = await openLogIn(page)
     await dialog.getByRole('button', { name: 'Create an account' }).click()
     await expect(page.getByRole('dialog', { name: 'Join Asinko' })).toBeVisible()
+    await expect(page.getByLabel('Username')).toHaveCount(0)
 
     const username = freshUsername('e2e')
     await page.getByLabel('Email').fill(`${username}@asinko.dev`)
     await page.getByLabel('Password', { exact: true }).fill('long-enough')
-    await page.getByLabel('Username').fill(username)
-    const create = page.getByRole('button', { name: 'Create account' })
-    await expect(create).toBeDisabled()
-    await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
-    await create.click()
+    await page.getByRole('button', { name: 'Create account' }).click()
 
-    await expect(page.getByRole('dialog')).toHaveCount(0)
+    // The welcome screen, with the username suggested from the email.
+    await expect(page).toHaveURL(/\/en\/welcome\?next=%2Fen%2Fhub%2Fdefi$/)
+    await expect(page.getByLabel('Username')).toHaveValue(username)
+    const go = page.getByRole('main').getByRole('button', { name: 'Continue', exact: true })
+    await expect(go).toBeDisabled()
+    await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
+    await go.click()
+
     await expect(page).toHaveURL(/\/en\/hub\/defi$/)
+    await signedIn(page)
+  })
+
+  test('adds a photo in the welcome screen, shown round before continuing (AU-21)', async ({
+    page,
+  }) => {
+    await page.goto('/en/login?mode=signup')
+    const username = freshUsername('pic')
+    await page.getByLabel('Email').fill(`${username}@asinko.dev`)
+    await page.getByLabel('Password', { exact: true }).fill('long-enough')
+    await page.getByRole('main').getByRole('button', { name: 'Create account' }).click()
+    await expect(page).toHaveURL(/\/en\/welcome/)
+
+    // A real 1×1 PNG (as e2e/post-image.spec.ts): the browser decodes it and cuts its square.
+    const png = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+      'base64',
+    )
+    await page.locator('input[type=file]').setInputFiles({
+      name: 'me.png',
+      mimeType: 'image/png',
+      buffer: png,
+    })
+    await expect(page.getByRole('button', { name: 'Remove' })).toBeVisible()
+    await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
+    await page.getByRole('main').getByRole('button', { name: 'Continue', exact: true }).click()
+    await expect(page).toHaveURL(/\/en$/)
     await signedIn(page)
   })
 
@@ -76,41 +107,31 @@ test.describe('Log in and sign up (specs/auth)', () => {
     ).toBeVisible()
   })
 
-  test('puts a taken username and a taken email next to their fields (AU-08)', async ({ page }) => {
-    await page.goto('/en/login?mode=signup')
-    await page.getByLabel('Email').fill('taken@asinko.dev')
-    await page.getByLabel('Password', { exact: true }).fill('long-enough')
-    // Someone's public profile: known before creating anything.
-    await page.getByLabel('Username').fill('maria')
-    await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
-    await page.getByRole('button', { name: 'Create account' }).click()
-    await expect(page.getByLabel('Username')).toHaveAccessibleDescription('That username is taken')
-
-    await page.getByLabel('Username').fill(freshUsername('e2e'))
-    await page.getByRole('button', { name: 'Create account' }).click()
-    await expect(page.getByLabel('Email')).toHaveAccessibleDescription(
-      'There’s already an account with this email',
-    )
-  })
-
-  test('an account whose username was taken at the last moment chooses another, never stuck (AU-09)', async ({
+  test('says a taken email when creating the account, and a taken username in the welcome screen (AU-08, AU-09)', async ({
     page,
   }) => {
     await page.goto(`/en/login?mode=signup&next=${encodeURIComponent('/en/hub/defi')}`)
+    await page.getByLabel('Email').fill('taken@asinko.dev')
+    await page.getByLabel('Password', { exact: true }).fill('long-enough')
+    const create = page.getByRole('main').getByRole('button', { name: 'Create account' })
+    await create.click()
+    await expect(page.getByLabel('Email')).toHaveAccessibleDescription(
+      'There’s already an account with this email',
+    )
+
     const username = freshUsername('e2e')
     await page.getByLabel('Email').fill(`${username}@asinko.dev`)
-    await page.getByLabel('Password', { exact: true }).fill('long-enough')
-    // 	aken has no public profile: only creating it says it is someone's.
-    await page.getByLabel('Username').fill('taken')
+    await create.click()
+    await expect(page).toHaveURL(/\/en\/welcome/)
+    // Someone's: the backend says so, next to the field, and the account is not stuck.
+    await page.getByLabel('Username').fill('maria')
     await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
-    await page.getByRole('button', { name: 'Create account' }).click()
-
-    await expect(page).toHaveURL(/\/en\/welcome\?next=%2Fen%2Fhub%2Fdefi$/)
+    const go = page.getByRole('main').getByRole('button', { name: 'Continue', exact: true })
+    await go.click()
+    await expect(page.getByLabel('Username')).toHaveAccessibleDescription('That username is taken')
     await page.getByLabel('Username').fill(username)
-    await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
-    await page.getByRole('main').getByRole('button', { name: 'Continue', exact: true }).click()
+    await go.click()
     await expect(page).toHaveURL(/\/en\/hub\/defi$/)
-    await signedIn(page)
   })
 
   test('the login page comes back to next, and never leaves the site (AU-03)', async ({ page }) => {
@@ -149,6 +170,7 @@ test.describe('Log in and sign up (specs/auth)', () => {
       page.getByRole('banner').getByRole('button', { name: 'Choose username' }),
     ).toBeVisible()
 
+    await expect(page.getByLabel('Username')).toHaveValue('new_trader')
     await page.getByLabel('Username').fill(freshUsername('g'))
     await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
     await page.getByRole('main').getByRole('button', { name: 'Continue', exact: true }).click()
@@ -173,7 +195,7 @@ test.describe('Log in and sign up (specs/auth)', () => {
       await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
       await page.setViewportSize({ width: 360, height: 800 })
       await page.goto('/en/login?mode=signup')
-      await expect(page.getByLabel('Username')).toBeVisible()
+      await expect(page.getByLabel('Password', { exact: true })).toBeVisible()
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
       )

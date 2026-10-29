@@ -82,7 +82,9 @@ describe('the login page form (AU-03)', () => {
 
   it('shows the sign up form in its mode', async () => {
     renderWithIntl(<LoginPageForm mode="signup" next="/en" />)
-    expect(await screen.findByLabelText('Username', {}, { timeout: 5000 })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('button', { name: 'Create account' }, { timeout: 5000 }),
+    ).toBeInTheDocument()
   })
 })
 

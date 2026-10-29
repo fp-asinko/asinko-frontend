@@ -3,7 +3,7 @@
 > **Estado:** aprobado por el PO el 2026-10-29. Tarea **MVP-210** (sprint MVP-3), la primera del sprint: sin login no se puede probar contra la API real nada de lo que pide sesión (tesis, comentar, notificaciones, crear comunidad).
 > **Decisiones del PO (2026-10-29):**
 >
-> - Registro con email **en un solo paso**: email, contraseña, username y la confirmación de edad y términos en el mismo formulario. Con Google, primero Google y después una pantalla para elegir el username y aceptar.
+> - ~~Registro con email en un solo paso~~. **Cambio del PO (2026-10-29, después de verlo):** el username en el primer formulario quedaba raro. Crear la cuenta pide solo email y contraseña; después, con email o con Google, la misma pantalla de bienvenida pide el username (ya sugerido), una foto opcional y la confirmación de edad y términos. El username no se deja para después en el perfil: el backend lo exige para crear el perfil y solo deja cambiarlo una vez cada 2 años (`USERNAME_CHANGE_TOO_SOON`).
 > - En el modal, **"Continuar con Google"** funciona y **Reddit** queda "Próximamente" (MVP-206). Se sacan Instagram y X.
 > - **"Olvidé mi contraseña" queda afuera:** va en otra tarea.
 > - **El botón "Dev login" se queda** como atajo de desarrollo (`specs/dev-login`).
@@ -26,7 +26,7 @@ Que cualquiera pueda crear su cuenta o entrar a Asinko, con email o con Google, 
 
 1. Como **visitante**, quiero crear mi cuenta con email o con Google desde el mismo modal que me invita a participar, para votar, comentar o publicar sin perder la página.
 2. Como **usuario con cuenta**, quiero entrar con mi email y contraseña o con Google, y seguir con sesión hasta que la cierre.
-3. Como **usuario nuevo con Google**, quiero elegir mi username una sola vez, para que mi perfil y mi canal tengan mi nombre.
+3. Como **usuario nuevo**, con email o con Google, quiero elegir mi username (y mi foto, si quiero) apenas creo la cuenta, para que mi perfil y mi canal tengan mi nombre.
 4. Como **usuario**, quiero cerrar sesión cuando quiera.
 
 ## Criterios de aceptación
@@ -43,25 +43,32 @@ Que cualquiera pueda crear su cuenta o entrar a Asinko, con email o con Google, 
 
 ### Crear la cuenta
 
-- [x] **AU-05** **Create account** pide, en un solo paso: email, contraseña, username, y un checkbox "Tengo 18 años o más y acepto los Términos y la Privacidad", con sus links (Q1). El botón principal queda bloqueado hasta marcar el checkbox.
-- [x] **AU-06** Antes de enviar, el formulario valida lo que se puede saber sin la red: email con formato válido, contraseña de 8 caracteres o más, username de 3 a 30 letras, números o `_`. Cada error va al lado de su campo.
-- [x] **AU-07** Con datos válidos se crea la cuenta y el perfil, y se entra con sesión, como en AU-02.
-- [x] **AU-08** **Errores del registro**, cada uno en su campo:
-  - email ya registrado;
-  - username tomado (`409 USERNAME_TAKEN`);
-  - username inválido (`422 INVALID_USERNAME`).
-- [x] **AU-09** Si la cuenta de Supabase se creó y el perfil no (por ejemplo, el username se ocupó en ese instante), la persona **no queda trabada**: entra con sesión y se le pide elegir otro username (AU-11).
+- [x] **AU-05** **Create account** pide solo **email y contraseña** (PO, 2026-10-29).
+- [x] **AU-06** Antes de enviar, cada formulario valida lo que se puede saber sin la red: email con formato válido, contraseña de 8 caracteres o más, username de 3 a 30 letras, números o `_`. Cada error va al lado de su campo.
+- [x] **AU-07** Con datos válidos se crea la cuenta, se entra con sesión y se pasa a la pantalla de bienvenida (AU-11). Al completarla, se vuelve a la página donde estaba.
+- [x] **AU-08** **Errores**, cada uno en su campo: email ya registrado (al crear la cuenta); username tomado (`409 USERNAME_TAKEN`) o inválido (`422 INVALID_USERNAME`) (en la bienvenida).
+- [x] **AU-09** Nadie queda trabado: una cuenta creada sin perfil (el registro, Google, o una pestaña cerrada a mitad de camino) vuelve a la bienvenida (AU-11).
 
 ### Google
 
 - [x] **AU-10** **"Continuar con Google"** está en el modal y en `/login`, para entrar y para crear la cuenta. Al volver de Google, quien ya tiene perfil entra con sesión y vuelve a la página donde estaba.
-- [x] **AU-11** **Elegir username:** con sesión pero sin perfil (Google por primera vez, o AU-09), se ve una pantalla para elegir el username y marcar edad y términos, con los mismos errores de AU-06 y AU-08. Hasta completarla:
+- [x] **AU-11** **Bienvenida:** con sesión pero sin perfil (después de crear la cuenta, Google por primera vez, o AU-09), una pantalla pide:
+  - el **username**, ya **sugerido** a partir del email (`ana.perez@…` → `ana_perez`), con los errores de AU-06 y AU-08;
+  - una **foto, opcional** (AU-21);
+  - el checkbox "Tengo 18 años o más y acepto los Términos y la Privacidad", con sus links (Q1). "Continuar" queda bloqueado hasta marcarlo.
+
+  Hasta completarla:
   - la persona puede leer, pero toda acción que pide cuenta la lleva a esa pantalla;
   - puede cerrar sesión desde ahí.
 
   Al completarla, vuelve a donde estaba.
 
 - [x] **AU-12** **Reddit** queda como botón "Próximamente" (MVP-206). Instagram y X se sacan del modal (G-13).
+- [x] **AU-21** **Foto en la bienvenida** (PO, 2026-10-29), opcional:
+  - se elige una imagen (JPEG, PNG o WebP) y se ve redonda antes de continuar;
+  - se recorta sola al cuadrado del centro, y se puede cambiar o encuadrar después en "Editar perfil";
+  - se puede quitar antes de continuar;
+  - si no se pudo subir, el perfil queda creado igual y se avisa; "Continuar" lo vuelve a intentar.
 
 ### Sesión
 

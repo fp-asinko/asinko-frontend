@@ -13,6 +13,8 @@ export type AuthTokens = {
   /** Seconds. */
   expiresIn: number
   userId: string
+  /** To suggest a username to a new account (specs/auth design.md § 11). */
+  email: string | null
 }
 
 export type AuthFailure =
@@ -31,7 +33,7 @@ const tokensSchema = z.object({
   access_token: z.string().min(1),
   refresh_token: z.string().min(1),
   expires_in: z.number().int().positive(),
-  user: z.object({ id: z.uuid() }),
+  user: z.object({ id: z.uuid(), email: z.string().nullish() }),
 })
 
 /** Supabase's error body: only the code is read, never the message. */
@@ -97,6 +99,7 @@ export function createSupabaseAuth({
           refreshToken: refresh_token,
           expiresIn: expires_in,
           userId: user.id,
+          email: user.email ?? null,
         },
       }
     }

@@ -3,7 +3,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Session } from '@/lib/auth/session-cookie'
 
 const USER_ID = '00000000-0000-4000-8000-0000000000aa'
-const TOKENS = { accessToken: 'access', refreshToken: 'refresh', expiresIn: 3600, userId: USER_ID }
+const TOKENS = {
+  accessToken: 'access',
+  refreshToken: 'refresh',
+  expiresIn: 3600,
+  userId: USER_ID,
+  email: 'ana.perez@example.com',
+}
 
 const deps = vi.hoisted(() => ({
   auth: {
@@ -16,7 +22,6 @@ const deps = vi.hoisted(() => ({
   clearSession: vi.fn(),
   startSession: vi.fn(),
   createProfile: vi.fn(),
-  isUsernameTaken: vi.fn(),
   revalidatePath: vi.fn(),
 }))
 vi.mock('@/lib/auth/supabase', () => ({
@@ -30,10 +35,7 @@ vi.mock('@/lib/auth/session', () => ({
   clearSession: deps.clearSession,
 }))
 vi.mock('@/lib/auth/account', () => ({ startSession: deps.startSession }))
-vi.mock('../lib/profile-api', () => ({
-  createProfile: deps.createProfile,
-  isUsernameTaken: deps.isUsernameTaken,
-}))
+vi.mock('../lib/profile-api', () => ({ createProfile: deps.createProfile }))
 vi.mock('next/cache', () => ({ revalidatePath: deps.revalidatePath }))
 vi.mock('next-intl/server', () => ({ getLocale: async () => 'es' }))
 
@@ -42,12 +44,7 @@ const { signUp } = await import('./sign-up.action')
 const { createProfile } = await import('./create-profile.action')
 const { logOut } = await import('./log-out.action')
 
-const SIGN_UP = {
-  email: 'ana@example.com',
-  password: 'long-enough',
-  username: 'ana_92',
-  accepted: true,
-}
+const SIGN_UP = { email: 'ana.perez@example.com', password: 'long-enough' }
 
 describe('auth actions (specs/auth design.md § 6)', () => {
   beforeEach(() => {
@@ -59,7 +56,6 @@ describe('auth actions (specs/auth design.md § 6)', () => {
     }
     deps.session = null
     deps.startSession.mockResolvedValue({ ok: true, session: { username: 'ana_92' } })
-    deps.isUsernameTaken.mockResolvedValue(false)
     deps.createProfile.mockResolvedValue({ ok: true, username: 'ana_92' })
   })
 
@@ -107,24 +103,16 @@ describe('auth actions (specs/auth design.md § 6)', () => {
     })
   })
 
-  describe('signUp (AU-05 to AU-09)', () => {
-    it('creates the account, then its profile in the locale, and signs in with the username', async () => {
-      expect(await signUp(SIGN_UP)).toEqual({ ok: true, data: { needsProfile: false } })
-      expect(deps.auth?.signUp).toHaveBeenCalledWith('ana@example.com', 'long-enough')
-      expect(deps.createProfile).toHaveBeenCalledWith('ana_92', 'es', 'access')
-      expect(deps.writeSession).toHaveBeenLastCalledWith(
-        expect.objectContaining({ userId: USER_ID, username: 'ana_92' }),
+  describe('signUp (AU-05, AU-07, design.md § 11)', () => {
+    it('creates the account with email and password, signed in without a username yet', async () => {
+      expect(await signUp(SIGN_UP)).toEqual({ ok: true, data: { needsProfile: true } })
+      expect(deps.auth?.signUp).toHaveBeenCalledWith('ana.perez@example.com', 'long-enough')
+      // The welcome screen asks for the username, suggested from the email.
+      expect(deps.writeSession).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: USER_ID, username: null, suggestion: 'ana_perez' }),
       )
-    })
-
-    it('refuses a taken username before creating anything (AU-08)', async () => {
-      deps.isUsernameTaken.mockResolvedValue(true)
-      expect(await signUp(SIGN_UP)).toEqual({
-        ok: false,
-        error: 'auth.errors.usernameTaken',
-        fieldErrors: { username: ['auth.errors.usernameTaken'] },
-      })
-      expect(deps.auth?.signUp).not.toHaveBeenCalled()
+      expect(deps.createProfile).not.toHaveBeenCalled()
+      expect(deps.revalidatePath).toHaveBeenCalledWith('/', 'layout')
     })
 
     it('puts a taken email next to its field (AU-08)', async () => {
@@ -135,17 +123,11 @@ describe('auth actions (specs/auth design.md § 6)', () => {
       expect(deps.writeSession).not.toHaveBeenCalled()
     })
 
-    it('stays signed in without a username when the profile fails (AU-09)', async () => {
-      deps.createProfile.mockResolvedValue({ ok: false, reason: 'usernameTaken' })
-      expect(await signUp(SIGN_UP)).toEqual({ ok: true, data: { needsProfile: true } })
-      expect(deps.writeSession).toHaveBeenCalledTimes(1)
-      expect(deps.writeSession).toHaveBeenCalledWith(expect.objectContaining({ username: null }))
-    })
-
-    it('refuses without age and terms (AU-05)', async () => {
-      expect(await signUp({ ...SIGN_UP, accepted: false })).toMatchObject({
-        fieldErrors: { accepted: ['auth.fields.accepted.required'] },
+    it('refuses a short password before calling Supabase (AU-06)', async () => {
+      expect(await signUp({ ...SIGN_UP, password: 'short' })).toMatchObject({
+        fieldErrors: { password: ['auth.fields.password.short'] },
       })
+      expect(deps.auth?.signUp).not.toHaveBeenCalled()
     })
   })
 
@@ -171,7 +153,11 @@ describe('auth actions (specs/auth design.md § 6)', () => {
       })
       // The user is the session's Bearer: no token or id goes from the form.
       expect(deps.createProfile).toHaveBeenCalledWith('ana_92', 'es')
-      expect(deps.writeSession).toHaveBeenCalledWith({ ...NO_PROFILE, username: 'ana_92' })
+      expect(deps.writeSession).toHaveBeenCalledWith({
+        ...NO_PROFILE,
+        username: 'ana_92',
+        suggestion: null,
+      })
     })
 
     it('says a taken username next to its field', async () => {

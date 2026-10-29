@@ -23,7 +23,7 @@ export async function createProfile(raw: unknown): Promise<ActionResult<{ userna
 
   const result = await createProfileFor(parsed.data.username, await getLocale())
   if (!result.ok) return profileFailure(result.reason)
-  await writeSession({ ...session, username: result.username })
+  await writeSession({ ...session, username: result.username, suggestion: null })
   revalidatePath('/', 'layout')
   return { ok: true, data: { username: result.username } }
 }

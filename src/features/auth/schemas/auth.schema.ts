@@ -28,14 +28,13 @@ const username = z
 /** 18 or more, and the Terms and the Privacy (Q1). */
 const accepted = z.boolean().refine((value) => value, { message: 'auth.fields.accepted.required' })
 
+/** Only email and password: the username, the photo and the terms come next (design.md § 11). */
 export const signUpSchema = z.object({
   email,
   password: z
     .string()
     .min(PASSWORD_MIN, { message: 'auth.fields.password.short' })
     .max(PASSWORD_MAX, { message: 'auth.fields.password.long' }),
-  username,
-  accepted,
 })
 
 export const profileSchema = z.object({ username, accepted })

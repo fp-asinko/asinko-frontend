@@ -30,7 +30,13 @@ vi.mock('next/headers', () => ({
 }))
 
 const USER_ID = '00000000-0000-4000-8000-0000000000aa'
-const TOKENS = { accessToken: 'access', refreshToken: 'refresh', expiresIn: 3600, userId: USER_ID }
+const TOKENS = {
+  accessToken: 'access',
+  refreshToken: 'refresh',
+  expiresIn: 3600,
+  userId: USER_ID,
+  email: 'maria@example.com',
+}
 const SESSION: Session = sessionFromTokens(TOKENS, 'maria', 1_000)
 
 describe('session cookie (specs/auth design.md § 3)', () => {
@@ -42,6 +48,14 @@ describe('session cookie (specs/auth design.md § 3)', () => {
       username: 'maria',
       expiresAt: 1_000 + 3_600_000,
     })
+  })
+
+  it('keeps a username suggested from the email while there is none (design.md § 11)', () => {
+    expect(sessionFromTokens(TOKENS, null, 1_000)).toMatchObject({
+      username: null,
+      suggestion: 'maria',
+    })
+    expect(SESSION).not.toHaveProperty('suggestion')
   })
 
   it('reads a valid cookie, also one without a profile, and nothing from a broken one', () => {

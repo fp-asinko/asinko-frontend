@@ -1157,7 +1157,7 @@
     },
     "welcome": {
       "title": "Choose your username",
-      "intro": "It’s how people find you and mention you on Asinko.",
+      "intro": "It’s how people find you and mention you on Asinko. Add a photo if you like.",
       "submit": "Continue",
       "pending": "Saving…"
     },
@@ -1196,7 +1196,17 @@
       "weakPassword": "Choose a stronger password",
       "usernameTaken": "That username is taken",
       "noSession": "Your session ended. Log in again",
-      "google": "We couldn’t log you in with Google. Try again"
+      "google": "We couldn’t log you in with Google. Try again",
+      "photoType": "Use a JPEG, PNG or WebP image",
+      "photoTooLarge": "That image is too large",
+      "photoUpload": "Your profile is ready, but the photo didn’t upload. Try again, or remove it to continue"
+    },
+    "photo": {
+      "label": "Profile photo (optional)",
+      "hint": "You can frame it later from your profile.",
+      "add": "Add a photo",
+      "change": "Change photo",
+      "remove": "Remove"
     }
   }
 }

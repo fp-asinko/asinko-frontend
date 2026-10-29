@@ -4,7 +4,13 @@ import { googleErrorPath, localeOf, welcomePath } from '@/app/auth/paths'
 import { finishGoogle, startGoogle } from './google'
 
 const USER_ID = '00000000-0000-4000-8000-0000000000aa'
-const TOKENS = { accessToken: 'a', refreshToken: 'r', expiresIn: 3600, userId: USER_ID }
+const TOKENS = {
+  accessToken: 'a',
+  refreshToken: 'r',
+  expiresIn: 3600,
+  userId: USER_ID,
+  email: null,
+}
 
 describe('Google with PKCE (specs/auth AU-10)', () => {
   it('sends to Supabase with the challenge of a verifier kept in the cookie', async () => {

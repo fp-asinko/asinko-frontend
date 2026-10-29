@@ -1,7 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 import type { ReactNode } from 'react'
 import { SocialLogins } from '@/components/organisms/auth-gate'
-import { AsinkoLogo } from '@/components/ui/asinko-logo'
 import { Link } from '@/i18n/navigation'
 import { LoginPageForm, WelcomePageForm } from './page-forms'
 import { LogOutButton } from './log-out-button'
@@ -17,9 +16,6 @@ function AuthCard({
 }) {
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-5 px-4 py-8 md:py-12">
-      <div aria-hidden className="flex justify-center">
-        <AsinkoLogo label="Asinko" />
-      </div>
       <div className="flex flex-col gap-2 text-center">
         <h1 className="text-[1.375rem] leading-tight font-bold">{title}</h1>
         {intro && <p className="type-ui text-muted-foreground">{intro}</p>}
@@ -75,12 +71,18 @@ export async function LoginView({
   )
 }
 
-/** Choosing the username (specs/auth AU-11), with the way out: logging out. */
-export async function WelcomeView({ next }: { next: string }) {
+/** The welcome screen (specs/auth AU-11, AU-21), with the way out: logging out. */
+export async function WelcomeView({
+  next,
+  suggestion,
+}: {
+  next: string
+  suggestion: string | null
+}) {
   const t = await getTranslations('auth.welcome')
   return (
     <AuthCard title={t('title')} intro={t('intro')}>
-      <WelcomePageForm next={next} />
+      <WelcomePageForm next={next} suggestion={suggestion} />
       <LogOutButton />
     </AuthCard>
   )

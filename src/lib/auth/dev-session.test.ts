@@ -58,6 +58,7 @@ describe('dev session (specs/dev-login, specs/auth AU-17)', () => {
       refreshToken: 'r',
       expiresIn: 3600,
       userId: USER_ID,
+      email: null,
     })
   })
 

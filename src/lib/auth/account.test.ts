@@ -7,7 +7,13 @@ vi.mock('@/lib/api', () => api)
 vi.mock('./session', () => session)
 
 const USER_ID = '00000000-0000-4000-8000-0000000000aa'
-const TOKENS = { accessToken: 'access', refreshToken: 'refresh', expiresIn: 3600, userId: USER_ID }
+const TOKENS = {
+  accessToken: 'access',
+  refreshToken: 'refresh',
+  expiresIn: 3600,
+  userId: USER_ID,
+  email: 'maria@example.com',
+}
 
 describe('startSession (specs/auth design.md § 6)', () => {
   beforeEach(() => {
