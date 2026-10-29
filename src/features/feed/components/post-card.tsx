@@ -127,7 +127,7 @@ export function PostCard({
             // A thought says so, as a poll does (specs/thoughts TH-06).
             badge={
               post.thought ? (
-                <span className="inline-flex min-h-6 shrink-0 items-center gap-1.25 type-action font-extrabold uppercase">
+                <span className="inline-flex min-h-6 shrink-0 items-center gap-1.25 type-action font-extrabold text-muted-foreground uppercase">
                   <QuoteIcon aria-hidden className="size-3.5" />
                   {t('thought')}
                 </span>

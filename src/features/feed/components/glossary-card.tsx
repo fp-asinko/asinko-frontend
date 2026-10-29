@@ -23,8 +23,8 @@ export function GlossaryCard({ term }: { term: GlossaryItem }) {
         <h2 className="min-w-0 text-2xl leading-tight font-extrabold tracking-tight">
           {term.term}
         </h2>
-        {/* The mark of a poll or a thought (feed-cards). */}
-        <span className="inline-flex shrink-0 items-center gap-1.25 type-action font-extrabold uppercase">
+        {/* The mark of a poll or a thought (feed-cards), in gray (PO, 2026-10-29). */}
+        <span className="inline-flex shrink-0 items-center gap-1.25 type-action font-extrabold text-muted-foreground uppercase">
           <BookOpenTextIcon aria-hidden className="size-3.5" />
           {t('label')}
         </span>

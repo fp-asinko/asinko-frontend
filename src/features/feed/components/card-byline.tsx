@@ -46,6 +46,7 @@ export function CardByline({
   const format = useFormatter()
   const now = useNow()
   const group = community && !community.personal ? community : null
+  const join = group && canJoin && group.viewerIsMember !== true ? group : null
   const authorName = author ? author.handle : t('system')
   const accuracy =
     author?.accuracyRate != null
@@ -113,17 +114,19 @@ export function CardByline({
           </div>
         )}
       </div>
-      {/* Badge and join in one block, centered on the header: join always on the right edge. */}
+      {/* Join and badge in one block, centered on the header: join first, a faint rule, and the
+          badge on the right edge (PO, 2026-10-29). */}
       <div className="flex shrink-0 items-center gap-3">
-        {badge}
-        {group && canJoin && group.viewerIsMember !== true && (
+        {join && (
           <JoinButton
-            slug={group.slug}
-            handle={group.handle}
+            slug={join.slug}
+            handle={join.handle}
             action={joinCommunity}
             focusFallbackId={titleId}
           />
         )}
+        {join && badge && <span aria-hidden data-separator className="h-4 w-px bg-border" />}
+        {badge}
       </div>
     </div>
   )

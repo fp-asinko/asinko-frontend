@@ -39,6 +39,21 @@ describe('PollCard (H-13)', () => {
     expect(screen.getByRole('button', { name })).toHaveAttribute('aria-haspopup', 'menu')
   })
 
+  it('puts Join first, a faint rule, and the gray POLL badge last (PO, 2026-10-29)', () => {
+    renderWithIntl(
+      <PollCard
+        poll={pollItem({ community: { ...pollItem().community!, viewerIsMember: false } })}
+      />,
+    )
+    const join = screen.getByRole('button', { name: /join/i })
+    const badge = screen.getByText('Poll')
+    const rule = badge.parentElement!.querySelector('[data-separator]')!
+    const follows = Node.DOCUMENT_POSITION_FOLLOWING
+    expect(join.compareDocumentPosition(rule) & follows).toBeTruthy()
+    expect(rule.compareDocumentPosition(badge) & follows).toBeTruthy()
+    expect(badge).toHaveClass('text-muted-foreground')
+  })
+
   it('shows the question, options with their share and the totals', () => {
     renderWithIntl(<PollCard poll={pollItem()} />)
 
