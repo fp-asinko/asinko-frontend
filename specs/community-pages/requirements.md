@@ -80,6 +80,7 @@ El PDF asigna `/hub` a `USER_PUBLIC`, pero en la base de dev los grupos del sist
   - "Seguir" es unirse a su canal personal (CP-05).
   - Siguiendo, el botón dice "Siguiendo", y tocarlo pide confirmación para dejar de seguir.
   - ~~Sin estrella de favorito.~~ Con la estrella al lado de "Siguiendo", como un grupo (`specs/favorites` FV-03, PO 2026-10-28).
+- **Compartir** (PO, 2026-10-28): las tres cabeceras (grupo, activo y perfil) llevan el botón de compartir al final de las acciones, con su nombre según el tipo ("Share group", "Share asset", "Share profile").
   - En tu propio perfil no hay acciones.
 - [x] **CP-13** **Contenido:** el feed de su canal (CP-07). El historial de tesis (`GET /users/{userId}/theses`) entra con las tesis, en la fase 2.
 - [x] **CP-20** **El nombre visible** (`displayName`, propuesta **P-011** en `proposals.md`): va en los mocks y se muestra cuando viene. **Tier y rating no se muestran:** el backend los dejó para después del MVP (2026-10-07). La reputación la dan el acierto y la racha de las estadísticas.

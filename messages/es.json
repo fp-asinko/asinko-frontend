@@ -829,7 +829,9 @@
       },
       "loadError": "No se pudieron cargar los logros.",
       "progressPercent": "{current, number} % de {target, number} %"
-    }
+    },
+    "shareGroup": "Compartir grupo",
+    "shareAsset": "Compartir activo"
   },
   "featured": {
     "title": "Destacados",

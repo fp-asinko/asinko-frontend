@@ -49,6 +49,18 @@ describe('CommunityHeader (specs/community-pages CP-04)', () => {
     expect(screen.getByText('NVIDIA')).toBeInTheDocument()
   })
 
+  it('shares a group and an asset as a profile, by the actions (PO, 2026-10-28)', () => {
+    const { unmount } = renderWithIntl(<CommunityHeader page={communityPage()} />)
+    expect(screen.getByRole('button', { name: 'Share group' })).toBeInTheDocument()
+    unmount()
+    renderWithIntl(
+      <CommunityHeader
+        page={communityPage({ slug: 'BTC', handle: '$BTC', kind: 'asset', path: '/asset/BTC' })}
+      />,
+    )
+    expect(screen.getByRole('button', { name: 'Share asset' })).toBeInTheDocument()
+  })
+
   it('counts members in the page locale', () => {
     renderWithIntl(<CommunityHeader page={communityPage({ memberCount: 1 })} />, { locale: 'es' })
     expect(screen.getByText('1').closest('p')).toHaveTextContent('1 miembro')

@@ -111,17 +111,18 @@ export function CommunityHeader({
               variant={profile ? 'user' : 'community'}
             />
           )}
-          {profile && (
-            // Share the profile, as Reddit's card (specs/profile-aside PA-04): here, by the
-            // actions, the same in phones and desktop; in the right column it would travel twice.
-            <ShareButton
-              href={`/user/${encodeURIComponent(profile.username)}`}
-              aria-label={t('profile.share')}
-              className="inline-flex size-8 tap items-center justify-center rounded-full bg-muted outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-4"
-            >
-              <Share2Icon aria-hidden />
-            </ShareButton>
-          )}
+          {/* Share the page, as Reddit's (specs/profile-aside PA-04): here, by the actions, the same
+              in phones and desktop; in the right column it would travel twice. Groups and assets
+              too: the three headers alike (PO, 2026-10-28). */}
+          <ShareButton
+            href={profile ? `/user/${encodeURIComponent(profile.username)}` : page.path}
+            aria-label={
+              profile ? t('profile.share') : t(page.kind === 'asset' ? 'shareAsset' : 'shareGroup')
+            }
+            className="inline-flex size-8 tap items-center justify-center rounded-full bg-muted outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-4"
+          >
+            <Share2Icon aria-hidden />
+          </ShareButton>
         </div>
       </div>
       {/* Under the name and the actions, the whole width: a long headline never squeezes them. */}

@@ -829,7 +829,9 @@
       },
       "loadError": "Não foi possível carregar as conquistas.",
       "progressPercent": "{current, number}% de {target, number}%"
-    }
+    },
+    "shareGroup": "Compartilhar grupo",
+    "shareAsset": "Compartilhar ativo"
   },
   "featured": {
     "title": "Destaques",
