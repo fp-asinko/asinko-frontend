@@ -1,4 +1,4 @@
-﻿# Favoritos en grupos, personas y activos — Design
+# Favoritos en grupos, personas y activos — Design
 
 ## 1. Sin propuesta al backend
 

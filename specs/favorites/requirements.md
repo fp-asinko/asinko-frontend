@@ -1,4 +1,4 @@
-﻿# Favoritos en grupos, personas y activos — Requirements
+# Favoritos en grupos, personas y activos — Requirements
 
 > **Estado:** aprobado por el PO el 2026-10-28 ("dale"): la estrella como Reddit, sin una sección aparte, también para personas y activos. Se trabajó local y se subió a `develop` el 2026-10-28, a pedido del PO.
 >
