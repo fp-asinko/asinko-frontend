@@ -68,6 +68,15 @@ describe('recently viewed (specs/recently-viewed)', () => {
     expect(readRecent()).toEqual([])
   })
 
+  it('leaves out an item with nothing to show: a thought saved before its text was', () => {
+    const good = { ...item('a'), viewedAt: '2026-10-26T10:00:00.000Z' }
+    localStorage.setItem(
+      'asinko:recently-viewed',
+      JSON.stringify([good, { ...good, id: 'b', title: '' }, { ...good, id: 'c', title: '  ' }]),
+    )
+    expect(readRecent().map((each) => each.id)).toEqual(['a'])
+  })
+
   it('keeps a thought, its text as its title (specs/thoughts)', () => {
     recordRecent(item('t', { kind: 'thought', title: 'Rates first, risk later.' }))
     expect(readRecent()).toEqual([expect.objectContaining({ id: 't', kind: 'thought' })])

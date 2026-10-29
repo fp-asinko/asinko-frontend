@@ -43,6 +43,9 @@ function isRecentItem(value: unknown): value is RecentItem {
     typeof item.label === 'string' &&
     item.label.length <= TEXT_MAX &&
     typeof item.title === 'string' &&
+    // Something to show: a thought saved before its text was (specs/thoughts) is left out; opened
+    // again, it comes back with it (PO, 2026-10-29).
+    item.title.trim() !== '' &&
     item.title.length <= TEXT_MAX &&
     (item.kind === 'post' || item.kind === 'thought') &&
     Number.isFinite(item.score) &&
