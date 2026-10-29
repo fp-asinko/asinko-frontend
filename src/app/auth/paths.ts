@@ -9,9 +9,14 @@ export function localeOf(path: string): string {
   return (routing.locales as readonly string[]).includes(first) ? first : routing.defaultLocale
 }
 
-/** Where to choose the username, coming back to `next` after it (AU-11). */
+/**
+ * Back where the person was, marked so the page opens the second step in the account modal: the
+ * username, the photo and the terms (AU-11, design.md § 12). Without JavaScript, /welcome.
+ */
 export function welcomePath(next: string): string {
-  return `/${localeOf(next)}/welcome?next=${encodeURIComponent(next)}`
+  const url = new URL(next, 'http://site')
+  url.searchParams.set('welcome', '1')
+  return `${url.pathname}${url.search}`
 }
 
 /** The login page saying Google did not work, coming back to `next` after it. */

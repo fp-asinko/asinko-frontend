@@ -1,8 +1,15 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
-import { useLocale } from 'next-intl'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react'
 
 /** What the visitor was about to do: the modal says it (G-05) and auth comes back to it (G-09). */
 export type GatedAction =
@@ -11,8 +18,14 @@ export type GatedAction =
 /** The pending action and where to come back after logging in (a relative path, security.md). */
 export type GateRequest = { action: GatedAction; next: string }
 
-/** What the modal shows: the invitation, or one of the forms (specs/auth AU-01). */
-export type GateView = 'invite' | 'login' | 'signup'
+/**
+ * What the modal shows: the invitation, one of the forms (specs/auth AU-01), or the second step of
+ * an account without a username (AU-11): its username, photo and terms.
+ */
+export type GateView = 'invite' | 'login' | 'signup' | 'profile'
+
+/** Back from Google without a username, the page opens the second step (design.md § 12). */
+export const WELCOME_PARAM = 'welcome'
 
 type AuthGate = {
   signedIn: boolean
@@ -64,8 +77,8 @@ const viewFor = (action: GatedAction): GateView =>
 
 /**
  * Who can act (specs/guest-experience § 1, specs/auth § 8). The layout passes the account's state
- * from the session; the Server Actions still check it themselves (security.md § 5). An account
- * without a username goes to choose one instead of seeing the modal (AU-11).
+ * from the session; the Server Actions still check it themselves (security.md § 5). For an account
+ * without a username, the modal is its second step (AU-11), and it opens by itself back from Google.
  */
 export function AuthGateProvider({
   signedIn,
@@ -83,7 +96,6 @@ export function AuthGateProvider({
   logOut?: () => Promise<unknown>
   children: ReactNode
 }) {
-  const locale = useLocale()
   const [request, setRequest] = useState<GateRequest | null>(null)
   // Stays mounted after the first open, so closing can animate and reopening is instant.
   const [last, setLast] = useState<GateRequest | null>(null)
@@ -92,19 +104,12 @@ export function AuthGateProvider({
   const openGate = useCallback(
     (action: GatedAction) => {
       const next = `${window.location.pathname}${window.location.search}`
-      if (needsProfile) {
-        // A full navigation on purpose: the page to choose it renders on the server with the session
-        // (AU-11), and the gate stays free of the router (it wraps every page and every test).
-        // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- see above
-        window.location.assign(`/${locale}/welcome?next=${encodeURIComponent(next)}`)
-        return
-      }
       const gate = { action, next }
-      setView(viewFor(action))
+      setView(needsProfile ? 'profile' : viewFor(action))
       setRequest(gate)
       setLast(gate)
     },
-    [needsProfile, locale],
+    [needsProfile],
   )
 
   const value = useMemo<AuthGate>(
@@ -122,6 +127,19 @@ export function AuthGateProvider({
     }),
     [signedIn, needsProfile, viewerAvatar, openGate, logOut],
   )
+
+  // Back from Google without a username: the second step, over the page the person was on.
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    if (!needsProfile || !url.searchParams.has(WELCOME_PARAM)) return
+    // After the page's first paint: the modal comes over it, and the mark leaves the address.
+    const frame = requestAnimationFrame(() => {
+      url.searchParams.delete(WELCOME_PARAM)
+      window.history.replaceState(window.history.state, '', url)
+      openGate('signup')
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [needsProfile, openGate])
 
   const close = useCallback(() => setRequest(null), [])
   const dialog = useMemo<GateDialog | null>(

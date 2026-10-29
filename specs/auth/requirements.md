@@ -45,14 +45,14 @@ Que cualquiera pueda crear su cuenta o entrar a Asinko, con email o con Google, 
 
 - [x] **AU-05** **Create account** pide solo **email y contraseña** (PO, 2026-10-29).
 - [x] **AU-06** Antes de enviar, cada formulario valida lo que se puede saber sin la red: email con formato válido, contraseña de 8 caracteres o más, username de 3 a 30 letras, números o `_`. Cada error va al lado de su campo.
-- [x] **AU-07** Con datos válidos se crea la cuenta, se entra con sesión y se pasa a la pantalla de bienvenida (AU-11). Al completarla, se vuelve a la página donde estaba.
+- [x] **AU-07** Con datos válidos se crea la cuenta, se entra con sesión y el mismo modal pasa al paso 2, la bienvenida (AU-11; PO, 2026-10-29). Al completarla, se vuelve a la página donde estaba.
 - [x] **AU-08** **Errores**, cada uno en su campo: email ya registrado (al crear la cuenta); username tomado (`409 USERNAME_TAKEN`) o inválido (`422 INVALID_USERNAME`) (en la bienvenida).
 - [x] **AU-09** Nadie queda trabado: una cuenta creada sin perfil (el registro, Google, o una pestaña cerrada a mitad de camino) vuelve a la bienvenida (AU-11).
 
 ### Google
 
 - [x] **AU-10** **"Continuar con Google"** está en el modal y en `/login`, para entrar y para crear la cuenta. Al volver de Google, quien ya tiene perfil entra con sesión y vuelve a la página donde estaba.
-- [x] **AU-11** **Bienvenida:** con sesión pero sin perfil (después de crear la cuenta, Google por primera vez, o AU-09), una pantalla pide:
+- [x] **AU-11** **Bienvenida (paso 2, en el modal):** con sesión pero sin perfil (después de crear la cuenta, Google por primera vez, o AU-09), el modal de cuenta pide, sobre la página donde estaba (al volver de Google se abre solo; `/welcome` queda para links directos y sin JavaScript):
   - el **username**, ya **sugerido** a partir del email (`ana.perez@…` → `ana_perez`), con los errores de AU-06 y AU-08;
   - una **foto, opcional** (AU-21);
   - el checkbox "Tengo 18 años o más y acepto los Términos y la Privacidad", con sus links (Q1). "Continuar" queda bloqueado hasta marcarlo.

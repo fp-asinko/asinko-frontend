@@ -13,14 +13,18 @@ import { authFailure, invalidForm, UNAVAILABLE } from './auth-results'
  * from here on, without a username yet. The welcome screen asks for it, with the photo and the
  * terms, so `needsProfile` is always true.
  */
-export async function signUp(raw: unknown): Promise<ActionResult<{ needsProfile: true }>> {
+export async function signUp(
+  raw: unknown,
+): Promise<ActionResult<{ needsProfile: true; suggestion: string | null }>> {
   const parsed = signUpSchema.safeParse(raw)
   if (!parsed.success) return invalidForm(parsed.error)
   if (!supabaseAuth) return UNAVAILABLE
 
   const created = await supabaseAuth.signUp(parsed.data.email, parsed.data.password)
   if (!created.ok) return authFailure(created.reason)
-  await writeSession(sessionFromTokens(created.tokens, null))
+  const session = sessionFromTokens(created.tokens, null)
+  await writeSession(session)
   revalidatePath('/', 'layout')
-  return { ok: true, data: { needsProfile: true } }
+  // The second step starts from it (AU-11).
+  return { ok: true, data: { needsProfile: true, suggestion: session.suggestion ?? null } }
 }

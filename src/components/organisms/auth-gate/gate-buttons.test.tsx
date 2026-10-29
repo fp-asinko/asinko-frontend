@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { AuthGateProvider } from './auth-gate'
 import { AccountButtons, GateButtons } from './gate-buttons'
@@ -33,9 +33,7 @@ describe('AccountButtons (G-02)', () => {
 })
 
 describe('AccountButtons without a username (specs/auth AU-11)', () => {
-  it('offers only to choose it, which leaves for that page', async () => {
-    const assign = vi.fn()
-    vi.stubGlobal('location', { ...window.location, pathname: '/en', search: '', assign })
+  it('offers only to choose it, in the account modal', async () => {
     renderWithIntl(
       <AuthGateProvider signedIn={false} needsProfile>
         <AccountButtons>
@@ -45,8 +43,7 @@ describe('AccountButtons without a username (specs/auth AU-11)', () => {
     )
     expect(screen.queryByRole('button', { name: 'Log in' })).toBeNull()
     await userEvent.click(screen.getByRole('button', { name: 'Choose username' }))
-    expect(assign).toHaveBeenCalledWith('/en/welcome?next=%2Fen')
-    vi.unstubAllGlobals()
+    expect(await screen.findByRole('dialog', { name: 'Choose your username' })).toBeInTheDocument()
   })
 })
 

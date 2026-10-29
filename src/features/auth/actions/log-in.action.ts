@@ -12,7 +12,9 @@ import { authFailure, invalidForm, UNAVAILABLE } from './auth-results'
  * input, and Supabase's message never reaches the UI. `needsProfile`: the account has no username
  * yet, and the UI takes it to choose one (AU-09, AU-11).
  */
-export async function logIn(raw: unknown): Promise<ActionResult<{ needsProfile: boolean }>> {
+export async function logIn(
+  raw: unknown,
+): Promise<ActionResult<{ needsProfile: boolean; suggestion: string | null }>> {
   const parsed = logInSchema.safeParse(raw)
   if (!parsed.success) return invalidForm(parsed.error)
   if (!supabaseAuth) return UNAVAILABLE
@@ -24,5 +26,6 @@ export async function logIn(raw: unknown): Promise<ActionResult<{ needsProfile: 
 
   // The whole page renders again with the session (AU-02).
   revalidatePath('/', 'layout')
-  return { ok: true, data: { needsProfile: started.session.username === null } }
+  const { username, suggestion } = started.session
+  return { ok: true, data: { needsProfile: username === null, suggestion: suggestion ?? null } }
 }

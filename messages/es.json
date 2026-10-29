@@ -275,7 +275,8 @@
       "join": "Únete a Asinko para sumarte a comunidades",
       "login": "Inicia sesión en Asinko",
       "signup": "Únete a Asinko",
-      "comment": "Únete a Asinko para comentar"
+      "comment": "Únete a Asinko para comentar",
+      "profile": "Elige tu nombre de usuario"
     },
     "value": "En Asinko, cada predicción tiene un historial público y verificable.",
     "signup": "Crear cuenta",
@@ -303,7 +304,8 @@
     },
     "menu": {
       "logOut": "Cerrar sesión"
-    }
+    },
+    "profileValue": "Es como te encuentran y te mencionan en Asinko. Agrega una foto si quieres."
   },
   "devLogin": {
     "login": "Dev login",

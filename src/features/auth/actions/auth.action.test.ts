@@ -63,7 +63,7 @@ describe('auth actions (specs/auth design.md § 6)', () => {
     it('signs in, starts the session and renders the page again', async () => {
       expect(await logIn({ email: 'ana@example.com', password: 'x' })).toEqual({
         ok: true,
-        data: { needsProfile: false },
+        data: { needsProfile: false, suggestion: null },
       })
       expect(deps.auth?.signInWithPassword).toHaveBeenCalledWith('ana@example.com', 'x')
       expect(deps.startSession).toHaveBeenCalledWith(TOKENS)
@@ -71,10 +71,13 @@ describe('auth actions (specs/auth design.md § 6)', () => {
     })
 
     it('says an account has no username yet (AU-11)', async () => {
-      deps.startSession.mockResolvedValue({ ok: true, session: { username: null } })
+      deps.startSession.mockResolvedValue({
+        ok: true,
+        session: { username: null, suggestion: 'ana' },
+      })
       expect(await logIn({ email: 'ana@example.com', password: 'x' })).toEqual({
         ok: true,
-        data: { needsProfile: true },
+        data: { needsProfile: true, suggestion: 'ana' },
       })
     })
 
@@ -105,7 +108,10 @@ describe('auth actions (specs/auth design.md § 6)', () => {
 
   describe('signUp (AU-05, AU-07, design.md § 11)', () => {
     it('creates the account with email and password, signed in without a username yet', async () => {
-      expect(await signUp(SIGN_UP)).toEqual({ ok: true, data: { needsProfile: true } })
+      expect(await signUp(SIGN_UP)).toEqual({
+        ok: true,
+        data: { needsProfile: true, suggestion: 'ana_perez' },
+      })
       expect(deps.auth?.signUp).toHaveBeenCalledWith('ana.perez@example.com', 'long-enough')
       // The welcome screen asks for the username, suggested from the email.
       expect(deps.writeSession).toHaveBeenCalledWith(

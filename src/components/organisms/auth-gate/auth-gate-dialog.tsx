@@ -44,6 +44,8 @@ export function AuthGateDialog({
 }) {
   const t = useTranslations('authGate')
   const title = view === 'invite' ? t(`title.${request.action}`) : t(`title.${view}`)
+  // The second step has its own line, and no way to switch or to another provider (AU-11).
+  const second = view === 'profile'
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
@@ -80,7 +82,9 @@ export function AuthGateDialog({
           {/* Loose classes, not type-*: cn does not merge them with the base text-* (design-system.md). */}
           <DialogTitle className="text-[1.375rem] leading-tight font-bold">{title}</DialogTitle>
           {/* The reason to have an account, under every title: the forms too. */}
-          <DialogDescription className="leading-normal">{t('value')}</DialogDescription>
+          <DialogDescription className="leading-normal">
+            {second ? t('profileValue') : t('value')}
+          </DialogDescription>
         </div>
 
         {view === 'invite' ? (
@@ -93,30 +97,35 @@ export function AuthGateDialog({
             </button>
           </div>
         ) : (
-          <>
-            {forms}
-            <p className="text-center type-ui text-muted-foreground">
-              {t.rich(view === 'login' ? 'switch.toSignup' : 'switch.toLogin', {
-                link: (chunks) => (
-                  <button
-                    type="button"
-                    className="font-semibold text-foreground underline underline-offset-2"
-                    onClick={() => onViewChange(view === 'login' ? 'signup' : 'login')}
-                  >
-                    {chunks}
-                  </button>
-                ),
-              })}
-            </p>
-          </>
+          // One place for every form: the forms keep their state from one step to the next.
+          forms
+        )}
+        {(view === 'login' || view === 'signup') && (
+          <p className="text-center type-ui text-muted-foreground">
+            {t.rich(view === 'login' ? 'switch.toSignup' : 'switch.toLogin', {
+              link: (chunks) => (
+                <button
+                  type="button"
+                  className="font-semibold text-foreground underline underline-offset-2"
+                  onClick={() => onViewChange(view === 'login' ? 'signup' : 'login')}
+                >
+                  {chunks}
+                </button>
+              ),
+            })}
+          </p>
         )}
 
-        <div className="flex items-center gap-3 type-meta text-muted-foreground">
-          <span aria-hidden className="h-px flex-1 bg-border" />
-          {t('or')}
-          <span aria-hidden className="h-px flex-1 bg-border" />
-        </div>
-        <SocialLogins next={request.next} />
+        {!second && (
+          <>
+            <div className="flex items-center gap-3 type-meta text-muted-foreground">
+              <span aria-hidden className="h-px flex-1 bg-border" />
+              {t('or')}
+              <span aria-hidden className="h-px flex-1 bg-border" />
+            </div>
+            <SocialLogins next={request.next} />
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )

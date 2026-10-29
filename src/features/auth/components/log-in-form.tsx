@@ -14,7 +14,11 @@ import { AuthField, FormAlert } from './auth-field'
  * Log in with email and password (specs/auth AU-02, AU-04). Loaded on first use: it brings zod to
  * the browser (seo.md § Zod). `onDone` says whether the account still needs a username.
  */
-export function LogInForm({ onDone }: { onDone: (result: { needsProfile: boolean }) => void }) {
+export function LogInForm({
+  onDone,
+}: {
+  onDone: (result: { needsProfile: boolean; suggestion?: string | null }) => void
+}) {
   const t = useTranslations('auth')
   const ids = useId()
   const form = useForm<LogInInput>({

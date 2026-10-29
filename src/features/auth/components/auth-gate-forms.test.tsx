@@ -15,6 +15,7 @@ vi.mock('../actions/log-in.action', () => ({ logIn: actions.logIn }))
 vi.mock('../actions/sign-up.action', () => ({ signUp: actions.signUp }))
 vi.mock('../actions/log-out.action', () => ({ logOut: actions.logOut }))
 vi.mock('../actions/create-profile.action', () => ({ createProfile: vi.fn() }))
+vi.mock('../actions/set-avatar.action', () => ({ setAvatar: vi.fn() }))
 
 function OpenLogIn() {
   const { openGate } = useAuthGate()
@@ -47,16 +48,17 @@ describe('the forms in the modal (specs/auth AU-01, AU-02, AU-11)', () => {
     expect(router.push).not.toHaveBeenCalled()
   })
 
-  it('takes an account without a username to choose one, back to this page after', async () => {
-    window.history.pushState({}, '', '/en/hub/macro')
-    actions.logIn.mockResolvedValue({ ok: true, data: { needsProfile: true } })
+  it('goes on to the second step in the same modal, from the suggested username (AU-11)', async () => {
+    actions.logIn.mockResolvedValue({
+      ok: true,
+      data: { needsProfile: true, suggestion: 'ana_perez' },
+    })
     await logInThroughTheModal()
-    await vi.waitFor(() =>
-      expect(router.push).toHaveBeenCalledWith({
-        pathname: '/welcome',
-        query: { next: '/en/hub/macro' },
-      }),
-    )
+    expect(
+      await screen.findByRole('dialog', { name: 'Choose your username' }, { timeout: 5000 }),
+    ).toBeInTheDocument()
+    expect(await screen.findByLabelText('Username', {}, { timeout: 5000 })).toHaveValue('ana_perez')
+    expect(router.push).not.toHaveBeenCalled()
   })
 
   it('is nothing outside the modal', () => {

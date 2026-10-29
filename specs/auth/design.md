@@ -141,3 +141,14 @@ Reemplaza lo que § 6, § 7 y § 9 dicen de `signUp` y del username al crear la 
 - **`SignUpForm`** queda con email y contraseña. El checkbox y su texto legal pasan a la bienvenida.
 - **Mocks:** el Supabase simulado guarda el email de cada cuenta y lo devuelve en `user.email`. La cuenta nueva de Google es `new.trader@gmail.com`, que sugiere `new_trader`.
 - **Sin logo en los formularios** (PO, 2026-10-29): el logo de Asinko queda solo arriba de la invitación del modal. Los formularios de entrar y crear cuenta, `/login` y la bienvenida empiezan por su título.
+
+## 12. Cambio del PO (2026-10-29): el paso 2 en el mismo modal
+
+Reemplaza la navegación a `/welcome` de § 11.
+
+- El modal suma la vista `profile`. En el paso 2 no hay link para cambiar de formulario ni otros proveedores: la cuenta ya existe.
+- **Crear cuenta y entrar sin username:** `signUp` y `logIn` devuelven `suggestion`, y `AuthGateForms` pasa a `profile` en el mismo modal.
+- **Una cuenta sin username** que toca una acción ve el modal abierto en `profile`, en lugar de ir a otra página.
+- **Google:** `/auth/callback` vuelve a `next` con `?welcome=1`. Con esa marca y sin username, `AuthGateProvider` abre el paso 2 en el cuadro siguiente al primer pintado y saca la marca de la dirección. La sugerencia de la sesión le llega a `AuthGateForms` desde el layout.
+- **Los formularios van siempre en el mismo lugar del modal:** si el paso 2 los montara en otro, React los volvería a crear y se perdería la sugerencia.
+- **`/welcome` sigue** para los links directos y sin JavaScript, y `/login` la usa cuando la cuenta no tiene username.

@@ -22,6 +22,7 @@ import { routing } from '@/i18n/routing'
 import { isIndexable } from '@/lib/seo/robots'
 import { communityPath } from '@/lib/communities/paths'
 import { LEFT_COLUMN_COOKIE, siteFolded } from '@/lib/left-column'
+import { readSession } from '@/lib/auth/session'
 import { getAccountState, getViewer } from '@/lib/session'
 import { isDevLoginEnabled } from '@/lib/auth/dev-session'
 import { DevLoginButton } from '@/features/dev-login'
@@ -102,7 +103,7 @@ export default async function LocaleLayout({ children, right, params }: LayoutPr
               needsProfile={needsProfile}
               viewerAvatar={viewer && <UserAvatar name={viewer.username} size="xs" />}
               // Log in and sign up inside the modal, and log out (specs/auth AU-01, AU-14).
-              forms={<AuthGateForms />}
+              forms={<AuthGateForms suggestion={(await readSession())?.suggestion ?? null} />}
               logOut={logOut}
             >
               {/* Joined communities of this visit: every join button hides at once (specs/community-first). */}

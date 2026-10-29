@@ -15,7 +15,11 @@ import { AuthField, FormAlert } from './auth-field'
  * username, the photo and the terms come right after, in the welcome screen. Loaded on first use
  * (seo.md § Zod).
  */
-export function SignUpForm({ onDone }: { onDone: (result: { needsProfile: boolean }) => void }) {
+export function SignUpForm({
+  onDone,
+}: {
+  onDone: (result: { needsProfile: boolean; suggestion?: string | null }) => void
+}) {
   const t = useTranslations('auth')
   const ids = useId()
   const form = useForm<SignUpInput>({

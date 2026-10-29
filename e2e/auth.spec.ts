@@ -41,14 +41,16 @@ test.describe('Log in and sign up (specs/auth)', () => {
     await page.getByLabel('Password', { exact: true }).fill('long-enough')
     await page.getByRole('button', { name: 'Create account' }).click()
 
-    // The welcome screen, with the username suggested from the email.
-    await expect(page).toHaveURL(/\/en\/welcome\?next=%2Fen%2Fhub%2Fdefi$/)
-    await expect(page.getByLabel('Username')).toHaveValue(username)
-    const go = page.getByRole('main').getByRole('button', { name: 'Continue', exact: true })
+    // Step 2 in the same modal, with the username suggested from the email.
+    const second = page.getByRole('dialog', { name: 'Choose your username' })
+    await expect(second.getByLabel('Username')).toHaveValue(username)
+    await expect(page).toHaveURL(/\/en\/hub\/defi$/)
+    const go = second.getByRole('button', { name: 'Continue', exact: true })
     await expect(go).toBeDisabled()
-    await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
+    await second.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
     await go.click()
 
+    await expect(page.getByRole('dialog')).toHaveCount(0)
     await expect(page).toHaveURL(/\/en\/hub\/defi$/)
     await signedIn(page)
   })
@@ -147,7 +149,7 @@ test.describe('Log in and sign up (specs/auth)', () => {
     await expect(page).toHaveURL(/\/en$/)
   })
 
-  test('Google for the first time asks for a username, then comes back (AU-10, AU-11)', async ({
+  test('Google for the first time comes back to the page with step 2 in the modal (AU-10, AU-11)', async ({
     page,
   }) => {
     // The simulated Google comes back as the demo user: this one is a new account.
@@ -161,20 +163,19 @@ test.describe('Log in and sign up (specs/auth)', () => {
     const dialog = await openLogIn(page)
     await dialog.getByRole('link', { name: 'Continue with Google' }).click()
 
-    await expect(page).toHaveURL(/\/en\/welcome\?next=%2Fen%2Fhub%2Fdefi$/)
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Choose your username' }),
-    ).toBeVisible()
-    // Until then, the bar offers only that.
-    await expect(
-      page.getByRole('banner').getByRole('button', { name: 'Choose username' }),
-    ).toBeVisible()
-
-    await expect(page.getByLabel('Username')).toHaveValue('new_trader')
-    await page.getByLabel('Username').fill(freshUsername('g'))
-    await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
-    await page.getByRole('main').getByRole('button', { name: 'Continue', exact: true }).click()
+    // Back on the same page, with step 2 open by itself and the mark gone from the address.
+    const second = page.getByRole('dialog', { name: 'Choose your username' })
+    await expect(second).toBeVisible()
     await expect(page).toHaveURL(/\/en\/hub\/defi$/)
+    await expect(second.getByLabel('Username')).toHaveValue('new_trader')
+
+    // Closed, the bar offers only that, and it opens the step again.
+    await page.keyboard.press('Escape')
+    await page.getByRole('banner').getByRole('button', { name: 'Choose username' }).click()
+    await second.getByLabel('Username').fill(freshUsername('g'))
+    await second.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
+    await second.getByRole('button', { name: 'Continue', exact: true }).click()
+    await expect(page.getByRole('dialog')).toHaveCount(0)
     await signedIn(page)
   })
 

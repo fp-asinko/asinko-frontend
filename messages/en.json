@@ -275,7 +275,8 @@
       "join": "Join Asinko to join communities",
       "login": "Log in to Asinko",
       "signup": "Join Asinko",
-      "comment": "Join Asinko to comment"
+      "comment": "Join Asinko to comment",
+      "profile": "Choose your username"
     },
     "value": "Asinko is where calls get a public, verifiable track record.",
     "signup": "Create account",
@@ -303,7 +304,8 @@
     },
     "menu": {
       "logOut": "Log out"
-    }
+    },
+    "profileValue": "It’s how people find you and mention you on Asinko. Add a photo if you like."
   },
   "devLogin": {
     "login": "Dev login",

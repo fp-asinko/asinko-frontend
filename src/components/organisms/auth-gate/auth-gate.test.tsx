@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { AuthGateProvider, useAuthGate, useGateDialog, type GatedAction } from './auth-gate'
 
@@ -30,8 +30,6 @@ function renderGate(signedIn: boolean, action?: GatedAction, needsProfile = fals
 }
 
 describe('AuthGate', () => {
-  afterEach(() => vi.unstubAllGlobals())
-
   it('lets the action through with a session, without any modal (G-11)', async () => {
     const onVote = renderGate(true)
     await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
@@ -124,14 +122,24 @@ describe('AuthGate', () => {
     expect(within(dialog).queryByRole('button', { name: /Instagram|Continue with X/ })).toBeNull()
   })
 
-  it('takes an account without a username to choose one, not to the modal (specs/auth AU-11)', async () => {
-    const assign = vi.fn()
-    vi.stubGlobal('location', { ...window.location, pathname: '/es/hub/macro', search: '', assign })
+  it('shows an account without a username its second step in the modal (specs/auth AU-11)', async () => {
     const onVote = renderGate(false, 'vote-post', true)
     await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
     expect(onVote).not.toHaveBeenCalled()
-    expect(assign).toHaveBeenCalledWith('/en/welcome?next=%2Fes%2Fhub%2Fmacro')
-    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(await screen.findByRole('dialog', { name: 'Choose your username' })).toHaveAttribute(
+      'data-view',
+      'profile',
+    )
+    expect(screen.getByText('form:profile')).toBeInTheDocument()
+    // No way to switch, and no other provider: the account exists already.
+    expect(screen.queryByRole('link', { name: 'Continue with Google' })).toBeNull()
+  })
+
+  it('opens the second step by itself back from Google, and clears the mark (design.md § 12)', async () => {
+    window.history.pushState({}, '', '/en/hub/macro?sort=new&welcome=1')
+    renderGate(false, 'vote-post', true)
+    expect(await screen.findByRole('dialog', { name: 'Choose your username' })).toBeInTheDocument()
+    expect(window.location.search).toBe('?sort=new')
   })
 
   it('shares the viewer avatar only with a session (FC-24)', () => {

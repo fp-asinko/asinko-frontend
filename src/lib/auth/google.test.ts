@@ -59,7 +59,7 @@ describe('Google with PKCE (specs/auth AU-10)', () => {
     expect(localeOf('/es/hub/macro')).toBe('es')
     expect(localeOf('/pt?x=1')).toBe('pt')
     expect(localeOf('/hub/macro')).toBe('en')
-    expect(welcomePath('/es/hub/macro')).toBe('/es/welcome?next=%2Fes%2Fhub%2Fmacro')
+    expect(welcomePath('/es/hub/macro?sort=new')).toBe('/es/hub/macro?sort=new&welcome=1')
     expect(googleErrorPath('/')).toBe('/en/login?error=google&next=%2F')
   })
 })
