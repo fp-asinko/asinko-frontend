@@ -196,7 +196,7 @@ Decisión del 2026-10-21: estas propuestas se implementan en el backend en una f
 
 ### P-029: Imágenes de un grupo
 
-**Estado:** propuesta (2026-10-19), mockeada. **Fase 3 del backend** (2026-10-21).
+**Estado:** propuesta (2026-10-19), mockeada. **Fase 3 del backend** (2026-10-21). **Backend, 2026-10-22 (`dev`, handoff del 22/10):** existe `POST /uploads/community-image`, pero para el avatar y el banner de una comunidad: `{ userId, contentType, size }`, igual que `POST /uploads/avatar`, sin `communityId` ni control de moderador; la imagen se limpia y se achica recién al guardarla con `POST /communities` o `PATCH /communities/{slug}`. Para los widgets falta que el guardado de P-028 haga lo mismo con sus imágenes: el mock sigue encendido hasta que existan los widgets (revisado contra `dev` en `9924924`, 2026-10-29).
 
 **Endpoint:** `POST /api/v1/uploads/community-image` `{ userId, communityId, contentType, size }` → `{ uploadUrl, imageUrl, path }`.
 

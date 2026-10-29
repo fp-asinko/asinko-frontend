@@ -4,39 +4,39 @@ Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of 
 
 **The DEV deploy (`API_MOCKS=missing`):** the backend's phase 3 (achievements, P-030; a group's widgets and their images, P-028 and P-029) is shown against these mocks, with the real users and groups of `dev`. A person who is not in the fixtures gets a sample of earned achievements, always the same for them (from their id). dev's real groups (#macro, #crypto, #acciones, #argentina, #chile, #ipos, #meme-stocks, Value Investing ARG) come with widgets of their own (`fixtures/widget-seeds.ts`); any other group starts without widgets; any session's user can save them (the front offers it only to its moderators, from the backend's data), and they live in the memory of that server instance: they can go away or not show from another device.
 
-| Method | Path                                       | Kind     | Notes                                                                                                           |
-| ------ | ------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------- |
-| GET    | `/api/v1/profiles/:identifier`             | contract | Implemented in the backend (E01). `liveExample` for `pnpm api:smoke`                                            |
-| GET    | `/api/v1/users/:userId/following`          | contract | E01. Users the demo viewer follows (maria, federico, jeppe)                                                     |
-| GET    | `/api/v1/communities`                      | contract | E02. `search`, `type`, `cursor`                                                                                 |
-| GET    | `/api/v1/communities/:slug`                | contract | E02                                                                                                             |
-| GET    | `/api/v1/feed/explore`                     | contract | E04. Posts + polls, newest first. `community`, `cursor`                                                         |
-| GET    | `/api/v1/feed/following`                   | contract | E04. Communities the demo user belongs to: `btc`, `defi`, `latam`                                               |
-| GET    | `/api/v1/posts/:id`                        | contract | E03, with `entities` (proposal P-001)                                                                           |
-| GET    | `/api/v1/polls/:id`                        | contract | E03                                                                                                             |
-| PUT    | `/api/v1/posts/:id/vote`                   | contract | E05. Stateless: computed from the fixtures (`votes.ts`)                                                         |
-| DELETE | `/api/v1/posts/:id/vote`                   | contract | E05                                                                                                             |
-| PUT    | `/api/v1/polls/:id/vote`                   | contract | E03. Reveals hidden results; `POLL_CLOSED`, `VOTE_LOCKED`                                                       |
-| GET    | `/api/v1/posts/:id/comments`               | contract | P-014 (backend 2026-10-13), only with `?q=` (`when`): search, a flat list                                       |
-| GET    | `/api/v1/posts/:id/comments`               | contract | E05, replies nested. `sort` (P-014): every level; without it, oldest first as the backend                       |
-| GET    | `/api/v1/polls/:id/comments`               | contract | E05                                                                                                             |
-| GET    | `/api/v1/assets`                           | contract | E14. Response shape assumed (proposal P-003). `q`, `cursor`                                                     |
-| GET    | `/api/v1/assets/:symbol`                   | contract | E14. `openTheses` empty until phase 2                                                                           |
-| PATCH  | `/api/v1/users/:userId`                    | proposal | P-026: only with `openTo` (`when`); the headline, city, links, banner and About go to the backend               |
-| GET    | `/api/v1/communities/:slug/widgets`        | proposal | P-028. In memory; #trading-on-chain (the demo moderates it) has one of each type, #macro two                    |
-| PUT    | `/api/v1/communities/:slug/widgets`        | proposal | P-028. Saves the whole list; `403 NOT_MODERATOR`, `422 INVALID_WIDGET` with `index` and `field`                 |
-| POST   | `/api/v1/uploads/community-image`          | proposal | P-029. A moderator of that community, as a post image                                                           |
-| GET    | `/api/v1/users/:userId/active-communities` | contract | P-027 (backend 2026-10-20). Posts, polls and theses by community in the last `days`, never the personal channel |
-| GET    | `/api/v1/users/:userId/achievements`       | proposal | P-030. Demo, María and Federico have earned ones; only the demo's own list brings the missing ones              |
-| GET    | `/api/v1/users/:userId/featured`           | contract | P-025 (backend 2026-10-20). Feed items with `featuredAt`; María has a thesis and a post                         |
-| POST   | `/api/v1/users/:userId/featured`           | contract | P-025. Only your own; `409 FEATURED_LIMIT` past 3, `403 NOT_OWNER`                                              |
-| DELETE | `/api/v1/users/:userId/featured/:kind/:id` | contract | P-025                                                                                                           |
-| GET    | `/api/v1/users/:userId/drafts`             | contract | P-022. The demo user's drafts, in memory, newest first, up to 20 (one seeded)                                   |
-| POST   | `/api/v1/drafts`                           | contract | P-022. `409 DRAFT_LIMIT` past 20                                                                                |
-| PATCH  | `/api/v1/drafts/:draftId`                  | contract | P-022. Goes first in the list                                                                                   |
-| DELETE | `/api/v1/drafts/:draftId`                  | contract | P-022                                                                                                           |
-| POST   | `/api/v1/uploads/avatar`                   | contract | P-021. Answers a fixture (`/mocks/avatar-demo.svg`), not the uploaded image                                     |
-| POST   | `/api/v1/uploads/profile-banner`           | contract | P-021. Answers a fixture (`/mocks/banner-demo.svg`)                                                             |
+| Method | Path                                       | Kind     | Notes                                                                                                            |
+| ------ | ------------------------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------- |
+| GET    | `/api/v1/profiles/:identifier`             | contract | Implemented in the backend (E01). `liveExample` for `pnpm api:smoke`                                             |
+| GET    | `/api/v1/users/:userId/following`          | contract | E01. Users the demo viewer follows (maria, federico, jeppe)                                                      |
+| GET    | `/api/v1/communities`                      | contract | E02. `search`, `type`, `cursor`                                                                                  |
+| GET    | `/api/v1/communities/:slug`                | contract | E02                                                                                                              |
+| GET    | `/api/v1/feed/explore`                     | contract | E04. Posts + polls, newest first. `community`, `cursor`                                                          |
+| GET    | `/api/v1/feed/following`                   | contract | E04. Communities the demo user belongs to: `btc`, `defi`, `latam`                                                |
+| GET    | `/api/v1/posts/:id`                        | contract | E03, with `entities` (proposal P-001)                                                                            |
+| GET    | `/api/v1/polls/:id`                        | contract | E03                                                                                                              |
+| PUT    | `/api/v1/posts/:id/vote`                   | contract | E05. Stateless: computed from the fixtures (`votes.ts`)                                                          |
+| DELETE | `/api/v1/posts/:id/vote`                   | contract | E05                                                                                                              |
+| PUT    | `/api/v1/polls/:id/vote`                   | contract | E03. Reveals hidden results; `POLL_CLOSED`, `VOTE_LOCKED`                                                        |
+| GET    | `/api/v1/posts/:id/comments`               | contract | P-014 (backend 2026-10-13), only with `?q=` (`when`): search, a flat list                                        |
+| GET    | `/api/v1/posts/:id/comments`               | contract | E05, replies nested. `sort` (P-014): every level; without it, oldest first as the backend                        |
+| GET    | `/api/v1/polls/:id/comments`               | contract | E05                                                                                                              |
+| GET    | `/api/v1/assets`                           | contract | E14. Response shape assumed (proposal P-003). `q`, `cursor`                                                      |
+| GET    | `/api/v1/assets/:symbol`                   | contract | E14. `openTheses` empty until phase 2                                                                            |
+| PATCH  | `/api/v1/users/:userId`                    | proposal | P-026: only with `openTo` (`when`); the headline, city, links, banner and About go to the backend                |
+| GET    | `/api/v1/communities/:slug/widgets`        | proposal | P-028. In memory; #trading-on-chain (the demo moderates it) has one of each type, #macro two                     |
+| PUT    | `/api/v1/communities/:slug/widgets`        | proposal | P-028. Saves the whole list; `403 NOT_MODERATOR`, `422 INVALID_WIDGET` with `index` and `field`                  |
+| POST   | `/api/v1/uploads/community-image`          | proposal | P-029. A moderator of that community, as a post image. The backend's (2026-10-22) is for a group's avatar/banner |
+| GET    | `/api/v1/users/:userId/active-communities` | contract | P-027 (backend 2026-10-20). Posts, polls and theses by community in the last `days`, never the personal channel  |
+| GET    | `/api/v1/users/:userId/achievements`       | proposal | P-030. Demo, María and Federico have earned ones; only the demo's own list brings the missing ones               |
+| GET    | `/api/v1/users/:userId/featured`           | contract | P-025 (backend 2026-10-20). Feed items with `featuredAt`; María has a thesis and a post                          |
+| POST   | `/api/v1/users/:userId/featured`           | contract | P-025. Only your own; `409 FEATURED_LIMIT` past 3, `403 NOT_OWNER`                                               |
+| DELETE | `/api/v1/users/:userId/featured/:kind/:id` | contract | P-025                                                                                                            |
+| GET    | `/api/v1/users/:userId/drafts`             | contract | P-022. The demo user's drafts, in memory, newest first, up to 20 (one seeded)                                    |
+| POST   | `/api/v1/drafts`                           | contract | P-022. `409 DRAFT_LIMIT` past 20                                                                                 |
+| PATCH  | `/api/v1/drafts/:draftId`                  | contract | P-022. Goes first in the list                                                                                    |
+| DELETE | `/api/v1/drafts/:draftId`                  | contract | P-022                                                                                                            |
+| POST   | `/api/v1/uploads/avatar`                   | contract | P-021. Answers a fixture (`/mocks/avatar-demo.svg`), not the uploaded image                                      |
+| POST   | `/api/v1/uploads/profile-banner`           | contract | P-021. Answers a fixture (`/mocks/banner-demo.svg`)                                                              |
 
 - **contract**: in `docs/references/api/`. Every route but the assets is already implemented on the backend's `dev` branch; they stay here to work without the backend (CI, `API_MOCKS=true`).
 - **proposal**: the frontend needs it and it is not in the contract; described in `docs/references/api/proposals.md`.
