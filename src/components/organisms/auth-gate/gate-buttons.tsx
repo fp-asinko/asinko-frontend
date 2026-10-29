@@ -1,5 +1,6 @@
 'use client'
 
+import { MailIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
@@ -16,9 +17,17 @@ const PILL = 'h-11 rounded-full px-3 text-[0.8125rem] font-semibold md:h-9 md:px
  * moves into "⋯" (HR-04).
  */
 export function AccountButtons({ children }: { children: ReactNode }) {
-  const { signedIn, openGate } = useAuthGate()
+  const { signedIn, needsProfile, openGate } = useAuthGate()
   const t = useTranslations('authGate.header')
   if (signedIn) return children
+  // Signed in without a username: the one thing left to do (specs/auth AU-11).
+  if (needsProfile) {
+    return (
+      <Button size="lg" className={PILL} onClick={() => openGate('post')}>
+        {t('chooseUsername')}
+      </Button>
+    )
+  }
 
   return (
     <span className="flex items-center gap-2">
@@ -41,6 +50,22 @@ export function AccountButtons({ children }: { children: ReactNode }) {
 export function SignedInOnly({ children }: { children: ReactNode }) {
   const { signedIn } = useAuthGate()
   return signedIn ? children : null
+}
+
+/** "Continue with email" in the Join card: the account modal's sign up form (specs/auth AU-01). */
+export function EmailSignUpButton() {
+  const { openGate } = useAuthGate()
+  const t = useTranslations('authGate.joinCard')
+  return (
+    <button
+      type="button"
+      onClick={() => openGate('signup')}
+      className="flex h-11 w-full tap items-center justify-center gap-2.5 rounded-full border bg-background type-ui font-semibold hover:bg-muted"
+    >
+      <MailIcon aria-hidden className="size-4.5 shrink-0" />
+      {t('email')}
+    </button>
+  )
 }
 
 /** "Create account" and "Log in", side by side: the Join card and the Following empty state. */

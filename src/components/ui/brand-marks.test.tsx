@@ -1,9 +1,10 @@
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { InstagramMark, RedditMark, XMark } from './brand-marks'
+import { GoogleMark, InstagramMark, RedditMark, XMark } from './brand-marks'
 
 describe('brand marks (G-13)', () => {
   it.each([
+    ['Google', GoogleMark],
     ['Reddit', RedditMark],
     ['Instagram', InstagramMark],
     ['X', XMark],

@@ -20,7 +20,7 @@ import { routing, type Locale } from '@/i18n/routing'
 
 /**
  * The "⋯" menu itself (Base UI Menu), loaded on the first open by MoreMenu (HR-03, HR-07):
- * language, dark mode and, on phones without a session, Sign up.
+ * language, dark mode and, on phones without a session, Sign up; with one, Log out (specs/auth AU-14).
  */
 export function MoreMenuPopup({
   open,
@@ -39,8 +39,9 @@ export function MoreMenuPopup({
   const pathname = usePathname()
   const router = useRouter()
   const { resolvedTheme, setTheme } = useTheme()
-  const { signedIn, openGate } = useAuthGate()
+  const { signedIn, needsProfile, openGate, logOut } = useAuthGate()
   const [, startTransition] = useTransition()
+  const tAuth = useTranslations('authGate.menu')
 
   function switchLocale(next: Locale) {
     // Same page in the other language, keeping the filters (H-27).
@@ -81,6 +82,21 @@ export function MoreMenuPopup({
         >
           {t('theme.toggle')}
         </DropdownMenuCheckboxItem>
+        {(signedIn || needsProfile) && (
+          <DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              className="min-h-10"
+              onClick={() =>
+                startTransition(async () => {
+                  await logOut()
+                })
+              }
+            >
+              {tAuth('logOut')}
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

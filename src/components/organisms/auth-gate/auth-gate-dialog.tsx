@@ -2,9 +2,8 @@
 
 import { XIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { ComingSoon } from '@/components/molecules/coming-soon'
+import type { ReactNode } from 'react'
 import { AsinkoLogo } from '@/components/ui/asinko-logo'
-import { InstagramMark, RedditMark, XMark } from '@/components/ui/brand-marks'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -13,32 +12,38 @@ import {
   DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog'
-import type { GateRequest } from './auth-gate'
+import type { GateRequest, GateView } from './auth-gate'
+import { SocialLogins } from './social-logins'
 
-// G-13: social logins, images only until the auth spec (Supabase has X; Reddit and Instagram
-// would need their own integration, see specs/guest-experience § 9).
-const SOCIAL = [
-  { name: 'Reddit', Mark: RedditMark },
-  { name: 'Instagram', Mark: InstagramMark },
-  { name: 'X', Mark: XMark },
-] as const
+const PRIMARY =
+  'flex h-11 w-full tap items-center justify-center rounded-full bg-primary type-ui font-semibold text-primary-foreground'
+const SECONDARY =
+  'flex h-11 w-full tap items-center justify-center rounded-full bg-muted type-ui font-semibold hover:bg-muted-hover'
 
 /**
- * The account modal (G-05 to G-08): says what the visitor was about to do and offers to create an
- * account or log in. A bottom panel on phones, a centered dialog from md, closable with Esc, the
- * backdrop or ×; Base UI traps the focus and gives it back to the control that opened it. Both
- * buttons are "Coming soon" until the auth spec, which also uses `request.next` to come back.
+ * The account modal (G-05 to G-08, specs/auth AU-01): says what the visitor was about to do and
+ * offers to create an account or log in, then shows that form (`forms`, from the auth feature) in
+ * the same modal. Below, Google and Reddit (AU-10, AU-12). A bottom panel on phones, a centered
+ * dialog from md, closable with Esc, the backdrop or ×; Base UI traps the focus and gives it back
+ * to the control that opened it.
  */
 export function AuthGateDialog({
   request,
+  view,
   open,
   onClose,
+  onViewChange,
+  forms,
 }: {
   request: GateRequest
+  view: GateView
   open: boolean
   onClose: () => void
+  onViewChange: (view: GateView) => void
+  forms: ReactNode
 }) {
   const t = useTranslations('authGate')
+  const title = view === 'invite' ? t(`title.${request.action}`) : t(`title.${view}`)
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
@@ -46,9 +51,11 @@ export function AuthGateDialog({
         // Own 44px close button, as the menu panel: on phones it is the main way out.
         showCloseButton={false}
         data-action={request.action}
-        // For the auth spec (G-09): where to come back after logging in.
+        data-view={view}
+        // Where to come back after logging in (G-09).
         data-next={request.next}
-        className="top-auto bottom-0 left-0 max-w-none translate-x-0 translate-y-0 gap-5 rounded-b-none px-5 pt-7 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:max-w-none md:top-1/2 md:bottom-auto md:left-1/2 md:max-w-sm md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-b-xl md:px-6 md:pb-6 data-open:slide-in-from-bottom-10 data-open:zoom-in-100 md:data-open:slide-in-from-bottom-0 md:data-open:zoom-in-95 data-closed:slide-out-to-bottom-10 data-closed:zoom-out-100 md:data-closed:slide-out-to-bottom-0 md:data-closed:zoom-out-95"
+        // A long form scrolls inside the panel, never past the screen.
+        className="top-auto bottom-0 left-0 max-h-[92dvh] max-w-none translate-x-0 translate-y-0 gap-5 overflow-y-auto overscroll-contain rounded-b-none px-5 pt-7 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:max-w-none md:top-1/2 md:bottom-auto md:left-1/2 md:max-w-sm md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-b-xl md:px-6 md:pb-6 data-open:slide-in-from-bottom-10 data-open:zoom-in-100 md:data-open:slide-in-from-bottom-0 md:data-open:zoom-in-95 data-closed:slide-out-to-bottom-10 data-closed:zoom-out-100 md:data-closed:slide-out-to-bottom-0 md:data-closed:zoom-out-95"
       >
         <DialogClose
           render={
@@ -68,44 +75,46 @@ export function AuthGateDialog({
         </div>
         <div className="flex flex-col gap-2 px-6 text-center">
           {/* Loose classes, not type-*: cn does not merge them with the base text-* (design-system.md). */}
-          <DialogTitle className="text-[1.375rem] leading-tight font-bold">
-            {t(`title.${request.action}`)}
-          </DialogTitle>
-          <DialogDescription className="leading-normal">{t('value')}</DialogDescription>
+          <DialogTitle className="text-[1.375rem] leading-tight font-bold">{title}</DialogTitle>
+          {view === 'invite' && (
+            <DialogDescription className="leading-normal">{t('value')}</DialogDescription>
+          )}
         </div>
-        {/* Column flex: stretches each coming-soon wrapper (and its button) to the full width. */}
-        <div className="flex flex-col gap-2">
-          <ComingSoon
-            label={t('signup')}
-            placement="above"
-            className="flex h-11 w-full tap items-center justify-center rounded-full bg-primary type-ui font-semibold text-primary-foreground"
-          >
-            {t('signup')}
-          </ComingSoon>
-          <ComingSoon
-            label={t('login')}
-            className="flex h-11 w-full tap items-center justify-center rounded-full bg-muted type-ui font-semibold hover:bg-muted-hover"
-          >
-            {t('login')}
-          </ComingSoon>
-        </div>
+
+        {view === 'invite' ? (
+          <div className="flex flex-col gap-2">
+            <button type="button" className={PRIMARY} onClick={() => onViewChange('signup')}>
+              {t('signup')}
+            </button>
+            <button type="button" className={SECONDARY} onClick={() => onViewChange('login')}>
+              {t('login')}
+            </button>
+          </div>
+        ) : (
+          <>
+            {forms}
+            <p className="text-center type-ui text-muted-foreground">
+              {t.rich(view === 'login' ? 'switch.toSignup' : 'switch.toLogin', {
+                link: (chunks) => (
+                  <button
+                    type="button"
+                    className="font-semibold text-foreground underline underline-offset-2"
+                    onClick={() => onViewChange(view === 'login' ? 'signup' : 'login')}
+                  >
+                    {chunks}
+                  </button>
+                ),
+              })}
+            </p>
+          </>
+        )}
+
         <div className="flex items-center gap-3 type-meta text-muted-foreground">
           <span aria-hidden className="h-px flex-1 bg-border" />
           {t('or')}
           <span aria-hidden className="h-px flex-1 bg-border" />
         </div>
-        <ul className="flex justify-center gap-3">
-          {SOCIAL.map(({ name, Mark }) => (
-            <li key={name}>
-              <ComingSoon
-                label={t('continueWith', { provider: name })}
-                className="inline-flex size-11 tap items-center justify-center rounded-full bg-muted text-foreground hover:bg-muted-hover"
-              >
-                <Mark className="size-5" />
-              </ComingSoon>
-            </li>
-          ))}
-        </ul>
+        <SocialLogins next={request.next} />
       </DialogContent>
     </Dialog>
   )

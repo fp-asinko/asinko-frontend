@@ -34,6 +34,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
   it('keeps only those namespaces, with their nesting', () => {
     const picked = pickClientMessages(en)
     expect(Object.keys(picked).sort()).toEqual([
+      'auth',
       'authGate',
       'comments',
       'common',

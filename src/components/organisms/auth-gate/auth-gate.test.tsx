@@ -1,8 +1,8 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
-import { AuthGateProvider, useAuthGate, type GatedAction } from './auth-gate'
+import { AuthGateProvider, useAuthGate, useGateDialog, type GatedAction } from './auth-gate'
 
 function Upvote({ onVote, action = 'vote-post' }: { onVote: () => void; action?: GatedAction }) {
   const { requireAccount } = useAuthGate()
@@ -13,10 +13,16 @@ function Upvote({ onVote, action = 'vote-post' }: { onVote: () => void; action?:
   )
 }
 
-function renderGate(signedIn: boolean, action?: GatedAction) {
+/** Stands in for the auth feature's forms: shows which one the modal asks for. */
+function Forms() {
+  const dialog = useGateDialog()
+  return <p>{`form:${dialog?.view}`}</p>
+}
+
+function renderGate(signedIn: boolean, action?: GatedAction, needsProfile = false) {
   const onVote = vi.fn()
   renderWithIntl(
-    <AuthGateProvider signedIn={signedIn}>
+    <AuthGateProvider signedIn={signedIn} needsProfile={needsProfile} forms={<Forms />}>
       <Upvote onVote={onVote} action={action} />
     </AuthGateProvider>,
   )
@@ -24,6 +30,8 @@ function renderGate(signedIn: boolean, action?: GatedAction) {
 }
 
 describe('AuthGate', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
   it('lets the action through with a session, without any modal (G-11)', async () => {
     const onVote = renderGate(true)
     await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
@@ -39,10 +47,29 @@ describe('AuthGate', () => {
     expect(dialog).toHaveAccessibleDescription(
       'Asinko is where calls get a public, verifiable track record.',
     )
-    // Until the auth spec, both ways in are coming soon (H-26).
-    for (const name of ['Create account', 'Log in']) {
-      expect(screen.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
-    }
+  })
+
+  it('opens each form in the same modal, and switches between them (specs/auth AU-01)', async () => {
+    renderGate(false)
+    await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Log in' }))
+    expect(screen.getByRole('dialog', { name: 'Log in to Asinko' })).toHaveAttribute(
+      'data-view',
+      'login',
+    )
+    expect(screen.getByText('form:login')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Create an account' }))
+    expect(screen.getByRole('dialog', { name: 'Join Asinko' })).toBeInTheDocument()
+    expect(screen.getByText('form:signup')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Log in' }))
+    expect(screen.getByText('form:login')).toBeInTheDocument()
+  })
+
+  it('opens straight on the form for Log in and Sign up', async () => {
+    renderGate(false, 'signup')
+    await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
+    expect(await screen.findByText('form:signup')).toBeInTheDocument()
   })
 
   it('names each action in the modal title', async () => {
@@ -80,17 +107,31 @@ describe('AuthGate', () => {
     expect(dialog).toHaveAttribute('data-next', '/en?filter=polls')
   })
 
-  it('shows the brand on top and the social logins as coming soon (G-13)', async () => {
+  it('offers Google back to this page, and Reddit as coming soon (specs/auth AU-10, AU-12)', async () => {
+    window.history.pushState({}, '', '/en/hub/macro')
     renderGate(false)
     await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
     const dialog = await screen.findByRole('dialog')
     expect(dialog.querySelector('[aria-hidden] [role="img"]')).not.toBeNull()
-    for (const provider of ['Reddit', 'Instagram', 'X']) {
-      expect(screen.getByRole('button', { name: `Continue with ${provider}` })).toHaveAttribute(
-        'aria-disabled',
-        'true',
-      )
-    }
+    expect(within(dialog).getByRole('link', { name: 'Continue with Google' })).toHaveAttribute(
+      'href',
+      '/auth/google?next=%2Fen%2Fhub%2Fmacro',
+    )
+    expect(within(dialog).getByRole('button', { name: 'Continue with Reddit' })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    )
+    expect(within(dialog).queryByRole('button', { name: /Instagram|Continue with X/ })).toBeNull()
+  })
+
+  it('takes an account without a username to choose one, not to the modal (specs/auth AU-11)', async () => {
+    const assign = vi.fn()
+    vi.stubGlobal('location', { ...window.location, pathname: '/es/hub/macro', search: '', assign })
+    const onVote = renderGate(false, 'vote-post', true)
+    await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
+    expect(onVote).not.toHaveBeenCalled()
+    expect(assign).toHaveBeenCalledWith('/en/welcome?next=%2Fes%2Fhub%2Fmacro')
+    expect(screen.queryByRole('dialog')).toBeNull()
   })
 
   it('shares the viewer avatar only with a session (FC-24)', () => {

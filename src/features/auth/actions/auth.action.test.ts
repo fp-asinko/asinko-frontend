@@ -159,7 +159,7 @@ describe('auth actions (specs/auth design.md § 6)', () => {
     it('needs a session', async () => {
       expect(await createProfile({ username: 'ana_92', accepted: true })).toEqual({
         ok: false,
-        error: 'api.errors.UNAUTHENTICATED',
+        error: 'auth.errors.noSession',
       })
     })
 

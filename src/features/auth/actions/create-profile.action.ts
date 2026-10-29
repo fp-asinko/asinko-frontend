@@ -17,7 +17,7 @@ export async function createProfile(raw: unknown): Promise<ActionResult<{ userna
   const parsed = profileSchema.safeParse(raw)
   if (!parsed.success) return invalidForm(parsed.error)
   const session = await readSession()
-  if (!session) return { ok: false, error: 'api.errors.UNAUTHENTICATED' }
+  if (!session) return { ok: false, error: 'auth.errors.noSession' }
   // Already chosen (a second tab): nothing to do.
   if (session.username) return { ok: true, data: { username: session.username } }
 

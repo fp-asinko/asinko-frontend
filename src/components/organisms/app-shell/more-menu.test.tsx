@@ -9,10 +9,10 @@ import { MoreMenu } from './more-menu'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
-function renderMenu(signedIn = true) {
+function renderMenu(signedIn = true, logOut = vi.fn(async () => {})) {
   return renderWithIntl(
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
-      <AuthGateProvider signedIn={signedIn}>
+      <AuthGateProvider signedIn={signedIn} logOut={logOut}>
         <MoreMenu />
       </AuthGateProvider>
     </ThemeProvider>,
@@ -20,6 +20,22 @@ function renderMenu(signedIn = true) {
 }
 
 describe('MoreMenu (HR-03)', () => {
+  it('logs out from the menu with a session, and offers no log out without one (specs/auth AU-14)', async () => {
+    const logOut = vi.fn(async () => {})
+    const { unmount } = renderMenu(true, logOut)
+    await userEvent.click(screen.getByRole('button', { name: 'More options' }))
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: 'Log out' }, { timeout: 5000 }),
+    )
+    expect(logOut).toHaveBeenCalledOnce()
+    unmount()
+
+    renderMenu(false)
+    await userEvent.click(screen.getByRole('button', { name: 'More options' }))
+    await screen.findByRole('menu', {}, { timeout: 5000 })
+    expect(screen.queryByRole('menuitem', { name: 'Log out' })).toBeNull()
+  })
+
   it('opens a menu with the language and the dark mode', async () => {
     renderMenu()
     const trigger = screen.getByRole('button', { name: 'More options' })

@@ -1,15 +1,8 @@
-import { MailIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useId, type ComponentType } from 'react'
+import { useId } from 'react'
 import { ComingSoon } from '@/components/molecules/coming-soon'
-import { InstagramMark, RedditMark, XMark } from '@/components/ui/brand-marks'
-
-// The same providers as the account modal (G-13), plus email. Coming soon until the auth spec.
-const PROVIDERS: ReadonlyArray<{ name: string; Mark: ComponentType<{ className?: string }> }> = [
-  { name: 'Reddit', Mark: RedditMark },
-  { name: 'Instagram', Mark: InstagramMark },
-  { name: 'X', Mark: XMark },
-]
+import { EmailSignUpButton } from './gate-buttons'
+import { SocialLogins } from './social-logins'
 
 // The minimal background (GS-04): mentions scattered in gray pills. Symbols, not copy: never
 // translated. Positions as inline styles (Tailwind only generates classes it finds written).
@@ -24,14 +17,11 @@ const MENTIONS = [
   { text: '#latam', left: 18, top: 82, rotate: -6 },
 ] as const
 
-const PILL =
-  // Icon and text in line, from the left: the column is narrow (about 220px inside the card).
-  'flex h-11 w-full tap items-center gap-2.5 rounded-full border bg-background px-3.5 type-action whitespace-nowrap hover:bg-muted'
-
 /**
  * The invitation to have an account, on top of the left column without a session
- * (specs/guest-sidebar), as Reddit does. The providers and the legal links are coming soon until
- * the auth spec. The mentions at the bottom are decorative.
+ * (specs/guest-sidebar), as Reddit does: Google, Reddit (coming soon) and email, as the account
+ * modal (specs/auth AU-10, AU-12). The legal links are coming soon until there is a legal text. The
+ * mentions at the bottom are decorative.
  */
 export function JoinCard() {
   const t = useTranslations('authGate')
@@ -48,18 +38,9 @@ export function JoinCard() {
       </h2>
       <p className="mt-1.5 text-center type-meta text-muted-foreground">{t('joinCard.body')}</p>
 
-      {/* Column flex: stretches each coming-soon wrapper (and its button) to the full width. */}
       <div className="mt-4 flex flex-col gap-2">
-        {PROVIDERS.map(({ name, Mark }) => (
-          <ComingSoon key={name} label={t('continueWith', { provider: name })} className={PILL}>
-            <Mark className="size-4.5 shrink-0" />
-            {t('continueWith', { provider: name })}
-          </ComingSoon>
-        ))}
-        <ComingSoon label={t('joinCard.email')} className={PILL}>
-          <MailIcon aria-hidden className="size-4.5 shrink-0" />
-          {t('joinCard.email')}
-        </ComingSoon>
+        <SocialLogins />
+        <EmailSignUpButton />
       </div>
 
       <p className="mt-3 text-center text-[0.6875rem] leading-4 text-muted-foreground">

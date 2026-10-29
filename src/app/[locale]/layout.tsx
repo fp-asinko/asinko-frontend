@@ -22,9 +22,12 @@ import { routing } from '@/i18n/routing'
 import { isIndexable } from '@/lib/seo/robots'
 import { communityPath } from '@/lib/communities/paths'
 import { LEFT_COLUMN_COOKIE, siteFolded } from '@/lib/left-column'
-import { getViewer } from '@/lib/session'
+import { getAccountState, getViewer } from '@/lib/session'
 import { isDevLoginEnabled } from '@/lib/auth/dev-session'
 import { DevLoginButton } from '@/features/dev-login'
+// By their paths (JS budget): the modal's forms load when it shows them.
+import { logOut } from '@/features/auth/actions/log-out.action'
+import { AuthGateForms } from '@/features/auth/components/auth-gate-forms'
 import { Providers } from './providers'
 import '../globals.css'
 
@@ -75,6 +78,8 @@ export default async function LocaleLayout({ children, right, params }: LayoutPr
   // Who can act: without a session, actions open the account modal (specs/guest-experience).
   const viewer = await getViewer()
   const signedIn = viewer !== null
+  // Signed in without a username: everything takes it to choose one (specs/auth AU-11).
+  const needsProfile = (await getAccountState()) === 'needs-profile'
   // The left column as the viewer left it: drawn so on the server, nothing jumps (specs/sidebar-toggle).
   const leftFolded = siteFolded((await cookies()).get(LEFT_COLUMN_COOKIE)?.value)
   // Development login (specs/dev-login): off in production and with every route mocked.
@@ -94,7 +99,11 @@ export default async function LocaleLayout({ children, right, params }: LayoutPr
           <Providers nonce={nonce}>
             <AuthGateProvider
               signedIn={signedIn}
+              needsProfile={needsProfile}
               viewerAvatar={viewer && <UserAvatar name={viewer.username} size="xs" />}
+              // Log in and sign up inside the modal, and log out (specs/auth AU-01, AU-14).
+              forms={<AuthGateForms />}
+              logOut={logOut}
             >
               {/* Joined communities of this visit: every join button hides at once (specs/community-first). */}
               <JoinedProvider>

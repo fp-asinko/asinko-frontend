@@ -283,7 +283,8 @@
     "close": "Close",
     "header": {
       "login": "Log in",
-      "signup": "Sign up"
+      "signup": "Sign up",
+      "chooseUsername": "Choose username"
     },
     "joinCard": {
       "title": "New to Asinko?",
@@ -295,7 +296,14 @@
     },
     "brand": "Asinko",
     "or": "or",
-    "continueWith": "Continue with {provider}"
+    "continueWith": "Continue with {provider}",
+    "switch": {
+      "toSignup": "New to Asinko? <link>Create an account</link>",
+      "toLogin": "Already have an account? <link>Log in</link>"
+    },
+    "menu": {
+      "logOut": "Log out"
+    }
   },
   "devLogin": {
     "login": "Dev login",
@@ -1137,5 +1145,58 @@
     "label": "Glossary",
     "region": "Glossary: {term}",
     "example": "Example"
+  },
+  "auth": {
+    "login": {
+      "submit": "Log in",
+      "pending": "Logging in…"
+    },
+    "signup": {
+      "submit": "Create account",
+      "pending": "Creating your account…"
+    },
+    "welcome": {
+      "title": "Choose your username",
+      "intro": "It’s how people find you and mention you on Asinko.",
+      "submit": "Continue",
+      "pending": "Saving…"
+    },
+    "fields": {
+      "email": {
+        "label": "Email",
+        "invalid": "Enter a valid email"
+      },
+      "password": {
+        "label": "Password",
+        "hint": "At least 8 characters",
+        "required": "Enter your password",
+        "short": "Use at least 8 characters",
+        "long": "Use 72 characters or fewer",
+        "show": "Show password",
+        "hide": "Hide password"
+      },
+      "username": {
+        "label": "Username",
+        "hint": "3 to 30 letters, numbers or _",
+        "invalid": "Use 3 to 30 letters, numbers or _"
+      },
+      "accepted": {
+        "label": "I’m 18 or older and I accept the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>",
+        "terms": "Terms",
+        "privacy": "Privacy Policy",
+        "required": "You need to be 18 or older and accept the Terms"
+      }
+    },
+    "errors": {
+      "invalid": "Check the marked fields",
+      "credentials": "Wrong email or password",
+      "rateLimited": "Too many tries. Wait a moment and try again",
+      "unavailable": "We couldn’t reach Asinko. Try again in a moment",
+      "emailTaken": "There’s already an account with this email",
+      "weakPassword": "Choose a stronger password",
+      "usernameTaken": "That username is taken",
+      "noSession": "Your session ended. Log in again",
+      "google": "We couldn’t log you in with Google. Try again"
+    }
   }
 }

@@ -26,7 +26,7 @@ const username = z
   .regex(USERNAME_PATTERN, { message: 'auth.fields.username.invalid' })
 
 /** 18 or more, and the Terms and the Privacy (Q1). */
-const accepted = z.literal(true, { message: 'auth.fields.accepted.required' })
+const accepted = z.boolean().refine((value) => value, { message: 'auth.fields.accepted.required' })
 
 export const signUpSchema = z.object({
   email,

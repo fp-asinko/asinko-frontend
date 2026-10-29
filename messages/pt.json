@@ -283,7 +283,8 @@
     "close": "Fechar",
     "header": {
       "login": "Entrar",
-      "signup": "Cadastrar-se"
+      "signup": "Cadastrar-se",
+      "chooseUsername": "Escolha seu usuário"
     },
     "joinCard": {
       "title": "Novo no Asinko?",
@@ -295,7 +296,14 @@
     },
     "brand": "Asinko",
     "or": "ou",
-    "continueWith": "Continuar com {provider}"
+    "continueWith": "Continuar com {provider}",
+    "switch": {
+      "toSignup": "Novo no Asinko? <link>Crie uma conta</link>",
+      "toLogin": "Já tem uma conta? <link>Entre</link>"
+    },
+    "menu": {
+      "logOut": "Sair"
+    }
   },
   "devLogin": {
     "login": "Dev login",
@@ -1137,5 +1145,58 @@
     "label": "Glossário",
     "region": "Glossário: {term}",
     "example": "Exemplo"
+  },
+  "auth": {
+    "login": {
+      "submit": "Entrar",
+      "pending": "Entrando…"
+    },
+    "signup": {
+      "submit": "Criar conta",
+      "pending": "Criando sua conta…"
+    },
+    "welcome": {
+      "title": "Escolha seu nome de usuário",
+      "intro": "É como as pessoas encontram e mencionam você no Asinko.",
+      "submit": "Continuar",
+      "pending": "Salvando…"
+    },
+    "fields": {
+      "email": {
+        "label": "E-mail",
+        "invalid": "Digite um e-mail válido"
+      },
+      "password": {
+        "label": "Senha",
+        "hint": "Pelo menos 8 caracteres",
+        "required": "Digite sua senha",
+        "short": "Use pelo menos 8 caracteres",
+        "long": "Use 72 caracteres ou menos",
+        "show": "Mostrar senha",
+        "hide": "Ocultar senha"
+      },
+      "username": {
+        "label": "Nome de usuário",
+        "hint": "De 3 a 30 letras, números ou _",
+        "invalid": "Use de 3 a 30 letras, números ou _"
+      },
+      "accepted": {
+        "label": "Tenho 18 anos ou mais e aceito os <terms>Termos</terms> e a <privacy>Política de Privacidade</privacy>",
+        "terms": "Termos",
+        "privacy": "Política de Privacidade",
+        "required": "Você precisa ter 18 anos ou mais e aceitar os Termos"
+      }
+    },
+    "errors": {
+      "invalid": "Confira os campos marcados",
+      "credentials": "E-mail ou senha incorretos",
+      "rateLimited": "Muitas tentativas. Espere um pouco e tente de novo",
+      "unavailable": "Não conseguimos falar com o Asinko. Tente de novo em instantes",
+      "emailTaken": "Já existe uma conta com este e-mail",
+      "weakPassword": "Escolha uma senha mais forte",
+      "usernameTaken": "Esse nome de usuário já está em uso",
+      "noSession": "Sua sessão terminou. Entre de novo",
+      "google": "Não conseguimos entrar com o Google. Tente de novo"
+    }
   }
 }
