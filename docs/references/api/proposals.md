@@ -6,6 +6,7 @@
 
 - **Pendiente ahora:** una pregunta sobre los slugs de los activos, y lo que espera una decisión de producto (P-026, P-023 y la fórmula de `best`, P-014).
 - **Fase 3 del backend:** los logros (P-030) y los widgets de los grupos (P-028, P-029). En el front ya se ven, contra mocks; el backend los implementa más adelante.
+- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033).
 
 **Verificado contra el deploy de `dev` el 2026-10-21** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 10 de 10 en verde, solo lecturas, cada respuesta con el mismo esquema que usa el mock. Además de lo de antes:
 
@@ -115,6 +116,21 @@ Lo que necesita sesión está en [Por verificar con datos reales](#por-verificar
 **Estado:** el backend acepta `sort=best` y por ahora responde cronológico; la fórmula está en definición.
 
 **Propuesta del front** (decisión del PO, 2026-10-08), la de Hacker News: `score / (horas desde createdAt + 2) ^ 1,5`, de mayor a menor; un comentario nuevo y votado sube, y uno viejo baja de a poco. El mock la usa. Reddit usa el intervalo de Wilson sobre votos a favor y en contra por separado, y el contrato solo tiene `score`. Si el backend prefiere otra (o guardar votos a favor y en contra para usar Wilson), el front no cambia: solo manda `sort=best`.
+
+## Sprint 2 (MVP-3, 25/10 al 7/11)
+
+Lo que pide el trabajo del sprint: login (MVP-210), tesis (MVP-137, MVP-140, MVP-141, MVP-143), crear comunidad (MVP-204) y notificaciones (MVP-146).
+
+### P-033: Reglas de la cuenta del lado del backend
+
+**Estado:** propuesta (2026-10-29), `specs/auth` (MVP-210). No hace falta mock: el front ya aplica las dos reglas.
+
+**Motivo:** el PO fijó dos reglas para crear una cuenta, y hoy solo las aplica el front. Una cuenta creada por otro camino (la página `/login` del backend, o una llamada directa a Supabase) se las saltea.
+
+**Cambio:**
+
+- **Contraseña de 8 caracteres o más:** en Supabase Auth, _Authentication → Policies → Minimum password length_ en 8 (hoy, el default de 6). Con eso, `signUp` rechaza una más corta, venga de donde venga. Es un cambio de Auth: necesita OK explícito.
+- **Edad mínima de 18 años:** el checkbox del front dice "Tengo 18 años o más y acepto los Términos". `POST /users` guarda solo `ageConfirmed` como un booleano. Proponemos que la edad quede escrita en los Términos (`TERMS_VERSION`) y en el contrato de E01, así `ageConfirmed: true` significa siempre "18 o más". No hace falta un campo nuevo.
 
 ## Fase 3 del backend: solo visual en el front
 
