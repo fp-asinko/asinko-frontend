@@ -1,4 +1,4 @@
-# Favoritos en grupos, personas y activos — Design
+﻿# Favoritos en grupos, personas y activos — Design
 
 ## 1. Sin propuesta al backend
 
@@ -22,7 +22,7 @@ Antes de subirlo conviene avisarle al backend que se favoritean canales personal
 
 - **`FavoriteStar`** (cliente, `features/interests/components/favorite-star.tsx`):
   - un botón `size-7` al lado del link de la fila; la fila es `group/row`;
-  - favorito: estrella llena, negra, siempre visible;
+  - favorito: estrella llena, gris oscuro (`text-muted-foreground`, PO 2026-10-29), siempre visible;
   - si no: vacía, con `opacity-0` hasta el hover o el foco de la fila;
   - es optimista: refresca la página para reordenar y, si falla, vuelve atrás y lo anuncia (`role="alert"`).
 - **Grupos y Personas:** la estrella a la derecha de la fila. En Personas va después de la precisión.

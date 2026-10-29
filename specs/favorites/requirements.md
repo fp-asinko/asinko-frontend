@@ -1,4 +1,4 @@
-# Favoritos en grupos, personas y activos — Requirements
+﻿# Favoritos en grupos, personas y activos — Requirements
 
 > **Estado:** aprobado por el PO el 2026-10-28 ("dale"): la estrella como Reddit, sin una sección aparte, también para personas y activos. Se trabajó local y se subió a `develop` el 2026-10-28, a pedido del PO.
 >
@@ -11,14 +11,14 @@
 
 ## Criterios de aceptación
 
-- [x] **FV-01** En la columna izquierda, cada lista (Grupos, Personas, Activos) muestra **primero los favoritos**, cada uno con una **estrella negra** junto al nombre.
-- [x] **FV-02** Al pasar el mouse por una fila de Grupos o Personas (o con el foco del teclado), aparece a la derecha la estrella para **marcar o desmarcar** el favorito. Se ve al instante y la lista se reordena después. En **Activos**, la estrella va en la esquina de la tarjetita, chica y sin fondo: negra y fija si es favorito, vacía al pasar el mouse si no (PO, 2026-10-28). La tarjeta de la página que se ve se marca con fondo gris, no con borde.
+- [x] **FV-01** En la columna izquierda, cada lista (Grupos, Personas, Activos) muestra **primero los favoritos**, cada uno con una **estrella gris oscuro** junto al nombre (negra hasta el 2026-10-29).
+- [x] **FV-02** Al pasar el mouse por una fila de Grupos o Personas (o con el foco del teclado), aparece a la derecha la estrella para **marcar o desmarcar** el favorito. Se ve al instante y la lista se reordena después. En **Activos**, la estrella va en la esquina de la tarjetita, chica y sin fondo: gris oscuro y fija si es favorito, vacía al pasar el mouse si no (PO, 2026-10-28). La tarjeta de la página que se ve se marca con fondo gris, no con borde.
 - [x] **FV-03** En la página de un perfil que seguís, al lado de "Siguiendo", aparece la estrella de favorito, como en un grupo y en un activo. Cambia CP-12 de `specs/community-pages`, que la sacaba. En tu propio perfil, nada.
 - [x] **FV-04** Sin sesión no hay estrellas. Si falla, vuelve como estaba y lo dice, como la estrella de la cabecera.
 - [x] **FV-06** Al marcar o desmarcar un favorito, la lista se reordena **al instante** y cada fila **se desliza** a su nuevo lugar (unos 250 ms, salida suave). No espera a que vuelvan los datos. Va en Grupos, Personas y Activos (PO, 2026-10-28). Con "reducir movimiento", se reordena sin animar.
 - [x] **FV-05** **Accesibilidad:**
   - la estrella es un botón con nombre ("Add maria to favorites" o "Remove maria from favorites") y `aria-pressed`;
-  - la estrella negra de la fila es decorativa, y el lector de pantalla la oye en el nombre del botón;
+  - la estrella de la fila es decorativa, y el lector de pantalla la oye en el nombre del botón;
   - axe sin violaciones en claro y oscuro;
   - presupuesto de JS dentro de 240 KB.
 

@@ -19,7 +19,7 @@ const PLACEMENT = {
 } as const
 
 /**
- * A favorite star in "Your interests" (specs/favorites FV-01, FV-02), as Reddit's: black and always
+ * A favorite star in "Your interests" (specs/favorites FV-01, FV-02), as Reddit's: filled and always
  * there on a favorite; empty, only on the row's hover or keyboard focus, on the rest. The row (or
  * the tile) is `group/row`. Shown at once; the column reorders when the page refreshes after it. If
  * it fails, it goes back and says so (FV-04).
@@ -74,8 +74,9 @@ export function FavoriteStar({
         className={cn(
           'inline-flex shrink-0 tap items-center justify-center text-muted-foreground outline-none hover:text-foreground focus-visible:opacity-100 focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:cursor-wait',
           PLACEMENT[placement],
+          // Dark gray, not black: a mark beside the name, quieter than it (PO, 2026-10-29).
           favorite
-            ? 'text-foreground'
+            ? 'text-muted-foreground'
             : 'opacity-0 group-focus-within/row:opacity-100 group-hover/row:opacity-100',
         )}
       >
