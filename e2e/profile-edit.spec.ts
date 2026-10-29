@@ -85,15 +85,22 @@ test.describe('Edit profile', () => {
       await page.keyboard.press('Escape')
       await expect(camera).toBeFocused()
 
-      // A word of 160 characters, saved: it wraps instead of widening the page (PE-07). Each project
-      // and theme its own: they share the server, and a bio already there would leave nothing to
-      // save, Save waiting (specs/profile-edit-flow EF-07).
-      const word = `${testInfo.project.name}-${theme}-`.padEnd(160, 'x')
+      // A word of 160 characters, saved: it wraps instead of widening the page (PE-07). Each project,
+      // theme and run its own: they share the server, and a bio already there (a retry's) would
+      // leave nothing to save, Save waiting (specs/profile-edit-flow EF-07).
+      const word = `${testInfo.project.name}-${theme}-${Date.now()}-`.padEnd(160, 'x')
       await dialog.getByRole('textbox', { name: 'About' }).fill(word)
       await dialog.getByRole('button', { name: 'Save' }).click()
       await expect(dialog).toBeHidden()
       await expect(page.getByRole('button', { name: 'Edit profile' })).toBeFocused()
-      await expect(page.getByRole('main').getByText(word)).toBeVisible()
+      // Shown once the page is drawn again on the server. The four projects and themes save the demo
+      // user's bio at once: the one shown may be another's, as long and as unbroken (PE-07 is that
+      // it wraps). Slower on a busy CI runner.
+      await expect(
+        page.getByRole('main').getByText(/^(mobile|desktop)-(light|dark)-\d+-x{40,}$/),
+      ).toBeVisible({
+        timeout: 15_000,
+      })
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
       )

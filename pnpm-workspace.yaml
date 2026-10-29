@@ -14,6 +14,7 @@ overrides:
   'undici@>=8.0.0 <8.12.2': ^8.12.2 # GHSA-xjj6-f33q-929c, via jsdom (vitest)
   'zod@>=4.0.0 <4.6.6': ^4.6.6 # GHSA-mrhx-c7xc-m3w5, via shadcn (@modelcontextprotocol/sdk); ours is direct
   'ip-address@<10.7.4': ^10.7.4 # moderate, via shadcn (@shadcn/registry > socks)
+  'systeminformation@<5.33.16': ^5.33.16 # high, Windows command injection, via shadcn (@dotenvx/dotenvx)
 
 # Advisories without a fix yet. Each one only reaches dev tooling, never the site; review them when
 # their package ships a patch.
