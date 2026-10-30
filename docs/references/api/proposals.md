@@ -6,7 +6,7 @@
 
 - **Pendiente ahora:** una pregunta sobre los slugs de los activos, y lo que espera una decisión de producto (P-026, P-023 y la fórmula de `best`, P-014).
 - **Fase 3 del backend:** los logros (P-030) y los widgets de los grupos (P-028, P-029). En el front ya se ven, contra mocks; el backend los implementa más adelante.
-- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033) y Explore con sesión (P-034).
+- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033), Explore con sesión (P-034) y saber si un username está libre mientras se escribe (P-035).
 
 **Verificado contra el deploy de `dev` el 2026-10-21** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 10 de 10 en verde, solo lecturas, cada respuesta con el mismo esquema que usa el mock. Además de lo de antes:
 
@@ -147,6 +147,34 @@ Lo que pide el trabajo del sprint: login (MVP-210), tesis (MVP-137, MVP-140, MVP
 Medido contra `dev` el 2026-10-30.
 
 **Cambio:** con sesión, Explore suma también `COUNTRY` y `TRENDING` (excluyendo lo que ya vino por `FOLLOWING` o `SIMILAR`), como sin sesión. Así una cuenta nueva arranca con lo popular, y una que sigue poco no se queda sin feed a la segunda página. El país de la cuenta (`countryCode`), o el de la IP si no tiene.
+
+### P-035: Saber si un username está libre
+
+**Estado:** propuesta (2026-10-30), mockeada. `specs/auth` (AU-24).
+
+**Endpoint:** `GET /api/v1/usernames/{username}`. Requiere sesión: la usa una cuenta recién creada, en el paso de elegir su username.
+
+**Motivo:** hoy un username tomado se sabe recién al enviar el formulario (`POST /users` → `409 USERNAME_TAKEN`). Queremos avisarlo mientras la persona escribe. Desde el front no se puede saber bien:
+
+- `GET /profiles/{identifier}` responde `404` para un perfil privado, que igual ocupa su username;
+- tampoco ve los usernames viejos reservados por un año (`SlugHistory`).
+
+**Cambio:**
+
+```jsonc
+// 200
+{ "available": false }
+```
+
+- `available: false` con las mismas reglas que `POST /users` y `PATCH /users/{userId}`:
+  - el username de otro, sin distinguir mayúsculas, aunque su perfil sea privado;
+  - uno reservado dentro de su ventana de un año.
+- El username propio de quien pregunta cuenta como disponible: sirve también para cambiarlo desde "Editar perfil".
+- **Errores:**
+  - `422 INVALID_USERNAME` si no cumple `USERNAME_RE` (3 a 30 letras, números o `_`);
+  - `401` sin sesión;
+  - `429` con `retryAfter` si se abusa. El front pregunta 400 ms después de la última tecla, uno por vez.
+- **Es solo un aviso:** `POST /users` sigue decidiendo, y su `409` se sigue mostrando, por ejemplo si dos personas eligen el mismo a la vez.
 
 ## Fase 3 del backend: solo visual en el front
 
