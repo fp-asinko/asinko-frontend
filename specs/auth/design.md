@@ -162,11 +162,12 @@ Reemplaza la navegación a `/welcome` de § 11.
 ## 14. Cambio del PO (2026-10-30): tu foto en la barra y en la caja de publicar
 
 - La cookie de sesión guarda `avatarUrl` (opcional) junto al username. `getViewer()` la devuelve filtrada por `allowedImageUrl`; la barra, los comentarios y la caja de publicar la muestran en vez de las iniciales.
-- Se escribe en tres momentos, sin pedidos extra por página:
+- Se escribe en cuatro momentos, sin pedidos extra por página:
   - al entrar: `findProfile` (antes `findUsername`) ya pide el perfil y toma también la foto;
   - al subirla en el paso 2: `setAvatar` guarda la URL que devuelve `PATCH /users/{id}` (el backend la re-codifica, P-021);
-  - al cambiarla o quitarla en "Editar perfil": `updateProfile` hace lo mismo con su respuesta.
+  - al cambiarla o quitarla en "Editar perfil": `updateProfile` hace lo mismo con su respuesta;
+  - al renovar el token en el proxy (§ 4, una vez por hora): `refreshSession` vuelve a pedir el perfil con el token nuevo y actualiza username y foto. Si la API no responde, queda lo que tenía.
 - `setSessionAvatar(url)` (`lib/auth/session.ts`) reescribe la cookie; sin sesión no hace nada.
-- Limitación conocida: si la foto se cambia desde otro dispositivo, este la actualiza recién al volver a entrar.
+- Una foto cambiada desde otro dispositivo, o una sesión de antes de este cambio (PO, 2026-10-30: seguía con las iniciales 12 horas después), se ve en menos de una hora, con la próxima renovación.
 - **Arreglo en el mismo cambio:** `createProfile` y `setAvatar` ya no vuelven a dibujar la página (`revalidatePath`). En `/welcome`, hacerlo apenas se creaba el perfil disparaba la redirección de la página (la cuenta ya estaba lista) y la foto no llegaba a subirse. Ahora lo hace quien usa el formulario al terminar: el modal con `router.refresh()` antes de cerrarse, y `/welcome` con su navegación completa a `next`.
 - **Mocks:** con `API_MOCKS=true`, subir la foto (`POST /uploads/avatar`) y `PATCH /users/{id}` aceptan al usuario del Bearer simulado (`mockCaller`), no solo al demo: una cuenta creada en el e2e sube su foto como en el backend real.

@@ -64,6 +64,37 @@ describe('refreshSession (specs/auth AU-13, design.md § 4)', () => {
     expect(await refreshSession(JSON.stringify(expiring), other, NOW)).toEqual({ kind: 'ended' })
   })
 
+  it('reads the photo and username again with the new token (design.md § 14)', async () => {
+    const auth = authAnswering({ ok: true, tokens: tokens('new') })
+    const photo = 'https://cdn.example/me.jpg'
+    const profileOf = vi.fn(async () => ({ username: 'maria_b', avatarUrl: photo }))
+    const outcome = await refreshSession(JSON.stringify(expiring), auth, NOW, profileOf)
+    expect(profileOf).toHaveBeenCalledWith(expect.objectContaining({ accessToken: 'new' }))
+    if (outcome.kind !== 'renewed') throw new Error(outcome.kind)
+    expect(parseSession(outcome.value)).toMatchObject({ username: 'maria_b', avatarUrl: photo })
+  })
+
+  it('keeps the profile it had when the API is down or there is none', async () => {
+    const auth = authAnswering({ ok: true, tokens: tokens('new') })
+    const withPhoto = { ...expiring, avatarUrl: 'https://cdn.example/me.jpg' }
+    for (const answer of ['unavailable', null] as const) {
+      const outcome = await refreshSession(JSON.stringify(withPhoto), auth, NOW, async () => answer)
+      if (outcome.kind !== 'renewed') throw new Error(outcome.kind)
+      expect(parseSession(outcome.value)).toMatchObject({
+        username: 'maria',
+        avatarUrl: withPhoto.avatarUrl,
+      })
+    }
+  })
+
+  it('does not look for a profile while the account has none (AU-11)', async () => {
+    const auth = authAnswering({ ok: true, tokens: tokens('new') })
+    const noProfile = sessionFromTokens({ ...tokens('old'), expiresIn: 30 }, null, NOW)
+    const profileOf = vi.fn()
+    await refreshSession(JSON.stringify(noProfile), auth, NOW, profileOf)
+    expect(profileOf).not.toHaveBeenCalled()
+  })
+
   it('keeps the session as it is without Supabase configured', async () => {
     expect(await refreshSession(JSON.stringify(expiring), null, NOW)).toEqual({ kind: 'keep' })
   })

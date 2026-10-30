@@ -2,6 +2,7 @@ import createMiddleware from 'next-intl/middleware'
 import { NextRequest, NextResponse } from 'next/server'
 import { env } from './env'
 import { routing } from './i18n/routing'
+import { findProfile } from './lib/auth/account'
 import { refreshSession } from './lib/auth/refresh-session'
 import { SESSION_COOKIE, sessionCookieOptions } from './lib/auth/session-cookie'
 import { supabaseAuth } from './lib/auth/supabase'
@@ -32,7 +33,12 @@ export default async function proxy(request: NextRequest) {
     sentryDsn: env.NEXT_PUBLIC_SENTRY_DSN,
   })
 
-  const session = await refreshSession(request.cookies.get(SESSION_COOKIE)?.value, supabaseAuth)
+  const session = await refreshSession(
+    request.cookies.get(SESSION_COOKIE)?.value,
+    supabaseAuth,
+    Date.now(),
+    findProfile,
+  )
   if (session.kind === 'renewed') request.cookies.set(SESSION_COOKIE, session.value)
   if (session.kind === 'ended') request.cookies.delete(SESSION_COOKIE)
 
