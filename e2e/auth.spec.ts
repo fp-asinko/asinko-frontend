@@ -55,7 +55,7 @@ test.describe('Log in and sign up (specs/auth)', () => {
     await signedIn(page)
   })
 
-  test('adds a photo in the welcome screen, shown round before continuing (AU-21)', async ({
+  test('adds a photo in the welcome screen, framed by hand and shown round (AU-21)', async ({
     page,
   }) => {
     await page.goto('/en/login?mode=signup')
@@ -65,7 +65,7 @@ test.describe('Log in and sign up (specs/auth)', () => {
     await page.getByRole('main').getByRole('button', { name: 'Create account' }).click()
     await expect(page).toHaveURL(/\/en\/welcome/)
 
-    // A real 1×1 PNG (as e2e/post-image.spec.ts): the browser decodes it and cuts its square.
+    // A real 1×1 PNG (as e2e/post-image.spec.ts): the browser decodes it and cuts the frame.
     const png = Buffer.from(
       'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
       'base64',
@@ -75,7 +75,16 @@ test.describe('Log in and sign up (specs/auth)', () => {
       mimeType: 'image/png',
       buffer: png,
     })
+    // Framing, only the cropper: Continue waits for it.
+    await expect(page.getByRole('heading', { name: 'Frame your photo' })).toBeFocused()
+    const main = page.getByRole('main')
+    await expect(main.getByRole('button', { name: 'Continue', exact: true })).toBeHidden()
+    await expect(page.getByLabel('Username')).toBeHidden()
+    // Zoomed out under the frame: the rest is white.
+    await page.getByRole('slider', { name: 'Zoom' }).fill('0.5')
+    await page.getByRole('button', { name: 'Apply' }).click()
     await expect(page.getByRole('button', { name: 'Remove' })).toBeVisible()
+    await expect(page.getByLabel('Username')).toBeVisible()
     await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
     await page.getByRole('main').getByRole('button', { name: 'Continue', exact: true }).click()
     await expect(page).toHaveURL(/\/en$/)

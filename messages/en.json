@@ -1205,10 +1205,15 @@
     },
     "photo": {
       "label": "Profile photo (optional)",
-      "hint": "You can frame it later from your profile.",
+      "hint": "You can change it anytime from your profile.",
       "add": "Add a photo",
       "change": "Change photo",
-      "remove": "Remove"
+      "remove": "Remove",
+      "crop": "Frame your photo",
+      "cropArea": "Photo to frame. Drag it, or move it with the arrow keys.",
+      "zoom": "Zoom",
+      "back": "Back",
+      "apply": "Apply"
     }
   }
 }

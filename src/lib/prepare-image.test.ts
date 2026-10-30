@@ -4,6 +4,7 @@ import { cropImage, MAX_UPLOAD_BYTES, prepareImage } from './prepare-image'
 /** jsdom has no image decoding nor canvas: doubles that keep what they were asked. */
 const canvas = vi.hoisted(() => ({
   drawn: [] as number[][],
+  filled: [] as number[][],
   types: [] as string[],
   result: (type: string): Blob | null => new Blob(['x'], { type }),
 }))
@@ -17,10 +18,12 @@ function stubBitmap(width: number, height: number) {
 
 beforeEach(() => {
   canvas.drawn = []
+  canvas.filled = []
   canvas.types = []
   canvas.result = (type) => new Blob(['x'], { type })
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
     drawImage: (_: unknown, ...numbers: number[]) => canvas.drawn.push(numbers),
+    fillRect: (...numbers: number[]) => canvas.filled.push(numbers),
   } as never)
   vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(function (callback, type) {
     canvas.types.push(type ?? '')
@@ -89,10 +92,20 @@ describe('cropImage (specs/profile-presentation PP-07)', () => {
       height: 400,
     })
     expect(canvas.drawn).toEqual([[100, 50, 800, 800, 0, 0, 400, 400]])
+    expect(canvas.filled).toEqual([])
     expect(canvas.types).toEqual(['image/webp'])
     expect(createImageBitmap).toHaveBeenCalledWith(expect.anything(), {
       imageOrientation: 'from-image',
     })
+  })
+
+  it('zoomed out, draws the whole image in its place over white (specs/auth AU-21)', async () => {
+    stubBitmap(1000, 500)
+    // A frame of 1000×1000 around a 1000×500 image: the image fills the middle half.
+    const area = { x: 0, y: -250, width: 1000, height: 1000 }
+    await cropImage(file('image/png'), area, { width: 400, height: 400 })
+    expect(canvas.filled).toEqual([[0, 0, 400, 400]])
+    expect(canvas.drawn).toEqual([[0, 0, 1000, 500, 0, 100, 400, 200]])
   })
 
   it('refuses other types, and says when it cannot read it or it is too large', async () => {

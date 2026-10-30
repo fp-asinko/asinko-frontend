@@ -47,28 +47,33 @@ export function ProfileForm({
   const { submit, pending, alert, error } = useAuthForm(form, save, onDone)
 
   return (
-    <form noValidate onSubmit={submit} className="flex flex-col gap-4">
-      <FormAlert message={alert} />
-      <AuthField
-        id={`${ids}-username`}
-        label={t('fields.username.label')}
-        hint={t('fields.username.hint')}
-        autoComplete="username"
-        autoCapitalize="none"
-        field={form.register('username')}
-        error={error('username')}
-      />
+    <form noValidate onSubmit={submit} className="group/form flex flex-col gap-4">
+      {/* While the photo is framed, only the cropper: Continue waits for it. */}
+      <div className="contents group-has-data-framing/form:hidden">
+        <FormAlert message={alert} />
+        <AuthField
+          id={`${ids}-username`}
+          label={t('fields.username.label')}
+          hint={t('fields.username.hint')}
+          autoComplete="username"
+          autoCapitalize="none"
+          field={form.register('username')}
+          error={error('username')}
+        />
+      </div>
       <AvatarPicker onChange={(blob) => (photo.current = blob)} />
-      <AcceptTerms id={`${ids}-accepted`} control={form.control} error={error('accepted')} />
-      <Button
-        type="submit"
-        size="lg"
-        disabled={!accepted}
-        aria-disabled={pending || undefined}
-        className="mt-1 h-11 rounded-full text-[0.875rem] font-semibold disabled:opacity-35"
-      >
-        {pending ? t('welcome.pending') : t('welcome.submit')}
-      </Button>
+      <div className="contents group-has-data-framing/form:hidden">
+        <AcceptTerms id={`${ids}-accepted`} control={form.control} error={error('accepted')} />
+        <Button
+          type="submit"
+          size="lg"
+          disabled={!accepted}
+          aria-disabled={pending || undefined}
+          className="mt-1 h-11 rounded-full text-[0.875rem] font-semibold disabled:opacity-35"
+        >
+          {pending ? t('welcome.pending') : t('welcome.submit')}
+        </Button>
+      </div>
     </form>
   )
 }

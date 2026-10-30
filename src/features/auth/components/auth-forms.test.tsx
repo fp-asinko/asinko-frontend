@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { useEffect } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { LogInForm } from './log-in-form'
@@ -21,6 +22,19 @@ vi.mock('../actions/set-avatar.action', () => ({ setAvatar: actions.setAvatar })
 vi.mock('@/lib/prepare-image', async (original) => ({
   ...(await original<typeof import('@/lib/prepare-image')>()),
   cropImage: actions.cropImage,
+}))
+// jsdom has no image decoding: a cropper that reports the area it shows.
+vi.mock('react-easy-crop', () => ({
+  default: function Cropper(props: {
+    cropShape: string
+    cropperProps: Record<string, string>
+    onCropComplete: (area: unknown, pixels: unknown) => void
+  }) {
+    useEffect(() => {
+      props.onCropComplete({}, { x: 10, y: 20, width: 300, height: 300 })
+    })
+    return <div {...props.cropperProps} data-shape={props.cropShape} />
+  },
 }))
 
 describe('auth forms (specs/auth AU-02 to AU-11, AU-18)', () => {
@@ -127,7 +141,6 @@ describe('auth forms (specs/auth AU-02 to AU-11, AU-18)', () => {
     beforeEach(() => {
       actions.createProfile.mockResolvedValue({ ok: true, data: { username: 'ana_perez' } })
       actions.setAvatar.mockResolvedValue({ ok: true, data: null })
-      vi.stubGlobal('createImageBitmap', async () => ({ width: 800, height: 600, close() {} }))
       vi.stubGlobal(
         'URL',
         Object.assign(URL, { createObjectURL: () => 'blob:photo', revokeObjectURL() {} }),
@@ -147,25 +160,54 @@ describe('auth forms (specs/auth AU-02 to AU-11, AU-18)', () => {
       expect(onDone).toHaveBeenCalled()
     })
 
-    it('uploads the chosen photo, cut to its centered square, after creating the profile', async () => {
+    const PHOTO_TYPE = 'Use a JPEG, PNG or WebP image'
+
+    async function pickPhoto(container: HTMLElement) {
+      const file = new File(['img'], 'me.jpg', { type: 'image/jpeg' })
+      await userEvent.upload(container.querySelector('input[type=file]')!, file)
+      return file
+    }
+
+    it('frames the chosen photo by hand, then uploads it after creating the profile', async () => {
       const square = new Blob(['x'], { type: 'image/webp' })
       actions.cropImage.mockResolvedValue({ ok: true, blob: square, width: 400, height: 400 })
       const onDone = vi.fn()
       const { container } = renderWithIntl(<ProfileForm suggestion="ana_perez" onDone={onDone} />)
-      const file = new File(['img'], 'me.jpg', { type: 'image/jpeg' })
-      await userEvent.upload(container.querySelector('input[type=file]')!, file)
+      const file = await pickPhoto(container)
 
+      // Only the cropper while framing, round, with the focus on its title.
+      const title = await screen.findByRole('heading', { name: 'Frame your photo' })
+      await vi.waitFor(() => expect(title).toHaveFocus())
+      expect(screen.getByRole('group', { name: /Photo to frame/ })).toHaveAttribute(
+        'data-shape',
+        'round',
+      )
+      // The rest of the step hides with CSS, which jsdom does not apply: the e2e checks it.
+
+      await userEvent.click(screen.getByRole('button', { name: 'Apply' }))
       expect(actions.cropImage).toHaveBeenCalledWith(
         file,
-        { x: 100, y: 0, width: 600, height: 600 },
+        { x: 10, y: 20, width: 300, height: 300 },
         { width: 400, height: 400 },
       )
       expect(await screen.findByRole('button', { name: 'Remove' })).toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: 'Frame your photo' })).toBeNull()
       await accept()
       await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
       expect(actions.setAvatar).toHaveBeenCalledOnce()
       expect((actions.setAvatar.mock.calls[0]![0] as FormData).get('file')).toBeInstanceOf(Blob)
       expect(onDone).toHaveBeenCalled()
+    })
+
+    it('goes back from framing without a photo', async () => {
+      const { container } = renderWithIntl(<ProfileForm suggestion="ana_perez" onDone={vi.fn()} />)
+      await pickPhoto(container)
+      await userEvent.click(await screen.findByRole('button', { name: 'Back' }))
+      expect(screen.getAllByRole('button', { name: 'Add a photo' })).toHaveLength(2)
+      expect(screen.queryByRole('button', { name: 'Remove' })).toBeNull()
+      await accept()
+      await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+      expect(actions.setAvatar).not.toHaveBeenCalled()
     })
 
     it('says when only the photo failed, and stays to try again', async () => {
@@ -178,10 +220,8 @@ describe('auth forms (specs/auth AU-02 to AU-11, AU-18)', () => {
       actions.setAvatar.mockResolvedValue({ ok: false, error: 'auth.errors.photoUpload' })
       const onDone = vi.fn()
       const { container } = renderWithIntl(<ProfileForm suggestion="ana_perez" onDone={onDone} />)
-      await userEvent.upload(
-        container.querySelector('input[type=file]')!,
-        new File(['img'], 'me.png', { type: 'image/png' }),
-      )
+      await pickPhoto(container)
+      await userEvent.click(await screen.findByRole('button', { name: 'Apply' }))
       await screen.findByRole('button', { name: 'Remove' })
       await accept()
       await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
@@ -189,14 +229,24 @@ describe('auth forms (specs/auth AU-02 to AU-11, AU-18)', () => {
       expect(onDone).not.toHaveBeenCalled()
     })
 
-    it('says a picture it cannot use', async () => {
+    it('says a picture it cannot use, and stays framing', async () => {
       actions.cropImage.mockResolvedValue({ ok: false, error: 'tooLarge' })
+      const { container } = renderWithIntl(<ProfileForm onDone={vi.fn()} />)
+      await pickPhoto(container)
+      await userEvent.click(await screen.findByRole('button', { name: 'Apply' }))
+      expect(await screen.findByText('That image is too large')).toHaveAttribute('role', 'alert')
+      expect(screen.getByRole('heading', { name: 'Frame your photo' })).toBeInTheDocument()
+    })
+
+    it('turns down a file that is not a photo before framing it', async () => {
       const { container } = renderWithIntl(<ProfileForm onDone={vi.fn()} />)
       await userEvent.upload(
         container.querySelector('input[type=file]')!,
-        new File(['img'], 'me.png', { type: 'image/png' }),
+        new File(['gif'], 'me.gif', { type: 'image/gif' }),
+        { applyAccept: false },
       )
-      expect(await screen.findByText('That image is too large')).toHaveAttribute('role', 'alert')
+      expect(await screen.findByText(PHOTO_TYPE)).toHaveAttribute('role', 'alert')
+      expect(screen.queryByRole('heading', { name: 'Frame your photo' })).toBeNull()
     })
   })
 })

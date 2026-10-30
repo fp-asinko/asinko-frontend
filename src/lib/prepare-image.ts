@@ -73,7 +73,36 @@ export async function cropImage(
   canvas.height = size.height
   const context = canvas.getContext('2d')
   if (!context) return { ok: false, error: 'unreadable' }
-  context.drawImage(bitmap, area.x, area.y, area.width, area.height, 0, 0, size.width, size.height)
+  // Zoomed out, the frame can go past the image: the rest is white, never transparent (a JPEG
+  // fallback would turn it black). Only the part inside the image is drawn, scaled to its place.
+  const left = Math.max(0, area.x)
+  const top = Math.max(0, area.y)
+  const right = Math.min(bitmap.width, area.x + area.width)
+  const bottom = Math.min(bitmap.height, area.y + area.height)
+  const scaleX = size.width / area.width
+  const scaleY = size.height / area.height
+  if (
+    left > area.x ||
+    top > area.y ||
+    right < area.x + area.width ||
+    bottom < area.y + area.height
+  ) {
+    context.fillStyle = '#fff'
+    context.fillRect(0, 0, size.width, size.height)
+  }
+  if (right > left && bottom > top) {
+    context.drawImage(
+      bitmap,
+      left,
+      top,
+      right - left,
+      bottom - top,
+      (left - area.x) * scaleX,
+      (top - area.y) * scaleY,
+      (right - left) * scaleX,
+      (bottom - top) * scaleY,
+    )
+  }
   bitmap.close()
 
   const blob = await toBlob(canvas, 'image/webp').then((webp) =>

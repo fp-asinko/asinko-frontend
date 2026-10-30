@@ -1,10 +1,9 @@
 'use client'
 
-import { useFormatter, useTranslations } from 'next-intl'
+import { useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState } from 'react'
-import Cropper, { type Area, type Point } from 'react-easy-crop'
-// Its styles as a stylesheet: the <style> it injects carries no nonce and the CSP blocks it.
-import 'react-easy-crop/react-easy-crop.css'
+import type { Area } from 'react-easy-crop'
+import { CropFrame } from '@/components/molecules/crop-frame'
 import { cropImage } from '@/lib/prepare-image'
 import { cn } from '@/lib/utils'
 import { uploadProfileImage } from '../actions/upload-profile-image.action'
@@ -26,9 +25,8 @@ const PILL =
   'inline-flex h-11 tap items-center rounded-full px-4 type-action font-bold outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-50 aria-disabled:active:scale-100 md:h-9'
 
 /**
- * Crops the photo or the banner before it is uploaded (specs/profile-presentation PP-07, Q3): the
- * image moves under a round (photo) or 4:1 (banner) frame with a finger, the mouse or the arrow
- * keys, and zooms with two fingers, the wheel or the slider. Apply cuts that part, prepares it as a
+ * Crops the photo or the banner before it is uploaded (specs/profile-presentation PP-07, Q3), in a
+ * round (photo) or 4:1 (banner) `CropFrame`. Apply cuts that part, prepares it as a
  * post image and uploads it; then onApply saves it in the profile (specs/profile-edit-flow EF-02),
  * and a failure stays here, said (EF-04). Back drops it.
  */
@@ -48,11 +46,8 @@ export function ImageCropper({
   onBack: () => void
 }) {
   const t = useTranslations('communities.edit')
-  const format = useFormatter()
   const ids = useId()
   const title = useRef<HTMLHeadingElement>(null)
-  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
   // Uploading the image, then saving it in the profile: what Apply says meanwhile.
   const [working, setWorking] = useState<'uploading' | 'saving' | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -99,44 +94,14 @@ export function ImageCropper({
       >
         {kind === 'avatar' ? t('cropPhoto') : t('cropBanner')}
       </h3>
-      <div className={cn('relative overflow-hidden rounded-lg bg-muted', 'h-64 sm:h-80')}>
-        <Cropper
-          image={source}
-          crop={crop}
-          zoom={zoom}
-          minZoom={1}
-          maxZoom={3}
-          aspect={kind === 'avatar' ? 1 : 4}
-          cropShape={kind === 'avatar' ? 'round' : 'rect'}
-          showGrid={false}
-          disableAutomaticStylesInjection
-          onCropChange={setCrop}
-          onZoomChange={setZoom}
-          onCropComplete={(_, pixels) => (area.current = pixels)}
-          cropperProps={{ role: 'group', 'aria-label': t('cropArea') }}
-          classes={{
-            containerClassName:
-              'outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset',
-          }}
-          mediaProps={{ alt: '' }}
-        />
-      </div>
-      <div className="flex items-center gap-3">
-        <label htmlFor={`${ids}-zoom`} className="type-action">
-          {t('zoom')}
-        </label>
-        <input
-          id={`${ids}-zoom`}
-          type="range"
-          min={1}
-          max={3}
-          step={0.05}
-          value={zoom}
-          aria-valuetext={format.number(zoom, { style: 'percent' })}
-          onChange={(event) => setZoom(Number(event.currentTarget.value))}
-          className="h-6 flex-1 accent-primary"
-        />
-      </div>
+      <CropFrame
+        source={source}
+        aspect={kind === 'avatar' ? 1 : 4}
+        round={kind === 'avatar'}
+        areaLabel={t('cropArea')}
+        zoomLabel={t('zoom')}
+        onAreaChange={(pixels) => (area.current = pixels)}
+      />
       {/* What Apply says while it works, also announced (PP-08). */}
       <p role="status" className="sr-only">
         {working ? t(working) : ''}

@@ -135,7 +135,7 @@ Reemplaza lo que § 6, § 7 y § 9 dicen de `signUp` y del username al crear la 
   Si la foto falla, el formulario lo dice y queda en pantalla; "Continuar" reintenta el paso 2.
 
 - **Foto:**
-  - **Navegador:** `AvatarPicker` (cliente) recorta el cuadrado central con `cropImage` de `lib/prepare-image` (400×400, WebP, sin EXIF). Es la misma preparación que "Editar perfil", sin el encuadre manual: queda para "Editar perfil".
+  - **Navegador:** `AvatarPicker` (cliente) abre `PhotoCropper` (diferido con `next/dynamic`) al elegir la foto: un `CropFrame` redondo, la molécula que comparte con el recorte de "Editar perfil". "Aplicar" la recorta con `cropImage` de `lib/prepare-image` (400×400, WebP, sin EXIF) sin subirla; la sube el formulario al continuar. Mientras se encuadra, el resto del paso se oculta por CSS (`group-has-data-framing`).
   - **Servidor:** `setAvatar` (action del feature `auth`) valida tamaño y bytes como `uploadProfileImage`, sube con `uploadSignedImage('/api/v1/uploads/avatar')` y guarda con `PATCH /users/{id}` `{ avatarUrl }`. Usa la URL que devuelve la subida.
   - **Duplicado a propósito:** son unas 20 líneas que repiten `communities`, porque los features no se importan entre sí (`structure.md`). Si aparece un tercer uso, se sube a `lib/`.
 - **`SignUpForm`** queda con email y contraseña. El checkbox y su texto legal pasan a la bienvenida.
@@ -152,3 +152,9 @@ Reemplaza la navegación a `/welcome` de § 11.
 - **Google:** `/auth/callback` vuelve a `next` con `?welcome=1`. Con esa marca y sin username, `AuthGateProvider` abre el paso 2 en el cuadro siguiente al primer pintado y saca la marca de la dirección. La sugerencia de la sesión le llega a `AuthGateForms` desde el layout.
 - **Los formularios van siempre en el mismo lugar del modal:** si el paso 2 los montara en otro, React los volvería a crear y se perdería la sugerencia.
 - **`/welcome` sigue** para los links directos y sin JavaScript, y `/login` la usa cuando la cuenta no tiene username.
+
+## 13. Cambio del PO (2026-10-30): encuadrar la foto y alejarla
+
+- El recorte de `communities` (`ImageCropper`) se partió: el marco con el zoom pasó a `components/molecules/crop-frame.tsx` (`CropFrame`), que usan "Editar perfil" y la bienvenida. Lo de cada uno (subir y guardar en el perfil, o devolver la foto al formulario) queda en su feature.
+- **Zoom hacia afuera:** `CropFrame` va de 0,5 a 3. Debajo de 1, la imagen se mueve libre dentro del marco (`restrictPosition` solo desde 1).
+- `cropImage` dibuja solo la parte del área que cae dentro de la imagen, en su lugar, y pinta el resto de blanco: nunca transparente, porque el respaldo JPEG lo volvería negro.

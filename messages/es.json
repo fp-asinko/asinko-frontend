@@ -1205,10 +1205,15 @@
     },
     "photo": {
       "label": "Foto de perfil (opcional)",
-      "hint": "Puedes encuadrarla después desde tu perfil.",
+      "hint": "Puedes cambiarla cuando quieras desde tu perfil.",
       "add": "Agregar una foto",
       "change": "Cambiar foto",
-      "remove": "Quitar"
+      "remove": "Quitar",
+      "crop": "Encuadra tu foto",
+      "cropArea": "Foto a encuadrar. Arrástrala o muévela con las flechas.",
+      "zoom": "Zoom",
+      "back": "Volver",
+      "apply": "Aplicar"
     }
   }
 }

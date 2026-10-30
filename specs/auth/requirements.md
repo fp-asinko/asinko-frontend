@@ -66,7 +66,8 @@ Que cualquiera pueda crear su cuenta o entrar a Asinko, con email o con Google, 
 - [x] **AU-12** **Reddit** queda como botón "Próximamente" (MVP-206). Instagram y X se sacan del modal (G-13).
 - [x] **AU-21** **Foto en la bienvenida** (PO, 2026-10-29), opcional:
   - se elige una imagen (JPEG, PNG o WebP) y se ve redonda antes de continuar;
-  - se recorta sola al cuadrado del centro, y se puede cambiar o encuadrar después en "Editar perfil";
+  - se encuadra a mano en el mismo paso, como en "Editar perfil": se mueve y se hace zoom, también hacia afuera, para que entre un logo entero (PO, 2026-10-30); lo que queda fuera de la imagen es blanco;
+  - mientras se encuadra, el paso muestra solo el recorte;
   - se puede quitar antes de continuar;
   - si no se pudo subir, el perfil queda creado igual y se avisa; "Continuar" lo vuelve a intentar.
 
