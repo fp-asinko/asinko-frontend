@@ -9,6 +9,7 @@ import type { ActionResult } from '@/lib/result'
 import { createProfile } from '../actions/create-profile.action'
 import { setAvatar } from '../actions/set-avatar.action'
 import { useAuthForm } from '../hooks/use-auth-form'
+import { useUsernameCheck } from '../hooks/use-username-check'
 import { profileSchema, type ProfileInput } from '../schemas/auth.schema'
 import { AcceptTerms } from './accept-terms'
 import { AuthField, FormAlert } from './auth-field'
@@ -52,6 +53,7 @@ export function ProfileForm({
     return setAvatar(body)
   }
   const { submit, pending, alert, error } = useAuthForm(form, save, onDone)
+  const { available } = useUsernameCheck(form)
 
   return (
     <form noValidate onSubmit={submit} className="group/form flex flex-col gap-4">
@@ -62,6 +64,7 @@ export function ProfileForm({
           id={`${ids}-username`}
           label={t('fields.username.label')}
           hint={t('fields.username.hint')}
+          confirmation={available && t('fields.username.available', { username: available })}
           autoComplete="username"
           autoCapitalize="none"
           field={form.register('username')}

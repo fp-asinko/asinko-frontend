@@ -14,12 +14,14 @@ const actions = vi.hoisted(() => ({
   setAvatar: vi.fn(),
   cropImage: vi.fn(),
   prepareImage: vi.fn(),
+  checkUsername: vi.fn(async (_username: string) => 'unknown'),
   getSuggestedPhoto: vi.fn(async (): Promise<{ type: string; base64: string } | null> => null),
 }))
 vi.mock('../actions/log-in.action', () => ({ logIn: actions.logIn }))
 vi.mock('../actions/sign-up.action', () => ({ signUp: actions.signUp }))
 vi.mock('../actions/create-profile.action', () => ({ createProfile: actions.createProfile }))
 vi.mock('../actions/set-avatar.action', () => ({ setAvatar: actions.setAvatar }))
+vi.mock('../actions/check-username.action', () => ({ checkUsername: actions.checkUsername }))
 vi.mock('../actions/suggested-photo.action', () => ({
   getSuggestedPhoto: actions.getSuggestedPhoto,
 }))
@@ -147,6 +149,7 @@ describe('auth forms (specs/auth AU-02 to AU-11, AU-18)', () => {
     beforeEach(() => {
       actions.createProfile.mockResolvedValue({ ok: true, data: { username: 'ana_perez' } })
       actions.setAvatar.mockResolvedValue({ ok: true, data: null })
+      actions.checkUsername.mockReset().mockResolvedValue('unknown')
       vi.stubGlobal(
         'URL',
         Object.assign(URL, { createObjectURL: () => 'blob:photo', revokeObjectURL() {} }),
@@ -205,6 +208,34 @@ describe('auth forms (specs/auth AU-02 to AU-11, AU-18)', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
       expect(actions.createProfile).toHaveBeenCalled()
       expect(actions.setAvatar).not.toHaveBeenCalled()
+    })
+
+    it('says whether the username is free while it is typed, for the one in the field (AU-24)', async () => {
+      actions.checkUsername.mockImplementation(async (username: string) =>
+        username === 'maria' ? 'taken' : 'available',
+      )
+      renderWithIntl(<ProfileForm suggestion="ana_perez" onDone={vi.fn()} />)
+      const field = screen.getByLabelText('Username')
+      // The suggested one is asked too, once the form shows.
+      expect(await screen.findByText('@ana_perez is available')).toBeInTheDocument()
+
+      await userEvent.clear(field)
+      await userEvent.type(field, 'maria')
+      await vi.waitFor(() => expect(field).toHaveAccessibleDescription('That username is taken'))
+      expect(screen.queryByText(/is available/)).toBeNull()
+
+      // Another one: "taken" goes, and it is asked again.
+      await userEvent.type(field, '_2')
+      expect(await screen.findByText('@maria_2 is available')).toBeInTheDocument()
+      expect(field).not.toHaveAttribute('aria-invalid')
+      // Only valid ones go to the server.
+      expect(actions.checkUsername.mock.calls.map(([name]) => name)).not.toContain('m')
+    })
+
+    it('says nothing when it cannot tell', async () => {
+      renderWithIntl(<ProfileForm suggestion="ana_perez" onDone={vi.fn()} />)
+      await vi.waitFor(() => expect(actions.checkUsername).toHaveBeenCalledWith('ana_perez'))
+      expect(screen.getByText('3 to 30 letters, numbers or _')).toBeInTheDocument()
     })
 
     it('back from Google, brings its name as the display name, to change or clear (AU-23)', async () => {

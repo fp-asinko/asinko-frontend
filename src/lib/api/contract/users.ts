@@ -56,3 +56,6 @@ export const profileSchema = userSchema.extend({
 
 export type RawUserSummary = z.infer<typeof userSummarySchema>
 export type RawProfile = z.infer<typeof profileSchema>
+
+/** P-035 (proposal): whether a username can be chosen, while it is typed (specs/auth AU-24). */
+export const usernameAvailabilitySchema = z.object({ available: z.boolean() })

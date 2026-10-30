@@ -195,3 +195,14 @@ Reemplaza la navegación a `/welcome` de § 11.
   - El backend lo deja en `null` si es igual al username (P-011).
 - Que el backend real lo guarde desde `POST /users` queda para la verificación a mano (T-07b).
 - **Mocks:** la cuenta nueva de Google simulada se llama "New Trader", y `POST /users` simulado guarda `displayName` con las reglas de P-011.
+
+## 17. Cambio del PO (2026-10-30): username libre mientras se escribe (AU-24)
+
+- **Contrato:** no hay cómo preguntarlo, y `GET /profiles/{identifier}` no alcanza: da `404` para un perfil privado y no ve los usernames reservados. Se propone `GET /api/v1/usernames/{username}` → `{ available }` (**P-035**). Se mockea como propuesta (`implemented: false`), así funciona con `API_MOCKS=missing` contra `dev`.
+- **Server Action** `checkUsername`: valida el username con el esquema antes de la red. Solo responde a una sesión que todavía no tiene username, y devuelve `available`, `taken` o `unknown`. Cualquier fallo es `unknown`.
+- **Hook** `useUsernameCheck`:
+  - pregunta 400 ms después de la última tecla, solo si el username cumple el formato;
+  - descarta la respuesta de un username que ya no está en el campo;
+  - `taken` va como error del campo (`setError`, tipo `taken`), que se borra al seguir escribiendo;
+  - `available` reemplaza la ayuda del campo por "@x está disponible", con ✓ en `text-success` (sobre el fondo blanco del modal y de la tarjeta) y `aria-live="polite"`.
+- **Es solo un aviso:** enviar no se bloquea, y el `409 USERNAME_TAKEN` de `POST /users` se sigue mostrando, por ejemplo si dos personas eligen el mismo a la vez.

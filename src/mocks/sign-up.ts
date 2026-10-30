@@ -17,6 +17,20 @@ const error = (status: number, code: string): MockResponse => ({
 })
 
 /**
+ * P-035 (proposal), GET /usernames/{username}: free unless someone has it, in any case, or it is
+ * the e2e's taken one; 422 for one the backend would refuse, 401 without a session.
+ */
+export function checkMockUsername({ params, accessToken }: MockContext): MockResponse {
+  if (!accessToken) return error(401, 'UNAUTHENTICATED')
+  const username = params.username ?? ''
+  if (!USERNAME.test(username)) return error(422, 'INVALID_USERNAME')
+  const lower = username.toLowerCase()
+  const taken =
+    lower === MOCK_TAKEN_USERNAME || PROFILES.some((each) => each.username.toLowerCase() === lower)
+  return { status: 200, body: { available: !taken } }
+}
+
+/**
  * POST /users (E01) as the backend does it: the user is the Bearer's, a new profile with its
  * personal channel, and its errors. The profile joins the mock world (PROFILES), so it has a page.
  */

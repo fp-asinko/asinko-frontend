@@ -1180,7 +1180,8 @@
       "username": {
         "label": "Nome de usuário",
         "hint": "De 3 a 30 letras, números ou _",
-        "invalid": "Use de 3 a 30 letras, números ou _"
+        "invalid": "Use de 3 a 30 letras, números ou _",
+        "available": "@{username} está disponível"
       },
       "displayName": {
         "label": "Nome (opcional)",

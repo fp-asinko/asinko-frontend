@@ -212,6 +212,8 @@ describe('mock handlers behave like the contract', () => {
         '/api/v1/uploads/community-image',
         // P-030 (specs/profile-achievements): a person's trophy case.
         '/api/v1/users/:userId/achievements',
+        // P-035 (specs/auth): whether a username is free.
+        '/api/v1/usernames/:username',
       ].toSorted(),
     )
   })

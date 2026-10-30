@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
 import { PROFILES } from './fixtures/users'
-import { createMockProfile, MOCK_TAKEN_USERNAME } from './sign-up'
+import { checkMockUsername, createMockProfile, MOCK_TAKEN_USERNAME } from './sign-up'
 
 const noRequest = { params: {}, query: {} }
 const token = (id = crypto.randomUUID()) => ({ id, accessToken: `mock-access.${id}.test` })
@@ -56,6 +56,22 @@ describe('the mocked POST /users (specs/auth design.md § 9)', () => {
     expect((createMockProfile(demo).body as { error: { code: string } }).error.code).toBe(
       'CONFLICT',
     )
+  })
+})
+
+describe('the mocked GET /usernames/{username} (P-035)', () => {
+  const check = (username: string, accessToken: string | null = 'mock-access.x.test') =>
+    checkMockUsername({ ...noRequest, params: { username }, body: undefined, accessToken })
+
+  it('says taken for someone’s in any case and the e2e’s, free otherwise', () => {
+    expect(check('MARIA').body).toEqual({ available: false })
+    expect(check(MOCK_TAKEN_USERNAME).body).toEqual({ available: false })
+    expect(check('nobody_has_this').body).toEqual({ available: true })
+  })
+
+  it('answers 422 to an invalid one and 401 without a session', () => {
+    expect(check('a-b').status).toBe(422)
+    expect(check('ana_92', null).status).toBe(401)
   })
 })
 

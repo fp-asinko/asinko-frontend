@@ -72,6 +72,7 @@ Que cualquiera pueda crear su cuenta o entrar a Asinko, con email o con Google, 
   - si no se pudo subir, el perfil queda creado igual y se avisa; "Continuar" lo vuelve a intentar.
 - [x] **AU-22** **Foto de Google** (PO, 2026-10-30): al entrar con Google por primera vez, la foto de la cuenta de Google viene ya elegida en el paso 2. Se puede cambiar o quitar como cualquier otra; si Google no tiene foto o no se pudo traer, el paso queda como siempre.
 - [x] **AU-23** **Nombre visible** (PO, 2026-10-30), opcional: el paso 2 tiene un campo "Nombre", de hasta 50 caracteres. Con Google viene completado con el nombre de la cuenta, y se puede cambiar o borrar. Con nombre, el perfil se titula con el nombre y el `@username` debajo; sin nombre, solo con el `@username` (P-011).
+- [x] **AU-24** **Username libre mientras se escribe** (PO, 2026-10-30): en el paso 2, poco después de dejar de escribir, se avisa si el username ya es de otro ("Ese username ya está tomado", en el campo) o si está libre ("@x está disponible", con un ✓). También el sugerido, al abrir el paso. Es solo un aviso: al continuar, el backend decide, y si no se pudo saber no se dice nada. Lo pregunta un endpoint propuesto (P-035).
 
 ### Sesión
 

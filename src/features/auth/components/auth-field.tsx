@@ -1,6 +1,6 @@
 'use client'
 
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { CheckIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useState, type ComponentProps } from 'react'
 import type { UseFormRegisterReturn } from 'react-hook-form'
@@ -11,11 +11,13 @@ import { cn } from '@/lib/utils'
 /**
  * A field of the auth forms (specs/auth AU-06, AU-18): label, input of 16px or more (iOS does not
  * zoom), an optional hint, and its error tied to the input and announced. A password can be shown.
+ * A confirmation (a free username, AU-24) takes the hint's place, announced too.
  */
 export function AuthField({
   id,
   label,
   hint,
+  confirmation,
   error,
   field,
   type = 'text',
@@ -25,6 +27,8 @@ export function AuthField({
   id: string
   label: string
   hint?: string
+  /** Already translated: in the hint's place, with a check. */
+  confirmation?: string | null
   /** Already translated. */
   error?: string
   field: UseFormRegisterReturn
@@ -71,8 +75,20 @@ export function AuthField({
         )}
       </div>
       {hint && !error && (
-        <FieldDescription id={hintId} className="type-meta">
-          {hint}
+        // Polite: the confirmation is read when it comes, without interrupting.
+        <FieldDescription
+          id={hintId}
+          aria-live={confirmation !== undefined ? 'polite' : undefined}
+          className={cn('type-meta', confirmation && 'flex items-center gap-1 text-success')}
+        >
+          {confirmation ? (
+            <>
+              <CheckIcon aria-hidden className="size-3.5 shrink-0" />
+              {confirmation}
+            </>
+          ) : (
+            hint
+          )}
         </FieldDescription>
       )}
       {error && (

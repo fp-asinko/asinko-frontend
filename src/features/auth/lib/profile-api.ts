@@ -1,6 +1,6 @@
 import 'server-only'
 import { apiRequest } from '@/lib/api'
-import { userSchema } from '@/lib/api/contract'
+import { userSchema, usernameAvailabilitySchema } from '@/lib/api/contract'
 
 /** Why a profile could not be created, as the forms say it (AU-08). */
 export type ProfileFailure =
@@ -56,4 +56,22 @@ export async function saveAvatar(userId: string, avatarUrl: string): Promise<str
     body: { avatarUrl },
   })
   return result.ok ? result.data.avatarUrl : null
+}
+
+/** Whether a username can be chosen, as far as the backend says (AU-24). */
+export type UsernameAvailability = 'available' | 'taken' | 'unknown'
+
+/**
+ * Asks whether a username is free while the welcome step is typed (P-035, proposal): only a hint,
+ * POST /users decides. Anything but a clear answer is 'unknown', and the form says nothing.
+ */
+export async function usernameAvailability(username: string): Promise<UsernameAvailability> {
+  const result = await apiRequest({
+    method: 'GET',
+    path: '/api/v1/usernames/:username',
+    params: { username },
+    schema: usernameAvailabilitySchema,
+  })
+  if (!result.ok) return 'unknown'
+  return result.data.available ? 'available' : 'taken'
 }

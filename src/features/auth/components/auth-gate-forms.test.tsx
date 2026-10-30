@@ -18,6 +18,7 @@ const profile = vi.hoisted(() => ({ createProfile: vi.fn() }))
 vi.mock('../actions/create-profile.action', () => ({ createProfile: profile.createProfile }))
 vi.mock('../actions/set-avatar.action', () => ({ setAvatar: vi.fn() }))
 vi.mock('../actions/suggested-photo.action', () => ({ getSuggestedPhoto: async () => null }))
+vi.mock('../actions/check-username.action', () => ({ checkUsername: async () => 'unknown' }))
 
 function OpenLogIn() {
   const { openGate } = useAuthGate()

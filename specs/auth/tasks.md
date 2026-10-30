@@ -11,6 +11,7 @@ Rama: `feature/auth-login`, desde `develop`. Requirements y design aprobados por
 - [x] **T-07a (M)** e2e (`auth.spec.ts`), 360 px, axe, presupuesto de JS con `/login` y `/welcome`. → AU-18, AU-19
 - [x] **T-08 (S)** Cambio del PO (2026-10-30): la foto de Google en el paso 2 (design.md § 15). Tests. → AU-22
 - [x] **T-09 (S)** Cambio del PO (2026-10-30): el nombre visible en el paso 2, con el de Google (design.md § 16). Tests. → AU-23
+- [x] **T-10 (S)** Cambio del PO (2026-10-30): avisar si el username está libre mientras se escribe, con la propuesta P-035 y su mock (design.md § 17). Tests. → AU-24
 - [ ] **T-07b (S)** Verificación a mano contra `dev` con una cuenta real (email y Google), y los cinco puntos de MVP-201. Necesita `SUPABASE_URL` y `SUPABASE_ANON_KEY` en `.env.local` y `/auth/callback` en las Redirect URLs de Supabase.
 
 | Criterio     | Test                                                                                                                                |
@@ -31,3 +32,4 @@ Rama: `feature/auth-login`, desde `develop`. Requirements y design aprobados por
 | AU-20        | `env-schema.test.ts`                                                                                                                |
 | AU-22        | `google-photo.test.ts`, `suggested-photo.action.test.ts`, `auth-forms.test.tsx`, e2e                                                |
 | AU-23        | `auth.schema`, `auth.action.test.ts`, `profile-api.test.ts`, `supabase-auth.test.ts`, `sign-up.test.ts`, `auth-forms.test.tsx`, e2e |
+| AU-24        | `check-username.action.test.ts`, `profile-api.test.ts`, `sign-up.test.ts`, `auth-forms.test.tsx`, e2e                               |

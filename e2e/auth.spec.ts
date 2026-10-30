@@ -122,7 +122,7 @@ test.describe('Log in and sign up (specs/auth)', () => {
     ).toBeVisible()
   })
 
-  test('says a taken email when creating the account, and a taken username in the welcome screen (AU-08, AU-09)', async ({
+  test('says a taken email when creating the account, and a taken username in the welcome screen (AU-08, AU-09, AU-24)', async ({
     page,
   }) => {
     await page.goto(`/en/login?mode=signup&next=${encodeURIComponent('/en/hub/defi')}`)
@@ -138,13 +138,16 @@ test.describe('Log in and sign up (specs/auth)', () => {
     await page.getByLabel('Email').fill(`${username}@asinko.dev`)
     await create.click()
     await expect(page).toHaveURL(/\/en\/welcome/)
-    // Someone's: the backend says so, next to the field, and the account is not stuck.
+    // Someone's: said while typing (AU-24), and again by the backend when sending anyway.
     await page.getByLabel('Username').fill('maria')
+    await expect(page.getByLabel('Username')).toHaveAccessibleDescription('That username is taken')
     await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
     const go = page.getByRole('main').getByRole('button', { name: 'Continue', exact: true })
     await go.click()
     await expect(page.getByLabel('Username')).toHaveAccessibleDescription('That username is taken')
+    // A free one says so, and the account is not stuck.
     await page.getByLabel('Username').fill(username)
+    await expect(page.getByText(`@${username} is available`)).toBeVisible()
     await go.click()
     await expect(page).toHaveURL(/\/en\/hub\/defi$/)
   })

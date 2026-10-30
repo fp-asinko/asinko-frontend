@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const api = vi.hoisted(() => ({ apiRequest: vi.fn() }))
 vi.mock('@/lib/api', () => api)
 
-const { createProfile, saveAvatar } = await import('./profile-api')
+const { createProfile, saveAvatar, usernameAvailability } = await import('./profile-api')
 
 const expected = (code: string, status = 422) => ({ ok: false, kind: 'expected', code, status })
 
@@ -25,6 +25,22 @@ describe('profile-api (specs/auth design.md § 6)', () => {
         accessToken: 'access',
       }),
     )
+  })
+
+  it('asks whether a username is free, and says unknown when it cannot tell (AU-24, P-035)', async () => {
+    api.apiRequest.mockResolvedValue({ ok: true, data: { available: true } })
+    expect(await usernameAvailability('ana_92')).toBe('available')
+    expect(api.apiRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        method: 'GET',
+        path: '/api/v1/usernames/:username',
+        params: { username: 'ana_92' },
+      }),
+    )
+    api.apiRequest.mockResolvedValue({ ok: true, data: { available: false } })
+    expect(await usernameAvailability('maria')).toBe('taken')
+    api.apiRequest.mockResolvedValue(expected('RATE_LIMITED', 429))
+    expect(await usernameAvailability('maria')).toBe('unknown')
   })
 
   it('sends the display name only when there is one (AU-23)', async () => {

@@ -25,6 +25,7 @@ import {
   searchResultSchema,
   thesisSchema,
   userSchema,
+  usernameAvailabilitySchema,
   userSummarySchema,
   voteResultSchema,
   type RawContentFeedItem,
@@ -61,7 +62,7 @@ import { isProposedUserChange, updateUser } from './profile-edit'
 import { signProfileImageUpload } from './profile-image'
 import { paginate } from './paginate'
 import { signPostImageUpload } from './post-image'
-import { createMockProfile } from './sign-up'
+import { checkMockUsername, createMockProfile } from './sign-up'
 import type { MockContext, MockExtension, MockResponse, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
 import {
@@ -464,6 +465,16 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       }
     },
     handler: createMockProfile,
+  },
+  // P-035 (proposal): whether a username is free, while the welcome step is typed (specs/auth).
+  {
+    method: 'GET',
+    path: '/api/v1/usernames/:username',
+    kind: 'proposal',
+    implemented: false,
+    schema: usernameAvailabilitySchema,
+    example: { ...noRequest, params: { username: 'maria' }, accessToken: 'mock-access.example' },
+    handler: checkMockUsername,
   },
   // E01: editing your own profile (specs/profile-edit), for the demo viewer.
   {
