@@ -1207,7 +1207,8 @@
       "google": "Não conseguimos entrar com o Google. Tente de novo",
       "photoType": "Use uma imagem JPEG, PNG ou WebP",
       "photoTooLarge": "Essa imagem é grande demais",
-      "photoUpload": "Seu perfil está pronto, mas a foto não subiu. Tente de novo ou remova-a para continuar"
+      "photoUpload": "Seu perfil está pronto, mas a foto não subiu. Tente de novo ou remova-a para continuar",
+      "nameSave": "Seu perfil está pronto, mas o nome não foi salvo. Tente de novo ou apague-o para continuar"
     },
     "photo": {
       "label": "Foto de perfil (opcional)",

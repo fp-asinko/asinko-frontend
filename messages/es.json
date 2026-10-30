@@ -1207,7 +1207,8 @@
       "google": "No pudimos iniciar sesión con Google. Prueba de nuevo",
       "photoType": "Usa una imagen JPEG, PNG o WebP",
       "photoTooLarge": "Esa imagen es demasiado grande",
-      "photoUpload": "Tu perfil está listo, pero la foto no se subió. Prueba de nuevo, o quítala para continuar"
+      "photoUpload": "Tu perfil está listo, pero la foto no se subió. Prueba de nuevo, o quítala para continuar",
+      "nameSave": "Tu perfil está listo, pero el nombre no se guardó. Prueba de nuevo, o bórralo para continuar"
     },
     "photo": {
       "label": "Foto de perfil (opcional)",

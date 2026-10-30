@@ -190,11 +190,12 @@ Reemplaza la navegación a `/welcome` de § 11.
 - **Por qué:** el perfil de una cuenta nueva se titulaba solo con `@username`, porque `displayName` (P-011) no se pedía al crearla. El nombre que muestra el panel de Supabase es de Supabase Auth (`user_metadata.full_name` de Google): Asinko no lo usa.
 - **El campo:** "Nombre (opcional)", debajo del username, con `autocomplete="name"`. `profileSchema` lo recorta y lo limita a 50 caracteres, como el backend.
 - **Con Google:** `supabase-auth.ts` lee `full_name` (o `name`) como `name` de los tokens. Sin perfil, la sesión lo guarda como `nameSuggestion`, y el layout y `/welcome` lo pasan al formulario como valor inicial. `createProfile` borra la sugerencia.
-- **Al backend:** va en el mismo `POST /users`, que acepta los campos de `User` (E01). Vacío no se manda.
+- **Al backend:** con `PATCH /users/{id}`, apenas se crea el perfil, en la misma Server Action (`createProfile`). Vacío no se manda.
+  - **Por qué no en `POST /users`:** E01 dice que acepta cualquier campo de `User`, pero el backend guarda solo username, país, idioma, foto, bio y visibilidad (`createUserProfile`, `asinko-app` `dev` en `9924924`). El nombre se perdía; lo encontró el PO al probar con Google el 2026-10-30. Se le propone en **P-037**.
   - `422 DISPLAY_NAME_TOO_LONG` se muestra en el campo.
+  - Si solo falló el nombre, el perfil ya existe: se avisa ("Tu perfil está listo, pero el nombre no se guardó"), y "Continuar" vuelve a mandar solo el nombre, sin crear el perfil de nuevo, como la foto (AU-21).
   - El backend lo deja en `null` si es igual al username (P-011).
-- Que el backend real lo guarde desde `POST /users` queda para la verificación a mano (T-07b).
-- **Mocks:** la cuenta nueva de Google simulada se llama "New Trader", y `POST /users` simulado guarda `displayName` con las reglas de P-011.
+- **Mocks:** la cuenta nueva de Google simulada se llama "New Trader". `POST /users` simulado ignora `displayName`, como el backend, y `PATCH` lo guarda.
 
 ## 17. Cambio del PO (2026-10-30): username libre mientras se escribe (AU-24)
 

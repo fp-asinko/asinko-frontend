@@ -5,8 +5,6 @@ import type { MockContext, MockResponse } from './types'
 
 /** The backend's rule (asinko-app USERNAME_RE). */
 const USERNAME = /^[a-zA-Z0-9_]{3,30}$/
-/** P-011: a display name of up to 50 characters. */
-const DISPLAY_NAME_MAX = 50
 
 /** Always someone's: the e2e's taken username (specs/auth design.md § 9). */
 export const MOCK_TAKEN_USERNAME = 'taken'
@@ -43,8 +41,6 @@ export function createMockProfile({ body, accessToken }: MockContext): MockRespo
   if (input.ageConfirmed !== true || input.termsAccepted !== true) {
     return error(422, 'TERMS_NOT_ACCEPTED')
   }
-  const displayName = typeof input.displayName === 'string' ? input.displayName.trim() : ''
-  if (displayName.length > DISPLAY_NAME_MAX) return error(422, 'DISPLAY_NAME_TOO_LONG')
   const lower = username.toLowerCase()
   if (
     lower === MOCK_TAKEN_USERNAME ||
@@ -58,8 +54,8 @@ export function createMockProfile({ body, accessToken }: MockContext): MockRespo
   const profile: RawProfile = {
     id: userId,
     username,
-    // As the backend: none when it is empty or the username itself (P-011).
-    displayName: displayName && displayName.toLowerCase() !== lower ? displayName : null,
+    // As the backend (asinko-app createUserProfile): POST /users does not keep it (P-037).
+    displayName: null,
     usernameChangedAt: null,
     avatarUrl: null,
     bio: null,

@@ -16,23 +16,15 @@ describe('the mocked POST /users (specs/auth design.md § 9)', () => {
     expect(PROFILES.find((each) => each.id === id)?.username).toBe(username)
   })
 
-  it('keeps the display name, none when empty or the username itself (P-011, AU-23)', () => {
-    const create = (displayName: string) => {
-      const { id, accessToken } = token()
-      const username = `new_${id.slice(0, 8)}`
-      const response = createMockProfile({
-        ...noRequest,
-        body: { ...body(username), displayName: displayName.replace('$user', username) },
-        accessToken,
-      })
-      return response.status === 201
-        ? PROFILES.find((each) => each.id === id)?.displayName
-        : response.status
-    }
-    expect(create(' Ana Pérez ')).toBe('Ana Pérez')
-    expect(create('')).toBeNull()
-    expect(create('$user')).toBeNull()
-    expect(create('x'.repeat(51))).toBe(422)
+  it('does not keep a display name, as the backend (P-037)', () => {
+    const { id, accessToken } = token()
+    const username = `new_${id.slice(0, 8)}`
+    createMockProfile({
+      ...noRequest,
+      body: { ...body(username), displayName: 'Ana Pérez' },
+      accessToken,
+    })
+    expect(PROFILES.find((each) => each.id === id)?.displayName).toBeNull()
   })
 
   it('answers as the backend: no Bearer, invalid, terms, taken, twice', () => {

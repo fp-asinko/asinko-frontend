@@ -4,7 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const api = vi.hoisted(() => ({ apiRequest: vi.fn() }))
 vi.mock('@/lib/api', () => api)
 
-const { createProfile, saveAvatar, usernameAvailability } = await import('./profile-api')
+const { createProfile, saveAvatar, saveDisplayName, usernameAvailability } =
+  await import('./profile-api')
 
 const expected = (code: string, status = 422) => ({ ok: false, kind: 'expected', code, status })
 
@@ -13,7 +14,7 @@ describe('profile-api (specs/auth design.md § 6)', () => {
 
   it('creates the profile with age and terms accepted, and the given Bearer', async () => {
     api.apiRequest.mockResolvedValue({ ok: true, data: { username: 'ana_92' } })
-    expect(await createProfile('ana_92', 'es', undefined, 'access')).toEqual({
+    expect(await createProfile('ana_92', 'es', 'access')).toEqual({
       ok: true,
       username: 'ana_92',
     })
@@ -43,14 +44,21 @@ describe('profile-api (specs/auth design.md § 6)', () => {
     expect(await usernameAvailability('maria')).toBe('unknown')
   })
 
-  it('sends the display name only when there is one (AU-23)', async () => {
+  it('saves the display name with PATCH, as POST /users does not keep it (AU-23, P-037)', async () => {
     api.apiRequest.mockResolvedValue({ ok: true, data: { username: 'ana_92' } })
-    await createProfile('ana_92', 'es', 'Ana Pérez')
-    expect(api.apiRequest).toHaveBeenLastCalledWith(
-      expect.objectContaining({ body: expect.objectContaining({ displayName: 'Ana Pérez' }) }),
+    expect(await saveDisplayName('user-id', 'Ana Pérez')).toBe('saved')
+    expect(api.apiRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        method: 'PATCH',
+        path: '/api/v1/users/:userId',
+        params: { userId: 'user-id' },
+        body: { displayName: 'Ana Pérez' },
+      }),
     )
-    await createProfile('ana_92', 'es', '')
-    expect(api.apiRequest.mock.lastCall![0].body).not.toHaveProperty('displayName')
+    api.apiRequest.mockResolvedValue(expected('DISPLAY_NAME_TOO_LONG'))
+    expect(await saveDisplayName('user-id', 'x')).toBe('tooLong')
+    api.apiRequest.mockResolvedValue({ ok: false, kind: 'unexpected', code: 'HTTP', status: 500 })
+    expect(await saveDisplayName('user-id', 'x')).toBe('unavailable')
   })
 
   it.each([

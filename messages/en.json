@@ -1207,7 +1207,8 @@
       "google": "We couldn’t log you in with Google. Try again",
       "photoType": "Use a JPEG, PNG or WebP image",
       "photoTooLarge": "That image is too large",
-      "photoUpload": "Your profile is ready, but the photo didn’t upload. Try again, or remove it to continue"
+      "photoUpload": "Your profile is ready, but the photo didn’t upload. Try again, or remove it to continue",
+      "nameSave": "Your profile is ready, but the name didn’t save. Try again, or clear it to continue"
     },
     "photo": {
       "label": "Profile photo (optional)",

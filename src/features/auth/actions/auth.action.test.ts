@@ -22,6 +22,7 @@ const deps = vi.hoisted(() => ({
   clearSession: vi.fn(),
   startSession: vi.fn(),
   createProfile: vi.fn(),
+  saveDisplayName: vi.fn(async () => 'saved'),
   revalidatePath: vi.fn(),
 }))
 vi.mock('@/lib/auth/supabase', () => ({
@@ -35,7 +36,10 @@ vi.mock('@/lib/auth/session', () => ({
   clearSession: deps.clearSession,
 }))
 vi.mock('@/lib/auth/account', () => ({ startSession: deps.startSession }))
-vi.mock('../lib/profile-api', () => ({ createProfile: deps.createProfile }))
+vi.mock('../lib/profile-api', () => ({
+  createProfile: deps.createProfile,
+  saveDisplayName: deps.saveDisplayName,
+}))
 vi.mock('next/cache', () => ({ revalidatePath: deps.revalidatePath }))
 vi.mock('next-intl/server', () => ({ getLocale: async () => 'es' }))
 
@@ -158,7 +162,8 @@ describe('auth actions (specs/auth design.md § 6)', () => {
         data: { username: 'ana_92' },
       })
       // The user is the session's Bearer: no token or id goes from the form.
-      expect(deps.createProfile).toHaveBeenCalledWith('ana_92', 'es', undefined)
+      expect(deps.createProfile).toHaveBeenCalledWith('ana_92', 'es')
+      expect(deps.saveDisplayName).not.toHaveBeenCalled()
       expect(deps.writeSession).toHaveBeenCalledWith({
         ...NO_PROFILE,
         username: 'ana_92',
@@ -179,17 +184,42 @@ describe('auth actions (specs/auth design.md § 6)', () => {
       expect(deps.writeSession).not.toHaveBeenCalled()
     })
 
-    it('sends the display name, and says a too long one next to its field (AU-23)', async () => {
+    it('saves the display name after creating the profile, for the session’s user (AU-23)', async () => {
       deps.session = NO_PROFILE
-      await createProfile({ username: 'ana_92', displayName: ' Ana Pérez ', accepted: true })
-      expect(deps.createProfile).toHaveBeenCalledWith('ana_92', 'es', 'Ana Pérez')
+      deps.createProfile.mockResolvedValue({ ok: true, username: 'ana_92' })
+      expect(
+        await createProfile({ username: 'ana_92', displayName: ' Ana Pérez ', accepted: true }),
+      ).toEqual({ ok: true, data: { username: 'ana_92' } })
+      expect(deps.saveDisplayName).toHaveBeenCalledWith(USER_ID, 'Ana Pérez')
+    })
+
+    it('says a too long name next to its field, before or after the backend', async () => {
+      deps.session = NO_PROFILE
       expect(
         await createProfile({ username: 'ana_92', displayName: 'x'.repeat(51), accepted: true }),
       ).toMatchObject({ fieldErrors: { displayName: ['auth.fields.displayName.long'] } })
-      deps.createProfile.mockResolvedValue({ ok: false, reason: 'displayNameTooLong' })
+      expect(deps.createProfile).not.toHaveBeenCalled()
+      deps.createProfile.mockResolvedValue({ ok: true, username: 'ana_92' })
+      deps.saveDisplayName.mockResolvedValueOnce('tooLong')
       expect(
         await createProfile({ username: 'ana_92', displayName: 'Ana', accepted: true }),
       ).toMatchObject({ fieldErrors: { displayName: ['auth.fields.displayName.long'] } })
+    })
+
+    it('when only the name failed, Continue saves it again over the profile already made', async () => {
+      deps.session = NO_PROFILE
+      deps.createProfile.mockResolvedValue({ ok: true, username: 'ana_92' })
+      deps.saveDisplayName.mockResolvedValueOnce('unavailable')
+      expect(
+        await createProfile({ username: 'ana_92', displayName: 'Ana', accepted: true }),
+      ).toEqual({ ok: false, error: 'auth.errors.nameSave' })
+      // The session has the username now: the profile is not created twice.
+      deps.session = { ...NO_PROFILE, username: 'ana_92' }
+      expect(
+        await createProfile({ username: 'ana_92', displayName: 'Ana', accepted: true }),
+      ).toEqual({ ok: true, data: { username: 'ana_92' } })
+      expect(deps.createProfile).toHaveBeenCalledOnce()
+      expect(deps.saveDisplayName).toHaveBeenCalledTimes(2)
     })
 
     it('does nothing when the username was already chosen', async () => {

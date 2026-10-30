@@ -21,21 +21,13 @@ const FAILURE_BY_CODE: Record<string, ProfileFailure> = {
 export async function createProfile(
   username: string,
   language: string,
-  displayName?: string,
   accessToken?: string,
 ): Promise<{ ok: true; username: string } | { ok: false; reason: ProfileFailure }> {
   const result = await apiRequest({
     method: 'POST',
     path: '/api/v1/users',
     schema: userSchema.pick({ username: true }),
-    body: {
-      username,
-      ageConfirmed: true,
-      termsAccepted: true,
-      language,
-      // A field of User that POST /users also takes (E01); empty, it is not sent.
-      ...(displayName ? { displayName } : {}),
-    },
+    body: { username, ageConfirmed: true, termsAccepted: true, language },
     accessToken,
   })
   if (result.ok) return { ok: true, username: result.data.username }
@@ -56,6 +48,27 @@ export async function saveAvatar(userId: string, avatarUrl: string): Promise<str
     body: { avatarUrl },
   })
   return result.ok ? result.data.avatarUrl : null
+}
+
+/**
+ * Saves the display name of the profile just created (AU-23): E01, PATCH /users/{id}. POST /users
+ * does not keep it, although E01 says it takes any field of User (P-037, design.md § 16).
+ */
+export async function saveDisplayName(
+  userId: string,
+  displayName: string,
+): Promise<'saved' | 'tooLong' | 'unavailable'> {
+  const result = await apiRequest({
+    method: 'PATCH',
+    path: '/api/v1/users/:userId',
+    params: { userId },
+    schema: userSchema.pick({ username: true }),
+    body: { displayName },
+  })
+  if (result.ok) return 'saved'
+  return result.kind === 'expected' && result.code === 'DISPLAY_NAME_TOO_LONG'
+    ? 'tooLong'
+    : 'unavailable'
 }
 
 /** Whether a username can be chosen, as far as the backend says (AU-24). */
