@@ -94,16 +94,19 @@ export async function resolvePostRoute(
 export function PostDetail({
   post,
   searchParams,
+  recentOwner,
 }: {
   post: PostItem
   searchParams: Record<string, string | string[] | undefined>
+  /** Whose "Recently viewed" it goes to (specs/recently-viewed RV-10). */
+  recentOwner: string
 }) {
   return (
     <CommentThread>
       <ScrollToTop id={post.id} />
       <PostCard post={post} variant="detail" leading={<BackButton variant="plain" />} />
       {/* Into the right column's "Recently viewed" (specs/recently-viewed); a deleted post, no. */}
-      {!post.deleted && <RecordView item={recentItem(post)} />}
+      {!post.deleted && <RecordView item={recentItem(post)} owner={recentOwner} />}
       <PostComments
         postId={post.id}
         path={post.path}

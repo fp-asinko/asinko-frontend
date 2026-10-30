@@ -49,3 +49,9 @@ type RecentItem = {
 
 - Unitarios: `lib/recently-viewed` (orden, tope, repetidos, validación, `href` externo, storage bloqueado, eventos), `RecordView` (registra, no registra un post borrado), `RecentlyViewed` (ítems, vacío, Borrar, nombre accesible, se actualiza con el evento), `RecentlyViewedSlot` (no carga por debajo de 1024 px).
 - E2E (desktop): abrir dos posts y volver al Home: aparecen en orden con su título; Borrar; axe en claro y oscuro. Mobile: la columna no existe. Presupuesto de JS.
+
+## 6. Cambio del PO (2026-10-30): una lista por cuenta (RV-10)
+
+- `localStorage` guarda el dueño de la lista en `asinko:recently-viewed-owner`: el id de la cuenta o `guest` (`GUEST_OWNER`).
+- `claimRecent(owner)` la vacía si es de otro, o si se guardó antes de tener dueño. La llaman `RecordView` antes de registrar y `RecentlyViewedSlot` antes de mostrarla.
+- El dueño sale de `getViewer()` en el servidor: la página del post y la columna derecha del Home lo pasan por props. Así también vale después de entrar con Google, que vuelve por una redirección.

@@ -23,6 +23,7 @@ Volver en un toque a lo que se estuvo leyendo: la columna derecha lista los últ
 - [ ] **RV-07** Accesibilidad: el bloque es una sección con título; cada ítem es un link con un nombre que se lee completo (comunidad, título, cuándo); "Borrar" es un botón con nombre claro. axe sin violaciones, en claro y oscuro.
 - [ ] **RV-08** Presupuesto de JS (`seo.md`, quedan 1,4 KB): la lista se descarga después de que carga la página y solo donde hay columna derecha; lo que registra la visita es mínimo. Si no entra, se consulta al PO antes de tocar el tope.
 - [ ] **RV-09** Textos en en, es y pt.
+- [x] **RV-10** **Una lista por cuenta** (PO, 2026-10-30): una cuenta nueva no hereda lo que se vio en ese navegador antes. La lista tiene dueño (la cuenta, o "invitado"); al entrar con otra cuenta, al salir o al crear una, empieza vacía.
 
 ## Fuera de alcance
 

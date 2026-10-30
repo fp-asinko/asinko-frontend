@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { PageColumns } from '@/components/organisms/app-shell'
+import { GUEST_OWNER } from '@/lib/recently-viewed'
+import { getViewer } from '@/lib/session'
 // By its path, not the feature's index: the index also brings the feeds' client parts (seo.md).
 import {
   PostDetail,
@@ -21,10 +23,10 @@ export default async function PostPage({
   searchParams,
 }: PageProps<'/[locale]/post/[id]/[[...slug]]'>) {
   const [{ locale, id, slug }, query] = await Promise.all([params, searchParams])
-  const post = await resolvePostRoute(id, slug, locale)
+  const [post, viewer] = await Promise.all([resolvePostRoute(id, slug, locale), getViewer()])
   return (
     <PageColumns>
-      <PostDetail post={post} searchParams={query} />
+      <PostDetail post={post} searchParams={query} recentOwner={viewer?.id ?? GUEST_OWNER} />
     </PageColumns>
   )
 }

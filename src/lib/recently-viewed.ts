@@ -20,6 +20,9 @@ export type RecentItem = {
 }
 
 const KEY = 'asinko:recently-viewed'
+/** Whose list it is: an account's id, or GUEST_OWNER (specs/recently-viewed RV-10). */
+const OWNER_KEY = 'asinko:recently-viewed-owner'
+export const GUEST_OWNER = 'guest'
 /**
  * Exactly a post's page, /post/{id} or /post/{id}/{slug}, the slug empty for a title with no
  * letters (only emojis): no dots, query or hash.
@@ -108,6 +111,20 @@ export function recordRecent(item: Omit<RecentItem, 'viewedAt'>, now = new Date(
 /** "Clear" (RV-05). */
 export function clearRecent() {
   write(EMPTY)
+}
+
+/**
+ * Makes the list this viewer's before reading or adding to it (RV-10): another account's, the
+ * guest's, or one kept before it had an owner, is emptied. A new account starts with nothing.
+ */
+export function claimRecent(owner: string) {
+  try {
+    if (localStorage.getItem(OWNER_KEY) === owner) return
+    localStorage.setItem(OWNER_KEY, owner)
+  } catch {
+    return
+  }
+  if (rawList() !== null) write(EMPTY)
 }
 
 /** Calls back when the list changes, in this tab or another (RV-06). */

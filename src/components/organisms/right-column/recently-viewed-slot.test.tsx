@@ -19,7 +19,7 @@ describe('RecentlyViewedSlot (specs/recently-viewed RV-08)', () => {
 
   it('brings the list once the page is idle, where the column exists', async () => {
     screenWidth(true)
-    renderWithIntl(<RecentlyViewedSlot />)
+    renderWithIntl(<RecentlyViewedSlot owner="guest" />)
     expect(
       await screen.findByRole('region', { name: 'Recently viewed' }, { timeout: 8000 }),
     ).toBeInTheDocument()
@@ -27,7 +27,7 @@ describe('RecentlyViewedSlot (specs/recently-viewed RV-08)', () => {
 
   it('downloads nothing below 1024px, where there is no column', async () => {
     screenWidth(false)
-    const { container } = renderWithIntl(<RecentlyViewedSlot />)
+    const { container } = renderWithIntl(<RecentlyViewedSlot owner="guest" />)
     await new Promise((done) => setTimeout(done, 400))
     expect(container).toBeEmptyDOMElement()
   })

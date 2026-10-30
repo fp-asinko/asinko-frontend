@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  claimRecent,
   clearRecent,
   readRecent,
   RECENT_MAX,
@@ -39,6 +40,24 @@ describe('recently viewed (specs/recently-viewed)', () => {
   it('gives the same array while nothing changed (useSyncExternalStore)', () => {
     recordRecent(item('a'))
     expect(readRecent()).toBe(readRecent())
+  })
+
+  it('belongs to one viewer: another account, or the guest, starts empty (RV-10)', () => {
+    claimRecent('guest')
+    recordRecent(item('a'))
+    claimRecent('guest')
+    expect(readRecent().map((each) => each.id)).toEqual(['a'])
+    claimRecent('account-1')
+    expect(readRecent()).toEqual([])
+    recordRecent(item('b'))
+    claimRecent('guest')
+    expect(readRecent()).toEqual([])
+  })
+
+  it('empties a list kept before it had an owner', () => {
+    recordRecent(item('a'))
+    claimRecent('account-1')
+    expect(readRecent()).toEqual([])
   })
 
   it('clears the list (RV-05)', () => {

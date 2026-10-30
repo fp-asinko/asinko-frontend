@@ -39,6 +39,15 @@ test.describe('Recently viewed', () => {
     test.skip(isMobile, 'The right column exists from 1024px')
   })
 
+  test('each account its own list: another one starts empty (RV-10)', async ({ page, context }) => {
+    // With every route mocked, the demo user is the viewer; the guest cookie turns it off.
+    await readTwoPosts(page)
+    await expect(recent(page).getByRole('link')).toHaveCount(2)
+    await context.addCookies([{ name: 'asinko-mock-guest', value: '1', url: page.url() }])
+    await page.reload()
+    await expect(recent(page).getByText('Nothing viewed yet')).toBeVisible()
+  })
+
   test('lists the posts opened, the last one first, each leading to its page (RV-01 to RV-03)', async ({
     page,
   }) => {

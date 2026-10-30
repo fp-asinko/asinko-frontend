@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
+import { claimRecent } from '@/lib/recently-viewed'
 
 // The list, its formats and its events: downloaded once the page is idle (RV-08, seo.md).
 const RecentlyViewed = dynamic(
@@ -17,16 +18,20 @@ const WIDE = '(min-width: 1024px)'
 /**
  * Brings "Recently viewed" into the right column (specs/recently-viewed § 4) after the page is
  * ready, and only where the column shows: a phone never downloads it. It goes below the cards
- * that are already there, so arriving late moves nothing.
+ * that are already there, so arriving late moves nothing. Shows the list of who is looking: another
+ * account's is emptied first (RV-10).
  */
-export function RecentlyViewedSlot() {
+export function RecentlyViewedSlot({ owner }: { owner: string }) {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
     const wide = window.matchMedia(WIDE)
     let idle: number | undefined
     const start = () => {
-      const run = () => setReady(true)
+      const run = () => {
+        claimRecent(owner)
+        setReady(true)
+      }
       idle =
         typeof window.requestIdleCallback === 'function'
           ? window.requestIdleCallback(run, { timeout: 2000 })
@@ -46,7 +51,7 @@ export function RecentlyViewedSlot() {
     }
     wide.addEventListener('change', onChange)
     return () => wide.removeEventListener('change', onChange)
-  }, [])
+  }, [owner])
 
   return ready ? <RecentlyViewed /> : null
 }
