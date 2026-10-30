@@ -17,6 +17,8 @@ export type AuthTokens = {
   email: string | null
   /** The provider's photo (Google), to offer it to a new account (design.md § 15). */
   photoUrl?: string | null
+  /** The provider's name (Google), the new account's display name (design.md § 16). */
+  name?: string | null
 }
 
 export type AuthFailure =
@@ -40,7 +42,12 @@ const tokensSchema = z.object({
     email: z.string().nullish(),
     // Google's photo: `avatar_url`, or `picture` as Google names it.
     user_metadata: z
-      .object({ avatar_url: z.unknown(), picture: z.unknown() })
+      .object({
+        avatar_url: z.unknown(),
+        picture: z.unknown(),
+        full_name: z.unknown(),
+        name: z.unknown(),
+      })
       .partial()
       .nullish()
       .catch(null),
@@ -54,6 +61,12 @@ const errorSchema = z.object({ error_code: z.string().optional(), code: z.unknow
 function photoOf(metadata: { avatar_url?: unknown; picture?: unknown } | null | undefined) {
   const url = metadata?.avatar_url ?? metadata?.picture
   return typeof url === 'string' && url ? url : null
+}
+
+/** The provider's name, trimmed, when it is text (Google's `full_name`, or `name`). */
+function nameOf(metadata: { full_name?: unknown; name?: unknown } | null | undefined) {
+  const name = metadata?.full_name ?? metadata?.name
+  return typeof name === 'string' && name.trim() ? name.trim() : null
 }
 
 const EMAIL_TAKEN = new Set(['user_already_exists', 'email_exists'])
@@ -118,6 +131,7 @@ export function createSupabaseAuth({
           userId: user.id,
           email: user.email ?? null,
           photoUrl: photoOf(user.user_metadata),
+          name: nameOf(user.user_metadata),
         },
       }
     }

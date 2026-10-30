@@ -3,12 +3,14 @@ import { apiRequest } from '@/lib/api'
 import { userSchema } from '@/lib/api/contract'
 
 /** Why a profile could not be created, as the forms say it (AU-08). */
-export type ProfileFailure = 'usernameTaken' | 'usernameInvalid' | 'termsRequired' | 'unavailable'
+export type ProfileFailure =
+  'usernameTaken' | 'usernameInvalid' | 'displayNameTooLong' | 'termsRequired' | 'unavailable'
 
 const FAILURE_BY_CODE: Record<string, ProfileFailure> = {
   USERNAME_TAKEN: 'usernameTaken',
   INVALID_USERNAME: 'usernameInvalid',
   TERMS_NOT_ACCEPTED: 'termsRequired',
+  DISPLAY_NAME_TOO_LONG: 'displayNameTooLong',
 }
 
 /**
@@ -19,13 +21,21 @@ const FAILURE_BY_CODE: Record<string, ProfileFailure> = {
 export async function createProfile(
   username: string,
   language: string,
+  displayName?: string,
   accessToken?: string,
 ): Promise<{ ok: true; username: string } | { ok: false; reason: ProfileFailure }> {
   const result = await apiRequest({
     method: 'POST',
     path: '/api/v1/users',
     schema: userSchema.pick({ username: true }),
-    body: { username, ageConfirmed: true, termsAccepted: true, language },
+    body: {
+      username,
+      ageConfirmed: true,
+      termsAccepted: true,
+      language,
+      // A field of User that POST /users also takes (E01); empty, it is not sent.
+      ...(displayName ? { displayName } : {}),
+    },
     accessToken,
   })
   if (result.ok) return { ok: true, username: result.data.username }

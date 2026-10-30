@@ -161,7 +161,11 @@ describe('auth forms (specs/auth AU-02 to AU-11, AU-18)', () => {
       expect(go).toBeDisabled()
       await accept()
       await userEvent.click(go)
-      expect(actions.createProfile).toHaveBeenCalledWith({ username: 'ana_perez', accepted: true })
+      expect(actions.createProfile).toHaveBeenCalledWith({
+        username: 'ana_perez',
+        displayName: '',
+        accepted: true,
+      })
       expect(actions.setAvatar).not.toHaveBeenCalled()
       expect(onDone).toHaveBeenCalled()
     })
@@ -201,6 +205,23 @@ describe('auth forms (specs/auth AU-02 to AU-11, AU-18)', () => {
       await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
       expect(actions.createProfile).toHaveBeenCalled()
       expect(actions.setAvatar).not.toHaveBeenCalled()
+    })
+
+    it('back from Google, brings its name as the display name, to change or clear (AU-23)', async () => {
+      renderWithIntl(
+        <ProfileForm suggestion="ana_perez" suggestedName="Ana Pérez" onDone={vi.fn()} />,
+      )
+      const name = screen.getByLabelText('Name (optional)')
+      expect(name).toHaveValue('Ana Pérez')
+      await userEvent.clear(name)
+      await userEvent.type(name, 'Ana P.')
+      await accept()
+      await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+      expect(actions.createProfile).toHaveBeenCalledWith({
+        username: 'ana_perez',
+        displayName: 'Ana P.',
+        accepted: true,
+      })
     })
 
     const PHOTO_TYPE = 'Use a JPEG, PNG or WebP image'

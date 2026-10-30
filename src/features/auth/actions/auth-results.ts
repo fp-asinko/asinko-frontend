@@ -55,6 +55,12 @@ export function profileFailure(reason: ProfileFailure): ActionResult<never> {
         error: 'auth.fields.username.invalid',
         fieldErrors: { username: ['auth.fields.username.invalid'] },
       }
+    case 'displayNameTooLong':
+      return {
+        ok: false,
+        error: 'auth.fields.displayName.long',
+        fieldErrors: { displayName: ['auth.fields.displayName.long'] },
+      }
     case 'termsRequired':
       return {
         ok: false,

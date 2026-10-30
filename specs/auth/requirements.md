@@ -71,6 +71,7 @@ Que cualquiera pueda crear su cuenta o entrar a Asinko, con email o con Google, 
   - se puede quitar antes de continuar;
   - si no se pudo subir, el perfil queda creado igual y se avisa; "Continuar" lo vuelve a intentar.
 - [x] **AU-22** **Foto de Google** (PO, 2026-10-30): al entrar con Google por primera vez, la foto de la cuenta de Google viene ya elegida en el paso 2. Se puede cambiar o quitar como cualquier otra; si Google no tiene foto o no se pudo traer, el paso queda como siempre.
+- [x] **AU-23** **Nombre visible** (PO, 2026-10-30), opcional: el paso 2 tiene un campo "Nombre", de hasta 50 caracteres. Con Google viene completado con el nombre de la cuenta, y se puede cambiar o borrar. Con nombre, el perfil se titula con el nombre y el `@username` debajo; sin nombre, solo con el `@username` (P-011).
 
 ### Sesión
 

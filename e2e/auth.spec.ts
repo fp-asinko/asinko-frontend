@@ -181,7 +181,8 @@ test.describe('Log in and sign up (specs/auth)', () => {
     await expect(second).toBeVisible()
     await expect(page).toHaveURL(/\/en\/hub\/defi$/)
     await expect(second.getByLabel('Username')).toHaveValue('new_trader')
-    // The Google photo, already chosen (AU-22).
+    // The Google name and photo, already there (AU-22, AU-23).
+    await expect(second.getByLabel('Name (optional)')).toHaveValue('New Trader')
     await expect(second.getByRole('button', { name: 'Remove' })).toBeVisible()
 
     // Closed, the bar offers only that, and it opens the step again.

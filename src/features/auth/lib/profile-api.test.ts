@@ -13,7 +13,10 @@ describe('profile-api (specs/auth design.md § 6)', () => {
 
   it('creates the profile with age and terms accepted, and the given Bearer', async () => {
     api.apiRequest.mockResolvedValue({ ok: true, data: { username: 'ana_92' } })
-    expect(await createProfile('ana_92', 'es', 'access')).toEqual({ ok: true, username: 'ana_92' })
+    expect(await createProfile('ana_92', 'es', undefined, 'access')).toEqual({
+      ok: true,
+      username: 'ana_92',
+    })
     expect(api.apiRequest).toHaveBeenCalledWith(
       expect.objectContaining({
         method: 'POST',
@@ -24,8 +27,19 @@ describe('profile-api (specs/auth design.md § 6)', () => {
     )
   })
 
+  it('sends the display name only when there is one (AU-23)', async () => {
+    api.apiRequest.mockResolvedValue({ ok: true, data: { username: 'ana_92' } })
+    await createProfile('ana_92', 'es', 'Ana Pérez')
+    expect(api.apiRequest).toHaveBeenLastCalledWith(
+      expect.objectContaining({ body: expect.objectContaining({ displayName: 'Ana Pérez' }) }),
+    )
+    await createProfile('ana_92', 'es', '')
+    expect(api.apiRequest.mock.lastCall![0].body).not.toHaveProperty('displayName')
+  })
+
   it.each([
     ['USERNAME_TAKEN', 'usernameTaken'],
+    ['DISPLAY_NAME_TOO_LONG', 'displayNameTooLong'],
     ['INVALID_USERNAME', 'usernameInvalid'],
     ['TERMS_NOT_ACCEPTED', 'termsRequired'],
     ['SOMETHING_ELSE', 'unavailable'],

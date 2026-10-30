@@ -58,6 +58,15 @@ describe('session cookie (specs/auth design.md § 3)', () => {
     expect(SESSION).not.toHaveProperty('suggestion')
   })
 
+  it('keeps the Google name to offer while there is no profile (design.md § 16)', () => {
+    expect(sessionFromTokens({ ...TOKENS, name: 'Maria' }, null, 1_000)).toMatchObject({
+      nameSuggestion: 'Maria',
+    })
+    expect(
+      sessionFromTokens({ ...TOKENS, name: 'Maria' }, { username: 'maria', avatarUrl: null }),
+    ).not.toHaveProperty('nameSuggestion')
+  })
+
   it('keeps the Google photo to offer while there is no profile (design.md § 15)', () => {
     const photo = 'https://lh3.googleusercontent.com/a/x=s96-c'
     expect(sessionFromTokens({ ...TOKENS, photoUrl: photo }, null, 1_000)).toMatchObject({

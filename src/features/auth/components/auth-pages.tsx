@@ -75,14 +75,17 @@ export async function LoginView({
 export async function WelcomeView({
   next,
   suggestion,
+  suggestedName = null,
 }: {
   next: string
   suggestion: string | null
+  /** Google's name, for the display name (design.md § 16). */
+  suggestedName?: string | null
 }) {
   const t = await getTranslations('auth.welcome')
   return (
     <AuthCard title={t('title')} intro={t('intro')}>
-      <WelcomePageForm next={next} suggestion={suggestion} />
+      <WelcomePageForm next={next} suggestion={suggestion} suggestedName={suggestedName} />
       <LogOutButton />
     </AuthCard>
   )

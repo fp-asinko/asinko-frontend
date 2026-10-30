@@ -19,6 +19,7 @@ export const MOCK_GOOGLE_CODE = { demo: 'mock-google-demo', new: 'mock-google-ne
 /** The email of a new Google account: the welcome screen suggests `new_trader`. */
 export const MOCK_GOOGLE_NEW_EMAIL = 'new.trader@gmail.com'
 /** The new Google account's photo (specs/auth design.md § 15): mockGooglePhotoFetch answers it. */
+export const MOCK_GOOGLE_NAME = 'New Trader'
 export const MOCK_GOOGLE_PHOTO = 'https://lh3.googleusercontent.com/a/mock-new-trader=s96-c'
 
 type Account = { id: string; password: string }
@@ -57,7 +58,12 @@ function session(
     refresh_token: `${REFRESH_PREFIX}${userId}.${nonce}`,
     expires_in: 3600,
     token_type: 'bearer',
-    user: { id: userId, email, user_metadata: avatarUrl ? { avatar_url: avatarUrl } : {} },
+    // A Google account brings its photo and its name (design.md § 15, § 16).
+    user: {
+      id: userId,
+      email,
+      user_metadata: avatarUrl ? { avatar_url: avatarUrl, full_name: MOCK_GOOGLE_NAME } : {},
+    },
   }
 }
 

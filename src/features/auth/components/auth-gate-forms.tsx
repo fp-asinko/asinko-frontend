@@ -27,7 +27,14 @@ const ProfileForm = dynamic(() => import('./profile-form').then((mod) => mod.Pro
  * suggested, the photo and the terms (design.md § 12). Done, the modal closes over the page,
  * rendered again with the session.
  */
-export function AuthGateForms({ suggestion = null }: { suggestion?: string | null }) {
+export function AuthGateForms({
+  suggestion = null,
+  suggestedName = null,
+}: {
+  suggestion?: string | null
+  /** Google's name, for the display name (design.md § 16). */
+  suggestedName?: string | null
+}) {
   const dialog = useGateDialog()
   const router = useRouter()
   // From the step just done; the layout's (from the session) when back from Google.
@@ -49,7 +56,13 @@ export function AuthGateForms({ suggestion = null }: { suggestion?: string | nul
       router.refresh()
       dialog.close()
     }
-    return <ProfileForm suggestion={suggested ?? suggestion} onDone={finish} />
+    return (
+      <ProfileForm
+        suggestion={suggested ?? suggestion}
+        suggestedName={suggestedName}
+        onDone={finish}
+      />
+    )
   }
   return dialog.view === 'signup' ? <SignUpForm onDone={done} /> : <LogInForm onDone={done} />
 }

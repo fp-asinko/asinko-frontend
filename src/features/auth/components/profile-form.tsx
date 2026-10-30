@@ -15,16 +15,19 @@ import { AuthField, FormAlert } from './auth-field'
 import { AvatarPicker } from './avatar-picker'
 
 /**
- * The welcome screen's form (specs/auth AU-11, AU-21, design.md § 11): the username, already
- * suggested, an optional photo, and age and terms. Creates the profile, then uploads the photo; if
+ * The welcome screen's form (specs/auth AU-11, AU-21, AU-23, design.md § 11, § 16): the username,
+ * already suggested, an optional display name and photo, and age and terms. Creates the profile, then uploads the photo; if
  * only the photo failed, it says so and Continue tries it again (the profile already exists).
  * Loaded after the page (seo.md § Zod).
  */
 export function ProfileForm({
   suggestion,
+  suggestedName,
   onDone,
 }: {
   suggestion?: string | null
+  /** Back from Google, its name (AU-23, design.md § 16). */
+  suggestedName?: string | null
   onDone: () => void
 }) {
   const t = useTranslations('auth')
@@ -32,7 +35,11 @@ export function ProfileForm({
   const photo = useRef<Blob | null>(null)
   const form = useForm<ProfileInput>({
     resolver: zodResolver(profileSchema),
-    defaultValues: { username: suggestion ?? '', accepted: false },
+    defaultValues: {
+      username: suggestion ?? '',
+      displayName: suggestedName ?? '',
+      accepted: false,
+    },
   })
   const accepted = useWatch({ control: form.control, name: 'accepted' })
 
@@ -59,6 +66,14 @@ export function ProfileForm({
           autoCapitalize="none"
           field={form.register('username')}
           error={error('username')}
+        />
+        <AuthField
+          id={`${ids}-display-name`}
+          label={t('fields.displayName.label')}
+          hint={t('fields.displayName.hint')}
+          autoComplete="name"
+          field={form.register('displayName')}
+          error={error('displayName')}
         />
       </div>
       <AvatarPicker onChange={(blob) => (photo.current = blob)} />

@@ -184,3 +184,14 @@ Reemplaza la navegación a `/welcome` de § 11.
 - Se pide a 400 px: el final `=s96-c` de Google pasa a `=s400-c`.
 - Llega ya elegida, con "Cambiar" y "Quitar". Si la persona elige o quita una foto antes de que llegue, la de Google no la reemplaza.
 - **Mocks:** la cuenta nueva de Google simulada trae una foto (`MOCK_GOOGLE_PHOTO`), y `mockGooglePhotoFetch` responde un PNG de 1×1 en lugar de Google.
+
+## 16. Cambio del PO (2026-10-30): el nombre visible en el paso 2 (AU-23)
+
+- **Por qué:** el perfil de una cuenta nueva se titulaba solo con `@username`, porque `displayName` (P-011) no se pedía al crearla. El nombre que muestra el panel de Supabase es de Supabase Auth (`user_metadata.full_name` de Google): Asinko no lo usa.
+- **El campo:** "Nombre (opcional)", debajo del username, con `autocomplete="name"`. `profileSchema` lo recorta y lo limita a 50 caracteres, como el backend.
+- **Con Google:** `supabase-auth.ts` lee `full_name` (o `name`) como `name` de los tokens. Sin perfil, la sesión lo guarda como `nameSuggestion`, y el layout y `/welcome` lo pasan al formulario como valor inicial. `createProfile` borra la sugerencia.
+- **Al backend:** va en el mismo `POST /users`, que acepta los campos de `User` (E01). Vacío no se manda.
+  - `422 DISPLAY_NAME_TOO_LONG` se muestra en el campo.
+  - El backend lo deja en `null` si es igual al username (P-011).
+- Que el backend real lo guarde desde `POST /users` queda para la verificación a mano (T-07b).
+- **Mocks:** la cuenta nueva de Google simulada se llama "New Trader", y `POST /users` simulado guarda `displayName` con las reglas de P-011.

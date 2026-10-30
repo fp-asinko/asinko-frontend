@@ -26,5 +26,12 @@ export default async function WelcomeRoute({
   if (state === 'ready') redirect(splitLocale(next))
   if (state === 'guest') redirect({ href: { pathname: '/login', query: { next } }, locale })
 
-  return <WelcomeView next={next} suggestion={(await readSession())?.suggestion ?? null} />
+  const session = await readSession()
+  return (
+    <WelcomeView
+      next={next}
+      suggestion={session?.suggestion ?? null}
+      suggestedName={session?.nameSuggestion ?? null}
+    />
+  )
 }

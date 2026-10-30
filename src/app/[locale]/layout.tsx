@@ -81,6 +81,7 @@ export default async function LocaleLayout({ children, right, params }: LayoutPr
   const signedIn = viewer !== null
   // Signed in without a username: everything takes it to choose one (specs/auth AU-11).
   const needsProfile = (await getAccountState()) === 'needs-profile'
+  const session = needsProfile ? await readSession() : null
   // The left column as the viewer left it: drawn so on the server, nothing jumps (specs/sidebar-toggle).
   const leftFolded = siteFolded((await cookies()).get(LEFT_COLUMN_COOKIE)?.value)
   // Development login (specs/dev-login): off in production and with every route mocked.
@@ -107,7 +108,12 @@ export default async function LocaleLayout({ children, right, params }: LayoutPr
                 )
               }
               // Log in and sign up inside the modal, and log out (specs/auth AU-01, AU-14).
-              forms={<AuthGateForms suggestion={(await readSession())?.suggestion ?? null} />}
+              forms={
+                <AuthGateForms
+                  suggestion={session?.suggestion ?? null}
+                  suggestedName={session?.nameSuggestion ?? null}
+                />
+              }
               logOut={logOut}
             >
               {/* Joined communities of this visit: every join button hides at once (specs/community-first). */}

@@ -1182,6 +1182,11 @@
         "hint": "3 to 30 letters, numbers or _",
         "invalid": "Use 3 to 30 letters, numbers or _"
       },
+      "displayName": {
+        "label": "Name (optional)",
+        "hint": "Shown on your profile above your username.",
+        "long": "Up to 50 characters"
+      },
       "accepted": {
         "label": "I’m 18 or older and I accept the <terms>Terms</terms> and the <privacy>Privacy Policy</privacy>",
         "terms": "Terms",

@@ -22,12 +22,17 @@ export async function createProfile(raw: unknown): Promise<ActionResult<{ userna
   // Already chosen (a second tab): nothing to do.
   if (session.username) return { ok: true, data: { username: session.username } }
 
-  const result = await createProfileFor(parsed.data.username, await getLocale())
+  const result = await createProfileFor(
+    parsed.data.username,
+    await getLocale(),
+    parsed.data.displayName,
+  )
   if (!result.ok) return profileFailure(result.reason)
   await writeSession({
     ...session,
     username: result.username,
     suggestion: null,
+    nameSuggestion: null,
     photoSuggestion: null,
   })
   return { ok: true, data: { username: result.username } }

@@ -8,6 +8,8 @@ export const USERNAME_PATTERN = /^[a-zA-Z0-9_]{3,30}$/
 /** PO, 2026-10-29 (Q2): 8 or more. 72 is bcrypt's limit, which Supabase uses. */
 export const PASSWORD_MIN = 8
 export const PASSWORD_MAX = 72
+/** The backend's limit for a display name (P-011): 422 DISPLAY_NAME_TOO_LONG past it. */
+export const DISPLAY_NAME_MAX = 50
 
 const email = z
   .string()
@@ -37,7 +39,14 @@ export const signUpSchema = z.object({
     .max(PASSWORD_MAX, { message: 'auth.fields.password.long' }),
 })
 
-export const profileSchema = z.object({ username, accepted })
+/** Optional: empty, the profile is titled with the username alone (P-011, design.md § 16). */
+const displayName = z
+  .string()
+  .trim()
+  .max(DISPLAY_NAME_MAX, { message: 'auth.fields.displayName.long' })
+  .optional()
+
+export const profileSchema = z.object({ username, displayName, accepted })
 
 export type LogInInput = z.infer<typeof logInSchema>
 export type SignUpInput = z.infer<typeof signUpSchema>

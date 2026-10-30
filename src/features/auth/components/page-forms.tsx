@@ -37,6 +37,16 @@ export function LoginPageForm({ mode, next }: { mode: 'login' | 'signup'; next: 
 }
 
 /** Choosing the username (specs/auth AU-11): back to `next` when done. */
-export function WelcomePageForm({ next, suggestion }: { next: string; suggestion: string | null }) {
-  return <ProfileForm suggestion={suggestion} onDone={() => goTo(next)} />
+export function WelcomePageForm({
+  next,
+  suggestion,
+  suggestedName = null,
+}: {
+  next: string
+  suggestion: string | null
+  suggestedName?: string | null
+}) {
+  return (
+    <ProfileForm suggestion={suggestion} suggestedName={suggestedName} onDone={() => goTo(next)} />
+  )
 }

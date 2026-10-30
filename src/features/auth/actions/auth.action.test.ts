@@ -158,11 +158,12 @@ describe('auth actions (specs/auth design.md § 6)', () => {
         data: { username: 'ana_92' },
       })
       // The user is the session's Bearer: no token or id goes from the form.
-      expect(deps.createProfile).toHaveBeenCalledWith('ana_92', 'es')
+      expect(deps.createProfile).toHaveBeenCalledWith('ana_92', 'es', undefined)
       expect(deps.writeSession).toHaveBeenCalledWith({
         ...NO_PROFILE,
         username: 'ana_92',
         suggestion: null,
+        nameSuggestion: null,
         photoSuggestion: null,
       })
       // The photo may follow: the caller renders the page again when everything is done.
@@ -176,6 +177,19 @@ describe('auth actions (specs/auth design.md § 6)', () => {
         fieldErrors: { username: ['auth.errors.usernameTaken'] },
       })
       expect(deps.writeSession).not.toHaveBeenCalled()
+    })
+
+    it('sends the display name, and says a too long one next to its field (AU-23)', async () => {
+      deps.session = NO_PROFILE
+      await createProfile({ username: 'ana_92', displayName: ' Ana Pérez ', accepted: true })
+      expect(deps.createProfile).toHaveBeenCalledWith('ana_92', 'es', 'Ana Pérez')
+      expect(
+        await createProfile({ username: 'ana_92', displayName: 'x'.repeat(51), accepted: true }),
+      ).toMatchObject({ fieldErrors: { displayName: ['auth.fields.displayName.long'] } })
+      deps.createProfile.mockResolvedValue({ ok: false, reason: 'displayNameTooLong' })
+      expect(
+        await createProfile({ username: 'ana_92', displayName: 'Ana', accepted: true }),
+      ).toMatchObject({ fieldErrors: { displayName: ['auth.fields.displayName.long'] } })
     })
 
     it('does nothing when the username was already chosen', async () => {

@@ -33,6 +33,26 @@ const TOKENS = {
 }
 
 describe('createSupabaseAuth (specs/auth design.md § 2)', () => {
+  it('keeps the name Google gave, trimmed (design.md § 16)', async () => {
+    for (const [metadata, name] of [
+      [{ full_name: ' Ana Pérez ' }, 'Ana Pérez'],
+      [{ name: 'Ana' }, 'Ana'],
+      [{ full_name: '  ' }, null],
+      [{ full_name: 7 }, null],
+    ] as const) {
+      const auth = createSupabaseAuth({
+        url: 'https://project.supabase.co',
+        anonKey: 'anon',
+        fetch: answer(200, {
+          ...TOKENS,
+          user: { id: USER_ID, email: null, user_metadata: metadata },
+        }),
+        timeoutMs: 1000,
+      })
+      expect(await auth.exchangeCode('code', 'verifier')).toMatchObject({ tokens: { name } })
+    }
+  })
+
   it('keeps the photo Google gave, and ignores one that is not text (design.md § 15)', async () => {
     const photo = 'https://lh3.googleusercontent.com/a/x=s96-c'
     for (const [metadata, photoUrl] of [
@@ -66,6 +86,7 @@ describe('createSupabaseAuth (specs/auth design.md § 2)', () => {
         userId: USER_ID,
         email: 'a@b.co',
         photoUrl: null,
+        name: null,
       },
     })
     const [url, init] = vi.mocked(fetchImpl).mock.calls[0]!
