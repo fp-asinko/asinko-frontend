@@ -6,7 +6,7 @@
 
 - **Pendiente ahora:** una pregunta sobre los slugs de los activos, y lo que espera una decisión de producto (P-026, P-023 y la fórmula de `best`, P-014).
 - **Fase 3 del backend:** los logros (P-030) y los widgets de los grupos (P-028, P-029). En el front ya se ven, contra mocks; el backend los implementa más adelante.
-- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033), Explore con sesión (P-034), saber si un username está libre mientras se escribe (P-035) y borrar una cuenta sin dejar el perfil huérfano (P-036).
+- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033), Explore con sesión (P-034), saber si un username está libre mientras se escribe (P-035), borrar una cuenta sin dejar el perfil huérfano (P-036) y que `POST /users` guarde lo que dice el contrato (P-037).
 
 **Verificado contra el deploy de `dev` el 2026-10-21** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 10 de 10 en verde, solo lecturas, cada respuesta con el mismo esquema que usa el mock. Además de lo de antes:
 
@@ -202,6 +202,19 @@ Medido contra `dev` el 2026-10-30.
 **Pregunta:** ¿el username de una cuenta borrada se reserva un año, como uno cambiado (`SlugHistory`)? Hoy queda libre al instante. Reservarlo evita que alguien se haga pasar por la cuenta borrada en los links y las menciones viejas. Liberarlo permite volver a crear la cuenta con el mismo nombre. Es una decisión de producto.
 
 **Mientras tanto, en `dev`:** para volver a probar el registro con una cuenta ya usada, se borra el usuario en Supabase Auth y se elige otro username. El perfil viejo queda huérfano.
+
+### P-037: `POST /users` guarda los campos que dice el contrato
+
+**Estado:** propuesta (2026-10-30), encontrada al probar `specs/auth` con Google: el nombre del paso 2 no se guardaba. El front ya lo resolvió por su lado; no hace falta mock.
+
+**Motivo:** E01 dice que `POST /users` acepta, además de lo listado, "cualquier otro campo client-safe de `User`/`Profile`". Pero `createUserProfile` (`asinko-app` `dev` en `9924924`) guarda solo `username`, `countryCode`, `language`, `avatarUrl`, `bio` e `isPublic`. El resto, como `displayName`, se ignora sin error, y el `201` dice que salió bien.
+
+**Mientras tanto, en el front:** el nombre se manda con `PATCH /users/{userId}` apenas se crea el perfil. Son dos pedidos, y si el segundo falla, el perfil queda sin nombre hasta que se reintenta.
+
+**Cambio**, una de dos:
+
+1. **(Preferida)** `POST /users` guarda también `displayName`, con las mismas reglas que `PATCH`: hasta 50 caracteres (`422 DISPLAY_NAME_TOO_LONG`) y `null` si es igual al username. Con eso, el front vuelve a un solo pedido.
+2. Corregir E01: listar exactamente lo que guarda, y responder `422` a un campo que no acepta, en lugar de ignorarlo.
 
 ## Fase 3 del backend: solo visual en el front
 
