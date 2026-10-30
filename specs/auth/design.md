@@ -158,3 +158,15 @@ Reemplaza la navegación a `/welcome` de § 11.
 - El recorte de `communities` (`ImageCropper`) se partió: el marco con el zoom pasó a `components/molecules/crop-frame.tsx` (`CropFrame`), que usan "Editar perfil" y la bienvenida. Lo de cada uno (subir y guardar en el perfil, o devolver la foto al formulario) queda en su feature.
 - **Zoom hacia afuera:** `CropFrame` va de 0,5 a 3. Debajo de 1, la imagen se mueve libre dentro del marco (`restrictPosition` solo desde 1).
 - `cropImage` dibuja solo la parte del área que cae dentro de la imagen, en su lugar, y pinta el resto de blanco: nunca transparente, porque el respaldo JPEG lo volvería negro.
+
+## 14. Cambio del PO (2026-10-30): tu foto en la barra y en la caja de publicar
+
+- La cookie de sesión guarda `avatarUrl` (opcional) junto al username. `getViewer()` la devuelve filtrada por `allowedImageUrl`; la barra, los comentarios y la caja de publicar la muestran en vez de las iniciales.
+- Se escribe en tres momentos, sin pedidos extra por página:
+  - al entrar: `findProfile` (antes `findUsername`) ya pide el perfil y toma también la foto;
+  - al subirla en el paso 2: `setAvatar` guarda la URL que devuelve `PATCH /users/{id}` (el backend la re-codifica, P-021);
+  - al cambiarla o quitarla en "Editar perfil": `updateProfile` hace lo mismo con su respuesta.
+- `setSessionAvatar(url)` (`lib/auth/session.ts`) reescribe la cookie; sin sesión no hace nada.
+- Limitación conocida: si la foto se cambia desde otro dispositivo, este la actualiza recién al volver a entrar.
+- **Arreglo en el mismo cambio:** `createProfile` y `setAvatar` ya no vuelven a dibujar la página (`revalidatePath`). En `/welcome`, hacerlo apenas se creaba el perfil disparaba la redirección de la página (la cuenta ya estaba lista) y la foto no llegaba a subirse. Ahora lo hace quien usa el formulario al terminar: el modal con `router.refresh()` antes de cerrarse, y `/welcome` con su navegación completa a `next`.
+- **Mocks:** con `API_MOCKS=true`, subir la foto (`POST /uploads/avatar`) y `PATCH /users/{id}` aceptan al usuario del Bearer simulado (`mockCaller`), no solo al demo: una cuenta creada en el e2e sube su foto como en el backend real.

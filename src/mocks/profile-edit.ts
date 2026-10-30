@@ -43,10 +43,14 @@ const error = (status: number, code: string): MockResponse => ({
   body: { error: { code, message: 'mock' } },
 })
 
-export function updateUser(userId: string, body: unknown): MockResponse {
+export function updateUser(
+  userId: string,
+  body: unknown,
+  caller: string = DEMO_USER.id,
+): MockResponse {
   const input = (body ?? {}) as Record<string, unknown>
   // The backend compares the path's userId with the session's (self only).
-  if (userId !== DEMO_USER.id) return error(403, 'USER_MISMATCH')
+  if (userId !== caller) return error(403, 'USER_MISMATCH')
   if (input.bio !== undefined && typeof input.bio !== 'string') {
     return error(422, 'VALIDATION_ERROR')
   }

@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { setSessionAvatar } from '@/lib/auth/session'
 import { MAX_UPLOAD_BYTES } from '@/lib/prepare-image'
 import type { ActionResult } from '@/lib/result'
 import { getViewer } from '@/lib/session'
@@ -30,9 +30,10 @@ export async function setAvatar(form: FormData): Promise<ActionResult<null>> {
     body: file,
     contentType,
   })
-  if (!uploaded.ok || !(await saveAvatar(viewer.id, uploaded.data.imageUrl))) {
-    return { ok: false, error: 'auth.errors.photoUpload' }
-  }
-  revalidatePath('/', 'layout')
+  const saved = uploaded.ok ? await saveAvatar(viewer.id, uploaded.data.imageUrl) : null
+  if (!saved) return { ok: false, error: 'auth.errors.photoUpload' }
+  // Its own avatar shows it at once (design.md § 14).
+  await setSessionAvatar(saved)
+  // The form's caller renders the page again when done (as createProfile).
   return { ok: true, data: null }
 }

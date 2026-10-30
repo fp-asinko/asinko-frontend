@@ -7,7 +7,9 @@ const ME = '00000000-0000-4000-8000-000000000100'
 const deps = vi.hoisted(() => ({
   viewer: null as { id: string; username: string } | null,
   updateProfileAs: vi.fn(),
+  setSessionAvatar: vi.fn(),
 }))
+vi.mock('@/lib/auth/session', () => ({ setSessionAvatar: deps.setSessionAvatar }))
 vi.mock('@/lib/session', () => ({ getViewer: async () => deps.viewer }))
 vi.mock('../lib/profile-api', () => ({ updateProfileAs: deps.updateProfileAs }))
 
@@ -83,7 +85,16 @@ describe('updateProfile (PE-03 to PE-06, PP-08, PP-09)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     deps.viewer = { id: ME, username: 'demo' }
-    deps.updateProfileAs.mockResolvedValue({ ok: true, data: null })
+    deps.updateProfileAs.mockResolvedValue({ ok: true, data: { avatarUrl: null } })
+  })
+
+  it('a new photo goes to the session too: your own avatar shows it (specs/auth design.md § 14)', async () => {
+    deps.updateProfileAs.mockResolvedValue({ ok: true, data: { avatarUrl: '/kept.webp' } })
+    expect(await updateProfile({ avatarUrl: '/sent.webp' })).toEqual({ ok: true, data: null })
+    expect(deps.setSessionAvatar).toHaveBeenCalledWith('/kept.webp')
+    deps.setSessionAvatar.mockClear()
+    await updateProfile({ bio: 'Rates.' })
+    expect(deps.setSessionAvatar).not.toHaveBeenCalled()
   })
 
   it('saves what changed as the viewer of the session, never as someone the form says', async () => {

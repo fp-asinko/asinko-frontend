@@ -40,17 +40,24 @@ export type FeedState =
 export function FeedTop({
   params,
   viewerName,
+  viewerAvatarUrl = null,
   chip,
 }: {
   params: FeedParams
   viewerName: string | null
+  /** The viewer's own photo (specs/auth design.md § 14). */
+  viewerAvatarUrl?: string | null
   /** The community chip, streamed on its own (specs/feed-navigation § 2). */
   chip?: ReactNode
 }) {
   return (
     <>
       {/* Filtered by a community (the chip): "Create" takes it along (specs/submit-page). */}
-      <ComposerPlaceholder viewerName={viewerName} communitySlug={params.community} />
+      <ComposerPlaceholder
+        viewerName={viewerName}
+        viewerAvatarUrl={viewerAvatarUrl}
+        communitySlug={params.community}
+      />
       <div className="px-2 pt-4 sm:px-0">
         <FeedTabs params={params} />
         <FeedFilters params={params} chip={chip} />

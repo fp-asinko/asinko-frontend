@@ -25,6 +25,7 @@ export async function HomeFeed({ searchParams }: { searchParams: Promise<unknown
       <FeedTop
         params={params}
         viewerName={viewer?.username ?? null}
+        viewerAvatarUrl={viewer?.avatarUrl ?? null}
         chip={
           filtered && (
             <Suspense key={key} fallback={<CommunityChipSkeleton />}>

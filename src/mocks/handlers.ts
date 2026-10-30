@@ -32,6 +32,7 @@ import {
   type RawFeedReason,
 } from '@/lib/api/contract'
 import { noContentSchema, paginatedSchema } from '@/lib/api/schemas'
+import { mockCaller } from './auth'
 import { DEMO_USER } from './demo-user'
 import { AD_EVERY, randomAds } from './fixtures/ads'
 import { GLOSSARY_EVERY, randomGlossary } from './fixtures/glossary'
@@ -472,7 +473,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     implemented: true,
     schema: userSchema,
     example: { ...noRequest, params: { userId: DEMO_USER.id }, body: { bio: 'Macro and rates.' } },
-    handler: ({ params, body }) => updateUser(params.userId ?? '', body),
+    handler: ({ params, body, accessToken }) =>
+      updateUser(params.userId ?? '', body, mockCaller(accessToken)),
   },
 
   // E12: a person's theses, the newest first (specs/profile-track-record). No liveExample: the
@@ -649,7 +651,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       ...noRequest,
       body: { userId: DEMO_USER.id, contentType: 'image/webp', size: 40_000 },
     },
-    handler: ({ body }) => signProfileImageUpload('avatar', body),
+    handler: ({ body, accessToken }) =>
+      signProfileImageUpload('avatar', body, mockCaller(accessToken)),
   },
   {
     method: 'POST',

@@ -1,10 +1,12 @@
 import 'server-only'
 import { cookies } from 'next/headers'
 import { env } from '@/env'
+import { allowedImageUrl } from '@/lib/images'
 import { DEMO_USER } from '@/mocks/demo-user'
 import { readSession } from './auth/session'
 
-export type Viewer = { id: string; username: string }
+/** avatarUrl: the account's photo, only for its own avatar (specs/auth design.md § 14). */
+export type Viewer = { id: string; username: string; avatarUrl?: string | null }
 
 /** Who is looking: nobody, an account still choosing its username (AU-11), or a user. */
 export type AccountState = 'guest' | 'needs-profile' | 'ready'
@@ -23,7 +25,11 @@ export const MOCK_GUEST_COOKIE = 'asinko-mock-guest' // also in lib/auth/session
  */
 export async function getViewer(): Promise<Viewer | null> {
   const session = await readSession()
-  if (session) return session.username ? { id: session.userId, username: session.username } : null
+  if (session) {
+    if (!session.username) return null
+    const avatarUrl = allowedImageUrl(session.avatarUrl ?? null)
+    return { id: session.userId, username: session.username, avatarUrl }
+  }
   if (env.API_MOCKS === 'all') {
     const guest = (await cookies()).get(MOCK_GUEST_COOKIE)?.value === '1'
     return guest ? null : DEMO_USER

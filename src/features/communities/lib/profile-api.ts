@@ -90,7 +90,7 @@ const isProposed = (key: string) => PROPOSED.includes(key)
 export async function updateProfileAs(
   userId: string,
   changes: EditProfileChanges,
-): Promise<ApiResult<null>> {
+): Promise<ApiResult<{ avatarUrl: string | null }>> {
   const { countryCode, ...rest } = changes
   const body: Record<string, unknown> = {
     ...rest,
@@ -99,6 +99,8 @@ export async function updateProfileAs(
   const proposed = Object.fromEntries(Object.entries(body).filter(([key]) => isProposed(key)))
   const known = Object.fromEntries(Object.entries(body).filter(([key]) => !(key in proposed)))
 
+  // The photo the profile keeps: the backend re-encodes it, the URL changes (P-021).
+  let avatarUrl: string | null = null
   for (const part of [known, proposed]) {
     if (Object.keys(part).length === 0) continue
     const result = await apiRequest({
@@ -109,6 +111,7 @@ export async function updateProfileAs(
       schema: userSchema,
     })
     if (!result.ok) return result
+    avatarUrl = result.data.avatarUrl
   }
-  return { ok: true, data: null }
+  return { ok: true, data: { avatarUrl } }
 }

@@ -164,6 +164,8 @@ describe('auth actions (specs/auth design.md § 6)', () => {
         username: 'ana_92',
         suggestion: null,
       })
+      // The photo may follow: the caller renders the page again when everything is done.
+      expect(deps.revalidatePath).not.toHaveBeenCalled()
     })
 
     it('says a taken username next to its field', async () => {

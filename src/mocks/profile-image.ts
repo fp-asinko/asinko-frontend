@@ -17,8 +17,9 @@ export const MOCK_PROFILE_IMAGES = {
 export function signProfileImageUpload(
   kind: keyof typeof MOCK_PROFILE_IMAGES,
   body: unknown,
+  caller: string = DEMO_USER.id,
 ): MockResponse {
-  const signed = signPostImageUpload(body)
+  const signed = signPostImageUpload(body, caller)
   if (signed.status !== 200) return signed
   const path = `${DEMO_USER.id}/${kind}.webp`
   return {

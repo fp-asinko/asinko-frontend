@@ -14,8 +14,12 @@ const tokens = (accessToken: string, userId = USER_ID) => ({
   email: null,
 })
 // Expires in 30 s: inside the margin.
-const expiring = sessionFromTokens({ ...tokens('old'), expiresIn: 30 }, 'maria', NOW)
-const fresh = sessionFromTokens(tokens('fresh'), 'maria', NOW)
+const expiring = sessionFromTokens(
+  { ...tokens('old'), expiresIn: 30 },
+  { username: 'maria', avatarUrl: null },
+  NOW,
+)
+const fresh = sessionFromTokens(tokens('fresh'), { username: 'maria', avatarUrl: null }, NOW)
 
 const authAnswering = (result: AuthResult) => ({ refresh: vi.fn(async () => result) })
 

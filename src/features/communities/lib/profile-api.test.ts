@@ -129,7 +129,7 @@ describe('updateProfileAs (specs/profile-edit PE-03, specs/profile-presentation 
   it("saves the viewer's profile and the page shows it; empty removes it", async () => {
     expect(await updateProfileAs(DEMO_USER.id, { bio: 'Macro and rates.' })).toEqual({
       ok: true,
-      data: null,
+      data: { avatarUrl: null },
     })
     expect(await getProfileDetails('demo')).toMatchObject({ data: { bio: 'Macro and rates.' } })
     await updateProfileAs(DEMO_USER.id, { bio: '', headline: 'Rates', links: ['https://x.com/d'] })

@@ -37,7 +37,7 @@ const TOKENS = {
   userId: USER_ID,
   email: 'maria@example.com',
 }
-const SESSION: Session = sessionFromTokens(TOKENS, 'maria', 1_000)
+const SESSION: Session = sessionFromTokens(TOKENS, { username: 'maria', avatarUrl: null }, 1_000)
 
 describe('session cookie (specs/auth design.md § 3)', () => {
   it('keeps both tokens, the user and when the access token expires', () => {
@@ -101,7 +101,7 @@ describe('the session on the server (AU-15 to AU-17)', () => {
     expect(await getAccessToken()).toBeNull()
 
     jar.values.set(SESSION_COOKIE, JSON.stringify(SESSION))
-    expect(await getViewer()).toEqual({ id: USER_ID, username: 'maria' })
+    expect(await getViewer()).toEqual({ id: USER_ID, username: 'maria', avatarUrl: null })
     expect(await getAccountState()).toBe('ready')
     expect(await getAccessToken()).toBe('access')
   })
@@ -121,7 +121,29 @@ describe('the session on the server (AU-15 to AU-17)', () => {
     jar.values.set(MOCK_GUEST_COOKIE, '1')
     expect(await getViewer()).toBeNull()
     jar.values.set(SESSION_COOKIE, JSON.stringify(SESSION))
-    expect(await getViewer()).toEqual({ id: USER_ID, username: 'maria' })
+    expect(await getViewer()).toEqual({ id: USER_ID, username: 'maria', avatarUrl: null })
+  })
+
+  it('keeps the photo for your own avatar, only from an allowed host (design.md § 14)', async () => {
+    const { setSessionAvatar } = await import('./session')
+    const { getViewer } = await import('@/lib/session')
+    const photo = 'https://hqarefesoovfmibncivu.supabase.co/storage/v1/object/public/avatars/a.webp'
+    jar.values.set(SESSION_COOKIE, JSON.stringify(SESSION))
+    await setSessionAvatar(photo)
+    expect(await getViewer()).toMatchObject({ username: 'maria', avatarUrl: photo })
+    await setSessionAvatar('https://evil.example/a.png')
+    expect(await getViewer()).toMatchObject({ avatarUrl: null })
+    await setSessionAvatar(null)
+    expect(await getViewer()).toMatchObject({ avatarUrl: null })
+    expect(sessionFromTokens(TOKENS, { username: 'maria', avatarUrl: photo }, 1_000)).toMatchObject(
+      { avatarUrl: photo },
+    )
+  })
+
+  it('without a session, a new photo changes nothing', async () => {
+    const { setSessionAvatar, readSession } = await import('./session')
+    await setSessionAvatar('/a.webp')
+    expect(await readSession()).toBeNull()
   })
 
   it('clears the session', async () => {

@@ -30,10 +30,13 @@ const ICON =
  */
 export function ComposerPlaceholder({
   viewerName,
+  viewerAvatarUrl = null,
   communityHandle,
   communitySlug,
 }: {
   viewerName: string | null
+  /** The viewer's own photo; without one, the initials (specs/auth design.md § 14). */
+  viewerAvatarUrl?: string | null
   communityHandle?: string
   /** The community of the page: "Create" takes it along. */
   communitySlug?: string
@@ -56,6 +59,7 @@ export function ComposerPlaceholder({
         <div className="flex items-center gap-3 @[39rem]:min-w-0 @[39rem]:flex-1">
           <UserAvatar
             name={viewerName ?? '?'}
+            imageUrl={viewerName ? viewerAvatarUrl : null}
             tone={viewerName ? 'identity' : 'neutral'}
             size="md"
             className="size-10"

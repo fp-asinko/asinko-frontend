@@ -25,6 +25,8 @@ const sessionSchema = z.object({
   expiresAt: z.number().int(),
   /** Without a username: the one the welcome screen suggests (design.md § 11). */
   suggestion: z.string().nullish(),
+  /** The account's photo, for its own avatar in the bar and the composer (design.md § 14). */
+  avatarUrl: z.string().nullish(),
 })
 
 export type Session = z.infer<typeof sessionSchema>
@@ -44,18 +46,22 @@ export function serializeSession(session: Session): string {
   return JSON.stringify(session)
 }
 
+/** What the session keeps of the account's profile: null while it has none (AU-09, AU-11). */
+export type SessionProfile = { username: string; avatarUrl: string | null }
+
 export function sessionFromTokens(
   tokens: AuthTokens,
-  username: string | null,
+  profile: SessionProfile | null,
   now = Date.now(),
 ): Session {
   return {
     accessToken: tokens.accessToken,
     refreshToken: tokens.refreshToken,
     userId: tokens.userId,
-    username,
+    username: profile?.username ?? null,
     expiresAt: now + tokens.expiresIn * 1000,
-    ...(username ? {} : { suggestion: suggestUsername(tokens.email) }),
+    ...(profile ? {} : { suggestion: suggestUsername(tokens.email) }),
+    ...(profile?.avatarUrl ? { avatarUrl: profile.avatarUrl } : {}),
   }
 }
 

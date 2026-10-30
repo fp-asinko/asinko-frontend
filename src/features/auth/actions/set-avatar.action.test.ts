@@ -5,11 +5,12 @@ const deps = vi.hoisted(() => ({
   viewer: null as { id: string; username: string } | null,
   uploadSignedImage: vi.fn(),
   saveAvatar: vi.fn(),
+  setSessionAvatar: vi.fn(),
 }))
 vi.mock('@/lib/session', () => ({ getViewer: async () => deps.viewer }))
 vi.mock('@/lib/uploads/signed-image-upload', () => ({ uploadSignedImage: deps.uploadSignedImage }))
 vi.mock('../lib/profile-api', () => ({ saveAvatar: deps.saveAvatar }))
-vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
+vi.mock('@/lib/auth/session', () => ({ setSessionAvatar: deps.setSessionAvatar }))
 
 const { setAvatar } = await import('./set-avatar.action')
 
@@ -26,7 +27,7 @@ describe('setAvatar (specs/auth AU-21)', () => {
     vi.clearAllMocks()
     deps.viewer = { id: 'user-1', username: 'ana_perez' }
     deps.uploadSignedImage.mockResolvedValue({ ok: true, data: { imageUrl: 'https://img/a.webp' } })
-    deps.saveAvatar.mockResolvedValue(true)
+    deps.saveAvatar.mockResolvedValue('https://img/kept.webp')
   })
 
   it('uploads the photo for the session user and saves its URL in the profile', async () => {
@@ -36,6 +37,8 @@ describe('setAvatar (specs/auth AU-21)', () => {
       expect.objectContaining({ userId: 'user-1', contentType: 'image/webp' }),
     )
     expect(deps.saveAvatar).toHaveBeenCalledWith('user-1', 'https://img/a.webp')
+    // The URL the profile keeps, for its own avatar in the bar (design.md § 14).
+    expect(deps.setSessionAvatar).toHaveBeenCalledWith('https://img/kept.webp')
   })
 
   it('needs a profile', async () => {
@@ -58,7 +61,8 @@ describe('setAvatar (specs/auth AU-21)', () => {
   it('says the upload failed when uploading or saving fails', async () => {
     deps.uploadSignedImage.mockResolvedValueOnce({ ok: false, error: 'upload' })
     expect(await setAvatar(form(WEBP))).toEqual({ ok: false, error: 'auth.errors.photoUpload' })
-    deps.saveAvatar.mockResolvedValueOnce(false)
+    deps.saveAvatar.mockResolvedValueOnce(null)
     expect(await setAvatar(form(WEBP))).toEqual({ ok: false, error: 'auth.errors.photoUpload' })
+    expect(deps.setSessionAvatar).not.toHaveBeenCalled()
   })
 })

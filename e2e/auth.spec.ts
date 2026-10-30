@@ -89,6 +89,10 @@ test.describe('Log in and sign up (specs/auth)', () => {
     await page.getByRole('main').getByRole('button', { name: 'Continue', exact: true }).click()
     await expect(page).toHaveURL(/\/en$/)
     await signedIn(page)
+    // Your own photo right away, not the initials (design.md § 14).
+    await expect(
+      page.getByRole('main').getByTestId('user-avatar').first().locator('img'),
+    ).toBeVisible()
   })
 
   test('logs in with email and password, and logs out from "⋯" (AU-02, AU-14)', async ({

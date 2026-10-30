@@ -33,8 +33,11 @@ export async function createProfile(
   return { ok: false, reason: reason ?? 'unavailable' }
 }
 
-/** Saves the photo just uploaded in the new profile (AU-21): E01, PATCH /users/{id}. */
-export async function saveAvatar(userId: string, avatarUrl: string): Promise<boolean> {
+/**
+ * Saves the photo just uploaded in the new profile (AU-21): E01, PATCH /users/{id}. The URL it
+ * keeps (the backend re-encodes the image, P-021), or null when it failed.
+ */
+export async function saveAvatar(userId: string, avatarUrl: string): Promise<string | null> {
   const result = await apiRequest({
     method: 'PATCH',
     path: '/api/v1/users/:userId',
@@ -42,5 +45,5 @@ export async function saveAvatar(userId: string, avatarUrl: string): Promise<boo
     schema: userSchema.pick({ avatarUrl: true }),
     body: { avatarUrl },
   })
-  return result.ok
+  return result.ok ? result.data.avatarUrl : null
 }

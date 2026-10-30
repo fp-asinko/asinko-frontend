@@ -41,7 +41,8 @@ describe('profile-api (specs/auth design.md § 6)', () => {
 
   it('saves the uploaded photo in the profile (AU-21)', async () => {
     api.apiRequest.mockResolvedValueOnce({ ok: true, data: { avatarUrl: 'https://img/a.webp' } })
-    expect(await saveAvatar('user-1', 'https://img/a.webp')).toBe(true)
+    // The URL the profile keeps (the backend re-encodes it, P-021).
+    expect(await saveAvatar('user-1', 'https://img/a.webp')).toBe('https://img/a.webp')
     expect(api.apiRequest).toHaveBeenCalledWith(
       expect.objectContaining({
         method: 'PATCH',
@@ -50,6 +51,6 @@ describe('profile-api (specs/auth design.md § 6)', () => {
       }),
     )
     api.apiRequest.mockResolvedValueOnce(expected('INVALID', 422))
-    expect(await saveAvatar('user-1', 'x')).toBe(false)
+    expect(await saveAvatar('user-1', 'x')).toBeNull()
   })
 })

@@ -35,6 +35,15 @@ export function mockTokenUser(accessToken: string | null | undefined): string | 
   return accessToken.slice(ACCESS_PREFIX.length).split('.')[0] ?? null
 }
 
+/**
+ * Who writes, for the routes that compare the userId with the session: the simulated account of
+ * the Bearer, else the demo user (no session with every route mocked). An account created in the
+ * e2e can then upload its photo and edit its profile (specs/auth design.md § 14).
+ */
+export function mockCaller(accessToken: string | null | undefined): string {
+  return mockTokenUser(accessToken) ?? DEMO_USER.id
+}
+
 function session(userId: string, email: string | null = emailOf(userId)) {
   const nonce = crypto.randomUUID()
   return {

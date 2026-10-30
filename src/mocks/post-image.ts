@@ -15,10 +15,10 @@ const MAX_BYTES = 5 * 1024 * 1024
  * POST /uploads/post-image as the backend (P-013, 2026-10-13): the demo user, JPEG, PNG, WebP or
  * GIF (never SVG), up to 5 MB; else 422. The upload URL is a placeholder nobody PUTs to.
  */
-export function signPostImageUpload(body: unknown): MockResponse {
+export function signPostImageUpload(body: unknown, caller: string = DEMO_USER.id): MockResponse {
   const input = (body ?? {}) as Record<string, unknown>
   const invalid = { status: 422, body: { error: { code: 'VALIDATION_ERROR', message: 'mock' } } }
-  if (input.userId !== DEMO_USER.id) {
+  if (input.userId !== caller) {
     return { status: 403, body: { error: { code: 'USER_MISMATCH', message: 'mock' } } }
   }
   if (typeof input.contentType !== 'string' || !TYPES.has(input.contentType)) return invalid

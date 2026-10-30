@@ -101,7 +101,11 @@ export default async function LocaleLayout({ children, right, params }: LayoutPr
             <AuthGateProvider
               signedIn={signedIn}
               needsProfile={needsProfile}
-              viewerAvatar={viewer && <UserAvatar name={viewer.username} size="xs" />}
+              viewerAvatar={
+                viewer && (
+                  <UserAvatar name={viewer.username} imageUrl={viewer.avatarUrl} size="xs" />
+                )
+              }
               // Log in and sign up inside the modal, and log out (specs/auth AU-01, AU-14).
               forms={<AuthGateForms suggestion={(await readSession())?.suggestion ?? null} />}
               logOut={logOut}

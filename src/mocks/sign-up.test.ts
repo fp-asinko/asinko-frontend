@@ -39,3 +39,22 @@ describe('the mocked POST /users (specs/auth design.md § 9)', () => {
     )
   })
 })
+
+describe('a new mocked account writes as itself (specs/auth design.md § 14)', () => {
+  it('uploads its photo and saves it in its own profile, never in another', async () => {
+    const { signProfileImageUpload } = await import('./profile-image')
+    const { updateUser } = await import('./profile-edit')
+    const { mockCaller } = await import('./auth')
+    const { id, accessToken } = token()
+    createMockProfile({ ...noRequest, body: body(`pic_${id.slice(0, 8)}`), accessToken })
+    const caller = mockCaller(accessToken)
+    expect(caller).toBe(id)
+
+    const upload = { userId: id, contentType: 'image/webp', size: 1_000 }
+    expect(signProfileImageUpload('avatar', upload, caller).status).toBe(200)
+    expect(signProfileImageUpload('avatar', upload).status).toBe(403)
+    const saved = updateUser(id, { avatarUrl: '/mocks/avatar-demo.svg' }, caller)
+    expect(saved).toMatchObject({ status: 200, body: { avatarUrl: '/mocks/avatar-demo.svg' } })
+    expect(updateUser(PROFILES[0]!.id, { bio: 'x' }, caller).status).toBe(403)
+  })
+})

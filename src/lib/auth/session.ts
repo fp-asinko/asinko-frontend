@@ -38,6 +38,16 @@ export async function writeSession(session: Session): Promise<void> {
   jar.set(SESSION_COOKIE, serializeSession(session), sessionCookieOptions(secureCookies()))
 }
 
+/**
+ * The account's new photo in its session (design.md § 14), after saving it in the profile: its own
+ * avatar shows it at once. Only from a Server Action.
+ */
+export async function setSessionAvatar(avatarUrl: string | null): Promise<void> {
+  const session = await readSession()
+  if (!session) return
+  await writeSession({ ...session, avatarUrl })
+}
+
 /** Only from a Server Action or a Route Handler. */
 export async function clearSession(): Promise<void> {
   const jar = await cookies()

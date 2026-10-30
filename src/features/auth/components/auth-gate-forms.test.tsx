@@ -14,7 +14,8 @@ const actions = vi.hoisted(() => ({ logIn: vi.fn(), signUp: vi.fn(), logOut: vi.
 vi.mock('../actions/log-in.action', () => ({ logIn: actions.logIn }))
 vi.mock('../actions/sign-up.action', () => ({ signUp: actions.signUp }))
 vi.mock('../actions/log-out.action', () => ({ logOut: actions.logOut }))
-vi.mock('../actions/create-profile.action', () => ({ createProfile: vi.fn() }))
+const profile = vi.hoisted(() => ({ createProfile: vi.fn() }))
+vi.mock('../actions/create-profile.action', () => ({ createProfile: profile.createProfile }))
 vi.mock('../actions/set-avatar.action', () => ({ setAvatar: vi.fn() }))
 
 function OpenLogIn() {
@@ -59,6 +60,17 @@ describe('the forms in the modal (specs/auth AU-01, AU-02, AU-11)', () => {
     ).toBeInTheDocument()
     expect(await screen.findByLabelText('Username', {}, { timeout: 5000 })).toHaveValue('ana_perez')
     expect(router.push).not.toHaveBeenCalled()
+  })
+
+  it('renders the page again with the new profile, then closes (design.md § 14)', async () => {
+    actions.logIn.mockResolvedValue({ ok: true, data: { needsProfile: true, suggestion: 'ana' } })
+    profile.createProfile.mockResolvedValue({ ok: true, data: { username: 'ana' } })
+    await logInThroughTheModal()
+    await screen.findByLabelText('Username', {}, { timeout: 5000 })
+    await userEvent.click(screen.getByRole('checkbox', { name: /I’m 18 or older/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    await vi.waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    expect(router.refresh).toHaveBeenCalledOnce()
   })
 
   it('is nothing outside the modal', () => {

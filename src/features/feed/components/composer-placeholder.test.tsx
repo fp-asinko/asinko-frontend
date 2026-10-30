@@ -26,6 +26,19 @@ describe('ComposerPlaceholder (H-09; specs/submit-page SU-02, Q1)', () => {
     )
   })
 
+  it('shows your own photo, or your initials without one (specs/auth design.md § 14)', () => {
+    const { container, unmount } = renderWithIntl(
+      <ComposerPlaceholder viewerName="demo" viewerAvatarUrl="/me.webp" />,
+    )
+    expect(container.querySelector('[data-testid="user-avatar"] img')).toHaveAttribute(
+      'src',
+      expect.stringContaining('me.webp'),
+    )
+    unmount()
+    renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
+    expect(screen.getByTestId('user-avatar')).toHaveTextContent('DE')
+  })
+
   it('says where the post goes on a community, and the page arrives with it chosen', () => {
     renderWithIntl(
       <ComposerPlaceholder viewerName="demo" communityHandle="#defi" communitySlug="defi" />,

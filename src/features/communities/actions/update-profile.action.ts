@@ -1,6 +1,7 @@
 'use server'
 
 import { z } from 'zod'
+import { setSessionAvatar } from '@/lib/auth/session'
 import type { ActionResult } from '@/lib/result'
 import { getViewer } from '@/lib/session'
 import { updateProfileAs } from '../lib/profile-api'
@@ -36,7 +37,12 @@ export async function updateProfile(raw: unknown): Promise<ActionResult<null>> {
   if (!viewer) return { ok: false, error: 'api.errors.UNAUTHENTICATED' }
 
   const result = await updateProfileAs(viewer.id, parsed.data)
-  if (result.ok) return result
+  if (result.ok) {
+    // A new or removed photo: your own avatar in the bar and the composer follows (specs/auth
+    // design.md § 14).
+    if (parsed.data.avatarUrl !== undefined) await setSessionAvatar(result.data.avatarUrl)
+    return { ok: true, data: null }
+  }
   const field = FIELD_ERRORS[result.code]
   return field
     ? { ok: false, error: field[1], fieldErrors: { [field[0]]: [field[1]] } }
