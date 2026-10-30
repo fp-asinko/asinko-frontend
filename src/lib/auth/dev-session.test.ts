@@ -59,6 +59,7 @@ describe('dev session (specs/dev-login, specs/auth AU-17)', () => {
       expiresIn: 3600,
       userId: USER_ID,
       email: null,
+      photoUrl: null,
     })
   })
 

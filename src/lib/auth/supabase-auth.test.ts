@@ -33,6 +33,27 @@ const TOKENS = {
 }
 
 describe('createSupabaseAuth (specs/auth design.md § 2)', () => {
+  it('keeps the photo Google gave, and ignores one that is not text (design.md § 15)', async () => {
+    const photo = 'https://lh3.googleusercontent.com/a/x=s96-c'
+    for (const [metadata, photoUrl] of [
+      [{ avatar_url: photo }, photo],
+      [{ picture: photo }, photo],
+      [{ avatar_url: 42 }, null],
+      ['broken', null],
+    ] as const) {
+      const auth = createSupabaseAuth({
+        url: 'https://project.supabase.co',
+        anonKey: 'anon',
+        fetch: answer(200, {
+          ...TOKENS,
+          user: { id: USER_ID, email: null, user_metadata: metadata },
+        }),
+        timeoutMs: 1000,
+      })
+      expect(await auth.exchangeCode('code', 'verifier')).toMatchObject({ tokens: { photoUrl } })
+    }
+  })
+
   it('signs in with the password grant and the public key, and keeps only the tokens', async () => {
     const fetchImpl = answer(200, { ...TOKENS, user: { id: USER_ID, email: 'a@b.co' } })
     const result = await withFetch(fetchImpl).signInWithPassword('a@b.co', 'secret-123')
@@ -44,6 +65,7 @@ describe('createSupabaseAuth (specs/auth design.md § 2)', () => {
         expiresIn: 3600,
         userId: USER_ID,
         email: 'a@b.co',
+        photoUrl: null,
       },
     })
     const [url, init] = vi.mocked(fetchImpl).mock.calls[0]!

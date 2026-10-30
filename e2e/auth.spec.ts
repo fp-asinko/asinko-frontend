@@ -181,15 +181,23 @@ test.describe('Log in and sign up (specs/auth)', () => {
     await expect(second).toBeVisible()
     await expect(page).toHaveURL(/\/en\/hub\/defi$/)
     await expect(second.getByLabel('Username')).toHaveValue('new_trader')
+    // The Google photo, already chosen (AU-22).
+    await expect(second.getByRole('button', { name: 'Remove' })).toBeVisible()
 
     // Closed, the bar offers only that, and it opens the step again.
     await page.keyboard.press('Escape')
     await page.getByRole('banner').getByRole('button', { name: 'Choose username' }).click()
+    await expect(second.getByRole('button', { name: 'Remove' })).toBeVisible()
     await second.getByLabel('Username').fill(freshUsername('g'))
     await second.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
     await second.getByRole('button', { name: 'Continue', exact: true }).click()
     await expect(page.getByRole('dialog')).toHaveCount(0)
     await signedIn(page)
+    // Uploaded with the profile: your own photo in the composer, not the initials.
+    await page.goto('/en')
+    await expect(
+      page.getByRole('main').getByTestId('user-avatar').first().locator('img'),
+    ).toBeVisible()
   })
 
   test('Reddit is coming soon, and Instagram and X are gone (AU-12)', async ({ page }) => {

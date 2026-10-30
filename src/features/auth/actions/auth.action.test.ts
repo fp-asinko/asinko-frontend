@@ -163,6 +163,7 @@ describe('auth actions (specs/auth design.md § 6)', () => {
         ...NO_PROFILE,
         username: 'ana_92',
         suggestion: null,
+        photoSuggestion: null,
       })
       // The photo may follow: the caller renders the page again when everything is done.
       expect(deps.revalidatePath).not.toHaveBeenCalled()

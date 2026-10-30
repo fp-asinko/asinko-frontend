@@ -9,21 +9,23 @@ Rama: `feature/auth-login`, desde `develop`. Requirements y design aprobados por
 - [x] **T-05 (M)** Google: Route Handlers `/auth/google` y `/auth/callback`, cookie del `code_verifier`. Tests. → AU-10
 - [x] **T-06 (L)** UI: formularios de log in, crear cuenta y username (diferidos); el modal con sus vistas, Google y Reddit; páginas `/login` y `/welcome`; "Cerrar sesión" en "⋯"; el estado sin perfil en el gate y la barra. Textos en en, es y pt. Tests. → AU-01 a AU-03, AU-05, AU-11, AU-12, AU-14, AU-18
 - [x] **T-07a (M)** e2e (`auth.spec.ts`), 360 px, axe, presupuesto de JS con `/login` y `/welcome`. → AU-18, AU-19
+- [x] **T-08 (S)** Cambio del PO (2026-10-30): la foto de Google en el paso 2 (design.md § 15). Tests. → AU-22
 - [ ] **T-07b (S)** Verificación a mano contra `dev` con una cuenta real (email y Google), y los cinco puntos de MVP-201. Necesita `SUPABASE_URL` y `SUPABASE_ANON_KEY` en `.env.local` y `/auth/callback` en las Redirect URLs de Supabase.
 
-| Criterio     | Test                                                   |
-| ------------ | ------------------------------------------------------ |
-| AU-01, AU-12 | `auth-gate.test.tsx`, e2e `auth.spec.ts`               |
-| AU-02, AU-07 | `auth.action.test.ts`, `auth-forms.test.tsx`, e2e      |
-| AU-03        | `next.test.ts`, e2e                                    |
-| AU-04, AU-08 | `supabase-auth.test.ts`, actions, formularios, e2e     |
-| AU-05, AU-06 | `auth.schema.test.ts`, `auth-forms.test.tsx`           |
-| AU-09, AU-11 | `auth.action.test.ts`, `auth-gate-forms.test.tsx`, e2e |
-| AU-10        | `google.test.ts`, e2e                                  |
-| AU-13        | `session.test.ts`, `refresh-session.test.ts`           |
-| AU-14        | `auth.action.test.ts`, `more-menu.test.tsx`, e2e       |
-| AU-15, AU-16 | `session.test.ts`, `api` client tests                  |
-| AU-17        | `session.test.ts` (modo mocks), `dev-session.test.ts`  |
-| AU-18        | Tests de componentes, e2e (axe, 360 px)                |
-| AU-19        | `performance.spec.ts`                                  |
-| AU-20        | `env-schema.test.ts`                                   |
+| Criterio     | Test                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------ |
+| AU-01, AU-12 | `auth-gate.test.tsx`, e2e `auth.spec.ts`                                             |
+| AU-02, AU-07 | `auth.action.test.ts`, `auth-forms.test.tsx`, e2e                                    |
+| AU-03        | `next.test.ts`, e2e                                                                  |
+| AU-04, AU-08 | `supabase-auth.test.ts`, actions, formularios, e2e                                   |
+| AU-05, AU-06 | `auth.schema.test.ts`, `auth-forms.test.tsx`                                         |
+| AU-09, AU-11 | `auth.action.test.ts`, `auth-gate-forms.test.tsx`, e2e                               |
+| AU-10        | `google.test.ts`, e2e                                                                |
+| AU-13        | `session.test.ts`, `refresh-session.test.ts`                                         |
+| AU-14        | `auth.action.test.ts`, `more-menu.test.tsx`, e2e                                     |
+| AU-15, AU-16 | `session.test.ts`, `api` client tests                                                |
+| AU-17        | `session.test.ts` (modo mocks), `dev-session.test.ts`                                |
+| AU-18        | Tests de componentes, e2e (axe, 360 px)                                              |
+| AU-19        | `performance.spec.ts`                                                                |
+| AU-20        | `env-schema.test.ts`                                                                 |
+| AU-22        | `google-photo.test.ts`, `suggested-photo.action.test.ts`, `auth-forms.test.tsx`, e2e |

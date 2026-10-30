@@ -13,15 +13,21 @@ const actions = vi.hoisted(() => ({
   createProfile: vi.fn(),
   setAvatar: vi.fn(),
   cropImage: vi.fn(),
+  prepareImage: vi.fn(),
+  getSuggestedPhoto: vi.fn(async (): Promise<{ type: string; base64: string } | null> => null),
 }))
 vi.mock('../actions/log-in.action', () => ({ logIn: actions.logIn }))
 vi.mock('../actions/sign-up.action', () => ({ signUp: actions.signUp }))
 vi.mock('../actions/create-profile.action', () => ({ createProfile: actions.createProfile }))
 vi.mock('../actions/set-avatar.action', () => ({ setAvatar: actions.setAvatar }))
+vi.mock('../actions/suggested-photo.action', () => ({
+  getSuggestedPhoto: actions.getSuggestedPhoto,
+}))
 // jsdom draws no images: the picker's preparation is the library's, tested there.
 vi.mock('@/lib/prepare-image', async (original) => ({
   ...(await original<typeof import('@/lib/prepare-image')>()),
   cropImage: actions.cropImage,
+  prepareImage: actions.prepareImage,
 }))
 // jsdom has no image decoding: a cropper that reports the area it shows.
 vi.mock('react-easy-crop', () => ({
@@ -158,6 +164,43 @@ describe('auth forms (specs/auth AU-02 to AU-11, AU-18)', () => {
       expect(actions.createProfile).toHaveBeenCalledWith({ username: 'ana_perez', accepted: true })
       expect(actions.setAvatar).not.toHaveBeenCalled()
       expect(onDone).toHaveBeenCalled()
+    })
+
+    it('back from Google, brings the Google photo already chosen, and uploads it (AU-22)', async () => {
+      actions.getSuggestedPhoto.mockResolvedValueOnce({ type: 'image/jpeg', base64: btoa('jpg') })
+      const ready = new Blob(['x'], { type: 'image/webp' })
+      actions.prepareImage.mockResolvedValueOnce({ ok: true, blob: ready, width: 400, height: 400 })
+      const onDone = vi.fn()
+      renderWithIntl(<ProfileForm suggestion="ana_perez" onDone={onDone} />)
+
+      // Prepared as a photo from the device would be, and shown with Change and Remove.
+      expect(await screen.findByRole('button', { name: 'Remove' })).toBeInTheDocument()
+      const file = actions.prepareImage.mock.calls[0]![0] as File
+      expect(file.type).toBe('image/jpeg')
+      expect(await file.text()).toBe('jpg')
+      await accept()
+      await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+      // FormData turns the Blob into a File: the same bytes, the prepared ones.
+      const sent = (actions.setAvatar.mock.calls[0]![0] as FormData).get('file') as Blob
+      expect(sent.type).toBe('image/webp')
+      expect(await sent.text()).toBe('x')
+      expect(onDone).toHaveBeenCalled()
+    })
+
+    it('removing the Google photo continues without one', async () => {
+      actions.getSuggestedPhoto.mockResolvedValueOnce({ type: 'image/jpeg', base64: btoa('jpg') })
+      actions.prepareImage.mockResolvedValueOnce({
+        ok: true,
+        blob: new Blob(['x'], { type: 'image/webp' }),
+        width: 400,
+        height: 400,
+      })
+      renderWithIntl(<ProfileForm suggestion="ana_perez" onDone={vi.fn()} />)
+      await userEvent.click(await screen.findByRole('button', { name: 'Remove' }))
+      await accept()
+      await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+      expect(actions.createProfile).toHaveBeenCalled()
+      expect(actions.setAvatar).not.toHaveBeenCalled()
     })
 
     const PHOTO_TYPE = 'Use a JPEG, PNG or WebP image'

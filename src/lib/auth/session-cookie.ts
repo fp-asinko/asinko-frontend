@@ -25,6 +25,8 @@ const sessionSchema = z.object({
   expiresAt: z.number().int(),
   /** Without a username: the one the welcome screen suggests (design.md § 11). */
   suggestion: z.string().nullish(),
+  /** Without a username: the Google photo the welcome screen offers (design.md § 15). */
+  photoSuggestion: z.string().nullish(),
   /** The account's photo, for its own avatar in the bar and the composer (design.md § 14). */
   avatarUrl: z.string().nullish(),
 })
@@ -61,6 +63,7 @@ export function sessionFromTokens(
     username: profile?.username ?? null,
     expiresAt: now + tokens.expiresIn * 1000,
     ...(profile ? {} : { suggestion: suggestUsername(tokens.email) }),
+    ...(!profile && tokens.photoUrl ? { photoSuggestion: tokens.photoUrl } : {}),
     ...(profile?.avatarUrl ? { avatarUrl: profile.avatarUrl } : {}),
   }
 }

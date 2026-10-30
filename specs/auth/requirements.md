@@ -70,6 +70,7 @@ Que cualquiera pueda crear su cuenta o entrar a Asinko, con email o con Google, 
   - mientras se encuadra, el paso muestra solo el recorte;
   - se puede quitar antes de continuar;
   - si no se pudo subir, el perfil queda creado igual y se avisa; "Continuar" lo vuelve a intentar.
+- [x] **AU-22** **Foto de Google** (PO, 2026-10-30): al entrar con Google por primera vez, la foto de la cuenta de Google viene ya elegida en el paso 2. Se puede cambiar o quitar como cualquier otra; si Google no tiene foto o no se pudo traer, el paso queda como siempre.
 
 ### Sesión
 

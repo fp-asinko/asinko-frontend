@@ -18,6 +18,8 @@ export const MOCK_TAKEN_EMAIL = 'taken@asinko.dev'
 export const MOCK_GOOGLE_CODE = { demo: 'mock-google-demo', new: 'mock-google-new' } as const
 /** The email of a new Google account: the welcome screen suggests `new_trader`. */
 export const MOCK_GOOGLE_NEW_EMAIL = 'new.trader@gmail.com'
+/** The new Google account's photo (specs/auth design.md § 15): mockGooglePhotoFetch answers it. */
+export const MOCK_GOOGLE_PHOTO = 'https://lh3.googleusercontent.com/a/mock-new-trader=s96-c'
 
 type Account = { id: string; password: string }
 
@@ -44,14 +46,18 @@ export function mockCaller(accessToken: string | null | undefined): string {
   return mockTokenUser(accessToken) ?? DEMO_USER.id
 }
 
-function session(userId: string, email: string | null = emailOf(userId)) {
+function session(
+  userId: string,
+  email: string | null = emailOf(userId),
+  avatarUrl: string | null = null,
+) {
   const nonce = crypto.randomUUID()
   return {
     access_token: `${ACCESS_PREFIX}${userId}.${nonce}`,
     refresh_token: `${REFRESH_PREFIX}${userId}.${nonce}`,
     expires_in: 3600,
     token_type: 'bearer',
-    user: { id: userId, email },
+    user: { id: userId, email, user_metadata: avatarUrl ? { avatar_url: avatarUrl } : {} },
   }
 }
 
@@ -105,7 +111,7 @@ export async function mockSupabaseFetch(
   if (route === '/auth/v1/token?grant_type=pkce') {
     if (body.auth_code === MOCK_GOOGLE_CODE.demo) return json(200, session(DEMO_USER.id))
     if (body.auth_code === MOCK_GOOGLE_CODE.new) {
-      return json(200, session(crypto.randomUUID(), MOCK_GOOGLE_NEW_EMAIL))
+      return json(200, session(crypto.randomUUID(), MOCK_GOOGLE_NEW_EMAIL, MOCK_GOOGLE_PHOTO))
     }
     return refused(400, 'flow_state_not_found')
   }
@@ -121,4 +127,18 @@ export function mockGoogleUrl({ redirectTo }: { redirectTo: string; codeChalleng
   const target = new URL(redirectTo)
   target.searchParams.set('code', MOCK_GOOGLE_CODE.demo)
   return target.toString()
+}
+
+/** A 1x1 PNG, the size it was: Google's photo without Google. */
+const MOCK_PHOTO_PNG =
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+
+/** A `fetch` for the Google photo of the simulated account (design.md § 15). */
+export async function mockGooglePhotoFetch(input: string | URL | Request): Promise<Response> {
+  const url = input instanceof Request ? input.url : input.toString()
+  return url.startsWith(MOCK_GOOGLE_PHOTO.replace(/=s96-c$/, ''))
+    ? new Response(Buffer.from(MOCK_PHOTO_PNG, 'base64'), {
+        headers: { 'Content-Type': 'image/png' },
+      })
+    : new Response(null, { status: 404 })
 }

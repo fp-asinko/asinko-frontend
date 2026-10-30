@@ -58,6 +58,16 @@ describe('session cookie (specs/auth design.md § 3)', () => {
     expect(SESSION).not.toHaveProperty('suggestion')
   })
 
+  it('keeps the Google photo to offer while there is no profile (design.md § 15)', () => {
+    const photo = 'https://lh3.googleusercontent.com/a/x=s96-c'
+    expect(sessionFromTokens({ ...TOKENS, photoUrl: photo }, null, 1_000)).toMatchObject({
+      photoSuggestion: photo,
+    })
+    expect(
+      sessionFromTokens({ ...TOKENS, photoUrl: photo }, { username: 'maria', avatarUrl: null }),
+    ).not.toHaveProperty('photoSuggestion')
+  })
+
   it('reads a valid cookie, also one without a profile, and nothing from a broken one', () => {
     expect(parseSession(JSON.stringify(SESSION))).toEqual(SESSION)
     const noProfile = { ...SESSION, username: null }

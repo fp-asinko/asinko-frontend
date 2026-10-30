@@ -171,3 +171,16 @@ Reemplaza la navegación a `/welcome` de § 11.
 - Una foto cambiada desde otro dispositivo, o una sesión de antes de este cambio (PO, 2026-10-30: seguía con las iniciales 12 horas después), se ve en menos de una hora, con la próxima renovación.
 - **Arreglo en el mismo cambio:** `createProfile` y `setAvatar` ya no vuelven a dibujar la página (`revalidatePath`). En `/welcome`, hacerlo apenas se creaba el perfil disparaba la redirección de la página (la cuenta ya estaba lista) y la foto no llegaba a subirse. Ahora lo hace quien usa el formulario al terminar: el modal con `router.refresh()` antes de cerrarse, y `/welcome` con su navegación completa a `next`.
 - **Mocks:** con `API_MOCKS=true`, subir la foto (`POST /uploads/avatar`) y `PATCH /users/{id}` aceptan al usuario del Bearer simulado (`mockCaller`), no solo al demo: una cuenta creada en el e2e sube su foto como en el backend real.
+
+## 15. Cambio del PO (2026-10-30): la foto de Google en el paso 2 (AU-22)
+
+- Supabase devuelve la foto de Google en `user.user_metadata.avatar_url` (o `picture`). `supabase-auth.ts` la lee como `photoUrl` de los tokens, sin confiar en su forma.
+- Sin perfil, la sesión la guarda como `photoSuggestion`, junto a `suggestion`. `createProfile` borra las dos.
+- **El navegador no habla con Google:** el formulario pide la foto a la Server Action `getSuggestedPhoto`. El servidor la descarga y le devuelve los bytes en base64, y el navegador los prepara con `prepareImage` como una foto del dispositivo (WebP, sin metadatos). Así la CSP (`img-src`, `connect-src`) no se abre a Google, y la subida es la misma de AU-21 (`setAvatar`).
+- **Sin SSRF:** la cookie de sesión no está firmada, así que la URL se revisa antes de cada descarga (`lib/auth/google-photo.ts`):
+  - solo `https` a un host `*.googleusercontent.com`, sin usuario, contraseña ni puerto;
+  - sin seguir redirecciones, con el timeout de la API;
+  - solo JPEG, PNG o WebP, de 1 MB como máximo.
+- Se pide a 400 px: el final `=s96-c` de Google pasa a `=s400-c`.
+- Llega ya elegida, con "Cambiar" y "Quitar". Si la persona elige o quita una foto antes de que llegue, la de Google no la reemplaza.
+- **Mocks:** la cuenta nueva de Google simulada trae una foto (`MOCK_GOOGLE_PHOTO`), y `mockGooglePhotoFetch` responde un PNG de 1×1 en lugar de Google.

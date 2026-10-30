@@ -15,6 +15,8 @@ export type AuthTokens = {
   userId: string
   /** To suggest a username to a new account (specs/auth design.md § 11). */
   email: string | null
+  /** The provider's photo (Google), to offer it to a new account (design.md § 15). */
+  photoUrl?: string | null
 }
 
 export type AuthFailure =
@@ -33,11 +35,26 @@ const tokensSchema = z.object({
   access_token: z.string().min(1),
   refresh_token: z.string().min(1),
   expires_in: z.number().int().positive(),
-  user: z.object({ id: z.uuid(), email: z.string().nullish() }),
+  user: z.object({
+    id: z.uuid(),
+    email: z.string().nullish(),
+    // Google's photo: `avatar_url`, or `picture` as Google names it.
+    user_metadata: z
+      .object({ avatar_url: z.unknown(), picture: z.unknown() })
+      .partial()
+      .nullish()
+      .catch(null),
+  }),
 })
 
 /** Supabase's error body: only the code is read, never the message. */
 const errorSchema = z.object({ error_code: z.string().optional(), code: z.unknown().optional() })
+
+/** The provider's photo when it is text; googlePhotoUrl checks where it points before using it. */
+function photoOf(metadata: { avatar_url?: unknown; picture?: unknown } | null | undefined) {
+  const url = metadata?.avatar_url ?? metadata?.picture
+  return typeof url === 'string' && url ? url : null
+}
 
 const EMAIL_TAKEN = new Set(['user_already_exists', 'email_exists'])
 
@@ -100,6 +117,7 @@ export function createSupabaseAuth({
           expiresIn: expires_in,
           userId: user.id,
           email: user.email ?? null,
+          photoUrl: photoOf(user.user_metadata),
         },
       }
     }

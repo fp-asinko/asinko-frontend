@@ -5,7 +5,8 @@ import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState } from 'react'
 import { Skeleton } from '@/components/ui/skeleton'
-import { IMAGE_TYPES } from '@/lib/prepare-image'
+import { IMAGE_TYPES, prepareImage } from '@/lib/prepare-image'
+import { getSuggestedPhoto } from '../actions/suggested-photo.action'
 
 /** The cropper (and its library) comes when a photo is picked (seo.md). */
 const PhotoCropper = dynamic(
@@ -16,9 +17,16 @@ const PhotoCropper = dynamic(
   },
 )
 
+/** The bytes the server sent, as the file a device would give. */
+function asFile({ type, base64 }: { type: string; base64: string }): File {
+  const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0))
+  return new File([bytes], 'google-photo', { type })
+}
+
 /**
  * The optional photo of the welcome screen (specs/auth AU-21): chosen from the device, framed by
- * hand as in "Edit profile" and shown round before continuing. It can be changed or removed.
+ * hand as in "Edit profile" and shown round before continuing. It can be changed or removed. Back
+ * from Google, the account's Google photo comes already chosen (AU-22, design.md § 15).
  */
 export function AvatarPicker({ onChange }: { onChange: (photo: Blob | null) => void }) {
   const t = useTranslations('auth.photo')
@@ -28,6 +36,22 @@ export function AvatarPicker({ onChange }: { onChange: (photo: Blob | null) => v
   const [preview, setPreview] = useState<string | null>(null)
   const [framing, setFraming] = useState<{ file: File; source: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
+  // Once the person picks or removes a photo, a late Google photo does not replace it.
+  const touched = useRef(false)
+
+  useEffect(() => {
+    let gone = false
+    void getSuggestedPhoto().then(async (photo) => {
+      if (!photo || gone || touched.current) return
+      const prepared = await prepareImage(asFile(photo))
+      if (!prepared.ok || gone || touched.current) return
+      setPreview(URL.createObjectURL(prepared.blob))
+      onChange(prepared.blob)
+    })
+    return () => void (gone = true)
+    // Once, when the form shows: onChange is the form's and does not change what is asked.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- see above
+  }, [])
 
   useEffect(() => () => void (preview && URL.revokeObjectURL(preview)), [preview])
   useEffect(() => () => void (framing && URL.revokeObjectURL(framing.source)), [framing])
@@ -35,6 +59,7 @@ export function AvatarPicker({ onChange }: { onChange: (photo: Blob | null) => v
   function pick(file: File | undefined) {
     if (input.current) input.current.value = ''
     if (!file) return
+    touched.current = true
     setError(null)
     if (!(IMAGE_TYPES as readonly string[]).includes(file.type)) {
       setError(tErrors('photoType'))
@@ -50,6 +75,7 @@ export function AvatarPicker({ onChange }: { onChange: (photo: Blob | null) => v
   }
 
   function remove() {
+    touched.current = true
     setPreview(null)
     onChange(null)
   }
