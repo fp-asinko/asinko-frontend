@@ -6,7 +6,7 @@
 
 - **Pendiente ahora:** una pregunta sobre los slugs de los activos, y lo que espera una decisión de producto (P-026, P-023 y la fórmula de `best`, P-014).
 - **Fase 3 del backend:** los logros (P-030) y los widgets de los grupos (P-028, P-029). En el front ya se ven, contra mocks; el backend los implementa más adelante.
-- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033), Explore con sesión (P-034) y saber si un username está libre mientras se escribe (P-035).
+- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033), Explore con sesión (P-034), saber si un username está libre mientras se escribe (P-035) y borrar una cuenta sin dejar el perfil huérfano (P-036).
 
 **Verificado contra el deploy de `dev` el 2026-10-21** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 10 de 10 en verde, solo lecturas, cada respuesta con el mismo esquema que usa el mock. Además de lo de antes:
 
@@ -175,6 +175,33 @@ Medido contra `dev` el 2026-10-30.
   - `401` sin sesión;
   - `429` con `retryAfter` si se abusa. El front pregunta 400 ms después de la última tecla, uno por vez.
 - **Es solo un aviso:** `POST /users` sigue decidiendo, y su `409` se sigue mostrando, por ejemplo si dos personas eligen el mismo a la vez.
+
+### P-036: Borrar una cuenta sin dejar el perfil huérfano
+
+**Estado:** propuesta (2026-10-30), encontrada al probar `specs/auth`: había que borrar una cuenta para volver a entrar con Google. No hace falta mock: el front no lo consume.
+
+**Motivo:** el perfil no está atado al usuario de Supabase Auth. `Profile.id = auth.users.id` es una convención, sin clave foránea (`schema.prisma`, `asinko-app` `dev` en `9924924`). Por eso:
+
+- **Si se borra el usuario en Supabase Auth** (desde el panel o con la API de admin), el `Profile` queda huérfano y activo: conserva su username, su foto y su página pública, y nadie puede entrar a esa cuenta. El username queda trabado para siempre.
+- **`DELETE /users/{userId}`**, el borrado lógico, sí libera el username: lo cambia a `del_<id>` y vacía los datos. Pero:
+  - necesita la sesión de esa misma cuenta, y no borra el usuario de Supabase Auth (el código ya lo marca como pendiente);
+  - no le cambia el slug al canal personal. El canal sigue con el username viejo, aunque `PATCH /users/{userId}` mantiene los dos iguales. Si otra cuenta elige después ese username, crear su canal podría chocar con el slug. No lo verificamos.
+
+**Cambio:**
+
+1. **Borrar el usuario en Supabase Auth hace el borrado lógico del perfil**, igual que `DELETE /users/{userId}`:
+   - username a `del_<id>`;
+   - sin foto, bio, nombre, headline, ciudad ni links;
+   - sin borradores ni banner;
+   - `isDeleted` y `deletedAt`.
+
+   Por ejemplo, con un trigger `AFTER DELETE ON auth.users` en una migración. No puede ser un `ON DELETE CASCADE`: la fila tiene que quedar, porque las tesis son inmutables y no pierden a su autor (E1-11-03).
+2. **El borrado lógico también cambia el slug del canal personal** al username nuevo (`del_<id>`), en la misma transacción, como ya hace `PATCH` al cambiar el username.
+3. **Para más adelante ("Borrar la cuenta" en el front, todavía sin spec):** que `DELETE /users/{userId}` también borre el usuario de Supabase Auth, o lo deshabilite, y cierre sus sesiones. Requiere la clave `service_role`, que solo puede estar en el backend. Así una cuenta se borra con un solo pedido, desde la app.
+
+**Pregunta:** ¿el username de una cuenta borrada se reserva un año, como uno cambiado (`SlugHistory`)? Hoy queda libre al instante. Reservarlo evita que alguien se haga pasar por la cuenta borrada en los links y las menciones viejas. Liberarlo permite volver a crear la cuenta con el mismo nombre. Es una decisión de producto.
+
+**Mientras tanto, en `dev`:** para volver a probar el registro con una cuenta ya usada, se borra el usuario en Supabase Auth y se elige otro username. El perfil viejo queda huérfano.
 
 ## Fase 3 del backend: solo visual en el front
 
