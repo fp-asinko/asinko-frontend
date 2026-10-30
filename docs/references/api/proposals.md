@@ -6,7 +6,7 @@
 
 - **Pendiente ahora:** una pregunta sobre los slugs de los activos, y lo que espera una decisión de producto (P-026, P-023 y la fórmula de `best`, P-014).
 - **Fase 3 del backend:** los logros (P-030) y los widgets de los grupos (P-028, P-029). En el front ya se ven, contra mocks; el backend los implementa más adelante.
-- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033).
+- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033) y Explore con sesión (P-034).
 
 **Verificado contra el deploy de `dev` el 2026-10-21** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 10 de 10 en verde, solo lecturas, cada respuesta con el mismo esquema que usa el mock. Además de lo de antes:
 
@@ -131,6 +131,22 @@ Lo que pide el trabajo del sprint: login (MVP-210), tesis (MVP-137, MVP-140, MVP
 
 - **Contraseña de 8 caracteres o más:** en Supabase Auth, _Authentication → Policies → Minimum password length_ en 8 (hoy, el default de 6). Con eso, `signUp` rechaza una más corta, venga de donde venga. Es un cambio de Auth: necesita OK explícito.
 - **Edad mínima de 18 años:** el checkbox del front dice "Tengo 18 años o más y acepto los Términos". `POST /users` guarda solo `ageConfirmed` como un booleano. Proponemos que la edad quede escrita en los Términos (`TERMS_VERSION`) y en el contrato de E01, así `ageConfirmed: true` significa siempre "18 o más". No hace falta un campo nuevo.
+
+### P-034: Explore con sesión también trae lo popular
+
+**Estado:** propuesta (2026-10-30), encontrado al probar `specs/auth` con una cuenta nueva. Sin mock: el front no lo compensa (`api-integration.md § Contrato`).
+
+**Motivo:** una cuenta recién creada ve el Home vacío ("No posts yet"). Sin sesión, el mismo pedido trae posts. La respuesta del 2026-10-20 dice que el ranking con sesión suma "lo popular de lo que seguís, comunidades parecidas, tu país y lo popular de toda la plataforma", pero hoy solo trae lo primero:
+
+| `GET /feed/explore?kind=POST,POLL,THOUGHT`, todas las páginas | Ítems | `reason`                       |
+| ------------------------------------------------------------- | ----- | ------------------------------ |
+| Sin sesión                                                    | 32    | `TRENDING` 28, `COUNTRY` 4     |
+| Con sesión (cuenta de QA que sigue comunidades, país FI)      | 21    | `FOLLOWING` 17, `SIMILAR` 4    |
+| Con sesión, cuenta nueva que no sigue nada                    | 0     | —                              |
+
+Medido contra `dev` el 2026-10-30.
+
+**Cambio:** con sesión, Explore suma también `COUNTRY` y `TRENDING` (excluyendo lo que ya vino por `FOLLOWING` o `SIMILAR`), como sin sesión. Así una cuenta nueva arranca con lo popular, y una que sigue poco no se queda sin feed a la segunda página. El país de la cuenta (`countryCode`), o el de la IP si no tiene.
 
 ## Fase 3 del backend: solo visual en el front
 
