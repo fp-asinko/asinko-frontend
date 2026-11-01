@@ -23,7 +23,7 @@ export const apiRequest = createApiClient({
   // The ads and the glossary on top of the real feeds (specs/glossary GL-07).
   extensions: env.API_MOCKS === 'missing' ? MOCK_EXTENSIONS : undefined,
   timeoutMs: env.API_TIMEOUT_MS,
-  // The session's token as Bearer on every backend call (P-002, specs/dev-login DL-04).
+  // The session's token as Bearer on every backend call (P-002, specs/auth).
   getHeaders: async (): Promise<Record<string, string>> => {
     const token = await getAccessToken()
     return token ? { Authorization: `Bearer ${token}` } : {}

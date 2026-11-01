@@ -26,12 +26,6 @@ export const serverEnvSchema = {
    */
   SUPABASE_URL: z.url().optional(),
   SUPABASE_ANON_KEY: z.string().min(1).optional(),
-  /**
-   * Development login (specs/dev-login): signs in with a test account of asinko-app with one tap.
-   * Never in production (refineEnv).
-   */
-  DEV_LOGIN_EMAIL: z.email().optional(),
-  DEV_LOGIN_PASSWORD: z.string().min(1).optional(),
 }
 
 // Set by Next.js; shared by server and client.
@@ -49,8 +43,6 @@ export const clientEnvSchema = {
 export const MOCKS_IN_PRODUCTION_ERROR = 'API_MOCKS must be false when APP_ENV is production'
 export const SUPABASE_REQUIRED_ERROR =
   'SUPABASE_URL and SUPABASE_ANON_KEY are required when APP_ENV is production'
-export const DEV_LOGIN_IN_PRODUCTION_ERROR =
-  'DEV_LOGIN_* must not be set when APP_ENV is production'
 
 export type MocksMode = 'off' | 'missing' | 'all'
 
@@ -61,8 +53,6 @@ export function refineEnv(
     API_MOCKS?: MocksMode
     SUPABASE_URL?: string
     SUPABASE_ANON_KEY?: string
-    DEV_LOGIN_EMAIL?: string
-    DEV_LOGIN_PASSWORD?: string
   },
   ctx: z.RefinementCtx,
 ): void {
@@ -72,14 +62,6 @@ export function refineEnv(
   // Logging in is not optional in production (specs/auth AU-20).
   if (env.APP_ENV === 'production' && (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY)) {
     ctx.addIssue({ code: 'custom', path: ['SUPABASE_URL'], message: SUPABASE_REQUIRED_ERROR })
-  }
-  // The development login can never reach production (specs/dev-login DL-07).
-  if (env.APP_ENV === 'production' && (env.DEV_LOGIN_EMAIL || env.DEV_LOGIN_PASSWORD)) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['DEV_LOGIN_EMAIL'],
-      message: DEV_LOGIN_IN_PRODUCTION_ERROR,
-    })
   }
 }
 

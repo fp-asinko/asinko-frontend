@@ -37,7 +37,7 @@ export type ApiClientOptions = {
   mocks?: readonly MockRoute[]
   /** Proposals on top of real responses (API_MOCKS=missing): what the backend does not send yet. */
   extensions?: readonly MockExtension[]
-  /** Extra headers for every network request, e.g. the session's Bearer token (specs/dev-login). */
+  /** Extra headers for every network request, e.g. the session's Bearer token (P-002, specs/auth). */
   getHeaders?: () => Promise<Record<string, string>> | Record<string, string>
   /** Called for every unexpected failure (5xx, network, timeout, contract drift): reporting. */
   onUnexpected?: (failure: UnexpectedFailure, cause?: unknown) => void

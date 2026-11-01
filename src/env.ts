@@ -18,8 +18,6 @@ export const env = createEnv({
     SENTRY_DSN: process.env.SENTRY_DSN,
     SUPABASE_URL: process.env.SUPABASE_URL,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
-    DEV_LOGIN_EMAIL: process.env.DEV_LOGIN_EMAIL,
-    DEV_LOGIN_PASSWORD: process.env.DEV_LOGIN_PASSWORD,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
   },

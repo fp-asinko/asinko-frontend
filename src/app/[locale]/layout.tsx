@@ -24,8 +24,6 @@ import { communityPath } from '@/lib/communities/paths'
 import { LEFT_COLUMN_COOKIE, siteFolded } from '@/lib/left-column'
 import { readSession } from '@/lib/auth/session'
 import { getAccountState, getViewer } from '@/lib/session'
-import { isDevLoginEnabled } from '@/lib/auth/dev-session'
-import { DevLoginButton } from '@/features/dev-login'
 // By their paths (JS budget): the modal's forms load when it shows them.
 import { logOut } from '@/features/auth/actions/log-out.action'
 import { AuthGateForms } from '@/features/auth/components/auth-gate-forms'
@@ -84,11 +82,6 @@ export default async function LocaleLayout({ children, right, params }: LayoutPr
   const session = needsProfile ? await readSession() : null
   // The left column as the viewer left it: drawn so on the server, nothing jumps (specs/sidebar-toggle).
   const leftFolded = siteFolded((await cookies()).get(LEFT_COLUMN_COOKIE)?.value)
-  // Development login (specs/dev-login): off in production and with every route mocked.
-  const devTools =
-    isDevLoginEnabled() && env.API_MOCKS !== 'all' ? (
-      <DevLoginButton username={viewer?.username ?? null} />
-    ) : null
 
   // Only views that exist (F-23b): each view's spec registers its own item.
   const navItems: NavItem[] = [{ href: '/', label: t('home'), icon: <HouseIcon /> }]
@@ -131,7 +124,6 @@ export default async function LocaleLayout({ children, right, params }: LayoutPr
                     }
                     // Each page's right column (the @right slot): the widgets, or its own (specs/submit-page).
                     right={right}
-                    devTools={devTools}
                     // Your own page, from the bars' "Profile" (specs/header-refresh HR-02).
                     profileHref={viewer && communityPath('user', viewer.username)}
                     leftFolded={leftFolded}

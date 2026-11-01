@@ -307,15 +307,6 @@
     },
     "profileValue": "It’s how people find you and mention you on Asinko. Add a photo if you like."
   },
-  "devLogin": {
-    "login": "Dev login",
-    "logout": "@{username} · Dev logout",
-    "errors": {
-      "credentials": "Wrong test account credentials",
-      "unavailable": "Backend or Supabase unavailable",
-      "disabled": "Dev login is off"
-    }
-  },
   "join": {
     "label": "Join",
     "labelFor": "Join {handle}",

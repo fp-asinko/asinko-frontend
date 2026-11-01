@@ -30,7 +30,7 @@ Errores que distinguimos: `400 invalid_credentials` → `credentials`; `422 user
 
 ## 3. Sesión (`src/lib/auth/session.ts`, server-only)
 
-Reemplaza a `dev-session.ts`, que pasa a usarlo (el "Dev login" se queda, AU-17).
+Reemplaza a `dev-session.ts`, que pasó a usarlo hasta que el "Dev login" se retiró (2026-11-01, T-11).
 
 - **Cookie `asinko-session`**, `HttpOnly`, `SameSite=Lax`, `Secure` con https, `path=/`, **30 días** (se renueva con cada refresh):
   ```ts
@@ -118,7 +118,7 @@ Al terminar bien, `revalidatePath('/', 'layout')`: toda la página se vuelve a d
 
 - `SUPABASE_URL` y `SUPABASE_ANON_KEY` (ya existen, solo del servidor: el navegador no los usa) pasan a ser **obligatorias en producción** (AU-20, `refineEnv`). El handoff habla de `NEXT_PUBLIC_SUPABASE_*`: no hace falta exponerlas.
 - En Vercel hay que cargarlas con esos nombres en cada ambiente.
-- `.env.example` lo explica. `DEV_LOGIN_*` sigue igual y sigue prohibida en producción.
+- `.env.example` lo explica. `DEV_LOGIN_*` ya no existe (T-11).
 - CSP sin cambios: el navegador no llama a Supabase (`connect-src` igual); Google es una navegación, no un `fetch`.
 
 ## 11. Cambio del PO (2026-10-29): registro en dos pasos y foto

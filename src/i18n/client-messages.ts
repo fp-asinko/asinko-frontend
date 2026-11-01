@@ -18,7 +18,6 @@ export const CLIENT_NAMESPACES = [
   'communities.profile',
   'communities.theses.more',
   'communities.widgets',
-  'devLogin',
   'emoji',
   'errors.unexpected',
   'featured',

@@ -18,7 +18,6 @@ export function AppShell({
   navItems,
   sidebar,
   right,
-  devTools,
   profileHref = null,
   leftFolded = false,
   children,
@@ -28,8 +27,6 @@ export function AppShell({
   navItems: NavItem[]
   sidebar: ReactNode
   right?: ReactNode
-  /** Development tools for the top bar (specs/dev-login); never in production. */
-  devTools?: ReactNode
   /** The viewer's own page (/user/maria), or null without a session (specs/header-refresh HR-02). */
   profileHref?: string | null
   children: ReactNode
@@ -45,11 +42,7 @@ export function AppShell({
       >
         {t('nav.skipToContent')}
       </a>
-      <SiteHeader
-        devTools={devTools}
-        profileHref={profileHref}
-        menu={<MobileSidebar>{sidebar}</MobileSidebar>}
-      />
+      <SiteHeader profileHref={profileHref} menu={<MobileSidebar>{sidebar}</MobileSidebar>} />
       {/* The left column opens and folds, as Reddit's (specs/sidebar-toggle): folded, a 32px
           strip with its line. `left-folded:` (globals.css) reads the toggle's state and a page's
           own choice from the HTML, so the server's first paint is already right. Its width slides,

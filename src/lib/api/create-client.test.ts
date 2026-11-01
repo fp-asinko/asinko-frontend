@@ -288,7 +288,7 @@ describe('error translations', () => {
   })
 })
 
-describe('getHeaders (specs/dev-login DL-04)', () => {
+describe('getHeaders (P-002, specs/auth)', () => {
   it('adds the session headers to every network request', async () => {
     const fetchImpl = vi.fn(
       async (_input: string | URL, _init?: RequestInit) =>

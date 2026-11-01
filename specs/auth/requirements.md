@@ -6,7 +6,7 @@
 > - ~~Registro con email en un solo paso~~. **Cambio del PO (2026-10-29, después de verlo):** el username en el primer formulario quedaba raro. Crear la cuenta pide solo email y contraseña; después, con email o con Google, la misma pantalla de bienvenida pide el username (ya sugerido), una foto opcional y la confirmación de edad y términos. El username no se deja para después en el perfil: el backend lo exige para crear el perfil y solo deja cambiarlo una vez cada 2 años (`USERNAME_CHANGE_TOO_SOON`).
 > - En el modal, **"Continuar con Google"** funciona y **Reddit** queda "Próximamente" (MVP-206). Se sacan Instagram y X.
 > - **"Olvidé mi contraseña" queda afuera:** va en otra tarea.
-> - **El botón "Dev login" se queda** como atajo de desarrollo (`specs/dev-login`).
+> - ~~El botón "Dev login" se queda como atajo de desarrollo~~. **Retirado el 2026-11-01** por pedido del PO, con el login real verificado contra `dev` (T-11).
 >
 > Viene de `specs/guest-experience`: el modal de cuenta y la página `/login` para los links directos (decisión del PO del 2026-10-05), y su base G-09 (`next`).
 >
@@ -83,7 +83,7 @@ Que cualquiera pueda crear su cuenta o entrar a Asinko, con email o con Google, 
   - los tokens viven en cookies `HttpOnly`, `SameSite=Lax` y `Secure` con https;
   - nunca llegan a `localStorage` ni al JavaScript del navegador;
   - el navegador no llama a la API.
-- [x] **AU-17** Con `API_MOCKS=true` todo sigue como hoy (el usuario demo y la cookie de invitado). El "Dev login" convive con el login real fuera de producción.
+- [x] **AU-17** Con `API_MOCKS=true` todo sigue como hoy (el usuario demo y la cookie de invitado). ~~El "Dev login" convive con el login real fuera de producción~~ (retirado el 2026-11-01, T-11).
 
 ### Calidad
 

@@ -307,15 +307,6 @@
     },
     "profileValue": "Es como te encuentran y te mencionan en Asinko. Agrega una foto si quieres."
   },
-  "devLogin": {
-    "login": "Dev login",
-    "logout": "@{username} · Dev logout",
-    "errors": {
-      "credentials": "Credenciales de la cuenta de prueba incorrectas",
-      "unavailable": "Backend o Supabase no disponibles",
-      "disabled": "El dev login está apagado"
-    }
-  },
   "join": {
     "label": "Unirse",
     "labelFor": "Unirse a {handle}",

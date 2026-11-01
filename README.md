@@ -38,16 +38,15 @@ Con `API_MOCKS=true` (el valor de `.env.example`) la app funciona **sin backend*
 
 Validadas en el build con zod (`src/env.ts`). Nunca se lee `process.env` fuera de ese archivo (y de `src/env.client.ts`).
 
-| Variable                                | Para qué                                                                                                               |
-| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `APP_ENV`                               | `development`, `preview` o `production`. Decide si el sitio se indexa y si se permiten mocks y el login de desarrollo. |
-| `NEXT_PUBLIC_SITE_URL`                  | URL pública del sitio: canonical, `metadataBase`, sitemap.                                                             |
-| `API_BASE_URL`                          | URL de `asinko-app`. Desarrollo: `https://asinko-app-web.vercel.app` (o `http://localhost:3001` con el backend local). |
-| `API_MOCKS`                             | `true`, `missing` o `false` (ver abajo). **Prohibido distinto de `false` en producción**: el build falla.              |
-| `API_TIMEOUT_MS`                        | Opcional. Tiempo máximo de cada pedido al backend (10 s por defecto).                                                  |
-| `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`  | Opcionales. Sin DSN, Sentry queda apagado.                                                                             |
-| `SUPABASE_URL`, `SUPABASE_ANON_KEY`     | Opcionales, solo desarrollo: el mismo proyecto Supabase que usa el backend, para el login de desarrollo.               |
-| `DEV_LOGIN_EMAIL`, `DEV_LOGIN_PASSWORD` | Opcionales, solo desarrollo: la cuenta de prueba del botón "Dev login". Nunca en producción.                           |
+| Variable                               | Para qué                                                                                                               |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `APP_ENV`                              | `development`, `preview` o `production`. Decide si el sitio se indexa y si se permiten mocks y el login de desarrollo. |
+| `NEXT_PUBLIC_SITE_URL`                 | URL pública del sitio: canonical, `metadataBase`, sitemap.                                                             |
+| `API_BASE_URL`                         | URL de `asinko-app`. Desarrollo: `https://asinko-app-web.vercel.app` (o `http://localhost:3001` con el backend local). |
+| `API_MOCKS`                            | `true`, `missing` o `false` (ver abajo). **Prohibido distinto de `false` en producción**: el build falla.              |
+| `API_TIMEOUT_MS`                       | Opcional. Tiempo máximo de cada pedido al backend (10 s por defecto).                                                  |
+| `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN` | Opcionales. Sin DSN, Sentry queda apagado.                                                                             |
+| `SUPABASE_URL`, `SUPABASE_ANON_KEY`    | El mismo proyecto Supabase que usa el backend, para el login. Obligatorias en producción; opcionales en desarrollo.    |
 
 ## Modos de la API
 
@@ -60,8 +59,6 @@ Validadas en el build con zod (`src/env.ts`). Nunca se lee `process.env` fuera d
 | `false`   | Nada                                                                          | Producción                                                  |
 
 Con `missing`, los logros y los widgets se ven también con los usuarios y grupos reales de `dev`: cada persona tiene una vitrina de ejemplo y cada grupo, sus widgets. Lo que un moderador guarda en un widget vive en la memoria de esa instancia del servidor, hasta que exista la fase 3 del backend.
-
-**Login de desarrollo:** con `APP_ENV` distinto de `production` y las variables de Supabase y `DEV_LOGIN_*` cargadas, aparece el botón **Dev login** en la barra superior. Entra con la cuenta de prueba y manda su token al backend como `Bearer`. El login real llega en una fase posterior.
 
 ## Comandos
 
@@ -138,7 +135,7 @@ Qué variable va en cada uno, y la configuración de DEV paso a paso: [`docs/dep
 | `staging` | QA         | `preview`     | `missing`   |
 | `main`    | Producción | `production`  | `false`     |
 
-Fuera de producción el sitio no se indexa (`noindex` y `robots.txt` cerrado). En DEV y QA, cargar también las variables de Supabase y `DEV_LOGIN_*` para tener el login de desarrollo. Producción todavía no tiene login real ni la fase 3 del backend: logros y widgets no deberían publicarse ahí hasta entonces.
+Fuera de producción el sitio no se indexa (`noindex` y `robots.txt` cerrado). Producción todavía no tiene la fase 3 del backend: logros y widgets no deberían publicarse ahí hasta entonces.
 
 ## Backend y contrato
 

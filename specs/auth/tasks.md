@@ -12,6 +12,7 @@ Rama: `feature/auth-login`, desde `develop`. Requirements y design aprobados por
 - [x] **T-08 (S)** Cambio del PO (2026-10-30): la foto de Google en el paso 2 (design.md § 15). Tests. → AU-22
 - [x] **T-09 (S)** Cambio del PO (2026-10-30): el nombre visible en el paso 2, con el de Google (design.md § 16). Tests. → AU-23
 - [x] **T-10 (S)** Cambio del PO (2026-10-30): avisar si el username está libre mientras se escribe, con la propuesta P-035 y su mock (design.md § 17). Tests. → AU-24
+- [x] **T-11 (S)** Pedido del PO (2026-11-01): sacar el "Dev login" (`specs/dev-login` retirado). Fuera el botón y su feature, `dev-session.ts`, `DEV_LOGIN_*` del esquema de env, sus textos y el lugar `devTools` de la barra; docs y `.env.example` al día. → AU-17
 - [ ] **T-07b (S)** Verificación a mano contra `dev` con una cuenta real (email y Google), y los cinco puntos de MVP-201. Necesita `SUPABASE_URL` y `SUPABASE_ANON_KEY` en `.env.local` y `/auth/callback` en las Redirect URLs de Supabase.
   - **2026-11-01, contra `dev` con `API_MOCKS=missing`:**
     - **Email, bien:** crear cuenta, el paso 2 con nombre (el perfil lo muestra arriba del `@username`: el PATCH de § 16 funciona), cerrar sesión desde "⋯" y volver a entrar.
@@ -35,7 +36,7 @@ Rama: `feature/auth-login`, desde `develop`. Requirements y design aprobados por
 | AU-13        | `session.test.ts`, `refresh-session.test.ts`                                                                                        |
 | AU-14        | `auth.action.test.ts`, `more-menu.test.tsx`, e2e                                                                                    |
 | AU-15, AU-16 | `session.test.ts`, `api` client tests                                                                                               |
-| AU-17        | `session.test.ts` (modo mocks), `dev-session.test.ts`                                                                               |
+| AU-17        | `session.test.ts` (modo mocks)                                                                                                      |
 | AU-18        | Tests de componentes, e2e (axe, 360 px)                                                                                             |
 | AU-19        | `performance.spec.ts`                                                                                                               |
 | AU-20        | `env-schema.test.ts`                                                                                                                |

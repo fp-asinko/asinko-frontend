@@ -1,5 +1,7 @@
 # Login de desarrollo con Bearer — Requirements
 
+> **Retirado el 2026-11-01** por pedido del PO ("ahora sí sacaría el dev login"): el login real (`specs/auth`) ya funciona contra `dev` con email y Google. Se borraron el botón, `dev-session.ts`, `DEV_LOGIN_*` y sus textos. Queda de DL-04 el Bearer en cada request, que ahora usa la sesión real (P-002). Lo que sigue es el spec original.
+
 > **Estado:** aprobado el 2026-10-05 por pedido directo del Product Owner: "un botón en el header para autologuearme con esta lógica… y poder ver la vista de un usuario logueado".
 > **Indicaciones del backend:**
 >

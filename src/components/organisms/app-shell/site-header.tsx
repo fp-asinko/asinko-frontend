@@ -25,11 +25,9 @@ const ICON_BUTTON =
  */
 export function SiteHeader({
   menu,
-  devTools,
   profileHref = null,
 }: {
   menu: ReactNode
-  devTools?: ReactNode
   /** The viewer's own page; the profile icon only shows with a session (AccountButtons). */
   profileHref?: string | null
 }) {
@@ -78,7 +76,6 @@ export function SiteHeader({
               <SearchIcon aria-hidden className="size-5" />
             </ComingSoon>
           </span>
-          {devTools}
           {/* Only with a session (PO, 2026-10-21): without one, Sign up and Log in say the way in. */}
           <SignedInOnly>
             <ComposeTrigger className="hidden h-10 tap items-center gap-1.5 rounded-full bg-muted pr-4 pl-3 type-action text-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50 md:inline-flex">
