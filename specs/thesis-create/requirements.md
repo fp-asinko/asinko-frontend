@@ -40,7 +40,7 @@ Publicar una tesis, el contenido central de Asinko: una predicción falsable sob
 - [ ] **TC-06** (Q4) **Fecha límite**, obligatoria, con un selector de fecha. Lo más cerca es el día en que, a las 23:59, falten más de 24 h; lo más lejos, 5 años. Fuera de ese rango, el campo lo dice.
 - [ ] **TC-07** **Convicción**, obligatoria: cuatro opciones, **Baja, Media, Alta y Extrema** (`LOW` a `EXTREME`), con una ayuda: la convicción pesa en tu calibración, y una errada con convicción extrema pesa más.
 - [ ] **TC-08** **Razonamiento**, obligatorio: el argumento detrás del claim, con la misma caja de texto del cuerpo de un post (Markdown, formato y emojis).
-- [ ] **TC-09** Mientras falte un campo obligatorio o haya uno inválido, "Publicar" está deshabilitado, igual que en el formulario de posts. Cada campo dice su error al salir de él.
+- [ ] **TC-09** Mientras falte un campo obligatorio o haya uno inválido, "Publicar" está deshabilitado, igual que en el formulario de posts. Un error (un claim largo, una fecha fuera de rango) aparece en su campo al tocar "Publicar" y se actualiza mientras se corrige, como en los posts (design.md § 3, ajustado el 2026-11-02).
 - [ ] **TC-10** (Q8) Lo escrito se guarda en el navegador mientras se edita y vuelve al recargar o al volver a la pestaña, hasta publicar o descartar. "Guardar borrador" no aparece en la pestaña Tesis.
 
 ### Confirmar y publicar
