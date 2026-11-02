@@ -23,6 +23,7 @@ Rama: `feature/auth-login`, desde `develop`. Requirements y design aprobados por
       - Impresiones: el beacon del Home sale; el mismo envío al backend da `204`, y con otro `userId`, `403 USER_MISMATCH`.
     - **Limitación del aviso de username con `missing`:** el mock de P-035 solo conoce los fixtures, así que dice "available" para un username real tomado (`qa_uno`). Al enviar, el `409` lo frena. En producción la ruta no existe: el aviso no aparece.
     - **Falta:** Google con una cuenta nueva (nombre y foto en el paso 2) y que una sesión vieja reciba su foto al renovar el token.
+  - **Fusionado a `develop` el 2026-11-02** sin esperar al backend (Eugenio vuelve a fin de mes). Lo que responda de P-033 a P-037 se ajusta en una rama nueva (`feature/auth-followups`): apagar el mock de P-035 cuando exista, sacar el PATCH del nombre si `POST /users` lo guarda (P-037) y las reglas de la cuenta (P-033).
 
 | Criterio     | Test                                                                                                                                |
 | ------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
