@@ -11,6 +11,8 @@ Rama: `feature/thesis-create`, desde `develop`. Requirements y design aprobados 
 - [x] **T-07 (M)** E2E (`e2e/thesis-create.spec.ts`), 360 px, axe en claro y oscuro, `performance.spec.ts` con `/submit?type=thesis`, `ui-reviewer`. → TC-16, TC-17, TC-19
 - [x] **T-08 (S)** `overview.md § Tesis` (280 y precio obligatorio), `specs/submit-page/design.md § 1` (`?type=thesis`). → TC-21
 - [ ] **T-09 (S)** A mano contra `dev` con una cuenta real: publicar una tesis y verla en el perfil.
+  - **2026-11-02, con `qa_t07b_mvya24yo` (email) y `API_MOCKS=missing`:** se publicó desde el formulario en su canal personal, sobre `$BTC`. El backend guardó dirección, objetivo, convicción y el precio de referencia (el de `dev`, desactualizado como lo manda el backend), y la tesis apareció primera en la pestaña Tesis. Después se canceló por la API (`CANCELLED`).
+  - **Encontrado:** la fecha límite se elige en la zona del navegador (23:59 local), pero el sitio formatea todas las fechas en UTC (`i18n/request.ts`). Con UTC−3, elegir el 3 de noviembre cierra a las 02:59 UTC del 4, y la tarjeta dice "Nov 4". Pendiente de decisión del PO.
 
 Orden: T-01 → T-02 → T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T-09. T-03 y T-04 no dependen de T-02.
 
