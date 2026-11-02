@@ -488,7 +488,8 @@ export function ThesisEditor({
         }}
         className="flex flex-1 flex-col gap-0"
       >
-        <div className="flex stagger flex-col gap-5">
+        {/* 16px between rows: the form fits 1280×800 with the target in its own row (TC-36). */}
+        <div className="flex stagger flex-col gap-4">
           <FormatTabs
             trailing={
               // The account's drafts, posts and theses together (specs/thesis-drafts TD-02).
@@ -504,9 +505,9 @@ export function ThesisEditor({
           />
 
           {/* The asset and the claim, each the full width, one under the other (TC-30). */}
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             {/* The asset is its card (TC-29): the whole box chooses it. */}
-            <Field data-invalid={invalid('assetSymbol') || undefined} className="gap-1.5">
+            <Field data-invalid={invalid('assetSymbol') || undefined} className="gap-1">
               <FieldLabel htmlFor={`${ids}-asset`}>{t('thesis.asset.label')}</FieldLabel>
               <CommunityPicker
                 id={`${ids}-asset`}
@@ -550,7 +551,7 @@ export function ThesisEditor({
               />
             </Field>
 
-            <Field data-invalid={invalid('claim') || undefined} className="gap-1.5">
+            <Field data-invalid={invalid('claim') || undefined} className="gap-1">
               <div className="flex items-baseline justify-between gap-2">
                 <FieldLabel htmlFor={`${ids}-claim`}>{t('thesis.claim.label')}</FieldLabel>
                 {/* The room left, beside its label: no line of its own (TC-31). */}
@@ -593,86 +594,83 @@ export function ThesisEditor({
             </Field>
           </div>
 
-          {/* The deadline and the target in one row from xl: the shortcuts take the width, the
-              price its box (TC-30). */}
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_11rem]">
-            <Field data-invalid={invalid('deadline') || undefined} className="gap-1.5">
-              {/* The day it closes beside the label: the shortcuts' row never grows (TC-33). */}
-              <div className="flex flex-wrap items-baseline gap-x-2">
-                <span id={`${ids}-deadline-label`} className="type-small font-medium">
-                  {t('thesis.deadline.label')}
-                </span>
-                <p id={`${ids}-deadline-closes`} className="type-meta text-muted-foreground">
-                  {closes &&
-                    t('thesis.deadline.closes', {
-                      date: format.dateTime(closes, { dateStyle: 'medium' }),
-                    })}
-                </p>
-              </div>
-              {/* Shortcuts in one row, as most deadlines are "in 3 months"; "Other date" turns into
-                  the calendar in its place, so the row keeps its height (TC-33). */}
-              <div className="flex flex-wrap items-center gap-1.5 xl:flex-nowrap">
-                <ChoiceGroup
-                  id={`${ids}-deadline-quick`}
-                  size="sm"
-                  labelledBy={`${ids}-deadline-label`}
-                  describedBy={`${ids}-deadline-closes ${ids}-deadline-error`}
-                  options={[
-                    ...quick.map(({ key }) => ({
-                      value: key,
-                      label: t(`thesis.deadline.quick.${key}`),
-                    })),
-                    ...(otherDate
-                      ? []
-                      : [{ value: 'custom' as const, label: t('thesis.deadline.quick.custom') }]),
-                  ]}
-                  value={shortcut}
-                  onChange={(next) => {
-                    if (next === 'custom') {
-                      setCustomDate(true)
-                      requestAnimationFrame(() =>
-                        document.getElementById(`${ids}-deadline`)?.focus(),
-                      )
-                      return
-                    }
-                    setCustomDate(false)
-                    const day = quick.find((each) => each.key === next)?.day
-                    if (day) setValue('deadline', day, { shouldValidate: formState.isSubmitted })
-                  }}
-                  invalid={invalid('deadline')}
-                  required
-                />
-                {otherDate && (
-                  <>
-                    <FieldLabel htmlFor={`${ids}-deadline`} className="sr-only">
-                      {t('thesis.deadline.label')}
-                    </FieldLabel>
-                    <Input
-                      id={`${ids}-deadline`}
-                      type="date"
-                      min={range.min}
-                      max={range.max}
-                      {...register('deadline')}
-                      aria-invalid={invalid('deadline') || undefined}
-                      aria-required
-                      aria-describedby={`${ids}-deadline-error`}
-                      className={cn(FIELD_BOX, 'h-8 w-36 shrink-0 rounded-full px-3')}
-                    />
-                  </>
-                )}
-              </div>
-              <FieldError
-                id={`${ids}-deadline-error`}
-                errors={fieldError('deadline')}
-                className="type-meta"
+          <Field data-invalid={invalid('deadline') || undefined} className="gap-1">
+            {/* The day it closes beside the label: the shortcuts' row never grows (TC-33). */}
+            <div className="flex flex-wrap items-baseline gap-x-2">
+              <span id={`${ids}-deadline-label`} className="type-small font-medium">
+                {t('thesis.deadline.label')}
+              </span>
+              <p id={`${ids}-deadline-closes`} className="type-meta text-muted-foreground">
+                {closes &&
+                  t('thesis.deadline.closes', {
+                    date: format.dateTime(closes, { dateStyle: 'medium' }),
+                  })}
+              </p>
+            </div>
+            {/* Shortcuts in one row, as most deadlines are "in 3 months"; "Other date" turns into
+                the calendar in its place, so the row keeps its height (TC-33). */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <ChoiceGroup
+                id={`${ids}-deadline-quick`}
+                size="sm"
+                labelledBy={`${ids}-deadline-label`}
+                describedBy={`${ids}-deadline-closes ${ids}-deadline-error`}
+                options={[
+                  ...quick.map(({ key }) => ({
+                    value: key,
+                    label: t(`thesis.deadline.quick.${key}`),
+                  })),
+                  ...(otherDate
+                    ? []
+                    : [{ value: 'custom' as const, label: t('thesis.deadline.quick.custom') }]),
+                ]}
+                value={shortcut}
+                onChange={(next) => {
+                  if (next === 'custom') {
+                    setCustomDate(true)
+                    requestAnimationFrame(() => document.getElementById(`${ids}-deadline`)?.focus())
+                    return
+                  }
+                  setCustomDate(false)
+                  const day = quick.find((each) => each.key === next)?.day
+                  if (day) setValue('deadline', day, { shouldValidate: formState.isSubmitted })
+                }}
+                invalid={invalid('deadline')}
+                required
               />
-            </Field>
+              {otherDate && (
+                <>
+                  <FieldLabel htmlFor={`${ids}-deadline`} className="sr-only">
+                    {t('thesis.deadline.label')}
+                  </FieldLabel>
+                  <Input
+                    id={`${ids}-deadline`}
+                    type="date"
+                    min={range.min}
+                    max={range.max}
+                    {...register('deadline')}
+                    aria-invalid={invalid('deadline') || undefined}
+                    aria-required
+                    aria-describedby={`${ids}-deadline-error`}
+                    className={cn(FIELD_BOX, 'h-8 w-36 shrink-0 rounded-full px-3')}
+                  />
+                </>
+              )}
+            </div>
+            <FieldError
+              id={`${ids}-deadline-error`}
+              errors={fieldError('deadline')}
+              className="type-meta"
+            />
+          </Field>
 
-            <Field
-              data-invalid={invalid('direction') || invalid('targetPrice') || undefined}
-              className="gap-1.5"
-            >
-              <FieldLabel htmlFor={`${ids}-targetPrice`}>{t('thesis.target.price')}</FieldLabel>
+          {/* The target in its own row, below the deadline (TC-30). */}
+          <Field
+            data-invalid={invalid('direction') || invalid('targetPrice') || undefined}
+            className="gap-1"
+          >
+            <FieldLabel htmlFor={`${ids}-targetPrice`}>{t('thesis.target.price')}</FieldLabel>
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
               <Input
                 id={`${ids}-targetPrice`}
                 inputMode="decimal"
@@ -692,7 +690,7 @@ export function ThesisEditor({
                 aria-invalid={invalid('targetPrice') || invalid('direction') || undefined}
                 aria-required
                 aria-describedby={`${ids}-direction-said ${ids}-targetPrice-error ${ids}-direction-error`}
-                className={cn(FIELD_BOX, 'h-11 tabular-nums disabled:opacity-60')}
+                className={cn(FIELD_BOX, 'h-11 tabular-nums disabled:opacity-60 sm:w-56')}
               />
               {/* Which way it bets, from the target (TC-24). */}
               <p
@@ -711,83 +709,88 @@ export function ThesisEditor({
                     }),
                   })}
               </p>
-              {/* Without the current price, the direction is chosen. */}
-              {choosing && (
-                <>
-                  <span id={`${ids}-target-label`} className="sr-only">
-                    {t('thesis.target.label')}
-                  </span>
-                  <Controller
-                    control={control}
-                    name="direction"
-                    render={({ field }) => (
-                      <ChoiceGroup
-                        id={`${ids}-direction`}
-                        labelledBy={`${ids}-target-label`}
-                        describedBy={`${ids}-direction-error`}
-                        options={THESIS_DIRECTIONS.map((value) => ({
-                          value,
-                          label: t(`thesis.target.${value === 'ABOVE' ? 'above' : 'below'}`),
-                        }))}
-                        value={field.value}
-                        onChange={field.onChange}
-                        invalid={invalid('direction')}
-                        required
-                      />
-                    )}
-                  />
-                </>
-              )}
-              <FieldError
-                id={`${ids}-targetPrice-error`}
-                errors={fieldError('targetPrice')}
-                className="type-meta"
-              />
-              {/* A missing direction is said where it can be fixed: a target equal to the price,
-                  or the pills. Without an asset, the asset's error says what to do. */}
-              <FieldError
-                id={`${ids}-direction-error`}
-                errors={
-                  derived === null
-                    ? [{ message: t('thesis.errors.samePrice') }]
-                    : choosing
-                      ? fieldError('direction')
-                      : undefined
-                }
-                className="type-meta"
-              />
-            </Field>
-          </div>
+            </div>
+            {/* Without the current price, the direction is chosen. */}
+            {choosing && (
+              <>
+                <span id={`${ids}-target-label`} className="sr-only">
+                  {t('thesis.target.label')}
+                </span>
+                <Controller
+                  control={control}
+                  name="direction"
+                  render={({ field }) => (
+                    <ChoiceGroup
+                      id={`${ids}-direction`}
+                      labelledBy={`${ids}-target-label`}
+                      describedBy={`${ids}-direction-error`}
+                      options={THESIS_DIRECTIONS.map((value) => ({
+                        value,
+                        label: t(`thesis.target.${value === 'ABOVE' ? 'above' : 'below'}`),
+                      }))}
+                      value={field.value}
+                      onChange={field.onChange}
+                      invalid={invalid('direction')}
+                      required
+                    />
+                  )}
+                />
+              </>
+            )}
+            <FieldError
+              id={`${ids}-targetPrice-error`}
+              errors={fieldError('targetPrice')}
+              className="type-meta"
+            />
+            {/* A missing direction is said where it can be fixed: a target equal to the price,
+                or the pills. Without an asset, the asset's error says what to do. */}
+            <FieldError
+              id={`${ids}-direction-error`}
+              errors={
+                derived === null
+                  ? [{ message: t('thesis.errors.samePrice') }]
+                  : choosing
+                    ? fieldError('direction')
+                    : undefined
+              }
+              className="type-meta"
+            />
+          </Field>
 
           {/* The conviction in its own row, with what it weighs (TC-25, TC-30). */}
-          <Field data-invalid={invalid('conviction') || undefined} className="gap-1.5">
+          <Field data-invalid={invalid('conviction') || undefined} className="gap-1">
             <span id={`${ids}-conviction-label`} className="type-small font-medium">
               {t('thesis.conviction.label')}
             </span>
-            {/* Four rising bars, as the prototype's (TC-25). */}
-            <Controller
-              control={control}
-              name="conviction"
-              render={({ field }) => (
-                <LevelBars
-                  id={`${ids}-conviction`}
-                  labelledBy={`${ids}-conviction-label`}
-                  describedBy={`${ids}-conviction-help ${ids}-conviction-error`}
-                  levels={CONVICTIONS.map((value) => ({
-                    value,
-                    label: t(`thesis.conviction.${value}`),
-                  }))}
-                  value={field.value}
-                  onChange={field.onChange}
-                  prompt={t('thesis.conviction.prompt')}
-                  invalid={invalid('conviction')}
-                  required
-                />
-              )}
-            />
-            <p id={`${ids}-conviction-help`} className="px-1 type-meta text-muted-foreground">
-              {t('thesis.conviction.help')}
-            </p>
+            {/* Four rising bars, as the prototype's (TC-25), and what it weighs beside them from sm. */}
+            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-end sm:gap-4">
+              <Controller
+                control={control}
+                name="conviction"
+                render={({ field }) => (
+                  <LevelBars
+                    id={`${ids}-conviction`}
+                    labelledBy={`${ids}-conviction-label`}
+                    describedBy={`${ids}-conviction-help ${ids}-conviction-error`}
+                    levels={CONVICTIONS.map((value) => ({
+                      value,
+                      label: t(`thesis.conviction.${value}`),
+                    }))}
+                    value={field.value}
+                    onChange={field.onChange}
+                    prompt={t('thesis.conviction.prompt')}
+                    invalid={invalid('conviction')}
+                    required
+                  />
+                )}
+              />
+              <p
+                id={`${ids}-conviction-help`}
+                className="px-1 type-meta text-muted-foreground sm:pb-0.5"
+              >
+                {t('thesis.conviction.help')}
+              </p>
+            </div>
             <FieldError
               id={`${ids}-conviction-error`}
               errors={fieldError('conviction')}
@@ -795,7 +798,7 @@ export function ThesisEditor({
             />
           </Field>
 
-          <Field data-invalid={invalid('reasoning') || undefined} className="gap-1.5">
+          <Field data-invalid={invalid('reasoning') || undefined} className="gap-1">
             <FieldLabel htmlFor={`${ids}-reasoning`}>{t('thesis.reasoning.label')}</FieldLabel>
             {/* The box of a post's body, with its format toolbar and emojis (TC-08). */}
             <BodyTabs
@@ -825,10 +828,10 @@ export function ThesisEditor({
                   aria-invalid={invalid('reasoning') || undefined}
                   aria-required
                   aria-describedby={`${ids}-reasoning-error`}
-                  // Three lines to start, growing with the text (TC-32).
+                  // Two lines to start, growing with the text (TC-32).
                   className={cn(
                     BARE,
-                    'field-sizing-content max-h-96 min-h-16 resize-none text-base leading-[1.55] md:text-base',
+                    'field-sizing-content max-h-96 min-h-12 resize-none text-base leading-[1.55] md:text-base',
                   )}
                 />
                 <MentionField fieldRef={reasoningRef} search={searchMentions} />
