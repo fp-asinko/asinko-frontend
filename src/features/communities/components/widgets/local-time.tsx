@@ -1,17 +1,11 @@
 'use client'
 
 import { useFormatter, useTranslations, type DateTimeFormatOptions } from 'next-intl'
-import { useSyncExternalStore } from 'react'
-
-const subscribe = () => () => {}
-/** The zone of who looks; on the server (and before hydrating), none: the time goes in UTC. */
-const browserZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone
-const noZone = () => null
 
 /**
- * When an event happens (specs/community-widgets CW-06), in the zone of who looks: the server does
- * not know it, so it sends the time in UTC, saying so, and the browser writes it in its own zone
- * as soon as it can (no effect: an external store). An all-day event is a date, the same anywhere.
+ * When an event happens (specs/community-widgets CW-06), in the zone of who looks: the configured
+ * one, the same on the server and in the browser (specs/local-time LT-04). An all-day event is a
+ * date, the same anywhere.
  */
 export function LocalTime({
   startsAt,
@@ -24,13 +18,11 @@ export function LocalTime({
 }) {
   const format = useFormatter()
   const t = useTranslations('communities.widgets.calendar')
-  const zone = useSyncExternalStore(subscribe, browserZone, noZone)
   const options: DateTimeFormatOptions = {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
-    ...(allDay ? {} : { hour: 'numeric', minute: '2-digit' }),
-    timeZone: allDay ? 'UTC' : (zone ?? 'UTC'),
+    ...(allDay ? { timeZone: 'UTC' } : { hour: 'numeric', minute: '2-digit' }),
   }
   const start = new Date(startsAt)
   const when =
@@ -38,9 +30,11 @@ export function LocalTime({
       ? format.dateTimeRange(start, new Date(endsAt), options)
       : format.dateTime(start, options)
 
+  // Node and the browser carry different ICU data: the same time can come with another space
+  // (a narrow one before PM). Only that text: the zone is the same on both sides.
   return (
     <time dateTime={startsAt} suppressHydrationWarning>
-      {allDay ? t('allDayWhen', { when }) : zone ? when : t('utcWhen', { when })}
+      {allDay ? t('allDayWhen', { when }) : when}
     </time>
   )
 }

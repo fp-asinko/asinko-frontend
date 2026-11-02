@@ -19,12 +19,12 @@ Que toda fecha y hora absoluta del sitio se lea en la zona horaria de quien la m
 
 ## Criterios de aceptación
 
-- [ ] **LT-01** (L1) Al cargar cualquier página, si la cookie `asinko-tz` no tiene la zona del navegador, se escribe (`path=/`, un año, `SameSite=Lax`, `Secure` con https) y la página se refresca una vez. Con la cookie al día, no se refresca.
-- [ ] **LT-02** (L1) El servidor valida la cookie (una zona IANA que `Intl` conoce, de hasta 64 caracteres) y formatea con ella; sin cookie o con una inválida, en UTC. El navegador recibe la misma zona: la hidratación no ve dos fechas distintas.
-- [ ] **LT-03** (L1) Una zona que el servidor rechaza no hace refrescar en bucle: se refresca solo cuando la cookie cambia.
-- [ ] **LT-04** (L2) Las fechas absolutas salen en la zona de quien mira: la fecha límite de una tesis, "miembro desde", logros, la actualización del precio de un activo, el calendario de un grupo y el resto que use `useFormatter`/`getFormatter`. El calendario (`LocalTime`) deja de pasar a la hora local por su cuenta y usa la zona configurada; un evento de todo el día sigue siendo una fecha, igual en todas partes.
-- [ ] **LT-05** (L4) Una tesis con fecha límite el día D, publicada desde una zona UTC−3, se muestra "D" a su autor.
-- [ ] **LT-06** El presupuesto de JS se respeta (`e2e/performance.spec.ts`).
+- [x] **LT-01** (L1) Al cargar cualquier página, si la cookie `asinko-tz` no tiene la zona del navegador, se escribe (`path=/`, un año, `SameSite=Lax`, `Secure` con https) y la página se refresca una vez. Con la cookie al día, no se refresca.
+- [x] **LT-02** (L1) El servidor valida la cookie (una zona IANA que `Intl` conoce, de hasta 64 caracteres) y formatea con ella; sin cookie o con una inválida, en UTC. El navegador recibe la misma zona: la hidratación no ve dos fechas distintas.
+- [x] **LT-03** (L1) Una zona que el servidor rechaza no hace refrescar en bucle: se refresca solo cuando la cookie cambia.
+- [x] **LT-04** (L2) Las fechas absolutas salen en la zona de quien mira: la fecha límite de una tesis, "miembro desde", logros, la actualización del precio de un activo, el calendario de un grupo y el resto que use `useFormatter`/`getFormatter`. El calendario (`LocalTime`) deja de pasar a la hora local por su cuenta y usa la zona configurada; un evento de todo el día sigue siendo una fecha, igual en todas partes.
+- [x] **LT-05** (L4) Una tesis con fecha límite el día D, publicada desde una zona UTC−3, se muestra "D" a su autor.
+- [x] **LT-06** El presupuesto de JS se respeta (`e2e/performance.spec.ts`).
 
 ## Fuera de alcance
 

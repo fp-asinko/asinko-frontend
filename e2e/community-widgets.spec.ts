@@ -20,6 +20,8 @@ test.describe('A group as a web page, as Reddit', () => {
     await page.goto('/en/hub/macro')
     const banner = page.getByRole('main').getByRole('heading', { level: 1, name: '#macro' })
     await expect(banner).toBeVisible()
+    // Measured once it is laid out: the heading can show a moment before its box has a size.
+    await expect(page.locator('[data-hero]')).toBeVisible()
     const hero = (await page.locator('[data-hero]').boundingBox())!
     const aside = (await column(page).boundingBox())!
     // Over the right column too (the banner bleeds over main's 16px gutter), and the column below.

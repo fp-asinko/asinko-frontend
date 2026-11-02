@@ -409,8 +409,7 @@
       },
       "calendar": {
         "empty": "Sem eventos próximos",
-        "allDayWhen": "{when} · O dia todo",
-        "utcWhen": "{when} (UTC)"
+        "allDayWhen": "{when} · O dia todo"
       },
       "editor": {
         "edit": "Editar widgets",

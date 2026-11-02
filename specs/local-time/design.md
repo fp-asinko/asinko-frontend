@@ -22,7 +22,7 @@
 
 ## 4. El calendario (LT-04)
 
-`LocalTime` deja el `useSyncExternalStore` y la etiqueta "(UTC)": formatea con la zona configurada, como el resto. Un evento de todo el día sigue en UTC: es una fecha. Se va la clave `communities.widgets.calendar.utcWhen`.
+`LocalTime` deja el `useSyncExternalStore` y la etiqueta "(UTC)": formatea con la zona configurada, como el resto. Conserva `suppressHydrationWarning`: Node y el navegador traen ICU distintos y la misma hora puede salir con otro espacio (uno angosto antes de "PM"). Sin él, React vuelve a dibujar todo el `body` al hidratar y se pierde lo que se estaba escribiendo. Lo encontraron los e2e de comentarios, que fallaban en las páginas con el calendario de #macro. Un evento de todo el día sigue en UTC: es una fecha. Se va la clave `communities.widgets.calendar.utcWhen`.
 
 ## 5. Tests
 

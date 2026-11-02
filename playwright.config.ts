@@ -10,7 +10,28 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
-  use: { baseURL: BASE_URL, trace: 'on-first-retry' },
+  use: {
+    baseURL: BASE_URL,
+    trace: 'on-first-retry',
+    // Every test in UTC, its zone already told to the server (specs/local-time): no refresh on the
+    // first load, and the same dates on any machine. e2e/local-time.spec.ts starts without it.
+    timezoneId: 'UTC',
+    storageState: {
+      cookies: [
+        {
+          name: 'asinko-tz',
+          value: 'UTC',
+          domain: 'localhost',
+          path: '/',
+          expires: -1,
+          httpOnly: false,
+          secure: false,
+          sameSite: 'Lax',
+        },
+      ],
+      origins: [],
+    },
+  },
   projects: [
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
