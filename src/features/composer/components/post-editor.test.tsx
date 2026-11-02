@@ -129,6 +129,8 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
       'Text',
       'Link',
       'Image',
+      // Another editor, swapped by the page (specs/thesis-create TC-01).
+      'Thesis',
     ])
     expect(screen.getByRole('tab', { name: 'Text' })).toHaveAttribute('aria-selected', 'true')
   })

@@ -17,7 +17,7 @@ import { communitySlugSchema } from '@/lib/communities/community-slug.schema'
 import { LEFT_COLUMN_SUBMIT_COOKIE, submitOpen } from '@/lib/left-column'
 import { getViewer } from '@/lib/session'
 import { SUBMIT_SEGMENT } from '@/i18n/submit-path'
-import { draftKey } from '../lib/draft-key'
+import { draftKey, thesisDraftKey } from '../lib/draft-key'
 import { RELATED_MAX } from '../schemas/create-post.schema'
 import { getSubmitCommunity } from '../lib/submit-community'
 import type { PreviewAction } from './body-tabs'
@@ -28,7 +28,7 @@ type SearchParams = Record<string, string | string[] | undefined>
 /** The page's query: user input, checked; anything odd is left out (SU-01). */
 const querySchema = z.object({
   community: z.string().min(1).max(64).optional().catch(undefined),
-  type: z.enum(['text', 'link', 'image', 'thought']).optional().catch(undefined),
+  type: z.enum(['text', 'link', 'image', 'thought', 'thesis']).optional().catch(undefined),
 })
 
 /** A related one's slug (specs/related-aside RA-04): a group's or an asset's. */
@@ -127,7 +127,9 @@ export async function SubmitPage({
         ? 'IMAGE'
         : query.type === 'thought'
           ? 'THOUGHT'
-          : 'TEXT'
+          : query.type === 'thesis'
+            ? 'THESIS'
+            : 'TEXT'
   // The related ones of the URL that exist and can be tagged: groups and assets (RA-04).
   const related = (
     await Promise.all(query.related.map((slug) => getSubmitCommunity(slug, viewer.username)))
@@ -168,6 +170,7 @@ export async function SubmitPage({
           type={type}
           community={community?.option ?? null}
           storageKey={draftKey(viewer.id)}
+          thesisStorageKey={thesisDraftKey(viewer.id)}
           related={related}
           preview={preview}
         />

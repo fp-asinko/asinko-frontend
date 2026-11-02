@@ -226,3 +226,28 @@ describe('CommunityPicker as "+" (specs/related-tags RT-01, RT-03)', () => {
     expect(onChange).toHaveBeenCalledWith(BTC)
   })
 })
+
+describe('CommunityPicker only="assets" (specs/thesis-create TC-02)', () => {
+  beforeEach(() => vi.clearAllMocks())
+
+  it('chooses an asset: asks only for assets, without the kind chips, even after a #', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    action.searchCommunities.mockResolvedValue({ ok: true, data: [BTC] })
+    const onChange = vi.fn()
+    renderWithIntl(<CommunityPicker id="asset" value={null} onChange={onChange} only="assets" />)
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    expect(chip()).toHaveTextContent('Choose an asset')
+
+    await open()
+    expect(action.searchCommunities).toHaveBeenCalledWith('', 'assets')
+    expect(screen.queryByRole('button', { name: 'All' })).toBeNull()
+
+    await user.type(screen.getByRole('combobox', { name: 'Search assets' }), '#bt')
+    await act(async () => vi.advanceTimersByTime(300))
+    expect(action.searchCommunities).toHaveBeenLastCalledWith('bt', 'assets')
+
+    await user.click(await screen.findByRole('option', { name: /BTC/ }))
+    expect(onChange).toHaveBeenCalledWith(BTC)
+    vi.useRealTimers()
+  })
+})

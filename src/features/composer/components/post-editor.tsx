@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlignLeftIcon, ImageIcon, LinkIcon, QuoteIcon } from 'lucide-react'
+import { LinkIcon } from 'lucide-react'
 import { useFormatter, useLocale, useNow, useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type RefObject } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
@@ -11,7 +11,7 @@ import { MentionField } from '@/components/molecules/mention-assist'
 import { useAuthGate } from '@/components/organisms/auth-gate'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { searchMentions } from '@/lib/mentions/search-mentions.action'
 import { postPath } from '@/lib/posts/paths'
@@ -38,6 +38,7 @@ import {
 import { useSavedDraft } from '../hooks/use-saved-draft'
 import { CommunityPicker } from './community-picker'
 import { DraftsButton } from './drafts-button'
+import { FormatTabs } from './format-tabs'
 import { DRAFT_LIMIT } from './drafts-dialog'
 import { ImageField, type TakeImage } from './image-field'
 import { BodyTabs, type PreviewAction } from './body-tabs'
@@ -47,13 +48,6 @@ import { TagPicker } from './tag-picker'
 /** A field without its own box: the composer box around them is the box, as X. */
 const BARE =
   'h-auto rounded-none border-0 bg-transparent p-0 text-foreground shadow-none focus-visible:ring-0 aria-invalid:ring-0 dark:bg-transparent'
-
-/**
- * A format, as Reddit's tabs: its name, a line under the chosen one (SF-02), on the row's border
- * (shadcn's sits 5px below it). Narrower in phones: the four fit 360px in every language.
- */
-const FORMAT =
-  'h-10 flex-none gap-1.5 rounded-none border-0 px-2 type-action text-muted-foreground hover:text-foreground data-active:text-foreground group-data-horizontal/tabs:after:-bottom-px sm:px-3 [&_svg]:size-4'
 
 /** A field in its own box, as Reddit's title (SF-03, SF-05): the border darkens while writing. */
 const FIELD_BOX =
@@ -125,6 +119,7 @@ export function PostEditor({
   onCancel,
   onPublished,
   onCommunityChange,
+  onThesis,
   related: initialRelated = [],
   onRelatedChange,
   preview,
@@ -149,6 +144,8 @@ export function PostEditor({
   onPublished: (path: string) => void
   /** Another community chosen: the page follows it in its URL (SU-03). */
   onCommunityChange?: (community: CommunityOption | null) => void
+  /** The Thesis tab: the page shows the thesis editor (specs/thesis-create TC-01). */
+  onThesis?: () => void
 }) {
   const t = useTranslations('composer')
   const locale = useLocale()
@@ -507,6 +504,9 @@ export function PostEditor({
         onValueChange={(next) => {
           if (next === 'TEXT' || next === 'LINK' || next === 'IMAGE' || next === 'THOUGHT') {
             setValue('type', next)
+          } else if (next === 'THESIS') {
+            // Another editor: the page swaps them (specs/thesis-create § 2).
+            onThesis?.()
           }
         }}
         className="flex flex-1 flex-col gap-0"
@@ -573,31 +573,7 @@ export function PostEditor({
             />
           </Field>
 
-          {/* The formats on top, as Reddit's (SF-02). Icons and names: room enough here. */}
-          <TabsList
-            variant="line"
-            aria-label={t('type.label')}
-            className="h-auto w-full justify-start gap-1 border-b p-0"
-          >
-            {/* First, as the prototype's; Text stays the one chosen on arrival. Only its text, no
-                title (specs/thoughts TH-03). */}
-            <TabsTrigger value="THOUGHT" className={FORMAT}>
-              <QuoteIcon aria-hidden />
-              {t('type.thought')}
-            </TabsTrigger>
-            <TabsTrigger value="TEXT" className={FORMAT}>
-              <AlignLeftIcon aria-hidden />
-              {t('type.text')}
-            </TabsTrigger>
-            <TabsTrigger value="LINK" className={FORMAT}>
-              <LinkIcon aria-hidden />
-              {t('type.link')}
-            </TabsTrigger>
-            <TabsTrigger value="IMAGE" className={FORMAT}>
-              <ImageIcon aria-hidden />
-              {t('type.image')}
-            </TabsTrigger>
-          </TabsList>
+          <FormatTabs />
 
           {/* A thought has no title: hidden, still mounted, so what was typed is back on a switch
               (the action leaves it out of a thought, TH-03). */}

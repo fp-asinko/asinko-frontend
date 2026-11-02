@@ -19,6 +19,8 @@ vi.mock('../actions/drafts.action', () => ({
   deleteDraft: vi.fn(),
 }))
 vi.mock('../actions/upload-post-image.action', () => ({ uploadPostImageAction: vi.fn() }))
+vi.mock('../actions/create-thesis.action', () => ({ createThesis: vi.fn() }))
+vi.mock('../actions/asset-quote.action', () => ({ getAssetQuote: vi.fn() }))
 vi.mock('../actions/search-communities.action', () => ({
   searchCommunities: actions.searchCommunities,
 }))
@@ -36,6 +38,34 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12)', () => {
   afterEach(() => {
     clearDraft(KEY)
     forgetOpenedDraft(KEY)
+  })
+
+  it('swaps to the thesis editor and back from the tabs, losing nothing (specs/thesis-create TC-01)', async () => {
+    renderWithIntl(<SubmitEditor type="TEXT" community={DEFI} storageKey={KEY} />)
+    await userEvent.type(title(), 'Keep me')
+    await userEvent.click(screen.getByRole('tab', { name: 'Thesis' }))
+    expect(router.replace).toHaveBeenLastCalledWith('/submit?community=defi&type=thesis', {
+      scroll: false,
+    })
+    await vi.waitFor(() =>
+      expect(screen.getByRole('tab', { name: 'Thesis', selected: true })).toBeInTheDocument(),
+    )
+    // The post's editor stays, hidden.
+    expect(screen.queryByRole('textbox', { name: 'Title' })).toBeNull()
+
+    await userEvent.click(screen.getByRole('tab', { name: 'Link' }))
+    expect(router.replace).toHaveBeenLastCalledWith('/submit?community=defi&type=link', {
+      scroll: false,
+    })
+    expect(title()).toHaveValue('Keep me')
+  })
+
+  it('opens on the thesis editor from the URL', async () => {
+    renderWithIntl(<SubmitEditor type="THESIS" community={DEFI} storageKey={KEY} />)
+    await vi.waitFor(() =>
+      expect(screen.getByRole('tab', { name: 'Thesis', selected: true })).toBeInTheDocument(),
+    )
+    expect(screen.queryByRole('textbox', { name: 'Title' })).toBeNull()
   })
 
   it('follows another community in the URL, keeping what is written', async () => {

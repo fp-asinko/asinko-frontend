@@ -62,7 +62,8 @@ function subtitle(option: CommunityOption) {
  * browser never calls the API. Chips under the search keep only groups or only assets, and a
  * leading `#` or `$` in the search picks them too, as in mentions (specs/picker-filters). As "+"
  * (`variant="add"`), it adds a related community or asset: no value, and neither "Your profile"
- * nor the handles in `exclude` (specs/related-tags RT-01, RT-03).
+ * nor the handles in `exclude` (specs/related-tags RT-01, RT-03). With `only="assets"`, it chooses
+ * a thesis's asset (specs/thesis-create TC-02): only assets, without the kind chips.
  */
 export function CommunityPicker({
   id,
@@ -72,6 +73,7 @@ export function CommunityPicker({
   describedBy,
   variant = 'chip',
   exclude = [],
+  only,
 }: {
   id: string
   value: CommunityOption | null
@@ -81,12 +83,15 @@ export function CommunityPicker({
   variant?: 'chip' | 'add'
   /** Handles not to offer: the main community and the related ones already added. */
   exclude?: readonly string[]
+  /** Only assets, always: the asset of a thesis. */
+  only?: 'assets'
 }) {
   const t = useTranslations('composer.community')
   const [options, setOptions] = useState<CommunityOption[]>(value ? [value] : [])
   const [failed, setFailed] = useState(false)
   const [loading, startTransition] = useTransition()
-  const [kind, setKind] = useState<CommunityKind>('all')
+  const start: CommunityKind = only ?? 'all'
+  const [kind, setKind] = useState<CommunityKind>(start)
   const [text, setText] = useState('')
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const asked = useRef<string | null>(null)
@@ -133,7 +138,11 @@ export function CommunityPicker({
     load(search, next)
   }
 
-  const label = value ? (value.own ? t('yourProfile') : value.handle) : t('placeholder')
+  const label = value
+    ? value.own
+      ? t('yourProfile')
+      : value.handle
+    : t(only ? 'assetPlaceholder' : 'placeholder')
 
   return (
     <Combobox<CommunityOption>
@@ -148,10 +157,10 @@ export function CommunityPicker({
       isItemEqualToValue={(option, selected) => option.id === selected.id}
       onOpenChange={(open) => {
         if (!open) return
-        // Every opening starts on All (PF-01): the search is empty again.
+        // Every opening starts on All (PF-01), or on assets alone: the search is empty again.
         bySymbol.current = false
-        setKind('all')
-        load('', 'all')
+        setKind(start)
+        load('', start)
       }}
       inputValue={text}
       onInputValueChange={(next, details) => {
@@ -160,7 +169,9 @@ export function CommunityPicker({
         if (details.reason !== 'input-change') return
         const { kind: typed, search } = readSearch(next)
         let of = kind
-        if (typed) {
+        if (only) {
+          of = only
+        } else if (typed) {
           of = typed
           bySymbol.current = true
         } else if (bySymbol.current) {
@@ -205,14 +216,15 @@ export function CommunityPicker({
       >
         <ComboboxInput
           showTrigger={false}
-          placeholder={t('search')}
-          aria-label={t('search')}
+          placeholder={t(only ? 'assetSearch' : 'search')}
+          aria-label={t(only ? 'assetSearch' : 'search')}
           // Light: the surface gray, no ring; the active field's border only while typing.
           className="h-9! rounded-lg border-transparent! bg-surface! has-[[data-slot=input-group-control]:focus-visible]:border-input! has-[[data-slot=input-group-control]:focus-visible]:ring-0 [&_input]:text-foreground"
         />
         <div
           role="group"
           aria-label={t('filter')}
+          hidden={Boolean(only)}
           className="flex flex-wrap gap-1.5 px-1 pt-2 pb-1"
         >
           {KINDS.map((each) => (

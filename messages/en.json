@@ -914,14 +914,17 @@
       },
       "emptyGroups": "No communities found",
       "emptyAssets": "No assets found",
-      "addRelated": "Add a related community or asset"
+      "addRelated": "Add a related community or asset",
+      "assetPlaceholder": "Choose an asset",
+      "assetSearch": "Search assets"
     },
     "type": {
       "label": "Post type",
       "text": "Text",
       "link": "Link",
       "image": "Image",
-      "thought": "Thought"
+      "thought": "Thought",
+      "thesis": "Thesis"
     },
     "fields": {
       "title": "Title",

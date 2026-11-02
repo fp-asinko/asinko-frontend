@@ -24,6 +24,8 @@ describe('the page to create a post: its URL (specs/submit-page SU-01)', () => {
       type: 'link',
       related: [],
     })
+    // The thesis's tab too (specs/thesis-create TC-01).
+    expect(parseSubmitQuery({ type: 'thesis' }).type).toBe('thesis')
     expect(parseSubmitQuery({ community: ['BTC', 'ETH'], type: 'video' })).toEqual({
       community: 'BTC',
       type: undefined,

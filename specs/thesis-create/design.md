@@ -23,7 +23,8 @@ Todo en `features/composer`: es una forma más de crear, en la misma página (`s
 - `parseSubmitQuery` suma `thesis` a `type`. `SubmitPage` pasa `type: 'THESIS'`.
 - `SubmitEditor` decide: con `THESIS` dibuja `ThesisEditor` (cargado con `next/dynamic`, con el mismo `EditorSkeleton`); si no, `PostEditor`. Cambiar de pestaña llama a `onTypeChange`, que hace `router.replace(submitPath(locale, { community, type }))` sin scroll: la URL dice dónde está la persona y "atrás" no se llena de pestañas.
 - **`FormatTabs`**: la fila de pestañas sale de `PostEditor` a su propio componente, con las cinco (`THOUGHT`, `TEXT`, `LINK`, `IMAGE`, `THESIS`) y el mismo estilo (`FORMAT`). `PostEditor` la sigue usando para sus cuatro (cambian el formulario ahí mismo, como hoy) y la quinta llama a `onTypeChange('THESIS')`. `ThesisEditor` la dibuja con `THESIS` elegida, y cualquier otra llama a `onTypeChange`.
-- Cada editor tiene su propio guardado local: pasar de un post a una tesis y volver no pierde lo escrito en ninguno.
+- **Los dos editores quedan montados** una vez abiertos, el otro oculto (`hidden`): pasar de un post a una tesis y volver no pierde lo escrito ni vuelve a ofrecer el borrador. Cada uno tiene además su propio guardado local. Cancelar con algo escrito en cualquiera de los dos pregunta, y descartar borra los dos borradores.
+- `EditorSkeleton` pasa a su propio archivo (`submit-editor-skeleton.tsx`): lo usan el loader de la página y la carga diferida del editor de tesis.
 - `submitPath` suma `thesis` a sus tipos.
 
 ## 3. El formulario (`ThesisEditor`)
