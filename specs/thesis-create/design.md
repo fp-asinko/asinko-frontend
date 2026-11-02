@@ -121,7 +121,7 @@ export async function createThesis(raw: unknown): Promise<ActionResult<{ usernam
 
 - Otra clave, `asinko:thesis-draft:{userId}` (`thesisDraftKey`), con el mismo patrón que `use-post-draft.ts`: escribe a los 500 ms de dejar de escribir y en `pagehide`, `try/catch` en todo acceso, Recuperar / Descartar al volver.
 - Guarda la comunidad, el activo, el claim, la dirección, el precio, la fecha, la convicción y el razonamiento. **No** guarda el checkbox del disclaimer: se acepta en cada publicación.
-- `use-post-draft.ts` y el nuevo comparten cómo se lee y se escribe (`read`, `writeDraft`, `clearDraft`, `discardDraft`, lo ya ofrecido y el `useSyncExternalStore` de `useStoredDraft`). Lo que no depende de la forma del borrador se sube a `lib/local-draft.ts`, parametrizado por el esquema zod de cada uno. Es el segundo uso y no el tercero, pero el código sería idéntico.
+- `use-post-draft.ts` y el nuevo comparten cómo se lee y se escribe (`read`, `writeDraft`, `clearDraft`, `discardDraft`, lo ya ofrecido y el `useSyncExternalStore` de `useStoredDraft`). Lo que no depende de la forma del borrador se sube a `hooks/use-local-draft.ts` (lleva el hook `useLocalDraft`, por eso no va en `lib/`), parametrizado por el esquema zod de cada uno. Es el segundo uso y no el tercero, pero el código sería idéntico.
 
 ## 9. Mocks (TC-18)
 
