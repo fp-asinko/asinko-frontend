@@ -2,7 +2,7 @@
 
 Rama: `feature/thesis-create`, desde `develop`. Requirements y design aprobados por el PO el 2026-11-02.
 
-- [ ] **T-01 (S)** Esquema `create-thesis.schema.ts` y `lib/thesis-deadline.ts` (`deadlineAt`, `thesisDeadlineRange`, `isDeadlineInRange`). Tests. → TC-04 a TC-07, TC-13
+- [x] **T-01 (S)** Esquema `create-thesis.schema.ts` y `lib/thesis-deadline.ts` (`deadlineAt`, `thesisDeadlineRange`, `isDeadlineInRange`). Tests. → TC-04 a TC-07, TC-13
 - [ ] **T-02 (M)** `lib/theses-api.ts`, las actions `createThesis` y `getAssetQuote`, y el mock de `POST /theses` con sus errores (la tesis se suma a las del usuario). Tests y `fixtures.test.ts`. → TC-13, TC-15, TC-18
 - [ ] **T-03 (S)** `lib/local-draft.ts` (lo común del guardado local, sacado de `use-post-draft.ts` sin cambiar su comportamiento) y `use-thesis-draft.ts`. Tests. → TC-10
 - [ ] **T-04 (M)** `FormatTabs` (fuera de `PostEditor`, con la quinta pestaña), `?type=thesis` en `parseSubmitQuery` y `submitPath`, `SubmitEditor` que cambia de editor, y `only="assets"` en `CommunityPicker`. Tests. → TC-01
