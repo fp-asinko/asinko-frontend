@@ -36,9 +36,9 @@ Publicar una tesis, el contenido central de Asinko: una predicción falsable sob
 - [ ] **TC-02** **Activo**: un selector con búsqueda sobre el catálogo de activos soportados (`$` + símbolo, nombre y precio actual cuando lo hay). Solo se elige uno del catálogo, nunca un texto libre. Entrando desde la página de un activo, o con `?community=` de la comunidad de un activo, viene elegido.
 - [ ] **TC-03** (Q5) Al elegir el activo queda elegida su comunidad en el selector de comunidad, si quien escribe no eligió otra a mano. Se puede cambiar a cualquier comunidad o al canal personal propio.
 - [ ] **TC-04** (Q2) **Claim**: una línea, obligatoria, de hasta **280** caracteres con contador. Ayuda: "Una frase clara que se pueda comprobar".
-- [ ] **TC-05** (Q3) **Dirección y precio objetivo**, obligatorios: "Por encima de" o "Por debajo de" y un precio mayor que cero, en la misma unidad que el precio del activo (el contrato no trae la moneda: el campo no muestra un símbolo de moneda). Con el activo elegido, se muestra su precio actual como referencia (con "desactualizado" si `priceStale`) y la diferencia en % con el objetivo. Un objetivo del lado contrario a la dirección (por ejemplo "por encima de" un precio menor al actual) se avisa, pero no se bloquea.
+- [ ] **TC-05** (Q3; ajustado por R1 y R3) **Dirección y precio objetivo**, obligatorios: "Por encima de" o "Por debajo de" y un precio mayor que cero, en la misma unidad que el precio del activo (el contrato no trae la moneda: el campo no muestra un símbolo de moneda). Con el activo elegido, se muestra su precio actual como referencia (con "desactualizado" si `priceStale`) y la diferencia en % con el objetivo. Un objetivo del lado contrario a la dirección (por ejemplo "por encima de" un precio menor al actual) se avisa, pero no se bloquea. **Desde la revisión 2:** la referencia es la tarjeta del activo (TC-22) y la dirección sale del objetivo (TC-24); el aviso de lado contrario ya no hace falta.
 - [ ] **TC-06** (Q4) **Fecha límite**, obligatoria, con un selector de fecha. Lo más cerca es el día en que, a las 23:59, falten más de 24 h; lo más lejos, 5 años. Fuera de ese rango, el campo lo dice.
-- [ ] **TC-07** **Convicción**, obligatoria: cuatro opciones, **Baja, Media, Alta y Extrema** (`LOW` a `EXTREME`), con una ayuda: la convicción pesa en tu calibración, y una errada con convicción extrema pesa más.
+- [ ] **TC-07** (con la forma de TC-25) **Convicción**, obligatoria: cuatro opciones, **Baja, Media, Alta y Extrema** (`LOW` a `EXTREME`), con una ayuda: la convicción pesa en tu calibración, y una errada con convicción extrema pesa más.
 - [ ] **TC-08** **Razonamiento**, obligatorio: el argumento detrás del claim, con la misma caja de texto del cuerpo de un post (Markdown, formato y emojis).
 - [ ] **TC-09** Mientras falte un campo obligatorio o haya uno inválido, "Publicar" está deshabilitado, igual que en el formulario de posts. Un error (un claim largo, una fecha fuera de rango) aparece en su campo al tocar "Publicar" y se actualiza mientras se corrige, como en los posts (design.md § 3, ajustado el 2026-11-02).
 - [ ] **TC-10** (Q8) Lo escrito se guarda en el navegador mientras se edita y vuelve al recargar o al volver a la pestaña, hasta publicar o descartar. "Guardar borrador" no aparece en la pestaña Tesis.
@@ -67,6 +67,17 @@ Publicar una tesis, el contenido central de Asinko: una predicción falsable sob
 - [ ] **TC-19** El presupuesto de JS se respeta: la pestaña Tesis y la confirmación se cargan diferidas, como el editor (`seo.md`).
 - [ ] **TC-20** Textos en en, es y pt.
 - [ ] **TC-21** `overview.md § Tesis` dice 280 caracteres (Q2) y que el precio objetivo es obligatorio (Q3).
+
+## Revisión 2: el estilo del prototipo (2026-11-02)
+
+Pedido del PO al ver la primera versión, con una captura del prototipo (`CreateTesisScreen`): "me gusta más como está en el prototipo, usar el gráfico en barras para elegir la convicción y la UI que plantea". Decisiones R1 a R6, las recomendadas ("dale").
+
+- [x] **TC-22** (R1) Debajo del activo, su **tarjeta**: el símbolo y el nombre a la izquierda; a la derecha el precio y la variación del día con flecha y color (verde sube, rojo baja; la flecha y el signo siempre, el color nunca solo). "Desactualizado" si `priceStale`. Debajo, la ayuda "El precio de referencia se toma al publicar". Sin precio (no se pudo leer), la tarjeta muestra solo el símbolo y el nombre.
+- [x] **TC-23** (R2) **Fecha límite y objetivo lado a lado** desde `sm`, cada uno con su etiqueta; en el teléfono, uno debajo del otro.
+- [x] **TC-24** (R3) **La dirección sale del objetivo**: con el precio actual, un objetivo mayor es "por encima" y uno menor "por debajo", dicho debajo del campo ("Por encima del precio actual · +50 %"). Un objetivo igual al precio actual se marca como error. Sin precio, aparecen las dos píldoras para elegirla, como antes.
+- [x] **TC-25** (R4) **Convicción en 4 barras** de alturas crecientes, con el nombre al lado ("Media"). Se elige tocando una barra o con el teclado (un grupo de opciones: flechas, una sola parada de Tab, foco visible). Se llenan hasta la elegida en negro; con Extrema, en rojo (`--destructive`). Sin elegir, el nombre dice "Elige tu convicción".
+- [x] **TC-26** (R5) El ejemplo del claim usa el activo y un objetivo de muestra (1,5 veces el precio): "ej.: BTC > 146.145 antes de la fecha límite". Sin activo, el ejemplo genérico.
+- [x] **TC-27** (R6) Con la pestaña Tesis, el H1 de la página es **"Publicar tesis"**, con el subtítulo "Tu tesis queda en tu historial. Se resuelve sola en la fecha límite.". Con un post, "Crear post" como hoy.
 
 ## Fuera de alcance
 

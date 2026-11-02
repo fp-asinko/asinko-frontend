@@ -75,7 +75,7 @@ const publish = () => screen.getByRole('button', { name: 'Publish' })
 /** Everything but where it goes and the asset, which come from the URL. */
 async function fill() {
   await userEvent.type(claim(), 'NVDA closes above 200')
-  await userEvent.click(screen.getByRole('radio', { name: 'Above' }))
+  // Above the current price (180): the direction comes from it (TC-24).
   await userEvent.type(price(), '200')
   // A date field: jsdom does not type into it as a browser (the e2e does), so its value is set.
   fireEvent.change(deadline(), { target: { value: thesisDeadlineRange(new Date()).min } })
@@ -86,7 +86,12 @@ async function fill() {
 describe('ThesisEditor (specs/thesis-create)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    actions.getAssetQuote.mockResolvedValue({ price: 180, stale: false })
+    actions.getAssetQuote.mockResolvedValue({
+      name: 'NVIDIA',
+      price: 180,
+      changePct: 2.14,
+      stale: false,
+    })
     actions.searchCommunities.mockResolvedValue({ ok: true, data: [NVDA, BTC, MACRO] })
   })
   afterEach(() => {
@@ -94,21 +99,51 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     forgetOpenedDraft(KEY)
   })
 
-  it('comes with the asset of an asset community, its price, and the claim focused (TC-02, TC-05)', async () => {
+  it('comes with the asset of an asset community and its card, and the claim focused (TC-02, TC-22, TC-26)', async () => {
     renderEditor()
     expect(screen.getByRole('combobox', { name: 'Asset' })).toHaveTextContent('$NVDA')
     expect(screen.getByRole('tab', { name: 'Thesis' })).toHaveAttribute('aria-selected', 'true')
     expect(claim()).toHaveFocus()
     expect(actions.getAssetQuote).toHaveBeenCalledWith('NVDA')
+    // The card: name, price and the day, with its arrow (spoken, not only colored).
+    expect(await screen.findByText('NVIDIA')).toBeVisible()
+    expect(screen.getByText('180')).toBeVisible()
+    expect(screen.getByText('2.14%')).toBeVisible()
+    expect(screen.getByText('The reference price is taken when you publish.')).toBeVisible()
+    // The claim's example, with the asset and a target half again its price.
+    expect(claim()).toHaveAttribute('placeholder', 'e.g. NVDA > 270 before the deadline')
+  })
 
-    await userEvent.click(screen.getByRole('radio', { name: 'Above' }))
+  it('takes the direction from the target, and refuses the current price itself (TC-24)', async () => {
+    renderEditor()
+    await screen.findByText('NVIDIA')
+    expect(screen.queryByRole('radiogroup', { name: 'Target' })).toBeNull()
     await userEvent.type(price(), '198')
-    expect(await screen.findByText(/Current price: 180 · the target is \+10%/)).toBeVisible()
-
-    // Above a price lower than today's: said, not blocked.
+    expect(screen.getByText('Above the current price · +10%')).toBeVisible()
     await userEvent.clear(price())
     await userEvent.type(price(), '150')
-    expect(screen.getByText(/already on that side/)).toBeVisible()
+    expect(screen.getByText('Below the current price · -16.7%')).toBeVisible()
+    await userEvent.clear(price())
+    await userEvent.type(price(), '180')
+    expect(
+      screen.getByText('The target can’t be the current price'.replace('’', "'")),
+    ).toBeVisible()
+  })
+
+  it('chooses the direction by hand when the price cannot be read (TC-24)', async () => {
+    actions.getAssetQuote.mockResolvedValue(null)
+    renderEditor()
+    const target = await screen.findByRole('radiogroup', { name: 'Target' })
+    await userEvent.click(within(target).getByRole('radio', { name: 'Below' }))
+    expect(within(target).getByRole('radio', { name: 'Below' })).toBeChecked()
+  })
+
+  it('fills the conviction bars up to the chosen one, and names it (TC-25)', async () => {
+    renderEditor()
+    expect(screen.getAllByText('Choose your conviction')[0]).toBeVisible()
+    await userEvent.click(screen.getByRole('radio', { name: 'Extreme' }))
+    expect(screen.getByRole('radio', { name: 'Extreme' })).toBeChecked()
+    expect(screen.getByText('Extreme', { selector: 'span' })).toBeVisible()
   })
 
   it('chooses the asset’s community, unless one was chosen by hand (TC-03)', async () => {
@@ -134,10 +169,10 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     await userEvent.type(claim(), 'abc')
     expect(screen.getByText('3/280')).toBeVisible()
     await userEvent.click(publish())
-    expect(await screen.findByText('Choose above or below')).toBeVisible()
-    expect(screen.getByText('Enter a price above zero')).toBeVisible()
+    expect(await screen.findByText('Enter a price above zero')).toBeVisible()
     expect(screen.getByText('Choose a day from tomorrow to 5 years from now')).toBeVisible()
-    expect(screen.getByText('Choose your conviction')).toBeVisible()
+    // The bars' name and the error say it.
+    expect(screen.getAllByText('Choose your conviction')).toHaveLength(2)
     expect(screen.getByText('Explain the reasoning')).toBeVisible()
     expect(screen.queryByRole('dialog')).toBeNull()
   })
@@ -151,7 +186,6 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     for (const name of ['Low', 'Medium', 'High', 'Extreme']) {
       expect(within(convictions).getByRole('radio', { name })).not.toBeChecked()
     }
-    expect(screen.getByRole('radiogroup', { name: 'Target' })).toHaveTextContent('AboveBelow')
   })
 
   it('confirms with the disclaimer, then publishes with the end of the day and goes on (TC-11 to TC-14)', async () => {
@@ -234,6 +268,8 @@ describe('ThesisEditor (specs/thesis-create)', () => {
   })
 
   it('recovers a draft from before, with its asset and community', async () => {
+    // Without the price, the direction it kept shows in the pills.
+    actions.getAssetQuote.mockResolvedValue(null)
     writeThesisDraft(KEY, {
       community: MACRO,
       asset: BTC,

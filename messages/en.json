@@ -1052,20 +1052,22 @@
     },
     "thesis": {
       "asset": {
-        "label": "Asset"
+        "label": "Asset",
+        "help": "The reference price is taken when you publish.",
+        "stale": "out of date"
       },
       "claim": {
         "label": "Claim",
         "placeholder": "e.g. $NVDA closes above 200 before the deadline",
-        "help": "One clear sentence that can be checked."
+        "help": "One clear sentence that can be checked.",
+        "example": "e.g. {symbol} > {target} before the deadline"
       },
       "target": {
         "label": "Target",
         "above": "Above",
         "below": "Below",
         "price": "Target price",
-        "reference": "Current price: {price}{stale, select, true { (out of date)} other {}}{change, select, none {} other { · the target is {change}}}",
-        "wrongSide": "The price is already on that side of the target."
+        "direction": "{direction, select, ABOVE {Above the current price} other {Below the current price}} · {change}"
       },
       "deadline": {
         "label": "Deadline",
@@ -1077,7 +1079,8 @@
         "LOW": "Low",
         "MEDIUM": "Medium",
         "HIGH": "High",
-        "EXTREME": "Extreme"
+        "EXTREME": "Extreme",
+        "prompt": "Choose your conviction"
       },
       "reasoning": {
         "label": "Reasoning",
@@ -1094,7 +1097,8 @@
         "reasoningRequired": "Explain the reasoning",
         "disclaimer": "Confirm that this is not financial advice",
         "rateLimited": "Wait a moment before publishing again",
-        "general": "Could not publish your thesis. Try again."
+        "general": "Could not publish your thesis. Try again.",
+        "samePrice": "The target can't be the current price"
       },
       "confirm": {
         "title": "Publish thesis",
@@ -1185,7 +1189,9 @@
       "OTHER": "Asset"
     },
     "loadError": "Could not load the community.",
-    "related": "Related ({count, number})"
+    "related": "Related ({count, number})",
+    "thesisTitle": "Publish thesis",
+    "thesisSubtitle": "Your thesis stays on your track record. It resolves by itself at the deadline."
   },
   "ads": {
     "label": "Ad",

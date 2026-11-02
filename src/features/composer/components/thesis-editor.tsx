@@ -6,6 +6,8 @@ import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type RefObject } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { ChoiceGroup } from '@/components/molecules/choice-group'
+import { Delta } from '@/components/molecules/delta'
+import { LevelBars } from '@/components/molecules/level-bars'
 import { EmojiButton } from '@/components/molecules/emoji-picker'
 import { applyFormat, FormatToolbar, formatShortcut } from '@/components/molecules/format-toolbar'
 import { MentionField } from '@/components/molecules/mention-assist'
@@ -180,6 +182,20 @@ export function ThesisEditor({
   )
   const quote = useAssetQuote(asset ? assetSymbolOf(asset) : null)
 
+  // The derived direction goes into the form, so it validates and is sent (TC-24).
+  const derivedNow = (() => {
+    const known = quote?.price ?? null
+    const typed = typedPrice(price)
+    if (known === null || typed === null) return known === null ? 'unknown' : undefined
+    return typed > known ? 'ABOVE' : typed < known ? 'BELOW' : undefined
+  })()
+  useEffect(() => {
+    if (derivedNow === 'unknown') return
+    setValue('direction', derivedNow as ThesisForm['direction'], {
+      shouldValidate: formState.isSubmitted,
+    })
+  }, [derivedNow, setValue, formState.isSubmitted])
+
   // On arrival the focus goes where the person starts: the asset, or the claim when it is there.
   useEffect(() => {
     document.getElementById(asset ? `${ids}-claim` : `${ids}-asset`)?.focus()
@@ -303,11 +319,9 @@ export function ThesisEditor({
   const reference = quote?.price ?? null
   const target = typedPrice(price)
   const change = reference !== null && target !== null ? (target - reference) / reference : null
-  const wrongSide =
-    reference !== null &&
-    target !== null &&
-    ((direction === 'ABOVE' && target <= reference) ||
-      (direction === 'BELOW' && target >= reference))
+  // With the current price, the target says the direction (TC-24); without it, the pills do.
+  const derived = change === null ? undefined : change > 0 ? 'ABOVE' : change < 0 ? 'BELOW' : null
+  const choosing = Boolean(asset) && quote === null
 
   const summary: ThesisSummary | null =
     confirming && asset ? { ...confirming, asset: asset.handle } : null
@@ -397,8 +411,36 @@ export function ThesisEditor({
               value={asset}
               onChange={chooseAsset}
               invalid={invalid('assetSymbol')}
-              describedBy={`${ids}-assetSymbol-error`}
+              describedBy={`${ids}-asset-help ${ids}-assetSymbol-error`}
             />
+            {/* The asset's card, as the prototype's (TC-22): on white, where a rise can be green. */}
+            {asset && (
+              <div className="flex items-center justify-between gap-3 rounded-lg border bg-background px-4 py-3">
+                <div className="min-w-0">
+                  <p className="type-action font-bold">{asset.handle}</p>
+                  <p className="truncate type-meta text-muted-foreground">
+                    {quote?.name ?? asset.name}
+                  </p>
+                </div>
+                {reference !== null && (
+                  <div className="shrink-0 text-right">
+                    <p className="type-action font-bold tabular-nums">
+                      {format.number(reference, { maximumFractionDigits: reference < 1 ? 6 : 2 })}
+                    </p>
+                    <p className="type-meta">
+                      {quote?.stale ? (
+                        <span className="text-muted-foreground">{t('thesis.asset.stale')}</span>
+                      ) : (
+                        quote?.changePct != null && <Delta value={quote.changePct} />
+                      )}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+            <p id={`${ids}-asset-help`} className="px-1 type-meta text-muted-foreground">
+              {t('thesis.asset.help')}
+            </p>
             <FieldError
               id={`${ids}-assetSymbol-error`}
               errors={fieldError('assetSymbol')}
@@ -410,7 +452,17 @@ export function ThesisEditor({
             <FieldLabel htmlFor={`${ids}-claim`}>{t('thesis.claim.label')}</FieldLabel>
             <Input
               id={`${ids}-claim`}
-              placeholder={t('thesis.claim.placeholder')}
+              // An example with the asset and a target half again its price (TC-26).
+              placeholder={
+                asset && reference !== null
+                  ? t('thesis.claim.example', {
+                      symbol: assetSymbolOf(asset),
+                      target: format.number(reference * 1.5, {
+                        maximumFractionDigits: reference * 1.5 < 1 ? 6 : 0,
+                      }),
+                    })
+                  : t('thesis.claim.placeholder')
+              }
               {...register('claim')}
               aria-invalid={invalid('claim') || undefined}
               aria-required
@@ -438,124 +490,134 @@ export function ThesisEditor({
             />
           </Field>
 
-          <Field
-            data-invalid={invalid('direction') || invalid('targetPrice') || undefined}
-            className="gap-1.5"
-          >
-            <span id={`${ids}-target-label`} className="type-small font-medium">
-              {t('thesis.target.label')}
-            </span>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <Controller
-                control={control}
-                name="direction"
-                render={({ field }) => (
-                  <ChoiceGroup
-                    id={`${ids}-direction`}
-                    labelledBy={`${ids}-target-label`}
-                    describedBy={`${ids}-direction-error`}
-                    options={THESIS_DIRECTIONS.map((value) => ({
-                      value,
-                      label: t(`thesis.target.${value === 'ABOVE' ? 'above' : 'below'}`),
-                    }))}
-                    value={field.value}
-                    onChange={field.onChange}
-                    invalid={invalid('direction')}
-                    required
-                  />
-                )}
+          {/* The deadline and the target side by side from sm, as the prototype's (TC-23). */}
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field data-invalid={invalid('deadline') || undefined} className="gap-1.5">
+              <FieldLabel htmlFor={`${ids}-deadline`}>{t('thesis.deadline.label')}</FieldLabel>
+              <Input
+                id={`${ids}-deadline`}
+                type="date"
+                min={range.min}
+                max={range.max}
+                {...register('deadline')}
+                aria-invalid={invalid('deadline') || undefined}
+                aria-required
+                aria-describedby={`${ids}-deadline-help ${ids}-deadline-error`}
+                className={cn(FIELD_BOX, 'h-11')}
               />
-              <FieldLabel htmlFor={`${ids}-targetPrice`} className="sr-only">
-                {t('thesis.target.price')}
-              </FieldLabel>
+              <p id={`${ids}-deadline-help`} className="px-1 type-meta text-muted-foreground">
+                {t('thesis.deadline.help')}
+              </p>
+              <FieldError
+                id={`${ids}-deadline-error`}
+                errors={fieldError('deadline')}
+                className="type-meta"
+              />
+            </Field>
+
+            <Field
+              data-invalid={invalid('direction') || invalid('targetPrice') || undefined}
+              className="gap-1.5"
+            >
+              <FieldLabel htmlFor={`${ids}-targetPrice`}>{t('thesis.target.price')}</FieldLabel>
               <Input
                 id={`${ids}-targetPrice`}
                 inputMode="decimal"
                 autoComplete="off"
-                placeholder={t('thesis.target.price')}
+                placeholder={
+                  reference !== null
+                    ? format.number(reference * 1.5, {
+                        maximumFractionDigits: reference * 1.5 < 1 ? 6 : 0,
+                      })
+                    : undefined
+                }
                 {...register('targetPrice')}
-                aria-invalid={invalid('targetPrice') || undefined}
+                aria-invalid={invalid('targetPrice') || invalid('direction') || undefined}
                 aria-required
-                aria-describedby={`${ids}-reference ${ids}-targetPrice-error`}
-                className={cn(FIELD_BOX, 'h-11 tabular-nums sm:w-44')}
+                aria-describedby={`${ids}-direction-said ${ids}-targetPrice-error ${ids}-direction-error`}
+                className={cn(FIELD_BOX, 'h-11 tabular-nums')}
               />
-            </div>
-            {/* The current price, as a reference (TC-05). Not live: it changes with every key of
-                the target, and the field already describes itself with it. */}
-            <p id={`${ids}-reference`} className="px-1 type-meta text-muted-foreground">
-              {reference !== null &&
-                t('thesis.target.reference', {
-                  price: format.number(reference, {
-                    maximumFractionDigits: reference < 1 ? 6 : 2,
-                  }),
-                  stale: String(Boolean(quote?.stale)),
-                  change:
-                    change === null
-                      ? 'none'
-                      : format.number(change, {
-                          style: 'percent',
-                          maximumFractionDigits: 1,
-                          signDisplay: 'exceptZero',
-                        }),
-                })}
-            </p>
-            {/* A target already reached: its own sentence, said when it appears. */}
-            <p role="status" className="px-1 type-meta text-muted-foreground">
-              {wrongSide && t('thesis.target.wrongSide')}
-            </p>
-            <FieldError
-              id={`${ids}-direction-error`}
-              errors={fieldError('direction')}
-              className="type-meta"
-            />
-            <FieldError
-              id={`${ids}-targetPrice-error`}
-              errors={fieldError('targetPrice')}
-              className="type-meta"
-            />
-          </Field>
-
-          <Field data-invalid={invalid('deadline') || undefined} className="gap-1.5">
-            <FieldLabel htmlFor={`${ids}-deadline`}>{t('thesis.deadline.label')}</FieldLabel>
-            <Input
-              id={`${ids}-deadline`}
-              type="date"
-              min={range.min}
-              max={range.max}
-              {...register('deadline')}
-              aria-invalid={invalid('deadline') || undefined}
-              aria-required
-              aria-describedby={`${ids}-deadline-help ${ids}-deadline-error`}
-              className={cn(FIELD_BOX, 'h-11 sm:w-56')}
-            />
-            <p id={`${ids}-deadline-help`} className="px-1 type-meta text-muted-foreground">
-              {t('thesis.deadline.help')}
-            </p>
-            <FieldError
-              id={`${ids}-deadline-error`}
-              errors={fieldError('deadline')}
-              className="type-meta"
-            />
-          </Field>
+              {/* Which way it bets, from the target (TC-24). */}
+              <p id={`${ids}-direction-said`} className="px-1 type-meta text-muted-foreground">
+                {derived &&
+                  change !== null &&
+                  t('thesis.target.direction', {
+                    direction: derived,
+                    change: format.number(change, {
+                      style: 'percent',
+                      maximumFractionDigits: 1,
+                      signDisplay: 'exceptZero',
+                    }),
+                  })}
+              </p>
+              {/* Without the current price, the direction is chosen. */}
+              {choosing && (
+                <>
+                  <span id={`${ids}-target-label`} className="sr-only">
+                    {t('thesis.target.label')}
+                  </span>
+                  <Controller
+                    control={control}
+                    name="direction"
+                    render={({ field }) => (
+                      <ChoiceGroup
+                        id={`${ids}-direction`}
+                        labelledBy={`${ids}-target-label`}
+                        describedBy={`${ids}-direction-error`}
+                        options={THESIS_DIRECTIONS.map((value) => ({
+                          value,
+                          label: t(`thesis.target.${value === 'ABOVE' ? 'above' : 'below'}`),
+                        }))}
+                        value={field.value}
+                        onChange={field.onChange}
+                        invalid={invalid('direction')}
+                        required
+                      />
+                    )}
+                  />
+                </>
+              )}
+              <FieldError
+                id={`${ids}-targetPrice-error`}
+                errors={fieldError('targetPrice')}
+                className="type-meta"
+              />
+              {/* A missing direction is said where it can be fixed: a target equal to the price,
+                  or the pills. Without an asset, the asset's error says what to do. */}
+              <FieldError
+                id={`${ids}-direction-error`}
+                errors={
+                  derived === null
+                    ? [{ message: t('thesis.errors.samePrice') }]
+                    : choosing
+                      ? fieldError('direction')
+                      : undefined
+                }
+                className="type-meta"
+              />
+            </Field>
+          </div>
 
           <Field data-invalid={invalid('conviction') || undefined} className="gap-1.5">
             <span id={`${ids}-conviction-label`} className="type-small font-medium">
               {t('thesis.conviction.label')}
             </span>
+            {/* Four rising bars, as the prototype's (TC-25). */}
             <Controller
               control={control}
               name="conviction"
               render={({ field }) => (
-                <ChoiceGroup
+                <LevelBars
                   id={`${ids}-conviction`}
                   labelledBy={`${ids}-conviction-label`}
                   describedBy={`${ids}-conviction-help ${ids}-conviction-error`}
-                  options={CONVICTIONS.map((value) => ({
+                  levels={CONVICTIONS.map((value) => ({
                     value,
                     label: t(`thesis.conviction.${value}`),
                   }))}
                   value={field.value}
                   onChange={field.onChange}
+                  prompt={t('thesis.conviction.prompt')}
                   invalid={invalid('conviction')}
                   required
                 />

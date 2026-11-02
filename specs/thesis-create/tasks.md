@@ -39,3 +39,16 @@ Orden: T-01 → T-02 → T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T
 | TC-19    | `performance.spec.ts`                                                                                       |
 | TC-20    | `messages.test.ts` (mismas claves en los tres idiomas)                                                      |
 | TC-21    | Revisión del PR                                                                                             |
+
+## Revisión 2 (2026-11-02)
+
+- [x] **T-10 (M)** El estilo del prototipo: la tarjeta del activo (`assetQuote` con nombre y variación), fecha y objetivo lado a lado, la dirección deducida del objetivo (píldoras solo sin precio), `LevelBars` para la convicción, el ejemplo del claim y el título de la página. Textos, tests y e2e. → TC-22 a TC-27
+
+| Criterio | Test                                                                            |
+| -------- | ------------------------------------------------------------------------------- |
+| TC-22    | `thesis-editor.test.tsx` (la tarjeta), `theses-api.test.ts`, e2e                |
+| TC-23    | e2e (360 px y axe)                                                              |
+| TC-24    | `thesis-editor.test.tsx` (dirección deducida, igual al precio, sin precio), e2e |
+| TC-25    | `level-bars.test.tsx`, `thesis-editor.test.tsx`                                 |
+| TC-26    | `thesis-editor.test.tsx` (el ejemplo)                                           |
+| TC-27    | e2e (el H1)                                                                     |

@@ -144,7 +144,16 @@ export async function SubmitPage({
       <LeftColumnScope
         initialOpen={submitOpen((await cookies()).get(LEFT_COLUMN_SUBMIT_COOKIE)?.value)}
       />
-      <h1 className="px-4 pt-4 type-page-title md:px-0">{t('title')}</h1>
+      {/* A thesis has its own title (specs/thesis-create TC-27): the tabs change the URL, and the
+          page follows. */}
+      {query.type === 'thesis' ? (
+        <div className="flex flex-col gap-1 px-4 pt-4 md:px-0">
+          <h1 className="type-page-title">{t('thesisTitle')}</h1>
+          <p className="type-small text-muted-foreground">{t('thesisSubtitle')}</p>
+        </div>
+      ) : (
+        <h1 className="px-4 pt-4 type-page-title md:px-0">{t('title')}</h1>
+      )}
       {community?.rules && (
         // Where there is no right column, the rules fold under the title (SU-08).
         <Collapsible className="mx-4 mt-3 rounded-lg border bg-surface md:mx-0 lg:hidden">

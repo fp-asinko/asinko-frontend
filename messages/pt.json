@@ -1052,20 +1052,22 @@
     },
     "thesis": {
       "asset": {
-        "label": "Ativo"
+        "label": "Ativo",
+        "help": "O preço de referência é registrado ao publicar.",
+        "stale": "desatualizado"
       },
       "claim": {
         "label": "Previsão",
         "placeholder": "ex.: $NVDA fecha acima de 200 antes do prazo",
-        "help": "Uma frase clara que possa ser verificada."
+        "help": "Uma frase clara que possa ser verificada.",
+        "example": "ex.: {symbol} > {target} antes do prazo"
       },
       "target": {
         "label": "Alvo",
         "above": "Acima de",
         "below": "Abaixo de",
         "price": "Preço-alvo",
-        "reference": "Preço atual: {price}{stale, select, true { (desatualizado)} other {}}{change, select, none {} other { · o alvo está a {change}}}",
-        "wrongSide": "O preço já está desse lado do alvo."
+        "direction": "{direction, select, ABOVE {Acima do preço atual} other {Abaixo do preço atual}} · {change}"
       },
       "deadline": {
         "label": "Prazo",
@@ -1077,7 +1079,8 @@
         "LOW": "Baixa",
         "MEDIUM": "Média",
         "HIGH": "Alta",
-        "EXTREME": "Extrema"
+        "EXTREME": "Extrema",
+        "prompt": "Escolha sua convicção"
       },
       "reasoning": {
         "label": "Raciocínio",
@@ -1094,7 +1097,8 @@
         "reasoningRequired": "Explique o raciocínio",
         "disclaimer": "Confirme que isto não é aconselhamento financeiro",
         "rateLimited": "Espere um momento antes de publicar de novo",
-        "general": "Não foi possível publicar sua tese. Tente de novo."
+        "general": "Não foi possível publicar sua tese. Tente de novo.",
+        "samePrice": "O alvo não pode ser o preço atual"
       },
       "confirm": {
         "title": "Publicar tese",
@@ -1185,7 +1189,9 @@
       "OTHER": "Ativo"
     },
     "loadError": "Não foi possível carregar a comunidade.",
-    "related": "Relacionados ({count, number})"
+    "related": "Relacionados ({count, number})",
+    "thesisTitle": "Publicar tese",
+    "thesisSubtitle": "Sua tese fica no seu histórico. Ela se resolve sozinha no prazo."
   },
   "ads": {
     "label": "Anúncio",

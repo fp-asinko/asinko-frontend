@@ -67,9 +67,14 @@ describe('assetQuote (TC-05)', () => {
     state.routes = MOCK_ROUTES
   })
 
-  it('reads the price and whether it is stale', async () => {
+  it('reads the name, the price, the day and whether it is stale (TC-22)', async () => {
     const btc = assetBySymbol('BTC')!
-    expect(await assetQuote('BTC')).toEqual({ price: btc.price, stale: btc.priceStale })
+    expect(await assetQuote('BTC')).toEqual({
+      name: btc.name,
+      price: btc.price,
+      changePct: btc.priceChangePct,
+      stale: btc.priceStale,
+    })
   })
 
   it('is null for an unknown asset, a bad symbol or without the backend', async () => {

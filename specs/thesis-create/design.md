@@ -174,3 +174,12 @@ Al revisarlo apareció un bug: volver desde la tesis a Link o Image mostraba el 
   - el mock (`fixtures.test.ts` y sus errores).
 - **E2E** (`e2e/thesis-create.spec.ts`, mobile y desktop, con mocks): llegar a la pestaña desde la URL; completar desde la página de un activo, confirmar y ver la tesis primera en el perfil; un error del servidor en su campo; 360 px y axe en claro y oscuro; el peso de JS.
 - **A mano contra `dev`** con una cuenta real: publicar una tesis y verla en el perfil.
+
+## 16. Revisión 2: el estilo del prototipo (TC-22 a TC-27)
+
+- **Tarjeta del activo** (TC-22): `assetQuote` pasa a devolver `{ name, price, changePct, stale }` (sigue saliendo de `GET /assets/:symbol`). La tarjeta va sobre fondo blanco con borde (`bg-background border`), no sobre `--surface`: el verde de una suba solo va sobre blanco (`design-system.md`). La variación usa el `Delta` que ya existe (`components/molecules/delta.tsx`), con flecha y signo.
+- **Fecha y objetivo** (TC-23): una grilla `sm:grid-cols-2`.
+- **Dirección** (TC-24): con precio, el formulario la calcula y la escribe en `direction` (`setValue`) cada vez que cambian el objetivo o el precio: mayor, `ABOVE`; menor, `BELOW`; igual, sin dirección y con el error `thesis.errors.samePrice`. Debajo del objetivo, la frase con la dirección y el %. Sin precio, el `ChoiceGroup` de antes. El aviso de lado contrario se va: con la dirección deducida no puede pasar.
+- **Convicción** (TC-25): `LevelBars`, una molécula nueva (`components/molecules/level-bars.tsx`) sobre el `radio-group` de shadcn. Cada `RadioGroupItem` es una barra de 16 px de ancho y alto creciente (20, 26, 32 y 38 px, los del prototipo), sin el punto. Se llenan hasta la elegida; con la última, `bg-destructive`. Al lado, el nombre de la elegida, o la invitación. Reemplaza al `ChoiceGroup` de la convicción.
+- **Ejemplo del claim** (TC-26): `thesis.claim.example` con `{symbol, target}`, el objetivo con `format.number`.
+- **Título** (TC-27): `SubmitPage` elige el H1 y el subtítulo por `?type=`. Al cambiar de pestaña, la URL cambia (`router.replace`) y el servidor vuelve a dibujar la página con el título nuevo; el formulario no se toca (es cliente).

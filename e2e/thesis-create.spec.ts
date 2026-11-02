@@ -27,7 +27,7 @@ async function signUp(page: Page, baseURL: string): Promise<string> {
 /** Fills everything but where it goes and the asset, which come from the URL. */
 async function fill(page: Page, claim: string) {
   await main(page).getByRole('textbox', { name: 'Claim' }).fill(claim)
-  await main(page).getByRole('radio', { name: 'Above' }).click()
+  // Above BTC's price in the mocks: the direction comes from it (TC-24).
   await main(page).getByRole('textbox', { name: 'Target price' }).fill('150000')
   const deadline = main(page).getByLabel('Deadline')
   // The first day it offers: tomorrow, in the browser's zone (TC-06).
@@ -48,10 +48,12 @@ test.describe('Create a thesis', () => {
       'aria-selected',
       'true',
     )
-    // The asset of the URL, and its price next to the target (TC-02, TC-05).
+    // Its own title (TC-27), the asset of the URL and its card (TC-02, TC-22).
+    await expect(page.getByRole('heading', { level: 1, name: 'Publish thesis' })).toBeVisible()
     await expect(main(page).getByRole('combobox', { name: 'Asset' })).toHaveText('$BTC')
+    await expect(main(page).getByText('Bitcoin', { exact: true })).toBeVisible()
     await fill(page, claim)
-    await expect(main(page).getByText(/Current price: .* the target is/)).toBeVisible()
+    await expect(main(page).getByText(/^Above the current price · \+\d/)).toBeVisible()
 
     await main(page).getByRole('button', { name: 'Publish' }).click()
     const dialog = page.getByRole('dialog', { name: 'Publish thesis' })

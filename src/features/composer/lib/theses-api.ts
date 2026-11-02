@@ -21,17 +21,30 @@ export async function createThesisAs(
   return result.ok ? { ok: true, data: { id: result.data.id } } : result
 }
 
-/** An asset's price, as the thesis editor shows it next to the target (TC-05). */
-export type AssetQuote = { price: number | null; stale: boolean }
+/** An asset as the thesis editor's card shows it (TC-05, TC-22): its name, price and day. */
+export type AssetQuote = {
+  name: string
+  price: number | null
+  /** The day's change, in percent (2.14 is +2.14 %). */
+  changePct: number | null
+  stale: boolean
+}
 
-/** GET /assets/{symbol} (E14), only its price. A symbol outside the catalog's shape never leaves. */
+/** GET /assets/{symbol} (E14), only what the card shows. A symbol outside the catalog's shape never leaves. */
 export async function assetQuote(symbol: string): Promise<AssetQuote | null> {
   if (!assetSymbolSchema.safeParse(symbol).success) return null
   const result = await apiRequest({
     method: 'GET',
     path: '/api/v1/assets/:symbol',
     params: { symbol },
-    schema: assetPageSchema.pick({ price: true, priceStale: true }),
+    schema: assetPageSchema.pick({
+      name: true,
+      price: true,
+      priceChangePct: true,
+      priceStale: true,
+    }),
   })
-  return result.ok ? { price: result.data.price, stale: result.data.priceStale } : null
+  if (!result.ok) return null
+  const { name, price, priceChangePct, priceStale } = result.data
+  return { name, price, changePct: priceChangePct, stale: priceStale }
 }

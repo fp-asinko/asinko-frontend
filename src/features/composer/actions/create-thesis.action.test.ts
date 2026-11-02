@@ -111,8 +111,9 @@ describe('getAssetQuote (TC-05)', () => {
   beforeEach(() => vi.clearAllMocks())
 
   it('asks for a valid symbol only', async () => {
-    deps.assetQuote.mockResolvedValue({ price: 180, stale: false })
-    expect(await getAssetQuote('NVDA')).toEqual({ price: 180, stale: false })
+    const quote = { name: 'NVIDIA', price: 180, changePct: 1.2, stale: false }
+    deps.assetQuote.mockResolvedValue(quote)
+    expect(await getAssetQuote('NVDA')).toEqual(quote)
     expect(await getAssetQuote('../x')).toBeNull()
     expect(await getAssetQuote(42)).toBeNull()
     expect(deps.assetQuote).toHaveBeenCalledTimes(1)
