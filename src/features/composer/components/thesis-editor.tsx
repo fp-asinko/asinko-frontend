@@ -872,6 +872,8 @@ export function ThesisEditor({
                 }}
                 invalid={invalid('communityId')}
                 describedBy={`${ids}-communityId-error`}
+                // The asset's community always on offer, member or not (TC-03).
+                suggested={asset}
               />
             </div>
             <FieldError

@@ -65,7 +65,8 @@ function subtitle(option: CommunityOption) {
  * leading `#` or `$` in the search picks them too, as in mentions (specs/picker-filters). As "+"
  * (`variant="add"`), it adds a related community or asset: no value, and neither "Your profile"
  * nor the handles in `exclude` (specs/related-tags RT-01, RT-03). With `only="assets"`, it chooses
- * a thesis's asset (specs/thesis-create TC-02): only assets, without the kind chips.
+ * a thesis's asset (specs/thesis-create TC-02): only assets, without the kind chips. `suggested`
+ * is offered with nothing typed even when the viewer is not a member: a thesis's asset (TC-03).
  */
 export function CommunityPicker({
   id,
@@ -77,6 +78,7 @@ export function CommunityPicker({
   exclude = [],
   only,
   renderValue,
+  suggested = null,
 }: {
   id: string
   value: CommunityOption | null
@@ -90,6 +92,8 @@ export function CommunityPicker({
   exclude?: readonly string[]
   /** Only assets, always: the asset of a thesis. */
   only?: 'assets'
+  /** Offered after "Your profile" with nothing typed, if the list does not bring it. */
+  suggested?: CommunityOption | null
 }) {
   const t = useTranslations('composer.community')
   const [options, setOptions] = useState<CommunityOption[]>(value ? [value] : [])
@@ -149,9 +153,18 @@ export function CommunityPicker({
       : value.handle
     : t(only ? 'assetPlaceholder' : 'placeholder')
 
+  // Nothing typed: the suggested one after "Your profile", when the list lacks it (TC-03).
+  const listed =
+    suggested &&
+    !readSearch(text).search &&
+    !options.some((option) => option.id === suggested.id) &&
+    ofKind([suggested], kind).length
+      ? [...options.filter((option) => option.own), suggested, ...options.filter((o) => !o.own)]
+      : options
+
   return (
     <Combobox<CommunityOption>
-      items={options.filter(
+      items={listed.filter(
         (option) => !exclude.includes(option.handle) && !(variant === 'add' && option.own),
       )}
       // The server filters: the list shows what it answers.

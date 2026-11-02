@@ -19,11 +19,18 @@ const DEFI: CommunityOption = {
 }
 const BTC: CommunityOption = { id: 'btc', slug: 'BTC', handle: '$BTC', name: 'Bitcoin', own: false }
 
-function Picker({ onChange }: { onChange: (value: CommunityOption | null) => void }) {
+function Picker({
+  onChange,
+  suggested,
+}: {
+  onChange: (value: CommunityOption | null) => void
+  suggested?: CommunityOption
+}) {
   const [value, setValue] = useState<CommunityOption | null>(null)
   return (
     <CommunityPicker
       id="community"
+      suggested={suggested}
       value={value}
       onChange={(next) => {
         setValue(next)
@@ -249,5 +256,19 @@ describe('CommunityPicker only="assets" (specs/thesis-create TC-02)', () => {
     await user.click(await screen.findByRole('option', { name: /BTC/ }))
     expect(onChange).toHaveBeenCalledWith(BTC)
     vi.useRealTimers()
+  })
+
+  it('offers the suggested one after Your profile, not being a member (specs/thesis-create TC-03)', async () => {
+    action.searchCommunities.mockResolvedValue({ ok: true, data: [OWN] })
+    const onChange = vi.fn()
+    renderWithIntl(<Picker onChange={onChange} suggested={BTC} />)
+    await open()
+    const options = await screen.findAllByRole('option')
+    expect(options.map((option) => option.textContent)).toEqual([
+      'Your profile@demo',
+      '$BTCBitcoin',
+    ])
+    await userEvent.click(options[1]!)
+    expect(onChange).toHaveBeenCalledWith(BTC)
   })
 })

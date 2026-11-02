@@ -42,7 +42,7 @@ Orden de los campos, en una columna (mobile first):
 7. **Razonamiento** (TC-08): `BodyTabs` con su barra de formato, emojis y menciones, igual que el cuerpo de un post.
 8. **Cancelar / Publicar**, como el post. Cancelar con algo escrito abre `DiscardDialog`.
 
-**Comunidad que sigue al activo (TC-03):** un ref `communityTouched` se marca cuando la persona elige comunidad a mano. Mientras esté sin marcar, elegir un activo elige también su comunidad (y la URL la sigue, como hoy).
+**Comunidad que sigue al activo (TC-03):** un ref `communityTouched` se marca cuando la persona elige comunidad a mano. Mientras esté sin marcar, elegir un activo elige también su comunidad (y la URL la sigue, como hoy). El selector recibe el activo como `suggested`: sin nada escrito, lo ofrece después de "Tu perfil" si la lista (las comunidades de las que es miembro) no lo trae.
 
 **Precio del activo:** al elegir un activo, `getAssetQuote(symbol)` (Server Action) lee `GET /assets/:symbol` y devuelve solo `{ price, priceStale }`. Si falla, el formulario sigue sin la referencia. Valida el símbolo con `assetSymbolSchema` antes de la red.
 
