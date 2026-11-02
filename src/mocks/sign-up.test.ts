@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
+import { communityBySlug } from './fixtures/communities'
 import { PROFILES } from './fixtures/users'
 import { checkMockUsername, createMockProfile, MOCK_TAKEN_USERNAME } from './sign-up'
 
@@ -14,6 +15,11 @@ describe('the mocked POST /users (specs/auth design.md § 9)', () => {
     const response = createMockProfile({ ...noRequest, body: body(username), accessToken })
     expect(response.status).toBe(201)
     expect(PROFILES.find((each) => each.id === id)?.username).toBe(username)
+    // With its personal channel, as the backend: its page exists.
+    expect(communityBySlug(username)).toMatchObject({
+      type: 'PERSONAL_CHANNEL',
+      createdByProfileId: id,
+    })
   })
 
   it('does not keep a display name, as the backend (P-037)', () => {

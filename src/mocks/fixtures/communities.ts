@@ -151,6 +151,24 @@ export const PERSONAL_CHANNELS: RawCommunity[] = PROFILES.map((profile, index) =
   }),
 )
 
+/**
+ * The personal channel of a profile created in this process (POST /users, specs/auth): the
+ * backend creates it with the profile, so the new account has a page.
+ */
+export function addPersonalChannel(profile: { id: string; username: string }) {
+  PERSONAL_CHANNELS.push(
+    community(100 + PERSONAL_CHANNELS.length, {
+      slug: profile.username,
+      name: profile.username,
+      description: null,
+      type: 'PERSONAL_CHANNEL',
+      memberCount: 0,
+      createdByProfileId: profile.id,
+      rules: null,
+    }),
+  )
+}
+
 export function communityBySlug(slug: string) {
   return (
     COMMUNITIES.find((each) => each.slug === slug) ??

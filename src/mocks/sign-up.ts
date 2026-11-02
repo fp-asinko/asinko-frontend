@@ -1,5 +1,6 @@
 import type { RawProfile } from '@/lib/api/contract'
 import { mockTokenUser } from './auth'
+import { addPersonalChannel } from './fixtures/communities'
 import { PROFILES } from './fixtures/users'
 import type { MockContext, MockResponse } from './types'
 
@@ -30,7 +31,8 @@ export function checkMockUsername({ params, accessToken }: MockContext): MockRes
 
 /**
  * POST /users (E01) as the backend does it: the user is the Bearer's, a new profile with its
- * personal channel, and its errors. The profile joins the mock world (PROFILES), so it has a page.
+ * personal channel, and its errors. The profile joins the mock world (PROFILES) with its channel,
+ * so it has a page.
  */
 export function createMockProfile({ body, accessToken }: MockContext): MockResponse {
   const userId = mockTokenUser(accessToken)
@@ -77,5 +79,7 @@ export function createMockProfile({ body, accessToken }: MockContext): MockRespo
     followingCount: 0,
   }
   PROFILES.push(profile)
+  // As the backend: its personal channel with it (E01), so the new account has a page.
+  addPersonalChannel(profile)
   return { status: 201, body: profile }
 }
