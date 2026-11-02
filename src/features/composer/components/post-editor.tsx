@@ -572,17 +572,6 @@ export function PostEditor({
             </div>
           </Field>
 
-          {/* Below the title, as Reddit's flair (specs/drafts-tags DT-07), once there is a
-              community: it is chosen at the bottom now (specs/submit-form-layout SF-11). */}
-          {chosen && (
-            <TagPicker
-              tags={chosen?.tags ?? []}
-              hasCommunity={Boolean(chosen)}
-              value={tag}
-              onChange={(next) => setValue('tag', next)}
-            />
-          )}
-
           {/* Title and body stay outside the panels, mounted across formats: a field remounted
               on a switch could drop what was just typed. Link only adds its URL. */}
           <TabsContent value="TEXT" />
@@ -793,6 +782,16 @@ export function PostEditor({
                         setValue('related', handles)
                         onRelatedChange?.(handles)
                       }}
+                    />
+                  )}
+                  {/* The tag, beside the community it belongs to (specs/drafts-tags DT-07,
+                      specs/submit-form-layout SF-11): once there is one. */}
+                  {chosen && (
+                    <TagPicker
+                      tags={chosen.tags ?? []}
+                      hasCommunity
+                      value={tag}
+                      onChange={(next) => setValue('tag', next)}
                     />
                   )}
                 </div>

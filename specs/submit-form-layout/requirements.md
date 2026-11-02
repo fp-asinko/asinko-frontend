@@ -30,5 +30,5 @@ Pedido del PO después de la revisión 3 de `specs/thesis-create`: "creo que deb
 
 - [x] **SF-09** La **comunidad y sus relacionadas** dejan de estar arriba: en la fila de las acciones, a la izquierda, "Se publica en" con el selector, los relacionados y el "+". Cambia SF-01 (la píldora sigue igual) y SF-02 (los formatos quedan arriba de todo).
 - [x] **SF-10** **Borradores** (`specs/drafts-tags` DT-02) pasa al final de la fila de los formatos, a la derecha.
-- [x] **SF-11** **"Añadir etiqueta"** no aparece hasta que haya comunidad: con ella, bajo el título como hoy (`specs/drafts-tags` DT-07). Desde la página de una comunidad, ya viene elegida.
+- [x] **SF-11** **"Añadir etiqueta"** va en la fila de abajo, después de la comunidad y sus relacionados ("Se publica en #macro · + · Añadir etiqueta"), y aparece cuando hay comunidad: la etiqueta es de esa comunidad (`specs/drafts-tags` DT-07). Ajustado con el PO el 2026-11-02: bajo el título, y sin comunidad, parecía que no estaba.
 - [x] **SF-12** El foco entra siempre en el título (o en el texto de un thought): la comunidad ya no está arriba (cambia `specs/submit-page` SU-09).
