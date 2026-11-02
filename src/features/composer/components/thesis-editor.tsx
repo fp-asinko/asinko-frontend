@@ -20,7 +20,10 @@ import { assetSymbolOf } from '@/lib/communities/paths'
 import { searchMentions } from '@/lib/mentions/search-mentions.action'
 import { cn } from '@/lib/utils'
 import { createThesis } from '../actions/create-thesis.action'
-import type { CommunityOption } from '../composer.types'
+import type { CommunityOption, SavedDraft } from '../composer.types'
+import { useSavedDraft } from '../hooks/use-saved-draft'
+import { DRAFT_LIMIT } from './drafts-dialog'
+import { DraftsButton } from './drafts-button'
 import {
   discardDraft,
   hasThesisText,
@@ -29,7 +32,7 @@ import {
 } from '../hooks/use-thesis-draft'
 import { useAssetQuote } from '../hooks/use-asset-quote'
 import { clearDraft } from '../hooks/use-local-draft'
-import { deadlineAt, quickDeadlines, thesisDeadlineRange } from '../lib/thesis-deadline'
+import { dayAt, deadlineAt, quickDeadlines, thesisDeadlineRange } from '../lib/thesis-deadline'
 import {
   CLAIM_MAX,
   CONVICTIONS,
@@ -60,6 +63,14 @@ const FIELDS = [
   'reasoning',
 ] as const
 type FieldName = (typeof FIELDS)[number]
+
+const DRAFT_ERRORS = ['limit', 'gone', 'invalid', 'general'] as const
+
+/** A draft's error key (composer.drafts.errors.*), or the general one. */
+function draftError(key: string) {
+  const name = key.replace(/^composer\.drafts\.errors\./, '')
+  return DRAFT_ERRORS.find((each) => each === name) ?? 'general'
+}
 
 /** The messages a field can show, from the schema or the action (composer.*). */
 const ERROR_KEYS = [
@@ -96,6 +107,8 @@ export function ThesisEditor({
   onFormat,
   onCommunityChange,
   onPublished,
+  onOpenPostDraft,
+  draftRequest = null,
 }: {
   community: CommunityOption | null
   /** Where the draft is kept (thesisDraftKey); null keeps nothing. */
@@ -109,6 +122,10 @@ export function ThesisEditor({
   onCommunityChange?: (community: CommunityOption | null) => void
   /** Published: the author's username, for their theses (TC-14). */
   onPublished: (username: string) => void
+  /** A post's draft chosen in this editor's list: the page opens it in the post's editor. */
+  onOpenPostDraft?: (draft: SavedDraft) => void
+  /** A thesis's draft chosen in the post editor's list: this editor opens it (each ask is new). */
+  draftRequest?: { draft: SavedDraft } | null
 }) {
   const t = useTranslations('composer')
   const format = useFormatter()
@@ -130,6 +147,8 @@ export function ThesisEditor({
   const [quick] = useState(() => quickDeadlines(new Date()))
   const [customDate, setCustomDate] = useState(false)
   const [confirming, setConfirming] = useState<ThesisFormValues | null>(null)
+  // The account's draft open in the form (specs/thesis-drafts TD-01, TD-03).
+  const saved = useSavedDraft()
   const [pending, setPending] = useState(false)
   const [confirmError, setConfirmError] = useState<string | null>(null)
 
@@ -247,6 +266,80 @@ export function ThesisEditor({
     document.getElementById(`${ids}-claim`)?.focus()
   }
 
+  /** An asset of a saved draft, as the picker holds one: its symbol is all the draft keeps. */
+  const assetOption = (symbol: string): CommunityOption => ({
+    id: `asset:${symbol}`,
+    slug: symbol,
+    handle: '$' + symbol,
+    name: '$' + symbol,
+    own: false,
+  })
+
+  // What a draft of the account keeps: "Saved" holds while the form still says it (TD-01).
+  const snapshot = JSON.stringify([
+    chosen?.id,
+    asset?.slug,
+    claim,
+    direction,
+    price,
+    deadline,
+    conviction,
+    reasoning,
+  ])
+  const savedNow = saved.savedAs === snapshot
+  const unsaveable = !(claim.trim() || reasoning.trim() || price.trim() || asset) || saved.saving
+
+  function saveDraft() {
+    const target = typedPrice(price)
+    saved.save(
+      {
+        type: 'THESIS',
+        communityId: chosen?.id ?? '',
+        title: claim,
+        body: reasoning,
+        thesis: {
+          assetSymbol: asset ? assetSymbolOf(asset) : null,
+          targetPrice: target,
+          direction: direction ?? null,
+          deadline: deadline ? deadlineAt(deadline) : null,
+          conviction: conviction ?? null,
+        },
+      },
+      snapshot,
+    )
+  }
+
+  /** A thesis's draft of the account takes the form's place (TD-03). */
+  function openSaved(draft: SavedDraft) {
+    const kept = draft.thesis
+    const day = kept?.deadline ? dayAt(kept.deadline) : null
+    form.reset({
+      communityId: draft.community?.id ?? '',
+      assetSymbol: kept?.assetSymbol ?? '',
+      claim: draft.title,
+      direction: kept?.direction ?? undefined,
+      targetPrice: kept?.targetPrice != null ? String(kept.targetPrice) : '',
+      deadline: day ?? '',
+      conviction: kept?.conviction ?? undefined,
+      reasoning: draft.body,
+    })
+    setChosen(draft.community)
+    setAsset(kept?.assetSymbol ? assetOption(kept.assetSymbol) : null)
+    communityTouched.current = Boolean(draft.community)
+    setCustomDate(Boolean(day && !quick.some((each) => each.day === day)))
+    saved.open(draft.id)
+    onCommunityChange?.(draft.community)
+    setAnswered(true)
+    document.getElementById(`${ids}-claim`)?.focus()
+  }
+
+  // A thesis's draft opened from the post editor's list (TD-03).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the other editor's ask, as an event: the form takes the draft once
+    if (draftRequest) openSaved(draftRequest.draft)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when a new one is asked
+  }, [draftRequest])
+
   /** The field's control: the picker's chip, a group's first option, or the input. */
   function focusField(name: FieldName) {
     const element =
@@ -285,7 +378,10 @@ export function ThesisEditor({
     setPending(true)
     setConfirmError(null)
     const result = at
-      ? await createThesis({ ...confirming, deadline: at, disclaimerAccepted: true })
+      ? await createThesis(
+          { ...confirming, deadline: at, disclaimerAccepted: true },
+          saved.draftId ?? undefined,
+        )
       : null
     setPending(false)
     if (result?.ok) {
@@ -391,7 +487,19 @@ export function ThesisEditor({
         className="flex flex-1 flex-col gap-0"
       >
         <div className="flex stagger flex-col gap-5">
-          <FormatTabs />
+          <FormatTabs
+            trailing={
+              // The account's drafts, posts and theses together (specs/thesis-drafts TD-02).
+              <DraftsButton
+                written={() => draftRef.current?.() ?? false}
+                onOpen={(draft) =>
+                  draft.type === 'THESIS' ? openSaved(draft) : onOpenPostDraft?.(draft)
+                }
+                onDeleted={saved.forget}
+                openedFocus={() => document.getElementById(`${ids}-claim`)}
+              />
+            }
+          />
 
           {/* The asset and the claim, each the full width, one under the other (TC-30). */}
           <div className="flex flex-col gap-5">
@@ -717,6 +825,12 @@ export function ThesisEditor({
         </div>
 
         {/* Cancel and Publish, on the right, as the post's: sticky over the bottom bar in phones. */}
+        {saved.error && (
+          <p role="alert" className="mt-3 type-small text-destructive">
+            {t(`drafts.errors.${draftError(saved.error)}`, { max: DRAFT_LIMIT })}
+          </p>
+        )}
+
         <div data-sticky-actions className={cn(ACTIONS_BAR, 'justify-between gap-3')}>
           {/* Where it goes, on the actions' row (TC-28): the asset's community, unless changed. */}
           <Field data-invalid={invalid('communityId') || undefined} className="w-auto gap-1">
@@ -751,6 +865,20 @@ export function ThesisEditor({
               className={cn(PILL, 'text-muted-foreground hover:bg-muted hover:text-foreground')}
             >
               {t('cancel')}
+            </button>
+            <button
+              type="button"
+              aria-disabled={unsaveable || undefined}
+              onClick={() => {
+                if (!unsaveable) saveDraft()
+              }}
+              className={cn(PILL, 'bg-muted text-foreground hover:bg-muted-hover')}
+            >
+              {saved.saving
+                ? t('drafts.saving')
+                : savedNow
+                  ? t('drafts.savedShort')
+                  : t('drafts.save')}
             </button>
             <button
               type="submit"

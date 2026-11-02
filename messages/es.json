@@ -1029,7 +1029,8 @@
         "invalid": "No se pudo guardar el borrador. Revisa sus campos.",
         "general": "No se pudo guardar el borrador. Inténtalo de nuevo.",
         "delete": "No se pudo eliminar el borrador. Inténtalo de nuevo."
-      }
+      },
+      "thesisMeta": "Tesis · {where} · {when}"
     },
     "format": {
       "label": "Formato del texto",

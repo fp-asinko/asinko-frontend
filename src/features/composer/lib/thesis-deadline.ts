@@ -20,6 +20,12 @@ function dayOf(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
 }
 
+/** The local day (YYYY-MM-DD) of an instant: a saved deadline back into the field (P-038). */
+export function dayAt(iso: string): string | null {
+  const date = new Date(iso)
+  return Number.isNaN(date.getTime()) ? null : dayOf(date)
+}
+
 /** The end of a day (YYYY-MM-DD) in the local zone, as an ISO instant; null for a day that does not exist. */
 export function deadlineAt(day: string): string | null {
   if (!DAY_PATTERN.test(day)) return null

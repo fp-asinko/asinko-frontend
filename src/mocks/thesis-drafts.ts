@@ -22,7 +22,7 @@ const DRAFTS = new Map<string, RawDraft[]>([
       {
         id: SEED_THESIS_DRAFT_ID,
         type: 'THESIS',
-        title: 'ETH closes the year above 5K',
+        title: 'ETH above 5K by the end of the year',
         body: 'Staking yield and the ETF flows.',
         url: '',
         imageUrl: null,

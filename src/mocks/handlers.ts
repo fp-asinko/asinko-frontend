@@ -333,7 +333,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     example: {
       ...noRequest,
       params: { draftId: SEED_THESIS_DRAFT_ID },
-      body: { userId: DEMO_USER.id, type: 'THESIS', title: 'ETH closes the year above 5K' },
+      body: { userId: DEMO_USER.id, type: 'THESIS', title: 'ETH above 5K by the end of the year' },
     },
     handler: updateThesisDraft,
   },

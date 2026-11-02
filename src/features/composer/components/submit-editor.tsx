@@ -7,7 +7,7 @@ import type { Locale } from '@/i18n/routing'
 import { useRouter } from '@/i18n/navigation'
 import { submitPath, type SubmitType } from '@/i18n/submit-path'
 import { communityPath } from '@/lib/communities/paths'
-import type { CommunityOption } from '../composer.types'
+import type { CommunityOption, SavedDraft } from '../composer.types'
 import { discardDraft } from '../hooks/use-local-draft'
 import { DiscardDialog } from './discard-dialog'
 import type { PreviewAction } from './body-tabs'
@@ -79,6 +79,9 @@ export function SubmitEditor({
   const thesisBox = useRef<HTMLDivElement>(null)
   // The format asked from the thesis's tabs: the post's editor takes it (each ask is new).
   const [postFormat, setPostFormat] = useState<{ format: PostFormat } | null>(null)
+  // A draft chosen in one editor's list that belongs to the other (specs/thesis-drafts TD-03).
+  const [postDraft, setPostDraft] = useState<{ draft: SavedDraft } | null>(null)
+  const [thesisDraft, setThesisDraft] = useState<{ draft: SavedDraft } | null>(null)
 
   /** The focus follows the swap to the chosen tab of the editor now shown (WCAG 2.4.3). */
   function focusTab(box: RefObject<HTMLDivElement | null>) {
@@ -128,6 +131,11 @@ export function SubmitEditor({
           onRelatedChange={(handles) => follow({ related: handles.map(slugOf) })}
           onThesis={showThesis}
           formatRequest={postFormat}
+          draftRequest={postDraft}
+          onOpenThesisDraft={(draft) => {
+            showThesis()
+            setThesisDraft({ draft })
+          }}
         />
       </div>
       {thesisOpened && (
@@ -140,6 +148,12 @@ export function SubmitEditor({
             onFormat={showPost}
             onCommunityChange={(next) => follow({ community: next?.slug ?? null })}
             // To the author's theses, the new one first (specs/thesis-create TC-14).
+            draftRequest={thesisDraft}
+            onOpenPostDraft={(draft) => {
+              if (draft.type === 'THESIS') return
+              showPost(draft.type)
+              setPostDraft({ draft })
+            }}
             onPublished={(username) => router.push(`${communityPath('user', username)}?tab=theses`)}
           />
         </div>

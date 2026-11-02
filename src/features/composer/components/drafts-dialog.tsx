@@ -207,7 +207,8 @@ export function DraftsDialog({
                         {title}
                       </span>{' '}
                       <span className="truncate type-meta text-muted-foreground">
-                        {t('meta', {
+                        {/* A thesis says so (specs/thesis-drafts TD-02). */}
+                        {t(draft.type === 'THESIS' ? 'thesisMeta' : 'meta', {
                           where,
                           when: format.relativeTime(new Date(draft.updatedAt), now),
                         })}

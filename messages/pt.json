@@ -1029,7 +1029,8 @@
         "invalid": "Não foi possível salvar o rascunho. Revise os campos.",
         "general": "Não foi possível salvar o rascunho. Tente de novo.",
         "delete": "Não foi possível excluir o rascunho. Tente de novo."
-      }
+      },
+      "thesisMeta": "Tese · {where} · {when}"
     },
     "format": {
       "label": "Formato do texto",

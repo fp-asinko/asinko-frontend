@@ -60,6 +60,17 @@ describe('DraftsDialog (specs/drafts-tags DT-02 to DT-04)', () => {
     expect(onOpen).toHaveBeenCalledWith(expect.objectContaining({ id: 'd1' }))
   })
 
+  it('marks a thesis (specs/thesis-drafts TD-02)', async () => {
+    actions.listDrafts.mockResolvedValue({
+      ok: true,
+      data: [draft({ type: 'THESIS', title: 'ETH above 5K' })],
+    })
+    renderDialog()
+    expect(
+      await screen.findByRole('button', { name: /ETH above 5K Thesis · #macro · 1 hour ago/ }),
+    ).toBeInTheDocument()
+  })
+
   it('says there are none yet', async () => {
     actions.listDrafts.mockResolvedValue({ ok: true, data: [] })
     renderDialog()

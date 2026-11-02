@@ -1029,7 +1029,8 @@
         "invalid": "This draft couldn't be saved. Check its fields.",
         "general": "The draft couldn't be saved. Try again.",
         "delete": "The draft couldn't be deleted. Try again."
-      }
+      },
+      "thesisMeta": "Thesis · {where} · {when}"
     },
     "format": {
       "label": "Text format",

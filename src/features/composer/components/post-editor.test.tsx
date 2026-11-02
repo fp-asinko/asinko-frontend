@@ -639,6 +639,28 @@ describe('PostEditor drafts (specs/drafts-tags DT-01 to DT-05)', () => {
     )
   })
 
+  it('hands a thesis draft to the thesis editor (specs/thesis-drafts TD-03)', async () => {
+    const thesis: SavedDraft = { ...SAVED, id: 'th1', type: 'THESIS', title: 'ETH above 5K' }
+    actions.listDrafts.mockResolvedValue({ ok: true, data: [thesis] })
+    const onOpenThesisDraft = vi.fn()
+    renderWithIntl(
+      <AuthGateProvider signedIn>
+        <PostEditor
+          type="TEXT"
+          community={DEFI}
+          draftRef={{ current: null }}
+          onCancel={vi.fn()}
+          onPublished={vi.fn()}
+          onOpenThesisDraft={onOpenThesisDraft}
+        />
+      </AuthGateProvider>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Drafts' }))
+    await userEvent.click(await screen.findByRole('button', { name: /^ETH above 5K/ }))
+    expect(onOpenThesisDraft).toHaveBeenCalledWith(thesis)
+    expect(title()).toHaveValue('')
+  })
+
   it('asks before replacing what is written, and keeps it on Cancel', async () => {
     actions.listDrafts.mockResolvedValue({ ok: true, data: [SAVED] })
     renderEditor()

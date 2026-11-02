@@ -125,6 +125,47 @@ test.describe('Create a thesis', () => {
   }
 })
 
+test('saves a thesis as a draft, finds it marked among the drafts and publishes it from there (specs/thesis-drafts)', async ({
+  page,
+  baseURL,
+}, testInfo) => {
+  const username = await signUp(page, baseURL!)
+  // Without parentheses: it goes into a pattern below.
+  const claim = `BTC above 150K from a draft ${testInfo.project.name} ${Date.now()}`
+  await page.goto('/en/submit?community=BTC&type=thesis')
+  await main(page).getByRole('textbox', { name: 'Claim' }).fill(claim)
+  await main(page).getByRole('textbox', { name: 'Target price' }).fill('150000')
+  await main(page).getByRole('button', { name: 'Save draft' }).click()
+  await expect(main(page).getByRole('button', { name: 'Saved' })).toBeVisible()
+
+  // From the post editor's list: marked, and it opens in the thesis's tab (TD-02, TD-03).
+  await page.goto('/en/submit')
+  await main(page).getByRole('button', { name: 'Drafts' }).click()
+  const row = page
+    .getByRole('dialog')
+    .getByRole('button', { name: new RegExp(`^${claim} Thesis · `) })
+  await row.click()
+  await expect(main(page).getByRole('tab', { name: 'Thesis' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  )
+  await expect(main(page).getByRole('textbox', { name: 'Claim' })).toHaveValue(claim)
+
+  await main(page).getByText('3 months', { exact: true }).click()
+  await main(page).getByRole('radio', { name: 'High' }).click()
+  await main(page).getByRole('textbox', { name: 'Reasoning' }).fill('Saved first, published later.')
+  await main(page).getByRole('button', { name: 'Publish' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Publish thesis' })
+  await dialog.getByRole('checkbox').click()
+  await dialog.getByRole('button', { name: 'Publish thesis' }).click()
+  await expect(page).toHaveURL(`/en/user/${username}?tab=theses`)
+
+  // Published, the draft is gone (TD-04).
+  await page.goto('/en/submit')
+  await main(page).getByRole('button', { name: 'Drafts' }).click()
+  await expect(page.getByRole('dialog').getByText('No drafts yet')).toBeVisible()
+})
+
 test('fits a 1280×800 window without scrolling, with an asset chosen (TC-36)', async ({
   page,
   isMobile,

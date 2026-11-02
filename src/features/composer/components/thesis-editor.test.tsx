@@ -13,6 +13,14 @@ const actions = vi.hoisted(() => ({
   createThesis: vi.fn(),
   getAssetQuote: vi.fn(),
   searchCommunities: vi.fn(),
+  saveDraft: vi.fn(),
+  listDrafts: vi.fn(),
+  deleteDraft: vi.fn(),
+}))
+vi.mock('../actions/drafts.action', () => ({
+  saveDraft: actions.saveDraft,
+  listDrafts: actions.listDrafts,
+  deleteDraft: actions.deleteDraft,
 }))
 vi.mock('@/lib/mentions/search-mentions.action', () => ({ searchMentions: vi.fn() }))
 vi.mock('@/components/molecules/mention-assist', () => ({ MentionField: () => null }))
@@ -257,6 +265,127 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     expect(await within(dialog).findByRole('alert')).toHaveTextContent(
       'Wait a moment before publishing again',
     )
+  })
+
+  it('saves the thesis as a draft of the account, and saving again updates it (specs/thesis-drafts TD-01)', async () => {
+    actions.saveDraft.mockResolvedValue({
+      ok: true,
+      data: { id: '00000000-0000-4000-8000-000000042001' },
+    })
+    renderEditor()
+    await screen.findByText('NVIDIA')
+    await userEvent.type(claim(), 'NVDA above 200')
+    await userEvent.type(price(), '200')
+    await userEvent.click(screen.getByRole('button', { name: 'Save draft' }))
+    expect(actions.saveDraft).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'THESIS',
+        communityId: NVDA.id,
+        title: 'NVDA above 200',
+        thesis: expect.objectContaining({
+          assetSymbol: 'NVDA',
+          targetPrice: 200,
+          direction: 'ABOVE',
+        }),
+      }),
+    )
+    expect(await screen.findByRole('button', { name: 'Saved' })).toBeInTheDocument()
+    await userEvent.type(claim(), '!')
+    await userEvent.click(screen.getByRole('button', { name: 'Save draft' }))
+    expect(actions.saveDraft).toHaveBeenLastCalledWith(
+      expect.objectContaining({ draftId: '00000000-0000-4000-8000-000000042001' }),
+    )
+  })
+
+  it('opens a thesis draft from its list, and publishes it with its id (TD-03, TD-04)', async () => {
+    const draft = {
+      id: '00000000-0000-4000-8000-000000042900',
+      type: 'THESIS' as const,
+      title: 'ETH closes the year above 5K',
+      body: 'Staking yield.',
+      url: '',
+      imageUrl: null,
+      imageAlt: '',
+      tag: '',
+      community: null,
+      related: [],
+      thesis: {
+        assetSymbol: 'ETH',
+        targetPrice: 5000,
+        direction: 'ABOVE' as const,
+        deadline: null,
+        conviction: 'MEDIUM' as const,
+      },
+      updatedAt: new Date().toISOString(),
+    }
+    actions.listDrafts.mockResolvedValue({ ok: true, data: [draft] })
+    actions.createThesis.mockResolvedValue({ ok: true, data: { username: 'demo' } })
+    renderEditor({ community: null })
+    await userEvent.click(screen.getByRole('button', { name: 'Drafts' }))
+    await userEvent.click(await screen.findByRole('button', { name: /^ETH closes the year/ }))
+    expect(claim()).toHaveValue('ETH closes the year above 5K')
+    expect(price()).toHaveValue('5000')
+    expect(screen.getByRole('combobox', { name: 'Asset' })).toHaveTextContent('$ETH')
+    expect(screen.getByRole('radio', { name: 'Medium' })).toBeChecked()
+
+    await userEvent.click(screen.getByRole('radio', { name: '3 months' }))
+    await userEvent.type(reasoning(), ' More.')
+    // The asset's community is not in the draft: chosen by hand.
+    screen.getByRole('combobox', { name: 'Publishing in' }).focus()
+    await userEvent.keyboard('{ArrowDown}')
+    await userEvent.click(await screen.findByRole('option', { name: /BTC/ }))
+    await userEvent.click(publish())
+    const dialog = await screen.findByRole('dialog')
+    await userEvent.click(within(dialog).getByRole('checkbox'))
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Publish thesis' }))
+    expect(actions.createThesis.mock.calls[0]?.[1]).toBe(draft.id)
+  })
+
+  it('hands a post’s draft to the post editor (TD-03)', async () => {
+    const post = {
+      ...{
+        id: '00000000-0000-4000-8000-000000042900',
+        type: 'THESIS' as const,
+        title: 'ETH closes the year above 5K',
+        body: 'Staking yield.',
+        url: '',
+        imageUrl: null,
+        imageAlt: '',
+        tag: '',
+        community: null,
+        related: [],
+        thesis: {
+          assetSymbol: 'ETH',
+          targetPrice: 5000,
+          direction: 'ABOVE' as const,
+          deadline: null,
+          conviction: 'MEDIUM' as const,
+        },
+        updatedAt: new Date().toISOString(),
+      },
+      id: 'p1',
+      type: 'TEXT' as const,
+      title: 'A post',
+      thesis: null,
+    }
+    actions.listDrafts.mockResolvedValue({ ok: true, data: [post] })
+    const onOpenPostDraft = vi.fn()
+    renderWithIntl(
+      <AuthGateProvider signedIn>
+        <ThesisEditor
+          community={NVDA}
+          storageKey={KEY}
+          draftRef={{ current: null }}
+          onCancel={vi.fn()}
+          onFormat={vi.fn()}
+          onPublished={vi.fn()}
+          onOpenPostDraft={onOpenPostDraft}
+        />
+      </AuthGateProvider>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Drafts' }))
+    await userEvent.click(await screen.findByRole('button', { name: /^A post/ }))
+    expect(onOpenPostDraft).toHaveBeenCalledWith(post)
   })
 
   it('goes back to the post’s formats from the tabs (TC-01)', async () => {
