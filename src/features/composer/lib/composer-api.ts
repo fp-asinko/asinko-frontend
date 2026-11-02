@@ -68,7 +68,9 @@ export async function listCommunityOptions(
       method: 'GET',
       path: '/api/v1/communities',
       query: {
-        ...(search ? { search } : { mine: 'true' }),
+        // Assets are a closed catalog: with nothing typed, all of them, not only the viewer's
+        // (specs/thesis-create TC-02: a new account belongs to none).
+        ...(search ? { search } : kind === 'assets' ? {} : { mine: 'true' }),
         ...(kind === 'assets' && { type: 'SYSTEM_ASSET' }),
       },
       schema: paginatedSchema(communitySchema),
