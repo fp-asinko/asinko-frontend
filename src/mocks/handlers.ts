@@ -63,6 +63,7 @@ import { signProfileImageUpload } from './profile-image'
 import { paginate } from './paginate'
 import { signPostImageUpload } from './post-image'
 import { checkMockUsername, createMockProfile } from './sign-up'
+import { createMockThesis } from './theses'
 import type { MockContext, MockExtension, MockResponse, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
 import {
@@ -501,6 +502,31 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       if (!PROFILES.some((each) => each.id === params.userId)) return notFound
       return { status: 200, body: paginate(thesesBy(params.userId ?? ''), query.cursor) }
     },
+  },
+
+  // E11: a new thesis (specs/thesis-create § 9). No liveExample: it writes.
+  {
+    method: 'POST',
+    path: '/api/v1/theses',
+    kind: 'contract',
+    implemented: true,
+    schema: thesisSchema,
+    example: {
+      ...noRequest,
+      body: {
+        userId: DEMO_USER.id,
+        communityId: communityBySlug('BTC')!.id,
+        assetSymbol: 'BTC',
+        claim: 'BTC closes the year above 150K',
+        reasoning: 'ETF flows and the halving cycle.',
+        conviction: 'HIGH',
+        deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        targetPrice: 150000,
+        targetDirection: 'ABOVE',
+        disclaimerAccepted: true,
+      },
+    },
+    handler: createMockThesis,
   },
 
   // E02

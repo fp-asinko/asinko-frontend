@@ -28,6 +28,7 @@ Endpoints answered locally (never in production). `API_MOCKS=true` mocks all of 
 | PUT    | `/api/v1/communities/:slug/widgets`        | proposal | P-028. Saves the whole list; `403 NOT_MODERATOR`, `422 INVALID_WIDGET` with `index` and `field`                  |
 | POST   | `/api/v1/uploads/community-image`          | proposal | P-029. A moderator of that community, as a post image. The backend's (2026-10-22) is for a group's avatar/banner |
 | GET    | `/api/v1/users/:userId/active-communities` | contract | P-027 (backend 2026-10-20). Posts, polls and theses by community in the last `days`, never the personal channel  |
+| POST   | `/api/v1/theses`                           | contract | E11 (specs/thesis-create). The backend's checks and codes; the new thesis goes first in its author's theses      |
 | GET    | `/api/v1/usernames/:username`              | proposal | P-035. Taken when a profile has it (any case) or it is `taken`; `422 INVALID_USERNAME`, `401` without a session  |
 | GET    | `/api/v1/users/:userId/achievements`       | proposal | P-030. Demo, María and Federico have earned ones; only the demo's own list brings the missing ones               |
 | GET    | `/api/v1/users/:userId/featured`           | contract | P-025 (backend 2026-10-20). Feed items with `featuredAt`; María has a thesis and a post                          |

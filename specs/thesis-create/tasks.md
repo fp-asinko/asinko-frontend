@@ -3,7 +3,7 @@
 Rama: `feature/thesis-create`, desde `develop`. Requirements y design aprobados por el PO el 2026-11-02.
 
 - [x] **T-01 (S)** Esquema `create-thesis.schema.ts` y `lib/thesis-deadline.ts` (`deadlineAt`, `thesisDeadlineRange`, `isDeadlineInRange`). Tests. → TC-04 a TC-07, TC-13
-- [ ] **T-02 (M)** `lib/theses-api.ts`, las actions `createThesis` y `getAssetQuote`, y el mock de `POST /theses` con sus errores (la tesis se suma a las del usuario). Tests y `fixtures.test.ts`. → TC-13, TC-15, TC-18
+- [x] **T-02 (M)** `lib/theses-api.ts`, las actions `createThesis` y `getAssetQuote`, y el mock de `POST /theses` con sus errores (la tesis se suma a las del usuario). Tests y `fixtures.test.ts`. → TC-13, TC-15, TC-18
 - [ ] **T-03 (S)** `lib/local-draft.ts` (lo común del guardado local, sacado de `use-post-draft.ts` sin cambiar su comportamiento) y `use-thesis-draft.ts`. Tests. → TC-10
 - [ ] **T-04 (M)** `FormatTabs` (fuera de `PostEditor`, con la quinta pestaña), `?type=thesis` en `parseSubmitQuery` y `submitPath`, `SubmitEditor` que cambia de editor, y `only="assets"` en `CommunityPicker`. Tests. → TC-01
 - [ ] **T-05 (L)** `ThesisEditor`: los campos, el activo que elige su comunidad, el precio de referencia y el aviso de dirección, deshabilitado hasta completar, errores en su campo, guardado local y Cancelar. Textos en en, es y pt. Tests. → TC-02 a TC-10, TC-20
