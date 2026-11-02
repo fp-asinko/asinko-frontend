@@ -8,6 +8,7 @@ import { getViewer } from '@/lib/session'
 import { cn } from '@/lib/utils'
 import type { SubmitCommunity } from '../composer.types'
 import { getSubmitCommunity } from '../lib/submit-community'
+import { ThesisTipsList } from './thesis-tips'
 
 /** A card of the right column, as its widgets (specs/right-column). */
 const CARD = 'm-3.5 overflow-hidden rounded-lg border bg-surface'
@@ -23,20 +24,36 @@ const CARD = 'm-3.5 overflow-hidden rounded-lg border bg-surface'
 export async function SubmitAside({
   community,
   related = [],
+  thesis = false,
 }: {
   community?: string
   related?: readonly string[]
+  /** The thesis's tab: how a thesis works first, instead of the tips to post (TC-31). */
+  thesis?: boolean
 }) {
+  const t = await getTranslations('submitPage.thesisTips')
   return (
     <div className="flex flex-1 flex-col">
-      <Cards community={community} />
+      {thesis && (
+        <section aria-labelledby="thesis-tips" className={cn(CARD, 'px-4 py-3.5')}>
+          <h2
+            id="thesis-tips"
+            className="mb-3 flex items-center gap-2 type-section text-muted-foreground"
+          >
+            <LightbulbIcon aria-hidden className="size-3.5" />
+            {t('title')}
+          </h2>
+          <ThesisTipsList />
+        </section>
+      )}
+      <Cards community={community} thesis={thesis} />
       <Related community={community} related={related} />
       <SiteFooter className="mt-auto pb-6" />
     </div>
   )
 }
 
-async function Cards({ community }: { community?: string }) {
+async function Cards({ community, thesis }: { community?: string; thesis: boolean }) {
   const t = await getTranslations('submitPage')
   const viewer = community ? await getViewer() : null
   const found = community && viewer ? await getSubmitCommunity(community, viewer.username) : null
@@ -51,6 +68,8 @@ async function Cards({ community }: { community?: string }) {
   }
 
   if (!shown) {
+    // A thesis has its own card above: the tips to post would not apply.
+    if (thesis) return null
     return (
       <section aria-labelledby="submit-tips" className={cn(CARD, 'px-4 py-3.5')}>
         <h2 id="submit-tips" className="flex items-center gap-2 type-section text-muted-foreground">

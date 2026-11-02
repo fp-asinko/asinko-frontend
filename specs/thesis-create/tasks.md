@@ -52,3 +52,7 @@ Orden: T-01 → T-02 → T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T
 | TC-25    | `level-bars.test.tsx`, `thesis-editor.test.tsx`                                 |
 | TC-26    | `thesis-editor.test.tsx` (el ejemplo)                                           |
 | TC-27    | e2e (el H1)                                                                     |
+
+## Revisión 3 (2026-11-02)
+
+- [x] **T-11 (M)** Sin scroll en escritorio: la comunidad en la fila de las acciones, el activo como tarjeta del alto del claim, los atajos de fecha (`quickDeadlines`), objetivo y convicción lado a lado, "Cómo funciona una tesis" en la columna derecha (plegada sin ella), el razonamiento que crece y los placeholders nuevos. Textos, tests y e2e (TC-36 a 1280×800). → TC-28 a TC-36

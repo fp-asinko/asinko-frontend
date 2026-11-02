@@ -1,4 +1,4 @@
-import { ChevronDownIcon, ScrollTextIcon, UserRoundPlusIcon } from 'lucide-react'
+import { ChevronDownIcon, LightbulbIcon, ScrollTextIcon, UserRoundPlusIcon } from 'lucide-react'
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
@@ -22,6 +22,7 @@ import { RELATED_MAX } from '../schemas/create-post.schema'
 import { getSubmitCommunity } from '../lib/submit-community'
 import type { PreviewAction } from './body-tabs'
 import { SubmitEditorLoader } from './submit-editor-loader'
+import { ThesisTipsList } from './thesis-tips'
 
 type SearchParams = Record<string, string | string[] | undefined>
 
@@ -146,13 +147,26 @@ export async function SubmitPage({
       />
       {/* A thesis has its own title (specs/thesis-create TC-27): the tabs change the URL, and the
           page follows. */}
-      {query.type === 'thesis' ? (
-        <div className="flex flex-col gap-1 px-4 pt-4 md:px-0">
-          <h1 className="type-page-title">{t('thesisTitle')}</h1>
-          <p className="type-small text-muted-foreground">{t('thesisSubtitle')}</p>
-        </div>
-      ) : (
-        <h1 className="px-4 pt-4 type-page-title md:px-0">{t('title')}</h1>
+      <h1 className="px-4 pt-4 type-page-title md:px-0">
+        {query.type === 'thesis' ? t('thesisTitle') : t('title')}
+      </h1>
+      {query.type === 'thesis' && (
+        // Where there is no right column, how a thesis works folds under the title (TC-31).
+        <Collapsible className="mx-4 mt-3 rounded-lg border bg-surface md:mx-0 lg:hidden">
+          <CollapsibleTrigger className="group flex min-h-11 w-full items-center gap-2 rounded-lg px-3.5 type-action outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+            <LightbulbIcon aria-hidden className="size-4 text-muted-foreground" />
+            <span className="min-w-0 flex-1 text-left">{t('thesisTips.title')}</span>
+            <ChevronDownIcon
+              aria-hidden
+              className="size-4 text-muted-foreground transition-transform duration-200 ease-out group-data-panel-open:rotate-180"
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="h-(--collapsible-panel-height) overflow-hidden transition-[height] duration-200 ease-out data-ending-style:h-0 data-ending-style:duration-150 data-starting-style:h-0">
+            <div className="px-3.5 pb-3.5">
+              <ThesisTipsList />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       )}
       {community?.rules && (
         // Where there is no right column, the rules fold under the title (SU-08).

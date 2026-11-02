@@ -29,7 +29,7 @@ import {
 } from '../hooks/use-thesis-draft'
 import { useAssetQuote } from '../hooks/use-asset-quote'
 import { clearDraft } from '../hooks/use-local-draft'
-import { deadlineAt, thesisDeadlineRange } from '../lib/thesis-deadline'
+import { deadlineAt, quickDeadlines, thesisDeadlineRange } from '../lib/thesis-deadline'
 import {
   CLAIM_MAX,
   CONVICTIONS,
@@ -126,6 +126,9 @@ export function ThesisEditor({
   // Chosen by hand, the community no longer follows the asset (TC-03).
   const communityTouched = useRef(false)
   const [range] = useState(() => thesisDeadlineRange(new Date()))
+  // The shortcuts' days, fixed for the visit, and whether the calendar is open (TC-33).
+  const [quick] = useState(() => quickDeadlines(new Date()))
+  const [customDate, setCustomDate] = useState(false)
   const [confirming, setConfirming] = useState<ThesisFormValues | null>(null)
   const [pending, setPending] = useState(false)
   const [confirmError, setConfirmError] = useState<string | null>(null)
@@ -246,9 +249,11 @@ export function ThesisEditor({
 
   /** The field's control: the picker's chip, a group's first option, or the input. */
   function focusField(name: FieldName) {
-    const element = document.getElementById(`${ids}-${name === 'assetSymbol' ? 'asset' : name}`)
+    const element =
+      document.getElementById(`${ids}-${name === 'assetSymbol' ? 'asset' : name}`) ??
+      document.getElementById(`${ids}-${name}-quick`)
     const control =
-      name === 'direction' || name === 'conviction'
+      name === 'direction' || name === 'conviction' || element?.id.endsWith('-quick')
         ? element?.querySelector<HTMLElement>('[role="radio"]')
         : element
     control?.focus()
@@ -316,6 +321,12 @@ export function ThesisEditor({
     )
   }
 
+  // The shortcut that holds the chosen day, or "Other date" for another one (TC-33).
+  const shortcut =
+    quick.find((each) => each.day === deadline)?.key ??
+    (customDate || deadline ? 'custom' : undefined)
+  const closesAt = deadline ? deadlineAt(deadline) : null
+  const closes = closesAt ? new Date(closesAt) : null
   const reference = quote?.price ?? null
   const target = typedPrice(price)
   const change = reference !== null && target !== null ? (target - reference) / reference : null
@@ -380,141 +391,165 @@ export function ThesisEditor({
         className="flex flex-1 flex-col gap-0"
       >
         <div className="flex stagger flex-col gap-5">
-          <Field data-invalid={invalid('communityId') || undefined} className="gap-1">
-            <FieldLabel htmlFor={`${ids}-communityId`} className="sr-only">
-              {t('community.label')}
-            </FieldLabel>
-            <CommunityPicker
-              id={`${ids}-communityId`}
-              value={chosen}
-              onChange={(next) => {
-                communityTouched.current = true
-                chooseCommunity(next)
-              }}
-              invalid={invalid('communityId')}
-              describedBy={`${ids}-communityId-error`}
-            />
-            <FieldError
-              id={`${ids}-communityId-error`}
-              errors={fieldError('communityId')}
-              className="type-meta"
-            />
-          </Field>
-
           <FormatTabs />
 
-          <Field data-invalid={invalid('assetSymbol') || undefined} className="gap-1.5">
-            <FieldLabel htmlFor={`${ids}-asset`}>{t('thesis.asset.label')}</FieldLabel>
-            <CommunityPicker
-              id={`${ids}-asset`}
-              only="assets"
-              value={asset}
-              onChange={chooseAsset}
-              invalid={invalid('assetSymbol')}
-              describedBy={`${ids}-asset-help ${ids}-assetSymbol-error`}
-            />
-            {/* The asset's card, as the prototype's (TC-22): on white, where a rise can be green. */}
-            {asset && (
-              <div className="flex items-center justify-between gap-3 rounded-lg border bg-background px-4 py-3">
-                <div className="min-w-0">
-                  <p className="type-action font-bold">{asset.handle}</p>
-                  <p className="truncate type-meta text-muted-foreground">
-                    {quote?.name ?? asset.name}
-                  </p>
-                </div>
-                {reference !== null && (
-                  <div className="shrink-0 text-right">
-                    <p className="type-action font-bold tabular-nums">
-                      {format.number(reference, { maximumFractionDigits: reference < 1 ? 6 : 2 })}
-                    </p>
-                    <p className="type-meta">
-                      {quote?.stale ? (
-                        <span className="text-muted-foreground">{t('thesis.asset.stale')}</span>
-                      ) : (
-                        quote?.changePct != null && <Delta value={quote.changePct} />
-                      )}
-                    </p>
-                  </div>
+          {/* The asset and the claim, each the full width, one under the other (TC-30). */}
+          <div className="flex flex-col gap-5">
+            {/* The asset is its card (TC-29): the whole box chooses it. */}
+            <Field data-invalid={invalid('assetSymbol') || undefined} className="gap-1.5">
+              <FieldLabel htmlFor={`${ids}-asset`}>{t('thesis.asset.label')}</FieldLabel>
+              <CommunityPicker
+                id={`${ids}-asset`}
+                only="assets"
+                variant="card"
+                value={asset}
+                onChange={chooseAsset}
+                invalid={invalid('assetSymbol')}
+                describedBy={`${ids}-assetSymbol-error`}
+                renderValue={(chosenAsset) => (
+                  <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
+                    <span className="min-w-0">
+                      <span className="block type-action font-bold">{chosenAsset.handle}</span>
+                      <span className="block truncate type-meta text-muted-foreground">
+                        {quote?.name ?? chosenAsset.name}
+                      </span>
+                    </span>
+                    {reference !== null && (
+                      <span className="shrink-0 text-right">
+                        <span className="block type-action font-bold tabular-nums">
+                          {format.number(reference, {
+                            maximumFractionDigits: reference < 1 ? 6 : 2,
+                          })}
+                        </span>
+                        <span className="block type-meta">
+                          {quote?.stale ? (
+                            <span className="text-muted-foreground">{t('thesis.asset.stale')}</span>
+                          ) : (
+                            quote?.changePct != null && <Delta value={quote.changePct} />
+                          )}
+                        </span>
+                      </span>
+                    )}
+                  </span>
                 )}
-              </div>
-            )}
-            <p id={`${ids}-asset-help`} className="px-1 type-meta text-muted-foreground">
-              {t('thesis.asset.help')}
-            </p>
-            <FieldError
-              id={`${ids}-assetSymbol-error`}
-              errors={fieldError('assetSymbol')}
-              className="type-meta"
-            />
-          </Field>
-
-          <Field data-invalid={invalid('claim') || undefined} className="gap-1.5">
-            <FieldLabel htmlFor={`${ids}-claim`}>{t('thesis.claim.label')}</FieldLabel>
-            <Input
-              id={`${ids}-claim`}
-              // An example with the asset and a target half again its price (TC-26).
-              placeholder={
-                asset && reference !== null
-                  ? t('thesis.claim.example', {
-                      symbol: assetSymbolOf(asset),
-                      target: format.number(reference * 1.5, {
-                        maximumFractionDigits: reference * 1.5 < 1 ? 6 : 0,
-                      }),
-                    })
-                  : t('thesis.claim.placeholder')
-              }
-              {...register('claim')}
-              aria-invalid={invalid('claim') || undefined}
-              aria-required
-              aria-describedby={`${ids}-claim-help ${ids}-claim-count ${ids}-claim-error`}
-              className={cn(FIELD_BOX, 'h-12 font-semibold')}
-            />
-            <div className="flex justify-between gap-2 px-1 type-meta">
-              <p id={`${ids}-claim-help`} className="text-muted-foreground">
-                {t('thesis.claim.help')}
-              </p>
-              <span
-                id={`${ids}-claim-count`}
-                className={cn(
-                  'ml-auto tabular-nums',
-                  claim.length > CLAIM_MAX ? 'font-bold text-destructive' : 'text-muted-foreground',
-                )}
-              >
-                {t('fields.counter', { count: claim.length, max: CLAIM_MAX })}
-              </span>
-            </div>
-            <FieldError
-              id={`${ids}-claim-error`}
-              errors={fieldError('claim')}
-              className="type-meta"
-            />
-          </Field>
-
-          {/* The deadline and the target side by side from sm, as the prototype's (TC-23). */}
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field data-invalid={invalid('deadline') || undefined} className="gap-1.5">
-              <FieldLabel htmlFor={`${ids}-deadline`}>{t('thesis.deadline.label')}</FieldLabel>
-              <Input
-                id={`${ids}-deadline`}
-                type="date"
-                min={range.min}
-                max={range.max}
-                {...register('deadline')}
-                aria-invalid={invalid('deadline') || undefined}
-                aria-required
-                aria-describedby={`${ids}-deadline-help ${ids}-deadline-error`}
-                className={cn(FIELD_BOX, 'h-11')}
               />
-              <p id={`${ids}-deadline-help`} className="px-1 type-meta text-muted-foreground">
-                {t('thesis.deadline.help')}
-              </p>
               <FieldError
-                id={`${ids}-deadline-error`}
-                errors={fieldError('deadline')}
+                id={`${ids}-assetSymbol-error`}
+                errors={fieldError('assetSymbol')}
                 className="type-meta"
               />
             </Field>
 
+            <Field data-invalid={invalid('claim') || undefined} className="gap-1.5">
+              <div className="flex items-baseline justify-between gap-2">
+                <FieldLabel htmlFor={`${ids}-claim`}>{t('thesis.claim.label')}</FieldLabel>
+                {/* The room left, beside its label: no line of its own (TC-31). */}
+                <span
+                  id={`${ids}-claim-count`}
+                  className={cn(
+                    'type-meta tabular-nums',
+                    claim.length > CLAIM_MAX
+                      ? 'font-bold text-destructive'
+                      : 'text-muted-foreground',
+                  )}
+                >
+                  {t('fields.counter', { count: claim.length, max: CLAIM_MAX })}
+                </span>
+              </div>
+              <Input
+                id={`${ids}-claim`}
+                // An example with the asset and a target half again its price (TC-26).
+                placeholder={
+                  asset && reference !== null
+                    ? t('thesis.claim.example', {
+                        symbol: assetSymbolOf(asset),
+                        target: format.number(reference * 1.5, {
+                          maximumFractionDigits: reference * 1.5 < 1 ? 6 : 0,
+                        }),
+                      })
+                    : t('thesis.claim.placeholder')
+                }
+                {...register('claim')}
+                aria-invalid={invalid('claim') || undefined}
+                aria-required
+                aria-describedby={`${ids}-claim-count ${ids}-claim-error`}
+                className={cn(FIELD_BOX, 'h-12 font-semibold')}
+              />
+              <FieldError
+                id={`${ids}-claim-error`}
+                errors={fieldError('claim')}
+                className="type-meta"
+              />
+            </Field>
+          </div>
+
+          <Field data-invalid={invalid('deadline') || undefined} className="gap-1.5">
+            <span id={`${ids}-deadline-label`} className="type-small font-medium">
+              {t('thesis.deadline.label')}
+            </span>
+            {/* Shortcuts in one row, as most deadlines are "in 3 months"; "Other date" opens the
+                calendar beside them, and the day it closes follows (TC-33). */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <ChoiceGroup
+                id={`${ids}-deadline-quick`}
+                size="sm"
+                labelledBy={`${ids}-deadline-label`}
+                describedBy={`${ids}-deadline-closes ${ids}-deadline-error`}
+                options={[
+                  ...quick.map(({ key }) => ({
+                    value: key,
+                    label: t(`thesis.deadline.quick.${key}`),
+                  })),
+                  { value: 'custom' as const, label: t('thesis.deadline.quick.custom') },
+                ]}
+                value={shortcut}
+                onChange={(next) => {
+                  if (next === 'custom') {
+                    setCustomDate(true)
+                    requestAnimationFrame(() => document.getElementById(`${ids}-deadline`)?.focus())
+                    return
+                  }
+                  setCustomDate(false)
+                  const day = quick.find((each) => each.key === next)?.day
+                  if (day) setValue('deadline', day, { shouldValidate: formState.isSubmitted })
+                }}
+                invalid={invalid('deadline')}
+                required
+              />
+              {customDate && (
+                <>
+                  <FieldLabel htmlFor={`${ids}-deadline`} className="sr-only">
+                    {t('thesis.deadline.label')}
+                  </FieldLabel>
+                  <Input
+                    id={`${ids}-deadline`}
+                    type="date"
+                    min={range.min}
+                    max={range.max}
+                    {...register('deadline')}
+                    aria-invalid={invalid('deadline') || undefined}
+                    aria-required
+                    aria-describedby={`${ids}-deadline-error`}
+                    className={cn(FIELD_BOX, 'h-8 w-44')}
+                  />
+                </>
+              )}
+              <p id={`${ids}-deadline-closes`} className="type-meta text-muted-foreground">
+                {closes &&
+                  t('thesis.deadline.closes', {
+                    date: format.dateTime(closes, { dateStyle: 'medium' }),
+                  })}
+              </p>
+            </div>
+            <FieldError
+              id={`${ids}-deadline-error`}
+              errors={fieldError('deadline')}
+              className="type-meta"
+            />
+          </Field>
+
+          {/* The target and the conviction side by side from sm (TC-30). */}
+          <div className="grid gap-5 sm:grid-cols-2">
             <Field
               data-invalid={invalid('direction') || invalid('targetPrice') || undefined}
               className="gap-1.5"
@@ -524,18 +559,22 @@ export function ThesisEditor({
                 id={`${ids}-targetPrice`}
                 inputMode="decimal"
                 autoComplete="off"
+                // Without an asset there is nothing to aim at yet (TC-34).
+                disabled={!asset}
                 placeholder={
-                  reference !== null
-                    ? format.number(reference * 1.5, {
-                        maximumFractionDigits: reference * 1.5 < 1 ? 6 : 0,
-                      })
-                    : undefined
+                  !asset
+                    ? t('thesis.target.needsAsset')
+                    : reference !== null
+                      ? format.number(reference * 1.5, {
+                          maximumFractionDigits: reference * 1.5 < 1 ? 6 : 0,
+                        })
+                      : undefined
                 }
                 {...register('targetPrice')}
                 aria-invalid={invalid('targetPrice') || invalid('direction') || undefined}
                 aria-required
                 aria-describedby={`${ids}-direction-said ${ids}-targetPrice-error ${ids}-direction-error`}
-                className={cn(FIELD_BOX, 'h-11 tabular-nums')}
+                className={cn(FIELD_BOX, 'h-11 tabular-nums disabled:opacity-60')}
               />
               {/* Which way it bets, from the target (TC-24). */}
               <p id={`${ids}-direction-said`} className="px-1 type-meta text-muted-foreground">
@@ -596,42 +635,39 @@ export function ThesisEditor({
                 className="type-meta"
               />
             </Field>
-          </div>
 
-          <Field data-invalid={invalid('conviction') || undefined} className="gap-1.5">
-            <span id={`${ids}-conviction-label`} className="type-small font-medium">
-              {t('thesis.conviction.label')}
-            </span>
-            {/* Four rising bars, as the prototype's (TC-25). */}
-            <Controller
-              control={control}
-              name="conviction"
-              render={({ field }) => (
-                <LevelBars
-                  id={`${ids}-conviction`}
-                  labelledBy={`${ids}-conviction-label`}
-                  describedBy={`${ids}-conviction-help ${ids}-conviction-error`}
-                  levels={CONVICTIONS.map((value) => ({
-                    value,
-                    label: t(`thesis.conviction.${value}`),
-                  }))}
-                  value={field.value}
-                  onChange={field.onChange}
-                  prompt={t('thesis.conviction.prompt')}
-                  invalid={invalid('conviction')}
-                  required
-                />
-              )}
-            />
-            <p id={`${ids}-conviction-help`} className="px-1 type-meta text-muted-foreground">
-              {t('thesis.conviction.help')}
-            </p>
-            <FieldError
-              id={`${ids}-conviction-error`}
-              errors={fieldError('conviction')}
-              className="type-meta"
-            />
-          </Field>
+            <Field data-invalid={invalid('conviction') || undefined} className="gap-1.5">
+              <span id={`${ids}-conviction-label`} className="type-small font-medium">
+                {t('thesis.conviction.label')}
+              </span>
+              {/* Four rising bars, as the prototype's (TC-25). */}
+              <Controller
+                control={control}
+                name="conviction"
+                render={({ field }) => (
+                  <LevelBars
+                    id={`${ids}-conviction`}
+                    labelledBy={`${ids}-conviction-label`}
+                    describedBy={`${ids}-conviction-error`}
+                    levels={CONVICTIONS.map((value) => ({
+                      value,
+                      label: t(`thesis.conviction.${value}`),
+                    }))}
+                    value={field.value}
+                    onChange={field.onChange}
+                    prompt={t('thesis.conviction.prompt')}
+                    invalid={invalid('conviction')}
+                    required
+                  />
+                )}
+              />
+              <FieldError
+                id={`${ids}-conviction-error`}
+                errors={fieldError('conviction')}
+                className="type-meta"
+              />
+            </Field>
+          </div>
 
           <Field data-invalid={invalid('reasoning') || undefined} className="gap-1.5">
             <FieldLabel htmlFor={`${ids}-reasoning`}>{t('thesis.reasoning.label')}</FieldLabel>
@@ -663,7 +699,11 @@ export function ThesisEditor({
                   aria-invalid={invalid('reasoning') || undefined}
                   aria-required
                   aria-describedby={`${ids}-reasoning-error`}
-                  className={cn(BARE, 'min-h-36 resize-none text-base leading-[1.55] md:text-base')}
+                  // Three lines to start, growing with the text (TC-32).
+                  className={cn(
+                    BARE,
+                    'field-sizing-content max-h-96 min-h-20 resize-none text-base leading-[1.55] md:text-base',
+                  )}
                 />
                 <MentionField fieldRef={reasoningRef} search={searchMentions} />
               </div>
@@ -677,8 +717,34 @@ export function ThesisEditor({
         </div>
 
         {/* Cancel and Publish, on the right, as the post's: sticky over the bottom bar in phones. */}
-        <div data-sticky-actions className={ACTIONS_BAR}>
-          <div className="flex flex-wrap items-center justify-end gap-2">
+        <div data-sticky-actions className={cn(ACTIONS_BAR, 'justify-between gap-3')}>
+          {/* Where it goes, on the actions' row (TC-28): the asset's community, unless changed. */}
+          <Field data-invalid={invalid('communityId') || undefined} className="w-auto gap-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <FieldLabel
+                htmlFor={`${ids}-communityId`}
+                className="type-small text-muted-foreground"
+              >
+                {t('thesis.publishIn')}
+              </FieldLabel>
+              <CommunityPicker
+                id={`${ids}-communityId`}
+                value={chosen}
+                onChange={(next) => {
+                  communityTouched.current = true
+                  chooseCommunity(next)
+                }}
+                invalid={invalid('communityId')}
+                describedBy={`${ids}-communityId-error`}
+              />
+            </div>
+            <FieldError
+              id={`${ids}-communityId-error`}
+              errors={fieldError('communityId')}
+              className="type-meta"
+            />
+          </Field>
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
             <button
               type="button"
               onClick={onCancel}

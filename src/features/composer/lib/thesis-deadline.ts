@@ -48,3 +48,31 @@ export function isDeadlineInRange(iso: string, now: Date): boolean {
   const delta = new Date(iso).getTime() - now.getTime()
   return delta >= DEADLINE_MIN_MS && delta <= DEADLINE_MAX_MS
 }
+
+/** The deadline shortcuts (specs/thesis-create TC-33). */
+export const QUICK_DEADLINES = ['month1', 'month3', 'month6', 'year1', 'yearEnd'] as const
+export type QuickDeadline = (typeof QUICK_DEADLINES)[number]
+
+/**
+ * The day of each shortcut from `now`, in the local calendar: months added to the date (31 Jan + 1
+ * month is the last of February), the end of the year is 31 Dec. One outside the range the backend
+ * takes (the end of the year less than a day away) is left out.
+ */
+export function quickDeadlines(now: Date): { key: QuickDeadline; day: string }[] {
+  const { min, max } = thesisDeadlineRange(now)
+  const plusMonths = (months: number) => {
+    const target = new Date(now.getFullYear(), now.getMonth() + months, 1)
+    const last = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate()
+    return dayOf(new Date(target.getFullYear(), target.getMonth(), Math.min(now.getDate(), last)))
+  }
+  const days: Record<QuickDeadline, string> = {
+    month1: plusMonths(1),
+    month3: plusMonths(3),
+    month6: plusMonths(6),
+    year1: plusMonths(12),
+    yearEnd: `${now.getFullYear()}-12-31`,
+  }
+  return QUICK_DEADLINES.map((key) => ({ key, day: days[key] })).filter(
+    ({ day }) => day >= min && day <= max,
+  )
+}

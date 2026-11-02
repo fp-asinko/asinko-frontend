@@ -1053,13 +1053,11 @@
     "thesis": {
       "asset": {
         "label": "Activo",
-        "help": "El precio de referencia se toma al publicar.",
         "stale": "desactualizado"
       },
       "claim": {
         "label": "Predicción",
         "placeholder": "ej.: $NVDA cierra por encima de 200 antes de la fecha límite",
-        "help": "Una frase clara que se pueda comprobar.",
         "example": "ej.: {symbol} > {target} antes de la fecha límite"
       },
       "target": {
@@ -1067,15 +1065,23 @@
         "above": "Por encima de",
         "below": "Por debajo de",
         "price": "Precio objetivo",
-        "direction": "{direction, select, ABOVE {Por encima del precio actual} other {Por debajo del precio actual}} · {change}"
+        "direction": "{direction, select, ABOVE {Por encima del precio actual} other {Por debajo del precio actual}} · {change}",
+        "needsAsset": "Elige un activo primero"
       },
       "deadline": {
         "label": "Fecha límite",
-        "help": "Cierra a las 23:59 de ese día, en tu hora. Desde mañana hasta 5 años."
+        "quick": {
+          "month1": "1 mes",
+          "month3": "3 meses",
+          "month6": "6 meses",
+          "year1": "1 año",
+          "yearEnd": "Fin de año",
+          "custom": "Otra fecha"
+        },
+        "closes": "Cierra el {date}"
       },
       "conviction": {
         "label": "Convicción",
-        "help": "Pesa en tu calibración: una errada con convicción Extrema pesa más.",
         "LOW": "Baja",
         "MEDIUM": "Media",
         "HIGH": "Alta",
@@ -1084,7 +1090,7 @@
       },
       "reasoning": {
         "label": "Razonamiento",
-        "placeholder": "El argumento detrás de la predicción: datos, contexto, riesgos…"
+        "placeholder": "¿Por qué va a pasar? Datos, catalizadores y qué te haría cambiar de idea"
       },
       "errors": {
         "asset": "Elige un activo",
@@ -1109,7 +1115,8 @@
         "back": "Volver",
         "submit": "Publicar tesis",
         "submitting": "Publicando…"
-      }
+      },
+      "publishIn": "Se publica en"
     }
   },
   "mentions": {
@@ -1191,7 +1198,15 @@
     "loadError": "No se pudo cargar la comunidad.",
     "related": "Relacionados ({count, number})",
     "thesisTitle": "Publicar tesis",
-    "thesisSubtitle": "Tu tesis queda en tu historial. Se resuelve sola en la fecha límite."
+    "thesisTips": {
+      "title": "Cómo funciona una tesis",
+      "claim": "La predicción es una frase que se puede comprobar: un activo, un precio y una fecha.",
+      "deadline": "La fecha límite va de mañana a 5 años, y cierra a las 23:59 de ese día, en tu hora.",
+      "resolution": "Se resuelve sola en la fecha límite, contra el precio de mercado.",
+      "final": "Una vez publicada queda en tu historial: no se puede editar ni borrar.",
+      "conviction": "Tu convicción pesa en tu calibración: una errada con Extrema pesa más.",
+      "reference": "El precio de referencia del activo se toma al publicar."
+    }
   },
   "ads": {
     "label": "Anuncio",

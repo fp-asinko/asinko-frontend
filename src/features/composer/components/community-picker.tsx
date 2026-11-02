@@ -3,7 +3,7 @@
 import { cva } from 'class-variance-authority'
 import { PlusIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useEffect, useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react'
 import {
   Combobox,
   ComboboxContent,
@@ -21,7 +21,7 @@ import { readSearch } from '../lib/picker-search'
 /** A pause before searching while the person types (specs/post-create-detail § 3). */
 const SEARCH_DELAY = 250
 
-/** The picker's trigger: the chosen community's chip, or the "+" that adds a related one. */
+/** The picker's trigger: the chosen community's chip, the "+" that adds a related one, or a card. */
 const trigger = cva(
   'inline-flex tap items-center rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
   {
@@ -30,6 +30,8 @@ const trigger = cva(
         // As Reddit's "Select community": outlined and bigger (specs/submit-form-layout SF-01).
         chip: 'h-10 max-w-full gap-1.5 border border-border-strong bg-background pr-3 pl-4 type-action font-bold hover:bg-surface aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/40 [&_svg]:size-4',
         add: 'h-8 w-8 justify-center bg-muted text-foreground hover:bg-muted-hover [&_svg]:size-4',
+        // A thesis's asset as its card (specs/thesis-create TC-29): the whole box is the trigger.
+        card: 'h-12 w-full gap-3 rounded-2xl border border-input bg-background px-4 text-left hover:bg-surface aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/40 [&_svg]:size-4 [&_svg]:shrink-0',
       },
     },
   },
@@ -74,13 +76,16 @@ export function CommunityPicker({
   variant = 'chip',
   exclude = [],
   only,
+  renderValue,
 }: {
   id: string
   value: CommunityOption | null
   onChange: (community: CommunityOption | null) => void
   invalid?: boolean
   describedBy?: string
-  variant?: 'chip' | 'add'
+  variant?: 'chip' | 'add' | 'card'
+  /** What the card shows of the chosen one (variant `card`); the label without it. */
+  renderValue?: (value: CommunityOption) => ReactNode
   /** Handles not to offer: the main community and the related ones already added. */
   exclude?: readonly string[]
   /** Only assets, always: the asset of a thesis. */
@@ -204,7 +209,15 @@ export function CommunityPicker({
               value ? 'text-foreground' : 'text-muted-foreground',
             )}
           >
-            <span className="truncate">{label}</span>
+            {value && renderValue ? (
+              renderValue(value)
+            ) : (
+              <span
+                className={cn('truncate', variant === 'card' && 'flex-1 type-action font-bold')}
+              >
+                {label}
+              </span>
+            )}
           </ComboboxTrigger>
         )}
       </div>

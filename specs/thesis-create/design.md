@@ -183,3 +183,14 @@ Al revisarlo apareció un bug: volver desde la tesis a Link o Image mostraba el 
 - **Convicción** (TC-25): `LevelBars`, una molécula nueva (`components/molecules/level-bars.tsx`) sobre el `radio-group` de shadcn. Cada `RadioGroupItem` es una barra de 16 px de ancho y alto creciente (20, 26, 32 y 38 px, los del prototipo), sin el punto. Se llenan hasta la elegida; con la última, `bg-destructive`. Al lado, el nombre de la elegida, o la invitación. Reemplaza al `ChoiceGroup` de la convicción.
 - **Ejemplo del claim** (TC-26): `thesis.claim.example` con `{symbol, target}`, el objetivo con `format.number`.
 - **Título** (TC-27): `SubmitPage` elige el H1 y el subtítulo por `?type=`. Al cambiar de pestaña, la URL cambia (`router.replace`) y el servidor vuelve a dibujar la página con el título nuevo; el formulario no se toca (es cliente).
+
+## 17. Revisión 3: sin scroll en escritorio (TC-28 a TC-36)
+
+- **Comunidad** (TC-28): el `CommunityPicker` (variante `chip`) baja a la barra de acciones, a la izquierda de Cancelar y Publicar (`justify-between`; se parte en dos renglones si no entra).
+- **Activo** (TC-29): `CommunityPicker` suma la variante `card` (todo el ancho, borde, `rounded-lg`, texto a la izquierda) y un `renderValue` opcional: el editor dibuja ahí la tarjeta del activo. El cambio es interno del feature (no es un átomo de `ui/`).
+- **Filas** (TC-30): activo y claim a todo el ancho, uno debajo del otro; la fecha sola, con los atajos y el día en una fila que se parte si no entra; objetivo y convicción en `grid sm:grid-cols-2`. La variante `card` mide `h-12` con `rounded-2xl` y `border-input`, como el claim. Medido en `next dev` a 1280×800 con un activo: Publicar termina a 786 px.
+- **Cómo funciona una tesis** (TC-31): `ThesisTips` (servidor) en `SubmitAside` cuando `?type=thesis`; la página la repite plegada bajo el título con `lg:hidden` (el mismo `Collapsible` de las reglas). Se van las ayudas bajo los campos y `submitPage.thesisSubtitle`.
+- **Razonamiento** (TC-32): `field-sizing-content` con `min-h-20` y `max-h-96`. Donde el navegador no lo soporta (Safari viejo), queda en tres líneas con scroll propio.
+- **Atajos de fecha** (TC-33): `quickDeadlines(now)` en `lib/thesis-deadline.ts` devuelve los días de cada atajo (sumando meses en el calendario local) y deja afuera los que caen fuera de `thesisDeadlineRange`. Un `ChoiceGroup` con los atajos y "Otra fecha"; el valor del formulario sigue siendo el día. Con "Otra fecha", el `input type="date"`. Al lado, la fecha con `format.dateTime`.
+- **Objetivo** (TC-34) y **razonamiento** (TC-35): placeholders nuevos; el objetivo, `disabled` sin activo.
+- **Medida** (TC-36): un e2e a 1280×800 compara el fondo de los botones con el alto de la ventana.

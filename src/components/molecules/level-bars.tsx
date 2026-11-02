@@ -74,7 +74,7 @@ export function LevelBars<Value extends string>({
       </RadioGroup>
       <span
         className={cn(
-          'type-action',
+          'type-action whitespace-nowrap',
           chosen === -1 ? 'font-normal text-muted-foreground' : 'text-foreground',
         )}
       >

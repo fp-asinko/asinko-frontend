@@ -7,10 +7,10 @@ import { parseSubmitQuery } from '@/features/composer/components/submit-page'
 // (specs/submit-page SU-07, § 2), and the related ones (specs/related-aside). It waits on its
 // own: the page never waits for it.
 export default async function SubmitRight({ searchParams }: PageProps<'/[locale]/submit'>) {
-  const { community, related } = parseSubmitQuery(await searchParams)
+  const { community, related, type } = parseSubmitQuery(await searchParams)
   return (
     <Suspense fallback={<Skeleton className="m-3.5 h-48 rounded-lg" />}>
-      <SubmitAside community={community} related={related} />
+      <SubmitAside community={community} related={related} thesis={type === 'thesis'} />
     </Suspense>
   )
 }

@@ -1053,13 +1053,11 @@
     "thesis": {
       "asset": {
         "label": "Ativo",
-        "help": "O preço de referência é registrado ao publicar.",
         "stale": "desatualizado"
       },
       "claim": {
         "label": "Previsão",
         "placeholder": "ex.: $NVDA fecha acima de 200 antes do prazo",
-        "help": "Uma frase clara que possa ser verificada.",
         "example": "ex.: {symbol} > {target} antes do prazo"
       },
       "target": {
@@ -1067,15 +1065,23 @@
         "above": "Acima de",
         "below": "Abaixo de",
         "price": "Preço-alvo",
-        "direction": "{direction, select, ABOVE {Acima do preço atual} other {Abaixo do preço atual}} · {change}"
+        "direction": "{direction, select, ABOVE {Acima do preço atual} other {Abaixo do preço atual}} · {change}",
+        "needsAsset": "Escolha um ativo primeiro"
       },
       "deadline": {
         "label": "Prazo",
-        "help": "Fecha às 23:59 desse dia, no seu horário. De amanhã até 5 anos."
+        "quick": {
+          "month1": "1 mês",
+          "month3": "3 meses",
+          "month6": "6 meses",
+          "year1": "1 ano",
+          "yearEnd": "Fim do ano",
+          "custom": "Outra data"
+        },
+        "closes": "Fecha em {date}"
       },
       "conviction": {
         "label": "Convicção",
-        "help": "Pesa na sua calibração: um erro com convicção Extrema pesa mais.",
         "LOW": "Baixa",
         "MEDIUM": "Média",
         "HIGH": "Alta",
@@ -1084,7 +1090,7 @@
       },
       "reasoning": {
         "label": "Raciocínio",
-        "placeholder": "O argumento por trás da previsão: dados, contexto, riscos…"
+        "placeholder": "Por que vai acontecer? Dados, catalisadores e o que faria você mudar de ideia"
       },
       "errors": {
         "asset": "Escolha um ativo",
@@ -1109,7 +1115,8 @@
         "back": "Voltar",
         "submit": "Publicar tese",
         "submitting": "Publicando…"
-      }
+      },
+      "publishIn": "Publicado em"
     }
   },
   "mentions": {
@@ -1191,7 +1198,15 @@
     "loadError": "Não foi possível carregar a comunidade.",
     "related": "Relacionados ({count, number})",
     "thesisTitle": "Publicar tese",
-    "thesisSubtitle": "Sua tese fica no seu histórico. Ela se resolve sozinha no prazo."
+    "thesisTips": {
+      "title": "Como funciona uma tese",
+      "claim": "A previsão é uma frase que pode ser verificada: um ativo, um preço e uma data.",
+      "deadline": "O prazo vai de amanhã a 5 anos, e fecha às 23:59 desse dia, no seu horário.",
+      "resolution": "Ela se resolve sozinha no prazo, contra o preço de mercado.",
+      "final": "Depois de publicada, fica no seu histórico: não pode ser editada nem apagada.",
+      "conviction": "Sua convicção pesa na sua calibração: um erro com Extrema pesa mais.",
+      "reference": "O preço de referência do ativo é registrado ao publicar."
+    }
   },
   "ads": {
     "label": "Anúncio",

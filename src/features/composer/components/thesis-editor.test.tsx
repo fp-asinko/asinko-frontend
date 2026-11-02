@@ -68,7 +68,7 @@ function renderEditor({ community = NVDA as CommunityOption | null, signedIn = t
 
 const claim = () => screen.getByRole('textbox', { name: 'Claim' })
 const price = () => screen.getByRole('textbox', { name: 'Target price' })
-const deadline = () => screen.getByLabelText('Deadline')
+const deadline = () => screen.getByLabelText('Deadline', { selector: 'input' })
 const reasoning = () => screen.getByRole('textbox', { name: 'Reasoning' })
 const publish = () => screen.getByRole('button', { name: 'Publish' })
 
@@ -77,8 +77,8 @@ async function fill() {
   await userEvent.type(claim(), 'NVDA closes above 200')
   // Above the current price (180): the direction comes from it (TC-24).
   await userEvent.type(price(), '200')
-  // A date field: jsdom does not type into it as a browser (the e2e does), so its value is set.
-  fireEvent.change(deadline(), { target: { value: thesisDeadlineRange(new Date()).min } })
+  // A shortcut: the most common way to set it (TC-33).
+  await userEvent.click(screen.getByRole('radio', { name: '3 months' }))
   await userEvent.click(screen.getByRole('radio', { name: 'High' }))
   await userEvent.type(reasoning(), 'Data center demand.')
 }
@@ -109,7 +109,6 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     expect(await screen.findByText('NVIDIA')).toBeVisible()
     expect(screen.getByText('180')).toBeVisible()
     expect(screen.getByText('2.14%')).toBeVisible()
-    expect(screen.getByText('The reference price is taken when you publish.')).toBeVisible()
     // The claim's example, with the asset and a target half again its price.
     expect(claim()).toHaveAttribute('placeholder', 'e.g. NVDA > 270 before the deadline')
   })
@@ -152,15 +151,15 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     await userEvent.keyboard('{ArrowDown}')
     await userEvent.click(await screen.findByRole('option', { name: /BTC/ }))
     expect(onCommunityChange).toHaveBeenLastCalledWith(BTC)
-    expect(screen.getByRole('combobox', { name: 'Community' })).toHaveTextContent('$BTC')
+    expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('$BTC')
 
-    screen.getByRole('combobox', { name: 'Community' }).focus()
+    screen.getByRole('combobox', { name: 'Publishing in' }).focus()
     await userEvent.keyboard('{ArrowDown}')
     await userEvent.click(await screen.findByRole('option', { name: /#macro/ }))
     screen.getByRole('combobox', { name: 'Asset' }).focus()
     await userEvent.keyboard('{ArrowDown}')
     await userEvent.click(await screen.findByRole('option', { name: /NVDA/ }))
-    expect(screen.getByRole('combobox', { name: 'Community' })).toHaveTextContent('#macro')
+    expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('#macro')
   })
 
   it('counts the claim, and says what is missing when Publish is pressed early (TC-04, TC-09)', async () => {
@@ -177,11 +176,20 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     expect(screen.queryByRole('dialog')).toBeNull()
   })
 
-  it('offers the deadline from tomorrow to 5 years, and the four convictions (TC-06, TC-07)', () => {
+  it('offers the deadline from tomorrow to 5 years, and the four convictions (TC-06, TC-07, TC-33)', async () => {
     renderEditor()
+    // The shortcuts, and "Other date" opens the calendar with the backend's range (TC-33).
+    const shortcuts = screen.getByRole('radiogroup', { name: 'Deadline' })
+    for (const name of ['1 month', '3 months', '6 months', '1 year', 'Other date']) {
+      expect(within(shortcuts).getByRole('radio', { name })).toBeInTheDocument()
+    }
+    await userEvent.click(within(shortcuts).getByRole('radio', { name: 'Other date' }))
     const { min, max } = thesisDeadlineRange(new Date())
     expect(deadline()).toHaveAttribute('min', min)
     expect(deadline()).toHaveAttribute('max', max)
+    // A day typed there closes that day.
+    fireEvent.change(deadline(), { target: { value: min } })
+    expect(screen.getByText(/^Closes /)).toBeVisible()
     const convictions = screen.getByRole('radiogroup', { name: 'Conviction' })
     for (const name of ['Low', 'Medium', 'High', 'Extreme']) {
       expect(within(convictions).getByRole('radio', { name })).not.toBeChecked()
@@ -287,6 +295,6 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     expect(price()).toHaveValue('50000')
     expect(screen.getByRole('radio', { name: 'Below' })).toBeChecked()
     expect(screen.getByRole('combobox', { name: 'Asset' })).toHaveTextContent('$BTC')
-    expect(screen.getByRole('combobox', { name: 'Community' })).toHaveTextContent('#macro')
+    expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('#macro')
   })
 })

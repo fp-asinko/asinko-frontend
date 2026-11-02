@@ -29,8 +29,9 @@ async function fill(page: Page, claim: string) {
   await main(page).getByRole('textbox', { name: 'Claim' }).fill(claim)
   // Above BTC's price in the mocks: the direction comes from it (TC-24).
   await main(page).getByRole('textbox', { name: 'Target price' }).fill('150000')
-  const deadline = main(page).getByLabel('Deadline')
-  // The first day it offers: tomorrow, in the browser's zone (TC-06).
+  // "Other date", and the first day it offers: tomorrow, in the browser's zone (TC-06, TC-33).
+  await main(page).getByText('Other date', { exact: true }).click()
+  const deadline = main(page).getByLabel('Deadline', { exact: true }).and(page.locator('input'))
   await deadline.fill((await deadline.getAttribute('min'))!)
   await main(page).getByRole('radio', { name: 'High' }).click()
   await main(page).getByRole('textbox', { name: 'Reasoning' }).fill('ETF flows keep coming.')
@@ -50,7 +51,7 @@ test.describe('Create a thesis', () => {
     )
     // Its own title (TC-27), the asset of the URL and its card (TC-02, TC-22).
     await expect(page.getByRole('heading', { level: 1, name: 'Publish thesis' })).toBeVisible()
-    await expect(main(page).getByRole('combobox', { name: 'Asset' })).toHaveText('$BTC')
+    await expect(main(page).getByRole('combobox', { name: 'Asset' })).toContainText('$BTC')
     await expect(main(page).getByText('Bitcoin', { exact: true })).toBeVisible()
     await fill(page, claim)
     await expect(main(page).getByText(/^Above the current price · \+\d/)).toBeVisible()
@@ -124,6 +125,18 @@ test.describe('Create a thesis', () => {
   }
 })
 
+test('fits a 1280×800 window without scrolling, with an asset chosen (TC-36)', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'Measured on desktop: a phone scrolls, with Publish fixed at the bottom')
+  await page.setViewportSize({ width: 1280, height: 800 })
+  await page.goto('/en/submit?community=BTC&type=thesis')
+  await expect(main(page).getByText('Bitcoin', { exact: true })).toBeVisible()
+  const publish = (await main(page).getByRole('button', { name: 'Publish' }).boundingBox())!
+  expect(publish.y + publish.height).toBeLessThanOrEqual(800)
+})
+
 test.describe('A thesis from UTC−3 (specs/local-time LT-05)', () => {
   // Santiago, already told to the server: no first-visit refresh in the middle of the form.
   test.use({
@@ -150,7 +163,10 @@ test.describe('A thesis from UTC−3 (specs/local-time LT-05)', () => {
     const claim = `BTC above 150K, from Santiago (${testInfo.project.name} ${Date.now()})`
     await page.goto('/en/submit?community=BTC&type=thesis')
     await fill(page, claim)
-    const day = await main(page).getByLabel('Deadline').inputValue()
+    const day = await main(page)
+      .getByLabel('Deadline', { exact: true })
+      .and(page.locator('input'))
+      .inputValue()
     await main(page).getByRole('button', { name: 'Publish' }).click()
     const dialog = page.getByRole('dialog', { name: 'Publish thesis' })
     await dialog.getByRole('checkbox').click()

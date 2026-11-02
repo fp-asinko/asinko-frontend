@@ -79,6 +79,20 @@ Pedido del PO al ver la primera versión, con una captura del prototipo (`Create
 - [x] **TC-26** (R5) El ejemplo del claim usa el activo y un objetivo de muestra (1,5 veces el precio): "ej.: BTC > 146.145 antes de la fecha límite". Sin activo, el ejemplo genérico.
 - [x] **TC-27** (R6) Con la pestaña Tesis, el H1 de la página es **"Publicar tesis"**, con el subtítulo "Tu tesis queda en tu historial. Se resuelve sola en la fecha límite.". Con un post, "Crear post" como hoy.
 
+## Revisión 3: sin scroll en escritorio (2026-11-02)
+
+Pedido del PO con una captura del formulario: "qué mejorarías, como placeholders y diseño; además quiero evitar el scroll". Medido: unos 1.250 px de alto sin activo elegido. Propuesta aprobada ("dale"): llegar a unos 750 px, sin scroll en escritorio desde 1280×800. En el teléfono el scroll sigue, con Publicar fijo abajo.
+
+- [x] **TC-28** La **comunidad** deja de estar arriba: en la fila de las acciones, a la izquierda, "Se publica en" con el selector. Sigue eligiéndose sola con el activo (TC-03) y se puede cambiar.
+- [x] **TC-29** **El activo es su tarjeta:** una sola caja que se toca para elegir, del alto y el borde del claim. Vacía dice "Elige un activo"; elegido, el símbolo, el nombre, el precio y la variación del día (TC-22).
+- [x] **TC-30** **Las filas:** el activo y el claim, cada uno a todo el ancho, uno debajo del otro; los atajos de la fecha a todo el ancho, con el día al final; el objetivo y la convicción, mitad y mitad (desde `sm`); el razonamiento; "Se publica en" en la fila de Cancelar y Publicar. En el teléfono, uno debajo del otro. (Ajustado con el PO el 2026-11-02: la primera versión, fecha, objetivo y convicción en tres columnas, dejaba los atajos en tres renglones; el activo y el claim lado a lado tampoco le gustó.)
+- [x] **TC-31** **Las ayudas van a la columna derecha**, en una tarjeta "Cómo funciona una tesis": una frase que se pueda comprobar; la fecha, entre mañana y 5 años, cierra a las 23:59 de tu hora; se resuelve sola contra el precio de mercado; no se edita ni se borra; la convicción pesa en tu calibración; el precio de referencia se toma al publicar. Reemplaza a los consejos de un post y al subtítulo. Bajo los campos quedan solo el contador del claim, la dirección deducida y los errores. Sin columna derecha (teléfono y tablet), la tarjeta va plegada bajo el título, como las reglas de una comunidad.
+- [x] **TC-32** El **razonamiento** arranca con tres líneas y crece mientras se escribe.
+- [x] **TC-33** **Atajos de fecha:** 1 mes, 3 meses, 6 meses, 1 año y fin de año, como un grupo de opciones; "Otra fecha" muestra el calendario. Al lado, la fecha elegida ("Cierra el 2 feb 2027"). Un atajo fuera del rango (fin de año a menos de un día) no se ofrece.
+- [x] **TC-34** Sin activo, el **objetivo** está deshabilitado y dice "Elige un activo primero".
+- [x] **TC-35** El ejemplo del **razonamiento**: "¿Por qué va a pasar? Datos, catalizadores y qué te haría cambiar de idea".
+- [x] **TC-36** El formulario entra sin scroll en escritorio a 1280×800 con un activo elegido (lo mide un e2e).
+
 ## Fuera de alcance
 
 - La tarjeta de una tesis en el feed y en las páginas de comunidad y activo, aunque el backend ya las mande (`kind: THESIS`). Va en el spec siguiente, con el detalle.

@@ -4,6 +4,7 @@ import {
   DEADLINE_MAX_MS,
   deadlineAt,
   isDeadlineInRange,
+  quickDeadlines,
   thesisDeadlineRange,
 } from './thesis-deadline'
 
@@ -57,5 +58,30 @@ describe('isDeadlineInRange (the backend rule)', () => {
     expect(isDeadlineInRange(at(24 * 60 * 60 * 1000 - 1), now)).toBe(false)
     expect(isDeadlineInRange(at(DEADLINE_MAX_MS + 1), now)).toBe(false)
     expect(isDeadlineInRange(at(-1000), now)).toBe(false)
+  })
+})
+
+describe('quickDeadlines (TC-33)', () => {
+  it('adds months in the local calendar, and ends the year on 31 Dec', () => {
+    expect(quickDeadlines(new Date(2026, 10, 2, 10))).toEqual([
+      { key: 'month1', day: '2026-12-02' },
+      { key: 'month3', day: '2027-02-02' },
+      { key: 'month6', day: '2027-05-02' },
+      { key: 'year1', day: '2027-11-02' },
+      { key: 'yearEnd', day: '2026-12-31' },
+    ])
+  })
+
+  it('keeps the end of a shorter month', () => {
+    expect(quickDeadlines(new Date(2027, 0, 31, 10))[0]).toEqual({
+      key: 'month1',
+      day: '2027-02-28',
+    })
+  })
+
+  it('leaves out the end of the year when it is not a day away', () => {
+    const keys = quickDeadlines(new Date(2026, 11, 31, 9)).map((each) => each.key)
+    expect(keys).not.toContain('yearEnd')
+    expect(keys).toContain('month1')
   })
 })
