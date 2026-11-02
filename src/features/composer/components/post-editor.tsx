@@ -111,6 +111,8 @@ export function PostEditor({
   onCommunityChange,
   onThesis,
   formatRequest = null,
+  onOpenThesisDraft,
+  draftRequest = null,
   related: initialRelated = [],
   onRelatedChange,
   preview,
@@ -137,6 +139,10 @@ export function PostEditor({
   onCommunityChange?: (community: CommunityOption | null) => void
   /** The Thesis tab: the page shows the thesis editor (specs/thesis-create TC-01). */
   onThesis?: () => void
+  /** A thesis's draft chosen in this editor's list: the page opens it in the thesis editor. */
+  onOpenThesisDraft?: (draft: SavedDraft) => void
+  /** A post's draft chosen in the thesis editor's list: this editor opens it (each ask is new). */
+  draftRequest?: { draft: SavedDraft } | null
   /** A format chosen in the thesis editor's tabs: this editor shows it. */
   formatRequest?: { format: 'TEXT' | 'LINK' | 'IMAGE' | 'THOUGHT' } | null
 }) {
@@ -257,12 +263,18 @@ export function PostEditor({
     if (formatRequest) setValue('type', formatRequest.format)
   }, [formatRequest, setValue])
 
-  // On arrival the focus goes where the person starts (SU-09): the title, or the community when
-  // none is chosen yet. Once: the page is opened, not re-rendered.
+  // A post's draft opened from the thesis editor's list (specs/thesis-drafts TD-03).
+  useEffect(() => {
+    if (draftRequest) openSaved(draftRequest.draft)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when a new one is asked
+  }, [draftRequest])
+
+  // On arrival the focus goes where the person starts (SU-09): the title, or a thought's text;
+  // the community is chosen at the bottom now (specs/submit-form-layout SF-12). Once.
   useEffect(() => {
     // A thought starts at its text: it has no title (TH-03).
     const field = current === 'THOUGHT' ? 'body' : 'title'
-    document.getElementById(chosen ? `${ids}-${field}` : `${ids}-community`)?.focus()
+    document.getElementById(`${ids}-${field}`)?.focus()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on arrival
   }, [])
 
@@ -290,6 +302,11 @@ export function PostEditor({
 
   // A draft of the account takes the form's place (DT-03), its related ones too (BA-05).
   function openSaved(draft: SavedDraft) {
+    // A thesis opens in its own editor (specs/thesis-drafts TD-03).
+    if (draft.type === 'THESIS') {
+      onOpenThesisDraft?.(draft)
+      return
+    }
     form.reset({
       communityId: draft.community?.id ?? '',
       type: draft.type,
@@ -511,67 +528,17 @@ export function PostEditor({
       >
         {/* The parts arrive one after the other, quickly (specs/home-motion: stagger). */}
         <div className="flex stagger flex-col gap-4">
-          <Field
-            data-invalid={invalid('communityId') || undefined}
-            // In the box, as tall as the avatar beside it (43px): the title starts below both.
-            className="gap-1"
-          >
-            <FieldLabel htmlFor={`${ids}-community`} className="sr-only">
-              {t('community.label')}
-            </FieldLabel>
-            <Controller
-              control={control}
-              name="communityId"
-              render={({ field }) => (
-                // Where the post goes, and beside it what else it is about (specs/related-tags).
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <CommunityPicker
-                    id={`${ids}-community`}
-                    value={chosen}
-                    onChange={(next) => {
-                      setChosen(next)
-                      field.onChange(next?.id ?? '')
-                      // A tag the new one does not have goes (specs/drafts-tags DT-08).
-                      if (tag && !next?.tags?.includes(tag)) setValue('tag', '')
-                      // The new main one is no longer a related one (RT-05).
-                      if (next && related.includes(next.handle)) {
-                        const rest = related.filter((handle) => handle !== next.handle)
-                        setValue('related', rest)
-                        onRelatedChange?.(rest)
-                      }
-                      onCommunityChange?.(next)
-                    }}
-                    invalid={invalid('communityId')}
-                    describedBy={`${ids}-community-error`}
-                  />
-                  {chosen && (
-                    <RelatedPicker
-                      main={chosen.handle}
-                      value={related}
-                      onChange={(handles) => {
-                        setValue('related', handles)
-                        onRelatedChange?.(handles)
-                      }}
-                    />
-                  )}
-                  {/* The account's drafts, at the row's end (DT-02). */}
-                  <DraftsButton
-                    written={() => draftRef.current?.() ?? false}
-                    onOpen={openSaved}
-                    onDeleted={saved.forget}
-                    openedFocus={() => document.getElementById(`${ids}-title`)}
-                  />
-                </div>
-              )}
-            />
-            <FieldError
-              id={`${ids}-community-error`}
-              errors={fieldError('communityId')}
-              className="type-meta"
-            />
-          </Field>
-
-          <FormatTabs />
+          <FormatTabs
+            trailing={
+              // The account's drafts, at the formats' end (DT-02, specs/submit-form-layout SF-10).
+              <DraftsButton
+                written={() => draftRef.current?.() ?? false}
+                onOpen={openSaved}
+                onDeleted={saved.forget}
+                openedFocus={() => document.getElementById(`${ids}-title`)}
+              />
+            }
+          />
 
           {/* A thought has no title: hidden, still mounted, so what was typed is back on a switch
               (the action leaves it out of a thought, TH-03). */}
@@ -605,13 +572,16 @@ export function PostEditor({
             </div>
           </Field>
 
-          {/* Below the title, as Reddit's flair (specs/drafts-tags DT-07). */}
-          <TagPicker
-            tags={chosen?.tags ?? []}
-            hasCommunity={Boolean(chosen)}
-            value={tag}
-            onChange={(next) => setValue('tag', next)}
-          />
+          {/* Below the title, as Reddit's flair (specs/drafts-tags DT-07), once there is a
+              community: it is chosen at the bottom now (specs/submit-form-layout SF-11). */}
+          {chosen && (
+            <TagPicker
+              tags={chosen?.tags ?? []}
+              hasCommunity={Boolean(chosen)}
+              value={tag}
+              onChange={(next) => setValue('tag', next)}
+            />
+          )}
 
           {/* Title and body stay outside the panels, mounted across formats: a field remounted
               on a switch could drop what was just typed. Link only adds its URL. */}
@@ -781,9 +751,61 @@ export function PostEditor({
         {/* Only Cancel, Save draft and Publish, on the right (SF-06, DT-01). In phones it sticks over the bottom bar
             while a long post is written (specs/submit-tools ST-07), edge to edge; from md, in its
             place. */}
-        <div data-sticky-actions className={ACTIONS_BAR}>
+        <div data-sticky-actions className={cn(ACTIONS_BAR, 'justify-between gap-3')}>
+          {/* Where it goes and what else it is about, at the actions' row (specs/submit-form-layout SF-09). */}
+          <Field data-invalid={invalid('communityId') || undefined} className="w-auto gap-1">
+            <Controller
+              control={control}
+              name="communityId"
+              render={({ field }) => (
+                // Where the post goes, and beside it what else it is about (specs/related-tags).
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <FieldLabel
+                    htmlFor={`${ids}-community`}
+                    className="mr-0.5 type-small text-muted-foreground"
+                  >
+                    {t('thesis.publishIn')}
+                  </FieldLabel>
+                  <CommunityPicker
+                    id={`${ids}-community`}
+                    value={chosen}
+                    onChange={(next) => {
+                      setChosen(next)
+                      field.onChange(next?.id ?? '')
+                      // A tag the new one does not have goes (specs/drafts-tags DT-08).
+                      if (tag && !next?.tags?.includes(tag)) setValue('tag', '')
+                      // The new main one is no longer a related one (RT-05).
+                      if (next && related.includes(next.handle)) {
+                        const rest = related.filter((handle) => handle !== next.handle)
+                        setValue('related', rest)
+                        onRelatedChange?.(rest)
+                      }
+                      onCommunityChange?.(next)
+                    }}
+                    invalid={invalid('communityId')}
+                    describedBy={`${ids}-community-error`}
+                  />
+                  {chosen && (
+                    <RelatedPicker
+                      main={chosen.handle}
+                      value={related}
+                      onChange={(handles) => {
+                        setValue('related', handles)
+                        onRelatedChange?.(handles)
+                      }}
+                    />
+                  )}
+                </div>
+              )}
+            />
+            <FieldError
+              id={`${ids}-community-error`}
+              errors={fieldError('communityId')}
+              className="type-meta"
+            />
+          </Field>
           {/* Wraps before overflowing at 360px, whatever the language's words. */}
-          <div className="flex flex-wrap items-center justify-end gap-2">
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
             <button
               type="button"
               onClick={onCancel}

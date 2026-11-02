@@ -41,10 +41,23 @@ export type SubmitCommunity = {
   rules: string | null
 }
 
-/** A post saved in the account to finish later (P-022, specs/drafts-tags): what the editor had. */
+/** What a thesis's draft keeps besides its claim (title) and reasoning (body) (P-038). */
+export type SavedThesis = {
+  assetSymbol: string | null
+  targetPrice: number | null
+  direction: 'ABOVE' | 'BELOW' | null
+  /** The end of the day chosen (ISO): the editor turns it back into the day, in its own zone. */
+  deadline: string | null
+  conviction: 'LOW' | 'MEDIUM' | 'HIGH' | 'EXTREME' | null
+}
+
+/**
+ * A post, or a thesis (P-038, specs/thesis-drafts), saved in the account to finish later (P-022,
+ * specs/drafts-tags): what the editor had.
+ */
 export type SavedDraft = {
   id: string
-  type: 'TEXT' | 'LINK' | 'IMAGE' | 'THOUGHT'
+  type: 'TEXT' | 'LINK' | 'IMAGE' | 'THOUGHT' | 'THESIS'
   title: string
   body: string
   url: string
@@ -55,5 +68,7 @@ export type SavedDraft = {
   community: CommunityOption | null
   /** Its related ones, as handles ($GGAL, #macro), as the editor holds them (P-018). */
   related: string[]
+  /** A thesis's fields; null for a post. */
+  thesis: SavedThesis | null
   updatedAt: string
 }

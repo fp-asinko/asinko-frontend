@@ -38,9 +38,9 @@ test.describe('Drafts and tags, as Reddit', () => {
       .click()
     await expect(drafts(page)).toBeHidden()
     await expect(title(page)).toHaveValue(text)
-    await expect(editor(page).getByRole('combobox', { name: 'Community', exact: true })).toHaveText(
-      '#defi',
-    )
+    await expect(
+      editor(page).getByRole('combobox', { name: 'Publishing in', exact: true }),
+    ).toHaveText('#defi')
 
     await body(page).fill('The Fed cuts.')
     await editor(page).getByRole('button', { name: 'Publish' }).click()
@@ -84,18 +84,18 @@ test.describe('Drafts and tags, as Reddit', () => {
     await expect(post.getByText('Analysis', { exact: true })).toBeVisible()
   })
 
-  test('without tags the button says why, and a new community drops the tag (DT-08)', async ({
+  test('the tag waits for a community, and a new community drops it (DT-08, specs/submit-form-layout SF-11)', async ({
     page,
   }) => {
     await page.goto('/en/submit')
     const add = editor(page).getByRole('button', { name: 'Add tag' })
-    await expect(add).toHaveAttribute('aria-disabled', 'true')
-    await expect(add).toHaveAccessibleDescription('Choose a community first')
+    // The community is chosen at the bottom now: the tag shows once there is one.
+    await expect(add).toHaveCount(0)
 
     await page.goto('/en/submit?community=defi')
     await add.click()
     await page.getByRole('menuitem', { name: 'News' }).click()
-    await editor(page).getByRole('combobox', { name: 'Community', exact: true }).click()
+    await editor(page).getByRole('combobox', { name: 'Publishing in', exact: true }).click()
     await page.getByRole('combobox', { name: 'Search communities' }).fill('latam')
     await page.getByRole('option', { name: /#latam/ }).click()
     await expect(editor(page).getByText('News', { exact: true })).toHaveCount(0)

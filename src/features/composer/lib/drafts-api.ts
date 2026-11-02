@@ -66,6 +66,17 @@ export async function listDraftsOf(
       tag: draft.tag ?? '',
       community: draft.community && optionOf(draft.community),
       related: (draft.related ?? []).map((each) => mentionOf(each).handle),
+      // A thesis's own fields (P-038).
+      thesis:
+        draft.type === 'THESIS' && draft.thesis
+          ? {
+              assetSymbol: draft.thesis.assetSymbol,
+              targetPrice: draft.thesis.targetPrice,
+              direction: draft.thesis.targetDirection,
+              deadline: draft.thesis.deadline,
+              conviction: draft.thesis.conviction,
+            }
+          : null,
       updatedAt: draft.updatedAt,
     })),
   }
@@ -78,11 +89,25 @@ export async function listDraftsOf(
 export async function saveDraftAs(
   userId: string,
   draftId: string | undefined,
-  { related, ...fields }: DraftFields,
+  { related, thesis, ...fields }: DraftFields,
 ): Promise<ApiResult<{ id: string }>> {
   const ids = await relatedCommunityIds(related)
   if (!ids.ok) return ids
-  const body = { userId, ...fields, relatedCommunityIds: ids.data }
+  const body = {
+    userId,
+    ...fields,
+    relatedCommunityIds: ids.data,
+    // A thesis's own fields, as P-038 names them.
+    ...(thesis && {
+      thesis: {
+        assetSymbol: thesis.assetSymbol,
+        targetPrice: thesis.targetPrice,
+        targetDirection: thesis.direction,
+        deadline: thesis.deadline,
+        conviction: thesis.conviction,
+      },
+    }),
+  }
   const result = draftId
     ? await apiRequest({
         method: 'PATCH',

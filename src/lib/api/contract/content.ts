@@ -260,7 +260,8 @@ export type RawActiveCommunity = z.infer<typeof activeCommunitySchema>
  */
 export const draftSchema = z.object({
   id: z.uuid(),
-  type: z.enum(['TEXT', 'LINK', 'IMAGE', 'THOUGHT']),
+  /** THESIS: a thesis being written (P-038, proposal), its claim in `title` and reasoning in `body`. */
+  type: z.enum(['TEXT', 'LINK', 'IMAGE', 'THOUGHT', 'THESIS']),
   title: z.string(),
   body: z.string(),
   url: z.string(),
@@ -270,6 +271,17 @@ export const draftSchema = z.object({
   community: communitySummarySchema.nullable(),
   /** As Post.related (P-018); and when it was first saved (backend 2026-10-20). */
   related: z.array(relatedCommunitySchema).optional(),
+  /** What a thesis's draft adds (P-038); null, or absent, in a post's. */
+  thesis: z
+    .object({
+      assetSymbol: z.string().nullable(),
+      targetPrice: z.number().nullable(),
+      targetDirection: z.enum(['ABOVE', 'BELOW']).nullable(),
+      deadline: z.iso.datetime().nullable(),
+      conviction: z.enum(['LOW', 'MEDIUM', 'HIGH', 'EXTREME']).nullable(),
+    })
+    .nullable()
+    .optional(),
   createdAt: z.iso.datetime().optional(),
   updatedAt: z.iso.datetime(),
 })

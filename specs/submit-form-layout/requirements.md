@@ -23,3 +23,12 @@
 
 - `PostEditor`: los formatos (`TabsList variant="line"`) pasan arriba; el título, el link y la descripción de la imagen, en cajas (`FIELD_BOX`); el contador del título, siempre; abajo, solo Cancelar y Publicar. `BodyTabs` dibuja la caja del cuerpo, con sus pestañas, la barra de formato y los emojis adentro, arriba. `CommunityPicker`: la variante `chip` con borde y 40 px de alto.
 - Cubierto por los tests del editor (`post-editor.test.tsx`, `body-tabs.test.tsx`) y los e2e de `submit-page.spec.ts`, sin cambios de roles ni de nombres.
+
+## Revisión 2: la comunidad abajo, como la tesis (2026-11-02)
+
+Pedido del PO después de la revisión 3 de `specs/thesis-create`: "creo que deberíamos poner lo de comunidad abajo en el resto de opciones como hicimos en thesis". Aprobado con lo propuesto ("si").
+
+- [x] **SF-09** La **comunidad y sus relacionadas** dejan de estar arriba: en la fila de las acciones, a la izquierda, "Se publica en" con el selector, los relacionados y el "+". Cambia SF-01 (la píldora sigue igual) y SF-02 (los formatos quedan arriba de todo).
+- [x] **SF-10** **Borradores** (`specs/drafts-tags` DT-02) pasa al final de la fila de los formatos, a la derecha.
+- [x] **SF-11** **"Añadir etiqueta"** no aparece hasta que haya comunidad: con ella, bajo el título como hoy (`specs/drafts-tags` DT-07). Desde la página de una comunidad, ya viene elegida.
+- [x] **SF-12** El foco entra siempre en el título (o en el texto de un thought): la comunidad ya no está arriba (cambia `specs/submit-page` SU-09).

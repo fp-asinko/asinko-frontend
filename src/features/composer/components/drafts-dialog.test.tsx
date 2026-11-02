@@ -13,6 +13,7 @@ vi.mock('../actions/drafts.action', () => ({
 
 const draft = (overrides: Partial<SavedDraft> = {}): SavedDraft => ({
   id: 'd1',
+  thesis: null,
   related: [],
   type: 'TEXT',
   title: 'Rates are going down',

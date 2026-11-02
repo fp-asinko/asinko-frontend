@@ -14,7 +14,7 @@ function createLink(page: Page, isMobile: boolean) {
 
 const editor = (page: Page) => page.getByRole('main')
 const community = (page: Page) =>
-  editor(page).getByRole('combobox', { name: 'Community', exact: true })
+  editor(page).getByRole('combobox', { name: 'Publishing in', exact: true })
 const title = (page: Page) => editor(page).getByRole('textbox', { name: 'Title' })
 const body = (page: Page) => editor(page).getByRole('textbox', { name: 'Body' })
 
@@ -140,8 +140,8 @@ test.describe('Page to create a post', () => {
     test.skip(isMobile, 'There is no right column in phones')
     await page.goto('/en/submit')
     await expect(page.getByRole('heading', { level: 2, name: 'Tips to post' })).toBeVisible()
-    // The community is what to choose first: the focus is on it (SU-09).
-    await expect(community(page)).toBeFocused()
+    // The focus to the title: the community is chosen at the bottom now (specs/submit-form-layout SF-12).
+    await expect(title(page)).toBeFocused()
   })
 
   test('the picker filters by kind, with chips or a leading symbol (specs/picker-filters)', async ({
@@ -403,7 +403,7 @@ test.describe('Tools of the page to create a post (specs/submit-tools)', () => {
     await expect(toggle).toHaveAttribute('aria-expanded', 'false')
     await expect(page.getByRole('region', { name: 'Your interests' })).toBeHidden()
     // The editor comes after the page: measured once it is there, not while it fades in.
-    await expect(community(page)).toBeFocused()
+    await expect(title(page)).toBeFocused()
     await expectNoA11yViolations(page)
 
     await toggle.click()

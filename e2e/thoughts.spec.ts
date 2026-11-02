@@ -11,7 +11,7 @@ const editor = (page: Page) => page.getByRole('main')
 const publish = (page: Page) => editor(page).getByRole('button', { name: 'Publish' })
 
 async function chooseDefi(page: Page) {
-  await editor(page).getByRole('combobox', { name: 'Community', exact: true }).click()
+  await editor(page).getByRole('combobox', { name: 'Publishing in', exact: true }).click()
   await page.getByRole('option', { name: /#defi/ }).click()
 }
 

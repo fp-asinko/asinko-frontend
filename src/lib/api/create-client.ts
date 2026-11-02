@@ -119,7 +119,7 @@ export function createApiClient({
       (route) =>
         route.method === request.method &&
         route.path === request.path &&
-        (!route.when || route.when(request.query ?? {}, request.body)),
+        (!route.when || route.when(request.query ?? {}, request.body, params)),
     )
 
     const context = {

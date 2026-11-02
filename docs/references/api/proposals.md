@@ -6,7 +6,7 @@
 
 - **Pendiente ahora:** una pregunta sobre los slugs de los activos, y lo que espera una decisión de producto (P-026, P-023 y la fórmula de `best`, P-014).
 - **Fase 3 del backend:** los logros (P-030) y los widgets de los grupos (P-028, P-029). En el front ya se ven, contra mocks; el backend los implementa más adelante.
-- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033), Explore con sesión (P-034), saber si un username está libre mientras se escribe (P-035), borrar una cuenta sin dejar el perfil huérfano (P-036) y que `POST /users` guarde lo que dice el contrato (P-037).
+- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033), Explore con sesión (P-034), saber si un username está libre mientras se escribe (P-035), borrar una cuenta sin dejar el perfil huérfano (P-036) que `POST /users` guarde lo que dice el contrato (P-037) y borradores de tesis (P-038).
 
 **Verificado contra el deploy de `dev` el 2026-10-21** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 10 de 10 en verde, solo lecturas, cada respuesta con el mismo esquema que usa el mock. Además de lo de antes:
 
@@ -215,6 +215,31 @@ Medido contra `dev` el 2026-10-30.
 
 1. **(Preferida)** `POST /users` guarda también `displayName`, con las mismas reglas que `PATCH`: hasta 50 caracteres (`422 DISPLAY_NAME_TOO_LONG`) y `null` si es igual al username. Con eso, el front vuelve a un solo pedido.
 2. Corregir E01: listar exactamente lo que guarda, y responder `422` a un campo que no acepta, en lugar de ignorarlo.
+
+### P-038: Borradores de tesis
+
+**Estado:** propuesta (2026-11-02, `specs/thesis-drafts`). Mockeada: con `API_MOCKS=missing`, solo los borradores de tesis van al mock; los de posts siguen yendo al backend.
+
+**Motivo:** las tesis se crean desde la misma página que los posts (`specs/thesis-create`), pero los borradores (P-022, E03) solo aceptan `TEXT`, `LINK`, `IMAGE` y `THOUGHT`. Una tesis lleva más trabajo que un post (activo, objetivo, fecha, convicción, razonamiento), y hoy no se puede guardar para terminarla después.
+
+**Cambio:**
+
+- `Draft.type` suma `THESIS`. Una tesis usa `title` para la predicción (`claim`) y `body` para el razonamiento, y suma `thesis` (`null` en los demás tipos):
+
+  ```jsonc
+  "thesis": {
+    "assetSymbol": "BTC" | null,
+    "targetPrice": 150000 | null,
+    "targetDirection": "ABOVE" | "BELOW" | null,
+    "deadline": "ISO 8601" | null, // el fin del día elegido, como en POST /theses
+    "conviction": "LOW" | "MEDIUM" | "HIGH" | "EXTREME" | null
+  } | null
+  ```
+
+- `POST /drafts` y `PATCH /drafts/{id}` aceptan `thesis`; como hoy, nada es obligatorio y el límite de 20 es de todos los borradores juntos.
+- `POST /theses` acepta `draftId`: publica y borra el borrador en la misma operación; inexistente o ajeno, `404` sin publicar (igual que `POST /posts`).
+
+**Mientras tanto, en el front:** después de publicar una tesis que vino de un borrador, el front lo borra con `DELETE /drafts/{id}`. Con `draftId` en el backend, ese pedido se va.
 
 ## Fase 3 del backend: solo visual en el front
 

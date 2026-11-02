@@ -30,7 +30,7 @@ test.describe('cursor', () => {
     await expect(editor).toBeVisible()
 
     for (const control of [
-      editor.getByRole('combobox', { name: 'Community', exact: true }),
+      editor.getByRole('combobox', { name: 'Publishing in', exact: true }),
       editor.getByRole('tab').first(),
       editor.getByRole('button', { name: 'Publish' }),
       editor.getByRole('button', { name: /emoji/i }).first(),
@@ -39,7 +39,7 @@ test.describe('cursor', () => {
     }
     await expect(editor.getByRole('textbox', { name: 'Title' })).toHaveCSS('cursor', 'text')
 
-    await editor.getByRole('combobox', { name: 'Community', exact: true }).click()
+    await editor.getByRole('combobox', { name: 'Publishing in', exact: true }).click()
     await expect(page.getByRole('option').first()).toHaveCSS('cursor', 'pointer')
   })
 })

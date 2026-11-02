@@ -31,9 +31,9 @@ export type MockRoute = {
    * Only requests with this query or body (a proposal that adds a parameter or a field to an
    * implemented endpoint, e.g. ?q= on the comments, P-014; headline on PATCH /users, P-019): the
    * rest of the endpoint still goes to the backend. The first route that matches wins, so it goes
-   * before the route of the whole endpoint.
+   * before the route of the whole endpoint. The path's params too: a thesis draft's id (P-038).
    */
-  when?: (query: Record<string, string>, body: unknown) => boolean
+  when?: (query: Record<string, string>, body: unknown, params?: Record<string, string>) => boolean
   schema: z.ZodType
   /** Sample request the fixtures test runs against the handler. */
   example: MockContext

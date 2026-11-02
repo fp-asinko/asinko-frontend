@@ -86,7 +86,7 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12)', () => {
       locale: 'es',
     })
     await userEvent.type(screen.getByRole('textbox', { name: 'Título' }), 'Keep me')
-    await userEvent.click(screen.getByRole('combobox', { name: 'Comunidad' }))
+    await userEvent.click(screen.getByRole('combobox', { name: 'Se publica en' }))
     await userEvent.click(await screen.findByRole('option', { name: /\$BTC/ }))
     expect(router.replace).toHaveBeenCalledWith('/publicar?community=BTC', { scroll: false })
     expect(screen.getByRole('textbox', { name: 'Título' })).toHaveValue('Keep me')
@@ -114,7 +114,7 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12)', () => {
       scroll: false,
     })
 
-    screen.getByRole('combobox', { name: 'Community' }).focus()
+    screen.getByRole('combobox', { name: 'Publishing in' }).focus()
     await userEvent.keyboard('{ArrowDown}')
     await userEvent.click(await screen.findByRole('option', { name: /#macro/ }))
     // The new main one stops being related; the other stays.
@@ -139,7 +139,7 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12)', () => {
     expect(title()).toHaveValue('From yesterday')
     // The notice goes with the button: the focus goes to the title (WCAG 2.4.3).
     expect(title()).toHaveFocus()
-    expect(screen.getByRole('combobox', { name: 'Community' })).toHaveTextContent('$BTC')
+    expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('$BTC')
     expect(router.replace).toHaveBeenCalledWith('/submit?community=BTC', { scroll: false })
     expect(screen.queryByRole('button', { name: 'Recover' })).toBeNull()
   })

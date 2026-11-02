@@ -13,6 +13,7 @@ vi.mock('../actions/drafts.action', () => ({
 
 const DRAFT: SavedDraft = {
   id: 'd1',
+  thesis: null,
   type: 'TEXT',
   title: 'Rates are going down',
   body: '',

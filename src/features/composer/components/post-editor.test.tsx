@@ -75,7 +75,7 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
 
   it("comes with the page's community chosen and opens on the asked tab", () => {
     renderEditor({ type: 'LINK' })
-    expect(screen.getByRole('combobox', { name: 'Community' })).toHaveTextContent('#defi')
+    expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('#defi')
     expect(screen.getByRole('tab', { name: 'Link' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('textbox', { name: 'Link' })).toBeInTheDocument()
   })
@@ -120,6 +120,20 @@ describe('PostEditor (specs/post-create-detail PC-06 to PC-10)', () => {
     await userEvent.type(title(), 'A title')
     expect(draftRef.current?.()).toBe(true)
     expect(publish()).not.toHaveAttribute('aria-disabled')
+  })
+
+  it('chooses the community at the bottom, with Drafts at the end of the formats and the tag once there is one (specs/submit-form-layout SF-09 to SF-12)', () => {
+    renderEditor({ community: null })
+    // The focus to the title: the community is no longer on top.
+    expect(title()).toHaveFocus()
+    expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent(
+      'Choose a community',
+    )
+    expect(screen.queryByRole('button', { name: 'Add tag' })).toBeNull()
+    // Drafts, in the formats' row: after the tabs, out of the tablist.
+    const drafts = screen.getByRole('button', { name: /Drafts/ })
+    expect(screen.getByRole('tablist').parentElement).toContainElement(drafts)
+    expect(screen.getByRole('tablist')).not.toContainElement(drafts)
   })
 
   it('shows Thought first, as the prototype, and starts on Text (specs/thoughts TH-03)', () => {
@@ -410,7 +424,7 @@ describe('PostEditor related ones (specs/related-tags)', () => {
       ok: true,
       data: [DEFI, option('$GGAL'), option('#macro')],
     })
-    screen.getByRole('combobox', { name: 'Community' }).focus()
+    screen.getByRole('combobox', { name: 'Publishing in' }).focus()
     await userEvent.keyboard('{ArrowDown}')
     await userEvent.click(await screen.findByRole('option', { name: /#defi/ }))
 
@@ -434,7 +448,7 @@ describe('PostEditor related ones (specs/related-tags)', () => {
     await addRelated('$GGAL')
     expect(screen.getByRole('list', { name: 'Related' })).toHaveTextContent('$GGAL')
 
-    screen.getByRole('combobox', { name: 'Community' }).focus()
+    screen.getByRole('combobox', { name: 'Publishing in' }).focus()
     await userEvent.keyboard('{ArrowDown}')
     await userEvent.click(await screen.findByRole('option', { name: '$GGAL' }))
     expect(screen.queryByRole('list', { name: 'Related' })).toBeNull()
@@ -538,7 +552,7 @@ describe('PostEditor tags (specs/drafts-tags DT-07 to DT-09)', () => {
     await userEvent.click(await screen.findByRole('menuitem', { name: 'Analysis' }))
     expect(screen.getByRole('button', { name: 'Remove tag Analysis' })).toBeInTheDocument()
 
-    screen.getByRole('combobox', { name: 'Community' }).focus()
+    screen.getByRole('combobox', { name: 'Publishing in' }).focus()
     await userEvent.keyboard('{ArrowDown}')
     await userEvent.click(await screen.findByRole('option', { name: /GGAL/ }))
     expect(screen.queryByText('Analysis')).toBeNull()
@@ -555,6 +569,7 @@ describe('PostEditor drafts (specs/drafts-tags DT-01 to DT-05)', () => {
   const saveDraftButton = () => screen.getByRole('button', { name: /Save draft|Saved/ })
   const SAVED: SavedDraft = {
     id: DRAFT_ID,
+    thesis: null,
     type: 'TEXT',
     title: 'Rates are going down',
     body: 'The Fed cuts.',
@@ -612,7 +627,7 @@ describe('PostEditor drafts (specs/drafts-tags DT-01 to DT-05)', () => {
 
     expect(title()).toHaveValue('Rates are going down')
     expect(body()).toHaveValue('The Fed cuts.')
-    expect(screen.getByRole('combobox', { name: 'Community' })).toHaveTextContent('#macro')
+    expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('#macro')
     expect(screen.getByRole('button', { name: 'Remove tag Analysis' })).toBeInTheDocument()
     // The focus goes to the form, not back to "Drafts" (WCAG 2.4.3).
     await vi.waitFor(() => expect(title()).toHaveFocus())
