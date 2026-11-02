@@ -105,3 +105,16 @@ test.describe('layout by width (F-23, F-26)', () => {
     await expect(page.getByRole('button', { name: 'Open menu' })).toBeHidden()
   })
 })
+
+// The columns are as tall as the window under the header, 60px plus its 1px border: a page shorter
+// than the window never scrolls (it scrolled 1px, PO 2026-11-02).
+test('a short page does not scroll on a tall window', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'The side columns are desktop only')
+  await page.setViewportSize({ width: 1484, height: 1313 })
+  await page.goto('/en/submit?type=thesis')
+  await expect(page.getByRole('main').getByRole('textbox', { name: 'Claim' })).toBeVisible()
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollHeight - document.documentElement.clientHeight,
+  )
+  expect(overflow).toBe(0)
+})

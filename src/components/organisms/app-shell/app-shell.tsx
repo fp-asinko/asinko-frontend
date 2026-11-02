@@ -52,8 +52,9 @@ export function AppShell({
       <div className="md:grid md:grid-cols-[16.25rem_minmax(0,1fr)] md:transition-[grid-template-columns] md:duration-200 md:ease-out md:left-folded:grid-cols-[2rem_minmax(0,1fr)] md:left-folded:duration-150">
         <div
           id="left-column"
-          // Open, a short shadow towards the content (SL-05), over the center's cards (z-10).
-          className="sticky top-15 z-10 hidden h-[calc(100dvh-3.75rem)] overflow-hidden border-r bg-background md:block md:shadow-rail md:left-folded:shadow-none"
+          // Open, a short shadow towards the content (SL-05), over the center's cards (z-10). As
+          // tall as the window under the header: 60px and its 1px border (a short page never scrolls).
+          className="sticky top-15 z-10 hidden h-[calc(100dvh-3.75rem-1px)] overflow-hidden border-r bg-background md:block md:shadow-rail md:left-folded:shadow-none"
         >
           {/* Its full width while the column slides (clipped, never squeezed), fading out as it
               folds and in as it opens; folded, invisible: out of reach and of what is read (SL-06).
@@ -86,7 +87,8 @@ export function AppShell({
           {right ? (
             <StickyColumn
               label={tr('label')}
-              className="sticky top-15 hidden min-h-[calc(100dvh-3.75rem)] w-75 shrink-0 flex-col self-start overflow-x-clip border-l lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:flex lg:group-has-[main>[data-hero]]/row:row-span-1 lg:group-has-[main>[data-hero]]/row:row-start-2"
+              // Under the header and its border, as the left column.
+              className="sticky top-15 hidden min-h-[calc(100dvh-3.75rem-1px)] w-75 shrink-0 flex-col self-start overflow-x-clip border-l lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:flex lg:group-has-[main>[data-hero]]/row:row-span-1 lg:group-has-[main>[data-hero]]/row:row-start-2"
             >
               {right}
             </StickyColumn>

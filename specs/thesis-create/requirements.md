@@ -91,7 +91,7 @@ Pedido del PO con una captura del formulario: "qué mejorarías, como placeholde
 - [x] **TC-33** **Atajos de fecha:** 1 mes, 3 meses, 6 meses, 1 año y fin de año, como un grupo de opciones; "Otra fecha" se convierte en el calendario en su lugar, en la misma fila, así la fila no crece (PO 2026-11-02). La fecha elegida ("Cierra el 2 feb 2027") va al lado del título "Fecha límite". Un atajo fuera del rango (fin de año a menos de un día) no se ofrece.
 - [x] **TC-34** Sin activo, el **objetivo** está deshabilitado y dice "Elige un activo primero".
 - [x] **TC-35** El ejemplo del **razonamiento**: "¿Por qué va a pasar? Datos, catalizadores y qué te haría cambiar de idea".
-- [x] **TC-36** El formulario entra sin scroll en escritorio a 1280×800 con un activo elegido (lo mide un e2e).
+- [x] **TC-36** A 1280×800, con un activo elegido, el formulario se ve entero hasta Publicar sin hacer scroll (lo mide un e2e). La página sigue teniendo unos 47 px de scroll: el margen inferior del layout del sitio. En una ventana alta (1484×1313, la del PO) no hay scroll (`e2e/shell.spec.ts`; las columnas laterales medían 1 px de más, corregido el 2026-11-02).
 
 ## Fuera de alcance
 
