@@ -421,6 +421,8 @@ export function ThesisEditor({
   const shortcut =
     quick.find((each) => each.day === deadline)?.key ??
     (customDate || deadline ? 'custom' : undefined)
+  // Another day: the calendar takes the "Other date" pill's place, a draft's day too.
+  const otherDate = shortcut === 'custom'
   const closesAt = deadline ? deadlineAt(deadline) : null
   const closes = closesAt ? new Date(closesAt) : null
   const reference = quote?.price ?? null
@@ -591,16 +593,25 @@ export function ThesisEditor({
             </Field>
           </div>
 
-          {/* The deadline and the target in one row from lg: the shortcuts take the width, the
+          {/* The deadline and the target in one row from xl: the shortcuts take the width, the
               price its box (TC-30). */}
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_14rem]">
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_11rem]">
             <Field data-invalid={invalid('deadline') || undefined} className="gap-1.5">
-              <span id={`${ids}-deadline-label`} className="type-small font-medium">
-                {t('thesis.deadline.label')}
-              </span>
-              {/* Shortcuts in one row, as most deadlines are "in 3 months"; "Other date" opens the
-                  calendar beside them, and the day it closes follows (TC-33). */}
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              {/* The day it closes beside the label: the shortcuts' row never grows (TC-33). */}
+              <div className="flex flex-wrap items-baseline gap-x-2">
+                <span id={`${ids}-deadline-label`} className="type-small font-medium">
+                  {t('thesis.deadline.label')}
+                </span>
+                <p id={`${ids}-deadline-closes`} className="type-meta text-muted-foreground">
+                  {closes &&
+                    t('thesis.deadline.closes', {
+                      date: format.dateTime(closes, { dateStyle: 'medium' }),
+                    })}
+                </p>
+              </div>
+              {/* Shortcuts in one row, as most deadlines are "in 3 months"; "Other date" turns into
+                  the calendar in its place, so the row keeps its height (TC-33). */}
+              <div className="flex flex-wrap items-center gap-1.5 xl:flex-nowrap">
                 <ChoiceGroup
                   id={`${ids}-deadline-quick`}
                   size="sm"
@@ -611,7 +622,9 @@ export function ThesisEditor({
                       value: key,
                       label: t(`thesis.deadline.quick.${key}`),
                     })),
-                    { value: 'custom' as const, label: t('thesis.deadline.quick.custom') },
+                    ...(otherDate
+                      ? []
+                      : [{ value: 'custom' as const, label: t('thesis.deadline.quick.custom') }]),
                   ]}
                   value={shortcut}
                   onChange={(next) => {
@@ -629,7 +642,7 @@ export function ThesisEditor({
                   invalid={invalid('deadline')}
                   required
                 />
-                {customDate && (
+                {otherDate && (
                   <>
                     <FieldLabel htmlFor={`${ids}-deadline`} className="sr-only">
                       {t('thesis.deadline.label')}
@@ -643,16 +656,10 @@ export function ThesisEditor({
                       aria-invalid={invalid('deadline') || undefined}
                       aria-required
                       aria-describedby={`${ids}-deadline-error`}
-                      className={cn(FIELD_BOX, 'h-8 w-44')}
+                      className={cn(FIELD_BOX, 'h-8 w-36 shrink-0 rounded-full px-3')}
                     />
                   </>
                 )}
-                <p id={`${ids}-deadline-closes`} className="type-meta text-muted-foreground">
-                  {closes &&
-                    t('thesis.deadline.closes', {
-                      date: format.dateTime(closes, { dateStyle: 'medium' }),
-                    })}
-                </p>
               </div>
               <FieldError
                 id={`${ids}-deadline-error`}

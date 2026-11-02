@@ -61,7 +61,8 @@ export function ChoiceGroup<Value extends string>({
       // Empty is "none chosen yet": Base UI takes null for it.
       value={value ?? null}
       onValueChange={(next) => onChange(next as Value)}
-      className={cn('flex flex-wrap', size === 'sm' ? 'gap-1.5' : 'gap-2')}
+      // As wide as its pills (the radio group is w-full): what follows fits beside them.
+      className={cn('flex w-auto flex-wrap', size === 'sm' ? 'gap-1.5' : 'gap-2')}
     >
       {options.map((option) => (
         <label
