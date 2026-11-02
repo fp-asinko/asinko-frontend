@@ -36,7 +36,7 @@ Orden de los campos, en una columna (mobile first):
 1. **Comunidad**: el `CommunityPicker` de siempre (`chip`).
 2. **Activo** (TC-02): el mismo `CommunityPicker` con un prop nuevo, `only="assets"`: fija el filtro de activos, oculta las fichas Todo / Grupos / Activos (`specs/picker-filters`) y no ofrece "Tu perfil". Sin el prop, el picker queda como hoy. Un activo es la comunidad del activo (`$NVDA`), y de ahí sale el símbolo (`assetSymbolOf`, `lib/communities/paths.ts`). Si la comunidad de la URL es de un activo, viene elegido.
 3. **Claim** (TC-04): `Input` con contador `n/280` y la ayuda.
-4. **Dirección y precio** (TC-05): un grupo de dos opciones (`role="radiogroup"`, flechas para moverse) "Por encima de" / "Por debajo de", y un `Input` `inputMode="decimal"`. Debajo, con el activo elegido: "Precio actual: 182,40 · objetivo +9,6 %" (con `useFormatter`) y "desactualizado" si `priceStale`. Si el objetivo queda del lado contrario a la dirección, un aviso gris (no error).
+4. **Dirección y precio** (TC-05): un grupo de dos opciones (`ChoiceGroup`, una molécula nueva en `components/molecules/` sobre el `radio-group` de shadcn, agregado con su CLI: píldoras grises, la elegida negra, flechas para moverse) "Por encima de" / "Por debajo de", y un `Input` `inputMode="decimal"`. Debajo, con el activo elegido: "Precio actual: 182,40 · objetivo +9,6 %" (con `useFormatter`) y "desactualizado" si `priceStale`. Si el objetivo queda del lado contrario a la dirección, un aviso gris (no error).
 5. **Fecha límite** (TC-06): `Input type="date"` con `min` y `max` de `thesisDeadlineRange(now)`.
 6. **Convicción** (TC-07): grupo de cuatro opciones (`radiogroup`) con su ayuda.
 7. **Razonamiento** (TC-08): `BodyTabs` con su barra de formato, emojis y menciones, igual que el cuerpo de un post.
@@ -116,7 +116,7 @@ export async function createThesis(raw: unknown): Promise<ActionResult<{ usernam
 | `429`                                 | —                    | `api.errors.RATE_LIMITED`                  |
 | otro                                  | —                    | `composer.errors.general` con "Reintentar" |
 
-6. Publicada: devuelve el `username` de la sesión. El cliente borra el guardado local, muestra el toast "Tesis publicada" (`sonner`) y va a `/user/{username}?tab=theses`.
+6. Publicada: devuelve el `username` de la sesión. El cliente borra el guardado local y va a `/user/{username}?tab=theses`. Sin toast: `sonner` no está instalado y sumarlo con su `Toaster` en el layout costaría JS en todas las rutas por un solo aviso; la tesis nueva, primera en el perfil, es la confirmación (como un post, que lleva a su página).
 
 ## 8. Guardado local (`use-thesis-draft.ts`, TC-10)
 
@@ -138,7 +138,7 @@ export async function createThesis(raw: unknown): Promise<ActionResult<{ usernam
 
 ## 11. Textos
 
-`composer.thesis.*` en en, es y pt, dentro del namespace `composer` (ya está en `CLIENT_NAMESPACES`): la pestaña, cada campo con su ayuda y su error, las direcciones, las convicciones, el precio de referencia, la confirmación, el disclaimer y el toast. "Tesis publicada" va en `composer.thesis.published`.
+`composer.thesis.*` en en, es y pt, dentro del namespace `composer` (ya está en `CLIENT_NAMESPACES`): la pestaña, cada campo con su ayuda y su error, las direcciones, las convicciones, el precio de referencia, la confirmación y el disclaimer.
 
 ## 12. Performance (TC-19)
 

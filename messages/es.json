@@ -1050,6 +1050,64 @@
       "failed": "No se pudo mostrar la vista previa. Puedes seguir escribiendo.",
       "loading": "Cargando la vista previa…",
       "ready": "Vista previa lista."
+    },
+    "thesis": {
+      "asset": {
+        "label": "Activo"
+      },
+      "claim": {
+        "label": "Predicción",
+        "placeholder": "ej.: $NVDA cierra por encima de 200 antes de la fecha límite",
+        "help": "Una frase clara que se pueda comprobar."
+      },
+      "target": {
+        "label": "Objetivo",
+        "above": "Por encima de",
+        "below": "Por debajo de",
+        "price": "Precio objetivo",
+        "reference": "Precio actual: {price} · el objetivo está a {change}",
+        "stale": "desactualizado",
+        "wrongSide": "El precio ya está de ese lado del objetivo."
+      },
+      "deadline": {
+        "label": "Fecha límite",
+        "help": "Cierra a las 23:59 de ese día, en tu hora. Desde mañana hasta 5 años."
+      },
+      "conviction": {
+        "label": "Convicción",
+        "help": "Pesa en tu calibración: una errada con convicción Extrema pesa más.",
+        "LOW": "Baja",
+        "MEDIUM": "Media",
+        "HIGH": "Alta",
+        "EXTREME": "Extrema"
+      },
+      "reasoning": {
+        "label": "Razonamiento",
+        "placeholder": "El argumento detrás de la predicción: datos, contexto, riesgos…"
+      },
+      "errors": {
+        "asset": "Elige un activo",
+        "claimRequired": "Escribe la predicción",
+        "claimTooLong": "Hasta {max} caracteres",
+        "direction": "Elige por encima o por debajo",
+        "targetPrice": "Escribe un precio mayor que cero",
+        "deadline": "Elige un día entre mañana y dentro de 5 años",
+        "conviction": "Elige tu convicción",
+        "reasoningRequired": "Explica el razonamiento",
+        "disclaimer": "Confirma que esto no es asesoramiento financiero",
+        "rateLimited": "Espera un momento antes de volver a publicar",
+        "general": "No se pudo publicar tu tesis. Inténtalo de nuevo."
+      },
+      "confirm": {
+        "title": "Publicar tesis",
+        "target": "{direction, select, ABOVE {Por encima de} other {Por debajo de}} {price} al {date}",
+        "conviction": "Convicción: {level}",
+        "final": "Una tesis publicada no se puede editar ni borrar. Se resuelve sola en la fecha límite, contra el precio de mercado.",
+        "disclaimer": "Entiendo que esto no es asesoramiento financiero",
+        "back": "Volver",
+        "submit": "Publicar tesis",
+        "submitting": "Publicando…"
+      }
     }
   },
   "mentions": {

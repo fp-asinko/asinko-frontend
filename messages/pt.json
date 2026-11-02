@@ -1050,6 +1050,64 @@
       "failed": "Não foi possível mostrar a pré-visualização. Você pode continuar escrevendo.",
       "loading": "Carregando a pré-visualização…",
       "ready": "Pré-visualização pronta."
+    },
+    "thesis": {
+      "asset": {
+        "label": "Ativo"
+      },
+      "claim": {
+        "label": "Previsão",
+        "placeholder": "ex.: $NVDA fecha acima de 200 antes do prazo",
+        "help": "Uma frase clara que possa ser verificada."
+      },
+      "target": {
+        "label": "Alvo",
+        "above": "Acima de",
+        "below": "Abaixo de",
+        "price": "Preço-alvo",
+        "reference": "Preço atual: {price} · o alvo está a {change}",
+        "stale": "desatualizado",
+        "wrongSide": "O preço já está desse lado do alvo."
+      },
+      "deadline": {
+        "label": "Prazo",
+        "help": "Fecha às 23:59 desse dia, no seu horário. De amanhã até 5 anos."
+      },
+      "conviction": {
+        "label": "Convicção",
+        "help": "Pesa na sua calibração: um erro com convicção Extrema pesa mais.",
+        "LOW": "Baixa",
+        "MEDIUM": "Média",
+        "HIGH": "Alta",
+        "EXTREME": "Extrema"
+      },
+      "reasoning": {
+        "label": "Raciocínio",
+        "placeholder": "O argumento por trás da previsão: dados, contexto, riscos…"
+      },
+      "errors": {
+        "asset": "Escolha um ativo",
+        "claimRequired": "Escreva a previsão",
+        "claimTooLong": "Até {max} caracteres",
+        "direction": "Escolha acima ou abaixo",
+        "targetPrice": "Digite um preço maior que zero",
+        "deadline": "Escolha um dia entre amanhã e daqui a 5 anos",
+        "conviction": "Escolha sua convicção",
+        "reasoningRequired": "Explique o raciocínio",
+        "disclaimer": "Confirme que isto não é aconselhamento financeiro",
+        "rateLimited": "Espere um momento antes de publicar de novo",
+        "general": "Não foi possível publicar sua tese. Tente de novo."
+      },
+      "confirm": {
+        "title": "Publicar tese",
+        "target": "{direction, select, ABOVE {Acima de} other {Abaixo de}} {price} até {date}",
+        "conviction": "Convicção: {level}",
+        "final": "Uma tese publicada não pode ser editada nem apagada. Ela se resolve sozinha no prazo, contra o preço de mercado.",
+        "disclaimer": "Entendo que isto não é aconselhamento financeiro",
+        "back": "Voltar",
+        "submit": "Publicar tese",
+        "submitting": "Publicando…"
+      }
     }
   },
   "mentions": {

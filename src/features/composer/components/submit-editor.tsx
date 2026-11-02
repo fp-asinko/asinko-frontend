@@ -6,6 +6,7 @@ import { useRef, useState } from 'react'
 import type { Locale } from '@/i18n/routing'
 import { useRouter } from '@/i18n/navigation'
 import { submitPath, type SubmitType } from '@/i18n/submit-path'
+import { communityPath } from '@/lib/communities/paths'
 import type { CommunityOption } from '../composer.types'
 import { discardDraft } from '../hooks/use-local-draft'
 import { DiscardDialog } from './discard-dialog'
@@ -123,6 +124,8 @@ export function SubmitEditor({
             onCancel={cancel}
             onFormat={showPost}
             onCommunityChange={(next) => follow({ community: next?.slug ?? null })}
+            // To the author's theses, the new one first (specs/thesis-create TC-14).
+            onPublished={(username) => router.push(`${communityPath('user', username)}?tab=theses`)}
           />
         </div>
       )}

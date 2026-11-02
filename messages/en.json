@@ -1050,6 +1050,64 @@
       "failed": "Could not show the preview. You can keep writing.",
       "loading": "Loading the preview…",
       "ready": "Preview ready."
+    },
+    "thesis": {
+      "asset": {
+        "label": "Asset"
+      },
+      "claim": {
+        "label": "Claim",
+        "placeholder": "e.g. $NVDA closes above 200 before the deadline",
+        "help": "One clear sentence that can be checked."
+      },
+      "target": {
+        "label": "Target",
+        "above": "Above",
+        "below": "Below",
+        "price": "Target price",
+        "reference": "Current price: {price} · the target is {change}",
+        "stale": "out of date",
+        "wrongSide": "The price is already on that side of the target."
+      },
+      "deadline": {
+        "label": "Deadline",
+        "help": "It closes at 23:59 that day, your time. From tomorrow to 5 years."
+      },
+      "conviction": {
+        "label": "Conviction",
+        "help": "It weighs on your calibration: a miss with Extreme conviction weighs more.",
+        "LOW": "Low",
+        "MEDIUM": "Medium",
+        "HIGH": "High",
+        "EXTREME": "Extreme"
+      },
+      "reasoning": {
+        "label": "Reasoning",
+        "placeholder": "The argument behind the claim: data, context, risks…"
+      },
+      "errors": {
+        "asset": "Choose an asset",
+        "claimRequired": "Write the claim",
+        "claimTooLong": "Up to {max} characters",
+        "direction": "Choose above or below",
+        "targetPrice": "Enter a price above zero",
+        "deadline": "Choose a day from tomorrow to 5 years from now",
+        "conviction": "Choose your conviction",
+        "reasoningRequired": "Explain the reasoning",
+        "disclaimer": "Confirm that this is not financial advice",
+        "rateLimited": "Wait a moment before publishing again",
+        "general": "Could not publish your thesis. Try again."
+      },
+      "confirm": {
+        "title": "Publish thesis",
+        "target": "{direction, select, ABOVE {Above} other {Below}} {price} by {date}",
+        "conviction": "Conviction: {level}",
+        "final": "A published thesis can't be edited or deleted. It resolves by itself at the deadline, against the market price.",
+        "disclaimer": "I understand this is not financial advice",
+        "back": "Back",
+        "submit": "Publish thesis",
+        "submitting": "Publishing…"
+      }
     }
   },
   "mentions": {

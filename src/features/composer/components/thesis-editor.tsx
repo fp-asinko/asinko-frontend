@@ -1,16 +1,103 @@
 'use client'
 
-import type { RefObject } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import dynamic from 'next/dynamic'
+import { useFormatter, useNow, useTranslations } from 'next-intl'
+import { useEffect, useId, useRef, useState, type RefObject } from 'react'
+import { Controller, useForm, useWatch } from 'react-hook-form'
+import { ChoiceGroup } from '@/components/molecules/choice-group'
+import { EmojiButton } from '@/components/molecules/emoji-picker'
+import { applyFormat, FormatToolbar, formatShortcut } from '@/components/molecules/format-toolbar'
+import { MentionField } from '@/components/molecules/mention-assist'
+import { useAuthGate } from '@/components/organisms/auth-gate'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 import { Tabs } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
+import { assetSymbolOf } from '@/lib/communities/paths'
+import { searchMentions } from '@/lib/mentions/search-mentions.action'
+import { cn } from '@/lib/utils'
+import { getAssetQuote } from '../actions/asset-quote.action'
+import { createThesis } from '../actions/create-thesis.action'
 import type { CommunityOption } from '../composer.types'
+import {
+  discardDraft,
+  forgetOpenedDraft,
+  hasThesisText,
+  useStoredThesisDraft,
+  writeThesisDraft,
+} from '../hooks/use-thesis-draft'
+import { clearDraft } from '../hooks/use-local-draft'
+import { deadlineAt, thesisDeadlineRange } from '../lib/thesis-deadline'
+import {
+  CLAIM_MAX,
+  CONVICTIONS,
+  THESIS_DIRECTIONS,
+  thesisFormSchema,
+  type ThesisForm,
+  type ThesisFormValues,
+} from '../schemas/create-thesis.schema'
+import { BodyTabs } from './body-tabs'
+import { CommunityPicker } from './community-picker'
+import { FIELD_BOX, PILL } from './editor-styles'
 import { FormatTabs, type CreateFormat } from './format-tabs'
+import type { ThesisSummary } from './thesis-confirm'
+
+// The confirmation, at the first Publish (specs/thesis-create TC-19).
+const ThesisConfirm = dynamic(() => import('./thesis-confirm').then((mod) => mod.ThesisConfirm), {
+  ssr: false,
+})
+
+const FIELDS = [
+  'communityId',
+  'assetSymbol',
+  'claim',
+  'direction',
+  'targetPrice',
+  'deadline',
+  'conviction',
+  'reasoning',
+] as const
+type FieldName = (typeof FIELDS)[number]
+
+/** The messages a field can show, from the schema or the action (composer.*). */
+const ERROR_KEYS = [
+  'errors.community',
+  'errors.invalidCommunity',
+  'errors.ownProfileOnly',
+  'thesis.errors.asset',
+  'thesis.errors.claimRequired',
+  'thesis.errors.claimTooLong',
+  'thesis.errors.direction',
+  'thesis.errors.targetPrice',
+  'thesis.errors.deadline',
+  'thesis.errors.conviction',
+  'thesis.errors.reasoningRequired',
+] as const
+
+/** How long the text rests before it is kept as the draft (as the post's). */
+const SAVE_AFTER_MS = 500
+
+/** A price as typed, or null: a comma works as the decimal point. */
+function typedPrice(value: string): number | null {
+  const number = Number(value.trim().replace(',', '.'))
+  return value.trim() && Number.isFinite(number) && number > 0 ? number : null
+}
 
 /**
- * The thesis editor of the page to create (specs/thesis-create § 3): the formats on top, with
- * Thesis chosen; any other goes back to the post's editor.
+ * The thesis editor (specs/thesis-create § 3): where it goes, the asset, the claim, the target,
+ * the deadline, the conviction and the reasoning, in one column. Publish waits until nothing is
+ * missing; pressed early, every field says what it needs and follows the typing (TC-09). Then the
+ * confirmation, with the disclaimer, sends it. What is written is kept in the browser (TC-10).
  */
 export function ThesisEditor({
+  community,
+  storageKey,
+  draftRef,
+  onCancel,
   onFormat,
+  onCommunityChange,
+  onPublished,
 }: {
   community: CommunityOption | null
   /** Where the draft is kept (thesisDraftKey); null keeps nothing. */
@@ -22,18 +109,575 @@ export function ThesisEditor({
   onFormat: (format: Exclude<CreateFormat, 'THESIS'>) => void
   /** Another community chosen: the page follows it in its URL. */
   onCommunityChange?: (community: CommunityOption | null) => void
+  /** Published: the author's username, for their theses (TC-14). */
+  onPublished: (username: string) => void
 }) {
+  const t = useTranslations('composer')
+  const format = useFormatter()
+  const now = useNow()
+  const ids = useId()
+  const { openGate } = useAuthGate()
+  const stored = useStoredThesisDraft(storageKey)
+  const [answered, setAnswered] = useState(false)
+  const offered = stored && !answered ? stored : null
+  const [chosen, setChosen] = useState<CommunityOption | null>(community)
+  // An asset community of the URL is the thesis's asset too (TC-02).
+  const [asset, setAsset] = useState<CommunityOption | null>(
+    community?.handle.startsWith('$') ? community : null,
+  )
+  // Chosen by hand, the community no longer follows the asset (TC-03).
+  const communityTouched = useRef(false)
+  const [quote, setQuote] = useState<{ price: number | null; stale: boolean } | null>(null)
+  const [range] = useState(() => thesisDeadlineRange(new Date()))
+  const [confirming, setConfirming] = useState<ThesisFormValues | null>(null)
+  const [pending, setPending] = useState(false)
+  const [confirmError, setConfirmError] = useState<string | null>(null)
+
+  const form = useForm<ThesisForm, unknown, ThesisFormValues>({
+    resolver: zodResolver(thesisFormSchema),
+    defaultValues: {
+      communityId: community?.id ?? '',
+      assetSymbol: asset ? assetSymbolOf(asset) : '',
+      claim: '',
+      targetPrice: '',
+      deadline: '',
+      reasoning: '',
+    },
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+  })
+  const { register, control, handleSubmit, setValue, setError, getValues, formState } = form
+  const [claim = '', direction, targetPrice = '', deadline = '', conviction, reasoning = ''] =
+    useWatch({
+      control,
+      name: ['claim', 'direction', 'targetPrice', 'deadline', 'conviction', 'reasoning'],
+    })
+  const price = typeof targetPrice === 'string' ? targetPrice : String(targetPrice ?? '')
+
+  useEffect(() => {
+    draftRef.current = () => {
+      const values = getValues()
+      return hasThesisText({
+        claim: values.claim ?? '',
+        targetPrice: String(values.targetPrice ?? ''),
+        reasoning: values.reasoning ?? '',
+      })
+    }
+    return () => {
+      draftRef.current = null
+    }
+  }, [draftRef, getValues])
+
+  // The draft (TC-10): kept a moment after the typing rests, and at once when the tab closes. Not
+  // while an older one waits for an answer: typing would overwrite it unasked.
+  useEffect(() => {
+    if (!storageKey || offered) return
+    const keep = () => {
+      const draft = {
+        community: chosen,
+        asset,
+        claim,
+        direction: direction ?? '',
+        targetPrice: price,
+        deadline,
+        conviction: conviction ?? '',
+        reasoning,
+        savedAt: Date.now(),
+      } as const
+      if (hasThesisText(draft)) writeThesisDraft(storageKey, draft)
+    }
+    const timer = setTimeout(keep, SAVE_AFTER_MS)
+    window.addEventListener('pagehide', keep)
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('pagehide', keep)
+    }
+  }, [storageKey, offered, chosen, asset, claim, direction, price, deadline, conviction, reasoning])
+  useEffect(() => {
+    if (!storageKey) return
+    return () => forgetOpenedDraft(storageKey)
+  }, [storageKey])
+
+  // The chosen asset's price, next to the target (TC-05); without it, the form goes on.
+  const symbol = asset ? assetSymbolOf(asset) : null
+  useEffect(() => {
+    if (!symbol) return
+    let current = true
+    void getAssetQuote(symbol).then(
+      (answer) => current && setQuote(answer),
+      () => current && setQuote(null),
+    )
+    return () => {
+      current = false
+      setQuote(null)
+    }
+  }, [symbol])
+
+  // On arrival the focus goes where the person starts: the asset, or the claim when it is there.
+  useEffect(() => {
+    document.getElementById(asset ? `${ids}-claim` : `${ids}-asset`)?.focus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on arrival
+  }, [])
+
+  function chooseCommunity(next: CommunityOption | null) {
+    setChosen(next)
+    setValue('communityId', next?.id ?? '', { shouldValidate: formState.isSubmitted })
+    onCommunityChange?.(next)
+  }
+
+  function chooseAsset(next: CommunityOption | null) {
+    setAsset(next)
+    setValue('assetSymbol', next ? assetSymbolOf(next) : '', {
+      shouldValidate: formState.isSubmitted,
+    })
+    if (next && !communityTouched.current) chooseCommunity(next)
+  }
+
+  function recover() {
+    if (!offered) return
+    form.reset({
+      communityId: offered.community?.id ?? '',
+      assetSymbol: offered.asset ? assetSymbolOf(offered.asset) : '',
+      claim: offered.claim,
+      direction: offered.direction || undefined,
+      targetPrice: offered.targetPrice,
+      deadline: offered.deadline,
+      conviction: offered.conviction || undefined,
+      reasoning: offered.reasoning,
+    })
+    setChosen(offered.community)
+    setAsset(offered.asset)
+    communityTouched.current = Boolean(
+      offered.community && offered.community.id !== offered.asset?.id,
+    )
+    onCommunityChange?.(offered.community)
+    setAnswered(true)
+    document.getElementById(`${ids}-claim`)?.focus()
+  }
+
+  function discardStored() {
+    if (storageKey) clearDraft(storageKey)
+    setAnswered(true)
+    document.getElementById(`${ids}-claim`)?.focus()
+  }
+
+  /** The field's control: the picker's chip, a group's first option, or the input. */
+  function focusField(name: FieldName) {
+    const element = document.getElementById(`${ids}-${name === 'assetSymbol' ? 'asset' : name}`)
+    const control =
+      name === 'direction' || name === 'conviction'
+        ? element?.querySelector<HTMLElement>('[role="radio"]')
+        : element
+    control?.focus()
+  }
+
+  const fieldError = (name: FieldName) => {
+    const message = formState.errors[name]?.message
+    if (!message) return undefined
+    const key = ERROR_KEYS.find((each) => `composer.${each}` === message) ?? 'thesis.errors.general'
+    return [{ message: t(key, { max: CLAIM_MAX }) }]
+  }
+  const invalid = (name: FieldName) => Boolean(formState.errors[name])
+
+  // Publish waits until nothing is missing (TC-09), and while sending.
+  const complete = Boolean(
+    chosen &&
+    asset &&
+    claim.trim() &&
+    direction &&
+    price.trim() &&
+    deadline &&
+    conviction &&
+    reasoning.trim(),
+  )
+
+  async function publish() {
+    if (!confirming) return
+    const at = deadlineAt(confirming.deadline)
+    setPending(true)
+    setConfirmError(null)
+    const result = at
+      ? await createThesis({ ...confirming, deadline: at, disclaimerAccepted: true })
+      : null
+    setPending(false)
+    if (result?.ok) {
+      // Published: gone, and no save still pending brings it back as a draft.
+      if (storageKey) discardDraft(storageKey)
+      onPublished(result.data.username)
+      return
+    }
+    if (result?.error === 'api.errors.UNAUTHENTICATED') {
+      setConfirming(null)
+      openGate('post')
+      return
+    }
+    if (result?.fieldErrors?.disclaimerAccepted) {
+      setConfirmError(t('thesis.errors.disclaimer'))
+      return
+    }
+    const field = result ? FIELDS.find((name) => result.fieldErrors?.[name]?.[0]) : 'deadline'
+    if (field) {
+      // A field's error goes to the field, the confirmation closes and the focus goes there.
+      setConfirming(null)
+      setError(field, {
+        message: result?.fieldErrors?.[field]?.[0] ?? 'composer.thesis.errors.deadline',
+      })
+      requestAnimationFrame(() => focusField(field))
+      return
+    }
+    // Anything else: said in the confirmation, whose Publish is the retry.
+    setConfirmError(
+      result?.error === 'api.errors.RATE_LIMITED'
+        ? t('thesis.errors.rateLimited')
+        : t('thesis.errors.general'),
+    )
+  }
+
+  const reference = quote?.price ?? null
+  const target = typedPrice(price)
+  const change = reference !== null && target !== null ? (target - reference) / reference : null
+  const wrongSide =
+    reference !== null &&
+    target !== null &&
+    ((direction === 'ABOVE' && target <= reference) ||
+      (direction === 'BELOW' && target >= reference))
+
+  const summary: ThesisSummary | null =
+    confirming && asset ? { ...confirming, asset: asset.handle } : null
+
+  const reasoningField = register('reasoning')
+  const reasoningRef = useRef<HTMLTextAreaElement | null>(null)
+
   return (
-    <Tabs
-      value="THESIS"
-      onValueChange={(next) => {
-        if (next === 'TEXT' || next === 'LINK' || next === 'IMAGE' || next === 'THOUGHT') {
-          onFormat(next)
-        }
+    <form
+      noValidate
+      onSubmit={(event) => {
+        // aria-disabled, not disabled: pressed with something missing, every field says what it
+        // needs (WCAG 3.3.1); from then on the errors follow the typing.
+        if (pending) return event.preventDefault()
+        void handleSubmit((values) => {
+          setConfirmError(null)
+          setConfirming(values)
+        })(event)
       }}
-      className="flex flex-1 flex-col gap-0"
+      className="flex flex-col"
     >
-      <FormatTabs />
-    </Tabs>
+      <p role="status" className="sr-only">
+        {offered &&
+          t('draft.notice', { when: format.relativeTime(new Date(offered.savedAt), now) })}
+      </p>
+      {offered && (
+        <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl bg-surface px-4 py-3 type-small">
+          <span aria-hidden className="flex-1">
+            {t('draft.notice', { when: format.relativeTime(new Date(offered.savedAt), now) })}
+          </span>
+          <span className="flex gap-1">
+            <button
+              type="button"
+              onClick={recover}
+              className={cn(PILL, 'bg-muted hover:bg-muted-hover')}
+            >
+              {t('draft.recover')}
+            </button>
+            <button
+              type="button"
+              onClick={discardStored}
+              className={cn(PILL, 'text-muted-foreground hover:bg-muted hover:text-foreground')}
+            >
+              {t('draft.discard')}
+            </button>
+          </span>
+        </div>
+      )}
+      <Tabs
+        value="THESIS"
+        onValueChange={(next) => {
+          if (next === 'TEXT' || next === 'LINK' || next === 'IMAGE' || next === 'THOUGHT') {
+            onFormat(next)
+          }
+        }}
+        className="flex flex-1 flex-col gap-0"
+      >
+        <div className="flex stagger flex-col gap-5">
+          <Field data-invalid={invalid('communityId') || undefined} className="gap-1">
+            <FieldLabel htmlFor={`${ids}-communityId`} className="sr-only">
+              {t('community.label')}
+            </FieldLabel>
+            <CommunityPicker
+              id={`${ids}-communityId`}
+              value={chosen}
+              onChange={(next) => {
+                communityTouched.current = true
+                chooseCommunity(next)
+              }}
+              invalid={invalid('communityId')}
+              describedBy={`${ids}-communityId-error`}
+            />
+            <FieldError
+              id={`${ids}-communityId-error`}
+              errors={fieldError('communityId')}
+              className="type-meta"
+            />
+          </Field>
+
+          <FormatTabs />
+
+          <Field data-invalid={invalid('assetSymbol') || undefined} className="gap-1.5">
+            <FieldLabel htmlFor={`${ids}-asset`}>{t('thesis.asset.label')}</FieldLabel>
+            <CommunityPicker
+              id={`${ids}-asset`}
+              only="assets"
+              value={asset}
+              onChange={chooseAsset}
+              invalid={invalid('assetSymbol')}
+              describedBy={`${ids}-assetSymbol-error`}
+            />
+            <FieldError
+              id={`${ids}-assetSymbol-error`}
+              errors={fieldError('assetSymbol')}
+              className="type-meta"
+            />
+          </Field>
+
+          <Field data-invalid={invalid('claim') || undefined} className="gap-1.5">
+            <FieldLabel htmlFor={`${ids}-claim`}>{t('thesis.claim.label')}</FieldLabel>
+            <Input
+              id={`${ids}-claim`}
+              placeholder={t('thesis.claim.placeholder')}
+              {...register('claim')}
+              aria-invalid={invalid('claim') || undefined}
+              aria-required
+              aria-describedby={`${ids}-claim-help ${ids}-claim-count ${ids}-claim-error`}
+              className={cn(FIELD_BOX, 'h-12 font-semibold')}
+            />
+            <div className="flex justify-between gap-2 px-1 type-meta">
+              <p id={`${ids}-claim-help`} className="text-muted-foreground">
+                {t('thesis.claim.help')}
+              </p>
+              <span
+                id={`${ids}-claim-count`}
+                className={cn(
+                  'ml-auto tabular-nums',
+                  claim.length > CLAIM_MAX ? 'font-bold text-destructive' : 'text-muted-foreground',
+                )}
+              >
+                {t('fields.counter', { count: claim.length, max: CLAIM_MAX })}
+              </span>
+            </div>
+            <FieldError
+              id={`${ids}-claim-error`}
+              errors={fieldError('claim')}
+              className="type-meta"
+            />
+          </Field>
+
+          <Field
+            data-invalid={invalid('direction') || invalid('targetPrice') || undefined}
+            className="gap-1.5"
+          >
+            <span id={`${ids}-target-label`} className="type-small font-medium">
+              {t('thesis.target.label')}
+            </span>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <Controller
+                control={control}
+                name="direction"
+                render={({ field }) => (
+                  <ChoiceGroup
+                    id={`${ids}-direction`}
+                    labelledBy={`${ids}-target-label`}
+                    describedBy={`${ids}-direction-error`}
+                    options={THESIS_DIRECTIONS.map((value) => ({
+                      value,
+                      label: t(`thesis.target.${value === 'ABOVE' ? 'above' : 'below'}`),
+                    }))}
+                    value={field.value}
+                    onChange={field.onChange}
+                    invalid={invalid('direction')}
+                  />
+                )}
+              />
+              <FieldLabel htmlFor={`${ids}-targetPrice`} className="sr-only">
+                {t('thesis.target.price')}
+              </FieldLabel>
+              <Input
+                id={`${ids}-targetPrice`}
+                inputMode="decimal"
+                autoComplete="off"
+                placeholder={t('thesis.target.price')}
+                {...register('targetPrice')}
+                aria-invalid={invalid('targetPrice') || undefined}
+                aria-required
+                aria-describedby={`${ids}-reference ${ids}-targetPrice-error`}
+                className={cn(FIELD_BOX, 'h-11 tabular-nums sm:w-44')}
+              />
+            </div>
+            {/* The current price, as a reference (TC-05): announced when it changes. */}
+            <p
+              id={`${ids}-reference`}
+              aria-live="polite"
+              className="px-1 type-meta text-muted-foreground"
+            >
+              {reference !== null &&
+                t('thesis.target.reference', {
+                  price: format.number(reference, {
+                    maximumFractionDigits: reference < 1 ? 6 : 2,
+                  }),
+                  change:
+                    change === null
+                      ? '—'
+                      : format.number(change, {
+                          style: 'percent',
+                          maximumFractionDigits: 1,
+                          signDisplay: 'exceptZero',
+                        }),
+                })}
+              {reference !== null && quote?.stale && ` · ${t('thesis.target.stale')}`}
+              {wrongSide && ` · ${t('thesis.target.wrongSide')}`}
+            </p>
+            <FieldError
+              id={`${ids}-direction-error`}
+              errors={fieldError('direction')}
+              className="type-meta"
+            />
+            <FieldError
+              id={`${ids}-targetPrice-error`}
+              errors={fieldError('targetPrice')}
+              className="type-meta"
+            />
+          </Field>
+
+          <Field data-invalid={invalid('deadline') || undefined} className="gap-1.5">
+            <FieldLabel htmlFor={`${ids}-deadline`}>{t('thesis.deadline.label')}</FieldLabel>
+            <Input
+              id={`${ids}-deadline`}
+              type="date"
+              min={range.min}
+              max={range.max}
+              {...register('deadline')}
+              aria-invalid={invalid('deadline') || undefined}
+              aria-required
+              aria-describedby={`${ids}-deadline-help ${ids}-deadline-error`}
+              className={cn(FIELD_BOX, 'h-11 sm:w-56')}
+            />
+            <p id={`${ids}-deadline-help`} className="px-1 type-meta text-muted-foreground">
+              {t('thesis.deadline.help')}
+            </p>
+            <FieldError
+              id={`${ids}-deadline-error`}
+              errors={fieldError('deadline')}
+              className="type-meta"
+            />
+          </Field>
+
+          <Field data-invalid={invalid('conviction') || undefined} className="gap-1.5">
+            <span id={`${ids}-conviction-label`} className="type-small font-medium">
+              {t('thesis.conviction.label')}
+            </span>
+            <Controller
+              control={control}
+              name="conviction"
+              render={({ field }) => (
+                <ChoiceGroup
+                  id={`${ids}-conviction`}
+                  labelledBy={`${ids}-conviction-label`}
+                  describedBy={`${ids}-conviction-help ${ids}-conviction-error`}
+                  options={CONVICTIONS.map((value) => ({
+                    value,
+                    label: t(`thesis.conviction.${value}`),
+                  }))}
+                  value={field.value}
+                  onChange={field.onChange}
+                  invalid={invalid('conviction')}
+                />
+              )}
+            />
+            <p id={`${ids}-conviction-help`} className="px-1 type-meta text-muted-foreground">
+              {t('thesis.conviction.help')}
+            </p>
+            <FieldError
+              id={`${ids}-conviction-error`}
+              errors={fieldError('conviction')}
+              className="type-meta"
+            />
+          </Field>
+
+          <Field data-invalid={invalid('reasoning') || undefined} className="gap-1.5">
+            <FieldLabel htmlFor={`${ids}-reasoning`}>{t('thesis.reasoning.label')}</FieldLabel>
+            {/* The box of a post's body, with its format toolbar and emojis (TC-08). */}
+            <BodyTabs
+              draft={() => null}
+              toolbar={
+                <div className="flex items-center gap-0.5">
+                  <FormatToolbar fieldRef={reasoningRef} />
+                  <EmojiButton fieldRef={reasoningRef} />
+                </div>
+              }
+            >
+              <div className="relative">
+                <Textarea
+                  id={`${ids}-reasoning`}
+                  placeholder={t('thesis.reasoning.placeholder')}
+                  {...reasoningField}
+                  ref={(element) => {
+                    reasoningField.ref(element)
+                    reasoningRef.current = element
+                  }}
+                  onKeyDown={(event) => {
+                    const kind = formatShortcut(event)
+                    if (!kind) return
+                    event.preventDefault()
+                    applyFormat(event.currentTarget, kind)
+                  }}
+                  aria-invalid={invalid('reasoning') || undefined}
+                  aria-required
+                  aria-describedby={`${ids}-reasoning-error`}
+                  className="h-auto min-h-36 resize-none rounded-none border-0 bg-transparent p-0 text-base leading-[1.55] text-foreground shadow-none focus-visible:ring-0 aria-invalid:ring-0 md:text-base dark:bg-transparent"
+                />
+                <MentionField fieldRef={reasoningRef} search={searchMentions} />
+              </div>
+            </BodyTabs>
+            <FieldError
+              id={`${ids}-reasoning-error`}
+              errors={fieldError('reasoning')}
+              className="type-meta"
+            />
+          </Field>
+        </div>
+
+        {/* Cancel and Publish, on the right, as the post's: sticky over the bottom bar in phones. */}
+        <div
+          data-sticky-actions
+          className="sticky bottom-[calc(3.5625rem+env(safe-area-inset-bottom))] z-10 -mx-4 mt-4 flex items-center justify-end border-t bg-background px-4 py-3 md:static md:mx-0 md:border-t-0 md:px-0 md:pt-0 md:pb-0"
+        >
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={onCancel}
+              className={cn(PILL, 'text-muted-foreground hover:bg-muted hover:text-foreground')}
+            >
+              {t('cancel')}
+            </button>
+            <button
+              type="submit"
+              aria-disabled={!complete || pending || undefined}
+              className={cn(PILL, 'bg-primary text-primary-foreground hover:bg-primary/85')}
+            >
+              {t('submit')}
+            </button>
+          </div>
+        </div>
+      </Tabs>
+
+      {confirming && (
+        <ThesisConfirm
+          summary={summary}
+          pending={pending}
+          error={confirmError}
+          onBack={() => setConfirming(null)}
+          onConfirm={() => void publish()}
+        />
+      )}
+    </form>
   )
 }

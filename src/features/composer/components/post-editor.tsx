@@ -38,6 +38,7 @@ import {
 import { useSavedDraft } from '../hooks/use-saved-draft'
 import { CommunityPicker } from './community-picker'
 import { DraftsButton } from './drafts-button'
+import { FIELD_BOX, PILL } from './editor-styles'
 import { FormatTabs } from './format-tabs'
 import { DRAFT_LIMIT } from './drafts-dialog'
 import { ImageField, type TakeImage } from './image-field'
@@ -48,13 +49,6 @@ import { TagPicker } from './tag-picker'
 /** A field without its own box: the composer box around them is the box, as X. */
 const BARE =
   'h-auto rounded-none border-0 bg-transparent p-0 text-foreground shadow-none focus-visible:ring-0 aria-invalid:ring-0 dark:bg-transparent'
-
-/** A field in its own box, as Reddit's title (SF-03, SF-05): the border darkens while writing. */
-const FIELD_BOX =
-  'rounded-2xl border border-input bg-background px-4 text-base shadow-none transition-colors duration-150 focus-visible:border-foreground/60 focus-visible:ring-0 aria-invalid:border-destructive aria-invalid:ring-0 md:text-base dark:bg-transparent dark:aria-invalid:ring-0'
-
-const PILL =
-  'inline-flex h-11 tap items-center justify-center rounded-full px-3 type-action font-bold outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-50 aria-disabled:active:scale-100 sm:px-4 md:h-9'
 
 const ERROR_NAMES = [
   'community',
