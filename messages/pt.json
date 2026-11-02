@@ -1087,7 +1087,8 @@
         "MEDIUM": "Média",
         "HIGH": "Alta",
         "EXTREME": "Extrema",
-        "prompt": "Escolha sua convicção"
+        "prompt": "Escolha sua convicção",
+        "help": "Sua convicção afeta sua calibração. Extrema + erro = penalidade maior."
       },
       "reasoning": {
         "label": "Raciocínio",
@@ -1205,7 +1206,6 @@
       "deadline": "O prazo vai de amanhã a 5 anos, e fecha às 23:59 desse dia, no seu horário.",
       "resolution": "Ela se resolve sozinha no prazo, contra o preço de mercado.",
       "final": "Depois de publicada, fica no seu histórico: não pode ser editada nem apagada.",
-      "conviction": "Sua convicção pesa na sua calibração: um erro com Extrema pesa mais.",
       "reference": "O preço de referência do ativo é registrado ao publicar."
     }
   },

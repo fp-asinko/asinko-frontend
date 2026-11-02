@@ -1087,7 +1087,8 @@
         "MEDIUM": "Media",
         "HIGH": "Alta",
         "EXTREME": "Extrema",
-        "prompt": "Elige tu convicción"
+        "prompt": "Elige tu convicción",
+        "help": "Tu convicción afecta tu calibración. Extrema + errada = penalización mayor."
       },
       "reasoning": {
         "label": "Razonamiento",
@@ -1205,7 +1206,6 @@
       "deadline": "La fecha límite va de mañana a 5 años, y cierra a las 23:59 de ese día, en tu hora.",
       "resolution": "Se resuelve sola en la fecha límite, contra el precio de mercado.",
       "final": "Una vez publicada queda en tu historial: no se puede editar ni borrar.",
-      "conviction": "Tu convicción pesa en tu calibración: una errada con Extrema pesa más.",
       "reference": "El precio de referencia del activo se toma al publicar."
     }
   },

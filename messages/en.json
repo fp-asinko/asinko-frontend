@@ -1087,7 +1087,8 @@
         "MEDIUM": "Medium",
         "HIGH": "High",
         "EXTREME": "Extreme",
-        "prompt": "Choose your conviction"
+        "prompt": "Choose your conviction",
+        "help": "Your conviction affects your calibration score. Extreme + miss = bigger penalty."
       },
       "reasoning": {
         "label": "Reasoning",
@@ -1205,7 +1206,6 @@
       "deadline": "The deadline goes from tomorrow to 5 years, and closes at 23:59 that day, your time.",
       "resolution": "It resolves by itself at the deadline, against the market price.",
       "final": "Once published it stays on your track record: it can’t be edited or deleted.",
-      "conviction": "Your conviction weighs on your calibration: a miss with Extreme weighs more.",
       "reference": "The asset’s reference price is taken when you publish."
     }
   },

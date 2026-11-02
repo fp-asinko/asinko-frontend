@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 
-const TIPS = ['claim', 'deadline', 'resolution', 'final', 'conviction', 'reference'] as const
+const TIPS = ['claim', 'deadline', 'resolution', 'final', 'reference'] as const
 
 /**
  * How a thesis works (specs/thesis-create TC-31): what the form's fields used to explain under
