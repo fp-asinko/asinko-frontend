@@ -53,8 +53,8 @@ Alertas de mercado (movimientos fuertes de un activo), encuestas oficiales, rank
 
 Una tesis tiene:
 
-- **Activo** (`$`) y **claim**: una frase clara y falsable, de 140 caracteres como máximo.
-- **Razonamiento**, **deadline**, **target** de precio (opcional) y **convicción** del 1 al 4.
+- **Activo** (`$`) y **claim**: una frase clara y falsable, de 280 caracteres como máximo (el límite del backend; `specs/thesis-create` Q2).
+- **Razonamiento**, **deadline**, **target** de precio con su dirección, por encima o por debajo (obligatorio: el backend solo crea tesis cuantitativas; `specs/thesis-create` Q3), y **convicción** del 1 al 4.
 - **Snapshot de precio** al momento de publicar.
 
 | Estado            | Significado                                                      |

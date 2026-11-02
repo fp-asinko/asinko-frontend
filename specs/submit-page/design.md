@@ -6,7 +6,7 @@
   - `src/app/[locale]/submit/page.tsx` (inglés) y `src/app/[locale]/publicar/page.tsx` (español y portugués), **fuera de `(main)`**: redirigen o dan 404 según la URL, así que van sin `loading.tsx` para que el 308 y el 404 sean reales (`i18n.md § 404`).
   - Cada una verifica su idioma con `checkSubmitSegment`: `/es/submit` y `/pt/submit` redirigen (308) a `/publicar` conservando la query; `/en/publicar` es 404.
   - `src/i18n/submit-path.ts`: `SUBMIT_SEGMENT` y `submitPath(locale, { community?, type? })`, que arma el link (`/publicar?community=defi`, sin el prefijo de idioma, que pone `Link`). Vive en `i18n/` porque `lib/` no puede importar el tipo `Locale` (límites de `tooling.md`).
-- **`?community=`** es el slug (validado con `communitySlugSchema` o `assetSymbolSchema`); **`?type=`** `text | link | image` elige la pestaña al llegar. Valores inválidos se ignoran (`parseSubmitQuery`).
+- **`?community=`** es el slug (validado con `communitySlugSchema` o `assetSymbolSchema`); **`?type=`** `text | link | image | thought | thesis` elige la pestaña al llegar (`thesis` abre el editor de tesis, `specs/thesis-create` TC-01). Valores inválidos se ignoran (`parseSubmitQuery`).
 - Metadata (`submitMetadata`): título "Crear post", `robots: noindex`, canonical propio y alternates por idioma.
 
 ## 2. La columna derecha por página: ruta paralela `@right`
