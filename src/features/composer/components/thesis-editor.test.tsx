@@ -77,6 +77,7 @@ async function fill() {
   await userEvent.type(claim(), 'NVDA closes above 200')
   await userEvent.click(screen.getByRole('radio', { name: 'Above' }))
   await userEvent.type(price(), '200')
+  // A date field: jsdom does not type into it as a browser (the e2e does), so its value is set.
   fireEvent.change(deadline(), { target: { value: thesisDeadlineRange(new Date()).min } })
   await userEvent.click(screen.getByRole('radio', { name: 'High' }))
   await userEvent.type(reasoning(), 'Data center demand.')

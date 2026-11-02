@@ -153,7 +153,13 @@ export async function createThesis(raw: unknown): Promise<ActionResult<{ usernam
 - El contador del claim y el precio de referencia se anuncian con `aria-live="polite"`, solo al cambiar.
 - La confirmación: título como nombre del diálogo, el foco entra en el checkbox y vuelve a "Publicar" al cerrar.
 
-## 14. Tests
+## 14. Revisión de UI (2026-11-02)
+
+El `ui-reviewer` marcó dos bloqueantes, ya resueltos: el foco se perdía al cambiar de editor (ahora va a la pestaña elegida del que queda visible, o al primer campo de la tesis la primera vez) y la línea del precio concatenaba textos (ahora es un mensaje ICU, y el aviso de dirección va aparte, en un `role="status"`). También se resolvieron: la línea del precio sin `aria-live`; la confirmación dice por qué no envía sin la casilla y marca `aria-busy`; el foco de `ChoiceGroup` en la píldora y `aria-required`; las clases compartidas en `editor-styles.ts`; el precio y el guardado en `useAssetQuote` y `useKeepThesisDraft`. Queda `thesis-editor.tsx` largo (~650 líneas, casi todo el formulario), como `post-editor.tsx`.
+
+Al revisarlo apareció un bug: volver desde la tesis a Link o Image mostraba el formato anterior del post. `PostEditor` recibe `formatRequest` y lo toma.
+
+## 15. Tests
 
 - **Unitarios:**
   - `create-thesis.schema` (cada campo, sin `EQUALS`, el disclaimer);

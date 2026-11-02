@@ -38,17 +38,13 @@ import {
 import { useSavedDraft } from '../hooks/use-saved-draft'
 import { CommunityPicker } from './community-picker'
 import { DraftsButton } from './drafts-button'
-import { FIELD_BOX, PILL } from './editor-styles'
+import { ACTIONS_BAR, BARE, FIELD_BOX, PILL } from './editor-styles'
 import { FormatTabs } from './format-tabs'
 import { DRAFT_LIMIT } from './drafts-dialog'
 import { ImageField, type TakeImage } from './image-field'
 import { BodyTabs, type PreviewAction } from './body-tabs'
 import { RelatedPicker } from './related-picker'
 import { TagPicker } from './tag-picker'
-
-/** A field without its own box: the composer box around them is the box, as X. */
-const BARE =
-  'h-auto rounded-none border-0 bg-transparent p-0 text-foreground shadow-none focus-visible:ring-0 aria-invalid:ring-0 dark:bg-transparent'
 
 const ERROR_NAMES = [
   'community',
@@ -114,6 +110,7 @@ export function PostEditor({
   onPublished,
   onCommunityChange,
   onThesis,
+  formatRequest = null,
   related: initialRelated = [],
   onRelatedChange,
   preview,
@@ -140,6 +137,8 @@ export function PostEditor({
   onCommunityChange?: (community: CommunityOption | null) => void
   /** The Thesis tab: the page shows the thesis editor (specs/thesis-create TC-01). */
   onThesis?: () => void
+  /** A format chosen in the thesis editor's tabs: this editor shows it. */
+  formatRequest?: { format: 'TEXT' | 'LINK' | 'IMAGE' | 'THOUGHT' } | null
 }) {
   const t = useTranslations('composer')
   const locale = useLocale()
@@ -252,6 +251,11 @@ export function PostEditor({
     if (!storageKey) return
     return () => forgetOpenedDraft(storageKey)
   }, [storageKey])
+
+  // Back from the thesis editor on another format (specs/thesis-create TC-01).
+  useEffect(() => {
+    if (formatRequest) setValue('type', formatRequest.format)
+  }, [formatRequest, setValue])
 
   // On arrival the focus goes where the person starts (SU-09): the title, or the community when
   // none is chosen yet. Once: the page is opened, not re-rendered.
@@ -777,10 +781,7 @@ export function PostEditor({
         {/* Only Cancel, Save draft and Publish, on the right (SF-06, DT-01). In phones it sticks over the bottom bar
             while a long post is written (specs/submit-tools ST-07), edge to edge; from md, in its
             place. */}
-        <div
-          data-sticky-actions
-          className="sticky bottom-[calc(3.5625rem+env(safe-area-inset-bottom))] z-10 -mx-4 mt-4 flex items-center justify-end border-t bg-background px-4 py-3 md:static md:mx-0 md:border-t-0 md:px-0 md:pt-0 md:pb-0"
-        >
+        <div data-sticky-actions className={ACTIONS_BAR}>
           {/* Wraps before overflowing at 360px, whatever the language's words. */}
           <div className="flex flex-wrap items-center justify-end gap-2">
             <button

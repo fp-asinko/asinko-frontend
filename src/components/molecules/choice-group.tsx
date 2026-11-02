@@ -19,6 +19,7 @@ export function ChoiceGroup<Value extends string>({
   value,
   onChange,
   invalid = false,
+  required = false,
 }: {
   id?: string
   /** The id of the visible label that names the group. */
@@ -28,6 +29,8 @@ export function ChoiceGroup<Value extends string>({
   value: Value | undefined
   onChange: (value: Value) => void
   invalid?: boolean
+  /** One has to be chosen: said to assistive technology. */
+  required?: boolean
 }) {
   return (
     <RadioGroup
@@ -35,6 +38,7 @@ export function ChoiceGroup<Value extends string>({
       aria-labelledby={labelledBy}
       aria-describedby={describedBy}
       aria-invalid={invalid || undefined}
+      aria-required={required || undefined}
       // Empty is "none chosen yet": Base UI takes null for it.
       value={value ?? null}
       onValueChange={(next) => onChange(next as Value)}
@@ -47,13 +51,15 @@ export function ChoiceGroup<Value extends string>({
             // 40px tall: a comfortable target (WCAG 2.5.8 asks 24).
             'inline-flex h-10 tap cursor-pointer items-center gap-2 rounded-full bg-muted px-4 type-action text-foreground hover:bg-muted-hover',
             'has-data-checked:bg-primary has-data-checked:text-primary-foreground',
+            // The focus ring on the whole pill: the dot alone is too small to show it (on black too).
+            'has-focus-visible:ring-3 has-focus-visible:ring-ring/50',
             invalid && 'ring-2 ring-destructive/40',
           )}
         >
           <RadioGroupItem
             value={option.value}
             // On the black pill, the dot inverts with it.
-            className="data-checked:border-primary-foreground"
+            className="focus-visible:ring-0 data-checked:border-primary-foreground"
           />
           {option.label}
         </label>

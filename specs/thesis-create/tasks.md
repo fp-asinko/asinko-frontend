@@ -8,7 +8,7 @@ Rama: `feature/thesis-create`, desde `develop`. Requirements y design aprobados 
 - [x] **T-04 (M)** `FormatTabs` (fuera de `PostEditor`, con la quinta pestaña), `?type=thesis` en `parseSubmitQuery` y `submitPath`, `SubmitEditor` que cambia de editor, y `only="assets"` en `CommunityPicker`. Tests. → TC-01
 - [x] **T-05 (L)** `ThesisEditor`: los campos, el activo que elige su comunidad, el precio de referencia y el aviso de dirección, deshabilitado hasta completar, errores en su campo, guardado local y Cancelar. Textos en en, es y pt. Tests. → TC-02 a TC-10, TC-20
 - [x] **T-06 (M)** `ThesisConfirm`: el resumen, el disclaimer, enviar y el paso al perfil; los errores del servidor al campo. Textos. Tests. → TC-11 a TC-15, TC-20
-- [ ] **T-07 (M)** E2E (`e2e/thesis-create.spec.ts`), 360 px, axe en claro y oscuro, `performance.spec.ts` con `/submit?type=thesis`, `ui-reviewer`. → TC-16, TC-17, TC-19
+- [x] **T-07 (M)** E2E (`e2e/thesis-create.spec.ts`), 360 px, axe en claro y oscuro, `performance.spec.ts` con `/submit?type=thesis`, `ui-reviewer`. → TC-16, TC-17, TC-19
 - [ ] **T-08 (S)** `overview.md § Tesis` (280 y precio obligatorio), `specs/submit-page/design.md § 1` (`?type=thesis`). → TC-21
 - [ ] **T-09 (S)** A mano contra `dev` con una cuenta real: publicar una tesis y verla en el perfil.
 

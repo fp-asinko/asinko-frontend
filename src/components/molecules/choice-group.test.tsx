@@ -9,7 +9,7 @@ const OPTIONS = [
   { value: 'HIGH', label: 'High' },
 ] as const
 
-function Group({ onChange = vi.fn(), invalid = false }) {
+function Group({ onChange = vi.fn(), invalid = false, required = false }) {
   const [value, setValue] = useState<'LOW' | 'HIGH' | undefined>(undefined)
   return (
     <>
@@ -24,6 +24,7 @@ function Group({ onChange = vi.fn(), invalid = false }) {
           onChange(next)
         }}
         invalid={invalid}
+        required={required}
       />
       <p id="help">How sure you are</p>
     </>
@@ -51,8 +52,9 @@ describe('ChoiceGroup (specs/thesis-create TC-05, TC-07)', () => {
     expect(onChange).toHaveBeenLastCalledWith('HIGH')
   })
 
-  it('says it is invalid', () => {
-    render(<Group invalid />)
+  it('says it is invalid, and required', () => {
+    render(<Group invalid required />)
     expect(screen.getByRole('radiogroup')).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByRole('radiogroup')).toBeRequired()
   })
 })

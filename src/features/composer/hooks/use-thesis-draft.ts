@@ -1,8 +1,9 @@
 'use client'
 
+import { useEffect } from 'react'
 import { z } from 'zod'
 import { CONVICTIONS, THESIS_DIRECTIONS } from '../schemas/create-thesis.schema'
-import { useLocalDraft, writeDraft } from './use-local-draft'
+import { forgetOpenedDraft, useLocalDraft, writeDraft } from './use-local-draft'
 
 export { clearDraft, discardDraft, forgetOpenedDraft } from './use-local-draft'
 
@@ -48,4 +49,37 @@ export function writeThesisDraft(key: string, draft: ThesisDraft) {
 /** The thesis draft kept for `key` when the page opens, or null. */
 export function useStoredThesisDraft(key: string | null): ThesisDraft | null {
   return useLocalDraft(key, thesisDraftSchema, hasThesisText)
+}
+
+/** How long the typing rests before it is kept (as the post's). */
+const SAVE_AFTER_MS = 500
+
+/**
+ * Keeps the thesis being written (TC-10): a moment after the typing rests, and at once when the
+ * tab closes. `draft` is null while an older one waits for an answer: typing would overwrite it
+ * unasked. When the editor leaves, the next visit reads the draft again.
+ */
+export function useKeepThesisDraft(key: string | null, draft: Omit<ThesisDraft, 'savedAt'> | null) {
+  // Its content, as the effect's dependency: a new object each render is not a change.
+  const content = draft ? JSON.stringify(draft) : null
+  useEffect(() => {
+    if (!key || !content) return
+    const keep = () => {
+      const next: ThesisDraft = {
+        ...(JSON.parse(content) as Omit<ThesisDraft, 'savedAt'>),
+        savedAt: Date.now(),
+      }
+      if (hasThesisText(next)) writeThesisDraft(key, next)
+    }
+    const timer = setTimeout(keep, SAVE_AFTER_MS)
+    window.addEventListener('pagehide', keep)
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('pagehide', keep)
+    }
+  }, [key, content])
+  useEffect(() => {
+    if (!key) return
+    return () => forgetOpenedDraft(key)
+  }, [key])
 }

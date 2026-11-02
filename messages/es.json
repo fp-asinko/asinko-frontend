@@ -1065,8 +1065,7 @@
         "above": "Por encima de",
         "below": "Por debajo de",
         "price": "Precio objetivo",
-        "reference": "Precio actual: {price} · el objetivo está a {change}",
-        "stale": "desactualizado",
+        "reference": "Precio actual: {price}{stale, select, true { (desactualizado)} other {}}{change, select, none {} other { · el objetivo está a {change}}}",
         "wrongSide": "El precio ya está de ese lado del objetivo."
       },
       "deadline": {

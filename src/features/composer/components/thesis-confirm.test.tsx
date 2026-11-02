@@ -50,6 +50,11 @@ describe('ThesisConfirm (specs/thesis-create TC-11, TC-12)', () => {
     const send = screen.getByRole('button', { name: 'Publicar tesis' })
     await userEvent.click(send)
     expect(onConfirm).not.toHaveBeenCalled()
+    // It says why (WCAG 3.3.1), tied to the checkbox.
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Confirma que esto no es asesoramiento financiero',
+    )
+    expect(checkbox).toHaveAccessibleDescription('Confirma que esto no es asesoramiento financiero')
     await userEvent.click(checkbox)
     await userEvent.click(send)
     expect(onConfirm).toHaveBeenCalledTimes(1)
@@ -66,10 +71,9 @@ describe('ThesisConfirm (specs/thesis-create TC-11, TC-12)', () => {
 
   it('says it is publishing, and cannot be left meanwhile', async () => {
     const { onBack } = renderConfirm({ pending: true })
-    expect(await screen.findByRole('button', { name: 'Publicando…' })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    )
+    const sending = await screen.findByRole('button', { name: 'Publicando…' })
+    expect(sending).toHaveAttribute('aria-disabled', 'true')
+    expect(sending).toHaveAttribute('aria-busy', 'true')
     expect(screen.getByRole('button', { name: 'Volver' })).toBeDisabled()
     await userEvent.keyboard('{Escape}')
     expect(onBack).not.toHaveBeenCalled()

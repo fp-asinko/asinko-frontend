@@ -50,6 +50,8 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12)', () => {
     await vi.waitFor(() =>
       expect(screen.getByRole('tab', { name: 'Thesis', selected: true })).toBeInTheDocument(),
     )
+    // The focus goes with the swap (WCAG 2.4.3): loaded now, to where a thesis starts.
+    await vi.waitFor(() => expect(screen.getByRole('combobox', { name: 'Asset' })).toHaveFocus())
     // The post's editor stays, hidden.
     expect(screen.queryByRole('textbox', { name: 'Title' })).toBeNull()
 
@@ -58,6 +60,17 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12)', () => {
       scroll: false,
     })
     expect(title()).toHaveValue('Keep me')
+    // On the format chosen there, with the focus on it.
+    const link = screen.getByRole('tab', { name: 'Link', selected: true })
+    await vi.waitFor(() => expect(link).toHaveFocus())
+    expect(screen.getByRole('textbox', { name: 'Link' })).toBeVisible()
+
+    // Already there, the thesis editor takes the focus on its tab.
+    await userEvent.click(link)
+    await userEvent.click(screen.getAllByRole('tab', { name: 'Thesis' })[0]!)
+    await vi.waitFor(() =>
+      expect(screen.getByRole('tab', { name: 'Thesis', selected: true })).toHaveFocus(),
+    )
   })
 
   it('opens on the thesis editor from the URL', async () => {

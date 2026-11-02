@@ -46,6 +46,9 @@ export function ThesisConfirm({
   const format = useFormatter()
   const ids = useId()
   const [accepted, setAccepted] = useState(false)
+  // Publish pressed without the checkbox: it says why (WCAG 3.3.1), as the form does.
+  const [missing, setMissing] = useState(false)
+  const shown = error ?? (missing && !accepted ? t('errors.disclaimer') : null)
 
   return (
     <Dialog
@@ -53,6 +56,7 @@ export function ThesisConfirm({
       onOpenChange={(open) => {
         if (open || pending) return
         setAccepted(false)
+        setMissing(false)
         onBack()
       }}
     >
@@ -70,7 +74,9 @@ export function ThesisConfirm({
         {summary && (
           <>
             <DialogHeader>
-              <DialogTitle className="type-post-title">{t('confirm.title')}</DialogTitle>
+              <DialogTitle className="text-[1.0625rem] leading-[1.3] font-bold">
+                {t('confirm.title')}
+              </DialogTitle>
               <DialogDescription>{t('confirm.final')}</DialogDescription>
             </DialogHeader>
             {/* What is published, as one block (TC-11). */}
@@ -95,17 +101,17 @@ export function ThesisConfirm({
                 id={`${ids}-disclaimer`}
                 checked={accepted}
                 onCheckedChange={(checked) => setAccepted(checked === true)}
-                aria-describedby={error ? `${ids}-error` : undefined}
-                aria-invalid={Boolean(error) || undefined}
+                aria-describedby={shown ? `${ids}-error` : undefined}
+                aria-invalid={Boolean(shown) || undefined}
                 className="mt-0.5"
               />
               <label htmlFor={`${ids}-disclaimer`} className="cursor-pointer type-small">
                 {t('confirm.disclaimer')}
               </label>
             </div>
-            {error && (
+            {shown && (
               <p id={`${ids}-error`} role="alert" className="type-small text-destructive">
-                {error}
+                {shown}
               </p>
             )}
             <DialogFooter className="flex-row justify-end gap-2">
@@ -114,6 +120,7 @@ export function ThesisConfirm({
                 disabled={pending}
                 onClick={() => {
                   setAccepted(false)
+                  setMissing(false)
                   onBack()
                 }}
                 className={cn(PILL, 'bg-muted text-foreground hover:bg-muted-hover')}
@@ -123,8 +130,11 @@ export function ThesisConfirm({
               <button
                 type="button"
                 aria-disabled={!accepted || pending || undefined}
+                aria-busy={pending || undefined}
                 onClick={() => {
-                  if (accepted && !pending) onConfirm()
+                  if (pending) return
+                  if (accepted) onConfirm()
+                  else setMissing(true)
                 }}
                 className={cn(PILL, 'bg-primary text-primary-foreground hover:bg-primary/85')}
               >

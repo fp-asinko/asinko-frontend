@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import { useLocale } from 'next-intl'
-import { useRef, useState } from 'react'
+import { useRef, useState, type RefObject } from 'react'
 import type { Locale } from '@/i18n/routing'
 import { useRouter } from '@/i18n/navigation'
 import { submitPath, type SubmitType } from '@/i18n/submit-path'
@@ -75,14 +75,28 @@ export function SubmitEditor({
   const thesisWritten = useRef<(() => boolean) | null>(null)
   const [discarding, setDiscarding] = useState(false)
 
+  const postBox = useRef<HTMLDivElement>(null)
+  const thesisBox = useRef<HTMLDivElement>(null)
+  // The format asked from the thesis's tabs: the post's editor takes it (each ask is new).
+  const [postFormat, setPostFormat] = useState<{ format: PostFormat } | null>(null)
+
+  /** The focus follows the swap to the chosen tab of the editor now shown (WCAG 2.4.3). */
+  function focusTab(box: RefObject<HTMLDivElement | null>) {
+    requestAnimationFrame(() =>
+      box.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]')?.focus(),
+    )
+  }
   function showThesis() {
     setThesis(true)
     setThesisOpened(true)
     follow({ type: 'thesis' })
+    focusTab(thesisBox)
   }
   function showPost(format: PostFormat) {
     setThesis(false)
+    setPostFormat({ format })
     follow({ type: format === 'TEXT' ? undefined : (format.toLowerCase() as SubmitType) })
+    focusTab(postBox)
   }
 
   // Back to where the person came from in the site; the Home when the page was opened directly or
@@ -100,7 +114,7 @@ export function SubmitEditor({
 
   return (
     <>
-      <div hidden={thesis}>
+      <div ref={postBox} hidden={thesis}>
         <PostEditor
           type={type === 'THESIS' ? 'TEXT' : type}
           community={community}
@@ -113,10 +127,11 @@ export function SubmitEditor({
           onCommunityChange={(next) => follow({ community: next?.slug ?? null })}
           onRelatedChange={(handles) => follow({ related: handles.map(slugOf) })}
           onThesis={showThesis}
+          formatRequest={postFormat}
         />
       </div>
       {thesisOpened && (
-        <div hidden={!thesis}>
+        <div ref={thesisBox} hidden={!thesis}>
           <ThesisEditor
             community={community}
             storageKey={thesisStorageKey}

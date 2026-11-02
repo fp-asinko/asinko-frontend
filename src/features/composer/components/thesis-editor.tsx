@@ -17,16 +17,15 @@ import { Textarea } from '@/components/ui/textarea'
 import { assetSymbolOf } from '@/lib/communities/paths'
 import { searchMentions } from '@/lib/mentions/search-mentions.action'
 import { cn } from '@/lib/utils'
-import { getAssetQuote } from '../actions/asset-quote.action'
 import { createThesis } from '../actions/create-thesis.action'
 import type { CommunityOption } from '../composer.types'
 import {
   discardDraft,
-  forgetOpenedDraft,
   hasThesisText,
+  useKeepThesisDraft,
   useStoredThesisDraft,
-  writeThesisDraft,
 } from '../hooks/use-thesis-draft'
+import { useAssetQuote } from '../hooks/use-asset-quote'
 import { clearDraft } from '../hooks/use-local-draft'
 import { deadlineAt, thesisDeadlineRange } from '../lib/thesis-deadline'
 import {
@@ -39,7 +38,7 @@ import {
 } from '../schemas/create-thesis.schema'
 import { BodyTabs } from './body-tabs'
 import { CommunityPicker } from './community-picker'
-import { FIELD_BOX, PILL } from './editor-styles'
+import { ACTIONS_BAR, BARE, FIELD_BOX, PILL } from './editor-styles'
 import { FormatTabs, type CreateFormat } from './format-tabs'
 import type { ThesisSummary } from './thesis-confirm'
 
@@ -74,9 +73,6 @@ const ERROR_KEYS = [
   'thesis.errors.conviction',
   'thesis.errors.reasoningRequired',
 ] as const
-
-/** How long the text rests before it is kept as the draft (as the post's). */
-const SAVE_AFTER_MS = 500
 
 /** A price as typed, or null: a comma works as the decimal point. */
 function typedPrice(value: string): number | null {
@@ -127,7 +123,6 @@ export function ThesisEditor({
   )
   // Chosen by hand, the community no longer follows the asset (TC-03).
   const communityTouched = useRef(false)
-  const [quote, setQuote] = useState<{ price: number | null; stale: boolean } | null>(null)
   const [range] = useState(() => thesisDeadlineRange(new Date()))
   const [confirming, setConfirming] = useState<ThesisFormValues | null>(null)
   const [pending, setPending] = useState(false)
@@ -168,50 +163,22 @@ export function ThesisEditor({
     }
   }, [draftRef, getValues])
 
-  // The draft (TC-10): kept a moment after the typing rests, and at once when the tab closes. Not
-  // while an older one waits for an answer: typing would overwrite it unasked.
-  useEffect(() => {
-    if (!storageKey || offered) return
-    const keep = () => {
-      const draft = {
-        community: chosen,
-        asset,
-        claim,
-        direction: direction ?? '',
-        targetPrice: price,
-        deadline,
-        conviction: conviction ?? '',
-        reasoning,
-        savedAt: Date.now(),
-      } as const
-      if (hasThesisText(draft)) writeThesisDraft(storageKey, draft)
-    }
-    const timer = setTimeout(keep, SAVE_AFTER_MS)
-    window.addEventListener('pagehide', keep)
-    return () => {
-      clearTimeout(timer)
-      window.removeEventListener('pagehide', keep)
-    }
-  }, [storageKey, offered, chosen, asset, claim, direction, price, deadline, conviction, reasoning])
-  useEffect(() => {
-    if (!storageKey) return
-    return () => forgetOpenedDraft(storageKey)
-  }, [storageKey])
-
-  // The chosen asset's price, next to the target (TC-05); without it, the form goes on.
-  const symbol = asset ? assetSymbolOf(asset) : null
-  useEffect(() => {
-    if (!symbol) return
-    let current = true
-    void getAssetQuote(symbol).then(
-      (answer) => current && setQuote(answer),
-      () => current && setQuote(null),
-    )
-    return () => {
-      current = false
-      setQuote(null)
-    }
-  }, [symbol])
+  useKeepThesisDraft(
+    storageKey,
+    offered
+      ? null
+      : {
+          community: chosen,
+          asset,
+          claim,
+          direction: direction ?? '',
+          targetPrice: price,
+          deadline,
+          conviction: conviction ?? '',
+          reasoning,
+        },
+  )
+  const quote = useAssetQuote(asset ? assetSymbolOf(asset) : null)
 
   // On arrival the focus goes where the person starts: the asset, or the claim when it is there.
   useEffect(() => {
@@ -494,6 +461,7 @@ export function ThesisEditor({
                     value={field.value}
                     onChange={field.onChange}
                     invalid={invalid('direction')}
+                    required
                   />
                 )}
               />
@@ -512,28 +480,28 @@ export function ThesisEditor({
                 className={cn(FIELD_BOX, 'h-11 tabular-nums sm:w-44')}
               />
             </div>
-            {/* The current price, as a reference (TC-05): announced when it changes. */}
-            <p
-              id={`${ids}-reference`}
-              aria-live="polite"
-              className="px-1 type-meta text-muted-foreground"
-            >
+            {/* The current price, as a reference (TC-05). Not live: it changes with every key of
+                the target, and the field already describes itself with it. */}
+            <p id={`${ids}-reference`} className="px-1 type-meta text-muted-foreground">
               {reference !== null &&
                 t('thesis.target.reference', {
                   price: format.number(reference, {
                     maximumFractionDigits: reference < 1 ? 6 : 2,
                   }),
+                  stale: String(Boolean(quote?.stale)),
                   change:
                     change === null
-                      ? '—'
+                      ? 'none'
                       : format.number(change, {
                           style: 'percent',
                           maximumFractionDigits: 1,
                           signDisplay: 'exceptZero',
                         }),
                 })}
-              {reference !== null && quote?.stale && ` · ${t('thesis.target.stale')}`}
-              {wrongSide && ` · ${t('thesis.target.wrongSide')}`}
+            </p>
+            {/* A target already reached: its own sentence, said when it appears. */}
+            <p role="status" className="px-1 type-meta text-muted-foreground">
+              {wrongSide && t('thesis.target.wrongSide')}
             </p>
             <FieldError
               id={`${ids}-direction-error`}
@@ -589,6 +557,7 @@ export function ThesisEditor({
                   value={field.value}
                   onChange={field.onChange}
                   invalid={invalid('conviction')}
+                  required
                 />
               )}
             />
@@ -632,7 +601,7 @@ export function ThesisEditor({
                   aria-invalid={invalid('reasoning') || undefined}
                   aria-required
                   aria-describedby={`${ids}-reasoning-error`}
-                  className="h-auto min-h-36 resize-none rounded-none border-0 bg-transparent p-0 text-base leading-[1.55] text-foreground shadow-none focus-visible:ring-0 aria-invalid:ring-0 md:text-base dark:bg-transparent"
+                  className={cn(BARE, 'min-h-36 resize-none text-base leading-[1.55] md:text-base')}
                 />
                 <MentionField fieldRef={reasoningRef} search={searchMentions} />
               </div>
@@ -646,10 +615,7 @@ export function ThesisEditor({
         </div>
 
         {/* Cancel and Publish, on the right, as the post's: sticky over the bottom bar in phones. */}
-        <div
-          data-sticky-actions
-          className="sticky bottom-[calc(3.5625rem+env(safe-area-inset-bottom))] z-10 -mx-4 mt-4 flex items-center justify-end border-t bg-background px-4 py-3 md:static md:mx-0 md:border-t-0 md:px-0 md:pt-0 md:pb-0"
-        >
+        <div data-sticky-actions className={ACTIONS_BAR}>
           <div className="flex flex-wrap items-center justify-end gap-2">
             <button
               type="button"

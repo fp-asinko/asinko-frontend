@@ -1065,8 +1065,7 @@
         "above": "Above",
         "below": "Below",
         "price": "Target price",
-        "reference": "Current price: {price} · the target is {change}",
-        "stale": "out of date",
+        "reference": "Current price: {price}{stale, select, true { (out of date)} other {}}{change, select, none {} other { · the target is {change}}}",
         "wrongSide": "The price is already on that side of the target."
       },
       "deadline": {
