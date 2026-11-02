@@ -6,16 +6,25 @@ import type { CreateThesisInput } from '../schemas/create-thesis.schema'
 
 /**
  * Publishes a thesis (E11, specs/thesis-create TC-13). The userId always comes from the server
- * session (api-integration.md); the backend takes the reference price itself (E14-02).
+ * session (api-integration.md); the backend takes the reference price itself (E14-02). From a
+ * draft, its id (P-038, specs/thesis-drafts TD-04).
  */
 export async function createThesisAs(
   userId: string,
   { direction, disclaimerAccepted, ...input }: CreateThesisInput,
+  draftId?: string,
 ): Promise<ApiResult<{ id: string }>> {
   const result = await apiRequest({
     method: 'POST',
     path: '/api/v1/theses',
-    body: { userId, ...input, targetDirection: direction, disclaimerAccepted },
+    // From a draft of the account, with its id: the backend deletes it in the same operation (P-038).
+    body: {
+      userId,
+      ...input,
+      targetDirection: direction,
+      disclaimerAccepted,
+      ...(draftId && { draftId }),
+    },
     schema: thesisSchema.pick({ id: true }),
   })
   return result.ok ? { ok: true, data: { id: result.data.id } } : result

@@ -7,7 +7,9 @@ const deps = vi.hoisted(() => ({
   getViewer: vi.fn(),
   createThesisAs: vi.fn(),
   assetQuote: vi.fn(),
+  deleteDraftAs: vi.fn(),
 }))
+vi.mock('../lib/drafts-api', () => ({ deleteDraftAs: deps.deleteDraftAs }))
 vi.mock('@/lib/session', () => ({ getViewer: deps.getViewer }))
 vi.mock('../lib/theses-api', () => ({
   createThesisAs: deps.createThesisAs,
@@ -80,6 +82,29 @@ describe('createThesis (specs/thesis-create TC-13 to TC-15)', () => {
     expect(input).not.toHaveProperty('userId')
     expect(input).toMatchObject({ targetPrice: 200, direction: 'ABOVE' })
     expect(result).toEqual({ ok: true, data: { username: DEMO_USER.username } })
+  })
+
+  it('publishes from a draft with its id, and deletes it (specs/thesis-drafts TD-04)', async () => {
+    const DRAFT = '00000000-0000-4000-8000-000000042001'
+    deps.createThesisAs.mockResolvedValue({ ok: true, data: { id: 'new' } })
+    await createThesis(valid(), DRAFT)
+    expect(deps.createThesisAs.mock.calls[0]?.[2]).toBe(DRAFT)
+    expect(deps.deleteDraftAs).toHaveBeenCalledWith(DEMO_USER.id, DRAFT)
+  })
+
+  it('publishes without the draft when it is gone, and ignores an id that is not one', async () => {
+    const DRAFT = '00000000-0000-4000-8000-000000042001'
+    deps.createThesisAs
+      .mockResolvedValueOnce(failure('NOT_FOUND'))
+      .mockResolvedValueOnce({ ok: true, data: { id: 'new' } })
+    expect(await createThesis(valid(), DRAFT)).toMatchObject({ ok: true })
+    expect(deps.createThesisAs.mock.calls[1]?.[2]).toBeUndefined()
+
+    vi.clearAllMocks()
+    deps.createThesisAs.mockResolvedValue({ ok: true, data: { id: 'new' } })
+    await createThesis(valid(), '../x')
+    expect(deps.createThesisAs.mock.calls[0]?.[2]).toBeUndefined()
+    expect(deps.deleteDraftAs).not.toHaveBeenCalled()
   })
 
   it.each([

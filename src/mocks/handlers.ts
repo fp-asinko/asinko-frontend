@@ -29,6 +29,7 @@ import {
   userSummarySchema,
   voteResultSchema,
   type RawContentFeedItem,
+  type RawDraft,
   type RawFeedItem,
   type RawFeedReason,
 } from '@/lib/api/contract'
@@ -63,6 +64,14 @@ import { signProfileImageUpload } from './profile-image'
 import { paginate } from './paginate'
 import { signPostImageUpload } from './post-image'
 import { checkMockUsername, createMockProfile } from './sign-up'
+import {
+  createThesisDraft,
+  deleteThesisDraft,
+  isThesisDraftId,
+  SEED_THESIS_DRAFT_ID,
+  updateThesisDraft,
+  withThesisDrafts,
+} from './thesis-drafts'
 import { createMockThesis } from './theses'
 import type { MockContext, MockExtension, MockResponse, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
@@ -299,6 +308,49 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     example: { ...noRequest, params: { userId: PROFILES[1]!.id } },
     handler: ({ params, query }) => userComments(params.userId ?? '', query.cursor),
   },
+  // P-038 (proposal, specs/thesis-drafts): a thesis's drafts. Only these with API_MOCKS=missing;
+  // the list adds them to the backend's (MOCK_EXTENSIONS).
+  {
+    method: 'POST',
+    path: '/api/v1/drafts',
+    kind: 'proposal',
+    implemented: false,
+    when: (_query, body) => (body as { type?: unknown } | undefined)?.type === 'THESIS',
+    schema: draftSchema,
+    example: {
+      ...noRequest,
+      body: { userId: DEMO_USER.id, type: 'THESIS', title: 'SOL above 300 by June' },
+    },
+    handler: createThesisDraft,
+  },
+  {
+    method: 'PATCH',
+    path: '/api/v1/drafts/:draftId',
+    kind: 'proposal',
+    implemented: false,
+    when: (_query, _body, params) => isThesisDraftId(params?.draftId),
+    schema: draftSchema,
+    example: {
+      ...noRequest,
+      params: { draftId: SEED_THESIS_DRAFT_ID },
+      body: { userId: DEMO_USER.id, type: 'THESIS', title: 'ETH closes the year above 5K' },
+    },
+    handler: updateThesisDraft,
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/drafts/:draftId',
+    kind: 'proposal',
+    implemented: false,
+    when: (_query, _body, params) => isThesisDraftId(params?.draftId),
+    schema: noContentSchema,
+    example: {
+      ...noRequest,
+      params: { draftId: SEED_THESIS_DRAFT_ID },
+      query: { userId: DEMO_USER.id },
+    },
+    handler: deleteThesisDraft,
+  },
   // P-022 (backend, 2026-10-20): a person's drafts (specs/drafts-tags), with their related ones.
   {
     method: 'GET',
@@ -307,7 +359,14 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     implemented: true,
     schema: paginatedSchema(draftSchema),
     example: { ...noRequest, params: { userId: DEMO_USER.id } },
-    handler: ({ params }) => listDrafts(params.userId ?? ''),
+    // With the person's thesis drafts (P-038): someone signed up in the e2e has only those.
+    handler: ({ params, accessToken }) => {
+      const userId = params.userId ?? ''
+      if (userId !== mockCaller(accessToken)) return listDrafts(userId)
+      const posts = userId === DEMO_USER.id ? listDrafts(userId) : null
+      const items = (posts?.body as { items?: RawDraft[] } | undefined)?.items ?? []
+      return { status: 200, body: { items: withThesisDrafts(items, userId), nextCursor: null } }
+    },
   },
   {
     method: 'POST',
@@ -1025,6 +1084,17 @@ function extendFeed(response: MockResponse, home: boolean): MockResponse {
  * handlers above already add them.
  */
 export const MOCK_EXTENSIONS: readonly MockExtension[] = [
+  {
+    // P-038: the thesis drafts, mocked, among the backend's post drafts.
+    method: 'GET',
+    path: '/api/v1/users/:userId/drafts',
+    extend: (response, { params }) => {
+      const body = response.body as { items?: unknown } | undefined
+      if (response.status !== 200 || !Array.isArray(body?.items)) return response
+      const items = withThesisDrafts(body.items as RawDraft[], params.userId ?? '')
+      return { ...response, body: { ...body, items } }
+    },
+  },
   {
     method: 'GET',
     path: '/api/v1/feed/explore',

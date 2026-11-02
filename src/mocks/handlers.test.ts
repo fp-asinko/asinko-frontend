@@ -214,6 +214,10 @@ describe('mock handlers behave like the contract', () => {
         '/api/v1/users/:userId/achievements',
         // P-035 (specs/auth): whether a username is free.
         '/api/v1/usernames/:username',
+        // P-038 (specs/thesis-drafts): a thesis's drafts, beside the backend's post drafts.
+        '/api/v1/drafts',
+        '/api/v1/drafts/:draftId',
+        '/api/v1/drafts/:draftId',
       ].toSorted(),
     )
   })

@@ -122,3 +122,8 @@ export function deleteDraft(draftId: string, userId: string | undefined): MockRe
   DRAFTS.splice(index, 1)
   return { status: 204 }
 }
+
+/** How many post drafts the demo user has: the limit of 20 counts a thesis's too (P-038). */
+export function postDraftCount(): number {
+  return DRAFTS.length
+}

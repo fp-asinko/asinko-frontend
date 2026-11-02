@@ -3,6 +3,7 @@
 import { z } from 'zod'
 import { getViewer } from '@/lib/session'
 import type { ActionResult } from '@/lib/result'
+import { deleteDraftAs } from '../lib/drafts-api'
 import { createThesisAs } from '../lib/theses-api'
 import { isDeadlineInRange } from '../lib/thesis-deadline'
 import { createThesisSchema } from '../schemas/create-thesis.schema'
@@ -35,7 +36,10 @@ const fieldError = (field: string, key: string) => ({
  * editor's schema and the backend's deadline rule, checks the session itself and takes the userId
  * from it, never from the form. Answers the author's username, for their theses tab (TC-14).
  */
-export async function createThesis(raw: unknown): Promise<ActionResult<{ username: string }>> {
+export async function createThesis(
+  raw: unknown,
+  rawDraftId?: unknown,
+): Promise<ActionResult<{ username: string }>> {
   const parsed = createThesisSchema.safeParse(raw)
   if (!parsed.success) {
     return {
@@ -52,8 +56,18 @@ export async function createThesis(raw: unknown): Promise<ActionResult<{ usernam
   const viewer = await getViewer()
   if (!viewer) return { ok: false, error: 'api.errors.UNAUTHENTICATED' }
 
-  const result = await createThesisAs(viewer.id, parsed.data)
-  if (result.ok) return { ok: true, data: { username: viewer.username } }
+  // From a draft of the account (P-038): one deleted meanwhile (from another device) does not stop
+  // the thesis, it goes without it.
+  const draftId = z.uuid().safeParse(rawDraftId)
+  let result = await createThesisAs(viewer.id, parsed.data, draftId.data)
+  if (!result.ok && result.code === 'NOT_FOUND' && draftId.success) {
+    result = await createThesisAs(viewer.id, parsed.data)
+  }
+  if (result.ok) {
+    // Until the backend takes draftId (P-038), the draft goes here; already gone is fine.
+    if (draftId.success) await deleteDraftAs(viewer.id, draftId.data)
+    return { ok: true, data: { username: viewer.username } }
+  }
   const field = FIELD_ERRORS[result.code]
   if (field) return fieldError(...field)
   return { ok: false, error: ERRORS[result.code] ?? result.errorKey }

@@ -4,6 +4,7 @@ import { assetBySymbol } from './fixtures/assets'
 import { communityById, communitySummary } from './fixtures/communities'
 import { mockId } from './fixtures/ids'
 import { THESES } from './fixtures/theses'
+import { takeThesisDraft } from './thesis-drafts'
 import { PROFILES, summary } from './fixtures/users'
 import type { MockContext, MockResponse } from './types'
 
@@ -52,6 +53,10 @@ export function createMockThesis({ body, accessToken }: MockContext): MockRespon
     return error(422, 'VALIDATION_ERROR')
   }
   if (input.disclaimerAccepted !== true) return error(422, 'DISCLAIMER_NOT_ACCEPTED')
+  // P-038: published from a draft, it goes in the same operation; someone else's or gone, 404.
+  if (input.draftId !== undefined && !takeThesisDraft(String(input.draftId), caller)) {
+    return error(404, 'NOT_FOUND')
+  }
 
   const now = Date.now()
   const deadline = typeof input.deadline === 'string' ? Date.parse(input.deadline) : NaN
