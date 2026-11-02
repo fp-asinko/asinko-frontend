@@ -204,6 +204,19 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     }
   })
 
+  it('opens the calendar again after a shortcut, beside the "Other date" pill (TC-33)', async () => {
+    renderEditor()
+    const shortcuts = screen.getByRole('radiogroup', { name: 'Deadline' })
+    await userEvent.click(within(shortcuts).getByRole('radio', { name: 'Other date' }))
+    expect(deadline()).toBeInTheDocument()
+    await userEvent.click(within(shortcuts).getByRole('radio', { name: '3 months' }))
+    expect(screen.queryByLabelText('Deadline', { selector: 'input' })).not.toBeInTheDocument()
+    // The shortcut's day is set, and "Other date" still opens the calendar (it did not, PO 2026-11-02).
+    await userEvent.click(within(shortcuts).getByRole('radio', { name: 'Other date' }))
+    expect(within(shortcuts).getByRole('radio', { name: 'Other date' })).toBeChecked()
+    expect(deadline()).toBeInTheDocument()
+  })
+
   it('confirms with the disclaimer, then publishes with the end of the day and goes on (TC-11 to TC-14)', async () => {
     actions.createThesis.mockResolvedValue({ ok: true, data: { username: 'demo' } })
     const { onPublished } = renderEditor()

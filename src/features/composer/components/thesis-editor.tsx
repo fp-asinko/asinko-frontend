@@ -240,6 +240,7 @@ export function ThesisEditor({
 
   function recover() {
     if (!offered) return
+    setCustomDate(false)
     form.reset({
       communityId: offered.community?.id ?? '',
       assetSymbol: offered.asset ? assetSymbolOf(offered.asset) : '',
@@ -313,6 +314,7 @@ export function ThesisEditor({
   function openSaved(draft: SavedDraft) {
     const kept = draft.thesis
     const day = kept?.deadline ? dayAt(kept.deadline) : null
+    setCustomDate(false)
     form.reset({
       communityId: draft.community?.id ?? '',
       assetSymbol: kept?.assetSymbol ?? '',
@@ -417,11 +419,12 @@ export function ThesisEditor({
     )
   }
 
-  // The shortcut that holds the chosen day, or "Other date" for another one (TC-33).
-  const shortcut =
-    quick.find((each) => each.day === deadline)?.key ??
-    (customDate || deadline ? 'custom' : undefined)
-  // Another day: the calendar takes the "Other date" pill's place, a draft's day too.
+  // "Other date" once chosen, even on a shortcut's day; else the shortcut that holds the day, or
+  // "Other date" for another one, as a draft's (TC-33).
+  const shortcut = customDate
+    ? 'custom'
+    : (quick.find((each) => each.day === deadline)?.key ?? (deadline ? 'custom' : undefined))
+  // The calendar beside the "Other date" pill, in the same row.
   const otherDate = shortcut === 'custom'
   const closesAt = deadline ? deadlineAt(deadline) : null
   const closes = closesAt ? new Date(closesAt) : null
@@ -607,8 +610,8 @@ export function ThesisEditor({
                   })}
               </p>
             </div>
-            {/* Shortcuts in one row, as most deadlines are "in 3 months"; "Other date" turns into
-                the calendar in its place, so the row keeps its height (TC-33). */}
+            {/* Shortcuts in one row, as most deadlines are "in 3 months"; "Other date" opens the
+                calendar beside them, in the same row while it fits (TC-33). */}
             <div className="flex flex-wrap items-center gap-1.5">
               <ChoiceGroup
                 id={`${ids}-deadline-quick`}
@@ -620,9 +623,7 @@ export function ThesisEditor({
                     value: key,
                     label: t(`thesis.deadline.quick.${key}`),
                   })),
-                  ...(otherDate
-                    ? []
-                    : [{ value: 'custom' as const, label: t('thesis.deadline.quick.custom') }]),
+                  { value: 'custom' as const, label: t('thesis.deadline.quick.custom') },
                 ]}
                 value={shortcut}
                 onChange={(next) => {
