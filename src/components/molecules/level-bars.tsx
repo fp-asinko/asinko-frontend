@@ -10,9 +10,20 @@ export type Level<Value extends string> = { value: Value; label: string }
 const HEIGHTS = ['h-5', 'h-6.5', 'h-8', 'h-9.5'] as const
 
 /**
+ * The scale, green to red: every filled bar takes the chosen level's, the chosen one too (the
+ * radio paints it --primary when checked).
+ */
+const FILLS = [
+  'bg-level-1 dark:bg-level-1 data-checked:bg-level-1 dark:data-checked:bg-level-1',
+  'bg-level-2 dark:bg-level-2 data-checked:bg-level-2 dark:data-checked:bg-level-2',
+  'bg-level-3 dark:bg-level-3 data-checked:bg-level-3 dark:data-checked:bg-level-3',
+  'bg-level-4 dark:bg-level-4 data-checked:bg-level-4 dark:data-checked:bg-level-4',
+] as const
+
+/**
  * A level chosen on rising bars, as the prototype's conviction (specs/thesis-create TC-25): a radio
  * group (one Tab stop, the arrows to move), each bar one option. The bars fill up to the chosen
- * one, black, or red at the last (the riskiest). Beside them, the chosen level's name, or `prompt`:
+ * one in its color, from green to red (the riskiest; the last level is always red). Beside them, the chosen level's name, or `prompt`:
  * color is never the only signal.
  */
 export function LevelBars<Value extends string>({
@@ -40,7 +51,8 @@ export function LevelBars<Value extends string>({
   required?: boolean
 }) {
   const chosen = levels.findIndex((level) => level.value === value)
-  const last = chosen === levels.length - 1
+  // Fewer than four levels end on red too.
+  const fill = FILLS[chosen + FILLS.length - levels.length]
 
   return (
     <div className="flex items-end gap-3">
@@ -64,8 +76,7 @@ export function LevelBars<Value extends string>({
               // A bar, not a dot: the indicator inside is hidden, the fill says the choice.
               'aspect-auto w-4 rounded-[2px] border-0 bg-border-strong transition-colors duration-150 after:-inset-x-1 dark:bg-border-strong [&_[data-slot=radio-group-indicator]]:hidden',
               HEIGHTS[index],
-              index <= chosen &&
-                (last ? 'bg-destructive dark:bg-destructive' : 'bg-primary dark:bg-primary'),
+              index <= chosen && fill,
               'data-checked:border-0',
               invalid && 'ring-2 ring-destructive/40',
             )}

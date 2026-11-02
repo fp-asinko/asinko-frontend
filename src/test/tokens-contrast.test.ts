@@ -105,6 +105,8 @@ const NON_TEXT_PAIRS: Array<[string, string]> = [
   ['bullish', 'card'],
   ['brand-dot', 'background'],
   ['input', 'card'],
+  // LevelBars' rising scale (TC-25): the filled bars on the form's card.
+  ...[1, 2, 3, 4].map((n): [string, string] => [`level-${n}`, 'card']),
 ]
 
 describe.each(Object.entries(THEMES))('%s theme tokens', (_name, theme) => {

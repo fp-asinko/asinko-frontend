@@ -51,6 +51,20 @@ describe('LevelBars (specs/thesis-create TC-25)', () => {
     expect(screen.getByText('High', { selector: 'span' })).toBeVisible()
   })
 
+  it('fills the bars up to the chosen one in its color, green to red', async () => {
+    render(<Bars />)
+    const bars = screen.getAllByRole('radio')
+    await userEvent.click(screen.getByRole('radio', { name: 'Medium' }))
+    expect(bars.map((bar) => bar.className.includes('bg-level-2 '))).toEqual([
+      true,
+      true,
+      false,
+      false,
+    ])
+    await userEvent.click(screen.getByRole('radio', { name: 'Extreme' }))
+    expect(bars.every((bar) => bar.className.includes('bg-level-4 '))).toBe(true)
+  })
+
   it('moves with the arrows', async () => {
     const onChange = vi.fn()
     render(<Bars onChange={onChange} />)

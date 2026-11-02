@@ -118,6 +118,11 @@
   --accuracy-mid-foreground: #7a5800;
   --accuracy-low: #fce6e6;
   --accuracy-low-foreground: #a8262c;
+  /* A rising scale on bars (LevelBars, specs/thesis-create TC-25): green to red, 3:1 on cards. */
+  --level-1: var(--success);
+  --level-2: #b07e00;
+  --level-3: #d4600f;
+  --level-4: var(--destructive);
 }
 
 /*
@@ -195,6 +200,8 @@
   --accuracy-mid-foreground: #f0c960;
   --accuracy-low: #3d1a1b;
   --accuracy-low-foreground: #ff9c9c;
+  --level-2: #f0c960;
+  --level-3: #ff8f4a;
 }
 
 @theme inline {
@@ -277,6 +284,10 @@
   --color-accuracy-mid-foreground: var(--accuracy-mid-foreground);
   --color-accuracy-low: var(--accuracy-low);
   --color-accuracy-low-foreground: var(--accuracy-low-foreground);
+  --color-level-1: var(--level-1);
+  --color-level-2: var(--level-2);
+  --color-level-3: var(--level-3);
+  --color-level-4: var(--level-4);
   /* A thesis's state (specs/profile-track-record PT-07): the accuracy tiers' tints, with ✓ / ✗. */
   --color-thesis-correct: var(--accuracy-high);
   --color-thesis-correct-foreground: var(--accuracy-high-foreground);
