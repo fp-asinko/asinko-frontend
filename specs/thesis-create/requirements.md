@@ -1,0 +1,85 @@
+# Crear una tesis — Requirements
+
+> **Estado:** aprobado por el PO el 2026-11-02 ("si"), con Q1 a Q8 como se recomendaron ("dale").
+> **Fuente:** Jira **MVP-137** ("Thesis creation form + validations": activo, dirección, precio objetivo, deadline, claim de 280 caracteres, convicción de 4 niveles y razonamiento) y **MVP-143** ("Wire 'not financial advice' disclaimer into thesis confirmation", con texto provisorio hasta la revisión legal). Visión de producto (`docs/product/overview.md § Tesis`) y el prototipo (`CreateTesisScreen`: una pestaña "Thesis" en Crear, junto a Post).
+> **Backend** (`asinko-app` rama `dev`, `9924924`, leído el 2026-11-02): `POST /api/v1/theses` implementado (E11). Pide `userId`, `communityId`, `assetSymbol`, `claim` (≤ 280), `reasoning`, `conviction` (`LOW|MEDIUM|HIGH|EXTREME`), `deadline` (entre 24 h y 5 años desde ahora), `targetPrice`, `targetDirection` (`ABOVE|BELOW|EQUALS`) y `disclaimerAccepted: true`. El precio de referencia lo toma el backend al crear (E14-02, MVP-164). Cualquiera publica en cualquier comunidad, salvo en el canal personal de otro (`PERSONAL_CHANNEL_OWNER_ONLY`).
+> **Hoy:** la página de crear (`specs/submit-page`) tiene Thought, Text, Link e Image. Las tesis solo se ven en la pestaña Tesis del perfil (`specs/profile-track-record`). El feed del backend ya manda `kind: THESIS`, pero el front no lo conoce y lo descarta.
+
+## Objetivo
+
+Publicar una tesis, el contenido central de Asinko: una predicción falsable sobre un activo, con fecha límite y precio objetivo, que después queda en el historial público de quien la escribe.
+
+## User stories
+
+- Como usuario, quiero publicar una predicción concreta sobre un activo (sube por encima o baja por debajo de un precio antes de una fecha), para que mi historial muestre si acierto.
+- Como usuario, quiero saber antes de publicar que la tesis no se puede editar ni borrar y que no es asesoramiento financiero.
+- Como usuario, quiero que el formulario me diga qué falta o qué está mal antes de enviarlo.
+
+## Decisiones (2026-11-02)
+
+| #   | Decisión                                                                                                                                                                                                                           |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q1  | Se crea en una pestaña **"Tesis"** de la página de crear, junto a Thought, Text, Link e Image (como el prototipo).                                                                                                                 |
+| Q2  | El claim admite **280** caracteres, como el backend y MVP-137. Se corrige el "140" de `overview.md`.                                                                                                                               |
+| Q3  | Precio objetivo y dirección **obligatorios**, con dos direcciones: **"Por encima de"** y **"Por debajo de"**. "Igual a" (`EQUALS`) no se ofrece: con un precio real es casi imposible de acertar.                                  |
+| Q4  | La fecha límite es **solo una fecha**: cierra a las 23:59 de ese día en la zona horaria de quien la escribe. Mínimo, que falten más de 24 h; máximo, 5 años.                                                                       |
+| Q5  | Se publica en una comunidad con el **mismo selector de los posts**; al elegir el activo, queda elegida su comunidad (`$NVDA` → la de NVDA), y se puede cambiar.                                                                    |
+| Q6  | El disclaimer va en un **paso de confirmación** al tocar "Publicar": el resumen de la tesis, que no se puede editar ni borrar, y el checkbox "No es asesoramiento financiero" (texto provisorio hasta la revisión legal, MVP-143). |
+| Q7  | Al publicar, se va a **tu perfil, pestaña Tesis**, con la nueva primera. La tarjeta en el feed, el detalle, los estados y cancelar van en el spec siguiente (MVP-140).                                                             |
+| Q8  | **Sin borrador en el backend** (los borradores son de posts). Lo escrito se guarda en el navegador mientras se edita, como un post (`specs/submit-page` SU-12).                                                                    |
+
+## Criterios de aceptación
+
+### El formulario
+
+- [ ] **TC-01** (Q1) La página de crear suma la pestaña **"Tesis"** después de Image. Solo con sesión, como el resto de la página. Queda en la URL (`?type=thesis`): se comparte y recarga.
+- [ ] **TC-02** **Activo**: un selector con búsqueda sobre el catálogo de activos soportados (`$` + símbolo, nombre y precio actual cuando lo hay). Solo se elige uno del catálogo, nunca un texto libre. Entrando desde la página de un activo, o con `?community=` de la comunidad de un activo, viene elegido.
+- [ ] **TC-03** (Q5) Al elegir el activo queda elegida su comunidad en el selector de comunidad, si quien escribe no eligió otra a mano. Se puede cambiar a cualquier comunidad o al canal personal propio.
+- [ ] **TC-04** (Q2) **Claim**: una línea, obligatoria, de hasta **280** caracteres con contador. Ayuda: "Una frase clara que se pueda comprobar".
+- [ ] **TC-05** (Q3) **Dirección y precio objetivo**, obligatorios: "Por encima de" o "Por debajo de" y un precio mayor que cero, en la misma unidad que el precio del activo (el contrato no trae la moneda: el campo no muestra un símbolo de moneda). Con el activo elegido, se muestra su precio actual como referencia (con "desactualizado" si `priceStale`) y la diferencia en % con el objetivo. Un objetivo del lado contrario a la dirección (por ejemplo "por encima de" un precio menor al actual) se avisa, pero no se bloquea.
+- [ ] **TC-06** (Q4) **Fecha límite**, obligatoria, con un selector de fecha. Lo más cerca es el día en que, a las 23:59, falten más de 24 h; lo más lejos, 5 años. Fuera de ese rango, el campo lo dice.
+- [ ] **TC-07** **Convicción**, obligatoria: cuatro opciones, **Baja, Media, Alta y Extrema** (`LOW` a `EXTREME`), con una ayuda: la convicción pesa en tu calibración, y una errada con convicción extrema pesa más.
+- [ ] **TC-08** **Razonamiento**, obligatorio: el argumento detrás del claim, con la misma caja de texto del cuerpo de un post (Markdown, formato y emojis).
+- [ ] **TC-09** Mientras falte un campo obligatorio o haya uno inválido, "Publicar" está deshabilitado, igual que en el formulario de posts. Cada campo dice su error al salir de él.
+- [ ] **TC-10** (Q8) Lo escrito se guarda en el navegador mientras se edita y vuelve al recargar o al volver a la pestaña, hasta publicar o descartar. "Guardar borrador" no aparece en la pestaña Tesis.
+
+### Confirmar y publicar
+
+- [ ] **TC-11** (Q6) "Publicar" abre una **confirmación** con el resumen: activo, claim, "por encima de / por debajo de" el precio, fecha límite y convicción. Dice que **una tesis publicada no se puede editar ni borrar** y que se resuelve sola a la fecha límite contra el precio de mercado.
+- [ ] **TC-12** (Q6, MVP-143) La confirmación tiene el checkbox **"Entiendo que esto no es asesoramiento financiero"** (texto provisorio, marcado `TODO(legal)` hasta la revisión, ítem 42). Sin marcarlo, "Publicar tesis" no envía. "Volver" cierra la confirmación sin perder nada.
+- [ ] **TC-13** Al confirmar se manda `POST /theses` con el `userId` de la sesión (nunca del cliente), la comunidad, el símbolo, el claim, el razonamiento, la convicción, la fecha límite (fin del día elegido, en la zona horaria del navegador, como ISO), el precio, la dirección y `disclaimerAccepted: true`. El botón no se puede tocar dos veces mientras se envía.
+- [ ] **TC-14** (Q7) Publicada, se borra lo guardado en el navegador, aparece un aviso ("Tesis publicada") y se va a tu perfil en la pestaña **Tesis**, con la nueva primera.
+- [ ] **TC-15** **Errores**, cada uno donde corresponde y sin perder lo escrito:
+  - `CLAIM_TOO_LONG` → en el claim;
+  - `DEADLINE_OUT_OF_RANGE` → en la fecha límite;
+  - `ASSET_NOT_FOUND` o `AMBIGUOUS_SYMBOL` → en el activo;
+  - `INVALID_COMMUNITY` o `PERSONAL_CHANNEL_OWNER_ONLY` → en la comunidad;
+  - `DISCLAIMER_NOT_ACCEPTED` → en el checkbox;
+  - `401` → el modal de cuenta, que vuelve a la página;
+  - `429` → "Esperá un momento antes de volver a publicar";
+  - cualquier otro → un error general con "Reintentar".
+
+### Calidad
+
+- [ ] **TC-16** A 360 px todo entra sin scroll horizontal; la confirmación es un panel desde abajo en el teléfono y una ventana en desktop (patrón Drawer/Dialog). Los campos usan 16 px o más (sin zoom en iOS).
+- [ ] **TC-17** Accesibilidad: cada campo con su etiqueta y su error asociado; la convicción y la dirección son grupos de opciones navegables con teclado; la confirmación atrapa el foco, lo devuelve a "Publicar" al cerrar, y el checkbox se lee con su texto. axe sin violaciones en claro y oscuro.
+- [ ] **TC-18** Mocks (`API_MOCKS=true`): `POST /theses` con la forma del backend y sus errores, y la tesis creada se suma a `GET /users/{id}/theses` del usuario demo. Con `missing`, va al backend real (la ruta ya existe).
+- [ ] **TC-19** El presupuesto de JS se respeta: la pestaña Tesis y la confirmación se cargan diferidas, como el editor (`seo.md`).
+- [ ] **TC-20** Textos en en, es y pt.
+- [ ] **TC-21** `overview.md § Tesis` dice 280 caracteres (Q2) y que el precio objetivo es obligatorio (Q3).
+
+## Fuera de alcance
+
+- La tarjeta de una tesis en el feed y en las páginas de comunidad y activo, aunque el backend ya las mande (`kind: THESIS`). Va en el spec siguiente, con el detalle.
+- La página de detalle, los estados (abierta, vencida, acertada, errada, disputada), cancelar, las actualizaciones del autor, los argumentos a favor y en contra y el voto de resolución: MVP-140 y MVP-141.
+- Tesis cualitativas (sin activo ni precio): el backend solo crea cuantitativas.
+- "Igual a" (`EQUALS`), la hora exacta de la fecha límite y el stake de tokens (fase 4).
+- Borradores de tesis en el backend.
+- Reacciones Bullish, Bearish, Interesting y Degen.
+
+## Dependencias
+
+- `specs/auth`: hace falta sesión real para publicar contra `dev`.
+- `specs/submit-page`: la página, el selector de comunidad, el guardado local y la caja de texto con formato.
+- `specs/profile-track-record`: la pestaña Tesis del perfil, a donde se llega al publicar.
+- Backend: nada nuevo. Que la tesis se resuelva sola depende del cron real (MVP-139); el bug de cancelar (MVP-166) no afecta a crear.
