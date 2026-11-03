@@ -141,8 +141,9 @@ export function ThesisEditor({
   const [asset, setAsset] = useState<CommunityOption | null>(
     community?.handle.startsWith('$') ? community : null,
   )
-  // Chosen by hand, the community no longer follows the asset (TC-03).
-  const communityTouched = useRef(false)
+  // Chosen by hand, the community no longer follows the asset (TC-03). A group or the own channel
+  // of the URL counts as chosen: the thesis was started there.
+  const communityTouched = useRef(Boolean(community && !community.handle.startsWith('$')))
   const [range] = useState(() => thesisDeadlineRange(new Date()))
   // The shortcuts' days, fixed for the visit, and whether the calendar is open (TC-33).
   const [quick] = useState(() => quickDeadlines(new Date()))

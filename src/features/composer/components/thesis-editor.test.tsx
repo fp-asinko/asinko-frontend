@@ -170,6 +170,13 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('#macro')
   })
 
+  it('keeps the group it was started in when the asset is chosen (TC-03)', async () => {
+    renderEditor({ community: MACRO })
+    await userEvent.keyboard('{ArrowDown}')
+    await userEvent.click(await screen.findByRole('option', { name: /BTC/ }))
+    expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('#macro')
+  })
+
   it('counts the claim, and says what is missing when Publish is pressed early (TC-04, TC-09)', async () => {
     renderEditor()
     expect(publish()).toHaveAttribute('aria-disabled', 'true')
