@@ -25,28 +25,28 @@ Que una tesis se discuta como Asinko la pensó: quien está de acuerdo argumenta
 
 ### Argumentos
 
-- [ ] **TA-01** En la página de la tesis, donde hoy dice "Próximamente", dos pestañas: **A favor (N)** y **En contra (N)**, con los contadores de `argumentCounts` (Q1). La elegida queda en la URL (`?side=contra`): se comparte y vuelve con "atrás". A favor es la de por defecto; un valor desconocido también.
-- [ ] **TA-02** Cada pestaña muestra los argumentos de su lado (`GET /theses/{id}/comments?side=…`) con el mismo hilo que los comentarios de un post (`specs/comment-threads`): respuestas anidadas, votos, plegar, responder y el link a un argumento. Editar y borrar no están en los comentarios de un post todavía: tampoco acá.
-- [ ] **TA-03** **Ordenar** igual que los comentarios de un post (`specs/post-detail-refresh` PD-03, PD-04): Mejores, Top, Nuevos y Antiguos, en la URL (`?sort=`).
-- [ ] **TA-04** La caja para escribir es la del post (PD-02), dentro de cada pestaña: en A favor dice "Argumentá a favor" y publica con `side: PRO`; en En contra, `side: CONTRA` (Q3).
-- [ ] **TA-05** Una respuesta va al lado de su argumento: se manda con el `side` del padre, sin que quien responde elija (Q2).
-- [ ] **TA-06** Sin argumentos de un lado: "Todavía nadie argumentó a favor. Sé el primero." (o en contra). Sin sesión, escribir abre el modal de cuenta.
-- [ ] **TA-07** El contador del lado sube al publicar un argumento, como el de comentarios de un post (`specs/card-comment` CC-03).
-- [ ] **TA-08** En el feed, el contador de argumentos de la tarjeta lleva a la página con la pestaña del lado que tiene más (o A favor si empatan).
+- [x] **TA-01** En la página de la tesis, donde hoy dice "Próximamente", dos pestañas: **A favor (N)** y **En contra (N)**, con los contadores de `argumentCounts` (Q1). La elegida queda en la URL (`?side=contra`): se comparte y vuelve con "atrás". A favor es la de por defecto; un valor desconocido también.
+- [x] **TA-02** Cada pestaña muestra los argumentos de su lado (`GET /theses/{id}/comments?side=…`) con el mismo hilo que los comentarios de un post (`specs/comment-threads`): respuestas anidadas, votos, plegar, responder y el link a un argumento. Editar y borrar no están en los comentarios de un post todavía: tampoco acá.
+- [x] **TA-03** **Ordenar** igual que los comentarios de un post (`specs/post-detail-refresh` PD-03, PD-04): Mejores, Top, Nuevos y Antiguos, en la URL (`?sort=`).
+- [x] **TA-04** La caja para escribir es la del post (PD-02), dentro de cada pestaña: en A favor dice "Argumentá a favor" y publica con `side: PRO`; en En contra, `side: CONTRA` (Q3).
+- [x] **TA-05** Una respuesta va al lado de su argumento: se manda con el `side` del padre, sin que quien responde elija (Q2).
+- [x] **TA-06** Sin argumentos de un lado: "Todavía nadie argumentó a favor. Sé el primero." (o en contra). Sin sesión, escribir abre el modal de cuenta.
+- [x] **TA-07** El contador del lado sube al publicar un argumento, como el de comentarios de un post (`specs/card-comment` CC-03).
+- [x] **TA-08** En el feed, el contador de argumentos de la tarjeta lleva a la página con la pestaña del lado que tiene más (o A favor si empatan).
 
 ### Actualizaciones del autor
 
-- [ ] **TA-09** Arriba de los argumentos, si hay alguna, **Actualizaciones del autor**: cada una con su fecha y su texto en Markdown, de la más nueva a la más vieja (Q4).
-- [ ] **TA-10** Su autor, mientras la tesis está abierta, ve **Publicar una actualización**: una caja de texto (Markdown, hasta 2.000 caracteres, Q4) que se envía con `POST /theses/{id}/updates` y el `userId` de la sesión. Publicada, aparece primera sin recargar.
-- [ ] **TA-11** Errores: `409 THESIS_NOT_OPEN` ("La tesis ya no está abierta: no se pueden sumar actualizaciones"), `403` el genérico, sin sesión el modal de cuenta.
-- [ ] **TA-12** Las actualizaciones no se editan ni se borran (el contrato no lo permite): la caja lo dice antes de publicar.
+- [x] **TA-09** Arriba de los argumentos, si hay alguna, **Actualizaciones del autor**: cada una con su fecha y su texto en Markdown, de la más nueva a la más vieja (Q4).
+- [x] **TA-10** Su autor, mientras la tesis está abierta, ve **Publicar una actualización**: una caja de texto (Markdown, hasta 2.000 caracteres, Q4) que se envía con `POST /theses/{id}/updates` y el `userId` de la sesión. Publicada, aparece primera sin recargar.
+- [x] **TA-11** Errores: `409 THESIS_NOT_OPEN` ("La tesis ya no está abierta: no se pueden sumar actualizaciones"), `403` el genérico, sin sesión el modal de cuenta.
+- [x] **TA-12** Las actualizaciones no se editan ni se borran (el contrato no lo permite): la caja lo dice antes de publicar.
 
 ### Calidad
 
-- [ ] **TA-13** A 360 px nada genera scroll horizontal; pestañas de 44 px de alto; axe sin violaciones en claro y oscuro con las dos pestañas y la caja abierta.
-- [ ] **TA-14** Presupuesto de JS (`seo.md`): las pestañas son links (servidor); el hilo reusa lo del post. La página de la tesis no puede pasar los 240 KB.
-- [ ] **TA-15** Mocks: argumentos de cada lado con respuestas en las tesis de ejemplo; `GET`/`POST` de comentarios con `side`; `GET`/`POST` de actualizaciones con su `409`. Validados en `fixtures.test.ts`.
-- [ ] **TA-16** Textos en en, es y pt.
+- [x] **TA-13** A 360 px nada genera scroll horizontal; pestañas de 44 px de alto; axe sin violaciones en claro y oscuro con las dos pestañas y la caja abierta.
+- [x] **TA-14** Presupuesto de JS (`seo.md`): las pestañas son links (servidor); el hilo reusa lo del post. La página de la tesis no puede pasar los 240 KB.
+- [x] **TA-15** Mocks: argumentos de cada lado con respuestas en las tesis de ejemplo; `GET`/`POST` de comentarios con `side`; `GET`/`POST` de actualizaciones con su `409`. Validados en `fixtures.test.ts`.
+- [x] **TA-16** Textos en en, es y pt.
 
 ## Fuera de alcance
 

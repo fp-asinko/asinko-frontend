@@ -249,6 +249,8 @@ Medido contra `dev` el 2026-10-30.
 
 **Consultas:**
 
+**Probado en `dev` el 2026-11-03:** una respuesta con el `side` de su padre se guarda bien; los comentarios de una tesis no traen `ads`; `/updates` devuelve `{ items }`. Quedan abiertas la 1 (¿rechaza el lado contrario?), la 2 y la 3.
+
 1. **El lado de una respuesta.** E05 dice que `side` es obligatorio en un comentario de una tesis. El front manda también en cada respuesta el `side` del argumento al que responde. ¿El backend lo acepta así? ¿Rechaza una respuesta con el lado contrario al de su padre? Proponemos que la rechace (`422`) o que tome el del padre.
 2. **El largo de una actualización.** El contrato no fija un máximo para el `body` de `POST /theses/{id}/updates`. El front corta en 2.000 caracteres. ¿Hay un límite en el backend?
 3. **Anuncios entre los argumentos.** En un post, `GET /posts/{id}/comments` trae `ads` (P-031). Proponemos lo mismo en `GET /theses/{id}/comments`, para cada lado: uno arriba y uno cada 10 argumentos. Con la lista vacía no los vimos.

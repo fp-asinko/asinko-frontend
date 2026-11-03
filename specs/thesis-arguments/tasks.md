@@ -8,7 +8,9 @@ Rama: `feature/thesis-arguments`, desde `feature/thesis-detail-lifecycle`. Requi
 - [x] **T-04 (M)** Actualizaciones: `thesis-updates-api.ts`, `create-thesis-update.action.ts`, `ThesisUpdates` y `ThesisUpdateComposer` (diferida). Textos. Tests. → TA-09 a TA-12, TA-16
 - [x] **T-05 (S)** `proposals.md` P-039 para Eugenio (lado de una respuesta, largo de una actualización, anuncios, forma de `/updates`) y el snapshot de E11. → Q2, Q4, Q5, Q6
 - [x] **T-06 (M)** E2E (`e2e/thesis-arguments.spec.ts`): argumentar de cada lado, responder, publicar una actualización, 360 px y axe en claro y oscuro. `performance.spec.ts`. `ui-reviewer`. → TA-13, TA-14
-- [ ] **T-07 (S)** A mano contra `dev` con la cuenta del PO: un argumento de cada lado en la tesis de `#chile`, una respuesta y una actualización.
+- [x] **T-07 (S)** A mano contra `dev` (con una cuenta QA, a pedido del PO): un argumento de cada lado en la tesis de `#chile`, una respuesta y una actualización.
+  - **2026-11-03, cuenta nueva `@qa_t07c_mw0xcr5x` (email `…@example.com`), build local con `API_MOCKS=missing`:** en la tesis de `#chile` del PO publicó un argumento a favor, una respuesta y uno en contra. El backend los guardó con `side` `PRO`, `PRO` (la respuesta, el de su padre: lo acepta así) y `CONTRA`, y `argumentCounts` pasó a `{ pro: 1, contra: 1 }`. En su propia tesis abierta (`QA T-07: BTC above 160K`) publicó una actualización: `GET /updates` la devuelve en `{ items }`. Los comentarios de una tesis no traen `ads`. Quedan como datos de prueba.
+  - Para la próxima: `pnpm build` escribe en la misma `.next` que `next dev`; correr el build de prueba con el servidor de desarrollo del PO prendido lo deja en 404. Hay que reiniciar `pnpm dev`.
 
 Orden: T-01 → T-02 → T-03 → T-04 → T-05 → T-06 → T-07. T-05 puede ir en cualquier momento.
 
