@@ -900,6 +900,7 @@
     "community": {
       "label": "Comunidad",
       "placeholder": "Elige una comunidad",
+      "publishIn": "Se publica en",
       "yourProfile": "Tu perfil",
       "alsoProfile": "También en tu perfil",
       "onlyProfile": "Solo en tu perfil",
@@ -1081,7 +1082,8 @@
           "yearEnd": "Fin de año",
           "custom": "Otra fecha"
         },
-        "closes": "Cierra el {date}"
+        "closes": "Cierra el {date}",
+        "date": "Día de la fecha límite"
       },
       "conviction": {
         "label": "Convicción",
@@ -1119,8 +1121,7 @@
         "back": "Volver",
         "submit": "Publicar tesis",
         "submitting": "Publicando…"
-      },
-      "publishIn": "Se publica en"
+      }
     }
   },
   "mentions": {

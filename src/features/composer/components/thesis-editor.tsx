@@ -643,8 +643,9 @@ export function ThesisEditor({
               />
               {otherDate && (
                 <>
+                  {/* Its own name, apart from the shortcuts' group. */}
                   <FieldLabel htmlFor={`${ids}-deadline`} className="sr-only">
-                    {t('thesis.deadline.label')}
+                    {t('thesis.deadline.date')}
                   </FieldLabel>
                   <Input
                     id={`${ids}-deadline`}
@@ -698,6 +699,8 @@ export function ThesisEditor({
               {/* Which way it bets, from the target (TC-24). */}
               <p
                 id={`${ids}-direction-said`}
+                // Said as it changes with the price typed.
+                aria-live="polite"
                 // Hidden while empty: it would add its gap below the price.
                 className="px-1 type-meta text-muted-foreground empty:hidden"
               >
@@ -855,21 +858,22 @@ export function ThesisEditor({
           </p>
         )}
 
-        {/* Where it goes and the actions, in one row (TC-28): a thesis has no tag nor related ones,
-            so it stays short and Publish fits a 1280×800 window (TC-36, specs/submit-form-layout
-            SF-14). Sticky over the bottom bar in phones, as the post's. */}
-        <div
-          data-sticky-actions
-          className={cn(ACTIONS_BAR, 'justify-between gap-3 md:border-t-0 md:pt-0')}
-        >
+        {/* Where it goes and the actions, in one row from md (TC-28): a thesis has no tag nor
+            related ones, so it stays short and Publish fits a 1280×800 window (TC-36,
+            specs/submit-form-layout SF-14). In phones, as the post's, only the buttons stick over
+            the bottom bar: the row is `contents` there, so they stick to the whole form. */}
+        <div className="contents md:mt-4 md:flex md:items-center md:justify-between md:gap-3">
           {/* The asset's community, unless changed. */}
-          <Field data-invalid={invalid('communityId') || undefined} className="w-auto gap-1">
+          <Field
+            data-invalid={invalid('communityId') || undefined}
+            className="mt-4 w-auto gap-1 md:mt-0"
+          >
             <div className="flex flex-wrap items-center gap-2">
               <FieldLabel
                 htmlFor={`${ids}-communityId`}
                 className="type-small text-muted-foreground"
               >
-                {t('thesis.publishIn')}
+                {t('community.publishIn')}
               </FieldLabel>
               <CommunityPicker
                 id={`${ids}-communityId`}
@@ -893,35 +897,37 @@ export function ThesisEditor({
               className="type-meta"
             />
           </Field>
-          <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={onCancel}
-              className={cn(PILL, 'text-muted-foreground hover:bg-muted hover:text-foreground')}
-            >
-              {t('cancel')}
-            </button>
-            <button
-              type="button"
-              aria-disabled={unsaveable || undefined}
-              onClick={() => {
-                if (!unsaveable) saveDraft()
-              }}
-              className={cn(PILL, 'bg-muted text-foreground hover:bg-muted-hover')}
-            >
-              {saved.saving
-                ? t('drafts.saving')
-                : savedNow
-                  ? t('drafts.savedShort')
-                  : t('drafts.save')}
-            </button>
-            <button
-              type="submit"
-              aria-disabled={!complete || pending || undefined}
-              className={cn(PILL, 'bg-primary text-primary-foreground hover:bg-primary/85')}
-            >
-              {t('submit')}
-            </button>
+          <div data-sticky-actions className={cn(ACTIONS_BAR, 'md:mt-0 md:border-t-0 md:pt-0')}>
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={onCancel}
+                className={cn(PILL, 'text-muted-foreground hover:bg-muted hover:text-foreground')}
+              >
+                {t('cancel')}
+              </button>
+              <button
+                type="button"
+                aria-disabled={unsaveable || undefined}
+                onClick={() => {
+                  if (!unsaveable) saveDraft()
+                }}
+                className={cn(PILL, 'bg-muted text-foreground hover:bg-muted-hover')}
+              >
+                {saved.saving
+                  ? t('drafts.saving')
+                  : savedNow
+                    ? t('drafts.savedShort')
+                    : t('drafts.save')}
+              </button>
+              <button
+                type="submit"
+                aria-disabled={!complete || pending || undefined}
+                className={cn(PILL, 'bg-primary text-primary-foreground hover:bg-primary/85')}
+              >
+                {t('submit')}
+              </button>
+            </div>
           </div>
         </div>
       </Tabs>

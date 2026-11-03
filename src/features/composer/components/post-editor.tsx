@@ -740,7 +740,7 @@ export function PostEditor({
                   htmlFor={`${ids}-community`}
                   className="mr-0.5 type-small text-muted-foreground"
                 >
-                  {t('thesis.publishIn')}
+                  {t('community.publishIn')}
                 </FieldLabel>
                 <CommunityPicker
                   id={`${ids}-community`}

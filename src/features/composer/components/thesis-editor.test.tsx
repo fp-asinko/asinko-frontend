@@ -76,7 +76,7 @@ function renderEditor({ community = NVDA as CommunityOption | null, signedIn = t
 
 const claim = () => screen.getByRole('textbox', { name: 'Claim' })
 const price = () => screen.getByRole('textbox', { name: 'Target price' })
-const deadline = () => screen.getByLabelText('Deadline', { selector: 'input' })
+const deadline = () => screen.getByLabelText('Deadline date', { selector: 'input' })
 const reasoning = () => screen.getByRole('textbox', { name: 'Reasoning' })
 const publish = () => screen.getByRole('button', { name: 'Publish' })
 
@@ -217,7 +217,7 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     await userEvent.click(within(shortcuts).getByRole('radio', { name: 'Other date' }))
     expect(deadline()).toBeInTheDocument()
     await userEvent.click(within(shortcuts).getByRole('radio', { name: '3 months' }))
-    expect(screen.queryByLabelText('Deadline', { selector: 'input' })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Deadline date', { selector: 'input' })).not.toBeInTheDocument()
     // The shortcut's day is set, and "Other date" still opens the calendar (it did not, PO 2026-11-02).
     await userEvent.click(within(shortcuts).getByRole('radio', { name: 'Other date' }))
     expect(within(shortcuts).getByRole('radio', { name: 'Other date' })).toBeChecked()

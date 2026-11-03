@@ -74,7 +74,7 @@ export function LevelBars<Value extends string>({
             aria-label={level.label}
             className={cn(
               // A bar, not a dot: the indicator inside is hidden, the fill says the choice.
-              'aspect-auto w-4 rounded-[2px] border-0 bg-border-strong transition-colors duration-150 after:-inset-x-1 dark:bg-border-strong [&_[data-slot=radio-group-indicator]]:hidden',
+              'aspect-auto w-4 rounded-xs border-0 bg-border-strong transition-colors duration-150 after:-inset-x-1 dark:bg-border-strong [&_[data-slot=radio-group-indicator]]:hidden',
               HEIGHTS[index],
               index <= chosen && fill,
               'data-checked:border-0',
