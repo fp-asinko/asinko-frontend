@@ -264,6 +264,24 @@
       "argumentsSoon": "Los argumentos a favor y en contra llegan pronto.",
       "page": {
         "title": "{claim} · {asset}"
+      },
+      "cancel": {
+        "menu": "Opciones de la tesis {claim}",
+        "action": "Cancelar tesis",
+        "title": "¿Cancelar esta tesis?",
+        "body": "Queda en tu historial como Cancelada, con su motivo. No se puede deshacer.",
+        "reason": "¿Por qué la cancelás?",
+        "reasonPlaceholder": "Por ejemplo: la publiqué en el activo equivocado.",
+        "counter": "{count}/{max}",
+        "back": "Volver",
+        "confirm": "Cancelar tesis",
+        "confirming": "Cancelando…",
+        "errors": {
+          "reasonRequired": "Decí por qué la cancelás",
+          "reasonTooLong": "Usá 280 caracteres o menos",
+          "notCancellable": "Ya no se puede cancelar: falta muy poco para la fecha límite.",
+          "generic": "No se pudo cancelar la tesis. Probá de nuevo."
+        }
       }
     }
   },

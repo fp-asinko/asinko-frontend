@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
-import { pollItem, postItem } from '../feed-items.fixture'
+import { pollItem, postItem, thesisItem } from '../feed-items.fixture'
 import { FeedItems } from './feed-items'
 
 vi.mock('@/lib/communities/join-community.action', () => ({ joinCommunity: vi.fn() }))
@@ -11,8 +11,27 @@ vi.mock('../actions/vote-post.action', () => ({ votePost: vi.fn() }))
 vi.mock('../actions/vote-comment.action', () => ({ voteComment: vi.fn() }))
 vi.mock('../actions/vote-thesis.action', () => ({ voteThesis: vi.fn() }))
 vi.mock('../actions/vote-poll.action', () => ({ votePoll: vi.fn() }))
+vi.mock('../actions/cancel-thesis.action', () => ({ cancelThesis: vi.fn() }))
 
 describe('FeedItems', () => {
+  it('draws a thesis with its card, and "⋯" only when its author can cancel it (TD-12)', () => {
+    renderWithIntl(
+      <ul>
+        <FeedItems
+          items={[
+            thesisItem({ id: 'a', claim: 'Mine, open', canCancel: true }),
+            thesisItem({ id: 'b', claim: 'Someone else’s' }),
+          ]}
+        />
+      </ul>,
+    )
+    expect(screen.getByRole('article', { name: 'Mine, open' })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: /^Options for the thesis/ })).toHaveLength(1)
+    expect(
+      screen.getByRole('button', { name: 'Options for the thesis Mine, open' }),
+    ).toBeInTheDocument()
+  })
+
   it('renders each item as a list item with the card of its kind', () => {
     const { container } = renderWithIntl(
       <ul>

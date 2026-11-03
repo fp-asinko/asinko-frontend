@@ -264,6 +264,24 @@
       "argumentsSoon": "Arguments for and against are coming soon.",
       "page": {
         "title": "{claim} · {asset}"
+      },
+      "cancel": {
+        "menu": "Options for the thesis {claim}",
+        "action": "Cancel thesis",
+        "title": "Cancel this thesis?",
+        "body": "It stays on your track record as Cancelled, with its reason. This cannot be undone.",
+        "reason": "Why are you cancelling it?",
+        "reasonPlaceholder": "For example: I posted it on the wrong asset.",
+        "counter": "{count}/{max}",
+        "back": "Back",
+        "confirm": "Cancel thesis",
+        "confirming": "Cancelling…",
+        "errors": {
+          "reasonRequired": "Say why you are cancelling it",
+          "reasonTooLong": "Use 280 characters or fewer",
+          "notCancellable": "It can no longer be cancelled: its deadline is too close.",
+          "generic": "Could not cancel the thesis. Try again."
+        }
       }
     }
   },

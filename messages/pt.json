@@ -264,6 +264,24 @@
       "argumentsSoon": "Os argumentos a favor e contra chegam em breve.",
       "page": {
         "title": "{claim} · {asset}"
+      },
+      "cancel": {
+        "menu": "Opções da tese {claim}",
+        "action": "Cancelar tese",
+        "title": "Cancelar esta tese?",
+        "body": "Ela fica no seu histórico como Cancelada, com o motivo. Não dá para desfazer.",
+        "reason": "Por que você está cancelando?",
+        "reasonPlaceholder": "Por exemplo: publiquei no ativo errado.",
+        "counter": "{count}/{max}",
+        "back": "Voltar",
+        "confirm": "Cancelar tese",
+        "confirming": "Cancelando…",
+        "errors": {
+          "reasonRequired": "Diga por que você está cancelando",
+          "reasonTooLong": "Use 280 caracteres ou menos",
+          "notCancellable": "Ela não pode mais ser cancelada: o prazo está muito perto.",
+          "generic": "Não foi possível cancelar a tese. Tente de novo."
+        }
       }
     }
   },

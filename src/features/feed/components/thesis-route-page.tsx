@@ -12,6 +12,7 @@ import { getThesis } from '../lib/thesis-api'
 import { PostMarkdown } from './post-markdown'
 import { ThesisBet } from './thesis-bet'
 import { ThesisCard } from './thesis-card'
+import { ThesisMenu } from './thesis-menu'
 
 /** "Above $150,000 by Dec 3, 2026": the thesis's description, as its summary says it. */
 async function targetLine(thesis: ThesisItem, locale: ReturnType<typeof safeLocale>) {
@@ -82,7 +83,12 @@ export async function ThesisDetail({ thesis }: { thesis: ThesisItem }) {
   const t = await getTranslations('feed.thesis')
   return (
     <>
-      <ThesisCard thesis={thesis} variant="detail" leading={<BackButton variant="plain" />}>
+      <ThesisCard
+        thesis={thesis}
+        variant="detail"
+        leading={<BackButton variant="plain" />}
+        menu={thesis.canCancel ? <ThesisMenu id={thesis.id} claim={thesis.claim} /> : undefined}
+      >
         <div className="mt-4 type-post-body">
           <PostMarkdown className="gap-4">{thesis.reasoning}</PostMarkdown>
         </div>

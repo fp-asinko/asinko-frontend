@@ -50,3 +50,28 @@ describe('getThesis (specs/thesis-detail § 4)', () => {
     })
   })
 })
+
+describe('cancelThesisAs (specs/thesis-detail TD-14)', () => {
+  beforeEach(() => {
+    state.routes = MOCK_ROUTES
+  })
+
+  it('cancels the demo user’s open thesis with its reason; a second time is 409', async () => {
+    const { cancelThesisAs } = await import('./thesis-api')
+    const { DEMO_USER } = await import('@/mocks/demo-user')
+    const thesis = THESES.find(
+      (each) => each.creator?.id === DEMO_USER.id && each.state === 'OPEN',
+    )!
+    const first = await cancelThesisAs(DEMO_USER.id, {
+      thesisId: thesis.id,
+      reason: 'Wrong asset.',
+    })
+    expect(first).toMatchObject({
+      ok: true,
+      data: { state: 'cancelled', cancellation: { reason: 'Wrong asset.' }, canCancel: false },
+    })
+    expect(
+      await cancelThesisAs(DEMO_USER.id, { thesisId: thesis.id, reason: 'Again.' }),
+    ).toMatchObject({ ok: false, code: 'THESIS_NOT_CANCELLABLE' })
+  })
+})
