@@ -141,7 +141,8 @@ El claim de `features/communities/components/thesis-card.tsx` pasa a ser el link
   - `GET /api/v1/theses/:id`: la tesis, o `404`. Con `liveExample` de una tesis del seed que se lee en `pnpm api:smoke`, encadenada desde el feed como el primer post.
   - `PUT /api/v1/theses/:id/cancel`: cambia el estado en memoria. Da `409 THESIS_NOT_CANCELLABLE` si no está abierta y `403 USER_MISMATCH` si no es del usuario demo.
   - `PUT` y `DELETE /api/v1/theses/:id/vote`: como las de un post.
-- Las tesis del usuario demo traen `canCancel: true` mientras están abiertas.
+- `canCancel` lo calcula el mock para quien llama (autor, abierta y fuera del último 10 %). @demo no tiene tesis de ejemplo (`e2e/profile-track-record.spec.ts` espera su pestaña vacía): el e2e de cancelar publica la suya con una cuenta propia (`e2e/fixtures/theses.ts`).
+- Los feeds llevan solo las tesis de ejemplo, no las escritas con mocks: si no, un e2e que publica una cambiaría la primera tarjeta de todos los feeds.
 
 ## 10. Textos
 

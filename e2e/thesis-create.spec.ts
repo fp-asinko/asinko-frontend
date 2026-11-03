@@ -1,43 +1,10 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { expectNoA11yViolations } from './fixtures/axe'
+import { fillThesis as fill, main, signUp } from './fixtures/theses'
 
 // specs/thesis-create against the production build with API_MOCKS=true. What publishes does it
 // with an account of its own (signUp), and the mocked POST /theses puts the thesis first in its
 // theses: @demo keeps none, as e2e/profile-track-record.spec.ts expects. The rest is the demo user.
-
-const main = (page: Page) => page.getByRole('main')
-
-/** A new account with its username (specs/auth, as e2e/auth.spec.ts): the simulated Supabase. */
-async function signUp(page: Page, baseURL: string): Promise<string> {
-  const username = `th_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`
-  // Without the demo user: the account's own session.
-  await page.context().addCookies([{ name: 'asinko-mock-guest', value: '1', url: baseURL }])
-  await page.goto('/en/login?mode=signup')
-  await page.getByLabel('Email').fill(`${username}@asinko.dev`)
-  await page.getByLabel('Password', { exact: true }).fill('long-enough')
-  await main(page).getByRole('button', { name: 'Create account' }).click()
-  await expect(page).toHaveURL(/\/en\/welcome/)
-  await expect(page.getByLabel('Username')).toHaveValue(username)
-  await page.getByRole('checkbox', { name: /I’m 18 or older/ }).click()
-  await main(page).getByRole('button', { name: 'Continue', exact: true }).click()
-  await expect(page).toHaveURL(/\/en$/)
-  return username
-}
-
-/** Fills everything but where it goes and the asset, which come from the URL. */
-async function fill(page: Page, claim: string) {
-  await main(page).getByRole('textbox', { name: 'Claim' }).fill(claim)
-  // Above BTC's price in the mocks: the direction comes from it (TC-24).
-  await main(page).getByRole('textbox', { name: 'Target price' }).fill('150000')
-  // "Other date", and the first day it offers: tomorrow, in the browser's zone (TC-06, TC-33).
-  await main(page).getByText('Other date', { exact: true }).click()
-  const deadline = main(page)
-    .getByLabel('Deadline date', { exact: true })
-    .and(page.locator('input[type=date]'))
-  await deadline.fill((await deadline.getAttribute('min'))!)
-  await main(page).getByRole('radio', { name: 'High' }).click()
-  await main(page).getByRole('textbox', { name: 'Reasoning' }).fill('ETF flows keep coming.')
-}
 
 test.describe('Create a thesis', () => {
   test('from an asset, confirmed with the disclaimer, lands first in the author’s theses (TC-01 to TC-14)', async ({

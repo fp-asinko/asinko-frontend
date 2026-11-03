@@ -176,6 +176,8 @@ export function CancelThesisDialog({
           <Button
             type="button"
             variant="destructive"
+            // Solid, as the action it is: the shadcn tint did not reach 4.5:1 (axe).
+            className="bg-destructive text-background hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive/90"
             aria-disabled={pending || length > CANCEL_REASON_MAX || undefined}
             aria-busy={pending || undefined}
             onClick={() => length <= CANCEL_REASON_MAX && confirm()}

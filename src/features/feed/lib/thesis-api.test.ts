@@ -59,9 +59,25 @@ describe('cancelThesisAs (specs/thesis-detail TD-14)', () => {
   it('cancels the demo user’s open thesis with its reason; a second time is 409', async () => {
     const { cancelThesisAs } = await import('./thesis-api')
     const { DEMO_USER } = await import('@/mocks/demo-user')
-    const thesis = THESES.find(
-      (each) => each.creator?.id === DEMO_USER.id && each.state === 'OPEN',
-    )!
+    // Written first: the fixtures keep none of @demo's.
+    const { createMockThesis } = await import('@/mocks/theses')
+    const { communityBySlug } = await import('@/mocks/fixtures/communities')
+    const thesis = createMockThesis({
+      params: {},
+      query: {},
+      body: {
+        userId: DEMO_USER.id,
+        communityId: communityBySlug('BTC')!.id,
+        assetSymbol: 'BTC',
+        claim: 'To cancel',
+        reasoning: 'A test.',
+        conviction: 'LOW',
+        deadline: new Date(Date.now() + 30 * 24 * 3600_000).toISOString(),
+        targetPrice: 150000,
+        targetDirection: 'ABOVE',
+        disclaimerAccepted: true,
+      },
+    }).body as { id: string }
     const first = await cancelThesisAs(DEMO_USER.id, {
       thesisId: thesis.id,
       reason: 'Wrong asset.',

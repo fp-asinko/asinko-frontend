@@ -22,15 +22,13 @@ type Seed = {
   publishedDaysAgo: number
   resolutionPrice?: number
   cancellationReason?: string
-  /** Where it is published, when not its asset's community (a group): specs/thesis-detail. */
-  community?: string
 }
 
 function thesis(n: number, seed: Seed): RawThesis {
   const author = userByUsername(seed.author)
   if (!author) throw new Error(`No mock user ${seed.author}`)
   const asset = seed.asset ? assetBySymbol(seed.asset) : null
-  const community = communitySummary(seed.community ?? seed.asset ?? seed.author)
+  const community = communitySummary(seed.asset ?? seed.author)
   const resolved = ['CORRECT', 'INCORRECT', 'DISPUTED'].includes(seed.state)
   return {
     id: mockId(9, n),
@@ -175,33 +173,24 @@ const FEDERICO: Seed[] = [
   },
 ]
 
-// The demo viewer's, open and in a group: the one to cancel with mocks (specs/thesis-detail TD-12).
-const DEMO: Seed[] = [
-  {
-    author: 'demo',
-    asset: 'BTC',
-    claim: 'BTC prints a new all-time high before the halving anniversary',
-    state: 'OPEN',
-    target: 130000,
-    conviction: 'MEDIUM',
-    deadlineIn: 120,
-    publishedDaysAgo: 3,
-    community: 'macro',
-  },
-]
-
-export const THESES: RawThesis[] = [...MARIA, ...FEDERICO, ...DEMO].map((seed, index) =>
+// None of @demo's: e2e/profile-track-record.spec.ts expects its tab empty. One to cancel is
+// written in the test itself (specs/thesis-detail).
+export const THESES: RawThesis[] = [...MARIA, ...FEDERICO].map((seed, index) =>
   thesis(index + 1, seed),
 )
 
+/** The seeded ones, apart from those written with mocks (they go first in THESES). */
+const SEEDED = new Set(THESES.map((each) => each.id))
+
 /**
- * The theses the feeds carry (specs/thesis-detail TD-20): the last two months', one of each
- * state, and the ones written with mocks (they go first in THESES). The older ones only page the
+ * The theses the feeds carry (specs/thesis-detail TD-20): the seeded ones of the last two months,
+ * one of each state, read on each request (cancelling one shows). Not the ones written with mocks:
+ * an e2e that publishes one would move every feed's first card. The older ones only page the
  * profile's tab.
  */
 export function feedTheses(): RawThesis[] {
   const since = Date.now() - 61 * 24 * 60 * 60 * 1000
-  return THESES.filter((each) => Date.parse(each.publishedAt) >= since)
+  return THESES.filter((each) => SEEDED.has(each.id) && Date.parse(each.publishedAt) >= since)
 }
 
 export function thesisById(id: string): RawThesis | undefined {

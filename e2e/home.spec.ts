@@ -129,8 +129,9 @@ test.describe('Home feed', () => {
     await page.goto('/en')
     await expect(articles(page)).toHaveCount(22)
     await page.getByRole('button', { name: 'Load more' }).scrollIntoViewIfNeeded()
-    // 30 posts and polls in two pages, and 3 glossary terms (specs/glossary, specs/thoughts).
-    await expect(articles(page)).toHaveCount(33)
+    // 30 posts and polls and 5 theses in two pages, and 3 glossary terms (specs/glossary,
+    // specs/thoughts, specs/thesis-detail).
+    await expect(articles(page)).toHaveCount(38)
     await expect(page.getByRole('button', { name: 'Load more' })).toBeHidden()
   })
 
@@ -215,8 +216,9 @@ test.describe('Home health', () => {
       .click()
     await expect(page.getByRole('link', { name: 'Ver todos los comentarios' })).toBeVisible()
     await page.getByRole('button', { name: 'Cargar más' }).scrollIntoViewIfNeeded()
-    // 30 posts and polls in two pages, and 3 glossary terms (specs/glossary, specs/thoughts).
-    await expect(articles(page)).toHaveCount(33)
+    // 30 posts and polls and 5 theses in two pages, and 3 glossary terms (specs/glossary,
+    // specs/thoughts, specs/thesis-detail).
+    await expect(articles(page)).toHaveCount(38)
     expect(errors).toEqual([])
   })
 })

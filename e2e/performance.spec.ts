@@ -47,6 +47,8 @@ test.describe('JavaScript budget', () => {
     '/en/submit?community=defi',
     // specs/thesis-create TC-19
     '/en/submit?type=thesis',
+    // specs/thesis-detail TD-19: a thesis's page
+    '/en/thesis/00000000-0000-4000-8000-000000009001',
     // specs/post-create-detail PC-19
     '/en/post/00000000-0000-4000-8000-000000004001/whales-accumulated-48-000-btc-in-two-weeks',
     // specs/auth AU-19

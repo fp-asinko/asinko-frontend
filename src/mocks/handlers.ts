@@ -55,8 +55,9 @@ import { followersOf, followingOf, listItem } from './fixtures/follows'
 import { membersOf } from './fixtures/members'
 import { feedTheses, THESES, thesesBy, thesisById } from './fixtures/theses'
 
-/** The demo viewer's open thesis: the one its cancel example uses (specs/thesis-detail TD-20). */
-const DEMO_THESIS = THESES.find((each) => each.creator?.id === DEMO_USER.id)!
+/** An open thesis and its author's session: what the cancel example needs (specs/thesis-detail). */
+const OPEN_THESIS = THESES.find((each) => each.state === 'OPEN')!
+const OPEN_THESIS_TOKEN = `mock-access.${OPEN_THESIS.creator!.id}.example`
 import { listAchievements } from './achievements'
 import { userComments, userContent, activeCommunities } from './user-activity'
 import { createDraft, deleteDraft, listDrafts, SEED_DRAFT_ID, updateDraft } from './drafts'
@@ -633,8 +634,9 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     schema: thesisSchema,
     example: {
       ...noRequest,
-      params: { id: DEMO_THESIS.id },
-      body: { userId: DEMO_USER.id, reason: 'Posted it on the wrong asset.' },
+      params: { id: OPEN_THESIS.id },
+      body: { userId: OPEN_THESIS.creator!.id, reason: 'Posted it on the wrong asset.' },
+      accessToken: OPEN_THESIS_TOKEN,
     },
     handler: cancelMockThesis,
   },

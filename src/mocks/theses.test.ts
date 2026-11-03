@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
+import type { RawThesis } from '@/lib/api/contract'
 import { DEMO_USER } from './demo-user'
 import { communityBySlug } from './fixtures/communities'
 import { THESES, thesesBy } from './fixtures/theses'
@@ -66,8 +67,8 @@ describe('the mocked POST /theses (specs/thesis-create § 9)', () => {
 })
 
 describe('cancelling and voting a mocked thesis (specs/thesis-detail § 9)', () => {
-  const demo = () =>
-    THESES.find((each) => each.creator?.id === DEMO_USER.id && each.state === 'OPEN')!
+  // A fresh one of the demo user each time: the fixtures keep none of @demo's.
+  const demo = () => send({ claim: `To cancel ${Math.random()}` }).body as RawThesis
   const maria = () =>
     THESES.find((each) => each.creator?.id !== DEMO_USER.id && each.state === 'OPEN')!
   const cancel = (id: string, userId = DEMO_USER.id) =>

@@ -96,13 +96,14 @@ export function ThesisCard({
       </div>
 
       {/* Its state and asset, and how long it has left (TD-03). */}
-      <p className="flex flex-wrap items-center gap-x-2 gap-y-1 type-meta text-muted-foreground">
+      {/* Clear of the author's link above: two 24px targets never overlap (WCAG 2.5.8). */}
+      <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 type-meta text-muted-foreground">
         <ThesisState state={thesis.state} />
         {thesis.asset && (
           <Link
             href={thesis.asset.path}
             {...previewProps('asset', thesis.asset.symbol)}
-            className="-my-1 inline-block py-1 font-bold text-foreground hover:underline"
+            className="inline-flex min-h-6 items-center font-bold text-foreground hover:underline"
           >
             ${thesis.asset.symbol}
           </Link>
