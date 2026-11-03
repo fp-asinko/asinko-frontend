@@ -1,6 +1,5 @@
 import { z } from 'zod'
-import { pollSchema, postSchema } from './content'
-import { thesisSchema } from './theses'
+import { pollSchema, postSchema, thesisSchema } from './content'
 
 /**
  * What a person put at the front of their profile (P-025, backend 2026-10-20): up to three posts,

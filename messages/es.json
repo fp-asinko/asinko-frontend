@@ -230,6 +230,11 @@
         "loaded": "{count, plural, one {Se cargó # respuesta más} other {Se cargaron # respuestas más}}",
         "error": "No se pudo cargar más. Inténtalo de nuevo."
       }
+    },
+    "thesis": {
+      "badge": "Tesis",
+      "closes": "Cierra {when}",
+      "arguments": "{count, plural, =0 {Sin argumentos todavía} one {# argumento} other {# argumentos}}"
     }
   },
   "rightColumn": {

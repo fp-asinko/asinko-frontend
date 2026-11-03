@@ -1,4 +1,5 @@
 import { useFormatter, useTranslations } from 'next-intl'
+import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 import type { ThesisSummaryData } from './thesis-summary.types'
 
@@ -11,12 +12,18 @@ export function ThesisSummary({
   thesis,
   titleId,
   heading = 'h3',
+  href,
 }: {
   thesis: ThesisSummaryData
   /** The title's id: the card's article is labelled by it. */
   titleId: string
   /** The page's own thesis is its h1; a card in a list, h2 or h3. */
   heading?: 'h1' | 'h2' | 'h3'
+  /**
+   * Its page, when the card opens it: the claim is the link for the keyboard and screen readers,
+   * as a post's title (specs/thesis-detail TD-05).
+   */
+  href?: string
 }) {
   const t = useTranslations('thesisSummary')
   const format = useFormatter()
@@ -34,7 +41,17 @@ export function ThesisSummary({
   return (
     <>
       <Title id={titleId} className="mt-2 type-post-title">
-        {thesis.claim}
+        {href ? (
+          // A 24px target on the 22px line (WCAG 2.5.8), as the post's title.
+          <Link
+            href={href}
+            className="-mb-0.5 inline-block rounded-sm pb-0.5 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            {thesis.claim}
+          </Link>
+        ) : (
+          thesis.claim
+        )}
       </Title>
 
       <p className="mt-1.5 type-small text-muted-foreground">

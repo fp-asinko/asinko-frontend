@@ -2,14 +2,20 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { DEMO_USER } from '@/mocks/demo-user'
 import { votePoll } from './vote-poll.action'
 import { votePost } from './vote-post.action'
+import { voteThesis } from './vote-thesis.action'
 
 const deps = vi.hoisted(() => ({
   getViewer: vi.fn(),
   votePostAs: vi.fn(),
   votePollAs: vi.fn(),
+  voteThesisAs: vi.fn(),
 }))
 vi.mock('@/lib/session', () => ({ getViewer: deps.getViewer }))
-vi.mock('../lib/votes-api', () => ({ votePostAs: deps.votePostAs, votePollAs: deps.votePollAs }))
+vi.mock('../lib/votes-api', () => ({
+  votePostAs: deps.votePostAs,
+  votePollAs: deps.votePollAs,
+  voteThesisAs: deps.voteThesisAs,
+}))
 
 const ID = '00000000-0000-4000-8000-000000000001'
 const OPTION = '00000000-0000-4000-8000-000000000002'
@@ -91,5 +97,32 @@ describe('votePoll (H-15)', () => {
       ok: false,
       error: 'api.errors.UNKNOWN',
     })
+  })
+})
+
+describe('voteThesis (specs/thesis-detail TD-16)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    deps.getViewer.mockResolvedValue(DEMO_USER)
+  })
+
+  it('rejects invalid input and needs a session, as a post', async () => {
+    expect(await voteThesis({ thesisId: 'x', value: 1 })).toEqual({
+      ok: false,
+      error: 'api.errors.INVALID',
+    })
+    deps.getViewer.mockResolvedValue(null)
+    expect(await voteThesis({ thesisId: ID, value: 1 })).toEqual({
+      ok: false,
+      error: 'api.errors.UNAUTHENTICATED',
+    })
+    expect(deps.voteThesisAs).not.toHaveBeenCalled()
+  })
+
+  it('votes with the userId of the session', async () => {
+    deps.voteThesisAs.mockResolvedValue({ ok: true, data: { score: 13, viewerVote: 1 } })
+    const result = await voteThesis({ thesisId: ID, value: 1, userId: 'someone-else' })
+    expect(deps.voteThesisAs).toHaveBeenCalledWith(DEMO_USER.id, { thesisId: ID, value: 1 })
+    expect(result).toEqual({ ok: true, data: { score: 13, viewerVote: 1 } })
   })
 })

@@ -22,7 +22,10 @@ const invalid: MockResponse = {
 }
 
 /** Read on each request: the posts created in this process count too (specs/profile-showcase). */
-const items = (): RawContentFeedItem[] => [
+/** Posts, thoughts and polls: a profile's Posts tab never asks for theses (specs/thesis-detail). */
+type PublishedItem = Exclude<RawContentFeedItem, { kind: 'THESIS' }>
+
+const items = (): PublishedItem[] => [
   ...[...CREATED_POSTS, ...POSTS].map((content) =>
     content.type === 'THOUGHT'
       ? { kind: 'THOUGHT' as const, content }

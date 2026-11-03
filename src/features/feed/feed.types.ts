@@ -1,6 +1,7 @@
 // Domain types of the Home feed (specs/home/design.md § 5 and § 6). The UI only knows these, never
 // the raw contract shapes.
 
+import type { ThesisStateName } from '@/components/organisms/thesis-summary'
 import type { CommunityKind } from '@/lib/communities/paths'
 
 export type Author = {
@@ -145,7 +146,41 @@ export type GlossaryItem = {
   example: string | null
 }
 
-export type FeedItem = PostItem | PollItem | AdItem | GlossaryItem
+/**
+ * A thesis in a feed and on its page (specs/thesis-detail § 2). Its summary is the profile's
+ * (components/organisms/thesis-summary); the rest is what the card and the page add.
+ */
+export type ThesisItem = {
+  kind: 'thesis'
+  id: string
+  path: string
+  claim: string
+  /** Markdown: whole only on its page. */
+  reasoning: string
+  asset: { symbol: string; name: string; path: string } | null
+  state: ThesisStateName
+  /** null for a qualitative thesis (no asset, no price). */
+  target: { direction: 'above' | 'below' | 'equals'; price: number } | null
+  reference: { price: number; at: string | null } | null
+  deadline: string
+  conviction: 1 | 2 | 3 | 4
+  resolution: {
+    price: number | null
+    at: string
+    source: 'automatic' | 'community' | 'admin' | null
+  } | null
+  cancellation: { at: string; reason: string | null } | null
+  author: Author | null
+  community: CardCommunity | null
+  score: number
+  viewerVote: 1 | -1 | null
+  argumentCount: { pro: number; contra: number }
+  canCancel: boolean
+  publishedAt: string
+  reason?: FeedReason | null
+}
+
+export type FeedItem = PostItem | PollItem | ThesisItem | AdItem | GlossaryItem
 
 /** A comment of the card's preview (H-28): top level only, never deleted. */
 export type CommentPreview = {

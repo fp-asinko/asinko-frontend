@@ -3,6 +3,7 @@ import { FeedAd } from './feed-ad'
 import { GlossaryCard } from './glossary-card'
 import { PollCard } from './poll-card'
 import { PostCard } from './post-card'
+import { ThesisCard } from './thesis-card'
 
 /**
  * The cards of one feed page, as list items. Shared by the first page and the ones loaded later.
@@ -37,6 +38,8 @@ export function FeedItems({
         <PostCard post={item} fadeImage={later} feedCommunity={feedCommunity} menu={menus} />
       ) : item.kind === 'poll' ? (
         <PollCard poll={item} feedCommunity={feedCommunity} menu={menus} />
+      ) : item.kind === 'thesis' ? (
+        <ThesisCard thesis={item} feedCommunity={feedCommunity} />
       ) : item.kind === 'glossary' ? (
         <GlossaryCard term={item} />
       ) : (

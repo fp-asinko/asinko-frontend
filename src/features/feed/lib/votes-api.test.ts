@@ -5,7 +5,8 @@ import { POSTS } from '@/mocks/fixtures/posts'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
 import { COMMENTS_BY_CONTENT } from '@/mocks/fixtures/comments'
-import { voteCommentAs, votePollAs, votePostAs } from './votes-api'
+import { THESES } from '@/mocks/fixtures/theses'
+import { voteCommentAs, votePollAs, votePostAs, voteThesisAs } from './votes-api'
 
 // The real client against the mock routes, which follow the contract (E03, E05).
 const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[] }))
@@ -50,6 +51,24 @@ describe('votePostAs', () => {
       value: 1,
     })
     expect(result).toMatchObject({ ok: false, code: 'USER_MISMATCH' })
+  })
+})
+
+describe('voteThesisAs (specs/thesis-detail TD-16)', () => {
+  beforeEach(() => {
+    state.routes = MOCK_ROUTES
+  })
+  const thesis = THESES[0]!
+
+  it('votes and removes the vote, as a post', async () => {
+    expect(await voteThesisAs(DEMO_USER.id, { thesisId: thesis.id, value: -1 })).toEqual({
+      ok: true,
+      data: { score: thesis.score - 1, viewerVote: -1 },
+    })
+    expect(await voteThesisAs(DEMO_USER.id, { thesisId: thesis.id, value: null })).toEqual({
+      ok: true,
+      data: { score: null, viewerVote: null },
+    })
   })
 })
 

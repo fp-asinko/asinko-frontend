@@ -7,6 +7,7 @@ import { useAuthGate } from '@/components/organisms/auth-gate'
 import { cn } from '@/lib/utils'
 import { voteComment } from '../actions/vote-comment.action'
 import { votePost } from '../actions/vote-post.action'
+import { voteThesis } from '../actions/vote-thesis.action'
 import { countFormat } from '../lib/count-format'
 import { HoverHint } from '@/components/molecules/hover-hint'
 
@@ -58,7 +59,7 @@ export function VoteControl({
   score,
   viewerVote,
 }: {
-  kind?: 'post' | 'comment'
+  kind?: 'post' | 'thesis' | 'comment'
   id: string
   size?: keyof typeof SIZES
 } & Vote) {
@@ -89,7 +90,9 @@ export function VoteControl({
       const result =
         kind === 'post'
           ? await votePost({ postId: id, value: next })
-          : await voteComment({ commentId: id, value: next })
+          : kind === 'thesis'
+            ? await voteThesis({ thesisId: id, value: next })
+            : await voteComment({ commentId: id, value: next })
       if (result.ok) {
         // Removing answers 204 without a score: the computed one stands.
         setConfirmed({ score: result.data.score ?? nextScore, viewerVote: result.data.viewerVote })

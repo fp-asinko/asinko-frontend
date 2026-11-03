@@ -4,12 +4,16 @@ import { PROFILES } from '@/mocks/fixtures/users'
 import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
 import { parseFeedParams } from '../schemas/feed-params.schema'
-import type { FeedItem, PollItem, PostItem } from '../feed.types'
+import type { FeedItem, PollItem, PostItem, ThesisItem } from '../feed.types'
 import { getFeed, getFilteredCommunity } from './feed-api'
 
 /** The users' content of a page, without its ads (specs/ads). */
+/** What people publish: posts, polls and theses (specs/thesis-detail), not ads nor terms. */
 const content = (items: FeedItem[]) =>
-  items.filter((item): item is PostItem | PollItem => item.kind === 'post' || item.kind === 'poll')
+  items.filter(
+    (item): item is PostItem | PollItem | ThesisItem =>
+      item.kind === 'post' || item.kind === 'poll' || item.kind === 'thesis',
+  )
 
 // The real client against the mock routes; a route left out reaches a fetch that always fails.
 const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[], dropped: [] as number[] }))
@@ -149,7 +153,7 @@ describe('getFeed', () => {
     expect(odd.data.requestId).toBeNull()
   })
 
-  it('asks only for posts, thoughts and polls: theses arrive in phase 2', async () => {
+  it('asks for posts, thoughts, polls and theses (specs/thesis-detail TD-01)', async () => {
     const queries: Record<string, string>[] = []
     state.routes = MOCK_ROUTES.map((route) =>
       route.path === '/api/v1/feed/explore'
@@ -158,6 +162,17 @@ describe('getFeed', () => {
     )
     await getFeed(parseFeedParams({}))
     // Thoughts too: ?kind=POST does not bring them (backend 2026-10-23, specs/thoughts TH-09).
+    expect(queries[0]).toMatchObject({ kind: 'POST,POLL,THOUGHT,THESIS' })
+  })
+
+  it("leaves theses out of a profile's Posts: they have their own tab", async () => {
+    const queries: Record<string, string>[] = []
+    state.routes = MOCK_ROUTES.map((route) =>
+      route.path === '/api/v1/users/:userId/content'
+        ? { ...route, handler: (context) => (queries.push(context.query), route.handler(context)) }
+        : route,
+    )
+    await getFeed({ ...parseFeedParams({}), author: PROFILES[1]!.id })
     expect(queries[0]).toMatchObject({ kind: 'POST,POLL,THOUGHT' })
   })
 
@@ -181,11 +196,10 @@ describe('getFeed', () => {
     expect(state.dropped).toEqual([2])
   })
 
-  it('leaves out, without reporting, the kinds it does not draw: theses, new ones (BA-07)', async () => {
+  it('leaves out, without reporting, the kinds it does not draw: new ones (BA-07)', async () => {
     state.routes = withRoute('/api/v1/feed/explore', {
       items: [
         { kind: 'POST', content: POSTS[0] },
-        { kind: 'THESIS', content: {} },
         { kind: 'LIVE', content: {} },
       ],
       nextCursor: null,

@@ -1,6 +1,7 @@
 import { communityPath, kindOf, mentionOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 import { postPath } from '@/lib/posts/paths'
+import { thesisPath } from '@/lib/theses/paths'
 import type {
   RawCommunity,
   RawCommunitySummary,
@@ -11,6 +12,7 @@ import type {
   RawFeedReason,
   RawPoll,
   RawPost,
+  RawThesis,
   RawUserSummary,
 } from '@/lib/api/contract'
 import type {
@@ -25,6 +27,7 @@ import type {
   PollResults,
   PostItem,
   PostMedia,
+  ThesisItem,
 } from '../feed.types'
 import { markMentions, type MentionLookup } from './mentions'
 
@@ -230,6 +233,63 @@ export function toGlossaryItem(term: RawGlossaryTerm): GlossaryItem {
   }
 }
 
+const CONVICTION = { LOW: 1, MEDIUM: 2, HIGH: 3, EXTREME: 4 } as const
+
+/** A thesis of a feed or of its page (specs/thesis-detail § 2). */
+export function toThesisItem(thesis: RawThesis, signedIn = false): ThesisItem {
+  const resolved = thesis.state === 'CORRECT' || thesis.state === 'INCORRECT'
+  return {
+    kind: 'thesis',
+    id: thesis.id,
+    path: thesisPath(thesis.id),
+    claim: thesis.claim,
+    reasoning: thesis.reasoning,
+    asset: thesis.asset
+      ? {
+          symbol: thesis.asset.symbol,
+          name: thesis.asset.name,
+          path: communityPath('asset', thesis.asset.symbol),
+        }
+      : null,
+    state: thesis.state.toLowerCase() as ThesisItem['state'],
+    target:
+      thesis.targetDirection && thesis.targetPrice !== null
+        ? {
+            direction: thesis.targetDirection.toLowerCase() as 'above' | 'below' | 'equals',
+            price: thesis.targetPrice,
+          }
+        : null,
+    reference:
+      thesis.referencePrice !== null
+        ? { price: thesis.referencePrice, at: thesis.referencePriceAt }
+        : null,
+    deadline: thesis.deadline,
+    conviction: CONVICTION[thesis.conviction],
+    resolution:
+      resolved && thesis.resolvedAt
+        ? {
+            price: thesis.resolutionPrice,
+            at: thesis.resolvedAt,
+            source: (thesis.resolutionSource?.toLowerCase() ?? null) as NonNullable<
+              ThesisItem['resolution']
+            >['source'],
+          }
+        : null,
+    cancellation:
+      thesis.state === 'CANCELLED' && thesis.cancelledAt
+        ? { at: thesis.cancelledAt, reason: thesis.cancellationReason?.trim() || null }
+        : null,
+    author: thesis.creatorType === 'SYSTEM' ? null : toAuthor(thesis.creator),
+    community: toCardCommunity(thesis.community, signedIn),
+    score: thesis.score,
+    viewerVote: thesis.viewerVote,
+    argumentCount: thesis.argumentCounts,
+    // The backend says it: only its author, while it is open and not in the last 10 % (E11).
+    canCancel: thesis.canCancel,
+    publishedAt: thesis.publishedAt,
+  }
+}
+
 /** `explained`: the Home's Explore, the only feed that says why it shows a card (EX-03). */
 export function toFeedItem(
   item: RawFeedItem,
@@ -241,6 +301,7 @@ export function toFeedItem(
   if (item.kind === 'AD') return toAdItem(item.content)
   if (item.kind === 'GLOSSARY') return toGlossaryItem(item.content)
   const reason = explained ? toFeedReason(item.reason) : null
+  if (item.kind === 'THESIS') return { ...toThesisItem(item.content, signedIn), reason }
   // A thought is a post with its own card (specs/thoughts): toPostItem reads its type.
   return item.kind === 'POLL'
     ? { ...toPollItem(item.content, signedIn), reason }

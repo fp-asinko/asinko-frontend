@@ -4,6 +4,7 @@ import type { RawPost } from '@/lib/api/contract'
 import { COMMUNITIES } from '@/mocks/fixtures/communities'
 import { POLLS } from '@/mocks/fixtures/polls'
 import { POSTS } from '@/mocks/fixtures/posts'
+import { THESES } from '@/mocks/fixtures/theses'
 import type { PostItem } from '../feed.types'
 import {
   indexCommunities,
@@ -14,6 +15,7 @@ import {
   toFeedReason,
   toPollItem,
   toPostItem,
+  toThesisItem,
 } from './mappers'
 
 const communities = indexCommunities(COMMUNITIES)
@@ -275,5 +277,52 @@ describe('toAdItem (specs/ads AD-06)', () => {
     for (const url of ['javascript:alert(1)', 'data:text/html,hi', 'ftp://x.com', 'not a url']) {
       expect(toAdItem({ ...raw, url })).toBeNull()
     }
+  })
+})
+
+describe('toThesisItem (specs/thesis-detail § 2)', () => {
+  const byState = (state: string) => THESES.find((each) => each.state === state)!
+
+  it('maps an open thesis with its page, asset, target, reference and conviction', () => {
+    const raw = byState('OPEN')
+    const item = toThesisItem(raw, true)
+    expect(item).toMatchObject({
+      kind: 'thesis',
+      path: `/thesis/${raw.id}`,
+      state: 'open',
+      asset: { symbol: 'BTC', name: 'Bitcoin', path: '/asset/BTC' },
+      target: { direction: 'above', price: 150000 },
+      conviction: 3,
+      resolution: null,
+      cancellation: null,
+      argumentCount: { pro: 3, contra: 1 },
+    })
+    expect(item.reference?.price).toBe(raw.referencePrice)
+    expect(item.author).toMatchObject({ username: 'maria' })
+    expect(item.community).toMatchObject({ slug: 'BTC', handle: '$BTC' })
+  })
+
+  it('says how a resolved one ended, and why a cancelled one was', () => {
+    expect(toThesisItem(byState('CORRECT')).resolution).toMatchObject({
+      price: 182.47,
+      source: 'automatic',
+    })
+    // Disputed is not resolved: no outcome yet.
+    expect(toThesisItem(byState('DISPUTED')).resolution).toBeNull()
+    expect(toThesisItem(byState('CANCELLED'))).toMatchObject({
+      target: null,
+      asset: null,
+      cancellation: { reason: 'Posted twice by mistake.' },
+    })
+  })
+
+  it('takes a feed item of kind THESIS, with its reason in Explore', () => {
+    const item = toFeedItem(
+      { kind: 'THESIS', content: byState('OPEN'), reason: null },
+      communities,
+      true,
+      true,
+    )
+    expect(item).toMatchObject({ kind: 'thesis', reason: null })
   })
 })

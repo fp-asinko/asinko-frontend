@@ -1,4 +1,4 @@
-import type { Author, CommentNode, PollItem, PostItem } from './feed.types'
+import type { Author, CommentNode, PollItem, PostItem, ThesisItem } from './feed.types'
 
 // Domain items for component tests (the mappers have their own tests against the mock fixtures).
 
@@ -38,6 +38,41 @@ export function postItem(overrides: Partial<PostItem> = {}): PostItem {
     deleted: false,
     tag: null,
     related: [],
+    ...overrides,
+  }
+}
+
+export function thesisItem(overrides: Partial<ThesisItem> = {}): ThesisItem {
+  return {
+    kind: 'thesis',
+    id: 'thesis-1',
+    path: '/thesis/thesis-1',
+    claim: 'BTC will close above $150K before December 2026',
+    reasoning: 'ETF flows and the **halving** cycle.',
+    asset: { symbol: 'BTC', name: 'Bitcoin', path: '/asset/BTC' },
+    state: 'open',
+    target: { direction: 'above', price: 150000 },
+    reference: { price: 83584.01, at: '2026-10-13T15:17:55.886Z' },
+    deadline: new Date(Date.now() + 23 * 24 * 3600_000).toISOString(),
+    conviction: 3,
+    resolution: null,
+    cancellation: null,
+    author: MARIA,
+    community: {
+      slug: 'macro',
+      name: 'Macro',
+      handle: '#macro',
+      path: '/hub/macro',
+      kind: 'group',
+      avatarUrl: null,
+      personal: false,
+      viewerIsMember: false,
+    },
+    score: 12,
+    viewerVote: null,
+    argumentCount: { pro: 3, contra: 1 },
+    canCancel: false,
+    publishedAt: new Date(Date.now() - 2 * 3600_000).toISOString(),
     ...overrides,
   }
 }

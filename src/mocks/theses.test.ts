@@ -2,8 +2,8 @@
 import { describe, expect, it } from 'vitest'
 import { DEMO_USER } from './demo-user'
 import { communityBySlug } from './fixtures/communities'
-import { thesesBy } from './fixtures/theses'
-import { createMockThesis } from './theses'
+import { THESES, thesesBy } from './fixtures/theses'
+import { asSeenBy, cancelMockThesis, createMockThesis, voteMockThesis } from './theses'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const noRequest = { params: {}, query: {} }
@@ -62,5 +62,55 @@ describe('the mocked POST /theses (specs/thesis-create § 9)', () => {
   it("refuses someone else's personal channel", () => {
     const other = communityBySlug('maria')!
     expect(code({ communityId: other.id })).toEqual([403, 'PERSONAL_CHANNEL_OWNER_ONLY'])
+  })
+})
+
+describe('cancelling and voting a mocked thesis (specs/thesis-detail § 9)', () => {
+  const demo = () =>
+    THESES.find((each) => each.creator?.id === DEMO_USER.id && each.state === 'OPEN')!
+  const maria = () =>
+    THESES.find((each) => each.creator?.id !== DEMO_USER.id && each.state === 'OPEN')!
+  const cancel = (id: string, userId = DEMO_USER.id) =>
+    cancelMockThesis({ ...noRequest, params: { id }, body: { userId, reason: 'Wrong asset.' } })
+
+  it('lets only its author cancel it: canCancel is the caller’s', () => {
+    expect(asSeenBy(demo(), undefined).canCancel).toBe(true)
+    expect(asSeenBy(maria(), undefined).canCancel).toBe(false)
+    expect(cancel(maria().id).status).toBe(403)
+  })
+
+  it('cancels it once, with its reason, and then answers 409', () => {
+    const thesis = demo()
+    const response = cancel(thesis.id)
+    expect(response).toMatchObject({
+      status: 200,
+      body: { state: 'CANCELLED', cancellationReason: 'Wrong asset.', canCancel: false },
+    })
+    expect(cancel(thesis.id)).toMatchObject({
+      status: 409,
+      body: { error: { code: 'THESIS_NOT_CANCELLABLE' } },
+    })
+  })
+
+  it('refuses the last 10 % of its window', () => {
+    const now = Date.now()
+    const late = {
+      ...maria(),
+      creator: { ...maria().creator!, id: DEMO_USER.id },
+      publishedAt: new Date(now - 95 * DAY_MS).toISOString(),
+      deadline: new Date(now + 5 * DAY_MS).toISOString(),
+    }
+    expect(asSeenBy(late, undefined).canCancel).toBe(false)
+  })
+
+  it('votes as a post', () => {
+    const thesis = maria()
+    expect(
+      voteMockThesis({
+        ...noRequest,
+        params: { id: thesis.id },
+        body: { userId: DEMO_USER.id, value: 1 },
+      }),
+    ).toMatchObject({ status: 200, body: { score: thesis.score + 1, viewerVote: 1 } })
   })
 })

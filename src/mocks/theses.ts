@@ -101,3 +101,61 @@ export function createMockThesis({ body, accessToken }: MockContext): MockRespon
   THESES.unshift(thesis)
   return { status: 201, body: thesis }
 }
+
+/**
+ * Whether its author can still cancel it (E11): open, and not in the last 10 % of the window from
+ * publishing to the deadline. Only for the caller who wrote it.
+ */
+function cancellable(thesis: RawThesis, caller: string, now = Date.now()) {
+  if (thesis.state !== 'OPEN' || thesis.creator?.id !== caller) return false
+  const published = Date.parse(thesis.publishedAt)
+  const deadline = Date.parse(thesis.deadline)
+  return now < deadline - (deadline - published) * 0.1
+}
+
+/** A thesis as the caller sees it: `canCancel` is theirs (specs/thesis-detail TD-12). */
+export function asSeenBy(thesis: RawThesis, accessToken: string | null | undefined): RawThesis {
+  return { ...thesis, canCancel: cancellable(thesis, mockCaller(accessToken)) }
+}
+
+/** PUT /api/v1/theses/{id}/cancel (E11): only its author, while it can (specs/thesis-detail § 9). */
+export function cancelMockThesis({ params, body, accessToken }: MockContext): MockResponse {
+  const index = THESES.findIndex((each) => each.id === params.id)
+  const thesis = THESES[index]
+  if (!thesis) return error(404, 'NOT_FOUND')
+  const caller = mockCaller(accessToken)
+  const input = (body ?? {}) as Record<string, unknown>
+  if (typeof input.userId !== 'string') return error(400, 'BAD_REQUEST')
+  if (input.userId !== caller || thesis.creator?.id !== caller) return error(403, 'USER_MISMATCH')
+  if (!cancellable(thesis, caller)) return error(409, 'THESIS_NOT_CANCELLABLE')
+  const cancelled: RawThesis = {
+    ...thesis,
+    state: 'CANCELLED',
+    cancelledAt: new Date().toISOString(),
+    cancellationReason: text(input.reason),
+    canCancel: false,
+  }
+  THESES[index] = cancelled
+  return { status: 200, body: cancelled }
+}
+
+/** PUT /api/v1/theses/{id}/vote (E05), as a post's. */
+export function voteMockThesis({ params, body, accessToken }: MockContext): MockResponse {
+  const thesis = THESES.find((each) => each.id === params.id)
+  if (!thesis) return error(404, 'NOT_FOUND')
+  const { userId, value } = (body ?? {}) as { userId?: unknown; value?: unknown }
+  if (userId !== mockCaller(accessToken)) return error(403, 'USER_MISMATCH')
+  if (value !== 1 && value !== -1) return error(422, 'INVALID')
+  // The fixture score already includes the viewer's previous vote.
+  return {
+    status: 200,
+    body: { score: thesis.score - (thesis.viewerVote ?? 0) + value, viewerVote: value },
+  }
+}
+
+/** DELETE /api/v1/theses/{id}/vote (E05). */
+export function removeMockThesisVote({ params, query, accessToken }: MockContext): MockResponse {
+  if (!THESES.some((each) => each.id === params.id)) return error(404, 'NOT_FOUND')
+  if (query.userId !== mockCaller(accessToken)) return error(403, 'USER_MISMATCH')
+  return { status: 204 }
+}

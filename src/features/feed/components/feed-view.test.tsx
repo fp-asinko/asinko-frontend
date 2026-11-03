@@ -38,6 +38,7 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 vi.mock('../actions/load-comments-preview.action', () => ({ loadCommentsPreview: vi.fn() }))
 vi.mock('../actions/vote-post.action', () => ({ votePost: vi.fn() }))
 vi.mock('../actions/vote-comment.action', () => ({ voteComment: vi.fn() }))
+vi.mock('../actions/vote-thesis.action', () => ({ voteThesis: vi.fn() }))
 vi.mock('../actions/vote-poll.action', () => ({ votePoll: vi.fn() }))
 vi.mock('./impression-tracker', () => ({
   Impressions: ({ requestId, children }: { requestId?: string | null; children: ReactNode }) =>

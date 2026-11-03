@@ -22,3 +22,11 @@ export const voteCommentSchema = z.object({
 })
 
 export type VoteCommentInput = z.infer<typeof voteCommentSchema>
+
+/** Input of voteThesis (specs/thesis-detail TD-16), as a post's. null removes the vote. */
+export const voteThesisSchema = z.object({
+  thesisId: z.uuid(),
+  value: z.union([z.literal(1), z.literal(-1), z.null()]),
+})
+
+export type VoteThesisInput = z.infer<typeof voteThesisSchema>

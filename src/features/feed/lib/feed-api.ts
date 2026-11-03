@@ -7,8 +7,11 @@ import type { FeedParams } from '../schemas/feed-params.schema'
 import { mentionEntities, toCommunityRef, toFeedItem } from './mappers'
 import { lookupMentions } from './mention-lookup'
 
-/** The kinds this front draws. THESIS waits for phase 2; AD, where the backend puts it (specs/ads). */
-const KNOWN_KINDS = new Set(['POST', 'POLL', 'THOUGHT', 'AD', 'GLOSSARY'])
+/**
+ * The kinds this front draws: a thesis since specs/thesis-detail; AD, where the backend puts it
+ * (specs/ads).
+ */
+const KNOWN_KINDS = new Set(['POST', 'POLL', 'THESIS', 'THOUGHT', 'AD', 'GLOSSARY'])
 
 /**
  * Leaves out, in silence, the items of a kind this front does not know (P-015, specs/backend-answer-
@@ -40,11 +43,17 @@ const FOLLOWING = '/api/v1/feed/following'
 /** What a person published, in any community (P-012, specs/backend-adoption BK-02). */
 const USER_CONTENT = '/api/v1/users/:userId/content'
 
-/** Theses arrive in phase 2: the feed asks only for what it shows, so a page keeps its 20 items. */
-const KINDS = { new: 'POST,POLL,THOUGHT', polls: 'POLL' } as const
+/**
+ * The feed asks only for what it shows, so a page keeps its 20 items. Theses since
+ * specs/thesis-detail (TD-01), except in a profile's Posts: its theses have their own tab.
+ */
+const KINDS = { new: 'POST,POLL,THOUGHT,THESIS', polls: 'POLL' } as const
+const PROFILE_KINDS = { new: 'POST,POLL,THOUGHT', polls: 'POLL' } as const
 
 function requestFeed(params: FeedParams, cursor: string | undefined) {
-  const query: Record<string, string> = { kind: KINDS[params.filter] }
+  const query: Record<string, string> = {
+    kind: (params.author ? PROFILE_KINDS : KINDS)[params.filter],
+  }
   if (cursor) query.cursor = cursor
   if (params.author) {
     return apiRequest({

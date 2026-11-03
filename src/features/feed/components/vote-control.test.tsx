@@ -9,6 +9,7 @@ const action = vi.hoisted(() => ({ votePost: vi.fn() }))
 vi.mock('../actions/vote-post.action', () => action)
 const commentAction = vi.hoisted(() => ({ voteComment: vi.fn() }))
 vi.mock('../actions/vote-comment.action', () => commentAction)
+vi.mock('../actions/vote-thesis.action', () => ({ voteThesis: vi.fn() }))
 
 const ID = '00000000-0000-4000-8000-000000000001'
 

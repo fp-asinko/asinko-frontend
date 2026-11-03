@@ -155,6 +155,54 @@ export const commentListSchema = z.object({
   ads: z.array(z.unknown()).optional(),
 })
 
+// E11 and E12: a thesis (here, beside the post and the poll: the feed carries it).
+
+export const thesisStateSchema = z.enum([
+  'OPEN',
+  'EXPIRED',
+  'CORRECT',
+  'INCORRECT',
+  'DISPUTED',
+  'CANCELLED',
+])
+
+/**
+ * A thesis (E11), as GET /users/{userId}/theses lists it (E12). A qualitative thesis has no asset,
+ * and then no target: `targetPrice` and `targetDirection` come null (the backend's serializer,
+ * `asinko-app` lib/api/theses.ts, although E11 types them as required).
+ */
+export const thesisSchema = z.object({
+  id: z.uuid(),
+  communityId: z.uuid(),
+  community: communitySummarySchema,
+  asset: z.object({ id: z.uuid(), symbol: z.string(), name: z.string() }).nullable(),
+  claim: z.string(),
+  reasoning: z.string(),
+  conviction: z.enum(['LOW', 'MEDIUM', 'HIGH', 'EXTREME']),
+  deadline: z.iso.datetime(),
+  referencePrice: z.number().nullable(),
+  referencePriceAt: z.iso.datetime().nullable(),
+  targetPrice: z.number().nullable(),
+  targetDirection: z.enum(['ABOVE', 'BELOW', 'EQUALS']).nullable(),
+  state: thesisStateSchema,
+  resolvedAt: z.iso.datetime().nullable(),
+  resolutionPrice: z.number().nullable(),
+  resolutionSource: z.enum(['AUTOMATIC', 'COMMUNITY', 'ADMIN']).nullable(),
+  cancelledAt: z.iso.datetime().nullable(),
+  cancellationReason: z.string().nullable(),
+  disclaimerAcceptedAt: z.iso.datetime(),
+  creator: userSummarySchema.nullable(),
+  creatorType: z.enum(['USER', 'SYSTEM']),
+  score: z.number().int(),
+  viewerVote: z.union([z.literal(1), z.literal(-1)]).nullable(),
+  argumentCounts: z.object({ pro: z.number().int(), contra: z.number().int() }),
+  canCancel: z.boolean(),
+  publishedAt: z.iso.datetime(),
+  createdAt: z.iso.datetime(),
+})
+
+export type RawThesis = z.infer<typeof thesisSchema>
+
 /**
  * Why Explore shows an item (backend 2026-10-20, specs/explore-v1 § 1): `via` only with SIMILAR,
  * `countryCode` only with COUNTRY. `type` stays a string: a new one is no reason, not a broken item.
@@ -172,10 +220,11 @@ export const feedReasonSchema = z.object({
 /** A label, not the content: a malformed reason leaves the item without one (EX-02). */
 const reasonField = feedReasonSchema.nullable().optional().catch(null)
 
-/** Feed item: discriminated by kind (E04). THESIS arrives in phase 2. */
+/** Feed item: discriminated by kind (E04). A thesis since specs/thesis-detail. */
 export const feedItemSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('POST'), content: postSchema, reason: reasonField }),
   z.object({ kind: z.literal('POLL'), content: pollSchema, reason: reasonField }),
+  z.object({ kind: z.literal('THESIS'), content: thesisSchema, reason: reasonField }),
   // A post of type THOUGHT, its own card and filter (backend 2026-10-23, specs/thoughts).
   z.object({ kind: z.literal('THOUGHT'), content: postSchema, reason: reasonField }),
   // An ad, where the backend puts it (P-015, P-031, specs/ads AD-01).
@@ -293,7 +342,10 @@ export type RawEntity = z.infer<typeof entitySchema>
 export type RawCommunitySummary = z.infer<typeof communitySummarySchema>
 export type RawFeedItem = z.infer<typeof feedItemSchema>
 /** A user's content in a feed: a post or a poll, not an ad (specs/ads). */
-export type RawContentFeedItem = Extract<RawFeedItem, { kind: 'POST' | 'POLL' | 'THOUGHT' }>
+export type RawContentFeedItem = Extract<
+  RawFeedItem,
+  { kind: 'POST' | 'POLL' | 'THOUGHT' | 'THESIS' }
+>
 export type RawFeedReason = z.infer<typeof feedReasonSchema>
 export type ImpressionEvent = z.infer<typeof impressionEventSchema>
 export type ImpressionsRequest = z.infer<typeof impressionsRequestSchema>

@@ -2,7 +2,12 @@ import 'server-only'
 import { apiRequest, noContentSchema, type ApiResult } from '@/lib/api'
 import { pollSchema, voteResultSchema } from '@/lib/api/contract'
 import type { PollResults } from '../feed.types'
-import type { VoteCommentInput, VotePollInput, VotePostInput } from '../schemas/vote.schema'
+import type {
+  VoteCommentInput,
+  VotePollInput,
+  VotePostInput,
+  VoteThesisInput,
+} from '../schemas/vote.schema'
 import { toPollResults } from './mappers'
 
 type PostVote = { score: number | null; viewerVote: 1 | -1 | null }
@@ -29,6 +34,30 @@ export async function votePostAs(
     method: 'PUT',
     path: '/api/v1/posts/:id/vote',
     params: { id: postId },
+    body: { userId, value },
+    schema: voteResultSchema,
+  })
+}
+
+/** Votes on a thesis (E05, specs/thesis-detail TD-16), as on a post. */
+export async function voteThesisAs(
+  userId: string,
+  { thesisId, value }: VoteThesisInput,
+): Promise<ApiResult<PostVote>> {
+  if (value === null) {
+    const removed = await apiRequest({
+      method: 'DELETE',
+      path: '/api/v1/theses/:id/vote',
+      params: { id: thesisId },
+      query: { userId },
+      schema: noContentSchema,
+    })
+    return removed.ok ? { ok: true, data: { score: null, viewerVote: null } } : removed
+  }
+  return apiRequest({
+    method: 'PUT',
+    path: '/api/v1/theses/:id/vote',
+    params: { id: thesisId },
     body: { userId, value },
     schema: voteResultSchema,
   })

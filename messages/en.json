@@ -230,6 +230,11 @@
         "loaded": "{count, plural, one {# more reply loaded} other {# more replies loaded}}",
         "error": "Could not load more. Try again."
       }
+    },
+    "thesis": {
+      "badge": "Thesis",
+      "closes": "Closes {when}",
+      "arguments": "{count, plural, =0 {No arguments yet} one {# argument} other {# arguments}}"
     }
   },
   "rightColumn": {

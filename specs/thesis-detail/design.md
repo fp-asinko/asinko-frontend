@@ -46,7 +46,8 @@ export type ThesisItem = {
 ```
 
 - `toFeedItem` (`lib/mappers.ts`) mapea `kind: 'THESIS'` con el `thesisSchema` del contrato (`@/lib/api/contract`), que ya existe. `community` y `author` se mapean igual que en un post.
-- `KNOWN_KINDS` (`lib/feed-api.ts`) suma `THESIS`. El comentario "THESIS waits for phase 2" se va.
+- `KNOWN_KINDS` (`lib/feed-api.ts`) suma `THESIS`, y el filtro Nuevos pide `kind=POST,POLL,THOUGHT,THESIS`: antes pedía solo lo que dibujaba. La pestaña Posts del perfil sigue pidiendo `POST,POLL,THOUGHT` (sus tesis tienen pestaña propia).
+- El esquema de la tesis pasa de `contract/theses.ts` a `contract/content.ts`, junto al post y la encuesta: el feed lo necesita y los dos archivos se importaban entre sí.
 - `keepValidItems` ya descarta y reporta una tesis mal formada sin tirar abajo la lista.
 
 ## 3. La tarjeta del feed (`thesis-card.tsx` en `features/feed`, TD-02 a TD-05)

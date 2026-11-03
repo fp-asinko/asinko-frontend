@@ -26,7 +26,7 @@ Que una tesis se vea donde se publica, igual que un post: en el Home, en su grup
 
 ### La tarjeta en el feed
 
-- [ ] **TD-01** Las tesis aparecen en todos los feeds que las mandan: Home (Explorar y Siguiendo), la página de un grupo, la de un activo y el canal de una persona. Van en el orden del backend, mezcladas con los posts.
+- [ ] **TD-01** Las tesis aparecen en los feeds que las mandan: Home (Explorar y Siguiendo), la página de un grupo y la de un activo, en el orden del backend, mezcladas con los posts. El front las pide (`kind=…,THESIS`): hasta ahora pedía solo posts, thoughts y encuestas. La pestaña Posts del perfil sigue sin ellas: las tesis de una persona tienen su pestaña (ajuste de la implementación, 2026-11-03).
 - [ ] **TD-02** La cabecera es la de cualquier tarjeta (`specs/community-first`): el grupo con su avatar y Unirse, el autor debajo; en un canal personal, el autor con su foto. Al lado, una etiqueta **Tesis**, para distinguirla de un post.
 - [ ] **TD-03** El cuerpo es el de la tarjeta del perfil (`specs/profile-track-record` PT-07):
   - el activo y su precio de referencia;

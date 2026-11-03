@@ -53,7 +53,10 @@ import { commentTree, searchComments } from './comment-tree'
 import { withTopPost } from './top-post'
 import { followersOf, followingOf, listItem } from './fixtures/follows'
 import { membersOf } from './fixtures/members'
-import { thesesBy } from './fixtures/theses'
+import { feedTheses, THESES, thesesBy, thesisById } from './fixtures/theses'
+
+/** The demo viewer's open thesis: the one its cancel example uses (specs/thesis-detail TD-20). */
+const DEMO_THESIS = THESES.find((each) => each.creator?.id === DEMO_USER.id)!
 import { listAchievements } from './achievements'
 import { userComments, userContent, activeCommunities } from './user-activity'
 import { createDraft, deleteDraft, listDrafts, SEED_DRAFT_ID, updateDraft } from './drafts'
@@ -72,7 +75,13 @@ import {
   updateThesisDraft,
   withThesisDrafts,
 } from './thesis-drafts'
-import { createMockThesis } from './theses'
+import {
+  asSeenBy,
+  cancelMockThesis,
+  createMockThesis,
+  removeMockThesisVote,
+  voteMockThesis,
+} from './theses'
 import type { MockContext, MockExtension, MockResponse, MockRoute } from './types'
 import { addFavorite, joinCommunity, leaveCommunity, removeFavorite } from './memberships'
 import {
@@ -106,6 +115,20 @@ const FEED: RawContentFeedItem[] = [
   ),
   ...POLLS.map((content) => ({ kind: 'POLL' as const, content })),
 ].sort((a, b) => b.content.publishedAt.localeCompare(a.content.publishedAt))
+
+/**
+ * The feed with its theses, read on each request: one written or cancelled with mocks shows as it
+ * is, and `canCancel` is the caller's (specs/thesis-detail TD-20).
+ */
+function feedWithTheses(accessToken: string | null | undefined): RawContentFeedItem[] {
+  return [
+    ...FEED,
+    ...feedTheses().map((content) => ({
+      kind: 'THESIS' as const,
+      content: asSeenBy(content, accessToken),
+    })),
+  ].sort((a, b) => b.content.publishedAt.localeCompare(a.content.publishedAt))
+}
 
 const FEED_KINDS = ['POST', 'THESIS', 'POLL', 'THOUGHT']
 
@@ -588,6 +611,57 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     handler: createMockThesis,
   },
 
+  // E11: a thesis's page (specs/thesis-detail § 4). `canCancel` is the caller's.
+  {
+    method: 'GET',
+    path: '/api/v1/theses/:id',
+    kind: 'contract',
+    implemented: true,
+    schema: thesisSchema,
+    example: { ...noRequest, params: { id: THESES[0]!.id } },
+    handler: ({ params, accessToken }) => {
+      const thesis = thesisById(params.id ?? '')
+      return thesis ? { status: 200, body: asSeenBy(thesis, accessToken) } : notFound
+    },
+  },
+  // E11: its author cancels it while it can (specs/thesis-detail § 7). No liveExample: it writes.
+  {
+    method: 'PUT',
+    path: '/api/v1/theses/:id/cancel',
+    kind: 'contract',
+    implemented: true,
+    schema: thesisSchema,
+    example: {
+      ...noRequest,
+      params: { id: DEMO_THESIS.id },
+      body: { userId: DEMO_USER.id, reason: 'Posted it on the wrong asset.' },
+    },
+    handler: cancelMockThesis,
+  },
+  // E05: voting a thesis, as a post (specs/thesis-detail TD-16).
+  {
+    method: 'PUT',
+    path: '/api/v1/theses/:id/vote',
+    kind: 'contract',
+    implemented: true,
+    schema: voteResultSchema,
+    example: {
+      ...noRequest,
+      params: { id: THESES[0]!.id },
+      body: { userId: DEMO_USER.id, value: 1 },
+    },
+    handler: voteMockThesis,
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/theses/:id/vote',
+    kind: 'contract',
+    implemented: true,
+    schema: noContentSchema,
+    example: { ...noRequest, params: { id: THESES[0]!.id }, query: { userId: DEMO_USER.id } },
+    handler: removeMockThesisVote,
+  },
+
   // E02
   {
     method: 'GET',
@@ -648,8 +722,8 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     example: noRequest,
     // The feed the Home asks for: checks Post and Poll (community, commentCount), reason and
     // requestId on the real API.
-    liveExample: { ...noRequest, query: { kind: 'POST,POLL,THOUGHT' } },
-    handler: ({ query }) => {
+    liveExample: { ...noRequest, query: { kind: 'POST,POLL,THOUGHT,THESIS' } },
+    handler: ({ query, accessToken }) => {
       // Backend dev: an unknown community answers an empty page, not a 404.
       if (query.community && !communityBySlug(query.community)) {
         return { status: 200, body: { items: [], nextCursor: null, requestId: null } }
@@ -657,11 +731,13 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       const community = query.community ? communityBySlug(query.community) : undefined
       // A community's feed has no reason: only the Home's Explore says why (specs/explore-v1).
       const items = community
-        ? FEED.filter((item) => item.content.communityId === community.id).map((item) => ({
-            ...item,
-            reason: null,
-          }))
-        : FEED.map(withReason)
+        ? feedWithTheses(accessToken)
+            .filter((item) => item.content.communityId === community.id)
+            .map((item) => ({
+              ...item,
+              reason: null,
+            }))
+        : feedWithTheses(accessToken).map(withReason)
       return {
         status: 200,
         body: feedPage(community ? 2 : 1, byKind(items, query.kind), query.cursor, !community),
@@ -676,11 +752,13 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     schema: feedPageSchema,
     example: noRequest,
     // With mocks the viewer is always the demo user (src/lib/session.ts).
-    handler: ({ query }) => {
-      const items = FEED.filter((item) => MEMBER_OF.has(item.content.communityId)).map((item) => ({
-        ...item,
-        reason: null,
-      }))
+    handler: ({ query, accessToken }) => {
+      const items = feedWithTheses(accessToken)
+        .filter((item) => MEMBER_OF.has(item.content.communityId))
+        .map((item) => ({
+          ...item,
+          reason: null,
+        }))
       return { status: 200, body: feedPage(3, byKind(items, query.kind), query.cursor, true) }
     },
   },

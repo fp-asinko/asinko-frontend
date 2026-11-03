@@ -12,6 +12,7 @@ vi.mock('@/lib/mentions/search-mentions.action', () => ({ searchMentions: vi.fn(
 vi.mock('@/components/molecules/mention-assist', () => ({ MentionField: () => null }))
 vi.mock('../actions/create-comment.action', () => ({ createComment: vi.fn() }))
 vi.mock('../actions/vote-comment.action', () => ({ voteComment: vi.fn() }))
+vi.mock('../actions/vote-thesis.action', () => ({ voteThesis: vi.fn() }))
 vi.mock('../actions/vote-post.action', () => ({ votePost: vi.fn() }))
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
