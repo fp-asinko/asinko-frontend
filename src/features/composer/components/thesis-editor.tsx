@@ -43,6 +43,7 @@ import {
 } from '../schemas/create-thesis.schema'
 import { BodyTabs } from './body-tabs'
 import { CommunityPicker } from './community-picker'
+import { ProfileReach } from './profile-reach'
 import { ACTIONS_BAR, BARE, FIELD_BOX, PILL } from './editor-styles'
 import { FormatTabs, type CreateFormat } from './format-tabs'
 import type { ThesisSummary } from './thesis-confirm'
@@ -871,11 +872,13 @@ export function ThesisEditor({
                   chooseCommunity(next)
                 }}
                 invalid={invalid('communityId')}
-                describedBy={`${ids}-communityId-error`}
+                describedBy={`${ids}-communityId-error ${ids}-communityId-reach`}
                 // The asset's community always on offer, member or not (TC-03).
                 suggested={asset}
               />
             </div>
+            {/* Whether it also shows on the profile (specs/submit-form-layout SF-13). */}
+            {chosen && <ProfileReach id={`${ids}-communityId-reach`} own={chosen.own} />}
             <FieldError
               id={`${ids}-communityId-error`}
               errors={fieldError('communityId')}

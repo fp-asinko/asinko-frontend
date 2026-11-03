@@ -901,6 +901,8 @@
       "label": "Community",
       "placeholder": "Choose a community",
       "yourProfile": "Your profile",
+      "alsoProfile": "Also on your profile",
+      "onlyProfile": "Only on your profile",
       "loading": "Searching…",
       "empty": "No communities found",
       "error": "Could not load the communities. Type to try again.",

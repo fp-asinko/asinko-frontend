@@ -37,6 +37,7 @@ import {
 } from '../hooks/use-post-draft'
 import { useSavedDraft } from '../hooks/use-saved-draft'
 import { CommunityPicker } from './community-picker'
+import { ProfileReach } from './profile-reach'
 import { DraftsButton } from './drafts-button'
 import { ACTIONS_BAR, BARE, FIELD_BOX, PILL } from './editor-styles'
 import { FormatTabs } from './format-tabs'
@@ -772,7 +773,7 @@ export function PostEditor({
                       onCommunityChange?.(next)
                     }}
                     invalid={invalid('communityId')}
-                    describedBy={`${ids}-community-error`}
+                    describedBy={`${ids}-community-error ${ids}-community-reach`}
                   />
                   {chosen && (
                     <RelatedPicker
@@ -797,6 +798,8 @@ export function PostEditor({
                 </div>
               )}
             />
+            {/* Whether it also shows on the profile (specs/submit-form-layout SF-13). */}
+            {chosen && <ProfileReach id={`${ids}-community-reach`} own={chosen.own} />}
             <FieldError
               id={`${ids}-community-error`}
               errors={fieldError('communityId')}

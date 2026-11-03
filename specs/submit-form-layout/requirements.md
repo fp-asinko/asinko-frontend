@@ -32,3 +32,4 @@ Pedido del PO después de la revisión 3 de `specs/thesis-create`: "creo que deb
 - [x] **SF-10** **Borradores** (`specs/drafts-tags` DT-02) pasa al final de la fila de los formatos, a la derecha.
 - [x] **SF-11** **"Añadir etiqueta"** va en la fila de abajo, después de la comunidad y sus relacionados ("Se publica en #macro · + · Añadir etiqueta"), y aparece cuando hay comunidad: la etiqueta es de esa comunidad (`specs/drafts-tags` DT-07). Ajustado con el PO el 2026-11-02: bajo el título, y sin comunidad, parecía que no estaba.
 - [x] **SF-12** El foco entra siempre en el título (o en el texto de un thought): la comunidad ya no está arriba (cambia `specs/submit-page` SU-09).
+- [x] **SF-13** Debajo de "Se publica en", una línea gris dice si también se ve en el perfil: con un grupo, "También en tu perfil" (el perfil lista todo lo que la persona publica, `GET /users/{id}/content`); con su canal, "Solo en tu perfil". Igual en posts y tesis. Pedido del PO el 2026-11-02.

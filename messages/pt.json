@@ -901,6 +901,8 @@
       "label": "Comunidade",
       "placeholder": "Escolha uma comunidade",
       "yourProfile": "Seu perfil",
+      "alsoProfile": "Também no seu perfil",
+      "onlyProfile": "Só no seu perfil",
       "loading": "Buscando…",
       "empty": "Nenhuma comunidade encontrada",
       "error": "Não foi possível carregar as comunidades. Digite para tentar de novo.",
