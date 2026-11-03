@@ -848,15 +848,21 @@ export function ThesisEditor({
           </Field>
         </div>
 
-        {/* Cancel and Publish, on the right, as the post's: sticky over the bottom bar in phones. */}
+        {/* Why a draft was not saved (DT-05). */}
         {saved.error && (
           <p role="alert" className="mt-3 type-small text-destructive">
             {t(`drafts.errors.${draftError(saved.error)}`, { max: DRAFT_LIMIT })}
           </p>
         )}
 
-        <div data-sticky-actions className={cn(ACTIONS_BAR, 'justify-between gap-3')}>
-          {/* Where it goes, on the actions' row (TC-28): the asset's community, unless changed. */}
+        {/* Where it goes and the actions, in one row (TC-28): a thesis has no tag nor related ones,
+            so it stays short and Publish fits a 1280×800 window (TC-36, specs/submit-form-layout
+            SF-14). Sticky over the bottom bar in phones, as the post's. */}
+        <div
+          data-sticky-actions
+          className={cn(ACTIONS_BAR, 'justify-between gap-3 md:border-t-0 md:pt-0')}
+        >
+          {/* The asset's community, unless changed. */}
           <Field data-invalid={invalid('communityId') || undefined} className="w-auto gap-1">
             <div className="flex flex-wrap items-center gap-2">
               <FieldLabel
@@ -877,9 +883,10 @@ export function ThesisEditor({
                 // The asset's community always on offer, member or not (TC-03).
                 suggested={asset}
               />
+              {/* Whether it also shows on the profile (specs/submit-form-layout SF-13): beside the
+                  picker, so the row keeps its height (TC-36). */}
+              {chosen && <ProfileReach id={`${ids}-communityId-reach`} own={chosen.own} />}
             </div>
-            {/* Whether it also shows on the profile (specs/submit-form-layout SF-13). */}
-            {chosen && <ProfileReach id={`${ids}-communityId-reach`} own={chosen.own} />}
             <FieldError
               id={`${ids}-communityId-error`}
               errors={fieldError('communityId')}

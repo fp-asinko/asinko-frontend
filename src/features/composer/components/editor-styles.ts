@@ -16,4 +16,4 @@ export const BARE =
  * text is written (specs/submit-tools ST-07), edge to edge; from md, in its place.
  */
 export const ACTIONS_BAR =
-  'sticky bottom-[calc(3.5625rem+env(safe-area-inset-bottom))] z-10 -mx-4 mt-4 flex items-center justify-end border-t bg-background px-4 py-3 md:static md:mx-0 md:border-t-0 md:px-0 md:pt-0 md:pb-0'
+  'sticky bottom-[calc(3.5625rem+env(safe-area-inset-bottom))] z-10 -mx-4 mt-4 flex items-center justify-end border-t bg-background px-4 py-3 md:static md:mx-0 md:px-0 md:pt-4 md:pb-0'

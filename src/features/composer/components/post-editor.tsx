@@ -724,13 +724,84 @@ export function PostEditor({
           </Field>
         </div>
 
+        {/* Where it goes, what else it is about, whether the profile shows it and its tag: one
+            block above the actions (specs/submit-form-layout SF-09, SF-14). */}
+        <Field
+          data-invalid={invalid('communityId') || undefined}
+          className="mt-4 items-start gap-1.5"
+        >
+          <Controller
+            control={control}
+            name="communityId"
+            render={({ field }) => (
+              // Where the post goes, and beside it what else it is about (specs/related-tags).
+              <div className="flex flex-wrap items-center gap-1.5">
+                <FieldLabel
+                  htmlFor={`${ids}-community`}
+                  className="mr-0.5 type-small text-muted-foreground"
+                >
+                  {t('thesis.publishIn')}
+                </FieldLabel>
+                <CommunityPicker
+                  id={`${ids}-community`}
+                  value={chosen}
+                  onChange={(next) => {
+                    setChosen(next)
+                    field.onChange(next?.id ?? '')
+                    // A tag the new one does not have goes (specs/drafts-tags DT-08).
+                    if (tag && !next?.tags?.includes(tag)) setValue('tag', '')
+                    // The new main one is no longer a related one (RT-05).
+                    if (next && related.includes(next.handle)) {
+                      const rest = related.filter((handle) => handle !== next.handle)
+                      setValue('related', rest)
+                      onRelatedChange?.(rest)
+                    }
+                    onCommunityChange?.(next)
+                  }}
+                  invalid={invalid('communityId')}
+                  describedBy={`${ids}-community-error ${ids}-community-reach`}
+                />
+                {chosen && (
+                  <RelatedPicker
+                    main={chosen.handle}
+                    value={related}
+                    onChange={(handles) => {
+                      setValue('related', handles)
+                      onRelatedChange?.(handles)
+                    }}
+                  />
+                )}
+              </div>
+            )}
+          />
+          {/* Whether it also shows on the profile (specs/submit-form-layout SF-13). */}
+          {chosen && <ProfileReach id={`${ids}-community-reach`} own={chosen.own} />}
+          {/* The tag, of the community chosen: in its own row, once there is one (specs/drafts-tags
+              DT-07, specs/submit-form-layout SF-11). */}
+          {chosen && (
+            // Wrapped: the Field stretches its children, the pill keeps its width.
+            <div className="flex flex-wrap items-center gap-2">
+              <TagPicker
+                tags={chosen.tags ?? []}
+                hasCommunity
+                value={tag}
+                onChange={(next) => setValue('tag', next)}
+              />
+            </div>
+          )}
+          <FieldError
+            id={`${ids}-community-error`}
+            errors={fieldError('communityId')}
+            className="type-meta"
+          />
+        </Field>
+
         {serverError && (
           <p role="alert" className="mt-3 type-small text-destructive">
             {t(`errors.${serverError}`)}
           </p>
         )}
 
-        {/* Why a draft was not saved (DT-05). */}
         {/* Why a draft was not saved (DT-05), as the server's errors above. */}
         {saved.error && (
           <p role="alert" className="mt-3 type-small text-destructive">
@@ -738,74 +809,10 @@ export function PostEditor({
           </p>
         )}
 
-        {/* Only Cancel, Save draft and Publish, on the right (SF-06, DT-01). In phones it sticks over the bottom bar
-            while a long post is written (specs/submit-tools ST-07), edge to edge; from md, in its
-            place. */}
-        <div data-sticky-actions className={cn(ACTIONS_BAR, 'justify-between gap-3')}>
-          {/* Where it goes and what else it is about, at the actions' row (specs/submit-form-layout SF-09). */}
-          <Field data-invalid={invalid('communityId') || undefined} className="w-auto gap-1">
-            <Controller
-              control={control}
-              name="communityId"
-              render={({ field }) => (
-                // Where the post goes, and beside it what else it is about (specs/related-tags).
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <FieldLabel
-                    htmlFor={`${ids}-community`}
-                    className="mr-0.5 type-small text-muted-foreground"
-                  >
-                    {t('thesis.publishIn')}
-                  </FieldLabel>
-                  <CommunityPicker
-                    id={`${ids}-community`}
-                    value={chosen}
-                    onChange={(next) => {
-                      setChosen(next)
-                      field.onChange(next?.id ?? '')
-                      // A tag the new one does not have goes (specs/drafts-tags DT-08).
-                      if (tag && !next?.tags?.includes(tag)) setValue('tag', '')
-                      // The new main one is no longer a related one (RT-05).
-                      if (next && related.includes(next.handle)) {
-                        const rest = related.filter((handle) => handle !== next.handle)
-                        setValue('related', rest)
-                        onRelatedChange?.(rest)
-                      }
-                      onCommunityChange?.(next)
-                    }}
-                    invalid={invalid('communityId')}
-                    describedBy={`${ids}-community-error ${ids}-community-reach`}
-                  />
-                  {chosen && (
-                    <RelatedPicker
-                      main={chosen.handle}
-                      value={related}
-                      onChange={(handles) => {
-                        setValue('related', handles)
-                        onRelatedChange?.(handles)
-                      }}
-                    />
-                  )}
-                  {/* The tag, beside the community it belongs to (specs/drafts-tags DT-07,
-                      specs/submit-form-layout SF-11): once there is one. */}
-                  {chosen && (
-                    <TagPicker
-                      tags={chosen.tags ?? []}
-                      hasCommunity
-                      value={tag}
-                      onChange={(next) => setValue('tag', next)}
-                    />
-                  )}
-                </div>
-              )}
-            />
-            {/* Whether it also shows on the profile (specs/submit-form-layout SF-13). */}
-            {chosen && <ProfileReach id={`${ids}-community-reach`} own={chosen.own} />}
-            <FieldError
-              id={`${ids}-community-error`}
-              errors={fieldError('communityId')}
-              className="type-meta"
-            />
-          </Field>
+        {/* Only Cancel, Save draft and Publish, on the right under a divider (SF-06, SF-14, DT-01).
+            In phones it sticks over the bottom bar while a long post is written
+            (specs/submit-tools ST-07), edge to edge; from md, in its place. */}
+        <div data-sticky-actions className={ACTIONS_BAR}>
           {/* Wraps before overflowing at 360px, whatever the language's words. */}
           <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
             <button
