@@ -9,7 +9,8 @@ import { createThesisUpdate } from '../actions/create-thesis-update.action'
 import { THESIS_UPDATE_MAX } from '../schemas/thesis-update.schema'
 
 const PILL =
-  'inline-flex h-9 tap items-center justify-center rounded-full px-4 type-action outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-60'
+  // 44px in phones, as the comment box's (design-system.md: main actions).
+  'inline-flex h-11 tap items-center justify-center rounded-full px-4 type-action outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-60 md:h-8'
 
 /**
  * The form of an update (specs/thesis-arguments TA-10 to TA-12), loaded on the first open: what
@@ -17,7 +18,14 @@ const PILL =
  * deleted, and Cancel and Post. Once posted, the page comes again with it first (the action
  * refreshes) and the form closes.
  */
-export function ThesisUpdateForm({ thesisId, onClose }: { thesisId: string; onClose: () => void }) {
+export function ThesisUpdateForm({
+  thesisId,
+  onClose,
+}: {
+  thesisId: string
+  /** `posted`: it went in, and the pill says so to screen readers. */
+  onClose: (posted?: boolean) => void
+}) {
   const t = useTranslations('feed.thesis.updates')
   const ids = useId()
   const field = useRef<HTMLTextAreaElement>(null)
@@ -42,7 +50,7 @@ export function ThesisUpdateForm({ thesisId, onClose }: { thesisId: string; onCl
       const result = await createThesisUpdate({ thesisId, body: text })
       if (result.ok) {
         setText('')
-        onClose()
+        onClose(true)
         return
       }
       if (result.error === 'api.errors.UNAUTHENTICATED') {
@@ -103,7 +111,7 @@ export function ThesisUpdateForm({ thesisId, onClose }: { thesisId: string; onCl
         <button
           type="button"
           disabled={pending}
-          onClick={onClose}
+          onClick={() => onClose()}
           className={cn(PILL, 'text-muted-foreground hover:bg-muted hover:text-foreground')}
         >
           {t('cancel')}

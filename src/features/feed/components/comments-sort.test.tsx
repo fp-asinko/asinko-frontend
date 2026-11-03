@@ -29,6 +29,23 @@ describe('CommentsSort (specs/post-detail-refresh PD-03, PD-04)', () => {
     )
   })
 
+  it('keeps what else the URL says: a thesis’s side (specs/thesis-arguments TA-03)', async () => {
+    const { unmount } = renderWithIntl(<CommentsSort current="best" keep={{ side: 'contra' }} />)
+    await userEvent.click(screen.getByRole('button', { name: 'Sort by: Best' }))
+    await userEvent.click(
+      await screen.findByRole('menuitemradio', { name: 'Old' }, { timeout: 8000 }),
+    )
+    expect(router.push).toHaveBeenCalledWith(`${PATH}?side=contra&sort=old`, { scroll: false })
+    unmount()
+
+    renderWithIntl(<CommentsSort current="old" keep={{ side: 'contra' }} />)
+    await userEvent.click(screen.getByRole('button', { name: 'Sort by: Old' }))
+    await userEvent.click(
+      await screen.findByRole('menuitemradio', { name: 'Best' }, { timeout: 8000 }),
+    )
+    expect(router.push).toHaveBeenLastCalledWith(`${PATH}?side=contra`, { scroll: false })
+  })
+
   it('puts the order in the URL, keeping the scroll; the default one without it', async () => {
     const { unmount } = renderWithIntl(<CommentsSort current="best" />)
     await userEvent.click(screen.getByRole('button', { name: 'Sort by: Best' }))

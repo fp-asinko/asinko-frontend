@@ -30,8 +30,12 @@ test.describe('A thesis in the feed and on its page', () => {
     await expect(bet.getByText(/^Closes in /)).toBeVisible()
     // Its arguments, For and Against (specs/thesis-arguments TA-01).
     const args = main(page).getByRole('region', { name: 'Arguments' })
-    await expect(args.getByRole('link', { name: 'For 3' })).toHaveAttribute('aria-current', 'page')
-    await expect(args.getByRole('link', { name: 'Against 1' })).toBeVisible()
+    // Without their counts: e2e/thesis-arguments.spec.ts argues on the same server.
+    await expect(args.getByRole('link', { name: /^For \d+$/ })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    await expect(args.getByRole('link', { name: /^Against \d+$/ })).toBeVisible()
   })
 
   test('says how a resolved one ended and why a cancelled one was (TD-08)', async ({ page }) => {

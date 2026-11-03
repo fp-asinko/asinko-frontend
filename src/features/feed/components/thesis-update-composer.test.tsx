@@ -40,6 +40,22 @@ describe('ThesisUpdateComposer (specs/thesis-arguments TA-10 to TA-12)', () => {
     await vi.waitFor(() =>
       expect(screen.getByRole('button', { name: 'Post an update' })).toBeInTheDocument(),
     )
+    // Said to screen readers: the form is gone and the update shows above.
+    expect(screen.getByRole('status')).toHaveTextContent('Update posted')
+  })
+
+  it('closes with Cancel or Esc, the focus back on the pill', async () => {
+    renderWithIntl(<ThesisUpdateComposer thesisId="t1" />)
+    await openForm()
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    const pill = screen.getByRole('button', { name: 'Post an update' })
+    await vi.waitFor(() => expect(pill).toHaveFocus())
+    await openForm()
+    await userEvent.keyboard('{Escape}')
+    await vi.waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Post an update' })).toHaveFocus(),
+    )
+    expect(action.createThesisUpdate).not.toHaveBeenCalled()
   })
 
   it('says when the thesis is no longer open (TA-11)', async () => {

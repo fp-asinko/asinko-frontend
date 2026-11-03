@@ -238,8 +238,8 @@
         "title": "Argumentos",
         "sides": "Lados do debate",
         "tab": {
-          "pro": "A favor {count}",
-          "contra": "Contra {count}"
+          "pro": "A favor {count, number}",
+          "contra": "Contra {count, number}"
         },
         "box": {
           "pro": "Argumente a favor…",
@@ -319,7 +319,8 @@
           "tooLong": "Use 2.000 caracteres ou menos",
           "notOpen": "A tese não está mais aberta: não aceita novas atualizações.",
           "generic": "Não foi possível publicar a atualização. Tente de novo."
-        }
+        },
+        "posted": "Atualização publicada"
       }
     }
   },

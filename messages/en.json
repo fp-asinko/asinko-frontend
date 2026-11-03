@@ -238,8 +238,8 @@
         "title": "Arguments",
         "sides": "Sides of the debate",
         "tab": {
-          "pro": "For {count}",
-          "contra": "Against {count}"
+          "pro": "For {count, number}",
+          "contra": "Against {count, number}"
         },
         "box": {
           "pro": "Argue for…",
@@ -319,7 +319,8 @@
           "tooLong": "Use 2,000 characters or fewer",
           "notOpen": "The thesis is no longer open: it takes no more updates.",
           "generic": "Could not post the update. Try again."
-        }
+        },
+        "posted": "Update posted"
       }
     }
   },

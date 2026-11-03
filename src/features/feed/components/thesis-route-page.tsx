@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 import { getFormatter, getTranslations } from 'next-intl/server'
 import { BackButton } from '@/components/molecules/back-button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { env } from '@/env'
 import { buildAlternates, OG_LOCALES } from '@/i18n/alternates'
 import { safeLocale } from '@/i18n/safe-locale'
@@ -101,17 +103,30 @@ export async function ThesisDetail({
         </div>
         <ThesisBet thesis={thesis} />
       </ThesisCard>
-      <ThesisUpdates
-        thesisId={thesis.id}
-        // Its author, while it is open (TA-10). Not canCancel: that one ends in the last 10 %.
-        canPublish={
-          thesis.state === 'open' &&
-          viewer !== null &&
-          thesis.author !== null &&
-          viewer.username === thesis.author.username
-        }
-      />
+      {/* A secondary section: it streams in, and never holds the arguments back. */}
+      <Suspense fallback={<UpdatesSkeleton />}>
+        <ThesisUpdates
+          thesisId={thesis.id}
+          // Its author, while it is open (TA-10). Not canCancel: that one ends in the last 10 %.
+          canPublish={
+            thesis.state === 'open' &&
+            viewer !== null &&
+            thesis.author !== null &&
+            viewer.username === thesis.author.username
+          }
+        />
+      </Suspense>
       <ThesisArguments thesis={thesis} query={thesisArgumentsQuerySchema.parse(searchParams)} />
     </>
+  )
+}
+
+/** The room of an update while the section loads: no jump when it arrives (CLS). */
+function UpdatesSkeleton() {
+  return (
+    <div aria-hidden className="flex flex-col gap-3 border-t px-4 pt-5 pb-5 md:px-0">
+      <Skeleton className="h-4 w-48" />
+      <Skeleton className="h-16 w-full rounded-xl" />
+    </div>
   )
 }
