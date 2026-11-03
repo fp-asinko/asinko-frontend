@@ -16,12 +16,15 @@ export async function generateMetadata({
   return thesisMetadata(id, locale)
 }
 
-export default async function ThesisPage({ params }: PageProps<'/[locale]/thesis/[id]'>) {
-  const { id } = await params
+export default async function ThesisPage({
+  params,
+  searchParams,
+}: PageProps<'/[locale]/thesis/[id]'>) {
+  const [{ id }, query] = await Promise.all([params, searchParams])
   const thesis = await resolveThesisRoute(id)
   return (
     <PageColumns>
-      <ThesisDetail thesis={thesis} />
+      <ThesisDetail thesis={thesis} searchParams={query} />
     </PageColumns>
   )
 }

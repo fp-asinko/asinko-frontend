@@ -48,11 +48,20 @@ describe('ThesisCard in a feed (specs/thesis-detail TD-02 to TD-05)', () => {
   it('votes, counts its arguments and shares, as a post (TD-04)', () => {
     renderWithIntl(<ThesisCard thesis={thesisItem()} />)
     expect(screen.getByRole('button', { name: /upvote/i })).toBeInTheDocument()
+    // To its arguments, on For: it has more of them (specs/thesis-arguments TA-08).
     expect(screen.getByRole('link', { name: '4 arguments' })).toHaveAttribute(
       'href',
-      '/thesis/thesis-1',
+      '/thesis/thesis-1#arguments',
     )
     expect(screen.getByRole('button', { name: 'Share' })).toBeInTheDocument()
+  })
+
+  it('takes its arguments count to the side with more (specs/thesis-arguments TA-08)', () => {
+    renderWithIntl(<ThesisCard thesis={thesisItem({ argumentCount: { pro: 1, contra: 2 } })} />)
+    expect(screen.getByRole('link', { name: '3 arguments' })).toHaveAttribute(
+      'href',
+      '/thesis/thesis-1?side=contra#arguments',
+    )
   })
 
   it('opens its page from the claim; on the page, the claim is its h1 (TD-05, TD-06)', () => {

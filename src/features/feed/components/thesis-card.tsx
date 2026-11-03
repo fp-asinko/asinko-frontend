@@ -134,8 +134,15 @@ export function ThesisCard({
         />
         {/* Its arguments, for and against: on its page (Q3, MVP-141). */}
         <Link
-          href={detail ? '#arguments' : thesis.path}
-          aria-label={t('arguments', { count: argumentCount })}
+          // The side with more, For when even (specs/thesis-arguments TA-08).
+          href={
+            detail
+              ? '#arguments'
+              : thesis.argumentCount.contra > thesis.argumentCount.pro
+                ? `${thesis.path}?side=contra#arguments`
+                : `${thesis.path}#arguments`
+          }
+          aria-label={t('argumentsLabel', { count: argumentCount })}
           className={CARD_ACTION}
         >
           <MessagesSquareIcon aria-hidden className="size-4" />

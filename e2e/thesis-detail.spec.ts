@@ -28,10 +28,10 @@ test.describe('A thesis in the feed and on its page', () => {
     await expect(bet.getByText('Reference price')).toBeVisible()
     await expect(bet.getByText(/^Above \$150,000 · [+-]/)).toBeVisible()
     await expect(bet.getByText(/^Closes in /)).toBeVisible()
-    // Its arguments, until MVP-141 (TD-09).
+    // Its arguments, For and Against (specs/thesis-arguments TA-01).
     const args = main(page).getByRole('region', { name: 'Arguments' })
-    await expect(args.getByText('3 for · 1 against')).toBeVisible()
-    await expect(args.getByText('Arguments for and against are coming soon.')).toBeVisible()
+    await expect(args.getByRole('link', { name: 'For 3' })).toHaveAttribute('aria-current', 'page')
+    await expect(args.getByRole('link', { name: 'Against 1' })).toBeVisible()
   })
 
   test('says how a resolved one ended and why a cancelled one was (TD-08)', async ({ page }) => {
@@ -72,7 +72,11 @@ test.describe('A thesis in the feed and on its page', () => {
 
   test('votes on a thesis as on a post (TD-16)', async ({ page }) => {
     await page.goto(MARIA_PAGE)
-    const upvote = main(page).getByRole('button', { name: 'Upvote' })
+    // The thesis's own, not its arguments' (specs/thesis-arguments).
+    const upvote = main(page)
+      .getByRole('article', { name: MARIA_OPEN })
+      .getByRole('button', { name: 'Upvote' })
+      .first()
     await upvote.click()
     await expect(upvote).toHaveAttribute('aria-pressed', 'true')
   })

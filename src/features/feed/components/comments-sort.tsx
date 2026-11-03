@@ -17,7 +17,14 @@ const CommentsSortMenu = dynamic(() => loadMenu().then((mod) => mod.CommentsSort
  * "Sort by: Best ▾" over a post's comments (specs/post-detail-refresh PD-03), as Reddit's. The
  * order goes in the URL (PD-04): the server sorts and renders the list.
  */
-export function CommentsSort({ current }: { current: CommentSort }) {
+export function CommentsSort({
+  current,
+  keep,
+}: {
+  current: CommentSort
+  /** What else the URL says and the order keeps: a thesis's side (specs/thesis-arguments TA-03). */
+  keep?: Record<string, string>
+}) {
   const t = useTranslations('postDetail.sort')
   const triggerRef = useRef<HTMLButtonElement>(null)
   const [open, setOpen] = useState(false)
@@ -53,6 +60,7 @@ export function CommentsSort({ current }: { current: CommentSort }) {
       {requested && (
         <CommentsSortMenu
           current={current}
+          keep={keep}
           open={open}
           onOpenChange={setOpen}
           anchor={triggerRef}

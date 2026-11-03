@@ -234,7 +234,29 @@
     "thesis": {
       "badge": "Tesis",
       "closes": "Cierra {when}",
-      "arguments": "{count, plural, =0 {Sin argumentos todavía} one {# argumento} other {# argumentos}}",
+      "arguments": {
+        "title": "Argumentos",
+        "sides": "Lados del debate",
+        "tab": {
+          "pro": "A favor {count}",
+          "contra": "En contra {count}"
+        },
+        "box": {
+          "pro": "Argumentá a favor…",
+          "contra": "Argumentá en contra…"
+        },
+        "empty": {
+          "pro": "Todavía nadie argumentó a favor",
+          "contra": "Todavía nadie argumentó en contra"
+        },
+        "emptyBody": "Sé el primero: datos, contexto, qué te haría cambiar de idea.",
+        "emptyAction": {
+          "pro": "Argumentar a favor",
+          "contra": "Argumentar en contra"
+        },
+        "failed": "No se pudieron cargar los argumentos",
+        "failedBody": "Probá de nuevo en un momento."
+      },
       "bet": {
         "title": "La apuesta",
         "reference": "Precio de referencia",
@@ -259,9 +281,6 @@
         "cancelled": "Cancelada el {date}{hasReason, select, yes {: {reason}} other {}}",
         "cancelledNoDate": "Cancelada"
       },
-      "argumentsTitle": "Argumentos",
-      "argumentsCount": "{pro} a favor · {contra} en contra",
-      "argumentsSoon": "Los argumentos a favor y en contra llegan pronto.",
       "page": {
         "title": "{claim} · {asset}"
       },
@@ -282,7 +301,8 @@
           "notCancellable": "Ya no se puede cancelar: falta muy poco para la fecha límite.",
           "generic": "No se pudo cancelar la tesis. Probá de nuevo."
         }
-      }
+      },
+      "argumentsLabel": "{count, plural, =0 {Sin argumentos todavía} one {# argumento} other {# argumentos}}"
     }
   },
   "rightColumn": {

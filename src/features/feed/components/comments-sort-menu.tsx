@@ -18,11 +18,14 @@ import { COMMENT_SORTS, type CommentSort } from '../schemas/comments-query.schem
  */
 export function CommentsSortMenu({
   current,
+  keep = {},
   open,
   onOpenChange,
   anchor,
 }: {
   current: CommentSort
+  /** What else the URL says and the order keeps: a thesis's side (specs/thesis-arguments TA-03). */
+  keep?: Record<string, string>
   open: boolean
   onOpenChange: (open: boolean) => void
   anchor: RefObject<HTMLButtonElement | null>
@@ -40,7 +43,10 @@ export function CommentsSortMenu({
             const sort = value as CommentSort
             // A radio item keeps a Base UI menu open: choosing an order is done with it.
             onOpenChange(false)
-            router.push(sort === 'best' ? pathname : `${pathname}?sort=${sort}`, { scroll: false })
+            const query = new URLSearchParams(keep)
+            if (sort !== 'best') query.set('sort', sort)
+            const search = query.toString()
+            router.push(search ? `${pathname}?${search}` : pathname, { scroll: false })
           }}
         >
           {COMMENT_SORTS.map((sort) => (

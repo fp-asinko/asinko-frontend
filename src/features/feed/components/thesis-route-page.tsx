@@ -14,6 +14,8 @@ import { PostMarkdown } from './post-markdown'
 import { ThesisBet } from './thesis-bet'
 import { ThesisCard } from './thesis-card'
 import { ThesisMenu } from './thesis-menu'
+import { ThesisArguments } from './thesis-arguments'
+import { thesisArgumentsQuerySchema } from '../schemas/thesis-arguments-query.schema'
 
 /** "Above $150,000 by Dec 3, 2026": the thesis's description, as its summary says it. */
 async function targetLine(thesis: ThesisItem, locale: ReturnType<typeof safeLocale>) {
@@ -72,11 +74,17 @@ export async function resolveThesisRoute(id: string): Promise<ThesisItem> {
 }
 
 /**
- * A thesis's own page (TD-06 to TD-09): its card whole, with the reasoning, what it bets on and
- * where it stands, and its arguments' counts until they come (MVP-141, Q3).
+ * A thesis's own page (TD-06 to TD-08): its card whole, with the reasoning, what it bets on and
+ * where it stands; then its arguments, For and Against (specs/thesis-arguments).
  */
-export async function ThesisDetail({ thesis }: { thesis: ThesisItem }) {
-  const t = await getTranslations('feed.thesis')
+export async function ThesisDetail({
+  thesis,
+  searchParams,
+}: {
+  thesis: ThesisItem
+  /** User input from the URL: validated here (security.md § 5). */
+  searchParams: Record<string, string | string[] | undefined>
+}) {
   return (
     <>
       <ThesisCard
@@ -90,22 +98,7 @@ export async function ThesisDetail({ thesis }: { thesis: ThesisItem }) {
         </div>
         <ThesisBet thesis={thesis} />
       </ThesisCard>
-      <section
-        id="arguments"
-        aria-labelledby="arguments-title"
-        className="scroll-mt-20 border-t px-4 py-5 md:px-0"
-      >
-        <h2 id="arguments-title" className="type-section text-muted-foreground">
-          {t('argumentsTitle')}
-        </h2>
-        <p className="mt-2 type-ui font-semibold">
-          {t('argumentsCount', {
-            pro: thesis.argumentCount.pro,
-            contra: thesis.argumentCount.contra,
-          })}
-        </p>
-        <p className="mt-1 type-small text-muted-foreground">{t('argumentsSoon')}</p>
-      </section>
+      <ThesisArguments thesis={thesis} query={thesisArgumentsQuerySchema.parse(searchParams)} />
     </>
   )
 }

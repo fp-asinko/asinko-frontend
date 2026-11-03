@@ -234,7 +234,29 @@
     "thesis": {
       "badge": "Thesis",
       "closes": "Closes {when}",
-      "arguments": "{count, plural, =0 {No arguments yet} one {# argument} other {# arguments}}",
+      "arguments": {
+        "title": "Arguments",
+        "sides": "Sides of the debate",
+        "tab": {
+          "pro": "For {count}",
+          "contra": "Against {count}"
+        },
+        "box": {
+          "pro": "Argue for…",
+          "contra": "Argue against…"
+        },
+        "empty": {
+          "pro": "No one has argued for it yet",
+          "contra": "No one has argued against it yet"
+        },
+        "emptyBody": "Be the first: data, context, what would change your mind.",
+        "emptyAction": {
+          "pro": "Argue for",
+          "contra": "Argue against"
+        },
+        "failed": "Could not load the arguments",
+        "failedBody": "Try again in a moment."
+      },
       "bet": {
         "title": "The bet",
         "reference": "Reference price",
@@ -259,9 +281,6 @@
         "cancelled": "Cancelled on {date}{hasReason, select, yes {: {reason}} other {}}",
         "cancelledNoDate": "Cancelled"
       },
-      "argumentsTitle": "Arguments",
-      "argumentsCount": "{pro} for · {contra} against",
-      "argumentsSoon": "Arguments for and against are coming soon.",
       "page": {
         "title": "{claim} · {asset}"
       },
@@ -282,7 +301,8 @@
           "notCancellable": "It can no longer be cancelled: its deadline is too close.",
           "generic": "Could not cancel the thesis. Try again."
         }
-      }
+      },
+      "argumentsLabel": "{count, plural, =0 {No arguments yet} one {# argument} other {# arguments}}"
     }
   },
   "rightColumn": {
