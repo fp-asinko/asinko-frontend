@@ -16,6 +16,8 @@ vi.mock('@/lib/session', () => ({ getViewer: vi.fn() }))
 vi.mock('../lib/submit-community', () => ({ getSubmitCommunity: vi.fn() }))
 // The editor brings the API client and its environment: not this test's.
 vi.mock('./submit-editor-loader', () => ({ SubmitEditorLoader: () => null }))
+// The page reads whether thesis drafts are mocked (specs/thesis-drafts TD-08).
+vi.mock('@/env', () => ({ env: { API_MOCKS: 'all' } }))
 
 describe('the page to create a post: its URL (specs/submit-page SU-01)', () => {
   it('reads the community and the format, leaving anything odd out', () => {
