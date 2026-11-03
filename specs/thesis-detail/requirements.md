@@ -41,7 +41,8 @@ Que una tesis se vea donde se publica, igual que un post: en el Home, en su grup
 ### La página de la tesis
 
 - [x] **TD-06** Cada tesis tiene su página, `/{locale}/thesis/{id}` (Q1). Muestra la tarjeta completa con el razonamiento entero en Markdown, igual que el cuerpo de un post. Arriba, el botón Volver del detalle de post (`specs/post-detail-refresh` PD-01).
-- [x] **TD-07** **Los datos de la apuesta**, en un bloque:
+- [x] **TD-07** **Ajuste (PO, 2026-11-03): sin datos repetidos.** En la página, arriba va solo el claim; "La apuesta" es el único lugar de los números: la fecha límite dice también cuánto falta, la convicción va con sus barras y "Publicada" se va (la cabecera ya dice cuándo). La línea de estado aparece solo cuando ya no está abierta.
+      Lo que pedía antes: **Los datos de la apuesta**, en un bloque:
   - el precio de referencia y cuándo se tomó;
   - el objetivo y la dirección, con el % de diferencia;
   - la fecha límite con su hora (23:59 en la zona de quien la ve, `specs/local-time`);

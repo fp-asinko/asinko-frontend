@@ -14,6 +14,7 @@ export function ThesisSummary({
   titleId,
   heading = 'h3',
   href,
+  claimOnly = false,
 }: {
   thesis: ThesisSummaryData
   /** The title's id: the card's article is labelled by it. */
@@ -25,6 +26,11 @@ export function ThesisSummary({
    * as a post's title (specs/thesis-detail TD-05).
    */
   href?: string
+  /**
+   * Only the claim: the thesis's page says the rest once, in its bet (specs/thesis-detail TD-07,
+   * PO 2026-11-03).
+   */
+  claimOnly?: boolean
 }) {
   const t = useTranslations('thesisSummary')
   const format = useFormatter()
@@ -47,38 +53,41 @@ export function ThesisSummary({
           thesis.claim
         )}
       </Title>
+      {!claimOnly && (
+        <>
+          <p className="mt-1.5 type-small text-muted-foreground">
+            {thesis.target
+              ? t(`target.${thesis.target.direction}`, { price: price(thesis.target.price), date })
+              : t('target.none', { date })}
+          </p>
+          {thesis.resolutionPrice !== null && (
+            <p className="type-small text-muted-foreground">
+              {t('resolved', { price: price(thesis.resolutionPrice) })}
+            </p>
+          )}
+          {thesis.state === 'cancelled' && thesis.cancellationReason && (
+            <p className="type-small text-muted-foreground">
+              {t('cancelledReason', { reason: thesis.cancellationReason })}
+            </p>
+          )}
 
-      <p className="mt-1.5 type-small text-muted-foreground">
-        {thesis.target
-          ? t(`target.${thesis.target.direction}`, { price: price(thesis.target.price), date })
-          : t('target.none', { date })}
-      </p>
-      {thesis.resolutionPrice !== null && (
-        <p className="type-small text-muted-foreground">
-          {t('resolved', { price: price(thesis.resolutionPrice) })}
-        </p>
+          <p className="mt-3 flex items-center gap-2 type-section text-muted-foreground">
+            {t('conviction.label')}
+            <span aria-hidden className="flex gap-0.5">
+              {[1, 2, 3, 4].map((bar) => (
+                <span
+                  key={bar}
+                  className={cn(
+                    'h-3 w-1.5 rounded-sm',
+                    bar <= thesis.conviction ? 'bg-foreground' : 'bg-border-strong',
+                  )}
+                />
+              ))}
+            </span>
+            <span className="normal-case">{t(`conviction.${thesis.conviction}`)}</span>
+          </p>
+        </>
       )}
-      {thesis.state === 'cancelled' && thesis.cancellationReason && (
-        <p className="type-small text-muted-foreground">
-          {t('cancelledReason', { reason: thesis.cancellationReason })}
-        </p>
-      )}
-
-      <p className="mt-3 flex items-center gap-2 type-section text-muted-foreground">
-        {t('conviction.label')}
-        <span aria-hidden className="flex gap-0.5">
-          {[1, 2, 3, 4].map((bar) => (
-            <span
-              key={bar}
-              className={cn(
-                'h-3 w-1.5 rounded-sm',
-                bar <= thesis.conviction ? 'bg-foreground' : 'bg-border-strong',
-              )}
-            />
-          ))}
-        </span>
-        <span className="normal-case">{t(`conviction.${thesis.conviction}`)}</span>
-      </p>
     </>
   )
 }

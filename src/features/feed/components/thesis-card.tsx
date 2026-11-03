@@ -121,6 +121,8 @@ export function ThesisCard({
         titleId={titleId}
         heading={detail ? 'h1' : 'h2'}
         href={detail ? undefined : thesis.path}
+        // On its page the bet says the rest, once.
+        claimOnly={detail}
       />
 
       {children}

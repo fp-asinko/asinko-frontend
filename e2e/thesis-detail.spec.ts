@@ -27,7 +27,9 @@ test.describe('A thesis in the feed and on its page', () => {
     const bet = main(page).getByRole('region', { name: 'The bet' })
     await expect(bet.getByText('Reference price')).toBeVisible()
     await expect(bet.getByText(/^Above \$150,000 · [+-]/)).toBeVisible()
-    await expect(bet.getByText(/^Closes in /)).toBeVisible()
+    // Its deadline says how long it has left; the summary above says only the claim (PO 2026-11-03).
+    await expect(bet.getByText(/ · in /)).toBeVisible()
+    await expect(main(page).getByText(/^Above $150,000 by /)).toHaveCount(0)
     // Its arguments, For and Against (specs/thesis-arguments TA-01).
     const args = main(page).getByRole('region', { name: 'Arguments' })
     // Without their counts: e2e/thesis-arguments.spec.ts argues on the same server.

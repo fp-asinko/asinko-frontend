@@ -7,7 +7,7 @@ import { ThesisBet } from './thesis-bet'
 const standing = () => document.querySelector('[data-standing]')
 
 describe('ThesisBet (specs/thesis-detail TD-07, TD-08)', () => {
-  it('says what it bets on: reference, target with its distance, deadline, conviction and when', () => {
+  it('says what it bets on once: reference, target with its distance, deadline and time left, conviction', () => {
     renderWithIntl(<ThesisBet thesis={thesisItem()} />)
     expect(screen.getByRole('heading', { name: 'The bet' })).toBeInTheDocument()
     expect(screen.getByText('$83,584, on Oct 13, 2026')).toBeInTheDocument()
@@ -15,9 +15,13 @@ describe('ThesisBet (specs/thesis-detail TD-07, TD-08)', () => {
     const target = screen.getByText(/^Above \$150,000 · \+79\.5%$/)
     expect(target).toHaveClass('text-bullish')
     expect(target.querySelector('svg')).not.toBeNull()
-    expect(screen.getByText('Deadline').nextElementSibling).toHaveTextContent(/\d{1,2}:\d{2}/)
-    expect(screen.getByText('High')).toBeInTheDocument()
-    expect(standing()).toHaveTextContent(/^Closes in /)
+    // To the minute, and how long it has left: no line of its own (PO 2026-11-03).
+    expect(screen.getByText('Deadline').nextElementSibling).toHaveTextContent(
+      /\d{1,2}:\d{2}.* · in /,
+    )
+    expect(screen.getByText('Conviction').nextElementSibling).toHaveTextContent('High')
+    expect(screen.queryByText('Published')).not.toBeInTheDocument()
+    expect(standing()).toBeNull()
   })
 
   it('says a bet below in red, and one without price as such', () => {

@@ -73,6 +73,9 @@ describe('ThesisCard in a feed (specs/thesis-detail TD-02 to TD-05)', () => {
 
     renderWithIntl(<ThesisCard thesis={thesisItem()} variant="detail" />)
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('BTC will close above')
+    // The rest, once, in its bet (PO 2026-11-03): no target line nor conviction here.
+    expect(screen.queryByText(/^Above $150,000 by /)).not.toBeInTheDocument()
+    expect(screen.queryByText('Conviction')).not.toBeInTheDocument()
     expect(
       screen.queryByRole('link', { name: 'BTC will close above $150K before December 2026' }),
     ).not.toBeInTheDocument()

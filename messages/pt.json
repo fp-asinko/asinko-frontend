@@ -270,10 +270,10 @@
         },
         "deadline": "Prazo",
         "conviction": "Convicção",
-        "published": "Publicada"
+        "deadlineLeft": "{date} · {left}",
+        "deadlineAt": "{date}"
       },
       "standing": {
-        "open": "Fecha {when}",
         "expired": "Aguardando resolução",
         "disputed": "Em revisão",
         "resolved": "{outcome, select, correct {Acertada} other {Errada}} em {date}{hasPrice, select, yes { a {price}} other {}}{source, select, automatic { · automaticamente} community { · pela comunidade} admin { · por um admin} other {}}",

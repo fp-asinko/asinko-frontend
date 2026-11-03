@@ -270,10 +270,10 @@
         },
         "deadline": "Deadline",
         "conviction": "Conviction",
-        "published": "Published"
+        "deadlineLeft": "{date} · {left}",
+        "deadlineAt": "{date}"
       },
       "standing": {
-        "open": "Closes {when}",
         "expired": "Waiting for resolution",
         "disputed": "Under review",
         "resolved": "{outcome, select, correct {Correct} other {Incorrect}} on {date}{hasPrice, select, yes { at {price}} other {}}{source, select, automatic { · automatically} community { · by the community} admin { · by an admin} other {}}",
