@@ -12,6 +12,7 @@
 - [x] **RA-05** (D-3) Desplegada o plegada se recuerda mientras se edita (al sumar otro no se cierra).
 - [x] **RA-06** Accesibilidad: el "+" es el botón del desplegable con su nombre ("Relacionados (2)") y `aria-expanded`; foco visible; axe sin violaciones en claro y oscuro.
 - [x] **RA-07** Textos en en, es y pt.
+- [x] **RA-08** En la pestaña Tesis no aparece: una tesis no lleva relacionados. Los del post siguen en la URL y vuelven al volver a un formato de post (PO 2026-11-02).
 
 ## Fuera de alcance
 

@@ -47,7 +47,8 @@ export async function SubmitAside({
         </section>
       )}
       <Cards community={community} thesis={thesis} />
-      <Related community={community} related={related} />
+      {/* A thesis has no related ones: the post's stay in the URL for its tabs (RA-08). */}
+      {!thesis && <Related community={community} related={related} />}
       <SiteFooter className="mt-auto pb-6" />
     </div>
   )

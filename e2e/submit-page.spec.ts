@@ -257,6 +257,13 @@ test.describe('Page to create a post', () => {
     })
   }
 
+  test('a thesis shows no related ones in the right column (RA-08)', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'There is no right column in phones')
+    await page.goto('/en/submit?type=thesis&community=defi&related=BTC,macro')
+    await expect(page.getByRole('heading', { name: 'How a thesis works' })).toBeVisible()
+    await expect(page.getByRole('button', { name: /^Related \(/ })).toHaveCount(0)
+  })
+
   test('asks before discarding what is written (SU-05)', async ({ page }) => {
     await page.goto('/en')
     await page.goto('/en/submit')
