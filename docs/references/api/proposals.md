@@ -241,6 +241,19 @@ Medido contra `dev` el 2026-10-30.
 
 **Mientras tanto, en el front:** después de publicar una tesis que vino de un borrador, el front lo borra con `DELETE /drafts/{id}`. Con `draftId` en el backend, ese pedido se va.
 
+### P-039: Argumentos y actualizaciones de una tesis
+
+**Estado:** consultas (2026-11-03, `specs/thesis-arguments`). El front ya usa lo que el backend tiene; esto aclara cuatro puntos. Con `API_MOCKS=true` se ven con mocks; con `missing`, todo va al backend.
+
+**Motivo:** la página de una tesis muestra sus argumentos a favor y en contra (los comentarios con `side`, E05) y las actualizaciones de su autor (E11). Lo probamos contra `dev` el 2026-11-03.
+
+**Consultas:**
+
+1. **El lado de una respuesta.** E05 dice que `side` es obligatorio en un comentario de una tesis. El front manda también en cada respuesta el `side` del argumento al que responde. ¿El backend lo acepta así? ¿Rechaza una respuesta con el lado contrario al de su padre? Proponemos que la rechace (`422`) o que tome el del padre.
+2. **El largo de una actualización.** El contrato no fija un máximo para el `body` de `POST /theses/{id}/updates`. El front corta en 2.000 caracteres. ¿Hay un límite en el backend?
+3. **Anuncios entre los argumentos.** En un post, `GET /posts/{id}/comments` trae `ads` (P-031). Proponemos lo mismo en `GET /theses/{id}/comments`, para cada lado: uno arriba y uno cada 10 argumentos. Con la lista vacía no los vimos.
+4. **La forma de `GET /theses/{id}/updates`.** `dev` devuelve `{ "items": [...] }`; E11 dice una lista suelta. Seguimos al backend y corregimos el snapshot de E11 (el front acepta las dos).
+
 ## Fase 3 del backend: solo visual en el front
 
 Decisión del 2026-10-21: estas propuestas se implementan en el backend en una fase 3. Hasta entonces, el front las muestra con mocks (desarrollo y CI, `API_MOCKS=missing` o `true`): la forma de abajo es la que ya usa, y es lo que proponemos.

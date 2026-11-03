@@ -77,7 +77,7 @@
 ### `GET /api/v1/theses/{id}/updates` — Lista de actualizaciones
 **Público.**
 
-**Respuesta `200`:** lista (no paginada) de `{ "id", "body", "createdAt", "author": { "id", "username", "avatarUrl" } }`.
+**Respuesta `200`:** `{ "items": [{ "id", "body", "createdAt", "author": { "id", "username", "avatarUrl" } }] }`, sin paginar (verificado en `dev` el 2026-11-03; antes decía una lista suelta, P-039).
 
 ### `POST /api/v1/theses/{id}/updates` — Publicar actualización
 **Auth:** requerida.
