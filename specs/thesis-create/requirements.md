@@ -32,24 +32,24 @@ Publicar una tesis, el contenido central de Asinko: una predicción falsable sob
 
 ### El formulario
 
-- [ ] **TC-01** (Q1) La página de crear suma la pestaña **"Tesis"** después de Image. Solo con sesión, como el resto de la página. Queda en la URL (`?type=thesis`): se comparte y recarga.
-- [ ] **TC-02** **Activo**: un selector con búsqueda sobre el catálogo de activos soportados (`$` + símbolo, nombre y precio actual cuando lo hay). Solo se elige uno del catálogo, nunca un texto libre. Entrando desde la página de un activo, o con `?community=` de la comunidad de un activo, viene elegido.
-- [ ] **TC-03** (Q5) Al elegir el activo queda elegida su comunidad en el selector de comunidad, si quien escribe no eligió otra a mano. Empezar desde la página de un grupo o del perfil cuenta como elegida: el activo no la cambia (PO 2026-11-02). Se puede cambiar a cualquier comunidad o al canal personal propio. La comunidad del activo siempre aparece en la lista, debajo de "Tu perfil", aunque quien escribe no sea miembro: así se puede volver a ella (PO 2026-11-02).
-- [ ] **TC-04** (Q2) **Claim**: una línea, obligatoria, de hasta **280** caracteres con contador. Ayuda: "Una frase clara que se pueda comprobar".
-- [ ] **TC-05** (Q3; ajustado por R1 y R3) **Dirección y precio objetivo**, obligatorios: "Por encima de" o "Por debajo de" y un precio mayor que cero, en la misma unidad que el precio del activo (el contrato no trae la moneda: el campo no muestra un símbolo de moneda). Con el activo elegido, se muestra su precio actual como referencia (con "desactualizado" si `priceStale`) y la diferencia en % con el objetivo. Un objetivo del lado contrario a la dirección (por ejemplo "por encima de" un precio menor al actual) se avisa, pero no se bloquea. **Desde la revisión 2:** la referencia es la tarjeta del activo (TC-22) y la dirección sale del objetivo (TC-24); el aviso de lado contrario ya no hace falta.
-- [ ] **TC-06** (Q4) **Fecha límite**, obligatoria, con un selector de fecha. Lo más cerca es el día en que, a las 23:59, falten más de 24 h; lo más lejos, 5 años. Fuera de ese rango, el campo lo dice.
-- [ ] **TC-07** (con la forma de TC-25) **Convicción**, obligatoria: cuatro opciones, **Baja, Media, Alta y Extrema** (`LOW` a `EXTREME`), con una ayuda: la convicción pesa en tu calibración, y una errada con convicción extrema pesa más.
-- [ ] **TC-08** **Razonamiento**, obligatorio: el argumento detrás del claim, con la misma caja de texto del cuerpo de un post (Markdown, formato y emojis).
-- [ ] **TC-09** Mientras falte un campo obligatorio o haya uno inválido, "Publicar" está deshabilitado, igual que en el formulario de posts. Un error (un claim largo, una fecha fuera de rango) aparece en su campo al tocar "Publicar" y se actualiza mientras se corrige, como en los posts (design.md § 3, ajustado el 2026-11-02).
-- [ ] **TC-10** (Q8) Lo escrito se guarda en el navegador mientras se edita y vuelve al recargar o al volver a la pestaña, hasta publicar o descartar. "Guardar borrador" no aparece en la pestaña Tesis.
+- [x] **TC-01** (Q1) La página de crear suma la pestaña **"Tesis"** después de Image. Solo con sesión, como el resto de la página. Queda en la URL (`?type=thesis`): se comparte y recarga.
+- [x] **TC-02** **Activo**: un selector con búsqueda sobre el catálogo de activos soportados (`$` + símbolo, nombre y precio actual cuando lo hay). Solo se elige uno del catálogo, nunca un texto libre. Entrando desde la página de un activo, o con `?community=` de la comunidad de un activo, viene elegido.
+- [x] **TC-03** (Q5) Al elegir el activo queda elegida su comunidad en el selector de comunidad, si quien escribe no eligió otra a mano. Empezar desde la página de un grupo o del perfil cuenta como elegida: el activo no la cambia (PO 2026-11-02). Se puede cambiar a cualquier comunidad o al canal personal propio. La comunidad del activo siempre aparece en la lista, debajo de "Tu perfil", aunque quien escribe no sea miembro: así se puede volver a ella (PO 2026-11-02).
+- [x] **TC-04** (Q2) **Claim**: una línea, obligatoria, de hasta **280** caracteres con contador. Ayuda: "Una frase clara que se pueda comprobar".
+- [x] **TC-05** (Q3; ajustado por R1 y R3) **Dirección y precio objetivo**, obligatorios: "Por encima de" o "Por debajo de" y un precio mayor que cero, en la misma unidad que el precio del activo (el contrato no trae la moneda: el campo no muestra un símbolo de moneda). Con el activo elegido, se muestra su precio actual como referencia (con "desactualizado" si `priceStale`) y la diferencia en % con el objetivo. Un objetivo del lado contrario a la dirección (por ejemplo "por encima de" un precio menor al actual) se avisa, pero no se bloquea. **Desde la revisión 2:** la referencia es la tarjeta del activo (TC-22) y la dirección sale del objetivo (TC-24); el aviso de lado contrario ya no hace falta.
+- [x] **TC-06** (Q4) **Fecha límite**, obligatoria, con un selector de fecha. Lo más cerca es el día en que, a las 23:59, falten más de 24 h; lo más lejos, 5 años. Fuera de ese rango, el campo lo dice.
+- [x] **TC-07** (con la forma de TC-25) **Convicción**, obligatoria: cuatro opciones, **Baja, Media, Alta y Extrema** (`LOW` a `EXTREME`), con una ayuda: la convicción pesa en tu calibración, y una errada con convicción extrema pesa más.
+- [x] **TC-08** **Razonamiento**, obligatorio: el argumento detrás del claim, con la misma caja de texto del cuerpo de un post (Markdown, formato y emojis).
+- [x] **TC-09** Mientras falte un campo obligatorio o haya uno inválido, "Publicar" está deshabilitado, igual que en el formulario de posts. Un error (un claim largo, una fecha fuera de rango) aparece en su campo al tocar "Publicar" y se actualiza mientras se corrige, como en los posts (design.md § 3, ajustado el 2026-11-02).
+- [x] **TC-10** (Q8) Lo escrito se guarda en el navegador mientras se edita y vuelve al recargar o al volver a la pestaña, hasta publicar o descartar. "Guardar borrador" no aparece en la pestaña Tesis.
 
 ### Confirmar y publicar
 
-- [ ] **TC-11** (Q6) "Publicar" abre una **confirmación** con el resumen: activo, claim, "por encima de / por debajo de" el precio, fecha límite y convicción. Dice que **una tesis publicada no se puede editar ni borrar** y que se resuelve sola a la fecha límite contra el precio de mercado.
-- [ ] **TC-12** (Q6, MVP-143) La confirmación tiene el checkbox **"Entiendo que esto no es asesoramiento financiero"** (texto provisorio, marcado `TODO(legal)` hasta la revisión, ítem 42). Sin marcarlo, "Publicar tesis" no envía. "Volver" cierra la confirmación sin perder nada.
-- [ ] **TC-13** Al confirmar se manda `POST /theses` con el `userId` de la sesión (nunca del cliente), la comunidad, el símbolo, el claim, el razonamiento, la convicción, la fecha límite (fin del día elegido, en la zona horaria del navegador, como ISO), el precio, la dirección y `disclaimerAccepted: true`. El botón no se puede tocar dos veces mientras se envía.
-- [ ] **TC-14** (Q7) Publicada, se borra lo guardado en el navegador y se va a tu perfil en la pestaña **Tesis**, con la nueva primera.
-- [ ] **TC-15** **Errores**, cada uno donde corresponde y sin perder lo escrito:
+- [x] **TC-11** (Q6) "Publicar" abre una **confirmación** con el resumen: activo, claim, "por encima de / por debajo de" el precio, fecha límite y convicción. Dice que **una tesis publicada no se puede editar ni borrar** y que se resuelve sola a la fecha límite contra el precio de mercado.
+- [x] **TC-12** (Q6, MVP-143) La confirmación tiene el checkbox **"Entiendo que esto no es asesoramiento financiero"** (texto provisorio, marcado `TODO(legal)` hasta la revisión, ítem 42). Sin marcarlo, "Publicar tesis" no envía. "Volver" cierra la confirmación sin perder nada.
+- [x] **TC-13** Al confirmar se manda `POST /theses` con el `userId` de la sesión (nunca del cliente), la comunidad, el símbolo, el claim, el razonamiento, la convicción, la fecha límite (fin del día elegido, en la zona horaria del navegador, como ISO), el precio, la dirección y `disclaimerAccepted: true`. El botón no se puede tocar dos veces mientras se envía.
+- [x] **TC-14** (Q7) Publicada, se borra lo guardado en el navegador y se va a tu perfil en la pestaña **Tesis**, con la nueva primera.
+- [x] **TC-15** **Errores**, cada uno donde corresponde y sin perder lo escrito:
   - `CLAIM_TOO_LONG` → en el claim;
   - `DEADLINE_OUT_OF_RANGE` → en la fecha límite;
   - `ASSET_NOT_FOUND` o `AMBIGUOUS_SYMBOL` → en el activo;
@@ -61,12 +61,12 @@ Publicar una tesis, el contenido central de Asinko: una predicción falsable sob
 
 ### Calidad
 
-- [ ] **TC-16** A 360 px todo entra sin scroll horizontal; la confirmación es un panel desde abajo en el teléfono y una ventana en desktop (patrón Drawer/Dialog). Los campos usan 16 px o más (sin zoom en iOS).
-- [ ] **TC-17** Accesibilidad: cada campo con su etiqueta y su error asociado; la convicción y la dirección son grupos de opciones navegables con teclado; la confirmación atrapa el foco, lo devuelve a "Publicar" al cerrar, y el checkbox se lee con su texto. axe sin violaciones en claro y oscuro.
-- [ ] **TC-18** Mocks (`API_MOCKS=true`): `POST /theses` con la forma del backend y sus errores, y la tesis creada se suma a `GET /users/{id}/theses` del usuario demo. Con `missing`, va al backend real (la ruta ya existe).
-- [ ] **TC-19** El presupuesto de JS se respeta: la pestaña Tesis y la confirmación se cargan diferidas, como el editor (`seo.md`).
-- [ ] **TC-20** Textos en en, es y pt.
-- [ ] **TC-21** `overview.md § Tesis` dice 280 caracteres (Q2) y que el precio objetivo es obligatorio (Q3).
+- [x] **TC-16** A 360 px todo entra sin scroll horizontal; la confirmación es un panel desde abajo en el teléfono y una ventana en desktop (patrón Drawer/Dialog). Los campos usan 16 px o más (sin zoom en iOS).
+- [x] **TC-17** Accesibilidad: cada campo con su etiqueta y su error asociado; la convicción y la dirección son grupos de opciones navegables con teclado; la confirmación atrapa el foco, lo devuelve a "Publicar" al cerrar, y el checkbox se lee con su texto. axe sin violaciones en claro y oscuro.
+- [x] **TC-18** Mocks (`API_MOCKS=true`): `POST /theses` con la forma del backend y sus errores, y la tesis creada se suma a `GET /users/{id}/theses` del usuario demo. Con `missing`, va al backend real (la ruta ya existe).
+- [x] **TC-19** El presupuesto de JS se respeta: la pestaña Tesis y la confirmación se cargan diferidas, como el editor (`seo.md`).
+- [x] **TC-20** Textos en en, es y pt.
+- [x] **TC-21** `overview.md § Tesis` dice 280 caracteres (Q2) y que el precio objetivo es obligatorio (Q3).
 
 ## Revisión 2: el estilo del prototipo (2026-11-02)
 
