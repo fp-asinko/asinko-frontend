@@ -46,6 +46,9 @@ export async function expectNoA11yViolations(page: Page) {
       const bar = document.querySelector<HTMLElement>('[data-site-header]')
       if (bar) bar.style.position = position
     }, value)
+  // Right after a client navigation (a router.replace, as the page to create a post does on
+  // every choice) the title can be empty a moment: wait for the page's own.
+  await expect(page).toHaveTitle(/\S/)
   await stuck('relative')
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
