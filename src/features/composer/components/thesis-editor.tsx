@@ -820,7 +820,8 @@ export function ThesisEditor({
               />
               <p
                 id={`${ids}-conviction-help`}
-                className="px-1 type-meta text-muted-foreground sm:pb-0.5"
+                // On the row's right edge from sm, as far from the bars as it goes (TC-30).
+                className="px-1 type-meta text-muted-foreground sm:ml-auto sm:pb-0.5 sm:text-right"
               >
                 {t('thesis.conviction.help')}
               </p>

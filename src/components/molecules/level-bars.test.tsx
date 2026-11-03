@@ -65,6 +65,17 @@ describe('LevelBars (specs/thesis-create TC-25)', () => {
     expect(bars.every((bar) => bar.className.includes('bg-level-4 '))).toBe(true)
   })
 
+  it('keeps every name in one cell, only the current one seen, so its width never changes', async () => {
+    render(<Bars />)
+    const hidden = () =>
+      ['Choose your conviction', 'Low', 'Medium', 'High', 'Extreme'].filter((text) =>
+        screen.getByText(text, { selector: 'span' }).classList.contains('invisible'),
+      )
+    expect(hidden()).toEqual(['Low', 'Medium', 'High', 'Extreme'])
+    await userEvent.click(screen.getByRole('radio', { name: 'High' }))
+    expect(hidden()).toEqual(['Choose your conviction', 'Low', 'Medium', 'Extreme'])
+  })
+
   it('moves with the arrows', async () => {
     const onChange = vi.fn()
     render(<Bars onChange={onChange} />)

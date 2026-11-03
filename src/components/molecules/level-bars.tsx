@@ -83,13 +83,25 @@ export function LevelBars<Value extends string>({
           />
         ))}
       </RadioGroup>
-      <span
-        className={cn(
-          'type-action whitespace-nowrap',
-          chosen === -1 ? 'font-normal text-muted-foreground' : 'text-foreground',
-        )}
-      >
-        {chosen === -1 ? prompt : levels[chosen]!.label}
+      {/* Every name in the same cell, only the current one seen: the cell takes the widest, so
+          what follows does not move when the level changes. */}
+      <span className="grid">
+        {[prompt, ...levels.map((level) => level.label)].map((text, index) => {
+          const current = index === chosen + 1
+          return (
+            <span
+              key={index}
+              aria-hidden={!current || undefined}
+              className={cn(
+                'col-start-1 row-start-1 type-action whitespace-nowrap',
+                index === 0 ? 'font-normal text-muted-foreground' : 'text-foreground',
+                !current && 'invisible',
+              )}
+            >
+              {text}
+            </span>
+          )
+        })}
       </span>
     </div>
   )

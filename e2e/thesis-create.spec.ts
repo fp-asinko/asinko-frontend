@@ -180,6 +180,21 @@ test('fits a 1280×800 window without scrolling, with an asset chosen (TC-36)', 
   expect(publish.y + publish.height).toBeLessThanOrEqual(800)
 })
 
+test('the conviction help stays put while the level changes (TC-30)', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'In phones the help goes under the bars')
+  await page.goto('/en/submit?community=BTC&type=thesis')
+  const help = main(page).getByText(/Your conviction affects/)
+  const at = async () => (await help.boundingBox())!.x
+  const start = await at()
+  for (const name of ['Low', 'Medium', 'High', 'Extreme']) {
+    await main(page).getByRole('radio', { name }).click()
+    expect(await at(), name).toBe(start)
+  }
+})
+
 test.describe('A thesis from UTC−3 (specs/local-time LT-05)', () => {
   // Santiago, already told to the server: no first-visit refresh in the middle of the form.
   test.use({
