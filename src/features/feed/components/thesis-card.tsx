@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils'
 import type { ThesisItem } from '../feed.types'
 import { CARD_ACTION } from './card-action'
 import { CardByline } from './card-byline'
-import { CardLink } from './card-link'
+import { CardLink } from '@/components/molecules/card-link'
 import { FeedReasonLine } from './feed-reason-line'
 import { VoteControl } from './vote-control'
 

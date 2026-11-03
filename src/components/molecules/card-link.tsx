@@ -13,7 +13,8 @@ export const OWN_CLICK =
   'a, button, input, textarea, select, summary, label, [role="button"], [role="menuitem"], [data-card-own-click]'
 
 /**
- * A post card that opens its post anywhere on it, as Reddit's (PO, 2026-10-09), besides its
+ * A card that opens its page anywhere on it, as Reddit's (PO, 2026-10-09): a post, a thesis in a
+ * feed or in a profile (specs/thesis-detail TD-17). Besides its
  * title, which stays the link for the keyboard and screen readers. A click on its votes,
  * comments, Share, Join, links or mentions does what it always did; selecting text does not
  * navigate; Ctrl or Cmd click opens it in another tab. A click inside a dialog that opened from

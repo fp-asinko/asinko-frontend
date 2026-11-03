@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from 'react'
 import { flushImpressions, trackImpression } from '../lib/impression-queue'
-import { OWN_CLICK } from './card-link'
+import { OWN_CLICK } from '@/components/molecules/card-link'
 
 /** Seen: at least half the card, for at least a second (specs/explore-v1 EX-05). */
 export const SEEN_RATIO = 0.5

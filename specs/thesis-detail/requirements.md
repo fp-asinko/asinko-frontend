@@ -77,7 +77,7 @@ Que una tesis se vea donde se publica, igual que un post: en el Home, en su grup
 
 ### El perfil
 
-- [x] **TD-17** La tarjeta de la pestaña Tesis del perfil pasa a ser un link a su página (Q5). Sigue igual de liviana: sin votos ni la cabecera del grupo, que en el perfil sobran.
+- [x] **TD-17** La tarjeta de la pestaña Tesis del perfil pasa a ser un link a su página (Q5). Sigue igual de liviana: sin votos ni la cabecera del grupo, que en el perfil sobran. **Ajuste (PO, 2026-11-03):** toda la tarjeta lleva a su página y se pinta de gris al pasar el mouse, como en el feed (`CardLink`, que pasa de `features/feed` a `components/molecules`).
 
 ### Calidad
 
