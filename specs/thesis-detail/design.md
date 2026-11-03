@@ -1,6 +1,6 @@
 # Una tesis en el feed y en su página — Design
 
-> Basado en `requirements.md` (Q1 a Q5 resueltas el 2026-11-03). Rama `feature/thesis-detail-lifecycle`, desde `feature/thesis-create`, que todavía no está en `develop`.
+> Basado en `requirements.md` (Q1 a Q5 resueltas el 2026-11-03). Aprobado por el PO el 2026-11-03. Rama `feature/thesis-detail-lifecycle`, desde `feature/thesis-create`, que todavía no está en `develop`.
 
 ## 1. Dónde vive
 

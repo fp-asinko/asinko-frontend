@@ -1,0 +1,73 @@
+import { useFormatter, useTranslations } from 'next-intl'
+import { cn } from '@/lib/utils'
+import type { ThesisSummaryData } from './thesis-summary.types'
+
+/**
+ * The body of a thesis, the same in the profile and in the feed (specs/thesis-detail TD-03): the
+ * claim as its title, what it bets on and by when, how it ended, and the conviction in 4 bars.
+ * The card around it draws the header (asset, author, state) and the actions.
+ */
+export function ThesisSummary({
+  thesis,
+  titleId,
+  heading = 'h3',
+}: {
+  thesis: ThesisSummaryData
+  /** The title's id: the card's article is labelled by it. */
+  titleId: string
+  /** The page's own thesis is its h1; a card in a list, h2 or h3. */
+  heading?: 'h1' | 'h2' | 'h3'
+}) {
+  const t = useTranslations('thesisSummary')
+  const format = useFormatter()
+  const Title = heading
+  // Cents only below $1,000: "$150,000", "$182.47", "$2.41".
+  const price = (value: number) =>
+    format.number(value, {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: value >= 1000 ? 0 : 2,
+    })
+  const date = format.dateTime(new Date(thesis.deadline), { dateStyle: 'medium' })
+
+  return (
+    <>
+      <Title id={titleId} className="mt-2 type-post-title">
+        {thesis.claim}
+      </Title>
+
+      <p className="mt-1.5 type-small text-muted-foreground">
+        {thesis.target
+          ? t(`target.${thesis.target.direction}`, { price: price(thesis.target.price), date })
+          : t('target.none', { date })}
+      </p>
+      {thesis.resolutionPrice !== null && (
+        <p className="type-small text-muted-foreground">
+          {t('resolved', { price: price(thesis.resolutionPrice) })}
+        </p>
+      )}
+      {thesis.state === 'cancelled' && thesis.cancellationReason && (
+        <p className="type-small text-muted-foreground">
+          {t('cancelledReason', { reason: thesis.cancellationReason })}
+        </p>
+      )}
+
+      <p className="mt-3 flex items-center gap-2 type-section text-muted-foreground">
+        {t('conviction.label')}
+        <span aria-hidden className="flex gap-0.5">
+          {[1, 2, 3, 4].map((bar) => (
+            <span
+              key={bar}
+              className={cn(
+                'h-3 w-1.5 rounded-sm',
+                bar <= thesis.conviction ? 'bg-foreground' : 'bg-border-strong',
+              )}
+            />
+          ))}
+        </span>
+        <span className="normal-case">{t(`conviction.${thesis.conviction}`)}</span>
+      </p>
+    </>
+  )
+}

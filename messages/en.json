@@ -596,29 +596,6 @@
       "empty": "{handle} has not published a thesis yet.",
       "emptySelf": "You have not published a thesis yet.",
       "error": "Could not load the theses. Try again later.",
-      "state": {
-        "open": "Open",
-        "correct": "Correct",
-        "incorrect": "Incorrect",
-        "expired": "Expired",
-        "disputed": "Disputed",
-        "cancelled": "Cancelled"
-      },
-      "target": {
-        "above": "Above {price} by {date}",
-        "below": "Below {price} by {date}",
-        "equals": "At {price} by {date}",
-        "none": "By {date}"
-      },
-      "resolved": "Resolved at {price}",
-      "cancelledReason": "Cancelled: {reason}",
-      "conviction": {
-        "1": "Low",
-        "2": "Medium",
-        "3": "High",
-        "4": "Extreme",
-        "label": "Conviction"
-      },
       "more": {
         "button": "Load more",
         "loading": "Loading…",
@@ -833,6 +810,31 @@
     },
     "shareGroup": "Share group",
     "shareAsset": "Share asset"
+  },
+  "thesisSummary": {
+    "state": {
+      "open": "Open",
+      "correct": "Correct",
+      "incorrect": "Incorrect",
+      "expired": "Expired",
+      "disputed": "Disputed",
+      "cancelled": "Cancelled"
+    },
+    "target": {
+      "above": "Above {price} by {date}",
+      "below": "Below {price} by {date}",
+      "equals": "At {price} by {date}",
+      "none": "By {date}"
+    },
+    "resolved": "Resolved at {price}",
+    "cancelledReason": "Cancelled: {reason}",
+    "conviction": {
+      "1": "Low",
+      "2": "Medium",
+      "3": "High",
+      "4": "Extreme",
+      "label": "Conviction"
+    }
   },
   "featured": {
     "title": "Featured",

@@ -1,8 +1,8 @@
 import { useTranslations } from 'next-intl'
 import { FeatureMenu } from '@/components/organisms/featured'
+import { ThesisState } from '@/components/organisms/thesis-summary'
 import { Link } from '@/i18n/navigation'
 import type { FeaturedItem } from '../communities.types'
-import { ThesisState } from './thesis-state'
 
 /**
  * A featured post, poll or thesis, as LinkedIn's "Featured" cards (specs/profile-showcase PS-05,
