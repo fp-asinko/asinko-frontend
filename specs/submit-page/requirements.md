@@ -39,6 +39,7 @@ Publicar en una página propia, como Reddit: la comunidad elegida arriba (y se p
 - [x] **SU-09** Mobile first: a 360 px, la página entra sin scroll horizontal, con Publicar al alcance. Teclado: el foco entra en el título; axe sin violaciones en claro y oscuro.
 - [x] **SU-10** Textos en en, es y pt; metadata de la página (título "Crear post", `noindex`).
 - [x] **SU-11** El editor se carga solo en esta página: deja de viajar en la primera carga del resto (el presupuesto de JS debería bajar en el Home y en las páginas de comunidad).
+- [x] **SU-13** Cada pestaña guarda su lugar: el post, su comunidad, relacionados y etiqueta; la tesis, su comunidad. Pasar a Tesis no lleva lo del post: arranca limpia, con el activo de la URL si lo hay (`specs/thesis-create` TC-02) y su comunidad al elegir el activo (TC-03). Volver al post recupera lo que tenía. La URL y la columna derecha muestran lo de la pestaña abierta (PO 2026-11-02).
 
 ## Fuera de alcance
 

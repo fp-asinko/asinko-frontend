@@ -20,7 +20,9 @@ vi.mock('../actions/drafts.action', () => ({
 }))
 vi.mock('../actions/upload-post-image.action', () => ({ uploadPostImageAction: vi.fn() }))
 vi.mock('../actions/create-thesis.action', () => ({ createThesis: vi.fn() }))
-vi.mock('../actions/asset-quote.action', () => ({ getAssetQuote: vi.fn() }))
+vi.mock('../actions/asset-quote.action', () => ({
+  getAssetQuote: vi.fn().mockResolvedValue(null),
+}))
 vi.mock('../actions/search-communities.action', () => ({
   searchCommunities: actions.searchCommunities,
 }))
@@ -30,7 +32,7 @@ const DEFI: CommunityOption = { id: 'c1', slug: 'defi', handle: '#defi', name: '
 const BTC: CommunityOption = { id: 'c2', slug: 'BTC', handle: '$BTC', name: 'Bitcoin', own: false }
 const title = () => screen.getByRole('textbox', { name: 'Title' })
 
-describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12)', () => {
+describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12, SU-13)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     actions.searchCommunities.mockResolvedValue({ ok: true, data: [DEFI, BTC] })
@@ -44,9 +46,8 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12)', () => {
     renderWithIntl(<SubmitEditor type="TEXT" community={DEFI} storageKey={KEY} />)
     await userEvent.type(title(), 'Keep me')
     await userEvent.click(screen.getByRole('tab', { name: 'Thesis' }))
-    expect(router.replace).toHaveBeenLastCalledWith('/submit?community=defi&type=thesis', {
-      scroll: false,
-    })
+    // The thesis starts clean: the post's group stays with the post (SU-13).
+    expect(router.replace).toHaveBeenLastCalledWith('/submit?type=thesis', { scroll: false })
     await vi.waitFor(() =>
       expect(screen.getByRole('tab', { name: 'Thesis', selected: true })).toBeInTheDocument(),
     )
@@ -70,6 +71,37 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12)', () => {
     await userEvent.click(screen.getAllByRole('tab', { name: 'Thesis' })[0]!)
     await vi.waitFor(() =>
       expect(screen.getByRole('tab', { name: 'Thesis', selected: true })).toHaveFocus(),
+    )
+  })
+
+  it('keeps each tab its own place: the post its community and related ones, the thesis its own (SU-13)', async () => {
+    renderWithIntl(
+      <SubmitEditor type="TEXT" community={DEFI} storageKey={KEY} related={['$BTC']} />,
+    )
+    await userEvent.click(screen.getByRole('tab', { name: 'Thesis' }))
+    expect(router.replace).toHaveBeenLastCalledWith('/submit?type=thesis', { scroll: false })
+    await vi.waitFor(() =>
+      expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent(
+        'Choose a community',
+      ),
+    )
+
+    await userEvent.click(screen.getByRole('tab', { name: 'Text' }))
+    expect(router.replace).toHaveBeenLastCalledWith('/submit?community=defi&related=BTC', {
+      scroll: false,
+    })
+    expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('#defi')
+    expect(screen.getByRole('list', { name: 'Related' })).toHaveTextContent('$BTC')
+  })
+
+  it('takes an asset of the URL to the thesis as its asset (specs/thesis-create TC-02)', async () => {
+    renderWithIntl(<SubmitEditor type="TEXT" community={BTC} storageKey={KEY} />)
+    await userEvent.click(screen.getByRole('tab', { name: 'Thesis' }))
+    expect(router.replace).toHaveBeenLastCalledWith('/submit?community=BTC&type=thesis', {
+      scroll: false,
+    })
+    await vi.waitFor(() =>
+      expect(screen.getByRole('combobox', { name: 'Asset' })).toHaveTextContent('$BTC'),
     )
   })
 

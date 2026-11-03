@@ -29,9 +29,10 @@ type PostFormat = Exclude<CreateFormat, 'THESIS'>
 /**
  * The editors on their page (specs/submit-page SU-03 to SU-05, specs/thesis-create § 2): the
  * post's and, from its tab, the thesis's. Both stay mounted once opened, the other one hidden:
- * switching loses nothing. Another community, other related ones (specs/related-aside) or the
- * format go into the URL (the page and its right column follow them, the forms keep what is
- * written); Cancel with something written asks first and, if confirmed, also drops the drafts;
+ * switching loses nothing, and each keeps its own place: the post's community and related ones,
+ * the thesis's community (SU-13). Another community, other related ones (specs/related-aside)
+ * or the format go into the URL (the page and its right column follow the open tab's, the forms
+ * keep what is written); Cancel with something written asks first and, if confirmed, also drops the drafts;
  * publishing goes to the new post, or to the author's theses.
  */
 export function SubmitEditor({
@@ -67,6 +68,13 @@ export function SubmitEditor({
     related: related.map(slugOf),
     type: type === 'TEXT' ? undefined : (type.toLowerCase() as SubmitType),
   })
+  // Each tab its own place (SU-13): the URL shows the open one's. The thesis starts clean, with
+  // only an asset of the URL (TC-02), unless the page was opened on it.
+  const thesisCommunity = type === 'THESIS' || community?.handle.startsWith('$') ? community : null
+  const places = useRef({
+    post: { community: community?.slug ?? null, related: related.map(slugOf) },
+    thesis: { community: thesisCommunity?.slug ?? null },
+  })
   function follow(next: Partial<typeof where.current>) {
     where.current = { ...where.current, ...next }
     router.replace(submitPath(locale, where.current), { scroll: false })
@@ -92,13 +100,16 @@ export function SubmitEditor({
   function showThesis() {
     setThesis(true)
     setThesisOpened(true)
-    follow({ type: 'thesis' })
+    follow({ type: 'thesis', ...places.current.thesis, related: [] })
     focusTab(thesisBox)
   }
   function showPost(format: PostFormat) {
     setThesis(false)
     setPostFormat({ format })
-    follow({ type: format === 'TEXT' ? undefined : (format.toLowerCase() as SubmitType) })
+    follow({
+      type: format === 'TEXT' ? undefined : (format.toLowerCase() as SubmitType),
+      ...places.current.post,
+    })
     focusTab(postBox)
   }
 
@@ -127,8 +138,14 @@ export function SubmitEditor({
           onPublished={(path) => router.push(path)}
           related={related}
           preview={preview}
-          onCommunityChange={(next) => follow({ community: next?.slug ?? null })}
-          onRelatedChange={(handles) => follow({ related: handles.map(slugOf) })}
+          onCommunityChange={(next) => {
+            places.current.post.community = next?.slug ?? null
+            follow({ community: places.current.post.community })
+          }}
+          onRelatedChange={(handles) => {
+            places.current.post.related = handles.map(slugOf)
+            follow({ related: places.current.post.related })
+          }}
           onThesis={showThesis}
           formatRequest={postFormat}
           draftRequest={postDraft}
@@ -141,12 +158,15 @@ export function SubmitEditor({
       {thesisOpened && (
         <div ref={thesisBox} hidden={!thesis}>
           <ThesisEditor
-            community={community}
+            community={thesisCommunity}
             storageKey={thesisStorageKey}
             draftRef={thesisWritten}
             onCancel={cancel}
             onFormat={showPost}
-            onCommunityChange={(next) => follow({ community: next?.slug ?? null })}
+            onCommunityChange={(next) => {
+              places.current.thesis.community = next?.slug ?? null
+              follow({ community: places.current.thesis.community })
+            }}
             // To the author's theses, the new one first (specs/thesis-create TC-14).
             draftRequest={thesisDraft}
             onOpenPostDraft={(draft) => {
