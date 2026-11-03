@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type RefObject } from 'react'
@@ -11,6 +12,7 @@ import { LevelBars } from '@/components/molecules/level-bars'
 import { EmojiButton } from '@/components/molecules/emoji-picker'
 import { applyFormat, FormatToolbar, formatShortcut } from '@/components/molecules/format-toolbar'
 import { MentionField } from '@/components/molecules/mention-assist'
+import { UserAvatar } from '@/components/molecules/user-avatar'
 import { useAuthGate } from '@/components/organisms/auth-gate'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -523,8 +525,16 @@ export function ThesisEditor({
                 invalid={invalid('assetSymbol')}
                 describedBy={`${ids}-assetSymbol-error`}
                 renderValue={(chosenAsset) => (
-                  <span className="flex min-w-0 flex-1 items-center justify-between gap-3">
-                    <span className="min-w-0">
+                  <span className="flex min-w-0 flex-1 items-center gap-3">
+                    {/* Its logo, or its initials on its color (TC-29). */}
+                    <UserAvatar
+                      name={chosenAsset.handle}
+                      colorKey={chosenAsset.slug}
+                      imageUrl={chosenAsset.avatarUrl}
+                      size="sm"
+                      className="shrink-0 rounded-md"
+                    />
+                    <span className="min-w-0 flex-1">
                       <span className="block type-action font-bold">{chosenAsset.handle}</span>
                       <span className="block truncate type-meta text-muted-foreground">
                         {quote?.name ?? chosenAsset.name}
@@ -537,11 +547,15 @@ export function ThesisEditor({
                             maximumFractionDigits: reference < 1 ? 6 : 2,
                           })}
                         </span>
-                        <span className="block type-meta">
-                          {quote?.stale ? (
-                            <span className="text-muted-foreground">{t('thesis.asset.stale')}</span>
-                          ) : (
-                            quote?.changePct != null && <Delta value={quote.changePct} />
+                        {/* The day's change in green or red, also when out of date: then it
+                            says so beside it (TC-29). */}
+                        <span className="flex items-center justify-end gap-1 type-meta">
+                          {quote?.changePct != null && <Delta value={quote.changePct} />}
+                          {quote?.stale && (
+                            <span className="text-muted-foreground">
+                              {quote.changePct != null && '· '}
+                              {t('thesis.asset.stale')}
+                            </span>
                           )}
                         </span>
                       </span>
@@ -674,7 +688,9 @@ export function ThesisEditor({
             className="gap-1"
           >
             <FieldLabel htmlFor={`${ids}-targetPrice`}>{t('thesis.target.price')}</FieldLabel>
-            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+            {/* The full width, as the claim; from sm, which way it bets goes inside the box, on its
+                right, so the row keeps its height (TC-30, TC-36). In phones, under it. */}
+            <div className="relative flex flex-col gap-1.5 sm:block">
               <Input
                 id={`${ids}-targetPrice`}
                 inputMode="decimal"
@@ -694,7 +710,7 @@ export function ThesisEditor({
                 aria-invalid={invalid('targetPrice') || invalid('direction') || undefined}
                 aria-required
                 aria-describedby={`${ids}-direction-said ${ids}-targetPrice-error ${ids}-direction-error`}
-                className={cn(FIELD_BOX, 'h-11 tabular-nums disabled:opacity-60 sm:w-56')}
+                className={cn(FIELD_BOX, 'h-11 tabular-nums disabled:opacity-60 sm:pr-64')}
               />
               {/* Which way it bets, from the target (TC-24). */}
               <p
@@ -702,18 +718,30 @@ export function ThesisEditor({
                 // Said as it changes with the price typed.
                 aria-live="polite"
                 // Hidden while empty: it would add its gap below the price.
-                className="px-1 type-meta text-muted-foreground empty:hidden"
+                // Green up or red down, with its arrow: never the color alone (on white, as the
+                // bullish green asks).
+                className={cn(
+                  'hidden items-center gap-1 px-1 type-meta font-semibold not-empty:flex sm:pointer-events-none sm:absolute sm:inset-y-0 sm:right-3',
+                  derived === 'BELOW' ? 'text-bearish' : 'text-bullish',
+                )}
               >
-                {derived &&
-                  change !== null &&
-                  t('thesis.target.direction', {
-                    direction: derived,
-                    change: format.number(change, {
-                      style: 'percent',
-                      maximumFractionDigits: 1,
-                      signDisplay: 'exceptZero',
-                    }),
-                  })}
+                {derived && change !== null && (
+                  <>
+                    {derived === 'BELOW' ? (
+                      <ArrowDownIcon aria-hidden className="size-3" strokeWidth={2.5} />
+                    ) : (
+                      <ArrowUpIcon aria-hidden className="size-3" strokeWidth={2.5} />
+                    )}
+                    {t('thesis.target.direction', {
+                      direction: derived,
+                      change: format.number(change, {
+                        style: 'percent',
+                        maximumFractionDigits: 1,
+                        signDisplay: 'exceptZero',
+                      }),
+                    })}
+                  </>
+                )}
               </p>
             </div>
             {/* Without the current price, the direction is chosen. */}

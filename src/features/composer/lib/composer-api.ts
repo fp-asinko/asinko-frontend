@@ -37,7 +37,8 @@ const handleOf = (community: Pick<RawCommunity, 'type' | 'slug' | 'name'>) =>
   mentionOf(community).handle
 
 export function toOption(
-  community: Pick<RawCommunity, 'id' | 'slug' | 'name' | 'type' | 'tags'>,
+  community: Pick<RawCommunity, 'id' | 'slug' | 'name' | 'type' | 'tags'> &
+    Partial<Pick<RawCommunity, 'avatarUrl'>>,
   own: boolean,
 ): CommunityOption {
   return {
@@ -47,6 +48,7 @@ export function toOption(
     name: community.name,
     own,
     tags: community.tags ?? [],
+    avatarUrl: community.avatarUrl ?? null,
   }
 }
 

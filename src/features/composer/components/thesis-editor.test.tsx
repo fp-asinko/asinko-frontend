@@ -121,15 +121,33 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     expect(claim()).toHaveAttribute('placeholder', 'e.g. NVDA > 270 before the deadline')
   })
 
+  it('keeps the day in its color when the price is out of date, and says so beside it (TC-29)', async () => {
+    actions.getAssetQuote.mockResolvedValue({
+      name: 'NVIDIA',
+      price: 180,
+      changePct: -0.4,
+      stale: true,
+    })
+    renderEditor()
+    expect(await screen.findByText('0.4%')).toBeVisible()
+    expect(screen.getByText(/out of date/)).toBeVisible()
+    // The logo's place: the asset's initials while it has no image.
+    expect(
+      screen.getByRole('combobox', { name: 'Asset' }).querySelector('[data-testid="user-avatar"]'),
+    ).toHaveTextContent('NV')
+  })
+
   it('takes the direction from the target, and refuses the current price itself (TC-24)', async () => {
     renderEditor()
     await screen.findByText('NVIDIA')
     expect(screen.queryByRole('radiogroup', { name: 'Target' })).toBeNull()
     await userEvent.type(price(), '198')
-    expect(screen.getByText('Above the current price · +10%')).toBeVisible()
+    // Green with its arrow up; red with its arrow down.
+    expect(screen.getByText('Above the current price · +10%')).toHaveClass('text-bullish')
+    expect(screen.getByText('Above the current price · +10%').querySelector('svg')).not.toBeNull()
     await userEvent.clear(price())
     await userEvent.type(price(), '150')
-    expect(screen.getByText('Below the current price · -16.7%')).toBeVisible()
+    expect(screen.getByText('Below the current price · -16.7%')).toHaveClass('text-bearish')
     await userEvent.clear(price())
     await userEvent.type(price(), '180')
     expect(

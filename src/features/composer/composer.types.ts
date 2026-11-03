@@ -14,6 +14,8 @@ export type CommunityOption = {
   own: boolean
   /** The tags a post of it can carry (P-023, specs/drafts-tags); none when absent. */
   tags?: string[]
+  /** Its image: an asset's logo on the thesis's card (specs/thesis-create TC-29). */
+  avatarUrl?: string | null
 }
 
 /** What the picker lists (specs/picker-filters PF-01): everything, only groups or only assets. */
