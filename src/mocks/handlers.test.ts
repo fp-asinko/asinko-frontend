@@ -73,6 +73,19 @@ describe('MOCK_EXTENSIONS (specs/glossary GL-07)', () => {
     expect(ads(comments.extend(tree, context({ limit: '3' })))).toBeUndefined()
   })
 
+  it('adds them to a thesis’s arguments too, each side as a post (P-039, specs/thesis-arguments Q5)', () => {
+    const args = extension('/api/v1/theses/:id/comments')
+    const side = {
+      status: 200,
+      body: { items: Array.from({ length: 3 }, (_, n) => ({ id: `a${n}`, replies: [] })) },
+    }
+    const ads = (response: { body?: unknown }) => (response.body as { ads?: unknown[] }).ads
+    expect(ads(args.extend(side, context({ side: 'PRO' })))).toEqual([
+      expect.objectContaining({ afterCommentId: null }),
+    ])
+    expect(args.extend({ status: 404, body: {} }, context()).body).toEqual({})
+  })
+
   it('only ads in a community and a profile, and leaves an error as it came', () => {
     const community = kinds(
       extension('/api/v1/feed/explore').extend(real(20), context({ community: 'BTC' })),

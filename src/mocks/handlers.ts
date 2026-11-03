@@ -1258,14 +1258,24 @@ export const MOCK_EXTENSIONS: readonly MockExtension[] = [
     // preview (?limit) does not.
     method: 'GET',
     path: '/api/v1/posts/:id/comments',
-    extend: (response, { query }) => {
-      const body = response.body
-      if (query.q !== undefined || query.limit !== undefined || response.status !== 200) {
-        return response
-      }
-      if (typeof body !== 'object' || body === null || !('items' in body)) return response
-      if (!Array.isArray(body.items)) return response
-      return { ...response, body: { ...body, ads: treeAds(body.items) } }
-    },
+    extend: withTreeAds,
+  },
+  {
+    // A thesis's arguments too, each side its own, as a post's (P-039, specs/thesis-arguments Q5):
+    // the backend does not send them yet.
+    method: 'GET',
+    path: '/api/v1/theses/:id/comments',
+    extend: withTreeAds,
   },
 ]
+
+/** The ads of a whole comment tree from the backend, where they would go (P-031). */
+function withTreeAds(response: MockResponse, { query }: Pick<MockContext, 'query'>): MockResponse {
+  const body = response.body
+  if (query.q !== undefined || query.limit !== undefined || response.status !== 200) {
+    return response
+  }
+  if (typeof body !== 'object' || body === null || !('items' in body)) return response
+  if (!Array.isArray(body.items)) return response
+  return { ...response, body: { ...body, ads: treeAds(body.items) } }
+}
