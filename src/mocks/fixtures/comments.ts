@@ -2,6 +2,7 @@ import type { RawComment } from '@/lib/api/contract'
 import { hoursAgo, minutesAgo, mockId } from './ids'
 import { POSTS } from './posts'
 import { POLLS } from './polls'
+import { THESES } from './theses'
 import { summary } from './users'
 
 let counter = 0
@@ -410,3 +411,90 @@ export const COMMENTS_BY_CONTENT: Record<string, RawComment[]> = {
     comment({ author: 'jeppe', body: '150k is conservative.', ago: minutesAgo(40), score: 11 }),
   ),
 }
+
+// A thesis's arguments (specs/thesis-arguments TA-15): comments with a side, and replies on their
+// argument's side. Maria's open $BTC thesis has 3 for and 1 against; Federico's, 1 and 2. Its
+// counters come from these (src/mocks/theses.ts, argumentsOf).
+const [mariaOpen] = THESES
+const federicoOpen = THESES.find(
+  (each) => each.creator?.username === 'federico' && each.state === 'OPEN',
+)!
+const pro = { side: 'PRO' as const }
+const contra = { side: 'CONTRA' as const }
+
+COMMENTS_BY_CONTENT[mariaOpen!.id] = thread(
+  comment(
+    {
+      ...pro,
+      author: 'jeppe',
+      body: 'ETF inflows have been positive 9 weeks in a row. Supply on exchanges keeps falling.',
+      ago: hoursAgo(20),
+      score: 34,
+    },
+    [
+      comment({
+        ...pro,
+        author: 'maria',
+        body: 'And the halving cut issuance in half. The math only goes one way.',
+        ago: hoursAgo(19),
+        score: 12,
+      }),
+    ],
+  ),
+  comment({
+    ...pro,
+    author: 'quantsimula',
+    body: 'Every cycle the post-halving top came 12 to 18 months later. December fits.',
+    ago: hoursAgo(15),
+    score: 21,
+  }),
+  comment({
+    ...pro,
+    author: 'esmev',
+    body: 'Rate cuts plus a weaker dollar: the macro tailwind is there.',
+    ago: hoursAgo(9),
+    score: 8,
+  }),
+  comment(
+    {
+      ...contra,
+      author: 'capitalprudente',
+      body: '150K is a 79% move in 14 months. Possible, but the base rate says no.',
+      ago: hoursAgo(12),
+      score: 17,
+    },
+    [
+      comment({
+        ...contra,
+        author: 'federico',
+        body: 'Agree. Liquidity is thinner than in 2021 and one ETF outflow week changes the mood.',
+        ago: hoursAgo(11),
+        score: 6,
+      }),
+    ],
+  ),
+)
+
+COMMENTS_BY_CONTENT[federicoOpen.id] = thread(
+  comment({
+    ...pro,
+    author: 'macropilar',
+    body: 'A retest before a new high is the textbook move. 90K is the weekly support.',
+    ago: hoursAgo(8),
+    score: 9,
+  }),
+  comment({
+    ...contra,
+    author: 'maria',
+    body: 'Spot demand is too strong for 90K. Dips are getting bought within hours.',
+    ago: hoursAgo(7),
+    score: 14,
+  }),
+  comment({
+    ...contra,
+    author: 'jeppe',
+    body: 'Funding is neutral: no leverage to flush, so no reason to go that low.',
+    ago: hoursAgo(5),
+    score: 5,
+  }),
+)

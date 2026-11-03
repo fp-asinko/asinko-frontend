@@ -204,6 +204,28 @@ export const thesisSchema = z.object({
 export type RawThesis = z.infer<typeof thesisSchema>
 
 /**
+ * An update of a thesis by its author (E11), while it is open (specs/thesis-arguments TA-09). The
+ * author is the thesis's: the front does not show it again.
+ */
+export const thesisUpdateSchema = z.object({
+  id: z.uuid(),
+  body: z.string(),
+  createdAt: z.iso.datetime(),
+  author: z.object({ id: z.uuid(), username: z.string(), avatarUrl: z.string().nullable() }),
+})
+
+/**
+ * A thesis's updates. The backend answers `{ items }` (dev, 2026-11-03), though E11 says a bare
+ * list: both are taken (Q6, P-039).
+ */
+export const thesisUpdateListSchema = z.union([
+  z.object({ items: z.array(thesisUpdateSchema) }),
+  z.array(thesisUpdateSchema).transform((items) => ({ items })),
+])
+
+export type RawThesisUpdate = z.infer<typeof thesisUpdateSchema>
+
+/**
  * Why Explore shows an item (backend 2026-10-20, specs/explore-v1 § 1): `via` only with SIMILAR,
  * `countryCode` only with COUNTRY. `type` stays a string: a new one is no reason, not a broken item.
  */

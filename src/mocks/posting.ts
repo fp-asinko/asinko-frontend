@@ -5,6 +5,7 @@ import { communityById, communityBySlug, communitySummary } from './fixtures/com
 import { mockId } from './fixtures/ids'
 import { pollById } from './fixtures/polls'
 import { postById } from './fixtures/posts'
+import { thesisById } from './fixtures/theses'
 import { summary } from './fixtures/users'
 import type { MockResponse } from './types'
 import { MOCK_POST_IMAGE } from './post-image'
@@ -148,12 +149,18 @@ function allComments(): RawComment[] {
   return flat
 }
 
-/** On a post or a poll (E05): the backend takes both (specs/card-comment). */
+/**
+ * On a post, a poll or a thesis (E05): the backend takes the three (specs/card-comment). On a
+ * thesis the side is required (specs/thesis-arguments TA-04), a reply's too.
+ */
 export function createComment(contentId: string, body: unknown): MockResponse {
-  if (!findPost(contentId) && !pollById(contentId)) return error(404, 'NOT_FOUND')
+  const thesis = thesisById(contentId)
+  if (!findPost(contentId) && !pollById(contentId) && !thesis) return error(404, 'NOT_FOUND')
   const input = (body ?? {}) as Record<string, unknown>
   if (input.userId !== DEMO_USER.id) return error(403, 'USER_MISMATCH')
   if (typeof input.body !== 'string' || !input.body.trim()) return error(422, 'VALIDATION_ERROR')
+  const side = input.side === 'PRO' || input.side === 'CONTRA' ? input.side : null
+  if (thesis && !side) return error(422, 'VALIDATION_ERROR')
   const parentId = input.parentCommentId ?? null
   if (parentId !== null) {
     const thread = commentsOf(contentId)
@@ -167,7 +174,7 @@ export function createComment(contentId: string, body: unknown): MockResponse {
     author: summary(DEMO_USER.username),
     body: input.body,
     parentCommentId: parentId as string | null,
-    side: null,
+    side: thesis ? side : null,
     score: 0,
     viewerVote: null,
     replyCount: 0,

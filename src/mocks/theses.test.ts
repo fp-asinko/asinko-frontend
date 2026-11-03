@@ -115,3 +115,61 @@ describe('cancelling and voting a mocked thesis (specs/thesis-detail § 9)', () 
     ).toMatchObject({ status: 200, body: { score: thesis.score + 1, viewerVote: 1 } })
   })
 })
+
+describe('a thesis’s arguments and updates in the mocks (specs/thesis-arguments § 8)', async () => {
+  const { MOCK_ROUTES } = await import('./handlers')
+  const route = (method: string, path: string) =>
+    MOCK_ROUTES.find((each) => each.method === method && each.path === path)!
+  const open = THESES[0]!
+  const ctx = (
+    params: Record<string, string>,
+    query = {},
+    body?: unknown,
+    accessToken?: string,
+  ) => ({
+    params,
+    query,
+    body,
+    accessToken,
+  })
+
+  it('reads one side, and counts each side from its arguments', async () => {
+    const res = await route('GET', '/api/v1/theses/:id/comments').handler(
+      ctx({ id: open.id }, { side: 'CONTRA' }),
+    )
+    const items = (res.body as { items: { side: string | null }[] }).items
+    expect(items.length).toBe(1)
+    expect(items.every((each) => each.side === 'CONTRA')).toBe(true)
+    expect(asSeenBy(open, undefined).argumentCounts).toEqual({ pro: 3, contra: 1 })
+  })
+
+  it('needs a side to argue on a thesis', async () => {
+    const post = route('POST', '/api/v1/theses/:id/comments')
+    expect(
+      (await post.handler(ctx({ id: open.id }, {}, { userId: DEMO_USER.id, body: 'Yes' }))).status,
+    ).toBe(422)
+    const res = await post.handler(
+      ctx({ id: open.id }, {}, { userId: DEMO_USER.id, body: 'Yes', side: 'PRO' }),
+    )
+    expect(res).toMatchObject({ status: 201, body: { side: 'PRO' } })
+  })
+
+  it('lets only its author update an open thesis', async () => {
+    const post = route('POST', '/api/v1/theses/:id/updates')
+    const author = open.creator!.id
+    const token = `mock-access.${author}.t`
+    expect(
+      (await post.handler(ctx({ id: open.id }, {}, { userId: DEMO_USER.id, body: 'Hi' }))).status,
+    ).toBe(403)
+    expect(
+      await post.handler(ctx({ id: open.id }, {}, { userId: author, body: 'Still in.' }, token)),
+    ).toMatchObject({ status: 201, body: { body: 'Still in.' } })
+    const closed = THESES.find((each) => each.state === 'CORRECT')!
+    const closedToken = `mock-access.${closed.creator!.id}.t`
+    expect(
+      await post.handler(
+        ctx({ id: closed.id }, {}, { userId: closed.creator!.id, body: 'Late.' }, closedToken),
+      ),
+    ).toMatchObject({ status: 409, body: { error: { code: 'THESIS_NOT_OPEN' } } })
+  })
+})

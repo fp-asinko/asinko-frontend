@@ -24,6 +24,8 @@ import {
   profileSchema,
   searchResultSchema,
   thesisSchema,
+  thesisUpdateListSchema,
+  thesisUpdateSchema,
   userSchema,
   usernameAvailabilitySchema,
   userSummarySchema,
@@ -58,6 +60,12 @@ import { feedTheses, THESES, thesesBy, thesisById } from './fixtures/theses'
 /** An open thesis and its author's session: what the cancel example needs (specs/thesis-detail). */
 const OPEN_THESIS = THESES.find((each) => each.state === 'OPEN')!
 const OPEN_THESIS_TOKEN = `mock-access.${OPEN_THESIS.creator!.id}.example`
+
+/** Another open one and its author: the update example's, apart from the one cancelled above. */
+const OTHER_OPEN_THESIS = THESES.find(
+  (each) => each.state === 'OPEN' && each.creator?.id !== OPEN_THESIS.creator!.id,
+)!
+const OTHER_OPEN_TOKEN = `mock-access.${OTHER_OPEN_THESIS.creator!.id}.example`
 import { listAchievements } from './achievements'
 import { userComments, userContent, activeCommunities } from './user-activity'
 import { createDraft, deleteDraft, listDrafts, SEED_DRAFT_ID, updateDraft } from './drafts'
@@ -80,6 +88,8 @@ import {
   asSeenBy,
   cancelMockThesis,
   createMockThesis,
+  createMockThesisUpdate,
+  listMockThesisUpdates,
   removeMockThesisVote,
   voteMockThesis,
 } from './theses'
@@ -639,6 +649,59 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       accessToken: OPEN_THESIS_TOKEN,
     },
     handler: cancelMockThesis,
+  },
+  // E05: a thesis's arguments, one side at a time, with their ads as a post's (specs/thesis-arguments).
+  {
+    method: 'GET',
+    path: '/api/v1/theses/:id/comments',
+    kind: 'contract',
+    implemented: true,
+    schema: commentListSchema,
+    example: { ...noRequest, params: { id: THESES[0]!.id }, query: { side: 'PRO' } },
+    handler: ({ params, query }) => {
+      if (!params.id || !thesisById(params.id)) return notFound
+      const side = query.side === 'PRO' || query.side === 'CONTRA' ? query.side : null
+      const roots = commentsOf(params.id).filter((each) => !side || each.side === side)
+      const items = commentTree(roots, query)
+      return { status: 200, body: { items, ads: treeAds(items) } }
+    },
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/theses/:id/comments',
+    kind: 'contract',
+    implemented: true,
+    schema: createdCommentSchema,
+    example: {
+      ...noRequest,
+      params: { id: THESES[0]!.id },
+      body: { userId: DEMO_USER.id, body: 'Flows keep coming.', side: 'PRO' },
+    },
+    handler: ({ params, body }) => createComment(params.id ?? '', body),
+  },
+  // E11: the author's updates (specs/thesis-arguments § 5).
+  {
+    method: 'GET',
+    path: '/api/v1/theses/:id/updates',
+    kind: 'contract',
+    implemented: true,
+    schema: thesisUpdateListSchema,
+    example: { ...noRequest, params: { id: THESES[0]!.id } },
+    handler: listMockThesisUpdates,
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/theses/:id/updates',
+    kind: 'contract',
+    implemented: true,
+    schema: thesisUpdateSchema,
+    example: {
+      ...noRequest,
+      params: { id: OTHER_OPEN_THESIS.id },
+      body: { userId: OTHER_OPEN_THESIS.creator!.id, body: 'Still holding the target.' },
+      accessToken: OTHER_OPEN_TOKEN,
+    },
+    handler: createMockThesisUpdate,
   },
   // E05: voting a thesis, as a post (specs/thesis-detail TD-16).
   {

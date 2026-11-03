@@ -3,7 +3,7 @@
 Rama: `feature/thesis-arguments`, desde `feature/thesis-detail-lifecycle`. Requirements (Q1 a Q6), design y tasks aprobados por el PO el 2026-11-03 ("si").
 
 - [x] **T-01 (M)** El destino de los comentarios (`CommentTarget`): `comments-api.ts`, la acción y su esquema, `CommentTree`, `CommentItem`, `CommentReply` y `CommentComposer`. El post pasa a usarlo sin cambiar su comportamiento. Tests. → TA-02, TA-05
-- [ ] **T-02 (M)** Mocks: argumentos de los dos lados con respuestas y anuncios, `GET`/`POST` de comentarios de una tesis con `side`, y `GET`/`POST` de actualizaciones con sus errores. `fixtures.test.ts`. → TA-15
+- [x] **T-02 (M)** Mocks: argumentos de los dos lados con respuestas y anuncios, `GET`/`POST` de comentarios de una tesis con `side`, y `GET`/`POST` de actualizaciones con sus errores. `fixtures.test.ts`. → TA-15
 - [ ] **T-03 (M)** `ThesisArguments`: las pestañas como links en la URL, el orden, la caja de cada lado, la lista, los vacíos y el contador que sube. El link del feed al lado que tiene más. Textos. Tests. → TA-01 a TA-08, TA-16
 - [ ] **T-04 (M)** Actualizaciones: `thesis-updates-api.ts`, `create-thesis-update.action.ts`, `ThesisUpdates` y `ThesisUpdateComposer` (diferida). Textos. Tests. → TA-09 a TA-12, TA-16
 - [ ] **T-05 (S)** `proposals.md` P-039 para Eugenio (lado de una respuesta, largo de una actualización, anuncios, forma de `/updates`) y el snapshot de E11. → Q2, Q4, Q5, Q6

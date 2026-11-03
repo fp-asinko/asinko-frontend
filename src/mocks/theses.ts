@@ -1,4 +1,4 @@
-import type { RawThesis } from '@/lib/api/contract'
+import type { RawThesis, RawThesisUpdate } from '@/lib/api/contract'
 import { mockCaller } from './auth'
 import { assetBySymbol } from './fixtures/assets'
 import { communityById, communitySummary } from './fixtures/communities'
@@ -6,6 +6,7 @@ import { mockId } from './fixtures/ids'
 import { THESES } from './fixtures/theses'
 import { takeThesisDraft } from './thesis-drafts'
 import { PROFILES, summary } from './fixtures/users'
+import { commentsOf } from './posting'
 import type { MockContext, MockResponse } from './types'
 
 // POST /api/v1/theses (E11) as the backend does it (asinko-app app/api/v1/theses/route.ts):
@@ -113,9 +114,70 @@ function cancellable(thesis: RawThesis, caller: string, now = Date.now()) {
   return now < deadline - (deadline - published) * 0.1
 }
 
+/**
+ * Its arguments' counters, from its comments (specs/thesis-arguments TA-15): the first level of
+ * each side, written with mocks included. Without any, the fixture's.
+ */
+function argumentsOf(thesis: RawThesis): RawThesis['argumentCounts'] {
+  const roots = commentsOf(thesis.id)
+  if (roots.length === 0) return thesis.argumentCounts
+  return {
+    pro: roots.filter((each) => each.side === 'PRO').length,
+    contra: roots.filter((each) => each.side === 'CONTRA').length,
+  }
+}
+
 /** A thesis as the caller sees it: `canCancel` is theirs (specs/thesis-detail TD-12). */
 export function asSeenBy(thesis: RawThesis, accessToken: string | null | undefined): RawThesis {
-  return { ...thesis, canCancel: cancellable(thesis, mockCaller(accessToken)) }
+  return {
+    ...thesis,
+    canCancel: cancellable(thesis, mockCaller(accessToken)),
+    argumentCounts: argumentsOf(thesis),
+  }
+}
+
+/** Updates by thesis, newest last as written: GET sorts them (specs/thesis-arguments § 8). */
+const UPDATES: Record<string, RawThesisUpdate[]> = {}
+let updates = 0
+
+/** One of Maria's open thesis, so the section shows with mocks. */
+{
+  const open = THESES[0]!
+  UPDATES[open.id] = [
+    {
+      id: mockId(42, 0),
+      body: 'ETF inflows held this week too. **Keeping the target.**',
+      createdAt: new Date(Date.parse(open.publishedAt) + 24 * 60 * 60 * 1000).toISOString(),
+      author: { id: open.creator!.id, username: open.creator!.username, avatarUrl: null },
+    },
+  ]
+}
+
+/** GET /api/v1/theses/{id}/updates (E11): `{ items }`, as the backend answers (Q6). */
+export function listMockThesisUpdates({ params }: MockContext): MockResponse {
+  if (!THESES.some((each) => each.id === params.id)) return error(404, 'NOT_FOUND')
+  return { status: 200, body: { items: [...(UPDATES[params.id ?? ''] ?? [])] } }
+}
+
+/** POST /api/v1/theses/{id}/updates (E11): only its author, while it is open. */
+export function createMockThesisUpdate({ params, body, accessToken }: MockContext): MockResponse {
+  const thesis = THESES.find((each) => each.id === params.id)
+  if (!thesis) return error(404, 'NOT_FOUND')
+  const caller = mockCaller(accessToken)
+  const input = (body ?? {}) as Record<string, unknown>
+  if (input.userId !== caller || thesis.creator?.id !== caller) return error(403, 'USER_MISMATCH')
+  if (thesis.state !== 'OPEN') return error(409, 'THESIS_NOT_OPEN')
+  const text = typeof input.body === 'string' ? input.body.trim() : ''
+  if (!text) return error(422, 'VALIDATION_ERROR')
+  updates += 1
+  const update: RawThesisUpdate = {
+    id: mockId(42, updates),
+    body: text,
+    createdAt: new Date().toISOString(),
+    author: { id: caller, username: thesis.creator!.username, avatarUrl: null },
+  }
+  ;(UPDATES[thesis.id] ??= []).push(update)
+  return { status: 201, body: update }
 }
 
 /** PUT /api/v1/theses/{id}/cancel (E11): only its author, while it can (specs/thesis-detail § 9). */
