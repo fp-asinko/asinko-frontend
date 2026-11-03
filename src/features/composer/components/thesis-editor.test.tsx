@@ -53,7 +53,11 @@ const MACRO: CommunityOption = {
 }
 const KEY = thesisDraftKey('u1')
 
-function renderEditor({ community = NVDA as CommunityOption | null, signedIn = true } = {}) {
+function renderEditor({
+  community = NVDA as CommunityOption | null,
+  signedIn = true,
+  draftsReady = true,
+} = {}) {
   const onPublished = vi.fn()
   const onFormat = vi.fn()
   const onCommunityChange = vi.fn()
@@ -63,6 +67,7 @@ function renderEditor({ community = NVDA as CommunityOption | null, signedIn = t
       <ThesisEditor
         community={community}
         storageKey={KEY}
+        draftsReady={draftsReady}
         draftRef={draftRef}
         onCancel={vi.fn()}
         onFormat={onFormat}
@@ -193,6 +198,16 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     await userEvent.keyboard('{ArrowDown}')
     await userEvent.click(await screen.findByRole('option', { name: /BTC/ }))
     expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('#macro')
+  })
+
+  it('says Save draft is coming soon until the backend has thesis drafts (P-038)', async () => {
+    renderEditor({ draftsReady: false })
+    await userEvent.type(claim(), 'Kept in the browser')
+    const save = screen.getByRole('button', { name: 'Save draft' })
+    expect(save).toHaveAttribute('aria-disabled', 'true')
+    await userEvent.click(save)
+    expect(screen.getByText('Coming soon')).toHaveAttribute('role', 'status')
+    expect(actions.saveDraft).not.toHaveBeenCalled()
   })
 
   it('counts the claim, and says what is missing when Publish is pressed early (TC-04, TC-09)', async () => {

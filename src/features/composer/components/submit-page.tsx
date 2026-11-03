@@ -15,6 +15,7 @@ import { permanentRedirect } from '@/i18n/navigation'
 import { assetSymbolSchema } from '@/lib/communities/asset-symbol.schema'
 import { communitySlugSchema } from '@/lib/communities/community-slug.schema'
 import { LEFT_COLUMN_SUBMIT_COOKIE, submitOpen } from '@/lib/left-column'
+import { env } from '@/env'
 import { getViewer } from '@/lib/session'
 import { SUBMIT_SEGMENT } from '@/i18n/submit-path'
 import { draftKey, thesisDraftKey } from '../lib/draft-key'
@@ -194,6 +195,9 @@ export async function SubmitPage({
           community={community?.option ?? null}
           storageKey={draftKey(viewer.id)}
           thesisStorageKey={thesisDraftKey(viewer.id)}
+          // P-038 is not in the backend yet: a thesis's draft saves only with every route mocked.
+          // With `missing` its mock lives in one server's memory; with `false`, the backend refuses it.
+          thesisDrafts={env.API_MOCKS === 'all'}
           related={related}
           preview={preview}
         />

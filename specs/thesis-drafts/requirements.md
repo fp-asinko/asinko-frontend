@@ -13,6 +13,7 @@
 - [x] **TD-05** El límite de 20 es de todos los borradores juntos; los errores, como los de un post (DT-05).
 - [x] **TD-06** `docs/references/api/proposals.md` con **P-038** (la forma exacta y el motivo) y el mock: con `API_MOCKS=true`, todos los borradores; con `missing`, solo los de tesis (los de posts siguen yendo al backend), y la lista los junta.
 - [x] **TD-07** Textos en en, es y pt; accesibilidad y 360 px como el resto del formulario.
+- [x] **TD-08** Mientras el backend no tenga borradores de tesis (P-038), "Guardar borrador" de una tesis dice **Próximamente** (el globo de `ComingSoon`) salvo con `API_MOCKS=true`: con `missing` el mock vive en la memoria de un servidor y en un deploy se perdería; con `false`, el backend lo rechaza. Lo escrito se sigue guardando en el navegador (`specs/thesis-create` TC-10). Al implementarse P-038 se saca la condición (PO, 2026-11-03).
 
 ## Fuera de alcance
 

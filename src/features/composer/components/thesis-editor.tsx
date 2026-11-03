@@ -7,6 +7,7 @@ import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type RefObject } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { ChoiceGroup } from '@/components/molecules/choice-group'
+import { ComingSoon } from '@/components/molecules/coming-soon'
 import { Delta } from '@/components/molecules/delta'
 import { LevelBars } from '@/components/molecules/level-bars'
 import { EmojiButton } from '@/components/molecules/emoji-picker'
@@ -105,6 +106,7 @@ function typedPrice(value: string): number | null {
 export function ThesisEditor({
   community,
   storageKey,
+  draftsReady = true,
   draftRef,
   onCancel,
   onFormat,
@@ -116,6 +118,11 @@ export function ThesisEditor({
   community: CommunityOption | null
   /** Where the draft is kept (thesisDraftKey); null keeps nothing. */
   storageKey: string | null
+  /**
+   * Whether "Save draft" saves (specs/thesis-drafts): until the backend has thesis drafts (P-038),
+   * it says "Coming soon" outside the full mocks. What is written is still kept in the browser.
+   */
+  draftsReady?: boolean
   /** Filled with a check of whether something is written, read when leaving. */
   draftRef: RefObject<(() => boolean) | null>
   onCancel: () => void
@@ -935,20 +942,31 @@ export function ThesisEditor({
               >
                 {t('cancel')}
               </button>
-              <button
-                type="button"
-                aria-disabled={unsaveable || undefined}
-                onClick={() => {
-                  if (!unsaveable) saveDraft()
-                }}
-                className={cn(PILL, 'bg-muted text-foreground hover:bg-muted-hover')}
-              >
-                {saved.saving
-                  ? t('drafts.saving')
-                  : savedNow
-                    ? t('drafts.savedShort')
-                    : t('drafts.save')}
-              </button>
+              {draftsReady ? (
+                <button
+                  type="button"
+                  aria-disabled={unsaveable || undefined}
+                  onClick={() => {
+                    if (!unsaveable) saveDraft()
+                  }}
+                  className={cn(PILL, 'bg-muted text-foreground hover:bg-muted-hover')}
+                >
+                  {saved.saving
+                    ? t('drafts.saving')
+                    : savedNow
+                      ? t('drafts.savedShort')
+                      : t('drafts.save')}
+                </button>
+              ) : (
+                // Over the bottom bar in phones: the bubble goes above, clear of the right edge.
+                <ComingSoon
+                  label={t('drafts.save')}
+                  placement="above-end"
+                  className={cn(PILL, 'bg-muted text-foreground')}
+                >
+                  {t('drafts.save')}
+                </ComingSoon>
+              )}
               <button
                 type="submit"
                 aria-disabled={!complete || pending || undefined}

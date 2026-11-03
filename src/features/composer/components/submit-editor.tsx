@@ -40,6 +40,7 @@ export function SubmitEditor({
   community,
   storageKey,
   thesisStorageKey = null,
+  thesisDrafts = true,
   related = [],
   preview,
 }: {
@@ -50,6 +51,8 @@ export function SubmitEditor({
   storageKey: string | null
   /** Where the thesis draft is kept (thesisDraftKey). */
   thesisStorageKey?: string | null
+  /** Whether a thesis's draft can be saved (P-038): "Coming soon" when not. */
+  thesisDrafts?: boolean
   /** The related ones of the URL, as handles (specs/related-aside RA-04). */
   related?: string[]
 }) {
@@ -160,6 +163,7 @@ export function SubmitEditor({
           <ThesisEditor
             community={thesisCommunity}
             storageKey={thesisStorageKey}
+            draftsReady={thesisDrafts}
             draftRef={thesisWritten}
             onCancel={cancel}
             onFormat={showPost}
