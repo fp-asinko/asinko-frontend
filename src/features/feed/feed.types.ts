@@ -228,3 +228,10 @@ export type UserReply = {
   /** Where it is: the post's (or poll's) title; a path only for a post, to the comment itself. */
   where: { title: string; path: string | null; community: CardCommunity | null }
 }
+
+/**
+ * Where comments go and come from (specs/thesis-arguments § 2): a post, a poll (from its card), or
+ * a thesis on one of its sides. The side comes from here, never from what someone writes.
+ */
+export type CommentTarget =
+  { kind: 'post' | 'poll'; id: string } | { kind: 'thesis'; id: string; side: 'PRO' | 'CONTRA' }

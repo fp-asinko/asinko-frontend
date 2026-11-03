@@ -60,7 +60,7 @@ export function CardComments({
         </ul>
         {!(empty && sent.length > 0) && children}
         <CommentComposer
-          postId={id}
+          target={{ kind, id }}
           boxId={null}
           send={({ body }) => commentFromCard({ kind, id, body })}
           onSent={({ id: commentId, body }) => {

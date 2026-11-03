@@ -19,7 +19,7 @@ function renderReply({ signedIn = true } = {}) {
   return renderWithIntl(
     <AuthGateProvider signedIn={signedIn}>
       <CommentThread>
-        <CommentReply postId={POST} commentId={COMMENT}>
+        <CommentReply target={{ kind: 'post', id: POST }} commentId={COMMENT}>
           <span>votes</span>
         </CommentReply>
         <PendingComments parentId={COMMENT} />
@@ -70,7 +70,7 @@ describe('CommentReply (specs/post-create-detail PC-15)', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Send reply' }))
 
     expect(actions.createComment).toHaveBeenCalledWith({
-      postId: POST,
+      target: { kind: 'post', id: POST },
       parentCommentId: COMMENT,
       body: 'My reply',
     })
@@ -93,7 +93,7 @@ describe('CommentReply (specs/post-create-detail PC-15)', () => {
       <AuthGateProvider signedIn>
         <CommentThread>
           <CommentReply
-            postId={POST}
+            target={{ kind: 'post', id: POST }}
             commentId={COMMENT}
             lead={<button type="button">Collapse</button>}
             actions={<button type="button">Share</button>}

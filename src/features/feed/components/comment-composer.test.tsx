@@ -18,7 +18,7 @@ function renderComposer({ signedIn = true } = {}) {
   return renderWithIntl(
     <AuthGateProvider signedIn={signedIn}>
       <CommentThread>
-        <CommentComposer postId={POST} />
+        <CommentComposer target={{ kind: 'post', id: POST }} />
         <PendingComments parentId={null} />
       </CommentThread>
     </AuthGateProvider>,
@@ -29,6 +29,26 @@ const box = () => screen.getByRole('textbox', { name: 'Join the conversation' })
 const send = () => screen.getByRole('button', { name: 'Comment' })
 
 describe('CommentComposer (specs/post-create-detail PC-15)', () => {
+  it('sends an argument to its thesis and side, inviting as that side asks (specs/thesis-arguments TA-04)', async () => {
+    actions.createComment.mockResolvedValue({ ok: true, data: { id: 'c-1' } })
+    const target = { kind: 'thesis', id: POST, side: 'CONTRA' } as const
+    renderWithIntl(
+      <AuthGateProvider signedIn>
+        <CommentThread>
+          <CommentComposer target={target} label="Argue against…" />
+        </CommentThread>
+      </AuthGateProvider>,
+    )
+    const field = screen.getByRole('textbox', { name: 'Argue against…' })
+    await userEvent.type(field, 'Rates stay high.')
+    await userEvent.click(send())
+    expect(actions.createComment).toHaveBeenCalledWith({
+      target,
+      parentCommentId: null,
+      body: 'Rates stay high.',
+    })
+  })
+
   beforeEach(() => vi.clearAllMocks())
 
   it('shows the comment at once, empties the box and announces it', async () => {
@@ -39,7 +59,7 @@ describe('CommentComposer (specs/post-create-detail PC-15)', () => {
     await userEvent.click(send())
 
     expect(actions.createComment).toHaveBeenCalledWith({
-      postId: POST,
+      target: { kind: 'post', id: POST },
       parentCommentId: null,
       body: 'Hello',
     })

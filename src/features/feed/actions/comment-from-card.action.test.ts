@@ -45,11 +45,11 @@ describe('commentFromCard (specs/card-comment)', () => {
       ok: true,
       data: { id: 'c-1' },
     })
-    expect(deps.createCommentAs).toHaveBeenCalledWith(
-      DEMO_USER.id,
-      { postId: ID, parentCommentId: null, body: 'Middle one.' },
-      'poll',
-    )
+    expect(deps.createCommentAs).toHaveBeenCalledWith(DEMO_USER.id, {
+      target: { kind: 'poll', id: ID },
+      parentCommentId: null,
+      body: 'Middle one.',
+    })
     expect(deps.refresh).not.toHaveBeenCalled()
   })
 

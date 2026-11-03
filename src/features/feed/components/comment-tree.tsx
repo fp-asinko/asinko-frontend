@@ -5,7 +5,7 @@ import { UserAvatar } from '@/components/molecules/user-avatar'
 import { Link } from '@/i18n/navigation'
 import { previewProps } from '@/lib/communities/preview'
 import { cn } from '@/lib/utils'
-import type { CommentNode } from '../feed.types'
+import type { CommentNode, CommentTarget } from '../feed.types'
 import { FOLD_DEPTH } from '../lib/comment-fold'
 import { CommentAnchor } from './comment-anchor'
 import { CommentAd } from './comment-ad'
@@ -36,12 +36,19 @@ const REPLY = 'thread-item thread-child thread-elbow'
  * Component: the Markdown never reaches the browser. Comments being sent show at the end of their
  * level (PendingComments). --av is the avatar column: 24px, 32px from sm (Q3).
  */
-export function CommentTree({ postId, comments }: { postId: string; comments: CommentNode[] }) {
+export function CommentTree({
+  target,
+  comments,
+}: {
+  /** Where its replies go: a post, or a thesis's side (specs/thesis-arguments § 2). */
+  target: CommentTarget
+  comments: CommentNode[]
+}) {
   return (
     <>
       <ul className="flex flex-col gap-4 [--av:1.5rem] empty:hidden sm:[--av:2rem]">
         {comments.map((comment) => (
-          <CommentItem key={comment.id} postId={postId} comment={comment} depth={0} />
+          <CommentItem key={comment.id} target={target} comment={comment} depth={0} />
         ))}
         <PendingComments parentId={null} itemClassName="thread-item" />
       </ul>
@@ -53,11 +60,11 @@ export function CommentTree({ postId, comments }: { postId: string; comments: Co
 }
 
 function CommentItem({
-  postId,
+  target,
   comment,
   depth,
 }: {
-  postId: string
+  target: CommentTarget
   comment: CommentNode
   depth: number
 }) {
@@ -69,7 +76,7 @@ function CommentItem({
   const id = elementId(comment.id)
   const handle = comment.author?.handle ?? tc('deleted')
   const replies = comment.replies.map((reply) => (
-    <CommentItem key={reply.id} postId={postId} comment={reply} depth={depth + 1} />
+    <CommentItem key={reply.id} target={target} comment={reply} depth={depth + 1} />
   ))
   const fold = depth + 1 === FOLD_DEPTH && comment.replies.length > 0
 
@@ -123,7 +130,7 @@ function CommentItem({
         <PostMarkdown>{comment.body}</PostMarkdown>
       </div>
       <CommentReply
-        postId={postId}
+        target={target}
         commentId={comment.id}
         lead={<CollapseButton />}
         actions={

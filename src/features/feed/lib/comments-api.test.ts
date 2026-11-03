@@ -3,7 +3,7 @@ import { COMMENTS_BY_CONTENT } from '@/mocks/fixtures/comments'
 import { POLLS } from '@/mocks/fixtures/polls'
 import { POSTS } from '@/mocks/fixtures/posts'
 import { MOCK_ROUTES } from '@/mocks/handlers'
-import type { MockRoute } from '@/mocks/types'
+import type { MockContext, MockRoute } from '@/mocks/types'
 import { DEMO_USER } from '@/mocks/demo-user'
 import {
   createCommentAs,
@@ -104,7 +104,7 @@ describe('getCommentTree (specs/post-create-detail PC-14)', () => {
 
   it('returns the whole thread, nested, keeping a deleted comment only while it has replies', async () => {
     const post = POSTS[0]!
-    const result = await getCommentTree(post.id)
+    const result = await getCommentTree({ kind: 'post', id: post.id })
     if (!result.ok) throw new Error('expected ok')
     expect(result.data.comments.map((each) => each.id)).toEqual(
       COMMENTS_BY_CONTENT[post.id]!.map((each) => each.id),
@@ -129,7 +129,7 @@ describe('getCommentTree (specs/post-create-detail PC-14)', () => {
           }
         : route,
     )
-    expect(await getCommentTree(post.id)).toEqual({
+    expect(await getCommentTree({ kind: 'post', id: post.id })).toEqual({
       ok: true,
       data: { comments: [], postAd: null },
     })
@@ -165,7 +165,7 @@ describe('the ads of a post (specs/ads AD-04 to AD-06, AD-08)', () => {
       { afterCommentId: null, ad: ad('00000000-0000-4000-8000-000000031001') },
       { afterCommentId: second.id, ad: ad('00000000-0000-4000-8000-000000031002') },
     ])
-    const result = await getCommentTree(post.id)
+    const result = await getCommentTree({ kind: 'post', id: post.id })
     if (!result.ok) throw new Error('expected ok')
     expect(result.data.postAd).toMatchObject({
       kind: 'ad',
@@ -188,7 +188,7 @@ describe('the ads of a post (specs/ads AD-04 to AD-06, AD-08)', () => {
         ad: ad('00000000-0000-4000-8000-000000031004'),
       },
     ])
-    const result = await getCommentTree(post.id)
+    const result = await getCommentTree({ kind: 'post', id: post.id })
     if (!result.ok) throw new Error('expected ok')
     expect(result.data.postAd).toBeNull()
     expect(result.data.comments.some((each) => each.ad)).toBe(false)
@@ -196,7 +196,7 @@ describe('the ads of a post (specs/ads AD-04 to AD-06, AD-08)', () => {
 
   it('carries the mock ads only in the whole tree, never in a search (AD-05)', async () => {
     const post = POSTS[0]!
-    const tree = await getCommentTree(post.id)
+    const tree = await getCommentTree({ kind: 'post', id: post.id })
     if (!tree.ok) throw new Error('expected ok')
     expect(tree.data.postAd?.kind).toBe('ad')
     const found = await searchComments(post.id, 'flows')
@@ -212,7 +212,7 @@ describe('sorted and searched (specs/post-detail-refresh P-014)', () => {
   const debate = POSTS[2]!.id
 
   it('asks the backend for the order: every level comes sorted', async () => {
-    const result = await getCommentTree(debate, 'top')
+    const result = await getCommentTree({ kind: 'post', id: debate }, 'top')
     if (!result.ok) throw new Error('expected ok')
     const scores = result.data.comments.map((each) => each.score)
     expect(scores).toEqual([...scores].sort((a, b) => b - a))
@@ -234,7 +234,7 @@ describe('createCommentAs (PC-15)', () => {
 
   it('comments as the session user and answers the new id', async () => {
     const result = await createCommentAs(DEMO_USER.id, {
-      postId: POSTS[0]!.id,
+      target: { kind: 'post', id: POSTS[0]!.id },
       parentCommentId: null,
       body: 'Agree',
     })
@@ -262,7 +262,7 @@ describe('createCommentAs (PC-15)', () => {
         : route,
     )
     const result = await createCommentAs(DEMO_USER.id, {
-      postId: POSTS[0]!.id,
+      target: { kind: 'post', id: POSTS[0]!.id },
       parentCommentId: null,
       body: 'prueba',
     })
@@ -272,10 +272,77 @@ describe('createCommentAs (PC-15)', () => {
   it('passes the backend failure through', async () => {
     expect(
       await createCommentAs('someone-else', {
-        postId: POSTS[0]!.id,
+        target: { kind: 'post', id: POSTS[0]!.id },
         parentCommentId: null,
         body: 'Agree',
       }),
     ).toMatchObject({ ok: false, code: 'USER_MISMATCH' })
+  })
+})
+
+describe('a thesis’s arguments (specs/thesis-arguments § 2)', () => {
+  const THESIS = '00000000-0000-4000-8000-000000009001'
+  const seen: { path: string; query: Record<string, string>; body: unknown }[] = []
+  const comment = {
+    id: '00000000-0000-4000-8000-0000000c0002',
+    author: { id: DEMO_USER.id, username: 'demo', avatarUrl: null, accuracyRate: null },
+    body: 'Flows say so.',
+    parentCommentId: null,
+    side: 'CONTRA',
+    score: 0,
+    viewerVote: null,
+    replyCount: 0,
+    editedAt: null,
+    deleted: false,
+    createdAt: '2026-11-03T10:00:00.000Z',
+  }
+  beforeEach(() => {
+    seen.length = 0
+    state.routes = [
+      {
+        method: 'GET',
+        path: '/api/v1/theses/:id/comments',
+        kind: 'contract',
+        implemented: true,
+        schema: {} as never,
+        example: { params: {}, query: {}, body: undefined },
+        handler: ({ query }: MockContext) => {
+          seen.push({ path: 'GET', query, body: undefined })
+          return { status: 200, body: { items: [{ ...comment, replies: [] }] } }
+        },
+      },
+      {
+        method: 'POST',
+        path: '/api/v1/theses/:id/comments',
+        kind: 'contract',
+        implemented: true,
+        schema: {} as never,
+        example: { params: {}, query: {}, body: undefined },
+        handler: ({ query, body }: MockContext) => {
+          seen.push({ path: 'POST', query, body })
+          return { status: 201, body: comment }
+        },
+      },
+    ] as unknown as readonly MockRoute[]
+  })
+
+  it('reads one side of a thesis, with its order', async () => {
+    const result = await getCommentTree({ kind: 'thesis', id: THESIS, side: 'CONTRA' }, 'new')
+    expect(result).toMatchObject({ ok: true, data: { comments: [{ body: 'Flows say so.' }] } })
+    expect(seen[0]!.query).toEqual({ side: 'CONTRA', sort: 'new' })
+  })
+
+  it('writes on the side of its target, a reply too', async () => {
+    await createCommentAs(DEMO_USER.id, {
+      target: { kind: 'thesis', id: THESIS, side: 'PRO' },
+      parentCommentId: '00000000-0000-4000-8000-0000000c0003',
+      body: 'Agree',
+    })
+    expect(seen[0]!.body).toEqual({
+      userId: DEMO_USER.id,
+      body: 'Agree',
+      parentCommentId: '00000000-0000-4000-8000-0000000c0003',
+      side: 'PRO',
+    })
   })
 })

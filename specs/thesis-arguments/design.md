@@ -1,6 +1,6 @@
 # Argumentos y actualizaciones de una tesis — Design
 
-> Basado en `requirements.md` (Q1 a Q6 resueltas el 2026-11-03). Rama `feature/thesis-arguments`, desde `feature/thesis-detail-lifecycle`.
+> Basado en `requirements.md` (Q1 a Q6 resueltas el 2026-11-03). Aprobado por el PO el 2026-11-03. Rama `feature/thesis-arguments`, desde `feature/thesis-detail-lifecycle`.
 
 ## 1. La idea
 

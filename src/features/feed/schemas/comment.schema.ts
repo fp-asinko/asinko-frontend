@@ -1,12 +1,18 @@
 import { z } from 'zod'
 
+/** Where a comment goes (specs/thesis-arguments § 2): a thesis needs its side. */
+export const commentTargetSchema = z.discriminatedUnion('kind', [
+  z.object({ kind: z.enum(['post', 'poll']), id: z.uuid() }),
+  z.object({ kind: z.literal('thesis'), id: z.uuid(), side: z.enum(['PRO', 'CONTRA']) }),
+])
+
 /**
- * Input of createComment (PC-15): a comment on a post, or a reply when `parentCommentId` is set.
- * The body only has to say something (the backend has no maximum). The userId never comes from
- * here: the action takes it from the session.
+ * Input of createComment (PC-15): a comment on a post or a thesis (an argument, on its side), or a
+ * reply when `parentCommentId` is set. The body only has to say something (the backend has no
+ * maximum). The userId never comes from here: the action takes it from the session.
  */
 export const createCommentSchema = z.object({
-  postId: z.uuid(),
+  target: commentTargetSchema,
   parentCommentId: z.uuid().nullable(),
   body: z.string().trim().min(1),
 })

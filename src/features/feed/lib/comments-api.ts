@@ -7,7 +7,7 @@ import {
   createdCommentSchema,
   type RawComment,
 } from '@/lib/api/contract'
-import type { AdItem, CommentNode, CommentPreview } from '../feed.types'
+import type { AdItem, CommentNode, CommentPreview, CommentTarget } from '../feed.types'
 import type { CreateCommentInput } from '../schemas/comment.schema'
 import type { CommentSort } from '../schemas/comments-query.schema'
 import type { CommentsTarget } from '../schemas/comments-preview.schema'
@@ -99,26 +99,42 @@ function toCommentNode(comment: RawComment): CommentNode | null {
  * PD-03): the backend sorts every level. Without an order, the backend's (oldest first). Cached per
  * request: the ad under the post and the comments come from the same answer (specs/ads AD-04).
  */
-export const getCommentTree = cache(async function getCommentTree(
-  postId: string,
-  sort?: CommentSort,
+export function getCommentTree(target: CommentTarget, sort?: CommentSort) {
+  // Primitives, so React's cache finds the same request (the page and its ad ask it twice).
+  return commentTree(target.kind, target.id, target.kind === 'thesis' ? target.side : null, sort)
+}
+
+/** The path of a target's comments (E05): a thesis's, a poll's or a post's. */
+function commentsPath(kind: CommentTarget['kind']) {
+  return kind === 'thesis'
+    ? '/api/v1/theses/:id/comments'
+    : kind === 'poll'
+      ? '/api/v1/polls/:id/comments'
+      : '/api/v1/posts/:id/comments'
+}
+
+const commentTree = cache(async function commentTree(
+  kind: CommentTarget['kind'],
+  id: string,
+  side: 'PRO' | 'CONTRA' | null,
+  sort: CommentSort | undefined,
 ): Promise<ApiResult<{ comments: CommentNode[]; postAd: AdItem | null }>> {
+  const query: Record<string, string> = {}
+  if (sort) query.sort = sort
+  // A thesis's side only (specs/thesis-arguments TA-02).
+  if (side) query.side = side
   const result = await apiRequest({
     method: 'GET',
-    path: '/api/v1/posts/:id/comments',
-    params: { id: postId },
-    query: sort ? { sort } : undefined,
+    path: commentsPath(kind),
+    params: { id },
+    query: Object.keys(query).length ? query : undefined,
     schema: commentListSchema,
   })
   if (!result.ok) return result
   const comments = result.data.items.flatMap((comment) => toCommentNode(comment) ?? [])
   // Its ads, where the backend puts them (P-031, specs/ads AD-04): a malformed one is left out and
   // reported, not the comments (AD-08); one with a link that is not http(s) too (AD-06).
-  const ads = keepValidItems(
-    result.data.ads ?? [],
-    commentAdSchema,
-    'GET /api/v1/posts/:id/comments',
-  )
+  const ads = keepValidItems(result.data.ads ?? [], commentAdSchema, `GET ${commentsPath(kind)}`)
     .map(({ afterCommentId, ad }) => ({ afterCommentId, ad: toAdItem(ad) }))
     .filter((each): each is { afterCommentId: string | null; ad: AdItem } => each.ad !== null)
   const after = new Map(
@@ -165,20 +181,24 @@ export async function searchComments(postId: string, q: string): Promise<ApiResu
 }
 
 /**
- * Comments a post or replies to a comment (PC-15). The userId always comes from the server
+ * Comments a post, a poll or a thesis, or replies to a comment (PC-15). A thesis's goes with its
+ * side, the target's (specs/thesis-arguments TA-05). The userId always comes from the server
  * session, never from the client (api-integration.md § userId explícito).
  */
 export async function createCommentAs(
   userId: string,
-  { postId, parentCommentId, body }: CreateCommentInput,
-  // A poll's too, from its card (specs/card-comment): the backend takes both (E05).
-  kind: 'post' | 'poll' = 'post',
+  { target, parentCommentId, body }: CreateCommentInput,
 ): Promise<ApiResult<{ id: string }>> {
   const result = await apiRequest({
     method: 'POST',
-    path: kind === 'poll' ? '/api/v1/polls/:id/comments' : '/api/v1/posts/:id/comments',
-    params: { id: postId },
-    body: { userId, body, parentCommentId },
+    path: commentsPath(target.kind),
+    params: { id: target.id },
+    body: {
+      userId,
+      body,
+      parentCommentId,
+      ...(target.kind === 'thesis' && { side: target.side }),
+    },
     schema: createdCommentSchema,
   })
   return result.ok ? { ok: true, data: { id: result.data.id } } : result

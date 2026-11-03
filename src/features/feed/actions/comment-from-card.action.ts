@@ -19,6 +19,10 @@ export async function commentFromCard(raw: unknown): Promise<ActionResult<{ id: 
   if (!viewer) return { ok: false, error: 'api.errors.UNAUTHENTICATED' }
 
   const { kind, id, body } = parsed.data
-  const result = await createCommentAs(viewer.id, { postId: id, parentCommentId: null, body }, kind)
+  const result = await createCommentAs(viewer.id, {
+    target: { kind, id },
+    parentCommentId: null,
+    body,
+  })
   return result.ok ? { ok: true, data: result.data } : { ok: false, error: result.errorKey }
 }

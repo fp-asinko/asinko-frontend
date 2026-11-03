@@ -21,7 +21,7 @@ const POST = '00000000-0000-4000-8000-000000000999'
 function renderTree(comments: CommentNode[]) {
   return renderWithIntl(
     <CommentThread>
-      <CommentTree postId={POST} comments={comments} />
+      <CommentTree target={{ kind: 'post', id: POST }} comments={comments} />
     </CommentThread>,
   )
 }

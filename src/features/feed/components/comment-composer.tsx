@@ -20,6 +20,7 @@ import { searchMentions } from '@/lib/mentions/search-mentions.action'
 import { createComment } from '../actions/create-comment.action'
 import { useThread } from './comment-thread'
 import { COMMENT_BOX } from './comment-box'
+import type { CommentTarget } from '../feed.types'
 
 // 44px in mobile (the main action, design-system.md § Mobile first), 32px from md.
 const PILL =
@@ -35,22 +36,26 @@ const PILL =
  * leaves it with nothing written (specs/post-detail-refresh PD-02). Replies open already open.
  */
 export function CommentComposer({
-  postId,
+  target,
   parentId = null,
+  label,
   onCancel,
   onSent,
   send = createComment,
   boxId = COMMENT_BOX,
 }: {
-  postId: string
+  /** Where it goes: a post, a poll or a thesis's side (specs/thesis-arguments § 2). */
+  target: CommentTarget
   parentId?: string | null
+  /** Its name and what it invites to write: a thesis's side says which (TA-04). */
+  label?: string
   /** Replies only: closes the box (Esc or Cancel). */
   onCancel?: () => void
   /** Once the comment is in: a reply closes its box; a card shows it (specs/card-comment). */
   onSent?: (comment: { id: string; body: string }) => void
   /** Where it goes: the post page's action by default; a card's, from it (specs/card-comment). */
   send?: (input: {
-    postId: string
+    target: CommentTarget
     parentCommentId: string | null
     body: string
   }) => Promise<ActionResult<{ id: string }>>
@@ -92,7 +97,7 @@ export function CommentComposer({
     const key = `${parentId ?? 'post'}-${sent.current}`
     startTransition(async () => {
       addPending({ key, parentId, body })
-      const result = await send({ postId, parentCommentId: parentId, body })
+      const result = await send({ target, parentCommentId: parentId, body })
       if (result.ok) {
         setAnnouncement(t('sent'))
         const comment = { id: result.data.id, body }
@@ -144,9 +149,9 @@ export function CommentComposer({
           onChange={(event) => setText(event.target.value)}
           onKeyDown={onKeyDown}
           onClick={() => setHeld(false)}
-          aria-label={t(reply ? 'replyLabel' : 'label')}
+          aria-label={reply ? t('replyLabel') : (label ?? t('label'))}
           // The box of the post is named what it shows (WCAG 2.5.3): "Join the conversation".
-          placeholder={t(reply ? 'replyPlaceholder' : 'label')}
+          placeholder={reply ? t('replyPlaceholder') : (label ?? t('label'))}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
           ref={field}

@@ -56,7 +56,7 @@ export async function PostComments({
         <h2 id="comments-title" className="type-ui font-bold">
           {t('title', { count })}
         </h2>
-        {!closed && <CommentComposer postId={postId} />}
+        {!closed && <CommentComposer target={{ kind: 'post', id: postId }} />}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           {!query.q && <CommentsSort current={query.sort} />}
           <CommentsSearch query={query.q} />
@@ -76,7 +76,7 @@ export async function PostComments({
 
 /** The post's own ad, as in a feed: the width of the column. Nothing if it fails. */
 async function PostAd({ postId, sort }: { postId: string; sort: CommentsQuery['sort'] }) {
-  const result = await getCommentTree(postId, sort)
+  const result = await getCommentTree({ kind: 'post', id: postId }, sort)
   if (!result.ok || !result.data.postAd) return null
   return (
     <div className="border-t">
@@ -100,7 +100,7 @@ async function LoadedComments({
   closed: boolean
 }) {
   const t = await getTranslations('postDetail')
-  const result = await getCommentTree(postId, sort)
+  const result = await getCommentTree({ kind: 'post', id: postId }, sort)
   if (!result.ok) return <Failed />
   const { comments } = result.data
   return (
@@ -116,7 +116,7 @@ async function LoadedComments({
           }
         />
       )}
-      <CommentTree postId={postId} comments={comments} />
+      <CommentTree target={{ kind: 'post', id: postId }} comments={comments} />
     </>
   )
 }

@@ -33,9 +33,9 @@ describe('createComment (PC-15)', () => {
   it('rejects invalid input before anything else (public endpoint)', async () => {
     for (const raw of [
       null,
-      { postId: 'x', parentCommentId: null, body: 'Yes' },
-      { postId: POST, parentCommentId: null, body: '   ' },
-      { postId: POST, parentCommentId: 'x', body: 'Yes' },
+      { target: { kind: 'post', id: 'x' }, parentCommentId: null, body: 'Yes' },
+      { target: { kind: 'post', id: POST }, parentCommentId: null, body: '   ' },
+      { target: { kind: 'post', id: POST }, parentCommentId: 'x', body: 'Yes' },
     ]) {
       expect(await createComment(raw)).toEqual({ ok: false, error: 'api.errors.INVALID' })
     }
@@ -44,7 +44,13 @@ describe('createComment (PC-15)', () => {
 
   it('needs a session, checked inside the action', async () => {
     deps.getViewer.mockResolvedValue(null)
-    expect(await createComment({ postId: POST, parentCommentId: null, body: 'Yes' })).toEqual({
+    expect(
+      await createComment({
+        target: { kind: 'post', id: POST },
+        parentCommentId: null,
+        body: 'Yes',
+      }),
+    ).toEqual({
       ok: false,
       error: 'api.errors.UNAUTHENTICATED',
     })
@@ -54,13 +60,13 @@ describe('createComment (PC-15)', () => {
   it('comments with the userId of the session and refreshes the page', async () => {
     deps.createCommentAs.mockResolvedValue({ ok: true, data: { id: COMMENT } })
     const result = await createComment({
-      postId: POST,
+      target: { kind: 'post', id: POST },
       parentCommentId: COMMENT,
       body: ' Yes ',
       userId: 'someone-else',
     })
     expect(deps.createCommentAs).toHaveBeenCalledWith(DEMO_USER.id, {
-      postId: POST,
+      target: { kind: 'post', id: POST },
       parentCommentId: COMMENT,
       body: 'Yes',
     })
@@ -70,7 +76,13 @@ describe('createComment (PC-15)', () => {
 
   it('returns the translation key of a failure, without refreshing', async () => {
     deps.createCommentAs.mockResolvedValue(failure('NOT_FOUND'))
-    expect(await createComment({ postId: POST, parentCommentId: null, body: 'Yes' })).toEqual({
+    expect(
+      await createComment({
+        target: { kind: 'post', id: POST },
+        parentCommentId: null,
+        body: 'Yes',
+      }),
+    ).toEqual({
       ok: false,
       error: 'api.errors.NOT_FOUND',
     })

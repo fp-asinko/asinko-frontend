@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useRef, useState, type ReactNode } from 'react'
 import { useAuthGate } from '@/components/organisms/auth-gate'
 import { CommentComposer } from './comment-composer'
+import type { CommentTarget } from '../feed.types'
 
 /** A text action of the row, as Reddit's: 32px, 12px semibold, no background until hovered. */
 export const COMMENT_ACTION =
@@ -17,13 +18,14 @@ export const COMMENT_ACTION =
  * the focus back to "Reply". Without a session, the account modal opens instead.
  */
 export function CommentReply({
-  postId,
+  target,
   commentId,
   lead,
   actions,
   children,
 }: {
-  postId: string
+  /** Where its replies go: a thesis's on the same side (specs/thesis-arguments TA-05). */
+  target: CommentTarget
   commentId: string
   lead?: ReactNode
   actions?: ReactNode
@@ -61,7 +63,7 @@ export function CommentReply({
       </div>
       {open && (
         <div className="mt-2">
-          <CommentComposer postId={postId} parentId={commentId} onCancel={close} onSent={close} />
+          <CommentComposer target={target} parentId={commentId} onCancel={close} onSent={close} />
         </div>
       )}
     </>
