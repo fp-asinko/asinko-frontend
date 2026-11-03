@@ -85,7 +85,9 @@ export function ThesisCard({
             badge={
               <span className="inline-flex min-h-6 shrink-0 items-center gap-1.25 type-action font-extrabold text-muted-foreground uppercase">
                 <TargetIcon aria-hidden className="size-3.5" />
-                {t('badge')}
+                {/* On its page in a phone, beside the back button and Join, only the icon: the
+                    community's name needs the room. */}
+                <span className={detail ? 'sr-only sm:not-sr-only' : undefined}>{t('badge')}</span>
               </span>
             }
           />
@@ -105,7 +107,8 @@ export function ThesisCard({
             ${thesis.asset.symbol}
           </Link>
         )}
-        {thesis.state === 'open' && (
+        {/* On its page, where it stands says it (TD-08). */}
+        {!detail && thesis.state === 'open' && (
           <time dateTime={thesis.deadline}>
             {t('closes', { when: format.relativeTime(new Date(thesis.deadline), now) })}
           </time>

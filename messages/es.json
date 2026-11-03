@@ -234,7 +234,37 @@
     "thesis": {
       "badge": "Tesis",
       "closes": "Cierra {when}",
-      "arguments": "{count, plural, =0 {Sin argumentos todavía} one {# argumento} other {# argumentos}}"
+      "arguments": "{count, plural, =0 {Sin argumentos todavía} one {# argumento} other {# argumentos}}",
+      "bet": {
+        "title": "La apuesta",
+        "reference": "Precio de referencia",
+        "referenceAt": "{price}, el {date}",
+        "noReference": "Sin precio",
+        "target": "Objetivo",
+        "direction": {
+          "above": "Por encima de {price}",
+          "below": "Por debajo de {price}",
+          "equals": "Igual a {price}"
+        },
+        "deadline": "Fecha límite",
+        "conviction": "Convicción",
+        "published": "Publicada"
+      },
+      "standing": {
+        "open": "Cierra {when}",
+        "expired": "Esperando resolución",
+        "disputed": "En revisión",
+        "resolved": "{outcome, select, correct {Acertada} other {Errada}} el {date}{hasPrice, select, yes { a {price}} other {}}{source, select, automatic { · automáticamente} community { · por la comunidad} admin { · por un admin} other {}}",
+        "resolvedNoDate": "{outcome, select, correct {Acertada} other {Errada}}",
+        "cancelled": "Cancelada el {date}{hasReason, select, yes {: {reason}} other {}}",
+        "cancelledNoDate": "Cancelada"
+      },
+      "argumentsTitle": "Argumentos",
+      "argumentsCount": "{pro} a favor · {contra} en contra",
+      "argumentsSoon": "Los argumentos a favor y en contra llegan pronto.",
+      "page": {
+        "title": "{claim} · {asset}"
+      }
     }
   },
   "rightColumn": {

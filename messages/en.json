@@ -234,7 +234,37 @@
     "thesis": {
       "badge": "Thesis",
       "closes": "Closes {when}",
-      "arguments": "{count, plural, =0 {No arguments yet} one {# argument} other {# arguments}}"
+      "arguments": "{count, plural, =0 {No arguments yet} one {# argument} other {# arguments}}",
+      "bet": {
+        "title": "The bet",
+        "reference": "Reference price",
+        "referenceAt": "{price}, on {date}",
+        "noReference": "No price",
+        "target": "Target",
+        "direction": {
+          "above": "Above {price}",
+          "below": "Below {price}",
+          "equals": "At {price}"
+        },
+        "deadline": "Deadline",
+        "conviction": "Conviction",
+        "published": "Published"
+      },
+      "standing": {
+        "open": "Closes {when}",
+        "expired": "Waiting for resolution",
+        "disputed": "Under review",
+        "resolved": "{outcome, select, correct {Correct} other {Incorrect}} on {date}{hasPrice, select, yes { at {price}} other {}}{source, select, automatic { · automatically} community { · by the community} admin { · by an admin} other {}}",
+        "resolvedNoDate": "{outcome, select, correct {Correct} other {Incorrect}}",
+        "cancelled": "Cancelled on {date}{hasReason, select, yes {: {reason}} other {}}",
+        "cancelledNoDate": "Cancelled"
+      },
+      "argumentsTitle": "Arguments",
+      "argumentsCount": "{pro} for · {contra} against",
+      "argumentsSoon": "Arguments for and against are coming soon.",
+      "page": {
+        "title": "{claim} · {asset}"
+      }
     }
   },
   "rightColumn": {

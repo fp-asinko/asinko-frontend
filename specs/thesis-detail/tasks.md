@@ -6,12 +6,12 @@ Rama: `feature/thesis-detail-lifecycle`, desde `feature/thesis-create`. Requirem
 - [x] **T-02 (M)** `ThesisItem` en `feed.types.ts`, el mapper de `THESIS` y `THESIS` en `KNOWN_KINDS`. Mocks: tesis en los feeds, `GET /theses/:id` con `liveExample`, y cancelar y votar con sus errores. Tests y `fixtures.test.ts`. → TD-01, TD-20
 - [x] **T-03 (M)** La tarjeta del feed (`features/feed/components/thesis-card.tsx`): la cabecera con la píldora Tesis, el cuerpo, cuánto falta, las acciones y el link. La rama en `FeedItems`. Textos en en, es y pt. Tests. → TD-02 a TD-05, TD-21
 - [x] **T-04 (S)** Votar: `kind="thesis"` en `VoteControl`, `vote-thesis.action.ts` y `voteThesisAs`. Tests. → TD-16
-- [ ] **T-05 (L)** La página `/thesis/[id]`:
+- [x] **T-05 (L)** La página `/thesis/[id]`:
   - `getThesis`, `ThesisDetail`, el bloque de la apuesta y el de estado, y los argumentos con "Próximamente";
   - la columna derecha, la metadata, la imagen para compartir, el 404 y el error.
     Tests. → TD-06 a TD-11
 - [ ] **T-06 (M)** Cancelar: `ThesisMenu`, `CancelThesisDialog` (diferida), `cancel-thesis.schema.ts`, `cancel-thesis.action.ts` y `cancelThesisAs`, con sus errores. Tests. → TD-12 a TD-15
-- [ ] **T-07 (S)** La tarjeta del perfil como link a la página. Tests. → TD-17
+- [x] **T-07 (S)** La tarjeta del perfil como link a la página. Tests. → TD-17
 - [ ] **T-08 (M)** E2E (`e2e/thesis-detail.spec.ts`): ver en el feed, abrir, votar, cancelar, 404, 360 px y axe en claro y oscuro. `performance.spec.ts` con `/thesis/{id}`. `ui-reviewer`. → TD-18, TD-19
 - [ ] **T-09 (S)** A mano contra `dev` con la cuenta del PO: ver las dos tesis de prueba en su grupo y en el Home, abrir su página y votar. Cancelar solo con una tesis nueva, si el PO lo pide: las de prueba se quedan.
 

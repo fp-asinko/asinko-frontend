@@ -25,3 +25,9 @@ export const postImageRoute = (id: string) => `/post/${id}/opengraph-image/card`
 
 /** A post's own image in a language (SP-01). */
 export const postImagePath = (locale: string, id: string) => `/${locale}${postImageRoute(id)}`
+
+/** A thesis's own image, without the locale (specs/thesis-detail TD-11): the share window's. */
+export const thesisImageRoute = (id: string) => `/thesis/${id}/opengraph-image/card`
+
+/** A thesis's own image in a language (specs/thesis-detail TD-11). */
+export const thesisImagePath = (locale: string, id: string) => `/${locale}${thesisImageRoute(id)}`

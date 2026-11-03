@@ -22,6 +22,13 @@ const thesis = (overrides: Partial<ThesisItem> = {}): ThesisItem => ({
 })
 
 describe('ThesisCard (specs/profile-track-record PT-07, PT-08)', () => {
+  it('opens its page from its claim (specs/thesis-detail TD-17)', () => {
+    renderWithIntl(<ThesisCard thesis={thesis()} />)
+    expect(
+      screen.getByRole('link', { name: 'BTC will close above $150K before December 2026' }),
+    ).toHaveAttribute('href', '/thesis/t1')
+  })
+
   it('shows the asset, the claim as its title, the target and the conviction', () => {
     renderWithIntl(<ThesisCard thesis={thesis()} />)
     expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/asset/BTC')
@@ -53,7 +60,8 @@ describe('ThesisCard (specs/profile-track-record PT-07, PT-08)', () => {
         })}
       />,
     )
-    expect(screen.queryByRole('link')).not.toBeInTheDocument()
+    // Only its claim links: to its page (specs/thesis-detail TD-17).
+    expect(screen.getAllByRole('link')).toHaveLength(1)
     expect(screen.getByText('By Dec 31, 2026')).toBeInTheDocument()
     expect(screen.getByText('Cancelled: Posted twice by mistake.')).toBeInTheDocument()
   })

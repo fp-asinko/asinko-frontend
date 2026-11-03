@@ -234,7 +234,37 @@
     "thesis": {
       "badge": "Tese",
       "closes": "Fecha {when}",
-      "arguments": "{count, plural, =0 {Sem argumentos ainda} one {# argumento} other {# argumentos}}"
+      "arguments": "{count, plural, =0 {Sem argumentos ainda} one {# argumento} other {# argumentos}}",
+      "bet": {
+        "title": "A aposta",
+        "reference": "Preço de referência",
+        "referenceAt": "{price}, em {date}",
+        "noReference": "Sem preço",
+        "target": "Alvo",
+        "direction": {
+          "above": "Acima de {price}",
+          "below": "Abaixo de {price}",
+          "equals": "Igual a {price}"
+        },
+        "deadline": "Prazo",
+        "conviction": "Convicção",
+        "published": "Publicada"
+      },
+      "standing": {
+        "open": "Fecha {when}",
+        "expired": "Aguardando resolução",
+        "disputed": "Em revisão",
+        "resolved": "{outcome, select, correct {Acertada} other {Errada}} em {date}{hasPrice, select, yes { a {price}} other {}}{source, select, automatic { · automaticamente} community { · pela comunidade} admin { · por um admin} other {}}",
+        "resolvedNoDate": "{outcome, select, correct {Acertada} other {Errada}}",
+        "cancelled": "Cancelada em {date}{hasReason, select, yes {: {reason}} other {}}",
+        "cancelledNoDate": "Cancelada"
+      },
+      "argumentsTitle": "Argumentos",
+      "argumentsCount": "{pro} a favor · {contra} contra",
+      "argumentsSoon": "Os argumentos a favor e contra chegam em breve.",
+      "page": {
+        "title": "{claim} · {asset}"
+      }
     }
   },
   "rightColumn": {

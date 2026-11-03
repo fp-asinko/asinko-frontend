@@ -132,7 +132,7 @@ Es un Server Component, igual que `PostCard`:
 
 ## 8. El perfil (TD-17)
 
-`features/communities/components/thesis-card.tsx` se envuelve en `CardLink` hacia `/thesis/{id}`. El link del activo y el "⋯" de destacar siguen por encima. La tarjeta pasa a usar `ThesisSummary` y `ThesisState` del organismo.
+El claim de `features/communities/components/thesis-card.tsx` pasa a ser el link a `/thesis/{id}` (`ThesisSummary` con `href`), como el título de un post. `CardLink`, que abre la tarjeta entera, vive en `features/feed` y un feature no importa a otro: el perfil se queda con el link del claim. La tarjeta usa `ThesisSummary` y `ThesisState` del organismo.
 
 ## 9. Mocks (TD-20)
 

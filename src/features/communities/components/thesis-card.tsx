@@ -3,6 +3,7 @@ import { FeatureMenu } from '@/components/organisms/featured'
 import { ThesisState, ThesisSummary } from '@/components/organisms/thesis-summary'
 import { Link } from '@/i18n/navigation'
 import { previewProps } from '@/lib/communities/preview'
+import { thesisPath } from '@/lib/theses/paths'
 import type { ThesisItem } from '../communities.types'
 
 /**
@@ -10,6 +11,7 @@ import type { ThesisItem } from '../communities.types'
  * come with them to the feed, specs/profile-track-record PT-07): the asset and when, the state,
  * the claim, what it bets on and by when, how it ended, and the conviction in 4 bars. A Server
  * Component: read only. On your own profile, "⋯" features it (specs/profile-showcase PS-07).
+ * Its claim opens its page (specs/thesis-detail TD-17).
  */
 export function ThesisCard({ thesis, menu = false }: { thesis: ThesisItem; menu?: boolean }) {
   const tf = useTranslations('featured')
@@ -48,7 +50,8 @@ export function ThesisCard({ thesis, menu = false }: { thesis: ThesisItem; menu?
         </div>
       </div>
 
-      <ThesisSummary thesis={thesis} titleId={titleId} />
+      {/* Its claim opens its page (specs/thesis-detail TD-17), as a post's title. */}
+      <ThesisSummary thesis={thesis} titleId={titleId} href={thesisPath(thesis.id)} />
     </article>
   )
 }
