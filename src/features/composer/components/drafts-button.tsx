@@ -65,10 +65,12 @@ export function DraftsButton({
           setOpening((count) => count + 1)
           setOpen(true)
         }}
-        className="ml-auto inline-flex h-10 tap items-center gap-1.5 rounded-full px-3 type-action font-bold text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-4"
+        // In phones only the icon, its name for the screen reader: beside the five formats the
+        // word did not fit 360px (specs/submit-form-layout SF-10).
+        className="ml-auto inline-flex h-10 shrink-0 tap items-center gap-1.5 rounded-full px-2.5 type-action font-bold text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 sm:px-3 [&_svg]:size-4"
       >
         <FileStackIcon aria-hidden />
-        {t('open')}
+        <span className="sr-only sm:not-sr-only">{t('open')}</span>
       </button>
       <DraftsDialog
         key={opening}

@@ -257,6 +257,25 @@ test.describe('Page to create a post', () => {
     })
   }
 
+  test('the five formats and Drafts share the row at 360px, in each language (SF-10)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 360, height: 800 })
+    for (const [locale, path, name] of [
+      ['en', '/en/submit', 'Drafts'],
+      ['es', '/es/submit', 'Borradores'],
+      ['pt', '/pt/submit', 'Rascunhos'],
+    ] as const) {
+      await page.goto(path)
+      const tabs = (await page.getByRole('main').getByRole('tablist').first().boundingBox())!
+      const last = (await page.getByRole('main').getByRole('tab').nth(4).boundingBox())!
+      const drafts = (await page.getByRole('main').getByRole('button', { name }).boundingBox())!
+      expect(last.x + last.width, locale).toBeLessThanOrEqual(drafts.x)
+      expect(tabs.x + tabs.width, locale).toBeLessThanOrEqual(360)
+      expect(drafts.x + drafts.width, locale).toBeLessThanOrEqual(360)
+    }
+  })
+
   test('a thesis shows no related ones in the right column (RA-08)', async ({ page, isMobile }) => {
     test.skip(isMobile, 'There is no right column in phones')
     await page.goto('/en/submit?type=thesis&community=defi&related=BTC,macro')
