@@ -4,7 +4,7 @@ Rama: `feature/thesis-detail-lifecycle`, desde `feature/thesis-create`. Requirem
 
 - [x] **T-01 (M)** El organismo `components/organisms/thesis-summary/`: `ThesisState` (movido de `features/communities`) y `ThesisSummary`, con sus textos en `thesisSummary`. La tarjeta del perfil y la destacada pasan a usarlo sin cambiar cómo se ven. Tests. → TD-03, TD-17
 - [x] **T-02 (M)** `ThesisItem` en `feed.types.ts`, el mapper de `THESIS` y `THESIS` en `KNOWN_KINDS`. Mocks: tesis en los feeds, `GET /theses/:id` con `liveExample`, y cancelar y votar con sus errores. Tests y `fixtures.test.ts`. → TD-01, TD-20
-- [ ] **T-03 (M)** La tarjeta del feed (`features/feed/components/thesis-card.tsx`): la cabecera con la píldora Tesis, el cuerpo, cuánto falta, las acciones y el link. La rama en `FeedItems`. Textos en en, es y pt. Tests. → TD-02 a TD-05, TD-21
+- [x] **T-03 (M)** La tarjeta del feed (`features/feed/components/thesis-card.tsx`): la cabecera con la píldora Tesis, el cuerpo, cuánto falta, las acciones y el link. La rama en `FeedItems`. Textos en en, es y pt. Tests. → TD-02 a TD-05, TD-21
 - [x] **T-04 (S)** Votar: `kind="thesis"` en `VoteControl`, `vote-thesis.action.ts` y `voteThesisAs`. Tests. → TD-16
 - [ ] **T-05 (L)** La página `/thesis/[id]`:
   - `getThesis`, `ThesisDetail`, el bloque de la apuesta y el de estado, y los argumentos con "Próximamente";

@@ -54,7 +54,7 @@ export type ThesisItem = {
 
 Es un Server Component, igual que `PostCard`:
 
-- **Cabecera:** `CardByline` con el grupo, Unirse y el autor, y una píldora gris **Tesis** al lado de la hora (Q2). La píldora es `rounded-full bg-muted px-2 type-meta font-semibold`, la misma forma que `TagPill`. Un canal personal muestra al autor con su foto.
+- **Cabecera:** `CardByline` con el grupo, Unirse y el autor, y **◎ TESIS** en el lugar del **POLL** de una encuesta (`badge`), con su mismo estilo (Q2, ajustada por el PO el 2026-11-03).
 - **Cuerpo:** `ThesisSummary` (§ 1). Suma "Cierra en 23 días" si está abierta (`useFormatter().relativeTime`) o el precio de resolución si está resuelta.
 - **Acciones:**
   - `VoteControl` con `kind="thesis"` (§ 6);

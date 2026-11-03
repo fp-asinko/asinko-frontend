@@ -27,7 +27,7 @@ Que una tesis se vea donde se publica, igual que un post: en el Home, en su grup
 ### La tarjeta en el feed
 
 - [ ] **TD-01** Las tesis aparecen en los feeds que las mandan: Home (Explorar y Siguiendo), la página de un grupo y la de un activo, en el orden del backend, mezcladas con los posts. El front las pide (`kind=…,THESIS`): hasta ahora pedía solo posts, thoughts y encuestas. La pestaña Posts del perfil sigue sin ellas: las tesis de una persona tienen su pestaña (ajuste de la implementación, 2026-11-03).
-- [ ] **TD-02** La cabecera es la de cualquier tarjeta (`specs/community-first`): el grupo con su avatar y Unirse, el autor debajo; en un canal personal, el autor con su foto. Al lado, una etiqueta **Tesis**, para distinguirla de un post.
+- [ ] **TD-02** La cabecera es la de cualquier tarjeta (`specs/community-first`): el grupo con su avatar y Unirse, el autor debajo; en un canal personal, el autor con su foto. A la derecha, **◎ TESIS**, como **POLL** en una encuesta, para distinguirla de un post (Q2, ajustada el 2026-11-03).
 - [ ] **TD-03** El cuerpo es el de la tarjeta del perfil (`specs/profile-track-record` PT-07):
   - el activo y su precio de referencia;
   - el claim como título;
@@ -102,6 +102,7 @@ Que una tesis se vea donde se publica, igual que un post: en el Home, en su grup
 - **Q1. La URL:** `/thesis/{id}`, igual en los tres idiomas, como `/post/{id}`, `/hub/…` y `/asset/…`. **Sí.** Las otras páginas de contenido no se traducen.
 - **Q2. La etiqueta "Tesis" en la tarjeta del feed:**
   - **Opción A, elegida:** una píldora gris "Tesis", al lado de la hora en la cabecera. Sigue el sistema monocromático.
+  - **Ajuste (PO, 2026-11-03), viendo la tarjeta:** va donde la encuesta dice POLL y con su mismo estilo, "◎ TESIS" a la derecha de la cabecera. Todas las tarjetas de un tipo especial se marcan igual.
   - **Opción B:** una franja de color arriba de la tarjeta, como la "alerta" del prototipo para las tesis abiertas.
 - **Q3. Los argumentos en la página:** sin comentarios hasta MVP-141, con los contadores y un "Próximamente" (el backend exige un lado para comentar una tesis). **Elegido:** MVP-141 va justo después, en su spec; hacerlo acá era casi el doble antes de ver algo funcionando.
 - **Q4. El motivo de cancelar:** el contrato lo pide (`reason`), pero no dice si puede ir vacío ni el largo. **Obligatorio, de hasta 280 caracteres**: el historial queda honesto. Si el backend acepta vacío o tiene otro largo, se ajusta con Eugenio.
