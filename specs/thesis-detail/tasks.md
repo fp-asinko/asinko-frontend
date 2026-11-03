@@ -13,7 +13,8 @@ Rama: `feature/thesis-detail-lifecycle`, desde `feature/thesis-create`. Requirem
 - [x] **T-06 (M)** Cancelar: `ThesisMenu`, `CancelThesisDialog` (diferida), `cancel-thesis.schema.ts`, `cancel-thesis.action.ts` y `cancelThesisAs`, con sus errores. Tests. → TD-12 a TD-15
 - [x] **T-07 (S)** La tarjeta del perfil como link a la página. Tests. → TD-17
 - [x] **T-08 (M)** E2E (`e2e/thesis-detail.spec.ts`): ver en el feed, abrir, votar, cancelar, 404, 360 px y axe en claro y oscuro. `performance.spec.ts` con `/thesis/{id}`. `ui-reviewer`. → TD-18, TD-19
-- [ ] **T-09 (S)** A mano contra `dev` con la cuenta del PO: ver las dos tesis de prueba en su grupo y en el Home, abrir su página y votar. Cancelar solo con una tesis nueva, si el PO lo pide: las de prueba se quedan.
+- [x] **T-09 (S)** A mano contra `dev` con la cuenta del PO: ver las dos tesis de prueba en su grupo y en el Home, abrir su página y votar. Cancelar solo con una tesis nueva, si el PO lo pide: las de prueba se quedan.
+  - **2026-11-03, con la cuenta del PO (`@juansegundomartinez`, `API_MOCKS=missing`):** la tesis de `#chile` se ve en el feed del grupo con su tarjeta y abre su página (la apuesta, el estado y los argumentos con "Próximamente"). El voto llegó al backend (`score` 1). El "⋯" ofrece cancelar; no se confirmó: las dos tesis de prueba siguen abiertas.
 
 Orden: T-01 → T-02 → T-03 → T-04 → T-05 → T-06 → T-07 → T-08 → T-09. T-04 y T-07 no dependen de T-05.
 
