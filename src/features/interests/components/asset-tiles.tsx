@@ -45,7 +45,9 @@ export function AssetTiles({ tiles, id }: { tiles: AssetTile[]; id?: string }) {
                     className={cn(
                       'flex min-h-19.5 tap flex-col items-center justify-center gap-0.5 rounded-md border border-b-3 bg-card p-1 text-center outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
                       // The page shown: a gray background, as a group's or a person's row (PO, 2026-10-28).
-                      'aria-[current=page]:bg-muted',
+                      // The day's green or red does not reach 4.5:1 on gray (design-system.md: green
+                      // on white): there it takes the text's color, and its arrow and sign still say it.
+                      'aria-[current=page]:bg-muted aria-[current=page]:[&_.text-bearish]:text-foreground aria-[current=page]:[&_.text-bullish]:text-foreground',
                       change > 0 && 'border-b-bullish',
                       change < 0 && 'border-b-bearish',
                     )}

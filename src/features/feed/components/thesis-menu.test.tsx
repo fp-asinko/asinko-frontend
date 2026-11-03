@@ -38,6 +38,18 @@ describe('ThesisMenu (specs/thesis-detail TD-12 to TD-15)', () => {
     expect(screen.getByText('12/280')).toBeInTheDocument()
   })
 
+  it('says why a reason over 280 characters does not go (WCAG 3.3.1)', async () => {
+    renderWithIntl(<ThesisMenu id="t1" claim={CLAIM} />)
+    await openConfirmation()
+    const field = screen.getByRole('textbox')
+    await userEvent.click(field)
+    await userEvent.paste('x'.repeat(281))
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel thesis' }))
+    expect(screen.getByRole('alert')).toHaveTextContent('Use 280 characters or fewer')
+    expect(field).toHaveAccessibleDescription(/281\/280/)
+    expect(action.cancelThesis).not.toHaveBeenCalled()
+  })
+
   it('cancels it and asks the page again, closing the confirmation', async () => {
     action.cancelThesis.mockResolvedValue({ ok: true, data: null })
     renderWithIntl(<ThesisMenu id="t1" claim={CLAIM} />)

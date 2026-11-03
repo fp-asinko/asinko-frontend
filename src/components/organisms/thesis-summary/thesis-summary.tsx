@@ -1,5 +1,6 @@
 import { useFormatter, useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
+import { thesisPrice } from '@/lib/theses/price'
 import { cn } from '@/lib/utils'
 import type { ThesisSummaryData } from './thesis-summary.types'
 
@@ -28,14 +29,7 @@ export function ThesisSummary({
   const t = useTranslations('thesisSummary')
   const format = useFormatter()
   const Title = heading
-  // Cents only below $1,000: "$150,000", "$182.47", "$2.41".
-  const price = (value: number) =>
-    format.number(value, {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: value >= 1000 ? 0 : 2,
-    })
+  const price = (value: number) => thesisPrice(format, value)
   const date = format.dateTime(new Date(thesis.deadline), { dateStyle: 'medium' })
 
   return (

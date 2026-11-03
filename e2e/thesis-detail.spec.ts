@@ -108,8 +108,8 @@ test.describe('A thesis in the feed and on its page', () => {
     test(`fits 360px and stays accessible in ${theme} (TD-18)`, async ({ page, isMobile }) => {
       await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
       if (isMobile) await page.setViewportSize({ width: 360, height: 740 })
-      // The Home, with theses among its cards, and a thesis's page.
-      for (const path of ['/en', MARIA_PAGE]) {
+      // The Home and an asset's page, with theses among their cards, and a thesis's page.
+      for (const path of ['/en', '/en/asset/BTC', MARIA_PAGE]) {
         await page.goto(path)
         if (theme === 'dark') await expect(page.locator('html')).toHaveClass(/dark/)
         const overflow = await page.evaluate(

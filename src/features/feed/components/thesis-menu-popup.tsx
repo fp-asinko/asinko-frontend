@@ -95,8 +95,9 @@ export function CancelThesisDialog({
 
   function confirm() {
     if (pending) return
-    if (length === 0) {
-      setError(t('errors.reasonRequired'))
+    if (length === 0 || length > CANCEL_REASON_MAX) {
+      // Said in words, not only by the red counter (WCAG 3.3.1).
+      setError(t(length === 0 ? 'errors.reasonRequired' : 'errors.reasonTooLong'))
       return
     }
     startTransition(async () => {
@@ -142,6 +143,7 @@ export function CancelThesisDialog({
               {t('reason')}
             </label>
             <span
+              id={`${ids}-count`}
               className={cn(
                 'type-meta tabular-nums',
                 length > CANCEL_REASON_MAX ? 'font-bold text-destructive' : 'text-muted-foreground',
@@ -159,7 +161,7 @@ export function CancelThesisDialog({
             }}
             maxLength={CANCEL_REASON_MAX + 20}
             aria-invalid={Boolean(error) || undefined}
-            aria-describedby={error ? `${ids}-error` : undefined}
+            aria-describedby={error ? `${ids}-count ${ids}-error` : `${ids}-count`}
             placeholder={t('reasonPlaceholder')}
             className="min-h-20 text-base"
           />
@@ -178,9 +180,9 @@ export function CancelThesisDialog({
             variant="destructive"
             // Solid, as the action it is: the shadcn tint did not reach 4.5:1 (axe).
             className="bg-destructive text-background hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive/90"
-            aria-disabled={pending || length > CANCEL_REASON_MAX || undefined}
+            aria-disabled={pending || undefined}
             aria-busy={pending || undefined}
-            onClick={() => length <= CANCEL_REASON_MAX && confirm()}
+            onClick={confirm}
           >
             {pending ? t('confirming') : t('confirm')}
           </Button>

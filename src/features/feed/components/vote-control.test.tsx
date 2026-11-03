@@ -9,7 +9,8 @@ const action = vi.hoisted(() => ({ votePost: vi.fn() }))
 vi.mock('../actions/vote-post.action', () => action)
 const commentAction = vi.hoisted(() => ({ voteComment: vi.fn() }))
 vi.mock('../actions/vote-comment.action', () => commentAction)
-vi.mock('../actions/vote-thesis.action', () => ({ voteThesis: vi.fn() }))
+const thesisAction = vi.hoisted(() => ({ voteThesis: vi.fn() }))
+vi.mock('../actions/vote-thesis.action', () => thesisAction)
 
 const ID = '00000000-0000-4000-8000-000000000001'
 
@@ -21,6 +22,14 @@ function deferred<T>() {
 }
 
 describe('VoteControl (H-15)', () => {
+  it('votes a thesis with its own action (specs/thesis-detail TD-16)', async () => {
+    thesisAction.voteThesis.mockResolvedValue({ ok: true, data: { score: 13, viewerVote: 1 } })
+    renderWithIntl(<VoteControl kind="thesis" id={ID} score={12} viewerVote={null} />)
+    await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
+    expect(thesisAction.voteThesis).toHaveBeenCalledWith({ thesisId: ID, value: 1 })
+    expect(action.votePost).not.toHaveBeenCalled()
+  })
+
   beforeEach(() => action.votePost.mockReset())
 
   it('announces the score and the pressed state of each arrow', () => {

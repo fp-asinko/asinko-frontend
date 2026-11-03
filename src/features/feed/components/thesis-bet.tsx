@@ -1,19 +1,14 @@
 import { ArrowDownIcon, ArrowUpIcon, CheckIcon, XIcon } from 'lucide-react'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
+import { thesisPrice } from '@/lib/theses/price'
 import { cn } from '@/lib/utils'
 import type { ThesisItem } from '../feed.types'
 
-/** "$150,000", "$182.47": cents only below $1,000, as the summary's. */
+/** The theses' prices (cents only below $1,000). */
 function usePrice() {
   const format = useFormatter()
-  return (value: number) =>
-    format.number(value, {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: value >= 1000 ? 0 : 2,
-    })
+  return (value: number) => thesisPrice(format, value)
 }
 
 /**
@@ -59,13 +54,18 @@ export function ThesisBet({ thesis }: { thesis: ThesisItem }) {
                 {thesis.target.direction !== 'equals' && (
                   <Arrow aria-hidden className="size-3.5" strokeWidth={2.5} />
                 )}
-                {t(`direction.${thesis.target.direction}`, { price: price(thesis.target.price) })}
-                {change !== null &&
-                  ` · ${format.number(change, {
-                    style: 'percent',
-                    maximumFractionDigits: 1,
-                    signDisplay: 'exceptZero',
-                  })}`}
+                {t(`direction.${thesis.target.direction}`, {
+                  price: price(thesis.target.price),
+                  hasChange: change === null ? 'no' : 'yes',
+                  change:
+                    change === null
+                      ? ''
+                      : format.number(change, {
+                          style: 'percent',
+                          maximumFractionDigits: 1,
+                          signDisplay: 'exceptZero',
+                        }),
+                })}
               </span>
             ),
           },

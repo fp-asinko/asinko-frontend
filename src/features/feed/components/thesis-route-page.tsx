@@ -7,6 +7,7 @@ import { buildAlternates, OG_LOCALES } from '@/i18n/alternates'
 import { safeLocale } from '@/i18n/safe-locale'
 import { getOrThrow } from '@/lib/api'
 import { shareImage, thesisImagePath } from '@/lib/share-image/share-metadata'
+import { thesisPrice } from '@/lib/theses/price'
 import type { ThesisItem } from '../feed.types'
 import { getThesis } from '../lib/thesis-api'
 import { PostMarkdown } from './post-markdown'
@@ -22,12 +23,7 @@ async function targetLine(thesis: ThesisItem, locale: ReturnType<typeof safeLoca
   ])
   const date = format.dateTime(new Date(thesis.deadline), { dateStyle: 'medium' })
   if (!thesis.target) return t('target.none', { date })
-  const price = format.number(thesis.target.price, {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: thesis.target.price >= 1000 ? 0 : 2,
-  })
+  const price = thesisPrice(format, thesis.target.price)
   return t(`target.${thesis.target.direction}`, { price, date })
 }
 

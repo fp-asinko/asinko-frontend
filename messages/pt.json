@@ -242,9 +242,9 @@
         "noReference": "Sem preço",
         "target": "Alvo",
         "direction": {
-          "above": "Acima de {price}",
-          "below": "Abaixo de {price}",
-          "equals": "Igual a {price}"
+          "above": "Acima de {price}{hasChange, select, yes { · {change}} other {}}",
+          "below": "Abaixo de {price}{hasChange, select, yes { · {change}} other {}}",
+          "equals": "Igual a {price}{hasChange, select, yes { · {change}} other {}}"
         },
         "deadline": "Prazo",
         "conviction": "Convicção",

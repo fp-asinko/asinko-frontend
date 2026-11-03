@@ -66,8 +66,8 @@ export function ThesisConfirm({
         initialFocus={() => document.getElementById(`${ids}-disclaimer`)}
         className={cn(
           'gap-5 p-5 sm:max-w-md',
-          // A panel from the bottom in phones, edge to edge (TC-16): the one place max-sm: reads
-          // best, against the shadcn window it overrides.
+          // A panel from the bottom in phones, edge to edge (TC-16): max-sm: reads best here, against
+          // the shadcn window it overrides. The same in cancelling a thesis (specs/thesis-detail).
           'max-sm:top-auto max-sm:bottom-0 max-sm:max-w-full max-sm:translate-y-0 max-sm:rounded-b-none max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))]',
         )}
       >
