@@ -235,3 +235,6 @@ export type UserReply = {
  */
 export type CommentTarget =
   { kind: 'post' | 'poll'; id: string } | { kind: 'thesis'; id: string; side: 'PRO' | 'CONTRA' }
+
+/** An update of a thesis by its author (specs/thesis-arguments TA-09): what changed, and when. */
+export type ThesisUpdate = { id: string; body: string; createdAt: string }

@@ -302,7 +302,25 @@
           "generic": "No se pudo cancelar la tesis. Probá de nuevo."
         }
       },
-      "argumentsLabel": "{count, plural, =0 {Sin argumentos todavía} one {# argumento} other {# argumentos}}"
+      "argumentsLabel": "{count, plural, =0 {Sin argumentos todavía} one {# argumento} other {# argumentos}}",
+      "updates": {
+        "title": "Actualizaciones del autor",
+        "open": "Publicar una actualización",
+        "label": "Tu actualización",
+        "placeholder": "¿Qué cambió? Datos, noticias, un motivo nuevo…",
+        "note": "Las actualizaciones no se pueden editar ni borrar.",
+        "counter": "{count}/{max}",
+        "cancel": "Cancelar",
+        "submit": "Publicar actualización",
+        "submitting": "Publicando…",
+        "failed": "No se pudieron cargar las actualizaciones.",
+        "errors": {
+          "required": "Escribí qué cambió",
+          "tooLong": "Usá 2.000 caracteres o menos",
+          "notOpen": "La tesis ya no está abierta: no se pueden sumar actualizaciones.",
+          "generic": "No se pudo publicar la actualización. Probá de nuevo."
+        }
+      }
     }
   },
   "rightColumn": {

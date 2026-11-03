@@ -302,7 +302,25 @@
           "generic": "Não foi possível cancelar a tese. Tente de novo."
         }
       },
-      "argumentsLabel": "{count, plural, =0 {Sem argumentos ainda} one {# argumento} other {# argumentos}}"
+      "argumentsLabel": "{count, plural, =0 {Sem argumentos ainda} one {# argumento} other {# argumentos}}",
+      "updates": {
+        "title": "Atualizações do autor",
+        "open": "Publicar uma atualização",
+        "label": "Sua atualização",
+        "placeholder": "O que mudou? Dados, notícias, um motivo novo…",
+        "note": "As atualizações não podem ser editadas nem apagadas.",
+        "counter": "{count}/{max}",
+        "cancel": "Cancelar",
+        "submit": "Publicar atualização",
+        "submitting": "Publicando…",
+        "failed": "Não foi possível carregar as atualizações.",
+        "errors": {
+          "required": "Escreva o que mudou",
+          "tooLong": "Use 2.000 caracteres ou menos",
+          "notOpen": "A tese não está mais aberta: não aceita novas atualizações.",
+          "generic": "Não foi possível publicar a atualização. Tente de novo."
+        }
+      }
     }
   },
   "rightColumn": {

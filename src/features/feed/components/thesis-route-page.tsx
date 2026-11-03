@@ -6,6 +6,7 @@ import { env } from '@/env'
 import { buildAlternates, OG_LOCALES } from '@/i18n/alternates'
 import { safeLocale } from '@/i18n/safe-locale'
 import { getOrThrow } from '@/lib/api'
+import { getViewer } from '@/lib/session'
 import { shareImage, thesisImagePath } from '@/lib/share-image/share-metadata'
 import { thesisPrice } from '@/lib/theses/price'
 import type { ThesisItem } from '../feed.types'
@@ -15,6 +16,7 @@ import { ThesisBet } from './thesis-bet'
 import { ThesisCard } from './thesis-card'
 import { ThesisMenu } from './thesis-menu'
 import { ThesisArguments } from './thesis-arguments'
+import { ThesisUpdates } from './thesis-updates'
 import { thesisArgumentsQuerySchema } from '../schemas/thesis-arguments-query.schema'
 
 /** "Above $150,000 by Dec 3, 2026": the thesis's description, as its summary says it. */
@@ -75,7 +77,7 @@ export async function resolveThesisRoute(id: string): Promise<ThesisItem> {
 
 /**
  * A thesis's own page (TD-06 to TD-08): its card whole, with the reasoning, what it bets on and
- * where it stands; then its arguments, For and Against (specs/thesis-arguments).
+ * where it stands; its author's updates, then its arguments, For and Against (specs/thesis-arguments).
  */
 export async function ThesisDetail({
   thesis,
@@ -85,6 +87,7 @@ export async function ThesisDetail({
   /** User input from the URL: validated here (security.md § 5). */
   searchParams: Record<string, string | string[] | undefined>
 }) {
+  const viewer = await getViewer()
   return (
     <>
       <ThesisCard
@@ -98,6 +101,16 @@ export async function ThesisDetail({
         </div>
         <ThesisBet thesis={thesis} />
       </ThesisCard>
+      <ThesisUpdates
+        thesisId={thesis.id}
+        // Its author, while it is open (TA-10). Not canCancel: that one ends in the last 10 %.
+        canPublish={
+          thesis.state === 'open' &&
+          viewer !== null &&
+          thesis.author !== null &&
+          viewer.username === thesis.author.username
+        }
+      />
       <ThesisArguments thesis={thesis} query={thesisArgumentsQuerySchema.parse(searchParams)} />
     </>
   )

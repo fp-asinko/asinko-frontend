@@ -67,6 +67,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
     ])
     expect(Object.keys((picked.feed as Record<string, Record<string, unknown>>).thesis!)).toEqual([
       'cancel',
+      'updates',
     ])
     // Only the client part of the namespace: the page texts stay on the server.
     // (profile: the badge of the hover cards, specs/mention-preview).

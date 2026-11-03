@@ -302,7 +302,25 @@
           "generic": "Could not cancel the thesis. Try again."
         }
       },
-      "argumentsLabel": "{count, plural, =0 {No arguments yet} one {# argument} other {# arguments}}"
+      "argumentsLabel": "{count, plural, =0 {No arguments yet} one {# argument} other {# arguments}}",
+      "updates": {
+        "title": "Updates from the author",
+        "open": "Post an update",
+        "label": "Your update",
+        "placeholder": "What changed? Data, news, a new reason…",
+        "note": "Updates can’t be edited or deleted.",
+        "counter": "{count}/{max}",
+        "cancel": "Cancel",
+        "submit": "Post update",
+        "submitting": "Posting…",
+        "failed": "Could not load the updates.",
+        "errors": {
+          "required": "Write what changed",
+          "tooLong": "Use 2,000 characters or fewer",
+          "notOpen": "The thesis is no longer open: it takes no more updates.",
+          "generic": "Could not post the update. Try again."
+        }
+      }
     }
   },
   "rightColumn": {
