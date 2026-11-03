@@ -1,6 +1,6 @@
 # Argumentos y actualizaciones de una tesis — Requirements
 
-> **Estado:** borrador para el PO (2026-11-03). Preguntas abiertas al final, cada una con una recomendación.
+> **Estado:** preguntas resueltas por el PO el 2026-11-03, las seis como se recomendaron ("si"). Q2, Q4, Q5 y Q6 se confirman con el backend (`docs/references/api/proposals.md`).
 > **Fuente:** Jira **MVP-141** ("Pro/Con arguments tab + author updates on thesis detail": el endpoint de actualizaciones ya está en el backend, E11; falta la UI; la notificación a quienes votaron, ítem 27, sigue pendiente). Sigue a `specs/thesis-detail`, que dejó en la página los contadores y un "Próximamente" (Q3).
 > **Backend** (`dev`, probado el 2026-11-03):
 >
@@ -55,7 +55,7 @@ Que una tesis se discuta como Asinko la pensó: quien está de acuerdo argumenta
 - **Votar la resolución** de una tesis vencida (`resolution-vote`): otro ticket.
 - **Elegir otro lado al responder**, citar un argumento del lado contrario.
 
-## Preguntas abiertas
+## Preguntas resueltas (2026-11-03, todas como se recomendaron)
 
 - **Q1. Cómo se leen los lados:** ¿dos pestañas, A favor / En contra, cada una su hilo (**recomendado**: es lo que pide el ticket, "Pro/Con arguments tab", y el backend filtra por lado)? ¿O un solo hilo con una marca verde o roja en cada argumento, como el prototipo (🟢 / 🔴)?
 - **Q2. El lado de una respuesta:** ¿hereda el de su argumento, sin elegir (**recomendado**: se responde dentro de una pestaña)? Hay que confirmar con Eugenio que el backend acepta y guarda así una respuesta (E05 no lo dice).
