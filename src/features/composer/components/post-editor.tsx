@@ -666,7 +666,7 @@ export function PostEditor({
               // a line, what makes a good one and how much room is left (TH-03).
               <div
                 className={cn(
-                  'rounded-2xl border border-input px-5 pt-4 pb-3 transition-colors duration-150 focus-within:border-foreground/60',
+                  'rounded-2xl border border-transparent bg-surface px-5 pt-4 pb-3 transition-colors duration-150 focus-within:border-foreground/60',
                   invalid('body') && 'border-destructive',
                 )}
               >

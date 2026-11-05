@@ -86,7 +86,11 @@ export function AssetSearch({
         id={id}
         role="group"
         aria-labelledby={labelledBy}
-        className={cn(FIELD_BOX, 'flex min-h-12 items-center gap-2 py-1.5 pr-2')}
+        // A value, not a field to type in: unfilled, on white, where the day's green reads (TC-29).
+        className={cn(
+          FIELD_BOX,
+          'flex min-h-12 items-center gap-2 bg-transparent py-1.5 pr-2 dark:bg-transparent',
+        )}
         aria-describedby={describedBy}
       >
         {renderValue(value)}

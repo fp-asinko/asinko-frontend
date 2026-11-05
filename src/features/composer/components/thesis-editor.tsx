@@ -725,19 +725,21 @@ export function ThesisEditor({
                 // Said as it changes with the price typed.
                 aria-live="polite"
                 // Hidden while empty: it would add its gap below the price.
-                // Green up or red down, with its arrow: never the color alone (on white, as the
-                // bullish green asks).
-                className={cn(
-                  'hidden items-center gap-1 px-1 type-meta font-semibold not-empty:flex sm:pointer-events-none sm:absolute sm:inset-y-0 sm:right-3',
-                  derived === 'BELOW' ? 'text-bearish' : 'text-bullish',
-                )}
+                // Its arrow green up or red down, the words in the text's color: from sm it sits
+                // in the filled field, where small green text would not reach 4.5:1 (PO
+                // 2026-11-05). Never the color alone: the arrow and the words say it.
+                className="hidden items-center gap-1 px-1 type-meta font-semibold text-foreground not-empty:flex sm:pointer-events-none sm:absolute sm:inset-y-0 sm:right-3"
               >
                 {derived && change !== null && (
                   <>
                     {derived === 'BELOW' ? (
-                      <ArrowDownIcon aria-hidden className="size-3" strokeWidth={2.5} />
+                      <ArrowDownIcon
+                        aria-hidden
+                        className="size-3 text-bearish"
+                        strokeWidth={2.5}
+                      />
                     ) : (
-                      <ArrowUpIcon aria-hidden className="size-3" strokeWidth={2.5} />
+                      <ArrowUpIcon aria-hidden className="size-3 text-bullish" strokeWidth={2.5} />
                     )}
                     {t('thesis.target.direction', {
                       direction: derived,

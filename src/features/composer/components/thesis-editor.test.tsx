@@ -148,11 +148,16 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     expect(screen.queryByRole('radiogroup', { name: 'Target' })).toBeNull()
     await userEvent.type(price(), '198')
     // Green with its arrow up; red with its arrow down.
-    expect(screen.getByText('Above the current price · +10%')).toHaveClass('text-bullish')
+    // The arrow in green, the words in the text's color: on the filled field (PO, 2026-11-05).
+    expect(screen.getByText('Above the current price · +10%').querySelector('svg')).toHaveClass(
+      'text-bullish',
+    )
     expect(screen.getByText('Above the current price · +10%').querySelector('svg')).not.toBeNull()
     await userEvent.clear(price())
     await userEvent.type(price(), '150')
-    expect(screen.getByText('Below the current price · -16.7%')).toHaveClass('text-bearish')
+    expect(screen.getByText('Below the current price · -16.7%').querySelector('svg')).toHaveClass(
+      'text-bearish',
+    )
     await userEvent.clear(price())
     await userEvent.type(price(), '180')
     expect(

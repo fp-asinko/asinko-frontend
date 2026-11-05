@@ -61,7 +61,7 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
 - **Texto secundario**: `--muted-foreground` (`#5C5D60`). **`--faint` (`#8A8B8E`) no es para texto chico** (3,4:1): solo íconos, separadores y texto de 18 px o más.
 - **Verde en texto** (`--success`/`--bullish`) sobre fondos blancos, no sobre `--surface`. El color nunca es la única señal: siempre con flecha, ícono o texto.
 - **Sin sombras**: las capas se separan con borde. Dos excepciones, aprobadas por el PO: las tarjetas que flotan al pasar el mouse (`shadow-float`, `specs/mention-preview`), con borde además, y la columna izquierda abierta, una sombra corta hacia el contenido como Reddit (`shadow-rail`, `specs/sidebar-toggle`, 2026-10-23). Radios de 4 / 8 / 12 / 16 px y `rounded-full` para píldoras.
-- **Bordes de campos activos** con `--input` (3:1); el borde suave del prototipo solo en elementos deshabilitados o decorativos.
+- **Bordes de campos activos** con `--input` (3:1); el borde suave del prototipo solo en elementos deshabilitados o decorativos. **Excepción, los formularios de crear post y tesis** (PO, 2026-11-05: más limpio): campos **rellenos**, `bg-surface` sin línea (`FIELD_BOX` y la caja del cuerpo). El borde aparece al escribir (`foreground/60`) o en rojo con un error. Cada campo conserva su rótulo visible, que es lo que lo identifica (WCAG 1.4.11 pide 3:1 para lo que hace falta para reconocer el control; acá lo dice el rótulo, no el borde).
 - `src/test/tokens-contrast.test.ts` mide cada par en los dos temas: un token que baja del mínimo rompe el build.
 
 ### Color de las tarjetas (`specs/feed-cards`)

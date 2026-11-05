@@ -10,9 +10,9 @@ import { cn } from '@/lib/utils'
 /** The preview's Server Action (the feed's card), passed down from the page (structure.md). */
 export type PreviewAction = (draft: unknown) => Promise<ActionResult<{ card: ReactNode }>>
 
-/** The body's box, as Reddit's: its border darkens while writing in it (SF-04, SF-07). */
+/** The body's box, filled as the fields and without a line; it shows while writing (SF-04, SF-07). */
 const BOX =
-  'rounded-2xl border border-input transition-colors duration-150 focus-within:border-foreground/60'
+  'rounded-2xl border border-transparent bg-surface transition-colors duration-150 focus-within:border-foreground/60'
 
 const TAB =
   'h-8 rounded-full px-3 type-action text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 data-active:bg-muted data-active:text-foreground'
