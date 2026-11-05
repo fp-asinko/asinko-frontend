@@ -20,7 +20,7 @@ test.describe('Create a thesis', () => {
     )
     // Its own title (TC-27), the asset of the URL and its card (TC-02, TC-22).
     await expect(page.getByRole('heading', { level: 1, name: 'Publish thesis' })).toBeVisible()
-    await expect(main(page).getByRole('combobox', { name: 'Asset' })).toContainText('$BTC')
+    await expect(main(page).getByRole('group', { name: 'Asset' })).toContainText('$BTC')
     await expect(main(page).getByText('Bitcoin', { exact: true })).toBeVisible()
     await fill(page, claim)
     await expect(main(page).getByText(/^Above the current price · \+\d/)).toBeVisible()
@@ -135,16 +135,17 @@ test('saves a thesis as a draft, finds it marked among the drafts and publishes 
   await expect(page.getByRole('dialog').getByText('No drafts yet')).toBeVisible()
 })
 
-test('fits a 1280×800 window without scrolling, with an asset chosen (TC-36)', async ({
+test('fits a 1280×900 window without scrolling, with an asset chosen (TC-36)', async ({
   page,
   isMobile,
 }) => {
   test.skip(isMobile, 'Measured on desktop: a phone scrolls, with Publish fixed at the bottom')
-  await page.setViewportSize({ width: 1280, height: 800 })
+  // 900, not 800, since the form's steps are spaced (specs/thesis-form-steps, PO 2026-11-04).
+  await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto('/en/submit?community=BTC&type=thesis')
   await expect(main(page).getByText('Bitcoin', { exact: true })).toBeVisible()
   const publish = (await main(page).getByRole('button', { name: 'Publish' }).boundingBox())!
-  expect(publish.y + publish.height).toBeLessThanOrEqual(800)
+  expect(publish.y + publish.height).toBeLessThanOrEqual(900)
 })
 
 test('the conviction help stays put while the level changes (TC-30)', async ({

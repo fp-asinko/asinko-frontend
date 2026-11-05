@@ -38,7 +38,7 @@ Todo en `features/composer`, junto al formulario de tesis (`thesis-editor.tsx`).
   Sale de los mismos `useWatch` que ya usa el botón Publicar.
 
 - **El alto:** el círculo va en la misma línea del label, así que no suma altura. El carrusel va al lado del buscador desde `sm`, tampoco suma. Se mide en `thesis-create.spec.ts` (TC-36).
-- **Espaciado** (PO, 2026-11-04): 24 px entre pasos y 8 px del título a su campo (antes 16 y 4), para que cada paso se lea como una sección. Si con eso el formulario deja de entrar en 1280×800, gana el espaciado y TC-36 se ajusta.
+- **Espaciado** (PO, 2026-11-04): 24 px entre pasos y 8 px del título a su campo (antes 16 y 4), para que cada paso se lea como una sección. Con eso el formulario dejó de entrar en 1280×800 (Publicar en 877 px): gana el espaciado y TC-36 pasa a 1280×900.
 - **Una sola columna en mobile con `grid-cols-1`** (`minmax(0, 1fr)`): sin columnas declaradas, la implícita crece con las píldoras y el carrusel nunca desborda ni se mueve.
 
 ## 5. Propuesta al backend (P-040)
