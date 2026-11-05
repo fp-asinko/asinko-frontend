@@ -189,6 +189,12 @@ function ComboboxEmpty({ className, ...props }: ComboboxPrimitive.Empty.Props) {
   )
 }
 
+// asinko: Base UI's Status, not in shadcn's wrapper: a polite live region inside the popup, the
+// only place a screen reader still hears while the list is open (the rest gets aria-hidden).
+function ComboboxStatus({ className, ...props }: ComboboxPrimitive.Status.Props) {
+  return <ComboboxPrimitive.Status data-slot="combobox-status" className={className} {...props} />
+}
+
 function ComboboxSeparator({ className, ...props }: ComboboxPrimitive.Separator.Props) {
   return (
     <ComboboxPrimitive.Separator
@@ -270,6 +276,7 @@ export {
   ComboboxLabel,
   ComboboxCollection,
   ComboboxEmpty,
+  ComboboxStatus,
   ComboboxSeparator,
   ComboboxChips,
   ComboboxChip,

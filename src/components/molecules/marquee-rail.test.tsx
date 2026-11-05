@@ -20,6 +20,10 @@ describe('MarqueeRail (specs/thesis-form-steps FS-05)', () => {
     expect(screen.getAllByRole('button', { name: 'BTC' })).toHaveLength(1)
     expect(rail.querySelectorAll('[inert] button')).toHaveLength(2)
     expect(screen.getByTestId('marquee-track')).toHaveClass('motion-safe:animate-marquee')
+    // Paused from its data attribute, not an inline style.
+    expect(screen.getByTestId('marquee-track')).toHaveClass(
+      'data-stopped:[animation-play-state:paused]',
+    )
     expect(screen.getByTestId('marquee-track')).toHaveStyle({ '--marquee-duration': '24s' })
   })
 

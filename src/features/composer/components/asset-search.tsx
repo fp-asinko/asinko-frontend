@@ -11,6 +11,7 @@ import {
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
+  ComboboxStatus,
 } from '@/components/ui/combobox'
 import { cn } from '@/lib/utils'
 import { searchCommunities } from '../actions/search-communities.action'
@@ -106,6 +107,17 @@ export function AssetSearch({
     )
   }
 
+  const query = text.trim()
+  const status = !query
+    ? ''
+    : loading
+      ? t('searching')
+      : failed
+        ? t('searchFailed')
+        : options.length === 0
+          ? t('none')
+          : t('results', { count: options.length })
+
   return (
     <Combobox<CommunityOption>
       items={options}
@@ -149,7 +161,11 @@ export function AssetSearch({
           align="start"
           className="min-w-0 rounded-xl border p-1 shadow-none ring-0 duration-150 ease-out data-open:slide-in-from-top-1"
         >
-          <ComboboxEmpty className="px-3 py-2.5 type-meta">
+          {/* Inside the list: while it is open, the rest of the page is hidden from a screen
+                reader. It says each change: searching, how many, none (WCAG 4.1.3, FS-01). */}
+          <ComboboxStatus className="sr-only">{status}</ComboboxStatus>
+          {/* Seen only: the status says it. */}
+          <ComboboxEmpty aria-hidden className="px-3 py-2.5 type-meta">
             {loading ? t('searching') : failed ? t('searchFailed') : t('none')}
           </ComboboxEmpty>
           <ComboboxList className="max-h-64">

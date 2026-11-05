@@ -1164,7 +1164,8 @@
         "change": "Change {asset}",
         "searching": "Searching…",
         "searchFailed": "Could not search. Try again.",
-        "none": "No assets with that name"
+        "none": "No assets with that name",
+        "results": "{count, plural, one {# asset} other {# assets}}"
       },
       "claim": {
         "label": "Claim",
@@ -1231,7 +1232,7 @@
       },
       "topAssets": {
         "label": "Assets with the most theses",
-        "item": "{name}, {count, plural, one {# thesis} other {# theses}}",
+        "item": "{handle}, {name}, {count, plural, one {# thesis} other {# theses}}",
         "count": "{count, plural, one {{shown} thesis} other {{shown} theses}}"
       }
     }

@@ -1164,7 +1164,8 @@
         "change": "Cambiar {asset}",
         "searching": "Buscando…",
         "searchFailed": "No se pudo buscar. Probá de nuevo.",
-        "none": "No hay activos con ese nombre"
+        "none": "No hay activos con ese nombre",
+        "results": "{count, plural, one {# activo} other {# activos}}"
       },
       "claim": {
         "label": "Predicción",
@@ -1231,7 +1232,7 @@
       },
       "topAssets": {
         "label": "Activos con más tesis",
-        "item": "{name}, {count, plural, one {# tesis} other {# tesis}}",
+        "item": "{handle}, {name}, {count, plural, one {# tesis} other {# tesis}}",
         "count": "{count, plural, one {{shown} tesis} other {{shown} tesis}}"
       }
     }

@@ -53,6 +53,8 @@ describe('AssetSearch (specs/thesis-form-steps FS-01 to FS-03)', () => {
 
     await userEvent.type(field(), 'bit')
     expect(await screen.findByRole('option', { name: /\$BTC/ })).toBeVisible()
+    // Said, not only seen (WCAG 4.1.3).
+    await vi.waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('2 assets'))
     // Only assets, and once typing rests (FS-01).
     expect(action.searchCommunities).toHaveBeenCalledTimes(1)
     expect(action.searchCommunities).toHaveBeenCalledWith('bit', 'assets')
@@ -79,10 +81,15 @@ describe('AssetSearch (specs/thesis-form-steps FS-01 to FS-03)', () => {
     renderWithIntl(<Search />)
     const input = field()
     await userEvent.type(input, 'zzz')
-    expect(await screen.findByText('No assets with that name')).toBeVisible()
+    // Said from the status, which is always there (WCAG 4.1.3).
+    await vi.waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent('No assets with that name'),
+    )
 
     action.searchCommunities.mockResolvedValue({ ok: false, error: 'api.errors.UNAVAILABLE' })
     await userEvent.type(input, 'z')
-    expect(await screen.findByText('Could not search. Try again.')).toBeVisible()
+    await vi.waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent('Could not search. Try again.'),
+    )
   })
 })

@@ -539,7 +539,7 @@ export function ThesisEditor({
             {/* The asset: a search, and beside it the assets with the most theses (specs/thesis-
                 form-steps FS-01 to FS-07). Chosen, the search is its card (TC-29). */}
             <Field data-invalid={invalid('assetSymbol') || undefined} className="gap-2">
-              <FieldLabel id={`${ids}-asset-label`} htmlFor={`${ids}-asset`}>
+              <FieldLabel id={`${ids}-asset-label`} htmlFor={asset ? undefined : `${ids}-asset`}>
                 <StepTitle n={1} total={STEPS} done={Boolean(asset)}>
                   {t('thesis.asset.label')}
                 </StepTitle>

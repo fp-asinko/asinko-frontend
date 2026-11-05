@@ -25,8 +25,8 @@ describe('TopAssetsRail (specs/thesis-form-steps FS-04 to FS-07)', () => {
     // Once: the ticker's looping copy is hidden.
     const items = within(rail).getAllByRole('button', { name: /thes[ie]s/ })
     expect(items).toHaveLength(2)
-    expect(items[0]).toHaveAccessibleName('Bitcoin, 12 theses')
-    expect(items[1]).toHaveAccessibleName('NVIDIA, 1 thesis')
+    expect(items[0]).toHaveAccessibleName('$BTC, Bitcoin, 12 theses')
+    expect(items[1]).toHaveAccessibleName('$NVDA, NVIDIA, 1 thesis')
     expect(items[0]).toHaveTextContent('$BTC')
   })
 
@@ -35,15 +35,16 @@ describe('TopAssetsRail (specs/thesis-form-steps FS-04 to FS-07)', () => {
     const { rerender } = renderWithIntl(
       <TopAssetsRail assets={TOP} chosen={null} onChoose={onChoose} />,
     )
-    await userEvent.click(screen.getByRole('button', { name: 'NVIDIA, 1 thesis' }))
+    await userEvent.click(screen.getByRole('button', { name: '$NVDA, NVIDIA, 1 thesis' }))
     expect(onChoose).toHaveBeenCalledWith(NVDA)
 
     rerender(<TopAssetsRail assets={TOP} chosen={NVDA} onChoose={onChoose} />)
-    expect(screen.getByRole('button', { name: 'NVIDIA, 1 thesis' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    )
-    expect(screen.getByRole('button', { name: 'Bitcoin, 12 theses' })).toHaveAttribute(
+    const chosen = screen.getByRole('button', { name: '$NVDA, NVIDIA, 1 thesis' })
+    expect(chosen).toHaveAttribute('aria-pressed', 'true')
+    // Not only its color: a ✓ where its logo was.
+    expect(chosen.querySelector('svg')).not.toBeNull()
+    expect(chosen.querySelector('[data-testid="user-avatar"]')).toBeNull()
+    expect(screen.getByRole('button', { name: '$BTC, Bitcoin, 12 theses' })).toHaveAttribute(
       'aria-pressed',
       'false',
     )

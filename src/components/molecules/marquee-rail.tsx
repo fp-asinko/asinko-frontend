@@ -32,10 +32,7 @@ export function MarqueeRail({
   const [focused, setFocused] = useState(false)
   const stopped = paused || held
 
-  const track = {
-    '--marquee-duration': `${duration}s`,
-    animationPlayState: stopped ? 'paused' : undefined,
-  } as CSSProperties
+  const track = { '--marquee-duration': `${duration}s` } as CSSProperties
 
   return (
     <section aria-label={label} className={cn('flex min-w-0 items-center gap-1', className)}>
@@ -55,7 +52,10 @@ export function MarqueeRail({
           data-testid="marquee-track"
           data-stopped={stopped || undefined}
           style={track}
-          className={cn('flex w-max', !focused && 'motion-safe:animate-marquee')}
+          className={cn(
+            'flex w-max data-stopped:[animation-play-state:paused]',
+            !focused && 'motion-safe:animate-marquee',
+          )}
         >
           <div className="flex gap-2 pr-2 [&>*]:shrink-0">{children}</div>
           <div aria-hidden inert className="flex gap-2 pr-2 motion-reduce:hidden [&>*]:shrink-0">

@@ -30,10 +30,11 @@ test.describe('The thesis form in steps', () => {
     // It moves by itself: paused first, as anyone would to take one (WCAG 2.2.2).
     await ticker.getByRole('button', { name: 'Pause' }).click()
     await expect(ticker.getByRole('button', { name: 'Play' })).toBeVisible()
-    await ticker.getByRole('button', { name: /^Bitcoin, \d+ theses$/ }).click()
+    // Its name starts with what it shows (WCAG 2.5.3).
+    await ticker.getByRole('button', { name: /^\$BTC, Bitcoin, \d+ theses$/ }).click()
 
     await expect(main(page).getByRole('group', { name: /Asset$/ })).toContainText('$BTC')
-    await expect(ticker.getByRole('button', { name: /^Bitcoin/ })).toHaveAttribute(
+    await expect(ticker.getByRole('button', { name: /^\$BTC,/ })).toHaveAttribute(
       'aria-pressed',
       'true',
     )
@@ -64,7 +65,7 @@ test.describe('The thesis form in steps', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     await page.goto('/en/submit?type=thesis')
     const ticker = main(page).getByRole('region', { name: 'Assets with the most theses' })
-    await expect(ticker.getByRole('button', { name: /^Bitcoin/ })).toBeVisible()
+    await expect(ticker.getByRole('button', { name: /^\$BTC,/ })).toBeVisible()
     await expect(ticker.getByRole('button', { name: 'Pause' })).toBeHidden()
   })
 

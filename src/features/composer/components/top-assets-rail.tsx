@@ -1,5 +1,6 @@
 'use client'
 
+import { CheckIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { MarqueeRail } from '@/components/molecules/marquee-rail'
 import { UserAvatar } from '@/components/molecules/user-avatar'
@@ -37,7 +38,7 @@ export function TopAssetsRail({
             key={option.id}
             type="button"
             aria-pressed={active}
-            aria-label={t('item', { name: option.name, count: thesisCount })}
+            aria-label={t('item', { handle: option.handle, name: option.name, count: thesisCount })}
             onClick={() => onChoose(option)}
             className={cn(
               'inline-flex h-11 tap items-center gap-2 rounded-full pr-3.5 pl-1.5 outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
@@ -46,13 +47,20 @@ export function TopAssetsRail({
                 : 'bg-muted text-foreground hover:bg-muted-hover',
             )}
           >
-            <UserAvatar
-              name={option.handle}
-              colorKey={option.slug}
-              imageUrl={option.avatarUrl}
-              size="xs"
-              className="size-7 shrink-0 rounded-full"
-            />
+            {/* Chosen, a ✓ in the logo's place: not only its color says so (FS-06). */}
+            {active ? (
+              <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-primary-foreground text-primary">
+                <CheckIcon aria-hidden className="size-4" strokeWidth={3} />
+              </span>
+            ) : (
+              <UserAvatar
+                name={option.handle}
+                colorKey={option.slug}
+                imageUrl={option.avatarUrl}
+                size="xs"
+                className="size-7 shrink-0 rounded-full"
+              />
+            )}
             <span aria-hidden className="flex flex-col items-start leading-tight">
               <span className="type-action font-bold">{option.handle}</span>
               <span
