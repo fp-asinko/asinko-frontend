@@ -60,6 +60,14 @@
       "create": "Create a post",
       "hideColumn": "Hide the side column",
       "showColumn": "Show the side column"
+    },
+    "steps": {
+      "step": "Step {n} of {total}:",
+      "stepDone": "Step {n} of {total}, done:"
+    },
+    "rail": {
+      "previous": "{label}: previous",
+      "next": "{label}: next"
     }
   },
   "errors": {

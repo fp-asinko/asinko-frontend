@@ -60,6 +60,14 @@
       "create": "Crear un post",
       "hideColumn": "Ocultar la columna lateral",
       "showColumn": "Mostrar la columna lateral"
+    },
+    "steps": {
+      "step": "Paso {n} de {total}:",
+      "stepDone": "Paso {n} de {total}, completo:"
+    },
+    "rail": {
+      "previous": "{label}: anteriores",
+      "next": "{label}: siguientes"
     }
   },
   "errors": {

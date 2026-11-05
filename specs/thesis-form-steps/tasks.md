@@ -1,8 +1,8 @@
 # El formulario de tesis en pasos, con buscador y carrusel — Tasks
 
-Rama: `feature/thesis-form-steps`, desde `develop`. Requirements con Q1 a Q4 resueltas por el PO el 2026-11-04; requirements, design y tasks pendientes de aprobación.
+Rama: `feature/thesis-form-steps`, desde `develop`. Requirements con Q1 a Q4 resueltas por el PO el 2026-11-04; requirements, design y tasks aprobados por el PO el 2026-11-04 ("si").
 
-- [ ] **T-01 (S)** `StepTitle` y `ScrollRail` en `components/molecules`, con sus tests. → FS-05, FS-08, FS-09
+- [x] **T-01 (S)** `StepTitle` y `ScrollRail` en `components/molecules`, con sus tests. → FS-05, FS-08, FS-09
 - [ ] **T-02 (M)** P-040 en `proposals.md`, el contrato, el mock (`implemented: false`) y `getTopThesisAssets`. Tests y `fixtures.test.ts`. → FS-04, FS-13
 - [ ] **T-03 (M)** `AssetSearch`: el combobox de shadcn (Base UI) con búsqueda, teclado, la tarjeta elegida con × y el vacío. Tests. → FS-01 a FS-03
 - [ ] **T-04 (M)** `TopAssetsRail` y el layout de la fila: mitad y mitad desde `sm`, debajo en el teléfono, elegir con un toque, el marcado y la falta de datos. La página pasa el ranking. Tests. → FS-04 a FS-07

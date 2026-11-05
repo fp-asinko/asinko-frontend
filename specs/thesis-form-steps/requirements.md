@@ -1,6 +1,6 @@
 # El formulario de tesis en pasos, con buscador y carrusel — Requirements
 
-> **Estado:** preguntas resueltas por el PO el 2026-11-04, las cuatro como se recomendaron. Falta aprobar requirements, design y tasks.
+> **Estado:** aprobado por el PO el 2026-11-04 ("si"), con Q1 a Q4 como se recomendaron.
 > **Fuente:** pedido del PO (2026-11-04), sobre una captura del formulario de tesis:
 >
 > - el selector de activo pasa a ser un buscador, a la mitad del ancho;
