@@ -10,7 +10,7 @@ export type Level<Value extends string> = { value: Value; label: string }
 const HEIGHTS = ['h-5', 'h-6.5', 'h-8', 'h-9.5'] as const
 
 /**
- * The scale, green to red: every filled bar takes the chosen level's, the chosen one too (the
+ * The scale, light blue up to the logo's: every filled bar takes the chosen level's, the chosen one too (the
  * radio paints it --primary when checked).
  */
 const FILLS = [
@@ -23,7 +23,8 @@ const FILLS = [
 /**
  * A level chosen on rising bars, as the prototype's conviction (specs/thesis-create TC-25): a radio
  * group (one Tab stop, the arrows to move), each bar one option. The bars fill up to the chosen
- * one in its color, from green to red (the riskiest; the last level is always red). Beside them, the chosen level's name, or `prompt`:
+ * one in its color, blues up to the logo's (the riskiest is the brightest). Beside them, the
+ * chosen level's name, or `prompt`:
  * color is never the only signal.
  */
 export function LevelBars<Value extends string>({

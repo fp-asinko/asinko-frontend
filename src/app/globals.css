@@ -118,11 +118,12 @@
   --accuracy-mid-foreground: #7a5800;
   --accuracy-low: #fce6e6;
   --accuracy-low-foreground: #a8262c;
-  /* A rising scale on bars (LevelBars, specs/thesis-create TC-25): green to red, 3:1 on cards. */
-  --level-1: var(--success);
-  --level-2: #b07e00;
-  --level-3: #d4600f;
-  --level-4: var(--destructive);
+  /* A rising scale on bars (LevelBars, specs/thesis-create TC-25): blues up to the logo's, the
+     Extreme one (PO, 2026-11-04). 3:1 on cards, the lightest at the floor. */
+  --level-1: #6893e8;
+  --level-2: #5384e9;
+  --level-3: #3d78ea;
+  --level-4: var(--brand-dot);
 }
 
 /*
@@ -200,8 +201,9 @@
   --accuracy-mid-foreground: #f0c960;
   --accuracy-low: #3d1a1b;
   --accuracy-low-foreground: #ff9c9c;
-  --level-2: #f0c960;
-  --level-3: #ff8f4a;
+  --level-1: #3260b0;
+  --level-2: #3769c2;
+  --level-3: #3f7ae0;
 }
 
 @theme inline {

@@ -51,7 +51,7 @@ describe('LevelBars (specs/thesis-create TC-25)', () => {
     expect(screen.getByText('High', { selector: 'span' })).toBeVisible()
   })
 
-  it('fills the bars up to the chosen one in its color, green to red', async () => {
+  it('fills the bars up to the chosen one in its color, blues up to the logo’s', async () => {
     render(<Bars />)
     const bars = screen.getAllByRole('radio')
     await userEvent.click(screen.getByRole('radio', { name: 'Medium' }))
