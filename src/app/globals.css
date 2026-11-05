@@ -339,6 +339,9 @@
   --animate-comment-flash: comment-flash 1.5s var(--ease-out);
   --animate-underline-in: underline-in 200ms var(--ease-out);
   --animate-live-pulse: live-pulse 2s var(--ease-out) infinite;
+  /* The top assets ticker (specs/thesis-form-steps FS-05): linear and endless on purpose, it is
+     not a response to a tap; it stops with its pause button and on hover. */
+  --animate-marquee: marquee var(--marquee-duration, 30s) linear infinite;
 
   @keyframes vote-pop {
     50% {
@@ -387,6 +390,11 @@
   @keyframes underline-in {
     from {
       transform: scaleX(0);
+    }
+  }
+  @keyframes marquee {
+    to {
+      transform: translateX(-50%);
     }
   }
   @keyframes live-pulse {

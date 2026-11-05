@@ -1,7 +1,7 @@
 'use client'
 
 import { useFormatter, useTranslations } from 'next-intl'
-import { ScrollRail } from '@/components/molecules/scroll-rail'
+import { MarqueeRail } from '@/components/molecules/marquee-rail'
 import { UserAvatar } from '@/components/molecules/user-avatar'
 import { cn } from '@/lib/utils'
 import type { CommunityOption, TopAsset } from '../composer.types'
@@ -9,8 +9,11 @@ import type { CommunityOption, TopAsset } from '../composer.types'
 /**
  * The assets with the most theses, beside the search (specs/thesis-form-steps FS-04 to FS-07): a
  * pill each, its logo, symbol and how many theses, the most first. A tap chooses it, as the search
- * would; the chosen one is marked. Without any, nothing shows and the search takes the width.
+ * would; the chosen one is marked. They go by as a ticker (FS-05). Without any, nothing shows and the search takes the width.
  */
+/** Seconds each asset takes to go by: a slow, even pace, whatever the count. */
+const PACE = 4
+
 export function TopAssetsRail({
   assets,
   chosen,
@@ -25,9 +28,10 @@ export function TopAssetsRail({
   if (assets.length === 0) return null
 
   return (
-    <ScrollRail label={t('label')} className="self-center">
+    <MarqueeRail label={t('label')} duration={assets.length * PACE} className="self-center">
       {assets.map(({ option, thesisCount }) => {
-        const active = chosen?.id === option.id
+        // By its symbol: unique per asset, whichever list it came from.
+        const active = chosen?.slug === option.slug
         return (
           <button
             key={option.id}
@@ -63,6 +67,6 @@ export function TopAssetsRail({
           </button>
         )
       })}
-    </ScrollRail>
+    </MarqueeRail>
   )
 }

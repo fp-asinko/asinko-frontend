@@ -34,7 +34,7 @@ Que elegir el activo sea escribir su nombre, como en cualquier buscador, y que l
 ### El carrusel
 
 - [ ] **FS-04** Desde `sm`, el buscador ocupa **la mitad del ancho**; en la otra mitad, un **carrusel** con los activos que más tesis tienen en los últimos 30 días (Q1). Cada uno muestra su logo, el símbolo y "12 tesis". Va de más a menos, hasta 10. En el teléfono va debajo del buscador, a todo el ancho.
-- [ ] **FS-05** Se desliza con el dedo, con la rueda horizontal o con flechas ‹ › en los extremos cuando hay más de los que entran. Sin sombras ni autoplay. Cada activo es un botón con su nombre accesible ("Bitcoin, 12 tesis").
+- [ ] **FS-05** **Se mueve solo, como una cinta de bolsa** (PO, 2026-11-04; antes: scroll a mano, sin autoplay): desliza lento y constante, en bucle. Se detiene con su botón de pausa (WCAG 2.2.2), con el mouse encima y mientras el dedo está apoyado; con el foco del teclado adentro vuelve al inicio y queda quieta. Con "reducir movimiento" queda quieta, con scroll a mano y sin el botón. Sin sombras. Cada activo es un botón con su nombre accesible ("Bitcoin, 12 tesis"), una sola vez para el lector de pantalla.
 - [ ] **FS-06** Tocar un activo **lo elige** (Q2): queda en el buscador como si lo hubieras buscado, con todo lo de FS-03. El elegido se marca en el carrusel.
 - [ ] **FS-07** Si el ranking falla o viene vacío, el carrusel no aparece y el buscador ocupa todo el ancho. El formulario sigue funcionando.
 

@@ -22,6 +22,8 @@ export const apiRequest = createApiClient({
   mocks: mockedRoutes(env.API_MOCKS),
   // The ads and the glossary on top of the real feeds (specs/glossary GL-07).
   extensions: env.API_MOCKS === 'missing' ? MOCK_EXTENSIONS : undefined,
+  // A mocked proposal over the backend's data reads it there (the ranking of assets, P-040).
+  backendReads: env.API_MOCKS === 'missing',
   timeoutMs: env.API_TIMEOUT_MS,
   // The session's token as Bearer on every backend call (P-002, specs/auth).
   getHeaders: async (): Promise<Record<string, string>> => {

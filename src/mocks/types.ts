@@ -8,6 +8,12 @@ export type MockContext = {
   body: unknown
   /** The caller's Bearer token, when the mock needs to know who calls (POST /users, specs/auth). */
   accessToken?: string | null
+  /**
+   * A GET to the real backend, only with API_MOCKS=missing: a proposal that points at the backend's
+   * data (the ranking of assets, P-040) takes its communities from there, with their real ids and
+   * logos, and invents only what the proposal adds.
+   */
+  backend?: (path: string) => Promise<MockResponse>
 }
 
 export type MockResponse = { status: number; body?: unknown }

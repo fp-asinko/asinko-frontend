@@ -1,10 +1,11 @@
 // @vitest-environment node
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { RawThesis } from '@/lib/api/contract'
 import { DEMO_USER } from './demo-user'
 import { communityBySlug } from './fixtures/communities'
 import { THESES, thesesBy } from './fixtures/theses'
 import { asSeenBy, cancelMockThesis, createMockThesis, voteMockThesis } from './theses'
+import type { MockResponse } from './types'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const noRequest = { params: {}, query: {} }
@@ -176,18 +177,46 @@ describe('a thesis’s arguments and updates in the mocks (specs/thesis-argument
 
 describe('the mocked ranking of assets by theses (P-040, specs/thesis-form-steps)', async () => {
   const { topThesisAssets } = await import('./theses')
-  const run = (query: Record<string, string>) =>
-    topThesisAssets({ ...noRequest, query, body: undefined })
+  const run = (query: Record<string, string>, backend?: (path: string) => Promise<MockResponse>) =>
+    topThesisAssets({ ...noRequest, query, body: undefined, backend })
 
-  it('counts the theses of each asset community, cancelled ones not, the most first', () => {
-    const body = run({}).body as { items: { community: { type: string }; thesisCount: number }[] }
+  it('counts the theses of each asset community, cancelled ones not, the most first', async () => {
+    const body = (await run({})).body as {
+      items: { community: { type: string }; thesisCount: number }[]
+    }
     expect(body.items.every((each) => each.community.type === 'SYSTEM_ASSET')).toBe(true)
     const counts = body.items.map((each) => each.thesisCount)
     expect(counts).toEqual([...counts].sort((a, b) => b - a))
   })
 
-  it('refuses a period or a size out of range', () => {
-    expect(run({ days: '0' }).status).toBe(422)
-    expect(run({ limit: '21' }).status).toBe(422)
+  it('refuses a period or a size out of range', async () => {
+    expect((await run({ days: '0' })).status).toBe(422)
+    expect((await run({ limit: '21' })).status).toBe(422)
+  })
+
+  it('takes the backend’s communities with API_MOCKS=missing: real ids and logos, none it lacks', async () => {
+    const backend = vi.fn(async (path: string) =>
+      path === '/api/v1/communities/BTC'
+        ? {
+            status: 200,
+            body: {
+              id: '9b44811a-0a7f-4294-abeb-d57f7bce7511',
+              slug: 'BTC',
+              name: '$BTC',
+              type: 'SYSTEM_ASSET',
+              avatarUrl: 'https://example.com/BTC.png',
+            },
+          }
+        : { status: 404 },
+    )
+    const body = (await run({}, backend)).body as {
+      items: { community: { id: string; avatarUrl: string | null } }[]
+    }
+    expect(body.items).toHaveLength(1)
+    expect(body.items[0]!.community).toMatchObject({
+      id: '9b44811a-0a7f-4294-abeb-d57f7bce7511',
+      avatarUrl: 'https://example.com/BTC.png',
+      viewerMembership: null,
+    })
   })
 })

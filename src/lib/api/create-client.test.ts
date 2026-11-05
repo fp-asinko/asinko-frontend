@@ -271,6 +271,31 @@ describe('mocks (F-36)', () => {
     )
   })
 
+  it('lets a mock read the backend only when allowed, and only with GET (P-040)', async () => {
+    const fetchMock = respond(200, { id: 'u5', username: 'real' })
+    const reader: MockRoute = {
+      ...profileMock,
+      handler: async ({ backend }) =>
+        backend
+          ? backend('/api/v1/users/u5')
+          : { status: 200, body: { id: 'u1', username: 'mock' } },
+    }
+    const closed = createApiClient({ baseUrl: BASE_URL, fetch: fetchMock, mocks: [reader] })
+    expect(await closed(getProfile)).toMatchObject({ ok: true, data: { username: 'mock' } })
+    expect(fetchMock).not.toHaveBeenCalled()
+
+    const open = createApiClient({
+      baseUrl: BASE_URL,
+      fetch: fetchMock,
+      mocks: [reader],
+      backendReads: true,
+    })
+    expect(await open(getProfile)).toMatchObject({ ok: true, data: { username: 'real' } })
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect(String(url)).toBe('https://api.example.com/api/v1/users/u5')
+    expect(init?.method).toBe('GET')
+  })
+
   it('applies the same error mapping to mocked errors', async () => {
     const api = createApiClient({ baseUrl: BASE_URL, fetch: respond(500), mocks: [profileMock] })
     expect(await api({ ...getProfile, params: { identifier: 'nobody' } })).toMatchObject({

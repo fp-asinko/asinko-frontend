@@ -37,6 +37,8 @@ export type ApiClientOptions = {
   mocks?: readonly MockRoute[]
   /** Proposals on top of real responses (API_MOCKS=missing): what the backend does not send yet. */
   extensions?: readonly MockExtension[]
+  /** Mocks may read the backend (GET only): a proposal over its data (API_MOCKS=missing, P-040). */
+  backendReads?: boolean
   /** Extra headers for every network request, e.g. the session's Bearer token (P-002, specs/auth). */
   getHeaders?: () => Promise<Record<string, string>> | Record<string, string>
   /** Called for every unexpected failure (5xx, network, timeout, contract drift): reporting. */
@@ -69,6 +71,7 @@ export function createApiClient({
   timeoutMs = DEFAULT_TIMEOUT_MS,
   mocks,
   extensions,
+  backendReads = false,
   getHeaders,
   onUnexpected,
 }: ApiClientOptions) {
@@ -128,6 +131,12 @@ export function createApiClient({
       body: request.body,
       // Who calls, for the mocks that need it (the mocked POST /users, specs/auth).
       accessToken: mock ? (request.accessToken ?? (await sessionToken())) : null,
+      // A mock that reads the backend's data (API_MOCKS=missing): GET only, never a write.
+      backend:
+        mock && backendReads
+          ? (backendPath: string) =>
+              callNetwork('GET', backendPath, undefined, undefined, request.accessToken)
+          : undefined,
     }
     const extension = mock
       ? undefined

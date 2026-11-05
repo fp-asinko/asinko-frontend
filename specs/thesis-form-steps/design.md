@@ -7,7 +7,7 @@
 Todo en `features/composer`, junto al formulario de tesis (`thesis-editor.tsx`). Hay dos piezas reutilizables sin negocio, que van a `components/molecules`:
 
 - **`StepTitle`**: el círculo con el número o el ✓, más el nombre. Recibe `n`, `total`, `done` y `children` (el label).
-- **`ScrollRail`**: una fila con scroll horizontal nativo (`overflow-x-auto snap-x`) y flechas ‹ › que aparecen solo si hay más a un lado. Las flechas usan `scrollBy` y un `IntersectionObserver` sobre el primer y el último hijo, sin librería.
+- **`MarqueeRail`** (reemplaza a `ScrollRail`, FS-05 revisado): dos copias de los ítems en una fila que se corre con `transform` (`animate-marquee`, `translateX(-50%)`, lineal e infinita, `--marquee-duration` = 4 s por ítem). La segunda copia es `inert` y `aria-hidden`. Pausa por botón (con `HoverHint`), mouse encima y dedo apoyado (`animation-play-state` inline); con el foco adentro se quita la animación. `motion-reduce`: sin animación, `overflow-x-auto`, sin copia ni botón. Excepción a "todo ≤ 300 ms": no responde a un toque.
 
 ## 2. El buscador (`AssetSearch`, FS-01 a FS-03)
 
@@ -20,7 +20,7 @@ Todo en `features/composer`, junto al formulario de tesis (`thesis-editor.tsx`).
 
 - **Datos:** `lib/top-assets.ts` (`server-only`), `getTopThesisAssets()` → `GET /api/v1/theses/top-assets?days=30&limit=10` (P-040). Se mapea a `{ option: CommunityOption, thesisCount }`.
 - **Cómo llega al editor:** la página (`submit-page.tsx`) lo pide en el servidor y lo pasa como prop. El editor se carga diferido (`SubmitEditorLoader`), así que el ranking ya está cuando se dibuja, sin un pedido más desde el navegador. Si falla, la página pasa `[]` y el carrusel no aparece (FS-07).
-- **Diseño:** cada activo es una píldora `bg-muted` con el avatar de 24 px, el símbolo en negrita y "12 tesis" en gris. El elegido va `bg-primary text-primary-foreground` y con `aria-pressed`. Todo dentro de `ScrollRail`.
+- **Diseño:** cada activo es una píldora `bg-muted` con el avatar de 24 px, el símbolo en negrita y "12 tesis" en gris. El elegido va `bg-primary text-primary-foreground` y con `aria-pressed`. Todo dentro de `MarqueeRail`. El elegido se marca por símbolo (`slug`), no por id: el buscador y el ranking pueden venir de fuentes distintas.
 - **Tocar uno:** `chooseAsset(option)`, igual que el buscador (FS-06).
 
 ## 4. El layout (FS-04, FS-12)
@@ -49,7 +49,7 @@ Todo en `features/composer`, junto al formulario de tesis (`thesis-editor.tsx`).
 - `days` de 1 a 365, `limit` de 1 a 20;
 - cuenta las tesis abiertas y resueltas, no las canceladas.
 
-Se mockea con `implemented: false`: con `missing` va al mock y con `false` el carrusel no aparece. El mock parte de una base por activo (`TOP_ASSETS_BASE`, las 6 comunidades de activos del mock) y le suma lo publicado: con solo las tesis sembradas entraban todas en una fila y el carrusel no tenía qué mover.
+Se mockea con `implemented: false`: con `missing` va al mock y con `false` el carrusel no aparece. El mock parte de una base por activo (`TOP_ASSETS_BASE`, las 6 comunidades de activos del mock) y le suma lo publicado: con solo las tesis sembradas entraban todas en una fila y el carrusel no tenía qué mover. **Con `missing`, las comunidades salen del backend real** (`backend` en el contexto del mock: solo `GET`, solo en ese modo): ids reales para publicar y sus logos, y los activos sin comunidad allá quedan afuera. Con ids del mock, elegir desde la cinta publicaba en una comunidad que el backend no conoce.
 
 ## 6. Textos
 
@@ -60,7 +60,7 @@ Se mockea con `implemented: false`: con `missing` va al mock y con `false` el ca
 | Qué                                                       | Dónde                                              |
 | --------------------------------------------------------- | -------------------------------------------------- |
 | `StepTitle` (número, ✓, "Paso n de N")                    | `components/molecules/step-title.test.tsx`         |
-| `ScrollRail` (flechas solo si hay más)                    | `components/molecules/scroll-rail.test.tsx`        |
+| `MarqueeRail` (copia oculta, pausa, foco)                 | `components/molecules/marquee-rail.test.tsx`       |
 | Buscador: escribir, elegir con teclado, ×, vacío          | `asset-search.test.tsx`                            |
 | Carrusel: orden, elegir, marcado, sin datos               | `top-assets-rail.test.tsx`                         |
 | `getTopThesisAssets` y el mock contra P-040               | `top-assets.test.ts`, `fixtures.test.ts`           |

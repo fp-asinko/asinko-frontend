@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
@@ -22,7 +22,8 @@ describe('TopAssetsRail (specs/thesis-form-steps FS-04 to FS-07)', () => {
   it('shows the assets with the most theses, in order, with how many', () => {
     renderWithIntl(<TopAssetsRail assets={TOP} chosen={null} onChoose={vi.fn()} />)
     const rail = screen.getByRole('region', { name: 'Assets with the most theses' })
-    const items = rail.querySelectorAll('button[aria-pressed]')
+    // Once: the ticker's looping copy is hidden.
+    const items = within(rail).getAllByRole('button', { name: /thes[ie]s/ })
     expect(items).toHaveLength(2)
     expect(items[0]).toHaveAccessibleName('Bitcoin, 12 theses')
     expect(items[1]).toHaveAccessibleName('NVIDIA, 1 thesis')

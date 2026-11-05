@@ -65,9 +65,9 @@
       "step": "Step {n} of {total}:",
       "stepDone": "Step {n} of {total}, done:"
     },
-    "rail": {
-      "previous": "{label}: previous",
-      "next": "{label}: next"
+    "marquee": {
+      "pause": "Pause",
+      "play": "Play"
     }
   },
   "errors": {

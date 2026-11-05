@@ -1,7 +1,12 @@
-import type { RawThesis, RawThesisUpdate } from '@/lib/api/contract'
+import type {
+  RawCommunity,
+  RawCommunitySummary,
+  RawThesis,
+  RawThesisUpdate,
+} from '@/lib/api/contract'
 import { mockCaller } from './auth'
 import { assetBySymbol } from './fixtures/assets'
-import { communityById, communitySummary } from './fixtures/communities'
+import { communityById, communityBySlug, communitySummary } from './fixtures/communities'
 import { MOCK_NOW, mockId } from './fixtures/ids'
 import { THESES } from './fixtures/theses'
 import { takeThesisDraft } from './thesis-drafts'
@@ -226,17 +231,43 @@ export function removeMockThesisVote({ params, query, accessToken }: MockContext
  * GET /api/v1/theses/top-assets?days=&limit= (P-040, specs/thesis-form-steps): the asset communities
  * with the most theses published in the last `days` (30 by default), cancelled ones not counted.
  */
-/** The month's theses per asset the mocked ranking starts from (P-040): the mock's asset communities. */
+/**
+ * The month's theses per asset the mocked ranking starts from (P-040). Only those with a community
+ * show: the mock's (BTC, ETH, SOL, XRP, LINK, AVAX) or, with the backend, its own (BTC, ETH, SOL,
+ * NVDA, AAPL in dev).
+ */
 const TOP_ASSETS_BASE: Record<string, number> = {
   BTC: 41,
+  NVDA: 33,
   ETH: 27,
   SOL: 18,
+  AAPL: 12,
   XRP: 11,
   LINK: 7,
   AVAX: 4,
 }
 
-export function topThesisAssets({ query }: MockContext): MockResponse {
+/** An asset community's summary from the backend, or null when it has none. */
+async function backendSummary(
+  backend: NonNullable<MockContext['backend']>,
+  slug: string,
+): Promise<RawCommunitySummary | null> {
+  const response = await backend(`/api/v1/communities/${encodeURIComponent(slug)}`).catch(
+    () => null,
+  )
+  const community = response?.status === 200 ? (response.body as Partial<RawCommunity>) : null
+  if (!community?.id || community.type !== 'SYSTEM_ASSET') return null
+  return {
+    id: community.id,
+    slug,
+    name: community.name ?? slug,
+    type: community.type,
+    avatarUrl: community.avatarUrl ?? null,
+    viewerMembership: community.viewerMembership ?? null,
+  }
+}
+
+export async function topThesisAssets({ query, backend }: MockContext): Promise<MockResponse> {
   const days = query.days === undefined ? 30 : Number(query.days)
   const limit = query.limit === undefined ? 10 : Number(query.limit)
   if (!Number.isInteger(days) || days < 1 || days > 365) return error(422, 'VALIDATION_ERROR')
@@ -251,9 +282,22 @@ export function topThesisAssets({ query }: MockContext): MockResponse {
     if (Date.parse(thesis.publishedAt) < since) continue
     counts.set(thesis.community.slug, (counts.get(thesis.community.slug) ?? 0) + 1)
   }
-  const items = [...counts]
-    .sort(([a, x], [b, y]) => y - x || a.localeCompare(b))
+  const ranked = [...counts].sort(([a, x], [b, y]) => y - x || a.localeCompare(b))
+  // With the backend, its communities: real ids to publish in, and their logos.
+  const communities = await Promise.all(
+    ranked.map(([slug]) =>
+      backend
+        ? backendSummary(backend, slug)
+        : communityBySlug(slug)
+          ? communitySummary(slug)
+          : null,
+    ),
+  )
+  const items = ranked
+    .flatMap(([, thesisCount], index) => {
+      const community = communities[index]
+      return community ? [{ community, thesisCount }] : []
+    })
     .slice(0, limit)
-    .map(([slug, thesisCount]) => ({ community: communitySummary(slug), thesisCount }))
   return { status: 200, body: { items } }
 }
