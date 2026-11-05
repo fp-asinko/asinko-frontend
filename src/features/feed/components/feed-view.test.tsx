@@ -58,6 +58,9 @@ describe('FeedTop and FeedListView, as the page composes them', () => {
       />,
     )
     expect(screen.getByRole('link', { name: 'What are you thinking?' })).toBeInTheDocument()
+    // The order and the type beside the tabs (FT-01).
+    expect(screen.getByRole('link', { name: 'New' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Content type: All' })).toBeInTheDocument()
     const cards = screen.getAllByRole('article')
     expect(cards).toHaveLength(2)
     expect(within(cards[1]!).getByText('Poll')).toBeInTheDocument()
@@ -134,15 +137,16 @@ describe('FeedTop and FeedListView, as the page composes them', () => {
     expect(screen.getByRole('link', { name: 'See For you' })).toHaveAttribute('href', '/')
   })
 
-  it('explains an empty Polls page and an empty community', () => {
+  it('explains an empty type and an empty community (specs/feed-type-filter FT-08)', () => {
     const { unmount } = renderWithIntl(
       <FeedView
-        params={params({ filter: 'polls' })}
+        params={params({ type: 'theses' })}
         state={{ status: 'ok', items: [], nextCursor: null, community: null }}
         viewerName={null}
       />,
     )
-    expect(screen.getByText('No polls here')).toBeInTheDocument()
+    expect(screen.getByText('No theses here')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'See all' })).toHaveAttribute('href', '/')
     unmount()
     renderWithIntl(
       <FeedView

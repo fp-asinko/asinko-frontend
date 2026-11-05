@@ -1,13 +1,13 @@
 import { z } from 'zod'
 import { routing } from '@/i18n/routing'
-import { feedParamsSchema } from './feed-params.schema'
+import { feedParamsObject } from './feed-params.schema'
 
 /**
  * Input of loadMoreFeed: the same feed state as the URL (invalid values fall back to the
  * defaults), the opaque cursor of the next page and the locale (next/root-params does not run in
  * Server Actions). getFeed checks the cursor's shape before any request.
  */
-export const loadMoreSchema = feedParamsSchema.extend({
+export const loadMoreSchema = feedParamsObject.extend({
   /** A profile's posts (specs/backend-adoption BK-02): the person's id. */
   author: z.uuid().optional(),
   cursor: z.string().min(1).max(512),

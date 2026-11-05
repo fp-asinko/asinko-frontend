@@ -149,8 +149,7 @@
     },
     "filters": {
       "label": "Filtros",
-      "new": "Novos",
-      "polls": "Enquetes"
+      "new": "Novos"
     },
     "chip": {
       "remove": "Remover o filtro {handle}"
@@ -203,7 +202,9 @@
       "followingBody": "Siga comunidades, ativos e pessoas para montar o seu feed.",
       "needAccountTitle": "Seu feed, do seu jeito",
       "seeAll": "Ver tudo",
-      "communityBody": "Seja o primeiro a publicar."
+      "communityBody": "Seja o primeiro a publicar.",
+      "posts": "Não há posts aqui",
+      "theses": "Não há teses aqui"
     },
     "comments": {
       "loading": "Carregando comentários…",
@@ -304,6 +305,14 @@
         },
         "posted": "Atualização publicada"
       }
+    },
+    "type": {
+      "label": "Tipo de conteúdo",
+      "trigger": "Tipo de conteúdo: {type}",
+      "all": "Tudo",
+      "posts": "Posts",
+      "theses": "Teses",
+      "polls": "Enquetes"
     }
   },
   "rightColumn": {

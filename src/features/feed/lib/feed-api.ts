@@ -44,15 +44,21 @@ const FOLLOWING = '/api/v1/feed/following'
 const USER_CONTENT = '/api/v1/users/:userId/content'
 
 /**
- * The feed asks only for what it shows, so a page keeps its 20 items. Theses since
- * specs/thesis-detail (TD-01), except in a profile's Posts: its theses have their own tab.
+ * The feed asks only for what it shows, so a page keeps its 20 items: by its type
+ * (specs/feed-type-filter FT-06), thoughts with the posts. Theses since specs/thesis-detail (TD-01),
+ * except in a profile's Posts: its theses have their own tab, and it has no type filter.
  */
-const KINDS = { new: 'POST,POLL,THOUGHT,THESIS', polls: 'POLL' } as const
-const PROFILE_KINDS = { new: 'POST,POLL,THOUGHT', polls: 'POLL' } as const
+const KINDS = {
+  all: 'POST,POLL,THOUGHT,THESIS',
+  posts: 'POST,THOUGHT',
+  theses: 'THESIS',
+  polls: 'POLL',
+} as const
+const PROFILE_KINDS = 'POST,POLL,THOUGHT'
 
 function requestFeed(params: FeedParams, cursor: string | undefined) {
   const query: Record<string, string> = {
-    kind: (params.author ? PROFILE_KINDS : KINDS)[params.filter],
+    kind: params.author ? PROFILE_KINDS : KINDS[params.type],
   }
   if (cursor) query.cursor = cursor
   if (params.author) {

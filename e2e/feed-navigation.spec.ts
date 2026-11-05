@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { expectNoA11yViolations } from './fixtures/axe'
+import { chooseType } from './fixtures/feed-type'
 
 // specs/feed-navigation against the production build with API_MOCKS=true. The x-mock-delay header
 // makes the mocked feed answer slowly, like the real backend today (src/lib/api/mock-delay.ts).
@@ -15,15 +16,11 @@ test.describe('Feed navigation with a slow backend', () => {
     await page.setExtraHTTPHeaders({ 'x-mock-delay': String(DELAY_MS) })
 
     const started = Date.now()
-    await page.getByRole('link', { name: 'Polls' }).click()
-    await expect(page).toHaveURL(/filter=polls/, { timeout: 1500 })
-    await expect(page.getByRole('link', { name: 'Polls' })).toHaveAttribute(
-      'aria-current',
-      'page',
-      {
-        timeout: 1500,
-      },
-    )
+    await chooseType(page, 'Polls')
+    await expect(page).toHaveURL(/type=polls/, { timeout: 1500 })
+    await expect(
+      page.getByRole('main').getByRole('button', { name: 'Content type: Polls' }),
+    ).toBeVisible({ timeout: 1500 })
     await expect(page.getByTestId('feed-skeleton')).toBeVisible({ timeout: 1500 })
     expect(Date.now() - started).toBeLessThan(DELAY_MS)
     // Screen readers hear it (FN-03), and the page stays accessible while it loads.
@@ -58,13 +55,13 @@ test.describe('Feed navigation with a slow backend', () => {
     page,
   }) => {
     await page.goto('/en')
-    await page.getByRole('link', { name: 'Polls' }).click()
+    await chooseType(page, 'Polls')
     await expect(page.getByRole('article').first()).toContainText('Poll')
 
     // From here on the backend is slow: only the cache can make the way back instant.
     await page.setExtraHTTPHeaders({ 'x-mock-delay': String(DELAY_MS) })
     const started = Date.now()
-    await page.getByRole('link', { name: 'New', exact: true }).click()
+    await chooseType(page, 'All')
     await expect(page.getByRole('article').filter({ hasText: 'Whales accumulated' })).toBeVisible()
     expect(Date.now() - started).toBeLessThan(DELAY_MS)
   })

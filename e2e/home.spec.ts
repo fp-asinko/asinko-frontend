@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { collectConsoleErrors, expectNoA11yViolations } from './fixtures/axe'
+import { chooseType } from './fixtures/feed-type'
 
 // specs/home: the feed against the production build with API_MOCKS=true (deterministic data from
 // src/mocks/fixtures: 23 posts and 3 polls, 20 per page). Runs on mobile and desktop.
@@ -38,10 +39,10 @@ test.describe('Home feed', () => {
     await expect(articles(page).first()).toBeVisible()
   })
 
-  test('the Polls filter shows only polls (H-11)', async ({ page }) => {
+  test('the Polls type shows only polls (H-11, specs/feed-type-filter FT-06)', async ({ page }) => {
     await page.goto('/en')
-    await page.getByRole('link', { name: 'Polls' }).click()
-    await expect(page).toHaveURL(/filter=polls/)
+    await chooseType(page, 'Polls')
+    await expect(page).toHaveURL(/type=polls/)
     await expect(articles(page)).toHaveCount(3)
     for (const poll of await articles(page).all()) {
       await expect(poll.getByText('Poll', { exact: true })).toBeVisible()

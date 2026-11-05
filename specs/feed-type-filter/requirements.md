@@ -20,7 +20,7 @@
 ### La barra del Home
 
 - [ ] **FT-01** Debajo de la caja de publicar, **un solo renglón**: a la izquierda las pestañas For you · Following · Live (como hoy); a la derecha, **New** y el **selector de tipo**. El renglón de píldoras de abajo desaparece.
-- [ ] **FT-02** A 360 px entra en un renglón, sin scroll horizontal: New y el selector quedan a la derecha, en su tamaño mínimo (24×24 px de área táctil o más).
+- [ ] **FT-02** A 360 px entra en un renglón, sin scroll horizontal, en los tres idiomas. En el teléfono (debajo de `sm`) **New se esconde** (es el único orden y siempre está activo: no hay qué elegir) y el selector queda como **ícono** con su nombre accesible ("Content type: All"); desde `sm`, los dos con texto. Medido: en español el renglón con texto pedía unos 390 px de 344 (2026-11-05).
 - [ ] **FT-03** El chip de la comunidad elegida (`?community=`, "× #macro") sigue funcionando: va debajo de la barra, solo cuando hay una.
 
 ### El selector (Q1, Q3)

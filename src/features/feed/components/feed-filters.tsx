@@ -1,54 +1,30 @@
-import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
-import { Link } from '@/i18n/navigation'
-import { cn } from '@/lib/utils'
-import { feedHref } from '../lib/feed-href'
 import type { FeedParams } from '../schemas/feed-params.schema'
+import { FeedSort } from './feed-sort'
+import { FeedTypeMenu } from './feed-type-menu'
 
 /**
- * New · Polls pills (H-11, Q3) and, with ?community, the slot of the chip that removes that filter
- * (CommunityChip, streamed on its own: specs/feed-navigation § 2). Hot and Top arrive when the
- * backend can sort the feed.
+ * The order and the type of a community page's feed, on their own line: it has no tabs
+ * (specs/feed-type-filter FT-11). On the Home they go beside the tabs (FeedTabs).
  */
 export function FeedFilters({
   params,
-  chip,
   pagePath,
 }: {
   params: FeedParams
-  chip?: ReactNode
-  /** On a community page, the filters stay on it (specs/community-pages CP-07). */
-  pagePath?: string
+  /** The page itself: the filters stay on it (specs/community-pages CP-07). */
+  pagePath: string
 }) {
-  const t = useTranslations('feed')
-  const filters = [
-    { filter: 'new', label: t('filters.new') },
-    { filter: 'polls', label: t('filters.polls') },
-  ] as const
-
   return (
-    <div className="mb-3 flex flex-wrap items-center gap-1.5">
-      <nav aria-label={t('filters.label')} className="flex gap-1.5">
-        {filters.map((filter) => {
-          const active = params.filter === filter.filter
-          return (
-            <Link
-              key={filter.filter}
-              href={feedHref({ ...params, filter: filter.filter }, pagePath)}
-              aria-current={active ? 'page' : undefined}
-              className={cn(
-                'inline-flex h-8 tap items-center rounded-full px-3.5 type-action font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                active
-                  ? 'bg-muted text-foreground'
-                  : 'text-muted-foreground hover:bg-surface hover:text-foreground',
-              )}
-            >
-              {filter.label}
-            </Link>
-          )
-        })}
-      </nav>
-      {chip}
+    <div className="mb-3 flex items-center gap-1.5">
+      <FeedSort params={params} pagePath={pagePath} />
+      <FeedTypeMenu params={params} pagePath={pagePath} />
     </div>
   )
+}
+
+/** The community the Home is filtered by, under the tab bar, only when there is one (FT-03). */
+export function FeedChipRow({ chip }: { chip?: ReactNode }) {
+  if (!chip) return null
+  return <div className="-mt-1 mb-3 flex flex-wrap items-center gap-1.5">{chip}</div>
 }

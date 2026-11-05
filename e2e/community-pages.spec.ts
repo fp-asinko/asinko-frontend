@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { expectNoA11yViolations } from './fixtures/axe'
+import { chooseType } from './fixtures/feed-type'
 
 // specs/community-pages against the production build with API_MOCKS=true: the demo user is a
 // member of #defi and $BTC, and not of #memecoins (src/mocks/fixtures/communities.ts).
@@ -64,8 +65,9 @@ test.describe('Community pages', () => {
     // The cards do not repeat the join button of the page's community.
     await expect(page.getByRole('main').getByRole('button', { name: 'Join #defi' })).toHaveCount(0)
 
-    await page.getByRole('link', { name: 'Polls' }).click()
-    await expect(page).toHaveURL(/\/en\/hub\/defi\?filter=polls$/)
+    // New and the type menu, on the page (specs/feed-type-filter FT-11).
+    await chooseType(page, 'Polls')
+    await expect(page).toHaveURL(/\/en\/hub\/defi\?type=polls$/)
   })
 
   test("an asset's page shows its price and change, open (specs/backend-adoption BK-05)", async ({

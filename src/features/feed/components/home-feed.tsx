@@ -17,7 +17,7 @@ import { FeedListView, FeedTop, type FeedState } from './feed-view'
 export async function HomeFeed({ searchParams }: { searchParams: Promise<unknown> }) {
   const params = parseFeedParams(await searchParams)
   const viewer = await getViewer()
-  const key = `${params.feed}|${params.filter}|${params.community ?? ''}`
+  const key = `${params.feed}|${params.filter}|${params.type}|${params.community ?? ''}`
   const filtered = params.community !== undefined && params.feed === 'for-you'
 
   return (

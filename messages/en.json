@@ -149,8 +149,7 @@
     },
     "filters": {
       "label": "Filters",
-      "new": "New",
-      "polls": "Polls"
+      "new": "New"
     },
     "chip": {
       "remove": "Remove the {handle} filter"
@@ -203,7 +202,9 @@
       "followingBody": "Follow communities, assets and people to build your feed.",
       "needAccountTitle": "Your feed, your way",
       "seeAll": "See all",
-      "communityBody": "Be the first to post."
+      "communityBody": "Be the first to post.",
+      "posts": "No posts here",
+      "theses": "No theses here"
     },
     "comments": {
       "loading": "Loading comments…",
@@ -304,6 +305,14 @@
         },
         "posted": "Update posted"
       }
+    },
+    "type": {
+      "label": "Content type",
+      "trigger": "Content type: {type}",
+      "all": "All",
+      "posts": "Posts",
+      "theses": "Theses",
+      "polls": "Polls"
     }
   },
   "rightColumn": {

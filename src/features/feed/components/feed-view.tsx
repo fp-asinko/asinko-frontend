@@ -7,8 +7,10 @@ import type { FeedItem } from '../feed.types'
 import { feedHref } from '../lib/feed-href'
 import type { FeedParams } from '../schemas/feed-params.schema'
 import { ComposerPlaceholder } from './composer-placeholder'
-import { FeedFilters } from './feed-filters'
+import { FeedChipRow } from './feed-filters'
+import { FeedSort } from './feed-sort'
 import { FeedTabs } from './feed-tabs'
+import { FeedTypeMenu } from './feed-type-menu'
 import { FeedItems } from './feed-items'
 import { Impressions } from './impression-tracker'
 import { LoadMore } from './load-more'
@@ -16,6 +18,7 @@ import {
   ChartBarIcon,
   PenLineIcon,
   SparklesIcon,
+  TargetIcon,
   UserPlusIcon,
   UserRoundPlusIcon,
 } from 'lucide-react'
@@ -59,8 +62,17 @@ export function FeedTop({
         communitySlug={params.community}
       />
       <div className="px-2 pt-4 sm:px-0">
-        <FeedTabs params={params} />
-        <FeedFilters params={params} chip={chip} />
+        {/* One line: the tabs, and at the right the order and the type (specs/feed-type-filter). */}
+        <FeedTabs
+          params={params}
+          trailing={
+            <>
+              <FeedSort params={params} />
+              <FeedTypeMenu params={params} />
+            </>
+          }
+        />
+        <FeedChipRow chip={chip} />
       </div>
     </>
   )
@@ -71,11 +83,14 @@ export function FeedListView({
   params,
   state,
   communityHandle,
+  pagePath,
 }: {
   params: FeedParams
   state: FeedState
   /** $BTC or #defi, for the empty state of a community page. */
   communityHandle?: string
+  /** A community page: its empty states link back to it (specs/feed-type-filter FT-08). */
+  pagePath?: string
 }) {
   const t = useTranslations('feed.empty')
   const items = state.status === 'ok' ? state.items : []
@@ -92,7 +107,7 @@ export function FeedListView({
             action={<GateButtons className="justify-center" />}
           />
         ) : items.length === 0 ? (
-          <EmptyFeed params={params} communityHandle={communityHandle} />
+          <EmptyFeed params={params} communityHandle={communityHandle} pagePath={pagePath} />
         ) : (
           <>
             <Impressions requestId={state.status === 'ok' ? state.requestId : null}>
@@ -116,16 +131,31 @@ export function FeedListView({
 
 const ACTION = ACTION_PILL
 
-function EmptyFeed({ params, communityHandle }: { params: FeedParams; communityHandle?: string }) {
+const TYPE_ICONS = {
+  posts: <PenLineIcon />,
+  theses: <TargetIcon />,
+  polls: <ChartBarIcon />,
+} as const
+
+function EmptyFeed({
+  params,
+  communityHandle,
+  pagePath,
+}: {
+  params: FeedParams
+  communityHandle?: string
+  pagePath?: string
+}) {
   const t = useTranslations('feed.empty')
 
-  if (params.filter === 'polls') {
+  // Nothing of that type (FT-08): back to all.
+  if (params.type !== 'all') {
     return (
       <EmptyState
-        icon={<ChartBarIcon />}
-        title={t('polls')}
+        icon={TYPE_ICONS[params.type]}
+        title={t(params.type)}
         action={
-          <Link href={feedHref({ ...params, filter: 'new' })} className={ACTION}>
+          <Link href={feedHref({ ...params, type: 'all' }, pagePath)} className={ACTION}>
             {t('seeAll')}
           </Link>
         }

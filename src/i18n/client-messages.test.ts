@@ -60,6 +60,8 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'replies',
       // Only cancelling a thesis (specs/thesis-detail TD-13): its card and page are the server's.
       'thesis',
+      // The feed's type menu (specs/feed-type-filter FT-04).
+      'type',
       'vote',
     ])
     expect(Object.keys((picked.feed as Record<string, Record<string, unknown>>).replies!)).toEqual([

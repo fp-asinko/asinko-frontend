@@ -4,32 +4,40 @@ import { feedHref } from './feed-href'
 
 describe('feedHref', () => {
   it('leaves the defaults out so the plain Home stays "/"', () => {
-    expect(feedHref({ feed: 'for-you', filter: 'new', community: undefined })).toEqual({
-      pathname: '/',
-      query: {},
-    })
+    expect(feedHref({ feed: 'for-you', filter: 'new', type: 'all', community: undefined })).toEqual(
+      {
+        pathname: '/',
+        query: {},
+      },
+    )
   })
 
   it('keeps every non-default value', () => {
-    expect(feedHref({ feed: 'for-you', filter: 'polls', community: 'BTC' }).query).toEqual({
-      filter: 'polls',
+    expect(
+      feedHref({ feed: 'for-you', filter: 'new', type: 'theses', community: 'BTC' }).query,
+    ).toEqual({
+      type: 'theses',
       community: 'BTC',
     })
   })
 
   it('drops the community on Following', () => {
-    expect(feedHref({ feed: 'following', filter: 'new', community: 'BTC' }).query).toEqual({
+    expect(
+      feedHref({ feed: 'following', filter: 'new', type: 'all', community: 'BTC' }).query,
+    ).toEqual({
       feed: 'following',
     })
   })
 })
 
 describe('feedHref on a community page (specs/community-pages CP-07)', () => {
-  it('stays on the page, with only the filter in the query', () => {
+  it('stays on the page, with only the type in the query (specs/feed-type-filter FT-11)', () => {
     expect(
-      feedHref({ feed: 'for-you', filter: 'polls', community: 'macro' }, '/hub/macro'),
-    ).toEqual({ pathname: '/hub/macro', query: { filter: 'polls' } })
-    expect(feedHref({ feed: 'for-you', filter: 'new', community: 'BTC' }, '/asset/BTC')).toEqual({
+      feedHref({ feed: 'for-you', filter: 'new', type: 'polls', community: 'macro' }, '/hub/macro'),
+    ).toEqual({ pathname: '/hub/macro', query: { type: 'polls' } })
+    expect(
+      feedHref({ feed: 'for-you', filter: 'new', type: 'all', community: 'BTC' }, '/asset/BTC'),
+    ).toEqual({
       pathname: '/asset/BTC',
       query: {},
     })

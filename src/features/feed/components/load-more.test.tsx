@@ -40,13 +40,14 @@ describe('LoadMore (H-16)', () => {
 
   it('appends the next page when pressed, with the feed state, cursor and locale', async () => {
     action.loadMoreFeed.mockResolvedValue(page('Card 21', 'c2'))
-    renderWithIntl(<LoadMore params={parseFeedParams({ filter: 'polls' })} cursor="c1" />)
+    renderWithIntl(<LoadMore params={parseFeedParams({ type: 'polls' })} cursor="c1" />)
 
     await userEvent.click(screen.getByRole('button', { name: 'Load more' }))
     expect(await screen.findByText('Card 21')).toBeInTheDocument()
     expect(action.loadMoreFeed).toHaveBeenCalledWith({
       feed: 'for-you',
-      filter: 'polls',
+      filter: 'new',
+      type: 'polls',
       community: undefined,
       cursor: 'c1',
       locale: 'en',

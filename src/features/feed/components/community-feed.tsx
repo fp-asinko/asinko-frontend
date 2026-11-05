@@ -28,11 +28,18 @@ export async function CommunityFeed({
   /** The page itself (/hub/macro): where the filters link to. */
   pagePath: string
   searchParams: Promise<unknown>
-  /** The feed's filters (New · Polls); a profile goes without them, as the prototype's. */
+  /** The feed's order and type (specs/feed-type-filter FT-11); a profile goes without them. */
   filters?: boolean
 }) {
-  const { filter } = parseFeedParams(await searchParams)
-  const params: FeedParams = { feed: 'for-you', filter, community: slug, author }
+  const { filter, type } = parseFeedParams(await searchParams)
+  // A profile has no filters: everything it published (as the prototype's).
+  const params: FeedParams = {
+    feed: 'for-you',
+    filter,
+    type: filters ? type : 'all',
+    community: slug,
+    author,
+  }
 
   return (
     <>
@@ -44,14 +51,22 @@ export async function CommunityFeed({
       ) : (
         <div className="pt-1.5" />
       )}
-      <Suspense key={filter} fallback={<FeedListSkeleton />}>
-        <CommunityFeedList params={params} handle={handle} />
+      <Suspense key={`${filter}|${params.type}`} fallback={<FeedListSkeleton />}>
+        <CommunityFeedList params={params} handle={handle} pagePath={pagePath} />
       </Suspense>
     </>
   )
 }
 
-async function CommunityFeedList({ params, handle }: { params: FeedParams; handle: string }) {
+async function CommunityFeedList({
+  params,
+  handle,
+  pagePath,
+}: {
+  params: FeedParams
+  handle: string
+  pagePath: string
+}) {
   // A slow backend on demand, for the e2e of the streaming (mocks only, never production).
   await mockDelay()
   const viewer = await getViewer()
@@ -71,6 +86,7 @@ async function CommunityFeedList({ params, handle }: { params: FeedParams; handl
         requestId: page.requestId,
       }}
       communityHandle={handle}
+      pagePath={pagePath}
     />
   )
 }

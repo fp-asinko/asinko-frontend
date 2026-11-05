@@ -38,11 +38,11 @@ describe('loadMoreFeed (H-16)', () => {
         requestId: 'page-2',
       },
     })
-    const result = await loadMoreFeed({ feed: 'nope', filter: 'polls', cursor: 'c2', locale: 'es' })
+    const result = await loadMoreFeed({ feed: 'nope', type: 'polls', cursor: 'c2', locale: 'es' })
 
     expect(deps.setRequestLocale).toHaveBeenCalledWith('es')
     expect(deps.getFeed).toHaveBeenCalledWith(
-      { feed: 'for-you', filter: 'polls', community: undefined },
+      { feed: 'for-you', filter: 'new', type: 'polls', community: undefined },
       'c2',
       { signedIn: false },
     )
