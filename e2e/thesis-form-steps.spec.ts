@@ -50,8 +50,8 @@ test.describe('The thesis form in steps', () => {
   test('numbers the six steps (FS-08)', async ({ page }) => {
     await page.goto('/en/submit?type=thesis')
     for (const [n, name] of [
-      [2, 'Claim'],
-      [4, 'Target price'],
+      [3, 'Target price'],
+      [5, 'Claim'],
       [6, 'Reasoning'],
     ] as const) {
       await expect(
@@ -59,10 +59,10 @@ test.describe('The thesis form in steps', () => {
       ).toBeVisible()
     }
     await expect(
-      main(page).getByRole('radiogroup', { name: /Step 3 of 6.*Deadline/ }),
+      main(page).getByRole('radiogroup', { name: /Step 2 of 6.*Deadline/ }),
     ).toBeVisible()
     await expect(
-      main(page).getByRole('radiogroup', { name: /Step 5 of 6.*Conviction/ }),
+      main(page).getByRole('radiogroup', { name: /Step 4 of 6.*Conviction/ }),
     ).toBeVisible()
   })
 

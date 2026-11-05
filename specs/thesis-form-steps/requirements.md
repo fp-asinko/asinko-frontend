@@ -40,7 +40,7 @@ Que elegir el activo sea escribir su nombre, como en cualquier buscador, y que l
 
 ### Los pasos
 
-- [ ] **FS-08** Cada parte lleva un **título de paso numerado** (Q3): ① Activo, ② Predicción, ③ Fecha límite, ④ Precio objetivo, ⑤ Convicción, ⑥ Razonamiento. El número va en un círculo, y el nombre es el label del campo, como hoy. "Se publica en" queda sin número, con los botones.
+- [ ] **FS-08** Cada parte lleva un **título de paso numerado** (Q3): ① Activo, ② Fecha límite, ③ Precio objetivo, ④ Convicción, ⑤ Predicción (claim), ⑥ Razonamiento. **El claim va justo arriba del razonamiento** (PO, 2026-11-05; antes era el ②), con una ayuda en itálica al lado de su rótulo: "The main reason, in one sentence". Llegando con el activo ya elegido, el foco va al paso siguiente: el primer atajo del plazo. El número va en un círculo, y el nombre es el label del campo, como hoy. "Se publica en" queda sin número, con los botones.
 - [ ] **FS-09** Un paso completo se marca: el círculo pasa a ✓, sin depender solo del color. Los lectores de pantalla oyen "Paso 1 de 6".
 
 ### Calidad

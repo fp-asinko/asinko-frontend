@@ -1149,7 +1149,8 @@
       "claim": {
         "label": "Predicción",
         "placeholder": "ej.: $NVDA cierra por encima de 200 antes de la fecha límite",
-        "example": "ej.: {symbol} > {target} antes de la fecha límite"
+        "example": "ej.: {symbol} > {target} antes de la fecha límite",
+        "hint": "La razón principal, en una frase"
       },
       "target": {
         "label": "Objetivo",

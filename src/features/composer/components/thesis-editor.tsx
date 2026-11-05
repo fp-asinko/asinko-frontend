@@ -238,9 +238,15 @@ export function ThesisEditor({
     })
   }, [derivedNow, setValue, formState.isSubmitted])
 
-  // On arrival the focus goes where the person starts: the asset, or the claim when it is there.
+  // On arrival the focus goes where the person starts: the asset, or with it the next step, the
+  // deadline's first shortcut (the claim is fifth since PO 2026-11-05).
   useEffect(() => {
-    document.getElementById(asset ? `${ids}-claim` : `${ids}-asset`)?.focus()
+    if (!asset) document.getElementById(`${ids}-asset`)?.focus()
+    else
+      document
+        .getElementById(`${ids}-deadline-quick`)
+        ?.querySelector<HTMLElement>('[role=radio]')
+        ?.focus()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on arrival
   }, [])
 
@@ -534,7 +540,7 @@ export function ThesisEditor({
             }
           />
 
-          {/* The asset and the claim, each the full width, one under the other (TC-30). */}
+          {/* The asset, the full width (TC-30). */}
           <div className="flex flex-col gap-6">
             {/* The asset: a search, and beside it the assets with the most theses (specs/thesis-
                 form-steps FS-01 to FS-07). Chosen, the search is its card (TC-29). */}
@@ -606,59 +612,13 @@ export function ThesisEditor({
                 className="type-meta"
               />
             </Field>
-
-            <Field data-invalid={invalid('claim') || undefined} className="gap-2">
-              <div className="flex items-baseline justify-between gap-2">
-                <FieldLabel htmlFor={`${ids}-claim`}>
-                  <StepTitle n={2} total={STEPS} done={done.claim}>
-                    {t('thesis.claim.label')}
-                  </StepTitle>
-                </FieldLabel>
-                {/* The room left, beside its label: no line of its own (TC-31). */}
-                <span
-                  id={`${ids}-claim-count`}
-                  className={cn(
-                    'type-meta tabular-nums',
-                    claim.length > CLAIM_MAX
-                      ? 'font-bold text-destructive'
-                      : 'text-muted-foreground',
-                  )}
-                >
-                  {t('fields.counter', { count: claim.length, max: CLAIM_MAX })}
-                </span>
-              </div>
-              <Input
-                id={`${ids}-claim`}
-                // An example with the asset and a target half again its price (TC-26).
-                placeholder={
-                  asset && reference !== null
-                    ? t('thesis.claim.example', {
-                        symbol: assetSymbolOf(asset),
-                        target: format.number(reference * 1.5, {
-                          maximumFractionDigits: reference * 1.5 < 1 ? 6 : 0,
-                        }),
-                      })
-                    : t('thesis.claim.placeholder')
-                }
-                {...register('claim')}
-                aria-invalid={invalid('claim') || undefined}
-                aria-required
-                aria-describedby={`${ids}-claim-count ${ids}-claim-error`}
-                className={cn(FIELD_BOX, 'h-12 font-semibold')}
-              />
-              <FieldError
-                id={`${ids}-claim-error`}
-                errors={fieldError('claim')}
-                className="type-meta"
-              />
-            </Field>
           </div>
 
           <Field data-invalid={invalid('deadline') || undefined} className="gap-2">
             {/* The day it closes beside the label: the shortcuts' row never grows (TC-33). */}
             <div className="flex flex-wrap items-baseline gap-x-2">
               <span id={`${ids}-deadline-label`} className="type-small font-medium">
-                <StepTitle n={3} total={STEPS} done={done.deadline}>
+                <StepTitle n={2} total={STEPS} done={done.deadline}>
                   {t('thesis.deadline.label')}
                 </StepTitle>
               </span>
@@ -731,7 +691,7 @@ export function ThesisEditor({
             className="gap-2"
           >
             <FieldLabel htmlFor={`${ids}-targetPrice`}>
-              <StepTitle n={4} total={STEPS} done={done.target}>
+              <StepTitle n={3} total={STEPS} done={done.target}>
                 {t('thesis.target.price')}
               </StepTitle>
             </FieldLabel>
@@ -841,7 +801,7 @@ export function ThesisEditor({
           {/* The conviction in its own row, with what it weighs (TC-25, TC-30). */}
           <Field data-invalid={invalid('conviction') || undefined} className="gap-2">
             <span id={`${ids}-conviction-label`} className="type-small font-medium">
-              <StepTitle n={5} total={STEPS} done={Boolean(conviction)}>
+              <StepTitle n={4} total={STEPS} done={Boolean(conviction)}>
                 {t('thesis.conviction.label')}
               </StepTitle>
             </span>
@@ -878,6 +838,58 @@ export function ThesisEditor({
             <FieldError
               id={`${ids}-conviction-error`}
               errors={fieldError('conviction')}
+              className="type-meta"
+            />
+          </Field>
+
+          {/* The claim, right above the reasoning: the bet first, then what it says (PO,
+              2026-11-05). */}
+          <Field data-invalid={invalid('claim') || undefined} className="gap-2">
+            <div className="flex items-baseline justify-between gap-2">
+              {/* What it is for, beside its label, in italics (PO, 2026-11-05). */}
+              <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
+                <FieldLabel htmlFor={`${ids}-claim`}>
+                  <StepTitle n={5} total={STEPS} done={done.claim}>
+                    {t('thesis.claim.label')}
+                  </StepTitle>
+                </FieldLabel>
+                <span id={`${ids}-claim-hint`} className="type-meta text-muted-foreground italic">
+                  {t('thesis.claim.hint')}
+                </span>
+              </div>
+              {/* The room left, beside its label: no line of its own (TC-31). */}
+              <span
+                id={`${ids}-claim-count`}
+                className={cn(
+                  'type-meta tabular-nums',
+                  claim.length > CLAIM_MAX ? 'font-bold text-destructive' : 'text-muted-foreground',
+                )}
+              >
+                {t('fields.counter', { count: claim.length, max: CLAIM_MAX })}
+              </span>
+            </div>
+            <Input
+              id={`${ids}-claim`}
+              // An example with the asset and a target half again its price (TC-26).
+              placeholder={
+                asset && reference !== null
+                  ? t('thesis.claim.example', {
+                      symbol: assetSymbolOf(asset),
+                      target: format.number(reference * 1.5, {
+                        maximumFractionDigits: reference * 1.5 < 1 ? 6 : 0,
+                      }),
+                    })
+                  : t('thesis.claim.placeholder')
+              }
+              {...register('claim')}
+              aria-invalid={invalid('claim') || undefined}
+              aria-required
+              aria-describedby={`${ids}-claim-hint ${ids}-claim-count ${ids}-claim-error`}
+              className={cn(FIELD_BOX, 'h-12 font-semibold')}
+            />
+            <FieldError
+              id={`${ids}-claim-error`}
+              errors={fieldError('claim')}
               className="type-meta"
             />
           </Field>

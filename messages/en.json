@@ -1149,7 +1149,8 @@
       "claim": {
         "label": "Claim",
         "placeholder": "e.g. $NVDA closes above 200 before the deadline",
-        "example": "e.g. {symbol} > {target} before the deadline"
+        "example": "e.g. {symbol} > {target} before the deadline",
+        "hint": "The main reason, in one sentence"
       },
       "target": {
         "label": "Target",

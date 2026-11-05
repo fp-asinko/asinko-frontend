@@ -1149,7 +1149,8 @@
       "claim": {
         "label": "Previsão",
         "placeholder": "ex.: $NVDA fecha acima de 200 antes do prazo",
-        "example": "ex.: {symbol} > {target} antes do prazo"
+        "example": "ex.: {symbol} > {target} antes do prazo",
+        "hint": "A razão principal, em uma frase"
       },
       "target": {
         "label": "Alvo",

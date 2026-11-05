@@ -112,11 +112,11 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     forgetOpenedDraft(KEY)
   })
 
-  it('comes with the asset of an asset community and its card, and the claim focused (TC-02, TC-22, TC-26)', async () => {
+  it('comes with the asset of an asset community and its card, and the next step focused: the deadline (TC-02, TC-22; claim fifth since PO 2026-11-05)', async () => {
     renderEditor()
     expect(screen.getByRole('group', { name: /Asset$/ })).toHaveTextContent('$NVDA')
     expect(screen.getByRole('tab', { name: 'Thesis' })).toHaveAttribute('aria-selected', 'true')
-    expect(claim()).toHaveFocus()
+    expect(screen.getByRole('radio', { name: '1 month' })).toHaveFocus()
     expect(actions.getAssetQuote).toHaveBeenCalledWith('NVDA')
     // The card: name, price and the day, with its arrow (spoken, not only colored).
     expect(await screen.findByText('NVIDIA')).toBeVisible()
@@ -179,13 +179,17 @@ describe('ThesisEditor (specs/thesis-create)', () => {
   it('numbers the six steps, and marks each one done (specs/thesis-form-steps FS-08, FS-09)', async () => {
     renderEditor()
     expect(screen.getByRole('group', { name: 'Step 1 of 6, done: Asset' })).toBeInTheDocument()
-    expect(claim()).toHaveAccessibleName('Step 2 of 6: Claim')
+    expect(claim()).toHaveAccessibleName('Step 5 of 6: Claim')
     expect(reasoning()).toHaveAccessibleName('Step 6 of 6: Reasoning')
+    // The claim right above the reasoning, with what it is for beside its label (PO, 2026-11-05).
+    expect(claim()).toHaveAccessibleDescription(/^The main reason, in one sentence/)
+    expect(claim().compareDocumentPosition(reasoning())).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+    expect(price().compareDocumentPosition(claim())).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     await fill()
-    expect(claim()).toHaveAccessibleName('Step 2 of 6, done: Claim')
-    expect(price()).toHaveAccessibleName('Step 4 of 6, done: Target price')
-    expect(screen.getByRole('radiogroup', { name: 'Step 3 of 6, done: Deadline' })).toBeVisible()
-    expect(screen.getByRole('radiogroup', { name: 'Step 5 of 6, done: Conviction' })).toBeVisible()
+    expect(claim()).toHaveAccessibleName('Step 5 of 6, done: Claim')
+    expect(price()).toHaveAccessibleName('Step 3 of 6, done: Target price')
+    expect(screen.getByRole('radiogroup', { name: 'Step 2 of 6, done: Deadline' })).toBeVisible()
+    expect(screen.getByRole('radiogroup', { name: 'Step 4 of 6, done: Conviction' })).toBeVisible()
     expect(reasoning()).toHaveAccessibleName('Step 6 of 6, done: Reasoning')
   })
 
