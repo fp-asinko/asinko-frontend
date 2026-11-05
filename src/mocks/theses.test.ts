@@ -173,3 +173,21 @@ describe('a thesis’s arguments and updates in the mocks (specs/thesis-argument
     ).toMatchObject({ status: 409, body: { error: { code: 'THESIS_NOT_OPEN' } } })
   })
 })
+
+describe('the mocked ranking of assets by theses (P-040, specs/thesis-form-steps)', async () => {
+  const { topThesisAssets } = await import('./theses')
+  const run = (query: Record<string, string>) =>
+    topThesisAssets({ ...noRequest, query, body: undefined })
+
+  it('counts the theses of each asset community, cancelled ones not, the most first', () => {
+    const body = run({}).body as { items: { community: { type: string }; thesisCount: number }[] }
+    expect(body.items.every((each) => each.community.type === 'SYSTEM_ASSET')).toBe(true)
+    const counts = body.items.map((each) => each.thesisCount)
+    expect(counts).toEqual([...counts].sort((a, b) => b - a))
+  })
+
+  it('refuses a period or a size out of range', () => {
+    expect(run({ days: '0' }).status).toBe(422)
+    expect(run({ limit: '21' }).status).toBe(422)
+  })
+})

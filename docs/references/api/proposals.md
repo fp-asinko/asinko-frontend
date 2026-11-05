@@ -256,6 +256,22 @@ Medido contra `dev` el 2026-10-30.
 3. **Anuncios entre los argumentos.** En un post, `GET /posts/{id}/comments` trae `ads` (P-031). Proponemos lo mismo en `GET /theses/{id}/comments`, para cada lado: uno arriba y uno cada 10 argumentos. Con la lista vacía no los vimos. Mientras tanto, con `API_MOCKS=missing` el front los agrega a la respuesta real (`MOCK_EXTENSIONS`), como los de un post.
 4. **La forma de `GET /theses/{id}/updates`.** `dev` devuelve `{ "items": [...] }`; E11 dice una lista suelta. Seguimos al backend y corregimos el snapshot de E11 (el front acepta las dos).
 
+### P-040: Los activos con más tesis
+
+**Estado:** propuesta (2026-11-04, `specs/thesis-form-steps`). Mockeada: con `API_MOCKS=missing` va al mock; con `false`, el formulario no muestra el carrusel.
+
+**Motivo:** el formulario de tesis muestra, al lado del buscador de activos, un carrusel con los activos de los que más tesis se publican, para elegir uno con un toque. No hay un endpoint para eso: `GET /users/{id}/active-communities` (P-027) es de una persona y cuenta también posts y encuestas.
+
+**Cambio:** `GET /api/v1/theses/top-assets?days=30&limit=10`, público:
+
+```jsonc
+{ "items": [{ "community": CommunitySummary, "thesisCount": 12 }] }
+```
+
+- Las comunidades de activo (`SYSTEM_ASSET`) con más tesis publicadas en los últimos `days` días, de más a menos (a igual cantidad, por slug).
+- Cuenta abiertas y resueltas; no las canceladas.
+- `days` de 1 a 365 (por defecto 30), `limit` de 1 a 20 (por defecto 10). Fuera de rango, `422`.
+
 ## Fase 3 del backend: solo visual en el front
 
 Decisión del 2026-10-21: estas propuestas se implementan en el backend en una fase 3. Hasta entonces, el front las muestra con mocks (desarrollo y CI, `API_MOCKS=missing` o `true`): la forma de abajo es la que ya usa, y es lo que proponemos.

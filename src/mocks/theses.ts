@@ -2,7 +2,7 @@ import type { RawThesis, RawThesisUpdate } from '@/lib/api/contract'
 import { mockCaller } from './auth'
 import { assetBySymbol } from './fixtures/assets'
 import { communityById, communitySummary } from './fixtures/communities'
-import { mockId } from './fixtures/ids'
+import { MOCK_NOW, mockId } from './fixtures/ids'
 import { THESES } from './fixtures/theses'
 import { takeThesisDraft } from './thesis-drafts'
 import { PROFILES, summary } from './fixtures/users'
@@ -220,4 +220,28 @@ export function removeMockThesisVote({ params, query, accessToken }: MockContext
   if (!THESES.some((each) => each.id === params.id)) return error(404, 'NOT_FOUND')
   if (query.userId !== mockCaller(accessToken)) return error(403, 'USER_MISMATCH')
   return { status: 204 }
+}
+
+/**
+ * GET /api/v1/theses/top-assets?days=&limit= (P-040, specs/thesis-form-steps): the asset communities
+ * with the most theses published in the last `days` (30 by default), cancelled ones not counted.
+ */
+export function topThesisAssets({ query }: MockContext): MockResponse {
+  const days = query.days === undefined ? 30 : Number(query.days)
+  const limit = query.limit === undefined ? 10 : Number(query.limit)
+  if (!Number.isInteger(days) || days < 1 || days > 365) return error(422, 'VALIDATION_ERROR')
+  if (!Number.isInteger(limit) || limit < 1 || limit > 20) return error(422, 'VALIDATION_ERROR')
+  // From the mocks' clock (MOCK_NOW): the seeded theses are dated against it, not today.
+  const since = Math.min(Date.now(), MOCK_NOW) - days * DAY_MS
+  const counts = new Map<string, number>()
+  for (const thesis of THESES) {
+    if (thesis.state === 'CANCELLED' || thesis.community.type !== 'SYSTEM_ASSET') continue
+    if (Date.parse(thesis.publishedAt) < since) continue
+    counts.set(thesis.community.slug, (counts.get(thesis.community.slug) ?? 0) + 1)
+  }
+  const items = [...counts]
+    .sort(([a, x], [b, y]) => y - x || a.localeCompare(b))
+    .slice(0, limit)
+    .map(([slug, thesisCount]) => ({ community: communitySummary(slug), thesisCount }))
+  return { status: 200, body: { items } }
 }

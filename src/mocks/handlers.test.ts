@@ -219,6 +219,8 @@ describe('mock handlers behave like the contract', () => {
     expect(missing.toSorted()).toEqual(
       [
         '/api/v1/users/:userId',
+        // P-040 (specs/thesis-form-steps): the assets with the most theses.
+        '/api/v1/theses/top-assets',
         // P-028 and P-029 (specs/community-widgets): a group's widgets and their images.
         '/api/v1/communities/:slug/widgets',
         '/api/v1/communities/:slug/widgets',

@@ -26,6 +26,7 @@ import {
   thesisSchema,
   thesisUpdateListSchema,
   thesisUpdateSchema,
+  topThesisAssetsSchema,
   userSchema,
   usernameAvailabilitySchema,
   userSummarySchema,
@@ -91,6 +92,7 @@ import {
   createMockThesisUpdate,
   listMockThesisUpdates,
   removeMockThesisVote,
+  topThesisAssets,
   voteMockThesis,
 } from './theses'
 import type { MockContext, MockExtension, MockResponse, MockRoute } from './types'
@@ -622,6 +624,16 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     handler: createMockThesis,
   },
 
+  // P-040: the assets with the most theses, for the thesis form's rail (specs/thesis-form-steps).
+  {
+    method: 'GET',
+    path: '/api/v1/theses/top-assets',
+    kind: 'proposal',
+    implemented: false,
+    schema: topThesisAssetsSchema,
+    example: { ...noRequest, query: { days: '30', limit: '10' } },
+    handler: topThesisAssets,
+  },
   // E11: a thesis's page (specs/thesis-detail § 4). `canCancel` is the caller's.
   {
     method: 'GET',

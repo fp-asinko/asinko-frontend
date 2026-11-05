@@ -74,3 +74,6 @@ export type SavedDraft = {
   thesis: SavedThesis | null
   updatedAt: string
 }
+
+/** An asset of the thesis form's rail (specs/thesis-form-steps FS-04): its option and its theses. */
+export type TopAsset = { option: CommunityOption; thesisCount: number }

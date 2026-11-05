@@ -226,6 +226,14 @@ export const thesisUpdateListSchema = z.union([
 export type RawThesisUpdate = z.infer<typeof thesisUpdateSchema>
 
 /**
+ * The assets with the most theses lately (P-040, specs/thesis-form-steps FS-04): their community and
+ * how many theses were published in it, the most first.
+ */
+export const topThesisAssetsSchema = z.object({
+  items: z.array(z.object({ community: communitySummarySchema, thesisCount: z.number().int() })),
+})
+
+/**
  * Why Explore shows an item (backend 2026-10-20, specs/explore-v1 § 1): `via` only with SIMILAR,
  * `countryCode` only with COUNTRY. `type` stays a string: a new one is no reason, not a broken item.
  */
