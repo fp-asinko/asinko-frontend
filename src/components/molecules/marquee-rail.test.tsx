@@ -14,11 +14,13 @@ function Rail() {
 }
 
 describe('MarqueeRail (specs/thesis-form-steps FS-05)', () => {
-  it('slides its items once for assistive tech: the loop’s copy is hidden and inert', () => {
+  it('slides its items once for assistive tech: the loop’s copy is hidden and out of the Tab order', () => {
     renderWithIntl(<Rail />)
     const rail = screen.getByRole('region', { name: 'Top assets' })
     expect(screen.getAllByRole('button', { name: 'BTC' })).toHaveLength(1)
-    expect(rail.querySelectorAll('[inert] button')).toHaveLength(2)
+    const copy = rail.querySelectorAll('[data-marquee-copy] button')
+    expect(copy).toHaveLength(2)
+    for (const button of copy) expect(button).toHaveAttribute('tabindex', '-1')
     expect(screen.getByTestId('marquee-track')).toHaveClass('motion-safe:animate-marquee')
     // Paused from its data attribute, not an inline style.
     expect(screen.getByTestId('marquee-track')).toHaveClass(
@@ -47,6 +49,19 @@ describe('MarqueeRail (specs/thesis-form-steps FS-05)', () => {
     expect(track).not.toHaveClass('motion-safe:animate-marquee')
     act(() => screen.getByRole('button', { name: 'ETH' }).blur())
     expect(track).toHaveClass('motion-safe:animate-marquee')
+  })
+
+  it('takes clicks on the copy too: half of each turn, it is what shows (PO, 2026-11-05)', async () => {
+    const onClick = vi.fn()
+    const { container } = renderWithIntl(
+      <MarqueeRail label="Top assets" duration={24}>
+        <button type="button" onClick={onClick}>
+          BTC
+        </button>
+      </MarqueeRail>,
+    )
+    await userEvent.click(container.querySelector('[data-marquee-copy] button')!)
+    expect(onClick).toHaveBeenCalledOnce()
   })
 
   it('keeps going under a click: the pill stays where it was pressed (PO, 2026-11-05)', async () => {

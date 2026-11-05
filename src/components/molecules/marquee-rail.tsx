@@ -2,12 +2,20 @@
 
 import { PauseIcon, PlayIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react'
 import { cn } from '@/lib/utils'
 import { HoverHint } from './hover-hint'
 
 /**
- * A row that slides by itself, like a ticker (specs/thesis-form-steps FS-05): a second, inert copy
+ * A row that slides by itself, like a ticker (specs/thesis-form-steps FS-05): a second copy
  * of the items follows the first so the loop has no seam, moved with transform only. It stops with
  * its pause button (WCAG 2.2.2), under the mouse and while a finger is down; with the keyboard's
  * focus inside (not a click's) it goes back to the start, so the focused item is in view. Asking for reduced
@@ -73,8 +81,18 @@ export function MarqueeRail({
           )}
         >
           <div className="flex gap-2 pr-2 [&>*]:shrink-0">{children}</div>
-          <div aria-hidden inert className="flex gap-2 pr-2 motion-reduce:hidden [&>*]:shrink-0">
-            {children}
+          {/* The loop's copy: half of each turn it is what shows, so it takes clicks (not inert,
+              PO 2026-11-05); hidden from screen readers and out of the Tab order, said once. */}
+          <div
+            aria-hidden
+            data-marquee-copy
+            className="flex gap-2 pr-2 motion-reduce:hidden [&>*]:shrink-0"
+          >
+            {Children.map(children, (child) =>
+              isValidElement<{ tabIndex?: number }>(child)
+                ? cloneElement(child, { tabIndex: -1 })
+                : child,
+            )}
           </div>
         </div>
       </div>

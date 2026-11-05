@@ -55,6 +55,17 @@ test.describe('The thesis form in steps', () => {
     await expect(eth).toHaveAttribute('aria-pressed', 'true')
   })
 
+  test('chooses from the loop’s copy too, the pills that come in from the edge (PO, 2026-11-05)', async ({
+    page,
+  }) => {
+    await page.goto('/en/submit?type=thesis')
+    const ticker = main(page).getByRole('region', { name: 'Assets with the most theses' })
+    await ticker.getByRole('button', { name: 'Pause' }).click()
+    // The copy is hidden from assistive tech, so it is found by its place, as a pointer finds it.
+    await ticker.locator('[data-marquee-copy] button').first().click({ force: true })
+    await expect(main(page).getByRole('group', { name: /Asset$/ })).toContainText('$')
+  })
+
   test('numbers the six steps (FS-08)', async ({ page }) => {
     await page.goto('/en/submit?type=thesis')
     for (const [n, name] of [
