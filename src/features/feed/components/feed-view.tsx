@@ -66,10 +66,10 @@ export function FeedTop({
         <FeedTabs
           params={params}
           trailing={
-            <>
+            <FeedControls>
               <FeedSort params={params} />
               <FeedTypeMenu params={params} />
-            </>
+            </FeedControls>
           }
         />
         <FeedChipRow chip={chip} />
@@ -130,6 +130,16 @@ export function FeedListView({
 }
 
 const ACTION = ACTION_PILL
+
+/** The order and the type beside the tabs, named as a group ("Filters"). */
+function FeedControls({ children }: { children: ReactNode }) {
+  const t = useTranslations('feed.filters')
+  return (
+    <div role="group" aria-label={t('label')} className="flex items-center gap-1">
+      {children}
+    </div>
+  )
+}
 
 const TYPE_ICONS = {
   posts: <PenLineIcon />,

@@ -19,7 +19,7 @@ export function FeedTabs({ params, trailing }: { params: FeedParams; trailing?: 
   ] as const
 
   return (
-    <div className="mb-4 flex items-center gap-2 border-b">
+    <div className="mb-4 flex items-center gap-2">
       <nav aria-label={t('label')} className="flex min-w-0 gap-1">
         {tabs.map((tab) => {
           const active = params.feed === tab.feed

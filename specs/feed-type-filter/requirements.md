@@ -10,6 +10,13 @@
 | Q2  | New y Polls de hoy | **Polls pasa al selector**; **New queda** como el orden, listo para Hot y Top cuando el backend ordene el feed. |
 | Q3  | Tipos              | **All, Posts, Theses, Polls.** Posts incluye texto, imagen, link y thoughts.                                    |
 
+## Ajustes del PO (2026-11-05, después de verlo)
+
+- Cada opción del menú lleva su ícono, el mismo que ese tipo usa en el resto del sitio: All (capas), Posts (lápiz), Theses (◎, como su badge) y Polls (barras, como su tarjeta).
+- Sin la línea debajo de las pestañas: el subrayado de la activa alcanza.
+- En la caja de publicar, **Tesis deja de ser "Próximamente"**: abre el formulario de tesis, con el ícono ◎ de la tesis en lugar del rayo. Live, Duel y Portfolio siguen en "Próximamente" (`specs/composer-row` CR-05).
+- Por la revisión de UI: en el teléfono, filtrado, el ícono lleva un punto (no solo el fondo, WCAG 1.4.1); un globo dice qué es; los controles se nombran como grupo ("Filtros").
+
 ## User stories
 
 - Como lector del Home, quiero elegir qué tipo de contenido veo (solo tesis, solo encuestas…) sin perder la pestaña en la que estoy.

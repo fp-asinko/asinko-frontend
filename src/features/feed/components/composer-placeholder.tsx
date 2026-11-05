@@ -5,7 +5,7 @@ import {
   QuoteIcon,
   RadioIcon,
   SwordsIcon,
-  ZapIcon,
+  TargetIcon,
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { GatedComingSoon } from '@/components/organisms/auth-gate'
@@ -24,8 +24,8 @@ const ICON =
  * The composer box at the top of a feed (H-09), as X's: the avatar and the prompt without a box;
  * below, the formats as icons and Publish on the right. Each part goes to the page to create a
  * post (specs/submit-page SU-02, Q1), on its format: the prompt and Publish on Text, the link and
- * the image icons on theirs, and Thought on its own (specs/thoughts TH-04). Thesis, Live, Duel and
- * Portfolio are coming soon (H-26, specs/composer-row CR-05). On a community's page it says
+ * the image icons on theirs, Thought on its own (specs/thoughts TH-04) and Thesis on its form (PO,
+ * 2026-11-05). Live, Duel and Portfolio are coming soon (H-26, specs/composer-row CR-05). On a community's page it says
  * where the post goes: "Post in #defi", and the page arrives with it chosen.
  */
 export function ComposerPlaceholder({
@@ -44,7 +44,6 @@ export function ComposerPlaceholder({
   const t = useTranslations('feed.composer')
   const prompt = communityHandle ? t('postIn', { handle: communityHandle }) : t('placeholder')
   const soon = [
-    { key: 'thesis', icon: ZapIcon },
     { key: 'live', icon: RadioIcon },
     { key: 'duel', icon: SwordsIcon },
     { key: 'portfolio', icon: ChartColumnIcon },
@@ -105,6 +104,17 @@ export function ComposerPlaceholder({
               className={ICON}
             >
               <ImageIcon aria-hidden />
+            </ComposeTrigger>
+          </HoverHint>
+          {/* A thesis, to its form (PO, 2026-11-05): the thesis's own icon, as its badge. */}
+          <HoverHint label={t('hints.thesis')}>
+            <ComposeTrigger
+              type="thesis"
+              community={communitySlug}
+              aria-label={t('thesis')}
+              className={ICON}
+            >
+              <TargetIcon aria-hidden />
             </ComposeTrigger>
           </HoverHint>
           {soon.map(({ key, icon: Icon }) => (

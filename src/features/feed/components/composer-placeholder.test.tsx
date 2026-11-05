@@ -49,9 +49,17 @@ describe('ComposerPlaceholder (H-09; specs/submit-page SU-02, Q1)', () => {
     )
   })
 
-  it('keeps Thesis, Live, Duel and Portfolio as coming soon, in that order (CR-05)', () => {
+  it('opens the thesis form from its icon (PO, 2026-11-05)', () => {
     renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
-    const soon = ['Thesis', 'Live', 'Duel', 'Portfolio']
+    expect(screen.getByRole('link', { name: 'Thesis' })).toHaveAttribute(
+      'href',
+      '/submit?type=thesis',
+    )
+  })
+
+  it('keeps Live, Duel and Portfolio as coming soon, in that order (CR-05)', () => {
+    renderWithIntl(<ComposerPlaceholder viewerName="demo" />)
+    const soon = ['Live', 'Duel', 'Portfolio']
     for (const name of soon) {
       expect(screen.getByRole('button', { name })).toHaveAttribute('aria-disabled', 'true')
     }
@@ -75,13 +83,13 @@ describe('ComposerPlaceholder (H-09; specs/submit-page SU-02, Q1)', () => {
     expect(thought).not.toHaveAttribute('aria-disabled')
   })
 
-  it('opens the account modal from Thesis without a session (G-04)', async () => {
+  it('opens the account modal from Duel without a session (G-04)', async () => {
     renderWithIntl(
       <AuthGateProvider signedIn={false}>
         <ComposerPlaceholder viewerName={null} />
       </AuthGateProvider>,
     )
-    await userEvent.click(screen.getByRole('button', { name: 'Thesis' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Duel' }))
     expect(await screen.findByRole('dialog', { name: 'Join Asinko to post' })).toBeInTheDocument()
   })
 })

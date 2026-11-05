@@ -50,6 +50,13 @@ describe('FeedTypeMenu (specs/feed-type-filter FT-04 to FT-07)', () => {
     )
   })
 
+  it('marks a filtered feed with a dot in a phone, not only its background (WCAG 1.4.1)', () => {
+    const { container, rerender } = renderWithIntl(<FeedTypeMenu params={parseFeedParams({})} />)
+    expect(container.querySelector('[data-filtered]')).toBeNull()
+    rerender(<FeedTypeMenu params={parseFeedParams({ type: 'theses' })} />)
+    expect(container.querySelector('[data-filtered]')).not.toBeNull()
+  })
+
   it('stays on a community page (FT-11)', async () => {
     renderWithIntl(<FeedTypeMenu params={parseFeedParams({})} pagePath="/asset/BTC" />)
     await userEvent.click(screen.getByRole('button', { name: 'Content type: All' }))

@@ -24,6 +24,24 @@ test.describe('The feed’s type filter', () => {
     )
   })
 
+  test('works from the keyboard: Enter opens it with the focus in, arrows and Enter choose (FT-07)', async ({
+    page,
+  }) => {
+    await page.goto('/en')
+    await page.getByRole('main').getByRole('button', { name: 'Content type: All' }).focus()
+    await page.keyboard.press('Enter')
+    const menu = page.getByRole('menu')
+    await expect(menu).toBeVisible()
+    // The focus goes into the menu, so the arrows move through it.
+    await expect
+      .poll(() => page.evaluate(() => Boolean(document.activeElement?.closest('[role=menu]'))))
+      .toBe(true)
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('Enter')
+    await expect(page).toHaveURL(/type=(posts|theses)/)
+  })
+
   test('reads an old ?filter=polls link as the Polls type (FT-10)', async ({ page }) => {
     await page.goto('/en?filter=polls')
     await expect(

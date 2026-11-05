@@ -138,10 +138,10 @@ test.describe('Home feed', () => {
 
   test('features of later phases say "Coming soon" (H-26)', async ({ page }) => {
     await page.goto('/en')
-    // The composer box's Thesis (Link and Image go to the page to create a post, specs/submit-page).
-    const thesis = page.getByRole('button', { name: 'Thesis' })
-    await expect(thesis).toHaveAttribute('aria-disabled', 'true')
-    await pressComingSoon(thesis)
+    // The composer box's Duel (Thesis, Link and Image go to the page to create a post).
+    const duel = page.getByRole('button', { name: 'Duel' })
+    await expect(duel).toHaveAttribute('aria-disabled', 'true')
+    await pressComingSoon(duel)
     await expect(page.getByRole('status').filter({ hasText: 'Coming soon' })).toBeVisible()
   })
 

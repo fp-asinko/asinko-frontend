@@ -4,6 +4,7 @@ import { ChevronDownIcon, ListFilterIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
+import { HoverHint } from '@/components/molecules/hover-hint'
 import { cn } from '@/lib/utils'
 import type { FeedParams } from '../schemas/feed-params.schema'
 
@@ -37,35 +38,47 @@ export function FeedTypeMenu({
 
   return (
     <>
-      <button
-        ref={triggerRef}
-        type="button"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-label={t('trigger', { type: t(params.type) })}
-        onPointerEnter={loadMenu}
-        onFocus={loadMenu}
-        onPointerDown={() => (wasOpen.current = open)}
-        onClick={() => {
-          setRequested(true)
-          setOpen(!wasOpen.current)
-          wasOpen.current = false
-        }}
-        className={cn(
-          'inline-flex h-8 min-w-8 shrink-0 tap items-center justify-center gap-1 rounded-full px-2 type-action font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:pr-2.5 sm:pl-3.5',
-          // Filtered, it stands out as the active pill; on All, it is quiet.
-          filtered
-            ? 'bg-muted text-foreground'
-            : 'text-muted-foreground hover:bg-surface hover:text-foreground',
-        )}
-      >
-        {/* In a phone, the icon: the row keeps one line (FT-02); its name says the type. */}
-        <ListFilterIcon aria-hidden className="size-4 sm:hidden" />
-        <span aria-hidden className="hidden sm:inline">
-          {t(params.type)}
-        </span>
-        <ChevronDownIcon aria-hidden className="hidden size-4 sm:block" />
-      </button>
+      {/* What it is, in a bubble: in a phone it is only an icon (design-system § Globos). */}
+      <HoverHint label={t('label')} side="bottom" align="end">
+        <button
+          ref={triggerRef}
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-label={t('trigger', { type: t(params.type) })}
+          onPointerEnter={loadMenu}
+          onFocus={loadMenu}
+          onPointerDown={() => (wasOpen.current = open)}
+          onClick={() => {
+            setRequested(true)
+            setOpen(!wasOpen.current)
+            wasOpen.current = false
+          }}
+          className={cn(
+            'inline-flex h-8 min-w-8 shrink-0 tap items-center justify-center gap-1 rounded-full px-2 type-action font-medium outline-none focus-visible:ring-3 focus-visible:ring-ring/50 sm:pr-2.5 sm:pl-3.5',
+            // Filtered, it stands out as the active pill; on All, it is quiet.
+            filtered
+              ? 'bg-muted text-foreground'
+              : 'text-muted-foreground hover:bg-surface hover:text-foreground',
+          )}
+        >
+          {/* In a phone, the icon: the row keeps one line (FT-02); its name says the type. Filtered,
+            a dot on it: not only its background says so (WCAG 1.4.1). */}
+          <span aria-hidden className="relative sm:hidden">
+            <ListFilterIcon className="size-4" />
+            {filtered && (
+              <span
+                data-filtered
+                className="absolute -top-0.5 -right-1 size-2 rounded-full border-2 border-muted bg-foreground"
+              />
+            )}
+          </span>
+          <span aria-hidden className="hidden sm:inline">
+            {t(params.type)}
+          </span>
+          <ChevronDownIcon aria-hidden className="hidden size-4 sm:block" />
+        </button>
+      </HoverHint>
       {requested && (
         <FeedTypeMenuPopup
           params={params}

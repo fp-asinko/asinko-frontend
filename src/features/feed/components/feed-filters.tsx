@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import type { FeedParams } from '../schemas/feed-params.schema'
 import { FeedSort } from './feed-sort'
@@ -15,8 +16,10 @@ export function FeedFilters({
   /** The page itself: the filters stay on it (specs/community-pages CP-07). */
   pagePath: string
 }) {
+  const t = useTranslations('feed.filters')
   return (
-    <div className="mb-3 flex items-center gap-1.5">
+    // Named as a group: the order and the type of this feed.
+    <div role="group" aria-label={t('label')} className="mb-3 flex items-center gap-1.5">
       <FeedSort params={params} pagePath={pagePath} />
       <FeedTypeMenu params={params} pagePath={pagePath} />
     </div>
