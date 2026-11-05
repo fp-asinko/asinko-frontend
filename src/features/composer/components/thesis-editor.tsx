@@ -24,7 +24,7 @@ import { assetSymbolOf } from '@/lib/communities/paths'
 import { searchMentions } from '@/lib/mentions/search-mentions.action'
 import { cn } from '@/lib/utils'
 import { createThesis } from '../actions/create-thesis.action'
-import type { CommunityOption, SavedDraft, TopAsset } from '../composer.types'
+import type { CommunityOption, SavedDraft, SuggestedAssets } from '../composer.types'
 import { useSavedDraft } from '../hooks/use-saved-draft'
 import { DRAFT_LIMIT } from './drafts-dialog'
 import { DraftsButton } from './drafts-button'
@@ -113,7 +113,7 @@ export function ThesisEditor({
   community,
   storageKey,
   draftsReady = true,
-  topAssets = [],
+  suggested,
   draftRef,
   onCancel,
   onFormat,
@@ -130,8 +130,8 @@ export function ThesisEditor({
    * it says "Coming soon" outside the full mocks. What is written is still kept in the browser.
    */
   draftsReady?: boolean
-  /** The assets with the most theses, beside the search (specs/thesis-form-steps FS-04). */
-  topAssets?: readonly TopAsset[]
+  /** The assets beside the search: the viewer's interests, then the popular (FS-04). */
+  suggested?: SuggestedAssets
   /** Filled with a check of whether something is written, read when leaving. */
   draftRef: RefObject<(() => boolean) | null>
   onCancel: () => void
@@ -545,7 +545,10 @@ export function ThesisEditor({
                 </StepTitle>
               </FieldLabel>
               <div
-                className={cn('grid grid-cols-1 gap-3', topAssets.length > 0 && 'sm:grid-cols-2')}
+                className={cn(
+                  'grid grid-cols-1 items-end gap-3',
+                  suggested?.assets.length && 'sm:grid-cols-2',
+                )}
               >
                 <AssetSearch
                   id={`${ids}-asset`}
@@ -593,7 +596,9 @@ export function ThesisEditor({
                     </span>
                   )}
                 />
-                <TopAssetsRail assets={topAssets} chosen={asset} onChoose={chooseAsset} />
+                {suggested && (
+                  <TopAssetsRail suggested={suggested} chosen={asset} onChoose={chooseAsset} />
+                )}
               </div>
               <FieldError
                 id={`${ids}-assetSymbol-error`}

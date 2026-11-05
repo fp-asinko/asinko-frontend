@@ -33,10 +33,10 @@ Que elegir el activo sea escribir su nombre, como en cualquier buscador, y que l
 
 ### El carrusel
 
-- [ ] **FS-04** Desde `sm`, el buscador ocupa **la mitad del ancho**; en la otra mitad, un **carrusel** con los activos que más tesis tienen en los últimos 30 días (Q1). Cada uno muestra su logo, el símbolo y "12 tesis". Va de más a menos, hasta 10. En el teléfono va debajo del buscador, a todo el ancho.
-- [ ] **FS-05** **Se mueve solo, como una cinta de bolsa** (PO, 2026-11-04; antes: scroll a mano, sin autoplay): desliza lento y constante, en bucle. Se detiene con su botón de pausa (WCAG 2.2.2), con el mouse encima y mientras el dedo está apoyado; con el foco del teclado adentro vuelve al inicio y queda quieta. Con "reducir movimiento" queda quieta, con scroll a mano y sin el botón. Sin sombras. Cada activo es un botón con su nombre accesible ("Bitcoin, 12 tesis"), una sola vez para el lector de pantalla.
-- [ ] **FS-06** Tocar un activo **lo elige** (Q2): queda en el buscador como si lo hubieras buscado, con todo lo de FS-03. El elegido se marca en el carrusel.
-- [ ] **FS-07** Si el ranking falla o viene vacío, el carrusel no aparece y el buscador ocupa todo el ancho. El formulario sigue funcionando.
+- [ ] **FS-04** Desde `sm`, el buscador ocupa **la mitad del ancho**; en la otra mitad, una **fila de activos** con un rótulo arriba. Primero **tus intereses** (las comunidades de activos de las que sos miembro, la favorita primero, como "Tus intereses"), completada hasta 10 con los que más tesis tienen en 30 días (P-040). El rótulo dice "Based on your previous interests" o, sin intereses propios, "Popular assets" (PO, 2026-11-05; antes: solo el ranking, con su cantidad de tesis). En el teléfono, la fila va debajo del buscador.
+- [ ] **FS-05** **Quieta** (PO, 2026-11-05; el 2026-11-04 se había probado una cinta que se movía sola): se desliza con el dedo, la rueda o las flechas ‹ › que aparecen cuando hay más. Cada activo es una píldora clara (`bg-surface` con borde) con su logo y su símbolo, **sin la cantidad de tesis**, y un nombre accesible ("$BTC, Bitcoin").
+- [ ] **FS-06** Tocar un activo **lo elige** (Q2): queda en el buscador como si lo hubieras buscado, con todo lo de FS-03. El elegido se marca en la fila con ✓, no solo con el color.
+- [ ] **FS-07** Si no hay ninguno (fallan tus intereses y el ranking, o vienen vacíos), la fila no aparece y el buscador ocupa todo el ancho. El formulario sigue funcionando.
 
 ### Los pasos
 

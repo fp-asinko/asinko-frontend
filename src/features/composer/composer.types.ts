@@ -77,3 +77,9 @@ export type SavedDraft = {
 
 /** An asset of the thesis form's rail (specs/thesis-form-steps FS-04): its option and its theses. */
 export type TopAsset = { option: CommunityOption; thesisCount: number }
+
+/**
+ * The assets beside the thesis form's search (specs/thesis-form-steps FS-04): the viewer's own
+ * interests, filled with the most-thesised ones, or only those when they have none.
+ */
+export type SuggestedAssets = { basis: 'interests' | 'popular'; assets: CommunityOption[] }

@@ -64,10 +64,6 @@
     "steps": {
       "step": "Paso {n} de {total}:",
       "stepDone": "Paso {n} de {total}, completo:"
-    },
-    "marquee": {
-      "pause": "Pausar",
-      "play": "Reproducir"
     }
   },
   "errors": {
@@ -1214,9 +1210,9 @@
         "submitting": "Publicando…"
       },
       "topAssets": {
-        "label": "Activos con más tesis",
-        "item": "{handle}, {name}, {count, plural, one {# tesis} other {# tesis}}",
-        "count": "{count, plural, one {{shown} tesis} other {{shown} tesis}}"
+        "interests": "Según tus intereses",
+        "popular": "Activos populares",
+        "item": "{handle}, {name}"
       }
     }
   },

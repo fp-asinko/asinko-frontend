@@ -64,10 +64,6 @@
     "steps": {
       "step": "Step {n} of {total}:",
       "stepDone": "Step {n} of {total}, done:"
-    },
-    "marquee": {
-      "pause": "Pause",
-      "play": "Play"
     }
   },
   "errors": {
@@ -1214,9 +1210,9 @@
         "submitting": "Publishing…"
       },
       "topAssets": {
-        "label": "Assets with the most theses",
-        "item": "{handle}, {name}, {count, plural, one {# thesis} other {# theses}}",
-        "count": "{count, plural, one {{shown} thesis} other {{shown} theses}}"
+        "interests": "Based on your previous interests",
+        "popular": "Popular assets",
+        "item": "{handle}, {name}"
       }
     }
   },
