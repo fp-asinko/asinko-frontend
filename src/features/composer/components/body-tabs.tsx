@@ -47,7 +47,8 @@ export function BodyTabs({
   if (!preview) {
     return (
       <div className={BOX}>
-        <div className="flex justify-end px-2 pt-2">{toolbar}</div>
+        {/* On the left, its first icon over the text (PO, 2026-11-05): no tabs share the row. */}
+        <div className="flex justify-start px-2 pt-2">{toolbar}</div>
         <div className="px-4 pt-1 pb-3">{children}</div>
       </div>
     )

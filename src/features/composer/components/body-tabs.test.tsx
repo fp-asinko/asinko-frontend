@@ -86,6 +86,9 @@ describe('BodyTabs (specs/submit-tools ST-01 to ST-03)', () => {
       </BodyTabs>,
     )
     expect(screen.queryByRole('tab')).toBeNull()
-    expect(screen.getByRole('toolbar', { name: 'Text format' })).toBeInTheDocument()
+    // On the left, over the text: no tabs share its row (PO, 2026-11-05).
+    expect(screen.getByRole('toolbar', { name: 'Text format' }).parentElement).toHaveClass(
+      'justify-start',
+    )
   })
 })
