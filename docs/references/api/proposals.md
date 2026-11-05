@@ -287,6 +287,41 @@ Medido contra `dev` el 2026-10-30.
 
 - `logoUrl`: `string | null`, la misma imagen que el `avatarUrl` de la comunidad del activo.
 
+### P-042: Claim y razonamiento opcionales en una tesis
+
+**Estado:** propuesta (2026-11-05, pedido del PO). Sin mockear todavía: el front lo adopta con su spec cuando esté acordada.
+
+**Motivo:** desde `specs/thesis-ticket`, la tesis se lee por su apuesta: el activo, el precio objetivo con su dirección, el plazo y la convicción. El claim y el razonamiento pasan a segundo plano, y el PO quiere que se pueda publicar una tesis sin ellos. Hoy E11 los exige a los dos en `POST /theses`.
+
+**Cambio:**
+
+1. **`POST /api/v1/theses`:** `claim` y `reasoning` pasan a ser **opcionales**. Se pueden omitir o mandar `null`. Un string vacío o con solo espacios se guarda como `null`. Las demás reglas no cambian: `claim` de 280 caracteres como máximo (`422 CLAIM_TOO_LONG`), y el resto del body igual que hoy.
+
+   ```jsonc
+   {
+     "userId": "uuid",
+     "communityId": "uuid",
+     "assetSymbol": "ETH",
+     "conviction": "HIGH",
+     "deadline": "2027-11-04T23:59:59.000Z",
+     "targetPrice": 3773,
+     "targetDirection": "ABOVE",
+     "disclaimerAccepted": true
+     // claim y reasoning: opcionales
+   }
+   ```
+
+2. **El recurso `Thesis`** (feed, `GET /theses/{id}`, `GET /users/{id}/theses`, destacados): `claim: string | null` y `reasoning: string | null`.
+
+3. **Lo que hoy usa el claim en el backend** (búsqueda, notificaciones, menciones del razonamiento, el título de una actividad) tiene que aceptar `null`. Sin claim, el backend no inventa un texto: el front arma el título con la apuesta ("$ETH por encima de $3.773 antes del 4 nov 2027"), traducido a cada idioma.
+
+4. **Las actualizaciones del autor y los argumentos** (`POST /theses/{id}/updates`, comentarios) no cambian.
+
+**Preguntas:**
+
+1. ¿Hay algo más del backend que dependa del claim o del razonamiento (moderación, el resumen de una notificación, el índice de búsqueda)?
+2. Una tesis sin claim y sin razonamiento, ¿necesita alguna otra señal para no parecer spam (por ejemplo, un límite de tesis por día)? El rate limit de hoy (`429`) ¿alcanza?
+
 ## Fase 3 del backend: solo visual en el front
 
 Decisión del 2026-10-21: estas propuestas se implementan en el backend en una fase 3. Hasta entonces, el front las muestra con mocks (desarrollo y CI, `API_MOCKS=missing` o `true`): la forma de abajo es la que ya usa, y es lo que proponemos.
