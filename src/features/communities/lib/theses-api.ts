@@ -2,7 +2,7 @@ import 'server-only'
 import { z } from 'zod'
 import { apiRequest, invalidInput, keepValidItems, type ApiResult } from '@/lib/api'
 import { thesisSchema, type RawThesis } from '@/lib/api/contract'
-import { communityPath } from '@/lib/communities/paths'
+import { toThesisTicket } from '@/lib/theses/ticket'
 import type { ThesesPage, ThesisItem } from '../communities.types'
 
 const ENDPOINT = 'GET /api/v1/users/:userId/theses'
@@ -13,29 +13,8 @@ const looseListSchema = z.object({ items: z.array(z.unknown()), nextCursor: z.st
 /** Opaque cursor from a previous page: checked before the request, as the feed's. */
 const cursorSchema = z.string().regex(/^[A-Za-z0-9_\-=.:]{1,512}$/)
 
-const CONVICTION = { LOW: 1, MEDIUM: 2, HIGH: 3, EXTREME: 4 } as const
-
 export function toThesisItem(thesis: RawThesis): ThesisItem {
-  return {
-    id: thesis.id,
-    asset: thesis.asset
-      ? { symbol: thesis.asset.symbol, path: communityPath('asset', thesis.asset.symbol) }
-      : null,
-    claim: thesis.claim,
-    state: thesis.state.toLowerCase() as ThesisItem['state'],
-    target:
-      thesis.targetDirection && thesis.targetPrice !== null
-        ? {
-            direction: thesis.targetDirection.toLowerCase() as 'above' | 'below' | 'equals',
-            price: thesis.targetPrice,
-          }
-        : null,
-    deadline: thesis.deadline,
-    conviction: CONVICTION[thesis.conviction],
-    resolutionPrice: thesis.resolutionPrice,
-    cancellationReason: thesis.cancellationReason?.trim() || null,
-    publishedAt: thesis.publishedAt,
-  }
+  return { ...toThesisTicket(thesis), claim: thesis.claim, publishedAt: thesis.publishedAt }
 }
 
 /**

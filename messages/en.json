@@ -240,8 +240,6 @@
       }
     },
     "thesis": {
-      "badge": "Thesis",
-      "closes": "Closes {when}",
       "arguments": {
         "title": "Arguments",
         "sides": "Sides of the debate",
@@ -264,30 +262,6 @@
         },
         "failed": "Could not load the arguments",
         "failedBody": "Try again in a moment."
-      },
-      "bet": {
-        "title": "The bet",
-        "reference": "Reference price",
-        "referenceAt": "{price}, on {date}",
-        "noReference": "No price",
-        "target": "Target",
-        "direction": {
-          "above": "Above {price}{hasChange, select, yes { · {change}} other {}}",
-          "below": "Below {price}{hasChange, select, yes { · {change}} other {}}",
-          "equals": "At {price}{hasChange, select, yes { · {change}} other {}}"
-        },
-        "deadline": "Deadline",
-        "conviction": "Conviction",
-        "deadlineLeft": "{date} · {left}",
-        "deadlineAt": "{date}"
-      },
-      "standing": {
-        "expired": "Waiting for resolution",
-        "disputed": "Under review",
-        "resolved": "{outcome, select, correct {Correct} other {Incorrect}} on {date}{hasPrice, select, yes { at {price}} other {}}{source, select, automatic { · automatically} community { · by the community} admin { · by an admin} other {}}",
-        "resolvedNoDate": "{outcome, select, correct {Correct} other {Incorrect}}",
-        "cancelled": "Cancelled on {date}{hasReason, select, yes {: {reason}} other {}}",
-        "cancelledNoDate": "Cancelled"
       },
       "page": {
         "title": "{claim} · {asset}"
@@ -1410,5 +1384,28 @@
       "back": "Back",
       "apply": "Apply"
     }
+  },
+  "thesisTicket": {
+    "title": "The bet",
+    "direction": {
+      "above": "Above",
+      "below": "Below",
+      "equals": "At"
+    },
+    "fromReference": "{change} from {price}{hasDate, select, yes { on {date}} other {}}",
+    "noReference": "No reference price",
+    "result": "Result",
+    "left": "{date}{hasLeft, select, yes { · {left}} other {}}",
+    "conviction": "Conviction",
+    "deadline": "Deadline",
+    "standing": {
+      "expired": "Waiting for resolution",
+      "disputed": "Under review",
+      "resolved": "{outcome, select, correct {Correct} other {Incorrect}} on {date}{hasPrice, select, yes { at {price}} other {}}{source, select, automatic { · automatically} community { · by the community} admin { · by an admin} other {}}",
+      "resolvedNoDate": "{outcome, select, correct {Correct} other {Incorrect}}",
+      "cancelled": "Cancelled on {date}{hasReason, select, yes {: {reason}} other {}}",
+      "cancelledNoDate": "Cancelled"
+    },
+    "badge": "Thesis"
   }
 }

@@ -24,12 +24,12 @@ test.describe('A thesis in the feed and on its page', () => {
     await expect(page.getByRole('button', { name: 'Back' })).toBeVisible()
     // The reasoning, the bet and where it stands (TD-06 to TD-08).
     await expect(main(page).getByText('Flows, positioning and the macro calendar')).toBeVisible()
+    // The ticket, every number once (specs/thesis-ticket Q4): how far from the entry price, and
+    // when that was; the deadline with how long it has left.
     const bet = main(page).getByRole('region', { name: 'The bet' })
-    await expect(bet.getByText('Reference price')).toBeVisible()
-    await expect(bet.getByText(/^Above \$150,000 · [+-]/)).toBeVisible()
-    // Its deadline says how long it has left; the summary above says only the claim (PO 2026-11-03).
+    await expect(bet.getByText(/^Above \$150,000$/)).toBeVisible()
+    await expect(bet.getByText(/^[+-][\d.]+% from \$[\d,.]+ on /)).toBeVisible()
     await expect(bet.getByText(/ · in /)).toBeVisible()
-    await expect(main(page).getByText(/^Above $150,000 by /)).toHaveCount(0)
     // Its arguments, For and Against (specs/thesis-arguments TA-01).
     const args = main(page).getByRole('region', { name: 'Arguments' })
     // Without their counts: e2e/thesis-arguments.spec.ts argues on the same server.
@@ -39,6 +39,26 @@ test.describe('A thesis in the feed and on its page', () => {
     )
     await expect(args.getByRole('link', { name: /^Against \d+$/ })).toBeVisible()
   })
+
+  for (const theme of ['light', 'dark'] as const) {
+    test(`leads its card with the ticket, at 360px and accessible, in ${theme} (specs/thesis-ticket TK-03, TK-12, TK-13)`, async ({
+      page,
+    }) => {
+      await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
+      await page.setViewportSize({ width: 360, height: 800 })
+      await page.goto('/en/asset/BTC')
+      const card = main(page).getByRole('article', { name: MARIA_OPEN })
+      // THESIS, then the asset and the target, then the claim, second.
+      await expect(card).toContainText(
+        /^Thesis\s*Open.*\$BTC.*Above \$150,000.*Conviction.*BTC will close/,
+      )
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      )
+      expect(overflow).toBeLessThanOrEqual(0)
+      await expectNoA11yViolations(page)
+    })
+  }
 
   test('says how a resolved one ended and why a cancelled one was (TD-08)', async ({ page }) => {
     await page.goto('/en/user/maria?tab=theses')

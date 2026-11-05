@@ -175,7 +175,15 @@ export const thesisSchema = z.object({
   id: z.uuid(),
   communityId: z.uuid(),
   community: communitySummarySchema,
-  asset: z.object({ id: z.uuid(), symbol: z.string(), name: z.string() }).nullable(),
+  asset: z
+    .object({
+      id: z.uuid(),
+      symbol: z.string(),
+      name: z.string(),
+      /** P-041 (proposal): the asset's logo. Optional until the backend sends it. */
+      logoUrl: z.string().nullable().optional(),
+    })
+    .nullable(),
   claim: z.string(),
   reasoning: z.string(),
   conviction: z.enum(['LOW', 'MEDIUM', 'HIGH', 'EXTREME']),

@@ -1,3 +1,4 @@
+import type { ThesisTicketData } from '@/lib/theses/ticket.types'
 // Domain types of the community, asset and profile pages (specs/community-pages § 3). The UI only
 // knows these, never the raw contract shapes.
 
@@ -135,21 +136,8 @@ export type PreviewCommunity = Pick<
 export type Preview = { community: PreviewCommunity; profile: ProfileDetails | null }
 
 /** A thesis of a person's "Theses" tab (specs/profile-track-record PT-07). */
-export type ThesisItem = {
-  id: string
-  /** The asset it is about, linked to its page; null for a qualitative thesis. */
-  asset: { symbol: string; path: string } | null
-  claim: string
-  state: 'open' | 'correct' | 'incorrect' | 'expired' | 'disputed' | 'cancelled'
-  /** What it bets on; null for a qualitative thesis (no asset, no price). */
-  target: { direction: 'above' | 'below' | 'equals'; price: number } | null
-  deadline: string
-  /** LOW … EXTREME as 1 … 4 bars. */
-  conviction: 1 | 2 | 3 | 4
-  resolutionPrice: number | null
-  cancellationReason: string | null
-  publishedAt: string
-}
+/** A thesis in a person's Theses tab (specs/thesis-ticket Q5): its ticket and its claim. */
+export type ThesisItem = ThesisTicketData & { claim: string; publishedAt: string }
 
 export type ThesesPage = { items: ThesisItem[]; nextCursor: string | null }
 

@@ -9,14 +9,15 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 
 const thesis = (overrides: Partial<ThesisItem> = {}): ThesisItem => ({
   id: 't1',
-  asset: { symbol: 'BTC', path: '/asset/BTC' },
+  asset: { symbol: 'BTC', name: 'Bitcoin', path: '/asset/BTC', logoUrl: null },
   claim: 'BTC will close above $150K before December 2026',
   state: 'open',
   target: { direction: 'above', price: 150000 },
   deadline: '2026-12-31T12:00:00.000Z',
   conviction: 3,
-  resolutionPrice: null,
-  cancellationReason: null,
+  reference: { price: 100000, at: '2026-09-29T12:00:00.000Z' },
+  resolution: null,
+  cancellation: null,
   publishedAt: '2026-09-29T12:00:00.000Z',
   ...overrides,
 })
@@ -29,48 +30,33 @@ describe('ThesisCard (specs/profile-track-record PT-07, PT-08)', () => {
     ).toHaveAttribute('href', '/thesis/t1')
   })
 
-  it('shows the asset, the claim as its title, the target and the conviction', () => {
+  it('leads with THESIS and the ticket, the claim second as its title (specs/thesis-ticket Q5)', () => {
     renderWithIntl(<ThesisCard thesis={thesis()} />)
-    expect(screen.getByRole('link', { name: '$BTC' })).toHaveAttribute('href', '/asset/BTC')
-    expect(
-      screen.getByRole('article', { name: 'BTC will close above $150K before December 2026' }),
-    ).toBeInTheDocument()
-    expect(screen.getByText('Above $150,000 by Dec 31, 2026')).toBeInTheDocument()
-    expect(screen.getByText('Open')).toBeInTheDocument()
-    expect(screen.getByText('High').closest('p')).toHaveTextContent('Conviction')
+    const card = screen.getByRole('article', {
+      name: 'BTC will close above $150K before December 2026',
+    })
+    expect(card).toHaveTextContent(/^Thesis/)
+    expect(screen.getByRole('link', { name: /\$BTC/ })).toHaveAttribute('href', '/asset/BTC')
+    expect(screen.getByText('+50% from $100,000')).toBeInTheDocument()
+    // The claim after the ticket, second: gray, two lines.
+    const claim = screen.getByRole('heading', { level: 3 })
+    expect(claim).toHaveClass('text-muted-foreground', 'line-clamp-2')
+    expect(screen.getByText('Bitcoin').compareDocumentPosition(claim)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
   })
 
-  it('marks a correct thesis with ✓ and the price it resolved at, without votes', () => {
-    renderWithIntl(<ThesisCard thesis={thesis({ state: 'correct', resolutionPrice: 182.47 })} />)
-    const chip = screen.getByText('Correct')
-    expect(chip).toHaveAttribute('data-state', 'correct')
-    expect(chip.querySelector('svg')).not.toBeNull()
-    expect(screen.getByText('Resolved at $182.47')).toBeInTheDocument()
-    expect(screen.queryByRole('button')).not.toBeInTheDocument()
-  })
-
-  it('keeps a qualitative thesis without asset nor price, and says why it was cancelled', () => {
+  it('shows how a correct thesis ended, without votes', () => {
     renderWithIntl(
       <ThesisCard
         thesis={thesis({
-          asset: null,
-          target: null,
-          state: 'cancelled',
-          cancellationReason: 'Posted twice by mistake.',
+          state: 'correct',
+          resolution: { price: 182.47, at: '2026-12-31T12:00:00.000Z', source: 'automatic' },
         })}
       />,
     )
-    // Only its claim links: to its page (specs/thesis-detail TD-17).
-    expect(screen.getAllByRole('link')).toHaveLength(1)
-    expect(screen.getByText('By Dec 31, 2026')).toBeInTheDocument()
-    expect(screen.getByText('Cancelled: Posted twice by mistake.')).toBeInTheDocument()
-  })
-
-  it('formats prices and dates in the page language', () => {
-    renderWithIntl(<ThesisCard thesis={thesis()} />, { locale: 'es' })
-    expect(
-      screen.getByText(/^Por encima de .*150\.000.* antes del 31 dic 2026$/),
-    ).toBeInTheDocument()
+    expect(screen.getByText(/^Correct on Dec 31, 2026 at \$182\.47/)).toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
   it.each([
@@ -82,7 +68,8 @@ describe('ThesisCard (specs/profile-track-record PT-07, PT-08)', () => {
     ['cancelled', 'Cancelled', null],
   ] as const)('names the %s state in its chip, with its mark', (state, label, icon) => {
     renderWithIntl(<ThesisCard thesis={thesis({ state })} />)
-    const chip = screen.getByText(label)
+    // The chip: the ticket's result says it too, once closed.
+    const chip = screen.getByText(label, { selector: '[data-state]' })
     expect(chip).toHaveAttribute('data-state', state)
     const mark = chip.querySelector('svg')
     if (icon) expect(mark).toHaveClass(`lucide-${icon}`)

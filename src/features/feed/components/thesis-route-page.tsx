@@ -14,7 +14,6 @@ import { thesisPrice } from '@/lib/theses/price'
 import type { ThesisItem } from '../feed.types'
 import { getThesis } from '../lib/thesis-api'
 import { PostMarkdown } from './post-markdown'
-import { ThesisBet } from './thesis-bet'
 import { ThesisCard } from './thesis-card'
 import { ThesisMenu } from './thesis-menu'
 import { ThesisArguments } from './thesis-arguments'
@@ -78,8 +77,8 @@ export async function resolveThesisRoute(id: string): Promise<ThesisItem> {
 }
 
 /**
- * A thesis's own page (TD-06 to TD-08): its card whole, with the reasoning, what it bets on and
- * where it stands; its author's updates, then its arguments, For and Against (specs/thesis-arguments).
+ * A thesis's own page (TD-06 to TD-08): its card whole, its ticket saying what it bets on and
+ * where it stands (specs/thesis-ticket Q4), and the reasoning; its author's updates, then its arguments, For and Against (specs/thesis-arguments).
  */
 export async function ThesisDetail({
   thesis,
@@ -101,7 +100,6 @@ export async function ThesisDetail({
         <div className="mt-4 type-post-body">
           <PostMarkdown className="gap-4">{thesis.reasoning}</PostMarkdown>
         </div>
-        <ThesisBet thesis={thesis} />
       </ThesisCard>
       {/* A secondary section: it streams in, and never holds the arguments back. */}
       <Suspense fallback={<UpdatesSkeleton />}>

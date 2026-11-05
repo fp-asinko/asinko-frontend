@@ -271,6 +271,21 @@ Medido contra `dev` el 2026-10-30.
 - Las comunidades de activo (`SYSTEM_ASSET`) con más tesis publicadas en los últimos `days` días, de más a menos (a igual cantidad, por slug).
 - Cuenta abiertas y resueltas; no las canceladas.
 - `days` de 1 a 365 (por defecto 30), `limit` de 1 a 20 (por defecto 10). Fuera de rango, `422`.
+- Con `API_MOCKS=missing`, el mock toma las comunidades del backend real (`GET /communities/{slug}`): ids y logos de verdad; solo inventa los conteos.
+
+### P-041: El logo del activo de una tesis
+
+**Estado:** propuesta (2026-11-05, `specs/thesis-ticket` TK-04). Mockeada con `API_MOCKS=true`; con `missing` y `false`, el front usa el avatar de la comunidad cuando la tesis está en la comunidad del activo, y si no, las iniciales.
+
+**Motivo:** la tarjeta de una tesis lleva el logo del activo grande, como en el prototipo. `thesis.asset` trae `{ id, symbol, name }`, sin imagen; el logo existe (es el avatar de la comunidad del activo), pero una tesis publicada en un grupo no lo tiene a mano.
+
+**Cambio:** un campo más en `thesis.asset`, en todo lo que devuelve tesis (feed, `GET /theses/{id}`, `GET /users/{id}/theses`):
+
+```jsonc
+{ "asset": { "id": "uuid", "symbol": "NVDA", "name": "NVIDIA", "logoUrl": "https://…/asset-logos/NVDA.png" } }
+```
+
+- `logoUrl`: `string | null`, la misma imagen que el `avatarUrl` de la comunidad del activo.
 
 ## Fase 3 del backend: solo visual en el front
 

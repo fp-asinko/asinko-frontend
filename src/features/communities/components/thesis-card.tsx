@@ -1,16 +1,15 @@
 import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { CardLink } from '@/components/molecules/card-link'
 import { FeatureMenu } from '@/components/organisms/featured'
-import { ThesisState, ThesisSummary } from '@/components/organisms/thesis-summary'
-import { Link } from '@/i18n/navigation'
-import { previewProps } from '@/lib/communities/preview'
+import { ThesisState } from '@/components/organisms/thesis-summary'
+import { ThesisBadge, ThesisClaim, ThesisTicket } from '@/components/organisms/thesis-ticket'
 import { thesisPath } from '@/lib/theses/paths'
 import type { ThesisItem } from '../communities.types'
 
 /**
- * A thesis in a person's "Theses" tab, as the prototype's card without its votes (votes on theses
- * come with them to the feed, specs/profile-track-record PT-07): the asset and when, the state,
- * the claim, what it bets on and by when, how it ended, and the conviction in 4 bars. A Server
+ * A thesis in a person's "Theses" tab, as a ticket without its votes (specs/thesis-ticket Q5;
+ * votes on theses are in the feed, specs/profile-track-record PT-07): THESIS, its state and when;
+ * the ticket with the asset, the target, the conviction and the deadline or result; then the claim. A Server
  * Component: read only. On your own profile, "⋯" features it (specs/profile-showcase PS-07).
  * It opens its page, the whole card as in a feed (specs/thesis-detail TD-17).
  */
@@ -27,38 +26,34 @@ export function ThesisCard({ thesis, menu = false }: { thesis: ThesisItem; menu?
       aria-labelledby={titleId}
       className="px-4 py-4.5 wrap-anywhere transition-colors duration-150 ease-out hover:bg-surface sm:rounded-2xl md:my-1 md:px-3"
     >
+      {/* THESIS and its state, and when (TK-01): the profile is its author's. */}
       <div className="flex items-center justify-between gap-3">
-        <p className="flex min-w-0 items-center gap-1 type-meta text-muted-foreground">
-          {thesis.asset && (
-            <>
-              <Link
-                href={thesis.asset.path}
-                {...previewProps('asset', thesis.asset.symbol)}
-                className="-my-1 inline-block py-1 font-bold text-foreground hover:underline"
-              >
-                ${thesis.asset.symbol}
-              </Link>
-              <span aria-hidden>·</span>
-            </>
-          )}
+        <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 type-meta text-muted-foreground">
+          <ThesisBadge />
+          <ThesisState state={thesis.state} />
           <time dateTime={thesis.publishedAt}>
             {format.relativeTime(new Date(thesis.publishedAt), now)}
           </time>
         </p>
-        <div className="-my-2 flex items-center gap-1">
-          <ThesisState state={thesis.state} />
-          {menu && (
+        {menu && (
+          <div className="-my-2">
             <FeatureMenu
               kind="thesis"
               id={thesis.id}
               label={tf('thesisMenu', { title: thesis.claim })}
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Its claim opens its page (specs/thesis-detail TD-17), as a post's title. */}
-      <ThesisSummary thesis={thesis} titleId={titleId} href={thesisPath(thesis.id)} />
+      <ThesisTicket thesis={thesis} />
+      {/* Its claim, second, opens its page (TK-09, specs/thesis-detail TD-17). */}
+      <ThesisClaim
+        claim={thesis.claim}
+        titleId={titleId}
+        heading="h3"
+        href={thesisPath(thesis.id)}
+      />
     </CardLink>
   )
 }

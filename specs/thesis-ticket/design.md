@@ -15,7 +15,7 @@
 
 ```
 ┌─ bg-surface · border · rounded-xl · p-4 ──────────────────┐
-│ (logo 44)  $NVDA                         ↑ $240           │  ← objetivo: 22px/800, text-brand
+│ (logo 44)  $NVDA                         ↑ $240           │  ← objetivo: 24px/800, verde o rojo
 │            NVIDIA                        +33 % desde $180 │  ← type-meta, muted
 │ ───────────────────────────────────────────────────────── │  ← border-t
 │ CONVICCIÓN  ▮▮▮▯ Alta        PLAZO  4 nov 2027 · en 12 m  │  ← type-section + type-small
@@ -24,10 +24,10 @@
 
 - **Grilla:** `grid grid-cols-[auto_1fr_auto]`. Por debajo de `sm`, si el objetivo no entra, pasa a la segunda fila alineado a la izquierda (`flex-wrap`).
 - **Logo:** `UserAvatar` de 44 px (`size-11`, `size-10` en el teléfono), `rounded-full`, con `colorKey` el símbolo. La imagen sale de `asset.logoUrl` (P-041) o del avatar de la comunidad si es la del activo.
-- **Objetivo:** un token nuevo, `--brand-text`. `--brand-dot` (#155de9) da 5,2:1 sobre `--surface` en claro, así que sirve como alias; en oscuro se elige uno que pase 4,5:1 sobre el `--surface` oscuro. Se suma a `tokens-contrast.test.ts`. La flecha es un ícono `aria-hidden`; el texto accesible es "Por encima de $240".
+- **Objetivo:** `text-bullish` si sube, `text-bearish` si baja, `text-foreground` si es a un precio (PO, 2026-11-05: sin azul). Es texto grande (24 px, 800): pide 3:1 sobre `--surface`, y el verde da 4,4:1 en claro. Los dos pares van en `tokens-contrast.test.ts`. La flecha es un ícono `aria-hidden`; el texto accesible es "Por encima de $240". El color nunca va solo: flecha y palabra.
 - **Convicción:** `LevelBars` en solo lectura (las barras del feed de hoy, ya en azules desde 2026-11-04) más el nombre del nivel.
 - **Cerrada (TK-07):** la columna de PLAZO pasa a RESULTADO, con el texto de `ThesisState` y el precio de cierre.
-- **Badge THESIS (TK-01):** `text-brand` con el ícono `TargetIcon`, en mayúsculas como hoy.
+- **Badge THESIS (TK-01):** `text-muted-foreground` (PO, 2026-11-05: no en azul) con el ícono `TargetIcon`, en mayúsculas como hoy.
 
 ## 3. El claim
 
@@ -50,5 +50,5 @@
 | Ticket: activo, objetivo, cambio, convicción y plazo | `thesis-ticket.test.tsx`                 |
 | Cerrada, cancelada y sin activo (TK-07, TK-08)       | `thesis-ticket.test.tsx`                 |
 | Tarjeta del feed: línea de arriba, grupo, claim (h2) | `features/feed/.../thesis-card.test.tsx` |
-| Contraste de `--brand-text`                          | `tokens-contrast.test.ts`                |
+| Contraste del objetivo (verde y rojo, 3:1)           | `tokens-contrast.test.ts`                |
 | 360 px, axe y presupuesto de JS                      | `thesis-detail.spec.ts`, `performance`   |

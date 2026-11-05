@@ -34,7 +34,8 @@ function thesis(n: number, seed: Seed): RawThesis {
     id: mockId(9, n),
     communityId: community.id,
     community,
-    asset: asset ? { id: asset.id, symbol: asset.symbol, name: asset.name } : null,
+    // P-041: the asset's logo; the mock's assets have none.
+    asset: asset ? { id: asset.id, symbol: asset.symbol, name: asset.name, logoUrl: null } : null,
     claim: seed.claim,
     reasoning: 'Flows, positioning and the macro calendar all point the same way.',
     conviction: seed.conviction ?? 'MEDIUM',

@@ -133,7 +133,7 @@ export function CardByline({
 }
 
 /** The group's handle, a link to its page with its hover card (specs/mention-preview MP-01). */
-function GroupName({ group, linked }: { group: CardCommunity; linked: boolean }) {
+export function GroupName({ group, linked }: { group: CardCommunity; linked: boolean }) {
   const className = 'inline-flex min-h-6 min-w-0 items-center type-ui font-bold text-foreground'
   // A group by its name alone, "crypto" (specs/byline-handles BH-01); an asset keeps its $ in gray,
   // the known way to write a ticker (Q1). Both inside one span: as two flex items the browser
@@ -163,7 +163,7 @@ function GroupName({ group, linked }: { group: CardCommunity; linked: boolean })
  * The author by their username, without the @ (specs/byline-handles BH-01), a link to the profile;
  * a system item ("Asinko") has none.
  */
-function AuthorName({
+export function AuthorName({
   author,
   fallback,
   linked = true,

@@ -49,7 +49,7 @@ export function thesisItem(overrides: Partial<ThesisItem> = {}): ThesisItem {
     path: '/thesis/thesis-1',
     claim: 'BTC will close above $150K before December 2026',
     reasoning: 'ETF flows and the **halving** cycle.',
-    asset: { symbol: 'BTC', name: 'Bitcoin', path: '/asset/BTC' },
+    asset: { symbol: 'BTC', name: 'Bitcoin', path: '/asset/BTC', logoUrl: null },
     state: 'open',
     target: { direction: 'above', price: 150000 },
     reference: { price: 83584.01, at: '2026-10-13T15:17:55.886Z' },

@@ -63,13 +63,13 @@ test.describe('Profile track record', () => {
     await page.goto('/en/user/maria?tab=theses')
     const card = (claim: string) => theses(page).getByRole('article', { name: claim })
     await expect(card('SOL holds above $150 through the October unlocks')).toContainText(
-      /Correct.*Resolved at \$182\.47/,
+      /Correct.*Correct on .+ at \$182\.47/,
     )
     await expect(card('XRP drops below $2 after the ETF delay')).toContainText(
       /Incorrect.*Below \$2/,
     )
     await expect(card('The Fed cuts twice more before the year ends')).toContainText(
-      'Cancelled: Posted twice by mistake.',
+      /Cancelled on .+: Posted twice by mistake\./,
     )
   })
 

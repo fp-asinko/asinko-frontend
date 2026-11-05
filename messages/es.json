@@ -240,8 +240,6 @@
       }
     },
     "thesis": {
-      "badge": "Tesis",
-      "closes": "Cierra {when}",
       "arguments": {
         "title": "Argumentos",
         "sides": "Lados del debate",
@@ -264,30 +262,6 @@
         },
         "failed": "No se pudieron cargar los argumentos",
         "failedBody": "Probá de nuevo en un momento."
-      },
-      "bet": {
-        "title": "La apuesta",
-        "reference": "Precio de referencia",
-        "referenceAt": "{price}, el {date}",
-        "noReference": "Sin precio",
-        "target": "Objetivo",
-        "direction": {
-          "above": "Por encima de {price}{hasChange, select, yes { · {change}} other {}}",
-          "below": "Por debajo de {price}{hasChange, select, yes { · {change}} other {}}",
-          "equals": "Igual a {price}{hasChange, select, yes { · {change}} other {}}"
-        },
-        "deadline": "Fecha límite",
-        "conviction": "Convicción",
-        "deadlineLeft": "{date} · {left}",
-        "deadlineAt": "{date}"
-      },
-      "standing": {
-        "expired": "Esperando resolución",
-        "disputed": "En revisión",
-        "resolved": "{outcome, select, correct {Acertada} other {Errada}} el {date}{hasPrice, select, yes { a {price}} other {}}{source, select, automatic { · automáticamente} community { · por la comunidad} admin { · por un admin} other {}}",
-        "resolvedNoDate": "{outcome, select, correct {Acertada} other {Errada}}",
-        "cancelled": "Cancelada el {date}{hasReason, select, yes {: {reason}} other {}}",
-        "cancelledNoDate": "Cancelada"
       },
       "page": {
         "title": "{claim} · {asset}"
@@ -1410,5 +1384,28 @@
       "back": "Volver",
       "apply": "Aplicar"
     }
+  },
+  "thesisTicket": {
+    "title": "La apuesta",
+    "direction": {
+      "above": "Por encima de",
+      "below": "Por debajo de",
+      "equals": "Igual a"
+    },
+    "fromReference": "{change} desde {price}{hasDate, select, yes { el {date}} other {}}",
+    "noReference": "Sin precio de referencia",
+    "result": "Resultado",
+    "left": "{date}{hasLeft, select, yes { · {left}} other {}}",
+    "conviction": "Convicción",
+    "deadline": "Fecha límite",
+    "standing": {
+      "expired": "Esperando resolución",
+      "disputed": "En revisión",
+      "resolved": "{outcome, select, correct {Acertada} other {Errada}} el {date}{hasPrice, select, yes { a {price}} other {}}{source, select, automatic { · automáticamente} community { · por la comunidad} admin { · por un admin} other {}}",
+      "resolvedNoDate": "{outcome, select, correct {Acertada} other {Errada}}",
+      "cancelled": "Cancelada el {date}{hasReason, select, yes {: {reason}} other {}}",
+      "cancelledNoDate": "Cancelada"
+    },
+    "badge": "Tesis"
   }
 }

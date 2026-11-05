@@ -52,16 +52,18 @@ describe('getUserTheses (specs/profile-track-record PT-05)', () => {
   })
 })
 
+// The ticket's fields (specs/thesis-ticket § 4), from lib/theses/ticket.ts, plus the claim.
 describe('toThesisItem (PT-07)', () => {
   const by = (claim: string) => THESES.find((each) => each.claim === claim)!
 
   it('maps an open thesis on an asset, with its target and conviction', () => {
     expect(toThesisItem(by('BTC will close above $150K before December 2026'))).toMatchObject({
       asset: { symbol: 'BTC', path: '/asset/BTC' },
+      claim: 'BTC will close above $150K before December 2026',
       state: 'open',
       target: { direction: 'above', price: 150000 },
       conviction: 3,
-      resolutionPrice: null,
+      resolution: null,
     })
   })
 
@@ -70,7 +72,7 @@ describe('toThesisItem (PT-07)', () => {
       asset: null,
       target: null,
       state: 'cancelled',
-      cancellationReason: 'Posted twice by mistake.',
+      cancellation: { reason: 'Posted twice by mistake.' },
     })
   })
 
@@ -78,7 +80,7 @@ describe('toThesisItem (PT-07)', () => {
     expect(toThesisItem(by('XRP drops below $2 after the ETF delay'))).toMatchObject({
       state: 'incorrect',
       target: { direction: 'below' },
-      resolutionPrice: 2.41,
+      resolution: { price: 2.41 },
     })
   })
 })
