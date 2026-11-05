@@ -39,58 +39,82 @@ export async function ThesisArguments({
   const counts = { pro: thesis.argumentCount.pro, contra: thesis.argumentCount.contra }
 
   return (
-    <section
-      id="arguments"
-      aria-labelledby="arguments-title"
-      className="flex scroll-mt-20 flex-col gap-5 border-t px-4 pt-5 pb-10 md:px-0"
-    >
-      <h2 id="arguments-title" className="type-ui font-bold">
-        {t('title')}
-      </h2>
-      <nav aria-label={t('sides')} className="flex gap-1.5">
-        {SIDES.map((side) => {
-          const active = query.side === side
-          return (
-            <Link
-              key={side}
-              // For is the page itself, as the default (TA-01).
-              href={side === 'pro' ? thesis.path : `${thesis.path}?side=contra`}
-              // Switching side keeps the place: the thesis stays where it is.
-              scroll={false}
-              aria-current={active ? 'page' : undefined}
-              className={cn(
-                // 30px tall, 24px+ target (WCAG 2.5.8), as the profile's tabs.
-                'inline-flex h-7.5 tap items-center gap-1.5 rounded-full border px-3.5 type-meta font-semibold tabular-nums outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                active
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border-strong bg-background text-muted-foreground hover:border-foreground/40 hover:text-foreground',
-              )}
-            >
-              {t(`tab.${side}`, { count: counts[side] })}
-            </Link>
-          )
-        })}
-      </nav>
-      {/* A side of its own: what is being sent shows in its thread (PendingComments). */}
-      <CommentThread key={query.side}>
-        <CommentComposer target={target} label={t(`box.${query.side}`)} />
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-          <CommentsSort
-            current={query.sort}
-            keep={query.side === 'contra' ? { side: 'contra' } : undefined}
-          />
-        </div>
-        <Suspense key={`${query.side}:${query.sort}`} fallback={<ArgumentsSkeleton />}>
-          <LoadedArguments target={target} side={query.side} sort={query.sort} />
-        </Suspense>
-      </CommentThread>
-    </section>
+    <>
+      {/* The side's ad above its arguments, under the thesis, as a post's above its comments
+          (specs/ads AD-04, PO 2026-11-05). Nothing if it fails. */}
+      <Suspense key={`${query.side}:${query.sort}`} fallback={null}>
+        <ArgumentsAd target={target} sort={query.sort} />
+      </Suspense>
+      <section
+        id="arguments"
+        aria-labelledby="arguments-title"
+        className="flex scroll-mt-20 flex-col gap-5 border-t px-4 pt-5 pb-10 md:px-0"
+      >
+        <h2 id="arguments-title" className="type-ui font-bold">
+          {t('title')}
+        </h2>
+        <nav aria-label={t('sides')} className="flex gap-1.5">
+          {SIDES.map((side) => {
+            const active = query.side === side
+            return (
+              <Link
+                key={side}
+                // For is the page itself, as the default (TA-01).
+                href={side === 'pro' ? thesis.path : `${thesis.path}?side=contra`}
+                // Switching side keeps the place: the thesis stays where it is.
+                scroll={false}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
+                  // 30px tall, 24px+ target (WCAG 2.5.8), as the profile's tabs.
+                  'inline-flex h-7.5 tap items-center gap-1.5 rounded-full border px-3.5 type-meta font-semibold tabular-nums outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+                  active
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border-strong bg-background text-muted-foreground hover:border-foreground/40 hover:text-foreground',
+                )}
+              >
+                {t(`tab.${side}`, { count: counts[side] })}
+              </Link>
+            )
+          })}
+        </nav>
+        {/* A side of its own: what is being sent shows in its thread (PendingComments). */}
+        <CommentThread key={query.side}>
+          <CommentComposer target={target} label={t(`box.${query.side}`)} />
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <CommentsSort
+              current={query.sort}
+              keep={query.side === 'contra' ? { side: 'contra' } : undefined}
+            />
+          </div>
+          <Suspense key={`${query.side}:${query.sort}`} fallback={<ArgumentsSkeleton />}>
+            <LoadedArguments target={target} side={query.side} sort={query.sort} />
+          </Suspense>
+        </CommentThread>
+      </section>
+    </>
+  )
+}
+
+/** The side's own ad, the width of the column: the same request as its thread (cached). */
+async function ArgumentsAd({
+  target,
+  sort,
+}: {
+  target: CommentTarget
+  sort: ThesisArgumentsQuery['sort']
+}) {
+  const result = await getCommentTree(target, sort)
+  if (!result.ok || !result.data.postAd) return null
+  return (
+    <div className="border-t">
+      <FeedAd ad={result.data.postAd} />
+    </div>
   )
 }
 
 /**
- * One side's thread, a secondary section: if it fails, the thesis stays and says so here. Its ads
- * come with it, as a post's (Q5): one above, and the ones between its arguments.
+ * One side's thread, a secondary section: if it fails, the thesis stays and says so here. The ads
+ * between its arguments come with it (Q5); the one on top is above the section (ArgumentsAd).
  */
 async function LoadedArguments({
   target,
@@ -106,10 +130,9 @@ async function LoadedArguments({
   if (!result.ok) {
     return <EmptyState icon={<CloudOffIcon />} title={t('failed')} description={t('failedBody')} />
   }
-  const { comments, postAd } = result.data
+  const { comments } = result.data
   return (
     <>
-      {postAd && <FeedAd ad={postAd} />}
       {comments.length === 0 && (
         <EmptyState
           icon={<MessagesSquareIcon />}

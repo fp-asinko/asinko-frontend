@@ -27,6 +27,20 @@ test.describe('A thesis’s arguments and updates', () => {
     await expect(args(page).getByText('ETF inflows have been positive 9 weeks')).toHaveCount(0)
   })
 
+  test('puts the side’s ad above the arguments, not inside them (specs/ads AD-04, PO 2026-11-05)', async ({
+    page,
+  }) => {
+    await page.goto(PAGE)
+    const ad = main(page).getByRole('region', { name: /^Ad: / }).first()
+    await expect(ad).toBeVisible()
+    // Before the section, as a post's ad before its comments.
+    const before = await ad.evaluate((node) => {
+      const section = document.getElementById('arguments')!
+      return Boolean(node.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING)
+    })
+    expect(before).toBe(true)
+  })
+
   test('the order keeps the side (TA-03)', async ({ page }) => {
     await page.goto(`${PAGE}?side=contra`)
     await args(page)
