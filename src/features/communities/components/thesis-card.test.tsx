@@ -59,22 +59,30 @@ describe('ThesisCard (specs/profile-track-record PT-07, PT-08)', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
-  it.each([
-    ['open', 'Open', null],
-    ['correct', 'Correct', 'check'],
-    ['incorrect', 'Incorrect', 'x'],
-    ['disputed', 'Disputed', null],
-    ['expired', 'Expired', null],
-    ['cancelled', 'Cancelled', null],
-  ] as const)('names the %s state in its chip, with its mark', (state, label, icon) => {
-    renderWithIntl(<ThesisCard thesis={thesis({ state })} />)
-    // The chip: the ticket's result says it too, once closed.
-    const chip = screen.getByText(label, { selector: '[data-state]' })
-    expect(chip).toHaveAttribute('data-state', state)
-    const mark = chip.querySelector('svg')
-    if (icon) expect(mark).toHaveClass(`lucide-${icon}`)
-    else expect(mark).toBeNull()
+  it('says it is open in a chip beside its deadline, in the ticket (PO, 2026-11-05)', () => {
+    renderWithIntl(<ThesisCard thesis={thesis()} />)
+    const chip = screen.getByText('Open', { selector: '[data-state]' })
+    expect(chip.closest('dt')).toHaveTextContent(/^Deadline\s*Open$/)
   })
+
+  it.each([
+    ['correct', /^Correct/, 'check'],
+    ['incorrect', /^Incorrect/, 'x'],
+    ['disputed', 'Under review', null],
+    ['expired', 'Waiting for resolution', null],
+    ['cancelled', /^Cancelled/, null],
+  ] as const)(
+    'says how a %s one stands in its result, with its mark, without a chip',
+    (state, text, icon) => {
+      renderWithIntl(<ThesisCard thesis={thesis({ state })} />)
+      expect(document.querySelector('[data-state]')).toBeNull()
+      const result = document.querySelector(`[data-standing="${state}"]`)!
+      expect(result).toHaveTextContent(text)
+      const mark = result.querySelector('svg')
+      if (icon) expect(mark).toHaveClass(`lucide-${icon}`)
+      else expect(mark).toBeNull()
+    },
+  )
 
   it('offers "⋯" to feature it only on your own profile (specs/profile-showcase PS-07)', () => {
     const name = 'Options for the thesis BTC will close above $150K before December 2026'

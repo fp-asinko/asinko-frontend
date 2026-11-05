@@ -48,9 +48,9 @@ test.describe('A thesis in the feed and on its page', () => {
       await page.setViewportSize({ width: 360, height: 800 })
       await page.goto('/en/asset/BTC')
       const card = main(page).getByRole('article', { name: MARIA_OPEN })
-      // THESIS, then the asset and the target, then the claim, second.
+      // THESIS; the asset › the conviction › the target; the deadline with its state; the claim.
       await expect(card).toContainText(
-        /^Thesis\s*Open.*\$BTC.*Above \$150,000.*Conviction.*BTC will close/,
+        /Thesis.*\$BTC.*Conviction.*Above \$150,000.*Deadline\s*Open.*BTC will close/,
       )
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -59,6 +59,22 @@ test.describe('A thesis in the feed and on its page', () => {
       await expectNoA11yViolations(page)
     })
   }
+
+  test('puts the conviction between the asset and the target (PO, 2026-11-05)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'In a phone the conviction has its own line, below')
+    await page.goto('/en/asset/BTC')
+    const card = main(page).getByRole('article', { name: MARIA_OPEN })
+    const asset = (await card.getByRole('link', { name: /\$BTC/ }).first().boundingBox())!
+    const conviction = (await card.getByText('Conviction', { exact: true }).boundingBox())!
+    const target = (await card.getByText(/^Above \$150,000$/).boundingBox())!
+    expect(conviction.x).toBeGreaterThan(asset.x + asset.width)
+    expect(conviction.x + conviction.width).toBeLessThan(target.x)
+    // On the same line.
+    expect(Math.abs(conviction.y - asset.y)).toBeLessThan(asset.height)
+  })
 
   test('says how a resolved one ended and why a cancelled one was (TD-08)', async ({ page }) => {
     await page.goto('/en/user/maria?tab=theses')

@@ -26,11 +26,10 @@ export function ThesisCard({ thesis, menu = false }: { thesis: ThesisItem; menu?
       aria-labelledby={titleId}
       className="px-4 py-4.5 wrap-anywhere transition-colors duration-150 ease-out hover:bg-surface sm:rounded-2xl md:my-1 md:px-3"
     >
-      {/* THESIS and its state, and when (TK-01): the profile is its author's. */}
+      {/* THESIS and when (TK-01): the profile is its author's. Its state, in the ticket. */}
       <div className="flex items-center justify-between gap-3">
         <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 type-meta text-muted-foreground">
           <ThesisBadge />
-          <ThesisState state={thesis.state} />
           <time dateTime={thesis.publishedAt}>
             {format.relativeTime(new Date(thesis.publishedAt), now)}
           </time>
@@ -46,7 +45,7 @@ export function ThesisCard({ thesis, menu = false }: { thesis: ThesisItem; menu?
         )}
       </div>
 
-      <ThesisTicket thesis={thesis} />
+      <ThesisTicket thesis={thesis} stateChip={<ThesisState state={thesis.state} />} />
       {/* Its claim, second, opens its page (TK-09, specs/thesis-detail TD-17). */}
       <ThesisClaim
         claim={thesis.claim}
