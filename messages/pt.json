@@ -1159,7 +1159,12 @@
     "thesis": {
       "asset": {
         "label": "Ativo",
-        "stale": "desatualizado"
+        "stale": "desatualizado",
+        "search": "Busque um ativo…",
+        "change": "Trocar {asset}",
+        "searching": "Buscando…",
+        "searchFailed": "Não foi possível buscar. Tente de novo.",
+        "none": "Nenhum ativo com esse nome"
       },
       "claim": {
         "label": "Previsão",
@@ -1223,6 +1228,11 @@
         "back": "Voltar",
         "submit": "Publicar tese",
         "submitting": "Publicando…"
+      },
+      "topAssets": {
+        "label": "Ativos com mais teses",
+        "item": "{name}, {count, plural, one {# tese} other {# teses}}",
+        "count": "{count, plural, one {{shown} tese} other {{shown} teses}}"
       }
     }
   },

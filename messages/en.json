@@ -1159,7 +1159,12 @@
     "thesis": {
       "asset": {
         "label": "Asset",
-        "stale": "out of date"
+        "stale": "out of date",
+        "search": "Search an asset…",
+        "change": "Change {asset}",
+        "searching": "Searching…",
+        "searchFailed": "Could not search. Try again.",
+        "none": "No assets with that name"
       },
       "claim": {
         "label": "Claim",
@@ -1223,6 +1228,11 @@
         "back": "Back",
         "submit": "Publish thesis",
         "submitting": "Publishing…"
+      },
+      "topAssets": {
+        "label": "Assets with the most theses",
+        "item": "{name}, {count, plural, one {# thesis} other {# theses}}",
+        "count": "{count, plural, one {{shown} thesis} other {{shown} theses}}"
       }
     }
   },

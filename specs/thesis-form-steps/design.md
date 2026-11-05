@@ -38,6 +38,8 @@ Todo en `features/composer`, junto al formulario de tesis (`thesis-editor.tsx`).
   Sale de los mismos `useWatch` que ya usa el botón Publicar.
 
 - **El alto:** el círculo va en la misma línea del label, así que no suma altura. El carrusel va al lado del buscador desde `sm`, tampoco suma. Se mide en `thesis-create.spec.ts` (TC-36).
+- **Espaciado** (PO, 2026-11-04): 24 px entre pasos y 8 px del título a su campo (antes 16 y 4), para que cada paso se lea como una sección. Si con eso el formulario deja de entrar en 1280×800, gana el espaciado y TC-36 se ajusta.
+- **Una sola columna en mobile con `grid-cols-1`** (`minmax(0, 1fr)`): sin columnas declaradas, la implícita crece con las píldoras y el carrusel nunca desborda ni se mueve.
 
 ## 5. Propuesta al backend (P-040)
 
@@ -47,7 +49,7 @@ Todo en `features/composer`, junto al formulario de tesis (`thesis-editor.tsx`).
 - `days` de 1 a 365, `limit` de 1 a 20;
 - cuenta las tesis abiertas y resueltas, no las canceladas.
 
-Se mockea con `implemented: false`: con `missing` va al mock y con `false` el carrusel no aparece.
+Se mockea con `implemented: false`: con `missing` va al mock y con `false` el carrusel no aparece. El mock parte de una base por activo (`TOP_ASSETS_BASE`, las 6 comunidades de activos del mock) y le suma lo publicado: con solo las tesis sembradas entraban todas en una fila y el carrusel no tenía qué mover.
 
 ## 6. Textos
 

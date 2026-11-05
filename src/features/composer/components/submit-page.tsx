@@ -21,6 +21,7 @@ import { SUBMIT_SEGMENT } from '@/i18n/submit-path'
 import { draftKey, thesisDraftKey } from '../lib/draft-key'
 import { RELATED_MAX } from '../schemas/create-post.schema'
 import { getSubmitCommunity } from '../lib/submit-community'
+import { getTopThesisAssets } from '../lib/top-assets'
 import type { PreviewAction } from './body-tabs'
 import { SubmitEditorLoader } from './submit-editor-loader'
 import { ThesisTipsList } from './thesis-tips'
@@ -132,10 +133,13 @@ export async function SubmitPage({
           : query.type === 'thesis'
             ? 'THESIS'
             : 'TEXT'
-  // The related ones of the URL that exist and can be tagged: groups and assets (RA-04).
-  const related = (
-    await Promise.all(query.related.map((slug) => getSubmitCommunity(slug, viewer.username)))
-  )
+  // The related ones of the URL that exist and can be tagged: groups and assets (RA-04). Beside
+  // them, the assets with the most theses (specs/thesis-form-steps FS-04): failing, none show (FS-07).
+  const [relatedFound, top] = await Promise.all([
+    Promise.all(query.related.map((slug) => getSubmitCommunity(slug, viewer.username))),
+    getTopThesisAssets(),
+  ])
+  const related = relatedFound
     .flatMap((each) => (each.ok && each.data.kind !== 'user' ? [each.data.option.handle] : []))
     .filter((handle) => handle !== community?.option.handle)
 
@@ -199,6 +203,7 @@ export async function SubmitPage({
           // With `missing` its mock lives in one server's memory; with `false`, the backend refuses it.
           thesisDrafts={env.API_MOCKS === 'all'}
           related={related}
+          topAssets={top.ok ? top.data : []}
           preview={preview}
         />
       </div>

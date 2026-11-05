@@ -7,6 +7,7 @@ import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type RefObject } from 'react'
 import { Controller, useForm, useWatch } from 'react-hook-form'
 import { ChoiceGroup } from '@/components/molecules/choice-group'
+import { StepTitle } from '@/components/molecules/step-title'
 import { ComingSoon } from '@/components/molecules/coming-soon'
 import { Delta } from '@/components/molecules/delta'
 import { LevelBars } from '@/components/molecules/level-bars'
@@ -23,7 +24,7 @@ import { assetSymbolOf } from '@/lib/communities/paths'
 import { searchMentions } from '@/lib/mentions/search-mentions.action'
 import { cn } from '@/lib/utils'
 import { createThesis } from '../actions/create-thesis.action'
-import type { CommunityOption, SavedDraft } from '../composer.types'
+import type { CommunityOption, SavedDraft, TopAsset } from '../composer.types'
 import { useSavedDraft } from '../hooks/use-saved-draft'
 import { DRAFT_LIMIT } from './drafts-dialog'
 import { DraftsButton } from './drafts-button'
@@ -45,7 +46,9 @@ import {
   type ThesisFormValues,
 } from '../schemas/create-thesis.schema'
 import { BodyTabs } from './body-tabs'
+import { AssetSearch } from './asset-search'
 import { CommunityPicker } from './community-picker'
+import { TopAssetsRail } from './top-assets-rail'
 import { ProfileReach } from './profile-reach'
 import { ACTIONS_BAR, BARE, FIELD_BOX, PILL } from './editor-styles'
 import { FormatTabs, type CreateFormat } from './format-tabs'
@@ -103,10 +106,14 @@ function typedPrice(value: string): number | null {
  * missing; pressed early, every field says what it needs and follows the typing (TC-09). Then the
  * confirmation, with the disclaimer, sends it. What is written is kept in the browser (TC-10).
  */
+/** The form's numbered steps (specs/thesis-form-steps FS-08). */
+const STEPS = 6
+
 export function ThesisEditor({
   community,
   storageKey,
   draftsReady = true,
+  topAssets = [],
   draftRef,
   onCancel,
   onFormat,
@@ -123,6 +130,8 @@ export function ThesisEditor({
    * it says "Coming soon" outside the full mocks. What is written is still kept in the browser.
    */
   draftsReady?: boolean
+  /** The assets with the most theses, beside the search (specs/thesis-form-steps FS-04). */
+  topAssets?: readonly TopAsset[]
   /** Filled with a check of whether something is written, read when leaving. */
   draftRef: RefObject<(() => boolean) | null>
   onCancel: () => void
@@ -373,6 +382,13 @@ export function ThesisEditor({
   }
   const invalid = (name: FieldName) => Boolean(formState.errors[name])
 
+  // Each step done (FS-09): the same values Publish waits for.
+  const done = {
+    claim: claim.trim().length > 0 && claim.trim().length <= CLAIM_MAX,
+    deadline: Boolean(deadline) && deadline >= range.min && deadline <= range.max,
+    target: Boolean(direction) && Number(price) > 0,
+  }
+
   // Publish waits until nothing is missing (TC-09), and while sending.
   const complete = Boolean(
     chosen &&
@@ -502,8 +518,8 @@ export function ThesisEditor({
         }}
         className="flex flex-1 flex-col gap-0"
       >
-        {/* 16px between rows: the form fits 1280×800 with the target in its own row (TC-36). */}
-        <div className="flex stagger flex-col gap-4">
+        {/* 24px between the steps, 8px from each title to its field (specs/thesis-form-steps FS-08). */}
+        <div className="flex stagger flex-col gap-6">
           <FormatTabs
             trailing={
               // The account's drafts, posts and theses together (specs/thesis-drafts TD-02).
@@ -519,57 +535,66 @@ export function ThesisEditor({
           />
 
           {/* The asset and the claim, each the full width, one under the other (TC-30). */}
-          <div className="flex flex-col gap-4">
-            {/* The asset is its card (TC-29): the whole box chooses it. */}
-            <Field data-invalid={invalid('assetSymbol') || undefined} className="gap-1">
-              <FieldLabel htmlFor={`${ids}-asset`}>{t('thesis.asset.label')}</FieldLabel>
-              <CommunityPicker
-                id={`${ids}-asset`}
-                only="assets"
-                variant="card"
-                value={asset}
-                onChange={chooseAsset}
-                invalid={invalid('assetSymbol')}
-                describedBy={`${ids}-assetSymbol-error`}
-                renderValue={(chosenAsset) => (
-                  <span className="flex min-w-0 flex-1 items-center gap-3">
-                    {/* Its logo, or its initials on its color (TC-29). */}
-                    <UserAvatar
-                      name={chosenAsset.handle}
-                      colorKey={chosenAsset.slug}
-                      imageUrl={chosenAsset.avatarUrl}
-                      size="sm"
-                      className="shrink-0 rounded-md"
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="block type-action font-bold">{chosenAsset.handle}</span>
-                      <span className="block truncate type-meta text-muted-foreground">
-                        {quote?.name ?? chosenAsset.name}
-                      </span>
-                    </span>
-                    {reference !== null && (
-                      <span className="shrink-0 text-right">
-                        <span className="block type-action font-bold tabular-nums">
-                          {format.number(reference, {
-                            maximumFractionDigits: reference < 1 ? 6 : 2,
-                          })}
+          <div className="flex flex-col gap-6">
+            {/* The asset: a search, and beside it the assets with the most theses (specs/thesis-
+                form-steps FS-01 to FS-07). Chosen, the search is its card (TC-29). */}
+            <Field data-invalid={invalid('assetSymbol') || undefined} className="gap-2">
+              <FieldLabel id={`${ids}-asset-label`} htmlFor={`${ids}-asset`}>
+                <StepTitle n={1} total={STEPS} done={Boolean(asset)}>
+                  {t('thesis.asset.label')}
+                </StepTitle>
+              </FieldLabel>
+              <div
+                className={cn('grid grid-cols-1 gap-3', topAssets.length > 0 && 'sm:grid-cols-2')}
+              >
+                <AssetSearch
+                  id={`${ids}-asset`}
+                  labelledBy={`${ids}-asset-label`}
+                  value={asset}
+                  onChange={chooseAsset}
+                  invalid={invalid('assetSymbol')}
+                  describedBy={`${ids}-assetSymbol-error`}
+                  renderValue={(chosenAsset) => (
+                    <span className="flex min-w-0 flex-1 items-center gap-3">
+                      {/* Its logo, or its initials on its color (TC-29). */}
+                      <UserAvatar
+                        name={chosenAsset.handle}
+                        colorKey={chosenAsset.slug}
+                        imageUrl={chosenAsset.avatarUrl}
+                        size="sm"
+                        className="shrink-0 rounded-md"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block type-action font-bold">{chosenAsset.handle}</span>
+                        <span className="block truncate type-meta text-muted-foreground">
+                          {quote?.name ?? chosenAsset.name}
                         </span>
-                        {/* The day's change in green or red, also when out of date: then it
+                      </span>
+                      {reference !== null && (
+                        <span className="shrink-0 text-right">
+                          <span className="block type-action font-bold tabular-nums">
+                            {format.number(reference, {
+                              maximumFractionDigits: reference < 1 ? 6 : 2,
+                            })}
+                          </span>
+                          {/* The day's change in green or red, also when out of date: then it
                             says so beside it (TC-29). */}
-                        <span className="flex items-center justify-end gap-1 type-meta">
-                          {quote?.changePct != null && <Delta value={quote.changePct} />}
-                          {quote?.stale && (
-                            <span className="text-muted-foreground">
-                              {quote.changePct != null && '· '}
-                              {t('thesis.asset.stale')}
-                            </span>
-                          )}
+                          <span className="flex items-center justify-end gap-1 type-meta">
+                            {quote?.changePct != null && <Delta value={quote.changePct} />}
+                            {quote?.stale && (
+                              <span className="text-muted-foreground">
+                                {quote.changePct != null && '· '}
+                                {t('thesis.asset.stale')}
+                              </span>
+                            )}
+                          </span>
                         </span>
-                      </span>
-                    )}
-                  </span>
-                )}
-              />
+                      )}
+                    </span>
+                  )}
+                />
+                <TopAssetsRail assets={topAssets} chosen={asset} onChoose={chooseAsset} />
+              </div>
               <FieldError
                 id={`${ids}-assetSymbol-error`}
                 errors={fieldError('assetSymbol')}
@@ -577,9 +602,13 @@ export function ThesisEditor({
               />
             </Field>
 
-            <Field data-invalid={invalid('claim') || undefined} className="gap-1">
+            <Field data-invalid={invalid('claim') || undefined} className="gap-2">
               <div className="flex items-baseline justify-between gap-2">
-                <FieldLabel htmlFor={`${ids}-claim`}>{t('thesis.claim.label')}</FieldLabel>
+                <FieldLabel htmlFor={`${ids}-claim`}>
+                  <StepTitle n={2} total={STEPS} done={done.claim}>
+                    {t('thesis.claim.label')}
+                  </StepTitle>
+                </FieldLabel>
                 {/* The room left, beside its label: no line of its own (TC-31). */}
                 <span
                   id={`${ids}-claim-count`}
@@ -620,11 +649,13 @@ export function ThesisEditor({
             </Field>
           </div>
 
-          <Field data-invalid={invalid('deadline') || undefined} className="gap-1">
+          <Field data-invalid={invalid('deadline') || undefined} className="gap-2">
             {/* The day it closes beside the label: the shortcuts' row never grows (TC-33). */}
             <div className="flex flex-wrap items-baseline gap-x-2">
               <span id={`${ids}-deadline-label`} className="type-small font-medium">
-                {t('thesis.deadline.label')}
+                <StepTitle n={3} total={STEPS} done={done.deadline}>
+                  {t('thesis.deadline.label')}
+                </StepTitle>
               </span>
               <p id={`${ids}-deadline-closes`} className="type-meta text-muted-foreground">
                 {closes &&
@@ -692,9 +723,13 @@ export function ThesisEditor({
           {/* The target in its own row, below the deadline (TC-30). */}
           <Field
             data-invalid={invalid('direction') || invalid('targetPrice') || undefined}
-            className="gap-1"
+            className="gap-2"
           >
-            <FieldLabel htmlFor={`${ids}-targetPrice`}>{t('thesis.target.price')}</FieldLabel>
+            <FieldLabel htmlFor={`${ids}-targetPrice`}>
+              <StepTitle n={4} total={STEPS} done={done.target}>
+                {t('thesis.target.price')}
+              </StepTitle>
+            </FieldLabel>
             {/* The full width, as the claim; from sm, which way it bets goes inside the box, on its
                 right, so the row keeps its height (TC-30, TC-36). In phones, under it. */}
             <div className="relative flex flex-col gap-1.5 sm:block">
@@ -799,9 +834,11 @@ export function ThesisEditor({
           </Field>
 
           {/* The conviction in its own row, with what it weighs (TC-25, TC-30). */}
-          <Field data-invalid={invalid('conviction') || undefined} className="gap-1">
+          <Field data-invalid={invalid('conviction') || undefined} className="gap-2">
             <span id={`${ids}-conviction-label`} className="type-small font-medium">
-              {t('thesis.conviction.label')}
+              <StepTitle n={5} total={STEPS} done={Boolean(conviction)}>
+                {t('thesis.conviction.label')}
+              </StepTitle>
             </span>
             {/* Four rising bars, as the prototype's (TC-25), and what it weighs beside them from sm. */}
             <div className="flex flex-col gap-1.5 sm:flex-row sm:items-end sm:gap-4">
@@ -840,8 +877,12 @@ export function ThesisEditor({
             />
           </Field>
 
-          <Field data-invalid={invalid('reasoning') || undefined} className="gap-1">
-            <FieldLabel htmlFor={`${ids}-reasoning`}>{t('thesis.reasoning.label')}</FieldLabel>
+          <Field data-invalid={invalid('reasoning') || undefined} className="gap-2">
+            <FieldLabel htmlFor={`${ids}-reasoning`}>
+              <StepTitle n={6} total={STEPS} done={Boolean(reasoning.trim())}>
+                {t('thesis.reasoning.label')}
+              </StepTitle>
+            </FieldLabel>
             {/* The box of a post's body, with its format toolbar and emojis (TC-08). */}
             <BodyTabs
               draft={() => null}

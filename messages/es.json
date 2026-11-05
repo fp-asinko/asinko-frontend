@@ -1159,7 +1159,12 @@
     "thesis": {
       "asset": {
         "label": "Activo",
-        "stale": "desactualizado"
+        "stale": "desactualizado",
+        "search": "Buscá un activo…",
+        "change": "Cambiar {asset}",
+        "searching": "Buscando…",
+        "searchFailed": "No se pudo buscar. Probá de nuevo.",
+        "none": "No hay activos con ese nombre"
       },
       "claim": {
         "label": "Predicción",
@@ -1223,6 +1228,11 @@
         "back": "Volver",
         "submit": "Publicar tesis",
         "submitting": "Publicando…"
+      },
+      "topAssets": {
+        "label": "Activos con más tesis",
+        "item": "{name}, {count, plural, one {# tesis} other {# tesis}}",
+        "count": "{count, plural, one {{shown} tesis} other {{shown} tesis}}"
       }
     }
   },

@@ -7,7 +7,7 @@ import type { Locale } from '@/i18n/routing'
 import { useRouter } from '@/i18n/navigation'
 import { submitPath, type SubmitType } from '@/i18n/submit-path'
 import { communityPath } from '@/lib/communities/paths'
-import type { CommunityOption, SavedDraft } from '../composer.types'
+import type { CommunityOption, SavedDraft, TopAsset } from '../composer.types'
 import { discardDraft } from '../hooks/use-local-draft'
 import { DiscardDialog } from './discard-dialog'
 import type { PreviewAction } from './body-tabs'
@@ -42,6 +42,7 @@ export function SubmitEditor({
   thesisStorageKey = null,
   thesisDrafts = true,
   related = [],
+  topAssets = [],
   preview,
 }: {
   /** The preview's Server Action (specs/submit-tools ST-01). */
@@ -55,6 +56,8 @@ export function SubmitEditor({
   thesisDrafts?: boolean
   /** The related ones of the URL, as handles (specs/related-aside RA-04). */
   related?: string[]
+  /** The assets with the most theses, for the thesis's asset (specs/thesis-form-steps FS-04). */
+  topAssets?: readonly TopAsset[]
 }) {
   const router = useRouter()
   const locale = useLocale() as Locale
@@ -164,6 +167,7 @@ export function SubmitEditor({
             community={thesisCommunity}
             storageKey={thesisStorageKey}
             draftsReady={thesisDrafts}
+            topAssets={topAssets}
             draftRef={thesisWritten}
             onCancel={cancel}
             onFormat={showPost}

@@ -79,10 +79,10 @@ function renderEditor({
   return { onPublished, onFormat, onCommunityChange, draftRef }
 }
 
-const claim = () => screen.getByRole('textbox', { name: 'Claim' })
-const price = () => screen.getByRole('textbox', { name: 'Target price' })
+const claim = () => screen.getByRole('textbox', { name: /Claim$/ })
+const price = () => screen.getByRole('textbox', { name: /Target price$/ })
 const deadline = () => screen.getByLabelText('Deadline date', { selector: 'input' })
-const reasoning = () => screen.getByRole('textbox', { name: 'Reasoning' })
+const reasoning = () => screen.getByRole('textbox', { name: /Reasoning$/ })
 const publish = () => screen.getByRole('button', { name: 'Publish' })
 
 /** Everything but where it goes and the asset, which come from the URL. */
@@ -114,7 +114,7 @@ describe('ThesisEditor (specs/thesis-create)', () => {
 
   it('comes with the asset of an asset community and its card, and the claim focused (TC-02, TC-22, TC-26)', async () => {
     renderEditor()
-    expect(screen.getByRole('combobox', { name: 'Asset' })).toHaveTextContent('$NVDA')
+    expect(screen.getByRole('group', { name: /Asset$/ })).toHaveTextContent('$NVDA')
     expect(screen.getByRole('tab', { name: 'Thesis' })).toHaveAttribute('aria-selected', 'true')
     expect(claim()).toHaveFocus()
     expect(actions.getAssetQuote).toHaveBeenCalledWith('NVDA')
@@ -138,7 +138,7 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     expect(screen.getByText(/out of date/)).toBeVisible()
     // The logo's place: the asset's initials while it has no image.
     expect(
-      screen.getByRole('combobox', { name: 'Asset' }).querySelector('[data-testid="user-avatar"]'),
+      screen.getByRole('group', { name: /Asset$/ }).querySelector('[data-testid="user-avatar"]'),
     ).toHaveTextContent('NV')
   })
 
@@ -176,10 +176,24 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     expect(screen.getByText('Extreme', { selector: 'span' })).toBeVisible()
   })
 
+  it('numbers the six steps, and marks each one done (specs/thesis-form-steps FS-08, FS-09)', async () => {
+    renderEditor()
+    expect(screen.getByRole('group', { name: 'Step 1 of 6, done: Asset' })).toBeInTheDocument()
+    expect(claim()).toHaveAccessibleName('Step 2 of 6: Claim')
+    expect(reasoning()).toHaveAccessibleName('Step 6 of 6: Reasoning')
+    await fill()
+    expect(claim()).toHaveAccessibleName('Step 2 of 6, done: Claim')
+    expect(price()).toHaveAccessibleName('Step 4 of 6, done: Target price')
+    expect(screen.getByRole('radiogroup', { name: 'Step 3 of 6, done: Deadline' })).toBeVisible()
+    expect(screen.getByRole('radiogroup', { name: 'Step 5 of 6, done: Conviction' })).toBeVisible()
+    expect(reasoning()).toHaveAccessibleName('Step 6 of 6, done: Reasoning')
+  })
+
   it('chooses the asset’s community, unless one was chosen by hand (TC-03)', async () => {
     const { onCommunityChange } = renderEditor({ community: null })
-    expect(screen.getByRole('combobox', { name: 'Asset' })).toHaveFocus()
-    await userEvent.keyboard('{ArrowDown}')
+    expect(screen.getByRole('combobox', { name: /Asset$/ })).toHaveFocus()
+    // A search (specs/thesis-form-steps FS-01): typing lists the matches.
+    await userEvent.keyboard('btc')
     await userEvent.click(await screen.findByRole('option', { name: /BTC/ }))
     expect(onCommunityChange).toHaveBeenLastCalledWith(BTC)
     expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('$BTC')
@@ -187,15 +201,17 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     screen.getByRole('combobox', { name: 'Publishing in' }).focus()
     await userEvent.keyboard('{ArrowDown}')
     await userEvent.click(await screen.findByRole('option', { name: /#macro/ }))
-    screen.getByRole('combobox', { name: 'Asset' }).focus()
-    await userEvent.keyboard('{ArrowDown}')
+    // × changes it (FS-02): the search comes back, focused.
+    await userEvent.click(screen.getByRole('button', { name: 'Change $BTC' }))
+    expect(screen.getByRole('combobox', { name: /Asset$/ })).toHaveFocus()
+    await userEvent.keyboard('nvda')
     await userEvent.click(await screen.findByRole('option', { name: /NVDA/ }))
     expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('#macro')
   })
 
   it('keeps the group it was started in when the asset is chosen (TC-03)', async () => {
     renderEditor({ community: MACRO })
-    await userEvent.keyboard('{ArrowDown}')
+    await userEvent.keyboard('btc')
     await userEvent.click(await screen.findByRole('option', { name: /BTC/ }))
     expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('#macro')
   })
@@ -227,7 +243,7 @@ describe('ThesisEditor (specs/thesis-create)', () => {
   it('offers the deadline from tomorrow to 5 years, and the four convictions (TC-06, TC-07, TC-33)', async () => {
     renderEditor()
     // The shortcuts, and "Other date" opens the calendar with the backend's range (TC-33).
-    const shortcuts = screen.getByRole('radiogroup', { name: 'Deadline' })
+    const shortcuts = screen.getByRole('radiogroup', { name: /Deadline$/ })
     for (const name of ['1 month', '3 months', '6 months', '1 year', 'Other date']) {
       expect(within(shortcuts).getByRole('radio', { name })).toBeInTheDocument()
     }
@@ -238,7 +254,7 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     // A day typed there closes that day.
     fireEvent.change(deadline(), { target: { value: min } })
     expect(screen.getByText(/^Closes /)).toBeVisible()
-    const convictions = screen.getByRole('radiogroup', { name: 'Conviction' })
+    const convictions = screen.getByRole('radiogroup', { name: /Conviction$/ })
     for (const name of ['Low', 'Medium', 'High', 'Extreme']) {
       expect(within(convictions).getByRole('radio', { name })).not.toBeChecked()
     }
@@ -246,7 +262,7 @@ describe('ThesisEditor (specs/thesis-create)', () => {
 
   it('opens the calendar again after a shortcut, beside the "Other date" pill (TC-33)', async () => {
     renderEditor()
-    const shortcuts = screen.getByRole('radiogroup', { name: 'Deadline' })
+    const shortcuts = screen.getByRole('radiogroup', { name: /Deadline$/ })
     await userEvent.click(within(shortcuts).getByRole('radio', { name: 'Other date' }))
     expect(deadline()).toBeInTheDocument()
     await userEvent.click(within(shortcuts).getByRole('radio', { name: '3 months' }))
@@ -378,7 +394,7 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     await userEvent.click(await screen.findByRole('button', { name: /^ETH closes the year/ }))
     expect(claim()).toHaveValue('ETH closes the year above 5K')
     expect(price()).toHaveValue('5000')
-    expect(screen.getByRole('combobox', { name: 'Asset' })).toHaveTextContent('$ETH')
+    expect(screen.getByRole('group', { name: /Asset$/ })).toHaveTextContent('$ETH')
     expect(screen.getByRole('radio', { name: 'Medium' })).toBeChecked()
 
     await userEvent.click(screen.getByRole('radio', { name: '3 months' }))
@@ -476,7 +492,7 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     expect(claim()).toHaveValue('From yesterday')
     expect(price()).toHaveValue('50000')
     expect(screen.getByRole('radio', { name: 'Below' })).toBeChecked()
-    expect(screen.getByRole('combobox', { name: 'Asset' })).toHaveTextContent('$BTC')
+    expect(screen.getByRole('group', { name: /Asset$/ })).toHaveTextContent('$BTC')
     expect(screen.getByRole('combobox', { name: 'Publishing in' })).toHaveTextContent('#macro')
   })
 })

@@ -1,0 +1,180 @@
+'use client'
+
+import { SearchIcon, XIcon } from 'lucide-react'
+import { useTranslations } from 'next-intl'
+import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react'
+import { UserAvatar } from '@/components/molecules/user-avatar'
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from '@/components/ui/combobox'
+import { cn } from '@/lib/utils'
+import { searchCommunities } from '../actions/search-communities.action'
+import type { CommunityOption } from '../composer.types'
+import { FIELD_BOX } from './editor-styles'
+
+/** Typing rests this long before the search goes out. */
+const SEARCH_DELAY = 200
+
+/**
+ * The thesis's asset as a search (specs/thesis-form-steps FS-01, FS-02): typing lists the catalog's
+ * assets that match, below; arrows and Enter, or a click, choose one. Chosen, the field becomes its
+ * card (TC-29, `renderValue`) with × to change it, which brings the empty field back, focused.
+ */
+export function AssetSearch({
+  id,
+  value,
+  onChange,
+  renderValue,
+  invalid = false,
+  describedBy,
+  labelledBy,
+}: {
+  id: string
+  /** The field's label: chosen, it names the card. */
+  labelledBy?: string
+  value: CommunityOption | null
+  onChange: (asset: CommunityOption | null) => void
+  /** The chosen asset's card: its logo, name, price and day (TC-29). */
+  renderValue: (asset: CommunityOption) => ReactNode
+  invalid?: boolean
+  describedBy?: string
+}) {
+  const t = useTranslations('composer.thesis.asset')
+  const [text, setText] = useState('')
+  const [options, setOptions] = useState<CommunityOption[]>([])
+  const [failed, setFailed] = useState(false)
+  const [loading, startTransition] = useTransition()
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const asked = useRef('')
+  const field = useRef<HTMLInputElement>(null)
+  const refocus = useRef(false)
+
+  useEffect(() => () => clearTimeout(timer.current), [])
+  // Back from × to the empty field: the focus goes to it.
+  useEffect(() => {
+    if (value === null && refocus.current) {
+      refocus.current = false
+      field.current?.focus()
+    }
+  }, [value])
+
+  function search(next: string) {
+    const query = next.trim()
+    asked.current = query
+    if (!query) {
+      setOptions([])
+      return
+    }
+    startTransition(async () => {
+      const result = await searchCommunities(query, 'assets')
+      // A newer search went out meanwhile: this answer is stale.
+      if (asked.current !== query) return
+      setFailed(!result.ok)
+      setOptions(result.ok ? result.data : [])
+    })
+  }
+
+  if (value) {
+    return (
+      <div
+        id={id}
+        role="group"
+        aria-labelledby={labelledBy}
+        className={cn(FIELD_BOX, 'flex min-h-12 items-center gap-2 py-1.5 pr-2')}
+        aria-describedby={describedBy}
+      >
+        {renderValue(value)}
+        <button
+          type="button"
+          aria-label={t('change', { asset: value.handle })}
+          onClick={() => {
+            refocus.current = true
+            setText('')
+            setOptions([])
+            onChange(null)
+          }}
+          className="inline-flex size-8 shrink-0 tap items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 [&_svg]:size-4"
+        >
+          <XIcon aria-hidden />
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <Combobox<CommunityOption>
+      items={options}
+      // The server filters: the list shows what it answers.
+      filter={null}
+      value={null}
+      onValueChange={(next) => {
+        if (next) onChange(next)
+      }}
+      itemToStringLabel={(option) => option.handle}
+      isItemEqualToValue={(option, selected) => option.id === selected.id}
+      inputValue={text}
+      onInputValueChange={(next, details) => {
+        setText(next)
+        if (details.reason !== 'input-change') return
+        clearTimeout(timer.current)
+        timer.current = setTimeout(() => search(next), SEARCH_DELAY)
+      }}
+    >
+      <ComboboxInput
+        ref={field}
+        id={id}
+        showTrigger={false}
+        placeholder={t('search')}
+        aria-invalid={invalid || undefined}
+        aria-describedby={describedBy}
+        className={cn(
+          FIELD_BOX,
+          'h-12 w-full px-3 [&_input]:text-base',
+          invalid && 'border-destructive',
+        )}
+      >
+        <SearchIcon
+          aria-hidden
+          className="order-first ml-1 size-4 shrink-0 text-muted-foreground"
+        />
+      </ComboboxInput>
+      {/* Only once something is typed: with nothing, the rail beside is the shortcut (FS-04). */}
+      {text.trim() && (
+        <ComboboxContent
+          align="start"
+          className="min-w-0 rounded-xl border p-1 shadow-none ring-0 duration-150 ease-out data-open:slide-in-from-top-1"
+        >
+          <ComboboxEmpty className="px-3 py-2.5 type-meta">
+            {loading ? t('searching') : failed ? t('searchFailed') : t('none')}
+          </ComboboxEmpty>
+          <ComboboxList className="max-h-64">
+            {(option: CommunityOption) => (
+              <ComboboxItem
+                key={option.id}
+                value={option}
+                className="min-h-11 gap-2.5 rounded-lg px-2.5"
+              >
+                <UserAvatar
+                  name={option.handle}
+                  colorKey={option.slug}
+                  imageUrl={option.avatarUrl}
+                  size="xs"
+                  className="shrink-0 rounded-md"
+                />
+                <span className="flex min-w-0 flex-col">
+                  <span className="truncate type-small font-bold">{option.handle}</span>
+                  <span className="truncate type-meta text-muted-foreground">{option.name}</span>
+                </span>
+              </ComboboxItem>
+            )}
+          </ComboboxList>
+        </ComboboxContent>
+      )}
+    </Combobox>
+  )
+}

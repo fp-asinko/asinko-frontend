@@ -226,6 +226,16 @@ export function removeMockThesisVote({ params, query, accessToken }: MockContext
  * GET /api/v1/theses/top-assets?days=&limit= (P-040, specs/thesis-form-steps): the asset communities
  * with the most theses published in the last `days` (30 by default), cancelled ones not counted.
  */
+/** The month's theses per asset the mocked ranking starts from (P-040): the mock's asset communities. */
+const TOP_ASSETS_BASE: Record<string, number> = {
+  BTC: 41,
+  ETH: 27,
+  SOL: 18,
+  XRP: 11,
+  LINK: 7,
+  AVAX: 4,
+}
+
 export function topThesisAssets({ query }: MockContext): MockResponse {
   const days = query.days === undefined ? 30 : Number(query.days)
   const limit = query.limit === undefined ? 10 : Number(query.limit)
@@ -233,7 +243,9 @@ export function topThesisAssets({ query }: MockContext): MockResponse {
   if (!Number.isInteger(limit) || limit < 1 || limit > 20) return error(422, 'VALIDATION_ERROR')
   // From the mocks' clock (MOCK_NOW): the seeded theses are dated against it, not today.
   const since = Math.min(Date.now(), MOCK_NOW) - days * DAY_MS
-  const counts = new Map<string, number>()
+  // A platform's month starts from a base (the few seeded theses would fit in one row, and the rail
+  // would never move); what is published here adds to it.
+  const counts = new Map<string, number>(Object.entries(TOP_ASSETS_BASE))
   for (const thesis of THESES) {
     if (thesis.state === 'CANCELLED' || thesis.community.type !== 'SYSTEM_ASSET') continue
     if (Date.parse(thesis.publishedAt) < since) continue

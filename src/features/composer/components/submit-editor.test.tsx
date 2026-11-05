@@ -52,7 +52,7 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12, SU-13)', () => 
       expect(screen.getByRole('tab', { name: 'Thesis', selected: true })).toBeInTheDocument(),
     )
     // The focus goes with the swap (WCAG 2.4.3): loaded now, to where a thesis starts.
-    await vi.waitFor(() => expect(screen.getByRole('combobox', { name: 'Asset' })).toHaveFocus())
+    await vi.waitFor(() => expect(screen.getByRole('combobox', { name: /Asset$/ })).toHaveFocus())
     // The post's editor stays, hidden.
     expect(screen.queryByRole('textbox', { name: 'Title' })).toBeNull()
 
@@ -101,7 +101,7 @@ describe('SubmitEditor (specs/submit-page SU-03 to SU-05, SU-12, SU-13)', () => 
       scroll: false,
     })
     await vi.waitFor(() =>
-      expect(screen.getByRole('combobox', { name: 'Asset' })).toHaveTextContent('$BTC'),
+      expect(screen.getByRole('group', { name: /Asset$/ })).toHaveTextContent('$BTC'),
     )
   })
 
