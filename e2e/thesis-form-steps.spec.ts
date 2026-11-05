@@ -40,6 +40,21 @@ test.describe('The thesis form in steps', () => {
     )
   })
 
+  test('chooses a pill clicked while the ticker moves, without jumping back (PO, 2026-11-05)', async ({
+    page,
+    isMobile,
+  }) => {
+    test.skip(isMobile, 'A pointer that hovers: a phone has no mouse over the row')
+    await page.goto('/en/submit?type=thesis')
+    const ticker = main(page).getByRole('region', { name: 'Assets with the most theses' })
+    const eth = ticker.getByRole('button', { name: /^\$ETH,/ })
+    await expect(eth).toBeVisible()
+    // Moving: no waiting for it to stand still, as a person would not.
+    await eth.click({ force: true })
+    await expect(main(page).getByRole('group', { name: /Asset$/ })).toContainText('$ETH')
+    await expect(eth).toHaveAttribute('aria-pressed', 'true')
+  })
+
   test('numbers the six steps (FS-08)', async ({ page }) => {
     await page.goto('/en/submit?type=thesis')
     for (const [n, name] of [

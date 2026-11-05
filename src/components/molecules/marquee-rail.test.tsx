@@ -1,6 +1,6 @@
 import { act, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { MarqueeRail } from './marquee-rail'
 
@@ -47,5 +47,20 @@ describe('MarqueeRail (specs/thesis-form-steps FS-05)', () => {
     expect(track).not.toHaveClass('motion-safe:animate-marquee')
     act(() => screen.getByRole('button', { name: 'ETH' }).blur())
     expect(track).toHaveClass('motion-safe:animate-marquee')
+  })
+
+  it('keeps going under a click: the pill stays where it was pressed (PO, 2026-11-05)', async () => {
+    const onClick = vi.fn()
+    renderWithIntl(
+      <MarqueeRail label="Top assets" duration={24}>
+        <button type="button" onClick={onClick}>
+          BTC
+        </button>
+      </MarqueeRail>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'BTC' }))
+    expect(onClick).toHaveBeenCalledOnce()
+    // Not taken back to the start, as the keyboard's focus would.
+    expect(screen.getByTestId('marquee-track')).toHaveClass('motion-safe:animate-marquee')
   })
 })

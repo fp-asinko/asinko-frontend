@@ -2,7 +2,7 @@
 
 import { PauseIcon, PlayIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 import { HoverHint } from './hover-hint'
 
@@ -10,7 +10,7 @@ import { HoverHint } from './hover-hint'
  * A row that slides by itself, like a ticker (specs/thesis-form-steps FS-05): a second, inert copy
  * of the items follows the first so the loop has no seam, moved with transform only. It stops with
  * its pause button (WCAG 2.2.2), under the mouse and while a finger is down; with the keyboard's
- * focus inside it goes back to the start, so the focused item is in view. Asking for reduced
+ * focus inside (not a click's) it goes back to the start, so the focused item is in view. Asking for reduced
  * motion, it stands still and scrolls by hand, without the button.
  */
 export function MarqueeRail({
@@ -30,6 +30,8 @@ export function MarqueeRail({
   const [paused, setPaused] = useState(false)
   const [held, setHeld] = useState(false)
   const [focused, setFocused] = useState(false)
+  // A pointer pressed in the row: the focus it brings is a click's, not the keyboard's.
+  const pointing = useRef(false)
   const stopped = paused || held
 
   const track = { '--marquee-duration': `${duration}s` } as CSSProperties
@@ -40,10 +42,23 @@ export function MarqueeRail({
         className="min-w-0 flex-1 [scrollbar-width:none] overflow-hidden motion-reduce:overflow-x-auto [&::-webkit-scrollbar]:hidden"
         onPointerEnter={(event) => event.pointerType === 'mouse' && setHeld(true)}
         onPointerLeave={() => setHeld(false)}
-        onPointerDown={(event) => event.pointerType !== 'mouse' && setHeld(true)}
-        onPointerUp={(event) => event.pointerType !== 'mouse' && setHeld(false)}
-        onPointerCancel={() => setHeld(false)}
-        onFocus={() => setFocused(true)}
+        onPointerDown={(event) => {
+          pointing.current = true
+          if (event.pointerType !== 'mouse') setHeld(true)
+        }}
+        onPointerUp={(event) => {
+          pointing.current = false
+          if (event.pointerType !== 'mouse') setHeld(false)
+        }}
+        onPointerCancel={() => {
+          pointing.current = false
+          setHeld(false)
+        }}
+        // Only the keyboard's focus takes it back to the start: a click focuses its pill too, and
+        // moving the row then would pull the pill from under the pointer (PO, 2026-11-05).
+        onFocus={() => {
+          if (!pointing.current) setFocused(true)
+        }}
         onBlur={(event) => {
           if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false)
         }}
