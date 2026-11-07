@@ -93,7 +93,7 @@ Las reglas son más estrictas que las del backend (`^[a-z0-9-]{1,50}$`): todo lo
   | Otro               | Su `errorKey`                                                 |
 
 - **En el cliente** (`use-create-group.ts`): crear, después subir las imágenes una por una, y al final `router.push('/hub/' + slug)`.
-  - Si una imagen falla, el formulario lo dice con el link al grupo ya creado: "The group was created, but its banner could not be saved. Go to the group" (CG-11). **Cambio al implementar (2026-11-07):** el plan era navegar y mostrar un `toast` de sonner, pero `sonner` no está instalado y su `Toaster` en el layout sumaría JS a todas las rutas.
+  - Si una imagen falla, igual navega y muestra un `toast` de sonner: "The group was created, but its banner could not be saved" (CG-11). `sonner` se carga con el primer aviso (`notify()`, en su propio root), para no sumarlo a la primera carga de ninguna ruta.
   - El botón dice "Creating…" mientras dura todo y queda `aria-disabled`.
   - Un error de campo pone el foco en ese campo (`setFocus`).
 - **Salir con cambios (CG-12):** un `beforeunload` mientras el formulario esté `isDirty` y no se haya creado.
@@ -119,4 +119,4 @@ Namespace nuevo `createGroup`, en en, es y pt, y en `CLIENT_NAMESPACES`: el form
 
 - Cada campo con su label (el `StepTitle`), los errores en `aria-describedby` y el estado del handle en `aria-live`.
 - Las imágenes: los botones de cámara con nombre ("Change group photo"), y el recorte manejable con teclado (`CropFrame`).
-- El formulario, el recorte y `zod` van diferidos. La ruta se suma a `e2e/performance.spec.ts` con el tope de 240 KB.
+- El formulario, el recorte y `zod` van diferidos. La ruta se suma a `e2e/performance.spec.ts` con el tope de 241 KB (subido por el PO el 2026-11-07, `seo.md`).

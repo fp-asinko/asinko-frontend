@@ -53,6 +53,10 @@
   Se suma la ruta a `performance.spec.ts`.
   - Depende de: T9.
 
+- [x] **T12 — Mejoras de UX (M), CG-16 a CG-23 (PO, 2026-11-07).**
+  - Imágenes hasta 512 px, `#` sin nombre, placeholders de ejemplo, la dirección y las alternativas del handle, la barra fija en el celular (`ACTIONS_BAR` sube a `components/molecules/field-styles.ts`), el toast al crear (`sonner`, `components/organisms/toaster`), los grupos parecidos (`find-similar-groups.action.ts`) y los tips en la columna derecha.
+  - Tests: `create-group-form.test.tsx`, `group-preview.test.tsx`, `slugify.test.ts`, `use-similar-groups.test.ts`, `find-similar-groups.action.test.ts`, `similar-groups.test.ts`, `notify.test.tsx`; e2e: `community-create.spec.ts`, `toasts.spec.ts`.
+
 - [ ] **T11 — Cierre (S).**
   - Pasar `ui-reviewer`.
   - Actualizar `libraries.md` si hiciera falta (no se esperan dependencias nuevas).

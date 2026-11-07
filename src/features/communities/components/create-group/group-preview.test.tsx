@@ -26,6 +26,8 @@ describe('GroupPreview (specs/community-create CG-08)', () => {
     const preview = screen.getByRole('region', { name: 'Preview' })
     expect(preview).toHaveTextContent('#your-group')
     expect(screen.getByText('your-group')).toHaveClass('text-muted-foreground')
+    // A # in the avatar, not the initials of the placeholder (CG-17).
+    expect(preview).toHaveTextContent(/^Preview#/)
   })
 
   it('shows the images chosen, or the color of its handle', () => {

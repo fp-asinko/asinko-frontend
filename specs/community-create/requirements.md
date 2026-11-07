@@ -74,17 +74,31 @@ Que cualquier persona con cuenta pueda abrir su propio grupo, con nombre, handle
   - `422 INVALID_SLUG`: marca el handle como inválido.
   - `401`: abre la ventana de cuenta.
   - Un fallo inesperado: un aviso con lo escrito intacto, para reintentar.
-  - Si una imagen no se pudo subir, el grupo **ya quedó creado**: el formulario lo dice, con el link a su página (Q5; ver design § 6).
+  - Si una imagen no se pudo subir, el grupo **ya quedó creado**: se va igual a su página, sin esa imagen, con un aviso que lo dice (Q5).
 - [ ] **CG-12** Cerrar o recargar la pestaña con algo escrito pide confirmación del navegador. Es nuevo en el sitio: crear post no lo pide, porque guarda borradores, y un grupo no tiene borradores.
 
 ### Calidad
 
 - [ ] **CG-13** Mobile first: a 360 px, una columna sin scroll horizontal y campos con texto de 16 px. Todo con teclado. Axe sin violaciones en claro y oscuro.
-- [ ] **CG-14** Presupuesto de JS (`seo.md`): la página nueva entra en `e2e/performance.spec.ts` y no pasa los 240 KB. El recorte de imágenes y el formulario con zod van diferidos, como en crear post y "Editar perfil".
+- [ ] **CG-14** Presupuesto de JS (`seo.md`): la página nueva entra en `e2e/performance.spec.ts` y no pasa el tope (241 KB desde el 2026-11-07). El recorte de imágenes y el formulario con zod van diferidos, como en crear post y "Editar perfil".
 - [ ] **CG-15** Mocks con `API_MOCKS=true`: `POST /communities` (con `409` y `422`) y la consulta del handle, validados en `fixtures.test.ts`. Los textos van en en, es y pt.
+
+### Mejoras de UX (PO, 2026-11-07)
+
+Después de ver la primera versión, el PO aprobó las mejoras rápidas y medianas:
+
+- [ ] **CG-16** El paso de imágenes no ocupa todo el ancho: hasta 512 px, así el banner mide como la cabecera del grupo y no domina el formulario.
+- [ ] **CG-17** Sin nombre ni handle, la vista previa y las imágenes muestran `#` en el avatar, no las iniciales de "your-group".
+- [ ] **CG-18** Los placeholders dicen que son un ejemplo ("e.g. Dividends LatAm"), para que no parezcan un valor cargado.
+- [ ] **CG-19** Debajo del handle válido se ve la dirección del grupo (`/hub/{slug}`). Si está tomado, se ofrecen hasta tres alternativas que se eligen con un toque y se vuelven a consultar.
+- [ ] **CG-20** En el celular, el botón "Create group" queda fijo sobre la barra inferior mientras se completa el formulario, como en crear post.
+- [ ] **CG-21** Al crear, un toast confirma "Your group is ready" en la página del grupo.
+- [ ] **CG-22** Mientras se escribe el nombre, después de una pausa, se muestran hasta tres grupos existentes con nombre parecido ("Similar groups"), con link a cada uno, para evitar duplicados. Usa `GET /communities?search=`; si falla, no se muestra nada.
+- [ ] **CG-23** En la columna derecha, debajo de la vista previa, una tarjeta "Tips for a good group": nombre claro, descripción de para quién es y reglas cortas.
 
 ## Fuera de alcance
 
+- Un checklist de "primeros pasos" en la página del grupo nuevo (propuesto el 2026-11-07): sin "Editar grupo", sus pasos (foto, descripción, reglas) no tendrían dónde hacerse. Va con el spec de editar un grupo.
 - Editar un grupo después de crearlo (`PATCH /communities/{slug}`), cambiar el handle y transferir la moderación.
 - Grupos privados o restringidos, contenido para adultos y temas: el backend solo crea grupos públicos.
 - Los widgets del grupo: tienen su spec (`specs/community-widgets`).

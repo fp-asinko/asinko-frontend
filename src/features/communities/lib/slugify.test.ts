@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
-import { slugify } from './slugify'
+import { slugAlternatives, slugify } from './slugify'
 
 describe('slugify (specs/community-create CG-05)', () => {
   it('drops accents and turns symbols and spaces into single hyphens', () => {
@@ -19,5 +19,16 @@ describe('slugify (specs/community-create CG-05)', () => {
   it('is empty when nothing usable is left', () => {
     expect(slugify('')).toBe('')
     expect(slugify('¡¿!?')).toBe('')
+  })
+})
+
+describe('slugAlternatives (specs/community-create CG-19)', () => {
+  it('offers three endings that still fit 30 characters', () => {
+    const year = new Date().getFullYear()
+    expect(slugAlternatives('defi')).toEqual(['defi-2', `defi-${year}`, 'defi-hub'])
+    for (const each of slugAlternatives('a'.repeat(28) + '-b')) {
+      expect(each.length).toBeLessThanOrEqual(30)
+      expect(each).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+    }
   })
 })

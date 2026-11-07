@@ -1462,23 +1462,27 @@
     "fields": {
       "name": {
         "label": "Name",
-        "placeholder": "Dividends LatAm"
+        "placeholder": "e.g. Dividends LatAm",
+        "similar": "Similar groups already exist",
+        "members": "{count, plural, one {# member} other {# members}}"
       },
       "slug": {
         "label": "Handle",
         "hint": "Lowercase letters, numbers and hyphens. It is how the group is mentioned.",
-        "available": "#{slug} is available"
+        "available": "#{slug} is available",
+        "address": "Its address: {path}",
+        "try": "Try:"
       },
       "description": {
         "label": "Description",
-        "placeholder": "What the group is about"
+        "placeholder": "e.g. Dividend stocks and REITs from Latin America"
       },
       "images": {
         "label": "Photo and banner"
       },
       "rules": {
         "label": "Rules",
-        "placeholder": "One rule per line"
+        "placeholder": "One rule per line, e.g. No spam or self-promotion"
       },
       "mainUrl": {
         "label": "Website",
@@ -1510,6 +1514,12 @@
       "imageUpload": "Could not upload the image",
       "unexpected": "The group could not be created. Try again in a moment."
     },
-    "goToGroup": "Go to the group"
+    "ready": "Your group is ready",
+    "tips": {
+      "title": "Tips for a good group",
+      "name": "A clear name says what it is about: \"Dividends LatAm\", not \"Group 1\".",
+      "description": "The description says who it is for and what is talked about.",
+      "rules": "Few, short rules are read; long ones are skipped."
+    }
   }
 }

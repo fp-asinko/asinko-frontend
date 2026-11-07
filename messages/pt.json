@@ -1462,23 +1462,27 @@
     "fields": {
       "name": {
         "label": "Nome",
-        "placeholder": "Dividendos LatAm"
+        "placeholder": "Ex.: Dividendos LatAm",
+        "similar": "Já existem grupos parecidos",
+        "members": "{count, plural, one {# membro} other {# membros}}"
       },
       "slug": {
         "label": "Handle",
         "hint": "Letras minúsculas, números e hifens. É como o grupo é mencionado.",
-        "available": "#{slug} está disponível"
+        "available": "#{slug} está disponível",
+        "address": "O endereço: {path}",
+        "try": "Tente:"
       },
       "description": {
         "label": "Descrição",
-        "placeholder": "Sobre o que é o grupo"
+        "placeholder": "Ex.: Ações de dividendos e REITs da América Latina"
       },
       "images": {
         "label": "Foto e banner"
       },
       "rules": {
         "label": "Regras",
-        "placeholder": "Uma regra por linha"
+        "placeholder": "Uma regra por linha, ex.: Sem spam nem autopromoção"
       },
       "mainUrl": {
         "label": "Site",
@@ -1510,6 +1514,12 @@
       "imageUpload": "Não foi possível enviar a imagem",
       "unexpected": "Não foi possível criar o grupo. Tente de novo em instantes."
     },
-    "goToGroup": "Ir para o grupo"
+    "ready": "Seu grupo está pronto",
+    "tips": {
+      "title": "Dicas para um bom grupo",
+      "name": "Um nome claro diz do que se trata: \"Dividendos LatAm\", não \"Grupo 1\".",
+      "description": "A descrição diz para quem é e do que se fala.",
+      "rules": "Poucas regras curtas são lidas; as longas são puladas."
+    }
   }
 }

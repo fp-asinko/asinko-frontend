@@ -2,12 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CheckIcon } from 'lucide-react'
-import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useForm, useWatch } from 'react-hook-form'
-import { FIELD_BOX } from '@/components/molecules/field-styles'
+import { ACTIONS_BAR, FIELD_BOX } from '@/components/molecules/field-styles'
 import { StepTitle } from '@/components/molecules/step-title'
 import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
@@ -15,8 +14,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 import { useCreateGroup } from '../../hooks/use-create-group'
+import { useSimilarGroups } from '../../hooks/use-similar-groups'
 import { useSlugAvailability } from '../../hooks/use-slug-availability'
-import { slugify } from '../../lib/slugify'
+import { slugAlternatives, slugify } from '../../lib/slugify'
 import {
   createGroupSchema,
   DESCRIPTION_MAX,
@@ -30,12 +30,10 @@ import {
   type CreateGroupInput,
 } from '../../schemas/create-group.schema'
 import { ProfileImages, type ProfileImageKind } from '../edit-profile-images'
-import { GroupPreview } from './group-preview'
-
-// The cropper brings react-easy-crop: only once an image is picked.
-const GroupImageCropper = dynamic(() =>
-  import('./group-image-cropper').then((mod) => mod.GroupImageCropper),
-)
+// The cropper (react-easy-crop) comes with the form, itself loaded after the page: one more
+// deferred import would cost every route its entry in the manifest (seo.md § Performance).
+import { GroupImageCropper } from './group-image-cropper'
+import { GroupPreview, NO_NAME } from './group-preview'
 
 const STEPS = 6
 const PREVIEW_SLOT = 'group-preview-slot'
@@ -65,6 +63,7 @@ export function CreateGroupForm() {
     name: ['name', 'slug', 'description', 'rules', 'mainUrl'],
   })
   const { available } = useSlugAvailability(form)
+  const similar = useSimilarGroups(name)
   const { state, submit } = useCreateGroup(form)
   // The handle follows the name until it is edited; emptied, it follows again (CG-05).
   const [slugTouched, setSlugTouched] = useState(false)
@@ -95,7 +94,7 @@ export function CreateGroupForm() {
   // Leaving with something written asks first (CG-12): a group has no drafts.
   const busy = state.status === 'creating' || state.status === 'created'
   const dirty = formState.isDirty || Object.keys(images).length > 0
-  const guard = dirty && state.status !== 'created' && state.status !== 'partial'
+  const guard = dirty && state.status !== 'created'
   useEffect(() => {
     if (!guard) return
     const warn = (event: BeforeUnloadEvent) => event.preventDefault()
@@ -129,6 +128,7 @@ export function CreateGroupForm() {
 
   const slugOk =
     slug.length >= SLUG_MIN && slug.length <= SLUG_MAX && GROUP_SLUG.test(slug) && !invalid('slug')
+  const taken = formState.errors.slug?.message === 'createGroup.errors.slugTaken'
   const done = {
     name: name.trim().length >= NAME_MIN && name.trim().length <= NAME_MAX,
     slug: slugOk,
@@ -216,6 +216,33 @@ export function CreateGroupForm() {
             className={cn(FIELD_BOX, 'h-12 font-semibold')}
           />
           <FieldError id={`${ids}-name-error`} errors={fieldError('name')} className="type-meta" />
+          {/* What already exists with a name like it, before a duplicate is made (CG-22). */}
+          {similar.length > 0 && (
+            <section
+              aria-labelledby={`${ids}-similar`}
+              className="rounded-xl bg-surface px-3.5 py-3"
+            >
+              <h2 id={`${ids}-similar`} className="type-meta font-semibold text-muted-foreground">
+                {t('fields.name.similar')}
+              </h2>
+              <ul className="mt-1.5 flex flex-col gap-1">
+                {similar.map((group) => (
+                  <li key={group.path}>
+                    <Link
+                      href={group.path}
+                      target="_blank"
+                      className="inline-flex min-h-6 flex-wrap items-baseline gap-x-1.5 rounded-sm type-small outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+                    >
+                      <span className="font-semibold">{group.handle}</span>{' '}
+                      <span className="text-muted-foreground">
+                        {t('fields.name.members', { count: group.memberCount })}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </Field>
 
         <Field data-invalid={invalid('slug') || undefined} className="gap-2">
@@ -242,8 +269,9 @@ export function CreateGroupForm() {
               className={cn(FIELD_BOX, 'h-12 pl-8')}
             />
           </div>
-          <p id={`${ids}-slug-hint`} className="type-meta text-muted-foreground">
-            {t('fields.slug.hint')}
+          {/* With a valid handle, where the group will live; before, how to write one (CG-19). */}
+          <p id={`${ids}-slug-hint`} className="type-meta wrap-anywhere text-muted-foreground">
+            {slugOk ? t('fields.slug.address', { path: `/hub/${slug}` }) : t('fields.slug.hint')}
           </p>
           {/* Whether it is free, announced politely (CG-06); a taken one is the field's error. */}
           <p
@@ -259,6 +287,25 @@ export function CreateGroupForm() {
             )}
           </p>
           <FieldError id={`${ids}-slug-error`} errors={fieldError('slug')} className="type-meta" />
+          {/* Taken: others like it, chosen with a tap and asked again (CG-19). */}
+          {taken && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="type-meta text-muted-foreground">{t('fields.slug.try')}</span>
+              {slugAlternatives(slug).map((each) => (
+                <button
+                  key={each}
+                  type="button"
+                  onClick={() => {
+                    setSlugTouched(true)
+                    setValue('slug', each, { shouldDirty: true, shouldValidate: true })
+                  }}
+                  className="inline-flex h-8 tap items-center rounded-full bg-muted px-3 type-action outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  #{each}
+                </button>
+              ))}
+            </div>
+          )}
         </Field>
 
         <Field data-invalid={invalid('description') || undefined} className="gap-2">
@@ -288,11 +335,13 @@ export function CreateGroupForm() {
           <p className="type-ui font-medium">
             {title(4, done.images, t('fields.images.label'), true)}
           </p>
+          {/* Up to 512px: the banner as tall as the group's header, not the whole form (CG-16). */}
           <ProfileImages
             idPrefix={`${ids}-images`}
             colorKey={slugOk ? slug : 'your-group'}
-            name={name.trim() || 'your-group'}
+            name={name.trim() || NO_NAME}
             shape="square"
+            className="max-w-lg"
             avatar={images.avatar?.url ?? null}
             banner={images.banner?.url ?? null}
             onPick={(kind, file) => setCropping({ kind, file, source: URL.createObjectURL(file) })}
@@ -352,16 +401,9 @@ export function CreateGroupForm() {
             {t('errors.unexpected')}
           </p>
         )}
-        {state.status === 'partial' && (
-          <p role="alert" className="type-small">
-            {t('images.failed', { kind: state.failed })}{' '}
-            <Link href={state.href} className="font-semibold underline underline-offset-2">
-              {t('goToGroup')}
-            </Link>
-          </p>
-        )}
 
-        <div className="flex justify-end border-t pt-4">
+        {/* In phones it sticks over the bottom bar while the form is filled (CG-20). */}
+        <div data-sticky-actions className={cn(ACTIONS_BAR, 'mt-0')}>
           <button
             type="submit"
             aria-disabled={!ready || undefined}

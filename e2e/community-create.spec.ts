@@ -29,6 +29,10 @@ test.describe('Create a group', () => {
       await expect(page).toHaveURL(/\/en\/create-group$/)
     }
     await expect(page.getByRole('heading', { level: 1, name: 'Create a group' })).toBeVisible()
+    if (!isMobile) {
+      // Under the preview, in the right column (CG-23).
+      await expect(page.getByRole('heading', { name: 'Tips for a good group' })).toBeVisible()
+    }
     await expect(create(page)).toHaveAttribute('aria-disabled', 'true')
 
     await name(page).fill(groupName)

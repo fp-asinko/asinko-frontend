@@ -9,13 +9,19 @@ const deps = vi.hoisted(() => ({
   createGroup: vi.fn(),
   uploadGroupImage: vi.fn(),
   checkGroupSlug: vi.fn(),
+  findSimilarGroups: vi.fn(),
   openGate: vi.fn(),
+  notify: vi.fn(),
 }))
+vi.mock('@/components/organisms/toaster/notify', () => ({ notify: deps.notify }))
 vi.mock('../../actions/create-group.action', () => ({ createGroup: deps.createGroup }))
 vi.mock('../../actions/upload-group-image.action', () => ({
   uploadGroupImage: deps.uploadGroupImage,
 }))
 vi.mock('../../actions/check-group-slug.action', () => ({ checkGroupSlug: deps.checkGroupSlug }))
+vi.mock('../../actions/find-similar-groups.action', () => ({
+  findSimilarGroups: deps.findSimilarGroups,
+}))
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 vi.mock('@/components/organisms/auth-gate', async (original) => ({
   ...(await original<object>()),
@@ -42,6 +48,7 @@ describe('CreateGroupForm (specs/community-create)', () => {
       Object.assign(URL, { createObjectURL: () => 'blob:x', revokeObjectURL: vi.fn() }),
     )
     deps.checkGroupSlug.mockResolvedValue('free')
+    deps.findSimilarGroups.mockResolvedValue([])
     deps.createGroup.mockResolvedValue({ ok: true, data: { id: 'g1', slug: 'dividendos-latam' } })
     deps.uploadGroupImage.mockResolvedValue({ ok: true, data: { imageUrl: '/i.webp' } })
   })
@@ -93,6 +100,8 @@ describe('CreateGroupForm (specs/community-create)', () => {
       expect.objectContaining({ name: 'Dividendos LatAm', slug: 'dividendos-latam' }),
     )
     expect(deps.uploadGroupImage).not.toHaveBeenCalled()
+    // On its page, a toast says it is ready (CG-21).
+    expect(deps.notify).toHaveBeenCalledWith({ message: 'Your group is ready', kind: 'success' })
   })
 
   it('uploads the images once the group exists (CG-09, Q5)', async () => {
@@ -140,7 +149,7 @@ describe('CreateGroupForm (specs/community-create)', () => {
     expect(name()).toHaveValue('Dividendos LatAm')
   })
 
-  it('says which image failed, with the link to the group already made (CG-11)', async () => {
+  it('goes to the group already made even if an image failed, and says which (CG-11)', async () => {
     deps.uploadGroupImage.mockResolvedValue({ ok: false, error: 'createGroup.errors.imageUpload' })
     renderWithIntl(<CreateGroupForm />)
     await userEvent.type(name(), 'Dividendos LatAm')
@@ -150,11 +159,11 @@ describe('CreateGroupForm (specs/community-create)', () => {
     await userEvent.upload(input, new File(['x'], 'a.png', { type: 'image/png' }))
     await userEvent.click(await screen.findByRole('button', { name: 'Apply crop' }))
     await userEvent.click(create())
-    expect(await screen.findByRole('alert')).toHaveTextContent('its photo could not be saved')
-    expect(screen.getByRole('link', { name: 'Go to the group' })).toHaveAttribute(
-      'href',
-      '/hub/dividendos-latam',
-    )
+    await waitFor(() => expect(router.push).toHaveBeenCalledWith('/hub/dividendos-latam'))
+    expect(deps.notify).toHaveBeenCalledWith({
+      message: 'The group was created, but its photo could not be saved.',
+      kind: 'error',
+    })
   })
 
   it('asks before leaving with something written (CG-12)', async () => {
@@ -167,5 +176,37 @@ describe('CreateGroupForm (specs/community-create)', () => {
     expect(leave()).toBe(false)
     await userEvent.type(name(), 'x')
     expect(leave()).toBe(true)
+  })
+
+  it('shows where the group will live, and offers others when the handle is taken (CG-19)', async () => {
+    deps.checkGroupSlug.mockResolvedValue('taken')
+    renderWithIntl(<CreateGroupForm />)
+    await userEvent.type(name(), 'DeFi')
+    expect(screen.getByText('Its address: /hub/defi')).toBeInTheDocument()
+    expect(await screen.findByText('Already taken')).toBeInTheDocument()
+    deps.checkGroupSlug.mockResolvedValue('free')
+    await userEvent.click(screen.getByRole('button', { name: '#defi-2' }))
+    expect(handle()).toHaveValue('defi-2')
+    expect(await screen.findByText('#defi-2 is available')).toBeInTheDocument()
+    // Chosen, the handle no longer follows the name.
+    await userEvent.type(name(), ' Latam')
+    expect(handle()).toHaveValue('defi-2')
+  })
+
+  it('shows the groups that already have a name like it (CG-22)', async () => {
+    deps.findSimilarGroups.mockResolvedValue([
+      { handle: '#defi', name: 'DeFi', memberCount: 12880, path: '/hub/defi' },
+    ])
+    renderWithIntl(<CreateGroupForm />)
+    await userEvent.type(name(), 'DeFi')
+    const similar = await screen.findByRole('region', { name: 'Similar groups already exist' })
+    expect(similar).toHaveTextContent('#defi')
+    expect(similar).toHaveTextContent('12,880 members')
+    expect(screen.getByRole('link', { name: /#defi/ })).toHaveAttribute('href', '/hub/defi')
+  })
+
+  it('keeps the actions in a bar that sticks over the phones bottom bar (CG-20)', () => {
+    renderWithIntl(<CreateGroupForm />)
+    expect(create().closest('[data-sticky-actions]')).not.toBeNull()
   })
 })
