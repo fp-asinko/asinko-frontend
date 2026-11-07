@@ -4,7 +4,7 @@
 
 ## Tareas
 
-- [ ] **T1 — Contrato y mocks (M).**
+- [x] **T1 — Contrato y mocks (M).**
   - En `src/mocks`: `POST /communities`, con `409` y `422`, y `PATCH /communities/:slug`, solo para `avatarUrl` y `bannerUrl` (design § 8).
   - Los dos se agregan a `handlers.test.ts` y `fixtures.test.ts`, y a la tabla de `src/mocks/README.md`.
   - P-048 va a `proposals.md`.

@@ -62,6 +62,7 @@ import { feedTheses, THESES, thesesBy, thesisById } from './fixtures/theses'
 import { answerMockThesis, extendWithAgreement, unanswerMockThesis } from './thesis-agreement'
 import { extendWithIdentity, withIdentity } from './thesis-identity'
 import { mockAssetPrices } from './asset-prices'
+import { createCommunity, updateCommunity } from './community-create'
 
 /** An open thesis and its author's session: what the cancel example needs (specs/thesis-detail). */
 const OPEN_THESIS = THESES.find((each) => each.state === 'OPEN')!
@@ -836,6 +837,33 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
       const community = params.slug ? communityBySlug(params.slug) : undefined
       return community ? { status: 200, body: withTopPost(community) } : notFound
     },
+  },
+  // Create a group, then save its images (specs/community-create).
+  {
+    method: 'POST',
+    path: '/api/v1/communities',
+    kind: 'contract',
+    implemented: true,
+    schema: communitySchema,
+    example: {
+      ...noRequest,
+      body: { userId: DEMO_USER.id, slug: 'options-flow', name: 'Options Flow' },
+    },
+    handler: ({ body, accessToken }) => createCommunity(body, mockCaller(accessToken)),
+  },
+  {
+    method: 'PATCH',
+    path: '/api/v1/communities/:slug',
+    kind: 'contract',
+    implemented: true,
+    schema: communitySchema,
+    example: {
+      ...noRequest,
+      params: { slug: 'trading-on-chain' },
+      body: { userId: DEMO_USER.id, bannerUrl: null },
+    },
+    handler: ({ params, body, accessToken }) =>
+      updateCommunity(params.slug ?? '', body, mockCaller(accessToken)),
   },
 
   // E04

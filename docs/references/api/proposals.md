@@ -427,6 +427,26 @@ Medido contra `dev` el 2026-10-30.
 
 Su orden entre las tesis publicadas del autor, desde 1, canceladas incluidas: no cambia nunca. Sin él en las tesis del sistema.
 
+### P-048: Límites al crear un grupo, e imágenes antes de que exista
+
+**Estado:** propuesta (2026-11-07, `specs/community-create`, MVP-204). No cambia ninguna forma: el front ya valida estos límites y crea el grupo antes de subir sus imágenes.
+
+**Motivo:** `POST /communities` solo valida el formato del slug. Un nombre, una descripción o unas reglas de cualquier largo, o un `mainUrl` que no es un link, llegan a la base si alguien llama a la API sin pasar por el front.
+
+**Cambio:** en `POST` y `PATCH /communities`, `422 VALIDATION_ERROR` con el campo cuando no se cumple:
+
+| Campo         | Regla                                                                         |
+| ------------- | ----------------------------------------------------------------------------- |
+| `slug`        | 3 a 30, `^[a-z0-9]+(?:-[a-z0-9]+)*$` (sin guion al principio, al final ni doble) |
+| `name`        | 3 a 50, sin espacios a los costados                                            |
+| `description` | hasta 500                                                                     |
+| `rules`       | hasta 2000                                                                    |
+| `mainUrl`     | `http(s)` con dominio, hasta 300 (la regla de los links del perfil, P-019)     |
+
+El slug más corto que hoy acepta el backend (1 a 50) seguiría valiendo para los grupos que ya existen.
+
+**Pregunta:** ¿`POST /uploads/community-image` acepta subir **sin `communityId`**, antes de crear el grupo, como la foto del perfil? Mientras no lo sepamos, el front crea el grupo sin imágenes, las sube ya como moderador y las guarda con `PATCH /communities/{slug}`.
+
 ## Fase 3 del backend: solo visual en el front
 
 Decisión del 2026-10-21: estas propuestas se implementan en el backend en una fase 3. Hasta entonces, el front las muestra con mocks (desarrollo y CI, `API_MOCKS=missing` o `true`): la forma de abajo es la que ya usa, y es lo que proponemos.
