@@ -1,6 +1,12 @@
 'use client'
 
-import { ArrowBigUpIcon, FileTextIcon, MessageCircleIcon, QuoteIcon } from 'lucide-react'
+import {
+  ArrowBigUpIcon,
+  FileTextIcon,
+  MessageCircleIcon,
+  QuoteIcon,
+  TargetIcon,
+} from 'lucide-react'
 import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { useId, useRef, useSyncExternalStore } from 'react'
 import { Link } from '@/i18n/navigation'
@@ -112,6 +118,9 @@ export function RecentlyViewed() {
                   <span className="ml-auto inline-flex items-center">
                     {item.kind === 'thought' ? (
                       <QuoteIcon aria-hidden data-kind="thought" className="size-3.5" />
+                    ) : item.kind === 'thesis' ? (
+                      // The thesis's icon, as its tab in the composer and its card's label.
+                      <TargetIcon aria-hidden data-kind="thesis" className="size-3.5" />
                     ) : (
                       <FileTextIcon aria-hidden data-kind="post" className="size-3.5" />
                     )}

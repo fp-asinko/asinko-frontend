@@ -1,13 +1,13 @@
 /**
- * What can be in the list: posts and thoughts today (specs/thoughts); polls, theses and alerts when
- * they have a page.
+ * What can be in the list: posts and thoughts (specs/thoughts), and theses since they have a page
+ * (specs/recently-viewed RV-11); alerts when they have one.
  */
-export type RecentKind = 'post' | 'thought'
+export type RecentKind = 'post' | 'thought' | 'thesis'
 
 /** A post opened lately (specs/recently-viewed § 2): what the right column shows of it. */
 export type RecentItem = {
   id: string
-  /** Its page, without the locale: /post/{id}/{slug}. */
+  /** Its page, without the locale: /post/{id}/{slug} or /thesis/{id}. */
   href: string
   /** Where it was published: $BTC, #macro, or @author in a personal channel. */
   label: string
@@ -28,6 +28,8 @@ export const GUEST_OWNER = 'guest'
  * letters (only emojis): no dots, query or hash.
  */
 const POST_PAGE = /^\/post\/[\w-]+(\/[\w-]*)?$/
+/** A thesis's page, /thesis/{id} (specs/thesis-detail Q1). */
+const THESIS_PAGE = /^\/thesis\/[\w-]+$/
 /** Longer than a real title or handle: something else wrote it. */
 const TEXT_MAX = 300
 /** Fired in this tab when the list changes; other tabs hear the `storage` event. */
@@ -42,7 +44,7 @@ function isRecentItem(value: unknown): value is RecentItem {
   return (
     typeof item.id === 'string' &&
     typeof item.href === 'string' &&
-    POST_PAGE.test(item.href) &&
+    (item.kind === 'thesis' ? THESIS_PAGE : POST_PAGE).test(item.href) &&
     typeof item.label === 'string' &&
     item.label.length <= TEXT_MAX &&
     typeof item.title === 'string' &&
@@ -50,7 +52,7 @@ function isRecentItem(value: unknown): value is RecentItem {
     // again, it comes back with it (PO, 2026-10-29).
     item.title.trim() !== '' &&
     item.title.length <= TEXT_MAX &&
-    (item.kind === 'post' || item.kind === 'thought') &&
+    (item.kind === 'post' || item.kind === 'thought' || item.kind === 'thesis') &&
     Number.isFinite(item.score) &&
     Number.isFinite(item.comments) &&
     typeof item.viewedAt === 'string' &&

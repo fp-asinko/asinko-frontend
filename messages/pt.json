@@ -352,9 +352,10 @@
       "comments": "{count, plural, one {# comentário} other {# comentários}}",
       "kinds": {
         "post": "Post",
-        "thought": "Thought"
+        "thought": "Thought",
+        "thesis": "Tese"
       },
-      "emptyBody": "Os posts que você abrir aparecerão aqui.",
+      "emptyBody": "Os posts e as teses que você abrir aparecerão aqui.",
       "quoted": "“{text}”"
     }
   },

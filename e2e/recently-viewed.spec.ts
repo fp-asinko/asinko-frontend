@@ -67,6 +67,22 @@ test.describe('Recently viewed', () => {
     await expect(recent(page).getByRole('link').first()).toContainText('ETH/BTC at a 4-year low')
   })
 
+  test('a thesis opened shows up too, leading back to its page (RV-11)', async ({ page }) => {
+    await page.goto('/en/thesis/00000000-0000-4000-8000-000000009001')
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => localStorage.getItem('asinko:recently-viewed')?.includes('/thesis/') ?? false,
+        ),
+      )
+      .toBe(true)
+    await page.goto('/en')
+    const link = recent(page).getByRole('link').first()
+    await expect(link).toHaveAccessibleName(/Thesis$/)
+    await link.click()
+    await expect(page).toHaveURL(/\/en\/thesis\/00000000-0000-4000-8000-000000009001$/)
+  })
+
   test('clears the list (RV-05)', async ({ page }) => {
     await readTwoPosts(page)
     await recent(page).getByRole('button', { name: 'Clear recently viewed' }).click()

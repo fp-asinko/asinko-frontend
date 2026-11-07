@@ -101,6 +101,13 @@ describe('recently viewed (specs/recently-viewed)', () => {
     expect(readRecent()).toEqual([expect.objectContaining({ id: 't', kind: 'thought' })])
   })
 
+  it('keeps a thesis on its page, never on a post page (RV-11)', () => {
+    recordRecent(item('th', { kind: 'thesis', href: '/thesis/th', title: 'BTC to 160k' }))
+    recordRecent(item('odd', { kind: 'thesis', href: '/post/odd/slug' }))
+    recordRecent(item('odd2', { kind: 'post', href: '/thesis/odd2' }))
+    expect(readRecent().map((each) => each.id)).toEqual(['th'])
+  })
+
   it('keeps a post whose title has no letters (its slug is empty: /post/{id}/)', () => {
     recordRecent(item('emoji', { href: '/post/emoji/', title: '🚀🚀🚀' }))
     expect(readRecent().map((each) => each.id)).toEqual(['emoji'])

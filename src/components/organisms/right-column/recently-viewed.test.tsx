@@ -44,6 +44,20 @@ describe('RecentlyViewed (specs/recently-viewed)', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 
+  it('marks a thesis by its icon, its claim as the title (RV-11)', () => {
+    recordRecent({
+      ...post('th', 'BTC above 160k by December', '$BTC'),
+      href: '/thesis/th',
+      kind: 'thesis' as const,
+    })
+    renderWithIntl(<RecentlyViewed />)
+    expect(screen.getByRole('link')).toHaveAccessibleName(
+      /^BTC: .*BTC above 160k by December.*Thesis$/,
+    )
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/thesis/th')
+    expect(screen.getByRole('link').querySelector('[data-kind="thesis"]')).not.toBeNull()
+  })
+
   it('marks a thought as such, with its text (specs/thoughts)', () => {
     recordRecent({ ...post('t', 'Rates first, risk later.', '@maria'), kind: 'thought' as const })
     renderWithIntl(<RecentlyViewed />)

@@ -15,6 +15,8 @@ import type { ThesisItem } from '../feed.types'
 import { getThesis } from '../lib/thesis-api'
 import { PostMarkdown } from './post-markdown'
 import { ThesisCard } from './thesis-card'
+import { RecordView } from './record-view'
+import { GUEST_OWNER } from '@/lib/recently-viewed'
 import { ThesisChartSection, ThesisChartSkeleton } from './thesis-chart-section'
 import { ThesisMenu } from './thesis-menu'
 import { ThesisArguments } from './thesis-arguments'
@@ -92,6 +94,8 @@ export async function ThesisDetail({
   const viewer = await getViewer()
   return (
     <>
+      {/* Into the right column's "Recently viewed" (specs/recently-viewed RV-11). */}
+      <RecordView item={recentThesis(thesis)} owner={viewer?.id ?? GUEST_OWNER} />
       <ThesisCard
         thesis={thesis}
         variant="detail"
@@ -139,4 +143,23 @@ function UpdatesSkeleton() {
       <Skeleton className="h-16 w-full rounded-xl" />
     </div>
   )
+}
+
+/**
+ * A thesis as "Recently viewed" shows it (RV-11): where it bets ($BTC, or its community without an
+ * asset), its claim, its votes, and its arguments as comments.
+ */
+function recentThesis(thesis: ThesisItem) {
+  const label = thesis.asset
+    ? `$${thesis.asset.symbol}`
+    : (thesis.community?.handle ?? thesis.author?.handle ?? '')
+  return {
+    id: thesis.id,
+    href: thesis.path,
+    label,
+    title: thesis.claim,
+    kind: 'thesis' as const,
+    score: thesis.score,
+    comments: thesis.argumentCount.pro + thesis.argumentCount.contra,
+  }
 }
