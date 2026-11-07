@@ -30,11 +30,14 @@ const CAMERA =
  * The photo and the banner in "Edit profile" (specs/profile-presentation PP-07,
  * specs/profile-edit-flow EF-01): how they look now (or the color and the initials), with a camera
  * button over each, as X and LinkedIn. Its menu uploads another image, to crop, or removes the one
- * there is. Only JPEG, PNG or WebP are offered (never SVG, security.md § 6).
+ * there is. Only JPEG, PNG or WebP are offered (never SVG, security.md § 6). A new group uses it
+ * too, with its square photo (specs/community-create CG-03).
  */
 export function ProfileImages({
   idPrefix,
-  username,
+  colorKey,
+  name = colorKey,
+  shape = 'round',
   avatar,
   banner,
   onPick,
@@ -43,8 +46,12 @@ export function ProfileImages({
 }: {
   /** For the ids of its buttons (changeImageId). */
   idPrefix: string
-  /** Their colors and initials when there is no image. */
-  username: string
+  /** Their colors when there is no image: a username, or a group's slug. */
+  colorKey: string
+  /** Its initials when there is no photo; the colorKey by default. */
+  name?: string
+  /** A person's photo is round; a group's, a rounded square. */
+  shape?: 'round' | 'square'
   avatar: string | null
   banner: string | null
   onPick: (kind: ProfileImageKind, file: File) => void
@@ -93,21 +100,24 @@ export function ProfileImages({
     <fieldset className={className}>
       {/* Named by its section's title too: only for who navigates by groups. */}
       <legend className="sr-only">{t('images')}</legend>
-      {/* As the profile shows them: the banner (4:1) and the round photo on its edge. */}
+      {/* As the page shows them: the banner (4:1) and the photo on its edge. */}
       <div className="relative mb-9">
         <IdentityBanner
-          colorKey={username}
+          colorKey={colorKey}
           imageUrl={banner}
           className="aspect-4/1 w-full overflow-hidden rounded-lg"
         />
         {camera('banner', Boolean(banner), t('changeBanner'), 'top-2 right-2')}
         <div className="absolute -bottom-7 left-3">
           <UserAvatar
-            name={username}
-            colorKey={username}
+            name={name}
+            colorKey={colorKey}
             imageUrl={avatar}
             size="xl"
-            className="size-16 rounded-full border-3 border-background text-lg"
+            className={cn(
+              'size-16 border-3 border-background text-lg',
+              shape === 'round' ? 'rounded-full' : 'rounded-xl',
+            )}
           />
           {camera('avatar', Boolean(avatar), t('changePhoto'), '-right-3 -bottom-1')}
         </div>

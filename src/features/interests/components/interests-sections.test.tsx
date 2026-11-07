@@ -1,5 +1,4 @@
 import { screen, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import type { Interests } from '../interests.types'
@@ -146,14 +145,14 @@ describe('InterestsSections', () => {
     expect(screen.queryByRole('button', { name: /^more:/ })).toBeNull()
   })
 
-  it('joins for real, while create group stays coming soon (specs/community-first CF-10)', async () => {
+  it('joins for real, and Create group goes to its page (specs/community-create CG-01)', () => {
     renderWithIntl(<InterestsSections interests={interests} />)
 
     expect(screen.getByRole('button', { name: 'Join #nft' })).not.toHaveAttribute('aria-disabled')
-    const create = screen.getByRole('button', { name: 'Create group' })
-    expect(create).toHaveAttribute('aria-disabled', 'true')
-    await userEvent.click(create)
-    expect(screen.getAllByRole('status').some((s) => s.textContent)).toBe(true)
+    expect(screen.getByRole('link', { name: 'Create group' })).toHaveAttribute(
+      'href',
+      '/create-group',
+    )
   })
 
   it('shows an error per failed section without hiding the others (H-19)', () => {

@@ -4,13 +4,17 @@ import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { ProfileImages } from './edit-profile-images'
 
-function renderImages(images: { avatar?: string | null; banner?: string | null } = {}) {
+function renderImages(
+  images: { avatar?: string | null; banner?: string | null } = {},
+  shape?: 'round' | 'square',
+) {
   const onPick = vi.fn()
   const onRemove = vi.fn()
   const { container } = renderWithIntl(
     <ProfileImages
       idPrefix="images"
-      username="demo"
+      colorKey="demo"
+      shape={shape}
       avatar={images.avatar ?? null}
       banner={images.banner ?? null}
       onPick={onPick}
@@ -18,7 +22,7 @@ function renderImages(images: { avatar?: string | null; banner?: string | null }
     />,
   )
   const input = container.querySelector('input[type="file"]') as HTMLInputElement
-  return { onPick, onRemove, input }
+  return { onPick, onRemove, input, container }
 }
 
 async function openMenu(name: string) {
@@ -53,5 +57,13 @@ describe('ProfileImages (specs/profile-edit-flow EF-01)', () => {
     await openMenu('Change banner')
     await userEvent.click(screen.getByRole('menuitem', { name: 'Remove' }))
     expect(onRemove).toHaveBeenCalledWith('banner')
+  })
+
+  it('draws the photo of a group as a rounded square (specs/community-create CG-03)', () => {
+    const round = renderImages().container
+    expect(round.querySelector('.size-16')).toHaveClass('rounded-full')
+    round.remove()
+    const { container } = renderImages({}, 'square')
+    expect(container.querySelector('.size-16')).toHaveClass('rounded-xl')
   })
 })

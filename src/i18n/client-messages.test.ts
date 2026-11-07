@@ -42,6 +42,8 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'common',
       'communities',
       'composer',
+      // The form to create a group (specs/community-create).
+      'createGroup',
       'emoji',
       'errors',
       'featured',

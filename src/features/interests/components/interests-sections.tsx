@@ -1,7 +1,7 @@
 import { JoinCard } from '@/components/organisms/auth-gate'
 import { PlusCircleIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
-import { ComingSoon } from '@/components/molecules/coming-soon'
+import { Link } from '@/i18n/navigation'
 import type { Interests } from '../interests.types'
 import { AssetTiles } from './asset-tiles'
 import { GroupList } from './group-list'
@@ -62,16 +62,16 @@ export function InterestsSections({ interests }: { interests: Interests }) {
       >
         {(groups, listId) => <GroupList id={listId} groups={groups} />}
       </SidebarSection>
-      {/* After the groups' "more", as in the prototype; shown even without groups. A column flex
-          container so the coming-soon wrapper (and its button) spans the width. */}
+      {/* After the groups' "more", as in the prototype; shown even without groups. Its page
+          (specs/community-create CG-01). */}
       <div className="mt-1 mb-6 flex flex-col">
-        <ComingSoon
-          label={t('createGroup')}
-          className="flex h-7.5 w-full tap items-center gap-1.75 rounded-md border border-dashed px-1.5 type-meta font-semibold text-muted-foreground hover:bg-surface"
+        <Link
+          href="/create-group"
+          className="flex h-7.5 w-full tap items-center gap-1.75 rounded-md border border-dashed px-1.5 type-meta font-semibold text-muted-foreground outline-none hover:bg-surface hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           <PlusCircleIcon aria-hidden className="size-3" />
           {t('createGroup')}
-        </ComingSoon>
+        </Link>
       </div>
       <SidebarSection
         title={t('people')}

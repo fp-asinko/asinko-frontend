@@ -335,7 +335,7 @@ export function EditProfileDialog({
                 <div className="flex flex-col gap-2">
                   <ProfileImages
                     idPrefix={`${ids}-images`}
-                    username={profile.username}
+                    colorKey={profile.username}
                     avatar={images.avatar}
                     banner={images.banner}
                     onPick={(kind, file) => {

@@ -74,7 +74,7 @@ Que cualquier persona con cuenta pueda abrir su propio grupo, con nombre, handle
   - `422 INVALID_SLUG`: marca el handle como inválido.
   - `401`: abre la ventana de cuenta.
   - Un fallo inesperado: un aviso con lo escrito intacto, para reintentar.
-  - Si una imagen no se pudo subir, el grupo **ya quedó creado**: se va igual a su página, sin esa imagen, con un aviso que lo dice (Q5).
+  - Si una imagen no se pudo subir, el grupo **ya quedó creado**: el formulario lo dice, con el link a su página (Q5; ver design § 6).
 - [ ] **CG-12** Cerrar o recargar la pestaña con algo escrito pide confirmación del navegador. Es nuevo en el sitio: crear post no lo pide, porque guarda borradores, y un grupo no tiene borradores.
 
 ### Calidad

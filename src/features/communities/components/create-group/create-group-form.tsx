@@ -1,0 +1,399 @@
+'use client'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CheckIcon } from 'lucide-react'
+import dynamic from 'next/dynamic'
+import { useTranslations } from 'next-intl'
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import { useForm, useWatch } from 'react-hook-form'
+import { FIELD_BOX } from '@/components/molecules/field-styles'
+import { StepTitle } from '@/components/molecules/step-title'
+import { Field, FieldError, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Link } from '@/i18n/navigation'
+import { cn } from '@/lib/utils'
+import { useCreateGroup } from '../../hooks/use-create-group'
+import { useSlugAvailability } from '../../hooks/use-slug-availability'
+import { slugify } from '../../lib/slugify'
+import {
+  createGroupSchema,
+  DESCRIPTION_MAX,
+  GROUP_SLUG,
+  NAME_MAX,
+  NAME_MIN,
+  RULES_MAX,
+  SLUG_MAX,
+  SLUG_MIN,
+  type CreateGroupForm as FormValues,
+  type CreateGroupInput,
+} from '../../schemas/create-group.schema'
+import { ProfileImages, type ProfileImageKind } from '../edit-profile-images'
+import { GroupPreview } from './group-preview'
+
+// The cropper brings react-easy-crop: only once an image is picked.
+const GroupImageCropper = dynamic(() =>
+  import('./group-image-cropper').then((mod) => mod.GroupImageCropper),
+)
+
+const STEPS = 6
+const PREVIEW_SLOT = 'group-preview-slot'
+
+/** The counter shows from 80% of the limit (CG-04). */
+const near = (length: number, max: number) => length >= max * 0.8
+
+type Image = { blob: Blob; url: string }
+
+/**
+ * The form to create a group (specs/community-create CG-03 to CG-12): six numbered steps, the
+ * handle that follows the name until edited and says whether it is free, the images cropped here
+ * and uploaded once the group exists, and a preview of its header. From lg the preview goes to the
+ * right column, through a portal; narrower, before the button.
+ */
+export function CreateGroupForm() {
+  const t = useTranslations('createGroup')
+  const ids = useId()
+  const form = useForm<FormValues, unknown, CreateGroupInput>({
+    resolver: zodResolver(createGroupSchema),
+    mode: 'onTouched',
+    defaultValues: { name: '', slug: '', description: '', rules: '', mainUrl: '' },
+  })
+  const { register, setValue, formState, control } = form
+  const [name, slug, description, rules, mainUrl] = useWatch({
+    control,
+    name: ['name', 'slug', 'description', 'rules', 'mainUrl'],
+  })
+  const { available } = useSlugAvailability(form)
+  const { state, submit } = useCreateGroup(form)
+  // The handle follows the name until it is edited; emptied, it follows again (CG-05).
+  const [slugTouched, setSlugTouched] = useState(false)
+  const [images, setImages] = useState<Partial<Record<ProfileImageKind, Image>>>({})
+  const [cropping, setCropping] = useState<{
+    kind: ProfileImageKind
+    file: File
+    source: string
+  } | null>(null)
+  const [slot, setSlot] = useState<HTMLElement | null>(null)
+
+  // The right column's place for the preview: another React tree, there after hydrating.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the slot is in the DOM only after hydrating
+    setSlot(document.getElementById(PREVIEW_SLOT))
+  }, [])
+
+  // The previews' URLs go with what they show.
+  const latest = useRef(images)
+  useEffect(() => {
+    latest.current = images
+  }, [images])
+  useEffect(
+    () => () => Object.values(latest.current).forEach((image) => URL.revokeObjectURL(image.url)),
+    [],
+  )
+
+  // Leaving with something written asks first (CG-12): a group has no drafts.
+  const busy = state.status === 'creating' || state.status === 'created'
+  const dirty = formState.isDirty || Object.keys(images).length > 0
+  const guard = dirty && state.status !== 'created' && state.status !== 'partial'
+  useEffect(() => {
+    if (!guard) return
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault()
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [guard])
+
+  const nameField = register('name', {
+    onChange: (event: { target: { value: string } }) => {
+      if (slugTouched) return
+      setValue('slug', slugify(event.target.value), {
+        shouldDirty: true,
+        shouldValidate: formState.isSubmitted || Boolean(formState.touchedFields.slug),
+      })
+    },
+  })
+  const slugField = register('slug', {
+    onChange: (event: { target: { value: string } }) => {
+      setSlugTouched(event.target.value !== '')
+    },
+  })
+
+  /** A field's error, as a key of this namespace (or of the api's, said generally). */
+  const fieldError = (field: keyof FormValues) => {
+    const message = formState.errors[field]?.message
+    if (!message) return undefined
+    const key = message.startsWith('createGroup.') ? message.slice(12) : 'errors.unexpected'
+    return [{ message: t(key as 'errors.unexpected') }]
+  }
+  const invalid = (field: keyof FormValues) => Boolean(formState.errors[field])
+
+  const slugOk =
+    slug.length >= SLUG_MIN && slug.length <= SLUG_MAX && GROUP_SLUG.test(slug) && !invalid('slug')
+  const done = {
+    name: name.trim().length >= NAME_MIN && name.trim().length <= NAME_MAX,
+    slug: slugOk,
+    description: description.trim().length > 0 && !invalid('description'),
+    images: Object.keys(images).length > 0,
+    rules: rules.trim().length > 0 && !invalid('rules'),
+    mainUrl: mainUrl.trim().length > 0 && !invalid('mainUrl'),
+  }
+  const ready = name.trim().length > 0 && slug.length > 0 && !busy
+
+  function setImage(kind: ProfileImageKind, blob: Blob | null) {
+    setImages((current) => {
+      const previous = current[kind]
+      if (previous) URL.revokeObjectURL(previous.url)
+      const next = { ...current }
+      if (blob) next[kind] = { blob, url: URL.createObjectURL(blob) }
+      else delete next[kind]
+      return next
+    })
+  }
+
+  const preview = (className?: string) => (
+    <GroupPreview
+      handle={slugOk ? slug : ''}
+      name={name.trim()}
+      description={description.trim()}
+      avatarUrl={images.avatar?.url ?? null}
+      bannerUrl={images.banner?.url ?? null}
+      className={className}
+    />
+  )
+
+  const counter = (id: string, length: number, max: number) =>
+    near(length, max) && (
+      <span
+        id={id}
+        className={cn(
+          'type-meta tabular-nums',
+          length > max ? 'font-bold text-destructive' : 'text-muted-foreground',
+        )}
+      >
+        {t('counter', { count: length, max })}
+      </span>
+    )
+
+  const title = (n: number, isDone: boolean, label: string, optional = false): ReactNode => (
+    <StepTitle n={n} total={STEPS} done={isDone}>
+      {label}
+      {optional && (
+        <>
+          {' '}
+          <span className="font-normal text-muted-foreground">{t('optional')}</span>
+        </>
+      )}
+    </StepTitle>
+  )
+
+  return (
+    <>
+      <form
+        noValidate
+        onSubmit={form.handleSubmit(() =>
+          submit(form.getValues(), {
+            avatar: images.avatar?.blob,
+            banner: images.banner?.blob,
+          }),
+        )}
+        className="flex flex-col gap-6"
+      >
+        <Field data-invalid={invalid('name') || undefined} className="gap-2">
+          <div className="flex items-baseline justify-between gap-2">
+            <FieldLabel htmlFor={`${ids}-name`}>
+              {title(1, done.name, t('fields.name.label'))}
+            </FieldLabel>
+            {counter(`${ids}-name-count`, name.trim().length, NAME_MAX)}
+          </div>
+          <Input
+            id={`${ids}-name`}
+            placeholder={t('fields.name.placeholder')}
+            autoComplete="off"
+            {...nameField}
+            aria-invalid={invalid('name') || undefined}
+            aria-required
+            aria-describedby={`${ids}-name-count ${ids}-name-error`}
+            className={cn(FIELD_BOX, 'h-12 font-semibold')}
+          />
+          <FieldError id={`${ids}-name-error`} errors={fieldError('name')} className="type-meta" />
+        </Field>
+
+        <Field data-invalid={invalid('slug') || undefined} className="gap-2">
+          <FieldLabel htmlFor={`${ids}-slug`}>
+            {title(2, done.slug, t('fields.slug.label'))}
+          </FieldLabel>
+          <div className="relative">
+            <span
+              aria-hidden
+              className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-base font-semibold text-muted-foreground"
+            >
+              #
+            </span>
+            <Input
+              id={`${ids}-slug`}
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              maxLength={SLUG_MAX}
+              {...slugField}
+              aria-invalid={invalid('slug') || undefined}
+              aria-required
+              aria-describedby={`${ids}-slug-hint ${ids}-slug-status ${ids}-slug-error`}
+              className={cn(FIELD_BOX, 'h-12 pl-8')}
+            />
+          </div>
+          <p id={`${ids}-slug-hint`} className="type-meta text-muted-foreground">
+            {t('fields.slug.hint')}
+          </p>
+          {/* Whether it is free, announced politely (CG-06); a taken one is the field's error. */}
+          <p
+            id={`${ids}-slug-status`}
+            aria-live="polite"
+            className="flex items-center gap-1 type-meta font-semibold text-success empty:hidden"
+          >
+            {available && !invalid('slug') && (
+              <>
+                <CheckIcon aria-hidden className="size-3.5" strokeWidth={3} />
+                {t('fields.slug.available', { slug: available })}
+              </>
+            )}
+          </p>
+          <FieldError id={`${ids}-slug-error`} errors={fieldError('slug')} className="type-meta" />
+        </Field>
+
+        <Field data-invalid={invalid('description') || undefined} className="gap-2">
+          <div className="flex items-baseline justify-between gap-2">
+            <FieldLabel htmlFor={`${ids}-description`}>
+              {title(3, done.description, t('fields.description.label'), true)}
+            </FieldLabel>
+            {counter(`${ids}-description-count`, description.trim().length, DESCRIPTION_MAX)}
+          </div>
+          <Textarea
+            id={`${ids}-description`}
+            placeholder={t('fields.description.placeholder')}
+            {...register('description')}
+            aria-invalid={invalid('description') || undefined}
+            aria-describedby={`${ids}-description-count ${ids}-description-error`}
+            className={cn(FIELD_BOX, 'field-sizing-content max-h-60 min-h-20 resize-none py-3')}
+          />
+          <FieldError
+            id={`${ids}-description-error`}
+            errors={fieldError('description')}
+            className="type-meta"
+          />
+        </Field>
+
+        <div className="flex flex-col gap-2">
+          {/* The images' own names are their camera buttons; the step titles the group. */}
+          <p className="type-ui font-medium">
+            {title(4, done.images, t('fields.images.label'), true)}
+          </p>
+          <ProfileImages
+            idPrefix={`${ids}-images`}
+            colorKey={slugOk ? slug : 'your-group'}
+            name={name.trim() || 'your-group'}
+            shape="square"
+            avatar={images.avatar?.url ?? null}
+            banner={images.banner?.url ?? null}
+            onPick={(kind, file) => setCropping({ kind, file, source: URL.createObjectURL(file) })}
+            onRemove={(kind) => setImage(kind, null)}
+          />
+        </div>
+
+        <Field data-invalid={invalid('rules') || undefined} className="gap-2">
+          <div className="flex items-baseline justify-between gap-2">
+            <FieldLabel htmlFor={`${ids}-rules`}>
+              {title(5, done.rules, t('fields.rules.label'), true)}
+            </FieldLabel>
+            {counter(`${ids}-rules-count`, rules.trim().length, RULES_MAX)}
+          </div>
+          <Textarea
+            id={`${ids}-rules`}
+            placeholder={t('fields.rules.placeholder')}
+            {...register('rules')}
+            aria-invalid={invalid('rules') || undefined}
+            aria-describedby={`${ids}-rules-count ${ids}-rules-error`}
+            className={cn(FIELD_BOX, 'field-sizing-content max-h-80 min-h-24 resize-none py-3')}
+          />
+          <FieldError
+            id={`${ids}-rules-error`}
+            errors={fieldError('rules')}
+            className="type-meta"
+          />
+        </Field>
+
+        <Field data-invalid={invalid('mainUrl') || undefined} className="gap-2">
+          <FieldLabel htmlFor={`${ids}-mainUrl`}>
+            {title(6, done.mainUrl, t('fields.mainUrl.label'), true)}
+          </FieldLabel>
+          <Input
+            id={`${ids}-mainUrl`}
+            type="url"
+            inputMode="url"
+            autoComplete="url"
+            placeholder={t('fields.mainUrl.placeholder')}
+            {...register('mainUrl')}
+            aria-invalid={invalid('mainUrl') || undefined}
+            aria-describedby={`${ids}-mainUrl-error`}
+            className={cn(FIELD_BOX, 'h-12')}
+          />
+          <FieldError
+            id={`${ids}-mainUrl-error`}
+            errors={fieldError('mainUrl')}
+            className="type-meta"
+          />
+        </Field>
+
+        {/* Where there is no right column, the preview before the button (Q3). */}
+        {preview('lg:hidden')}
+
+        {state.status === 'error' && (
+          <p role="alert" className="type-small text-destructive">
+            {t('errors.unexpected')}
+          </p>
+        )}
+        {state.status === 'partial' && (
+          <p role="alert" className="type-small">
+            {t('images.failed', { kind: state.failed })}{' '}
+            <Link href={state.href} className="font-semibold underline underline-offset-2">
+              {t('goToGroup')}
+            </Link>
+          </p>
+        )}
+
+        <div className="flex justify-end border-t pt-4">
+          <button
+            type="submit"
+            aria-disabled={!ready || undefined}
+            onClick={(event) => {
+              if (!ready) event.preventDefault()
+            }}
+            className="inline-flex h-11 tap items-center justify-center rounded-full bg-primary px-5 type-action font-bold text-primary-foreground outline-none hover:bg-primary/85 focus-visible:ring-3 focus-visible:ring-ring/50 aria-disabled:opacity-50 aria-disabled:active:scale-100 md:h-9"
+          >
+            {busy ? t('creating') : t('submit')}
+          </button>
+        </div>
+      </form>
+
+      {/* From lg, at the top of the right column (CG-08). */}
+      {slot && createPortal(preview(), slot)}
+
+      {cropping && (
+        <GroupImageCropper
+          kind={cropping.kind}
+          file={cropping.file}
+          source={cropping.source}
+          onApply={(blob) => {
+            setImage(cropping.kind, blob)
+            URL.revokeObjectURL(cropping.source)
+            setCropping(null)
+          }}
+          onBack={() => {
+            URL.revokeObjectURL(cropping.source)
+            setCropping(null)
+          }}
+        />
+      )}
+    </>
+  )
+}

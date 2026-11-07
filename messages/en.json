@@ -1451,5 +1451,65 @@
   "agreeBar": {
     "result": "{yes} yes · {no} no · {count, plural, one {# vote} other {# votes}}",
     "empty": "No votes yet"
+  },
+  "createGroup": {
+    "title": "Create a group",
+    "description": "Create a group to talk about what interests you, with its own rules.",
+    "gateTitle": "Create a group with an account",
+    "gateBody": "Create an account or log in to create a group.",
+    "optional": "(optional)",
+    "counter": "{count}/{max}",
+    "fields": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Dividends LatAm"
+      },
+      "slug": {
+        "label": "Handle",
+        "hint": "Lowercase letters, numbers and hyphens. It is how the group is mentioned.",
+        "available": "#{slug} is available"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "What the group is about"
+      },
+      "images": {
+        "label": "Photo and banner"
+      },
+      "rules": {
+        "label": "Rules",
+        "placeholder": "One rule per line"
+      },
+      "mainUrl": {
+        "label": "Website",
+        "placeholder": "https://"
+      }
+    },
+    "submit": "Create group",
+    "creating": "Creating…",
+    "preview": {
+      "label": "Preview",
+      "placeholder": "your-group",
+      "joined": "Joined"
+    },
+    "images": {
+      "cropPhoto": "Crop the photo",
+      "cropBanner": "Crop the banner",
+      "failed": "The group was created, but its {kind, select, avatar {photo} other {banner}} could not be saved."
+    },
+    "errors": {
+      "nameLength": "The name needs 3 to 50 characters.",
+      "slugFormat": "Use 3 to 30 lowercase letters, numbers or hyphens, without a hyphen at the ends.",
+      "slugTaken": "Already taken",
+      "descriptionMax": "The description can have up to 500 characters.",
+      "rulesMax": "The rules can have up to 2000 characters.",
+      "url": "Enter a link that starts with http:// or https://",
+      "invalid": "Check the fields marked.",
+      "imageType": "Only JPEG, PNG or WebP images",
+      "imageTooLarge": "The image is too large",
+      "imageUpload": "Could not upload the image",
+      "unexpected": "The group could not be created. Try again in a moment."
+    },
+    "goToGroup": "Go to the group"
   }
 }

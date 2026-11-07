@@ -1451,5 +1451,65 @@
   "agreeBar": {
     "result": "{yes} sí · {no} no · {count, plural, one {# voto} other {# votos}}",
     "empty": "Todavía sin votos"
+  },
+  "createGroup": {
+    "title": "Crear un grupo",
+    "description": "Creá un grupo para hablar de lo que te interesa, con sus propias reglas.",
+    "gateTitle": "Creá un grupo con una cuenta",
+    "gateBody": "Creá una cuenta o iniciá sesión para crear un grupo.",
+    "optional": "(opcional)",
+    "counter": "{count}/{max}",
+    "fields": {
+      "name": {
+        "label": "Nombre",
+        "placeholder": "Dividendos LatAm"
+      },
+      "slug": {
+        "label": "Handle",
+        "hint": "Minúsculas, números y guiones. Es cómo se menciona el grupo.",
+        "available": "#{slug} está disponible"
+      },
+      "description": {
+        "label": "Descripción",
+        "placeholder": "De qué se trata el grupo"
+      },
+      "images": {
+        "label": "Foto y banner"
+      },
+      "rules": {
+        "label": "Reglas",
+        "placeholder": "Una regla por línea"
+      },
+      "mainUrl": {
+        "label": "Sitio web",
+        "placeholder": "https://"
+      }
+    },
+    "submit": "Crear grupo",
+    "creating": "Creando…",
+    "preview": {
+      "label": "Vista previa",
+      "placeholder": "tu-grupo",
+      "joined": "Unido"
+    },
+    "images": {
+      "cropPhoto": "Recortá la foto",
+      "cropBanner": "Recortá el banner",
+      "failed": "El grupo se creó, pero no se pudo guardar {kind, select, avatar {su foto} other {su banner}}."
+    },
+    "errors": {
+      "nameLength": "El nombre necesita de 3 a 50 caracteres.",
+      "slugFormat": "Usá de 3 a 30 minúsculas, números o guiones, sin guion en los extremos.",
+      "slugTaken": "Ya está tomado",
+      "descriptionMax": "La descripción puede tener hasta 500 caracteres.",
+      "rulesMax": "Las reglas pueden tener hasta 2000 caracteres.",
+      "url": "Ingresá un link que empiece con http:// o https://",
+      "invalid": "Revisá los campos marcados.",
+      "imageType": "Solo imágenes JPEG, PNG o WebP",
+      "imageTooLarge": "La imagen es demasiado grande",
+      "imageUpload": "No se pudo subir la imagen",
+      "unexpected": "No se pudo crear el grupo. Probá de nuevo en un momento."
+    },
+    "goToGroup": "Ir al grupo"
   }
 }

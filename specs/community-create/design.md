@@ -34,7 +34,7 @@ Las reglas son más estrictas que las del backend (`^[a-z0-9-]{1,50}$`): todo lo
 - **En el cliente**, `use-slug-availability.ts`:
   - consulta 400 ms después de la última tecla, y solo con un formato válido;
   - descarta respuestas viejas (compara con el slug actual);
-  - el estado (`idle | checking | free | taken | unknown`) se muestra debajo del campo con ✓ o ✗ y texto, en una región `aria-live="polite"`.
+  - como el username de `specs/auth` (`use-username-check.ts`): libre se confirma debajo del campo con ✓ y texto, en una región `aria-live="polite"`; tomado es el error del campo ("Already taken"), que se borra al cambiar el handle.
 
   No bloquea el botón: el envío es el control final (`409`).
 
@@ -46,7 +46,7 @@ Las reglas son más estrictas que las del backend (`^[a-z0-9-]{1,50}$`): todo lo
 - **`CreateGroupForm`** (`'use client'`):
   - `react-hook-form` + `Field` de shadcn, con un `StepTitle` por campo (`n` de 6, `done` según `useWatch`).
   - Los opcionales llevan "(optional)" en el título.
-  - Campos rellenos (`FIELD_BOX`, la excepción de los formularios de crear, `design-system.md`). `FIELD_BOX` vive en `features/composer`, así que se sube a `components/` (`field-styles.ts`), porque los features no se importan entre sí.
+  - Campos rellenos (`FIELD_BOX`, la excepción de los formularios de crear, `design-system.md`). `FIELD_BOX` vive en `features/composer`, así que se sube a `components/molecules/field-styles.ts`, porque los features no se importan entre sí; `editor-styles.ts` lo reexporta.
   - El contador aparece desde el 80 % del tope.
 - **Dónde se ve la vista previa:**
   - Desde `lg` (cuando existe la columna derecha del shell), el formulario la dibuja con `createPortal` en `#group-preview-slot`, `sticky` arriba de la columna.
@@ -54,7 +54,7 @@ Las reglas son más estrictas que las del backend (`^[a-z0-9-]{1,50}$`): todo lo
 
   Son dos instancias del mismo componente chico, con los mismos datos. El portal se monta después de hidratar (`useEffect` busca el contenedor), así que en el HTML del servidor solo está la vista previa en línea.
 
-- **`GroupPreview`** (organismo de `components/organisms/`, sin negocio, con props mínimas: `handle`, `name`, `description`, `avatarUrl`, `bannerUrl`):
+- **`GroupPreview`** (en `features/communities/components/create-group/`: solo lo usa este formulario; sin negocio, con props mínimas: `handle`, `name`, `description`, `avatarUrl`, `bannerUrl`):
   - `IdentityBanner` con `colorKey = slug` (el tono que va a tener, `identityIndex`);
   - el avatar cuadrado redondeado de las páginas de grupo;
   - `#handle` como título, el nombre y la descripción en 3 líneas;
@@ -65,7 +65,7 @@ Las reglas son más estrictas que las del backend (`^[a-z0-9-]{1,50}$`): todo lo
 ## 5. Las imágenes (CG-03.4, Q5)
 
 - **Elegir y recortar:** `ProfileImages` (los botones de cámara sobre el banner y el avatar) y `CropFrame`.
-  - `ProfileImages` suma la prop `shape: 'round' | 'square'` (por defecto `round`), y `username` pasa a llamarse `colorKey`. El perfil no cambia.
+  - `ProfileImages` suma la prop `shape: 'round' | 'square'` (por defecto `round`), `username` pasa a llamarse `colorKey` y suma `name` para las iniciales. El perfil no cambia.
   - El recorte de un grupo **no sube nada**: `GroupImageCropper` (nuevo, en un `Dialog` diferido) usa `CropFrame` + `cropImage` con los mismos tamaños (400×400, 1500×375) y devuelve el `Blob` preparado.
   - El formulario guarda `{ avatar?: Blob, banner?: Blob }` y un `URL.createObjectURL` para la vista previa, que se revoca al cambiar o al desmontar.
 - **Subir, después de crear:** la acción `upload-group-image.action.ts` recibe `FormData` con `communityId`, `slug`, `kind` y `file`:
@@ -93,7 +93,7 @@ Las reglas son más estrictas que las del backend (`^[a-z0-9-]{1,50}$`): todo lo
   | Otro               | Su `errorKey`                                                 |
 
 - **En el cliente** (`use-create-group.ts`): crear, después subir las imágenes una por una, y al final `router.push('/hub/' + slug)`.
-  - Si una imagen falla, igual navega y muestra un `toast` de sonner: "The group was created, but its banner could not be saved" (CG-11).
+  - Si una imagen falla, el formulario lo dice con el link al grupo ya creado: "The group was created, but its banner could not be saved. Go to the group" (CG-11). **Cambio al implementar (2026-11-07):** el plan era navegar y mostrar un `toast` de sonner, pero `sonner` no está instalado y su `Toaster` en el layout sumaría JS a todas las rutas.
   - El botón dice "Creating…" mientras dura todo y queda `aria-disabled`.
   - Un error de campo pone el foco en ese campo (`setFocus`).
 - **Salir con cambios (CG-12):** un `beforeunload` mientras el formulario esté `isDirty` y no se haya creado.

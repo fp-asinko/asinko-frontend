@@ -1451,5 +1451,65 @@
   "agreeBar": {
     "result": "{yes} sim · {no} não · {count, plural, one {# voto} other {# votos}}",
     "empty": "Ainda sem votos"
+  },
+  "createGroup": {
+    "title": "Criar um grupo",
+    "description": "Crie um grupo para conversar sobre o que te interessa, com suas próprias regras.",
+    "gateTitle": "Crie um grupo com uma conta",
+    "gateBody": "Crie uma conta ou entre para criar um grupo.",
+    "optional": "(opcional)",
+    "counter": "{count}/{max}",
+    "fields": {
+      "name": {
+        "label": "Nome",
+        "placeholder": "Dividendos LatAm"
+      },
+      "slug": {
+        "label": "Handle",
+        "hint": "Letras minúsculas, números e hifens. É como o grupo é mencionado.",
+        "available": "#{slug} está disponível"
+      },
+      "description": {
+        "label": "Descrição",
+        "placeholder": "Sobre o que é o grupo"
+      },
+      "images": {
+        "label": "Foto e banner"
+      },
+      "rules": {
+        "label": "Regras",
+        "placeholder": "Uma regra por linha"
+      },
+      "mainUrl": {
+        "label": "Site",
+        "placeholder": "https://"
+      }
+    },
+    "submit": "Criar grupo",
+    "creating": "Criando…",
+    "preview": {
+      "label": "Prévia",
+      "placeholder": "seu-grupo",
+      "joined": "Participando"
+    },
+    "images": {
+      "cropPhoto": "Recorte a foto",
+      "cropBanner": "Recorte o banner",
+      "failed": "O grupo foi criado, mas não foi possível salvar {kind, select, avatar {a foto} other {o banner}}."
+    },
+    "errors": {
+      "nameLength": "O nome precisa ter de 3 a 50 caracteres.",
+      "slugFormat": "Use de 3 a 30 letras minúsculas, números ou hifens, sem hífen nas pontas.",
+      "slugTaken": "Já está em uso",
+      "descriptionMax": "A descrição pode ter até 500 caracteres.",
+      "rulesMax": "As regras podem ter até 2000 caracteres.",
+      "url": "Digite um link que comece com http:// ou https://",
+      "invalid": "Revise os campos marcados.",
+      "imageType": "Apenas imagens JPEG, PNG ou WebP",
+      "imageTooLarge": "A imagem é grande demais",
+      "imageUpload": "Não foi possível enviar a imagem",
+      "unexpected": "Não foi possível criar o grupo. Tente de novo em instantes."
+    },
+    "goToGroup": "Ir para o grupo"
   }
 }
