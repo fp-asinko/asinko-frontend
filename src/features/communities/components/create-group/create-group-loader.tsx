@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { arriving } from '@/components/molecules/arriving'
 import { Skeleton } from '@/components/ui/skeleton'
 
 /** The form's outline: six steps and the button, so nothing jumps when it arrives (CLS). */
@@ -25,6 +26,6 @@ function FormSkeleton() {
  * react-hook-form and zod, which would put the page over the JS budget (seo.md).
  */
 export const CreateGroupLoader = dynamic(
-  () => import('./create-group-form').then((mod) => mod.CreateGroupForm),
+  () => import('./create-group-form').then((mod) => arriving(mod.CreateGroupForm)),
   { ssr: false, loading: FormSkeleton },
 )

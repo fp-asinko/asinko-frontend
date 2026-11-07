@@ -15,7 +15,7 @@ Que lo que termina de cargar no aparezca de golpe: un fade de opacidad corto cua
   - el gráfico y las novedades de una tesis;
   - las tesis y las respuestas del perfil;
   - la columna derecha de crear post;
-  - los formularios diferidos: el editor de crear post, los de la cuenta y los recortes de imágenes.
+  - los formularios diferidos: el editor de crear post, crear un grupo, los de la cuenta y los recortes de imágenes.
 - [ ] **CR-05** El Home, que pasa por el skeleton de toda la página (`(main)/loading.tsx`): el composer, las pestañas y el feed entran juntos con el mismo fade (PO, 2026-11-07). Es la única página con ese skeleton; su LCP, el primer post, ya entraba con el fade.
 - [ ] **CR-02** Los primeros posts del feed entran todos juntos, no en cascada. "Cargar más" sigue como está (`stagger`).
 - [ ] **CR-03** Con "reducir movimiento", aparece al instante, como hoy toda animación (regla global de `globals.css`).
