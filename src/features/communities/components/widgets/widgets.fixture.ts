@@ -7,6 +7,7 @@ export const GROUP: CommunityPage = {
   slug: 'trading-on-chain',
   handle: '#trading-on-chain',
   path: '/hub/trading-on-chain',
+  name: 'Trading on-chain',
   subtitle: 'Trading on-chain',
   description: 'Flows of wallets, exchanges and whales.',
   avatarUrl: null,

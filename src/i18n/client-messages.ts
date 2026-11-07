@@ -15,6 +15,7 @@ export const CLIENT_NAMESPACES = [
   'createGroup',
   'communities.actions',
   'communities.edit',
+  'communities.editGroup',
   'communities.follows',
   'communities.openTo',
   'communities.profile',

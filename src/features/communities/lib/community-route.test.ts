@@ -27,6 +27,7 @@ const page = (overrides: Partial<CommunityPage>): CommunityPage => ({
   slug: 'macro',
   handle: '#macro',
   path: '/hub/macro',
+  name: 'Macro',
   subtitle: null,
   description: null,
   avatarUrl: null,

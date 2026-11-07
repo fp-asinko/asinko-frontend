@@ -237,6 +237,7 @@ export function CreateGroupForm() {
                       <span className="text-muted-foreground">
                         {t('fields.name.members', { count: group.memberCount })}
                       </span>
+                      <span className="sr-only">{t('fields.name.newTab')}</span>
                     </Link>
                   </li>
                 ))}

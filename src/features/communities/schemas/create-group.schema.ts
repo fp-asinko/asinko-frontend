@@ -19,34 +19,63 @@ export const groupSlugSchema = z
   .max(SLUG_MAX, { message: 'createGroup.errors.slugFormat' })
   .regex(GROUP_SLUG, { message: 'createGroup.errors.slugFormat' })
 
-/** An optional text: trimmed, and empty is the same as not given. */
-const optionalText = (max: number, message: string) =>
-  z
-    .string()
-    .trim()
-    .max(max, { message })
-    .transform((value) => value || undefined)
+/** The texts of a group, trimmed and checked; what an empty one means is up to each schema. */
+const text = (max: number, message: string) => z.string().trim().max(max, { message })
+
+const nameSchema = z
+  .string()
+  .trim()
+  .min(NAME_MIN, { message: 'createGroup.errors.nameLength' })
+  .max(NAME_MAX, { message: 'createGroup.errors.nameLength' })
+
+/** Only http(s), as a profile's links (security.md § 1); empty is no link. */
+const urlSchema = text(URL_MAX, 'createGroup.errors.url').refine(
+  (value) => value === '' || isHttpUrl(value),
+  { message: 'createGroup.errors.url' },
+)
+
+const descriptionSchema = text(DESCRIPTION_MAX, 'createGroup.errors.descriptionMax')
+const rulesSchema = text(RULES_MAX, 'createGroup.errors.rulesMax')
+
+/** Empty is not given: a new group starts without it. */
+const orUndefined = (value: string) => value || undefined
+/** Empty removes what there was (specs/community-edit CE-05). */
+const orNull = (value: string) => value || null
 
 /**
  * A new group (specs/community-create design § 2): the same rules in the form and in the Server
  * Action. Messages are translation keys (i18n.md).
  */
 export const createGroupSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(NAME_MIN, { message: 'createGroup.errors.nameLength' })
-    .max(NAME_MAX, { message: 'createGroup.errors.nameLength' }),
+  name: nameSchema,
   slug: groupSlugSchema,
-  description: optionalText(DESCRIPTION_MAX, 'createGroup.errors.descriptionMax'),
-  rules: optionalText(RULES_MAX, 'createGroup.errors.rulesMax'),
-  mainUrl: z
-    .string()
-    .trim()
-    .max(URL_MAX, { message: 'createGroup.errors.url' })
-    .refine((value) => value === '' || isHttpUrl(value), { message: 'createGroup.errors.url' })
-    .transform((value) => value || undefined),
+  description: descriptionSchema.transform(orUndefined),
+  rules: rulesSchema.transform(orUndefined),
+  mainUrl: urlSchema.transform(orUndefined),
 })
 
 export type CreateGroupForm = z.input<typeof createGroupSchema>
 export type CreateGroupInput = z.output<typeof createGroupSchema>
+
+/**
+ * A group's fields as "Edit group" has them (specs/community-edit § 2): the same rules, without
+ * the handle (Q2). The form keeps empty texts as "".
+ */
+export const editGroupSchema = z.object({
+  name: nameSchema,
+  description: descriptionSchema.transform(orNull),
+  rules: rulesSchema.transform(orNull),
+  mainUrl: urlSchema.transform(orNull),
+})
+
+/**
+ * What the Server Action takes: only what changed. An empty text is null, which removes it; the
+ * photo or banner, only null (to remove it): a new one is saved by its upload.
+ */
+export const editGroupChangesSchema = editGroupSchema
+  .extend({ avatarUrl: z.null(), bannerUrl: z.null() })
+  .partial()
+
+export type EditGroupForm = z.input<typeof editGroupSchema>
+export type EditGroupChanges = z.output<typeof editGroupChangesSchema>
+export type EditGroupInput = z.output<typeof editGroupSchema>

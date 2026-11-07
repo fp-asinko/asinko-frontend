@@ -900,7 +900,43 @@
       "progressPercent": "{current, number}% of {target, number}%"
     },
     "shareGroup": "Share group",
-    "shareAsset": "Share asset"
+    "shareAsset": "Share asset",
+    "editGroup": {
+      "button": "Edit group",
+      "title": "Edit group",
+      "handle": "Handle",
+      "handleNote": "The handle cannot be changed.",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "close": "Close",
+      "saved": "Changes saved",
+      "discard": {
+        "title": "Discard your changes?",
+        "body": "What you changed in this group will not be saved.",
+        "cancel": "Keep editing",
+        "confirm": "Discard"
+      },
+      "errors": {
+        "general": "The changes could not be saved. Try again in a moment.",
+        "notModerator": "Only its moderators can edit this group.",
+        "image": "The {kind, select, avatar {photo} other {banner}} could not be saved. Try again."
+      }
+    },
+    "groupChecklist": {
+      "title": "Get your group started",
+      "progress": "{done, number} of {total, number} done",
+      "hide": "Hide",
+      "hidden": "Hidden. You will not see it again in this browser.",
+      "undo": "Undo",
+      "steps": {
+        "images": "Add a photo and a banner",
+        "description": "Say what the group is about",
+        "rules": "Write its rules",
+        "post": "Write the first post"
+      },
+      "done": "Done"
+    }
   },
   "thesisSummary": {
     "state": {
@@ -1464,7 +1500,8 @@
         "label": "Name",
         "placeholder": "e.g. Dividends LatAm",
         "similar": "Similar groups already exist",
-        "members": "{count, plural, one {# member} other {# members}}"
+        "members": "{count, plural, one {# member} other {# members}}",
+        "newTab": "(opens in a new tab)"
       },
       "slug": {
         "label": "Handle",

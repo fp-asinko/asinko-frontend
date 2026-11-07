@@ -900,7 +900,43 @@
       "progressPercent": "{current, number}% de {target, number}%"
     },
     "shareGroup": "Compartilhar grupo",
-    "shareAsset": "Compartilhar ativo"
+    "shareAsset": "Compartilhar ativo",
+    "editGroup": {
+      "button": "Editar grupo",
+      "title": "Editar grupo",
+      "handle": "Handle",
+      "handleNote": "O handle não pode ser alterado.",
+      "save": "Salvar",
+      "saving": "Salvando…",
+      "cancel": "Cancelar",
+      "close": "Fechar",
+      "saved": "Alterações salvas",
+      "discard": {
+        "title": "Descartar as alterações?",
+        "body": "O que você mudou neste grupo não será salvo.",
+        "cancel": "Continuar editando",
+        "confirm": "Descartar"
+      },
+      "errors": {
+        "general": "Não foi possível salvar as alterações. Tente de novo em instantes.",
+        "notModerator": "Só os moderadores podem editar este grupo.",
+        "image": "Não foi possível salvar {kind, select, avatar {a foto} other {o banner}}. Tente de novo."
+      }
+    },
+    "groupChecklist": {
+      "title": "Deixe seu grupo pronto",
+      "progress": "{done, number} de {total, number} feitos",
+      "hide": "Ocultar",
+      "hidden": "Oculto. Você não vai vê-lo de novo neste navegador.",
+      "undo": "Desfazer",
+      "steps": {
+        "images": "Adicione uma foto e um banner",
+        "description": "Conte do que se trata o grupo",
+        "rules": "Escreva as regras",
+        "post": "Escreva o primeiro post"
+      },
+      "done": "Feito"
+    }
   },
   "thesisSummary": {
     "state": {
@@ -1464,7 +1500,8 @@
         "label": "Nome",
         "placeholder": "Ex.: Dividendos LatAm",
         "similar": "Já existem grupos parecidos",
-        "members": "{count, plural, one {# membro} other {# membros}}"
+        "members": "{count, plural, one {# membro} other {# membros}}",
+        "newTab": "(abre em outra aba)"
       },
       "slug": {
         "label": "Handle",

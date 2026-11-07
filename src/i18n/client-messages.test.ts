@@ -84,6 +84,8 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
     expect(Object.keys(picked.communities as object)).toEqual([
       'actions',
       'edit',
+      // "Edit group" (specs/community-edit).
+      'editGroup',
       'follows',
       'openTo',
       'profile',

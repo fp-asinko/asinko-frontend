@@ -67,6 +67,35 @@ describe('updateCommunity (specs/community-create)', () => {
     })
   })
 
+  it('edits what a moderator can, removes with null and ignores the slug (specs/community-edit CE-11)', () => {
+    create({ slug: 'to-edit', description: 'Old' })
+    const response = updateCommunity(
+      'to-edit',
+      { userId: me, name: 'Edited', description: null, rules: 'Be kind', slug: 'other' },
+      me,
+    )
+    expect(response).toMatchObject({
+      status: 200,
+      body: { slug: 'to-edit', name: 'Edited', description: null, rules: 'Be kind' },
+    })
+  })
+
+  it('refuses a field out of its limits with its name, and changes nothing (CE-11)', () => {
+    create({ slug: 'to-refuse', description: 'Kept' })
+    for (const [field, value] of [
+      ['name', ''],
+      ['name', null],
+      ['description', 'a'.repeat(501)],
+      ['rules', 'a'.repeat(2001)],
+      ['mainUrl', 'a'.repeat(301)],
+    ] as const) {
+      expect(
+        updateCommunity('to-refuse', { userId: me, description: 'Changed', [field]: value }, me),
+      ).toMatchObject({ status: 422, body: { error: { code: 'VALIDATION_ERROR', field } } })
+    }
+    expect(communityBySlug('to-refuse')?.description).toBe('Kept')
+  })
+
   it('refuses who does not moderate it, another userId and an unknown group', () => {
     expect(updateCommunity('defi', { userId: me, avatarUrl: '/a.webp' }, me)).toMatchObject({
       status: 403,

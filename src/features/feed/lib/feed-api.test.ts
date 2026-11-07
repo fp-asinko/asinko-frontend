@@ -5,7 +5,7 @@ import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
 import { parseFeedParams } from '../schemas/feed-params.schema'
 import type { FeedItem, PollItem, PostItem, ThesisItem } from '../feed.types'
-import { getFeed, getFilteredCommunity } from './feed-api'
+import { communityHasPosts, getFeed, getFilteredCommunity } from './feed-api'
 
 /** The users' content of a page, without its ads (specs/ads). */
 /** What people publish: posts, polls and theses (specs/thesis-detail), not ads nor terms. */
@@ -351,5 +351,21 @@ describe('getFilteredCommunity (specs/feed-navigation § 2)', () => {
     )
     await getFeed(parseFeedParams({ community: 'BTC' }), undefined, { communityResolved: true })
     expect(lookups).toBe(0)
+  })
+})
+
+describe('communityHasPosts (specs/community-edit CE-07)', () => {
+  beforeEach(() => {
+    state.routes = MOCK_ROUTES
+  })
+
+  it('is true for a group with posts and false for one without', async () => {
+    expect(await communityHasPosts('defi')).toBe(true)
+    expect(await communityHasPosts('nobody-posted-here')).toBe(false)
+  })
+
+  it('counts a failure as published: the step is not offered on a guess', async () => {
+    state.routes = []
+    expect(await communityHasPosts('defi')).toBe(true)
   })
 })

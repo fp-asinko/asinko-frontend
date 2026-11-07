@@ -14,10 +14,13 @@ const HideContext = createContext<(() => void) | null>(null)
 export function HideableChecklist({
   hiddenText,
   undoLabel,
+  cookie,
   children,
 }: {
   hiddenText: string
   undoLabel: string
+  /** Its own cookie (a group's, specs/community-edit CE-08); the profile's by default. */
+  cookie?: string
   children: ReactNode
 }) {
   const textId = useId()
@@ -46,7 +49,7 @@ export function HideableChecklist({
 
   function toggle(next: boolean) {
     // The cookie first: its event (for a card shown from "Edit profile") moves no focus.
-    writeChecklistHidden(next)
+    writeChecklistHidden(next, cookie)
     moved.current = true
     setHidden(next)
   }

@@ -92,6 +92,19 @@ function requestCommunity(params: FeedParams) {
  * The community the feed is filtered by: the chip's name, streamed on its own (specs/feed-navigation
  * § 2). NOT_FOUND passes through, for the not-found page. null without a community filter.
  */
+/**
+ * Whether a community has anything published (specs/community-edit CE-07: "Write the first post"):
+ * its first page, without the mentions' lookups getFeed adds. A failure counts as not knowing, so
+ * as published: the step is not offered on a guess.
+ */
+export async function communityHasPosts(slug: string): Promise<boolean> {
+  const result = await requestFeed(
+    { feed: 'for-you', filter: 'new', type: 'all', community: slug },
+    undefined,
+  )
+  return !result.ok || knownKinds(result.data.items).length > 0
+}
+
 export async function getFilteredCommunity(
   params: FeedParams,
 ): Promise<ApiResult<CommunityRef> | null> {

@@ -1,7 +1,7 @@
 import type { RawCommunity } from '@/lib/api/contract'
 import { allowedImageUrl } from '@/lib/images'
 import { kindOf, mentionOf } from '@/lib/communities/paths'
-import type { CommunityPage } from '../communities.types'
+import type { CommunityPage, EditableGroup } from '../communities.types'
 
 export { kindOf }
 
@@ -34,6 +34,7 @@ export function toCommunityPage(community: RawCommunity, signedIn = true): Commu
     slug: community.slug,
     handle,
     path,
+    name: community.name,
     subtitle,
     description: community.description?.trim() || null,
     avatarUrl: allowedImageUrl(community.avatarUrl),
@@ -45,5 +46,20 @@ export function toCommunityPage(community: RawCommunity, signedIn = true): Commu
     mainUrl: safeLink(community.mainUrl),
     viewerMembership: signedIn ? community.viewerMembership : null,
     viewerIsFavorite: signedIn && community.viewerIsFavorite === true,
+  }
+}
+
+/** What "Edit group" starts with (specs/community-edit § 3): only what the window shows. */
+export function toEditableGroup(page: CommunityPage): EditableGroup {
+  return {
+    id: page.id,
+    slug: page.slug,
+    handle: page.handle,
+    name: page.name,
+    description: page.description,
+    rules: page.rules,
+    mainUrl: page.mainUrl?.url ?? null,
+    avatarUrl: page.avatarUrl,
+    bannerUrl: page.bannerUrl,
   }
 }

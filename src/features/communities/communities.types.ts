@@ -76,6 +76,8 @@ export type CommunityPage = {
   handle: string
   /** Its page: /hub/macro, /asset/BRK.B (the symbol, never the slug) or /user/maria. */
   path: string
+  /** Its name as saved: what "Edit group" starts with (specs/community-edit). */
+  name: string
   /** The display name, only when it says more than the handle (NVIDIA under $NVDA). */
   subtitle: string | null
   description: string | null
@@ -262,3 +264,21 @@ export type CommunityWidget = { id: string; title: string } & (
       }[]
     }
 )
+
+/** What "Edit group" starts with (specs/community-edit § 3): only what the window shows. */
+export type EditableGroup = {
+  /** For its images' upload (P-029). */
+  id: string
+  slug: string
+  handle: string
+  name: string
+  description: string | null
+  rules: string | null
+  /** The link as saved, to edit it. */
+  mainUrl: string | null
+  avatarUrl: string | null
+  bannerUrl: string | null
+}
+
+/** A field "Edit group" can open on: each step of "Get your group started" (CE-07). */
+export type EditGroupField = 'images' | 'name' | 'description' | 'rules' | 'mainUrl'

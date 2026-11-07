@@ -50,7 +50,25 @@ export function createCommunity(body: unknown, caller: string): MockResponse {
   return { status: 201, body: created }
 }
 
-/** PATCH /communities/{slug} { userId, avatarUrl?, bannerUrl? }: only what creating needs. */
+/**
+ * What a moderator edits (E02) and its length (P-048); null removes it. The name is required:
+ * never null nor empty. The slug is left out (specs/community-edit Q2): ignored.
+ */
+const EDITABLE = {
+  name: 50,
+  description: 500,
+  rules: 2000,
+  mainUrl: 300,
+  avatarUrl: Infinity,
+  bannerUrl: Infinity,
+} as const
+
+const fieldError = (field: string): MockResponse => ({
+  status: 422,
+  body: { error: { code: 'VALIDATION_ERROR', message: 'mock', field } },
+})
+
+/** PATCH /communities/{slug} { userId, name?, description?, rules?, mainUrl?, avatarUrl?, bannerUrl? } */
 export function updateCommunity(slug: string, body: unknown, caller: string): MockResponse {
   const community = communityBySlug(slug)
   if (!community) return error(404, 'NOT_FOUND')
@@ -58,12 +76,18 @@ export function updateCommunity(slug: string, body: unknown, caller: string): Mo
   if (input.userId !== caller) return error(403, 'USER_MISMATCH')
   const role = community.viewerMembership
   if (role !== 'MODERATOR' && role !== 'PRINCIPAL_MODERATOR') return error(403, 'NOT_MODERATOR')
-  for (const key of ['avatarUrl', 'bannerUrl'] as const) {
-    if (key in input) {
-      const value = input[key]
-      if (value !== null && typeof value !== 'string') return error(422, 'VALIDATION_ERROR')
-      community[key] = value
-    }
+  // Checked whole before anything changes: a refusal leaves the group as it was.
+  const keys = (Object.keys(EDITABLE) as (keyof typeof EDITABLE)[]).filter((key) => key in input)
+  for (const key of keys) {
+    const value = input[key]
+    if (key === 'name' && (typeof value !== 'string' || !value.trim())) return fieldError(key)
+    if (value !== null && typeof value !== 'string') return fieldError(key)
+    if (typeof value === 'string' && value.length > EDITABLE[key]) return fieldError(key)
+  }
+  for (const key of keys) {
+    const value = input[key] as string | null
+    if (key === 'name') community.name = value as string
+    else community[key] = value
   }
   return { status: 200, body: community }
 }
