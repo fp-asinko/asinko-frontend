@@ -23,3 +23,6 @@ auditConfig:
     # braces <=3.0.3, stack exhaustion with deeply nested patterns (2026-09-18). No patched version
     # exists. It only expands our own globs (ESLint, shadcn CLI), never user input.
     - GHSA-vfj7-8cjw-p6xm
+
+patchedDependencies:
+  sonner@2.0.8: patches/sonner@2.0.8.patch

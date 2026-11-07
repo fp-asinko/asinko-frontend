@@ -1,11 +1,12 @@
 import { gzipSync } from 'node:zlib'
 import { expect, test } from '@playwright/test'
 
-// F-41 / seo.md § Performance: first-load JS per route ≤ 240 KB gzip, measured as the sum of every
+// F-41 / seo.md § Performance: first-load JS per route ≤ 241 KB gzip, measured as the sum of every
 // <script src> in the initial HTML, gzipped.
 // 230 until 2026-10-07 (raised by the PO with specs/community-pages), 235 until 2026-10-08 (raised
-// by the PO with specs/mention-autocomplete). History in seo.md § Performance.
-const BUDGET_KB = 240
+// by the PO with specs/mention-autocomplete), 240 until 2026-11-07 (raised by the PO with
+// specs/community-create). History in seo.md § Performance.
+const BUDGET_KB = 241
 
 // A guest (the login page sends anyone else away) and an account without a username (the page to
 // choose it): with API_MOCKS=true there is the demo user unless a cookie says otherwise.

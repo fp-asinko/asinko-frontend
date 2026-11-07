@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+/* sonner's styles, here and not injected by its JS: the CSP needs a nonce (patches/sonner). */
+@import 'sonner/dist/styles.css';
 
 /* Tailwind reads every file of the project for class names: not the specs and guides, whose
    examples are text (a "[&>li:nth-child(n+K)]" in a spec once broke the CSS). */

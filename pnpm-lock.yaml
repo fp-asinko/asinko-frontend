@@ -13,6 +13,9 @@ overrides:
   ip-address@<10.7.4: ^10.7.4
   systeminformation@<5.33.16: ^5.33.16
 
+patchedDependencies:
+  sonner@2.0.8: 781a1a4146c52424ba7f7f4504795d0a4766a19fe3812902ce5a8ac0b7c3b79b
+
 importers:
 
   .:
@@ -68,6 +71,9 @@ importers:
       shadcn:
         specifier: ^4.22.1
         version: 4.22.1
+      sonner:
+        specifier: 2.0.8
+        version: 2.0.8(patch_hash=781a1a4146c52424ba7f7f4504795d0a4766a19fe3812902ce5a8ac0b7c3b79b)(@types/react@19.3.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       tw-animate-css:
         specifier: ^1.4.0
         version: 1.4.0
@@ -4534,6 +4540,16 @@ packages:
   socks@2.8.10:
     resolution: {integrity: sha512-e0VyvkVTwVYViNovRkZ9aodhxVlyoMn7eJhVUPxZ+eK9P/7CBkxvvsBOHqFPEH416726W8tLXXXjKwqgTErrCQ==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
+
+  sonner@2.0.8:
+    resolution: {integrity: sha512-UM/ByIoFra8yzV75n1o0Puu0bw5U/9UNnDacrJNspekBewIfsQ3D6ez1nvlWpt7aTsO6rujQtifBpycwIivqlg==}
+    peerDependencies:
+      '@types/react': ^18.0.0 || ^19.0.0
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   source-map-js@1.2.2:
     resolution: {integrity: sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==}
@@ -9522,6 +9538,13 @@ snapshots:
     dependencies:
       ip-address: 10.7.4
       smart-buffer: 4.2.0
+
+  sonner@2.0.8(patch_hash=781a1a4146c52424ba7f7f4504795d0a4766a19fe3812902ce5a8ac0b7c3b79b)(@types/react@19.3.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
+    dependencies:
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+    optionalDependencies:
+      '@types/react': 19.3.0
 
   source-map-js@1.2.2: {}
 
