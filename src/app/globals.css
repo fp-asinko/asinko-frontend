@@ -341,6 +341,21 @@
   --animate-comment-flash: comment-flash 1.5s var(--ease-out);
   --animate-underline-in: underline-in 200ms var(--ease-out);
   --animate-live-pulse: live-pulse 2s var(--ease-out) infinite;
+  /* A thesis's chart draws itself once, left to right (specs/thesis-chart Q1): the second
+     exception to the 300ms, after the poll bars. Linear: it is time going by, and an ease-out drew
+     most of it at once and then crawled (PO, 2026-11-06: "se traba"). A clip-path uncovers the
+     line, not an SVG mask (that one repainted every frame); its area fades in meanwhile, so no
+     hard edge sweeps across. Today's dot lands as the line reaches it; then the projection and,
+     while open, the live pulse (CH-22). */
+  --animate-chart-draw: chart-draw 1600ms linear backwards;
+  --animate-chart-area: fade-in 1600ms linear backwards;
+  --animate-chart-dot: chart-dot 250ms var(--ease-out) 1500ms backwards;
+  --animate-chart-fade: fade-in 300ms var(--ease-out) 1600ms backwards;
+  --animate-chart-pulse: live-pulse 2s var(--ease-out) 1700ms infinite;
+  /* The asset search's results unfold down from the field, as if it grew (PO 2026-11-06): opening
+     slower than closing. */
+  --animate-unfold-in: unfold-in 200ms var(--ease-out);
+  --animate-unfold-out: unfold-out 150ms var(--ease-out) forwards;
 
   @keyframes vote-pop {
     50% {
@@ -389,6 +404,38 @@
   @keyframes underline-in {
     from {
       transform: scaleX(0);
+    }
+  }
+  /* Both ends written (from an inset() to none does not interpolate: it jumps halfway), and the
+     end at today, --chart-rest from the right: the whole time draws the line, none is left idle. */
+  @keyframes chart-draw {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 var(--chart-rest, 0%) 0 0);
+    }
+  }
+  @keyframes unfold-in {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+  @keyframes unfold-out {
+    from {
+      clip-path: inset(0 0 0 0);
+    }
+    to {
+      clip-path: inset(0 0 100% 0);
+    }
+  }
+  @keyframes chart-dot {
+    from {
+      opacity: 0;
+      transform: scale(0.5);
     }
   }
   @keyframes live-pulse {
@@ -451,6 +498,67 @@
   }
   & > :nth-child(n + 5) {
     animation-delay: 160ms;
+  }
+}
+
+/*
+ * A thesis's ticket, perforated between its two stubs (specs/thesis-identity TI-12, TI-13): a mask
+ * bites a half circle out of each side at the join, so what is behind shows through (white, or the
+ * card's gray on hover), and a ring 1px wider draws the bite's edge in the border's color.
+ */
+@utility ticket-stub-top {
+  --notch: 0.5rem;
+  position: relative;
+  mask-image:
+    radial-gradient(circle at 0 100%, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)),
+    radial-gradient(circle at 100% 100%, #0000 var(--notch), #000 calc(var(--notch) + 0.5px));
+  mask-position: left, right;
+  mask-size: 51% 100%;
+  mask-repeat: no-repeat;
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: calc(-1 * var(--notch) - 1px);
+    width: calc(2 * var(--notch) + 2px);
+    height: calc(2 * var(--notch) + 2px);
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    pointer-events: none;
+  }
+  &::before {
+    left: calc(-1 * var(--notch) - 1px);
+  }
+  &::after {
+    right: calc(-1 * var(--notch) - 1px);
+  }
+}
+
+@utility ticket-stub-bottom {
+  --notch: 0.5rem;
+  position: relative;
+  mask-image:
+    radial-gradient(circle at 0 0, #0000 var(--notch), #000 calc(var(--notch) + 0.5px)),
+    radial-gradient(circle at 100% 0, #0000 var(--notch), #000 calc(var(--notch) + 0.5px));
+  mask-position: left, right;
+  mask-size: 51% 100%;
+  mask-repeat: no-repeat;
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: calc(-1 * var(--notch) - 1px);
+    width: calc(2 * var(--notch) + 2px);
+    height: calc(2 * var(--notch) + 2px);
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    pointer-events: none;
+  }
+  &::before {
+    left: calc(-1 * var(--notch) - 1px);
+  }
+  &::after {
+    right: calc(-1 * var(--notch) - 1px);
   }
 }
 

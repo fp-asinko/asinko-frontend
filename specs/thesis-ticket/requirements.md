@@ -21,15 +21,15 @@
 
 ### La línea de arriba (Q3)
 
-- [ ] **TK-01** Una línea chica arriba: a la izquierda el badge **◎ THESIS** en gris (como POLL) y el estado (Abierta, Acertada, Errada…); a la derecha, `@autor · hace 11 h`. El motivo del feed ("Porque seguís #argentina") sigue encima, como hoy.
-- [ ] **TK-02** Si la tesis está en un grupo o canal que no es la comunidad del activo, el grupo va en esa línea, con Unirse cuando corresponde (CP-07). En la comunidad del activo no se repite: el activo ya está en el ticket.
+- [ ] **TK-01** La cabecera de todos los tipos de post (`CardByline`): primero el grupo o el autor, con su avatar, y `hace 11 h`; a la derecha, donde va POLL, el badge **◎ THESIS** en gris y el estado (Abierta, Acertada, Errada…). El motivo del feed ("Porque seguís #argentina") sigue encima, como hoy. (PO, 2026-11-05: antes THESIS y el estado iban primero; una tesis se encabeza como los demás posts.) En la pestaña "Tesis" de un perfil, sin autor (el perfil es suyo): `hace 11 h` a la izquierda y THESIS a la derecha, antes del "⋯".
+- [ ] **TK-02** Si la tesis está en un grupo que no es la comunidad del activo, el grupo encabeza, con el autor debajo y Unirse cuando corresponde (CP-07). En la comunidad del activo no se repite (el activo ya está en el ticket): la cabecera muestra al autor con su foto, como un post del canal personal.
 
 ### El ticket (Q1, Q2)
 
 - [ ] **TK-03** Un panel `bg-surface` con borde y `rounded-xl`, sin sombra. Es lo que distingue a la tesis de un post.
-- [ ] **TK-04** **Arriba a la izquierda, el activo:** su logo de 44 px (40 px en el teléfono), el símbolo en negrita (`$NVDA`) y el nombre debajo, en gris. El logo y el símbolo llevan a la página del activo. Sin logo, las iniciales en su tono de identidad (como hoy).
-- [ ] **TK-05** **Arriba a la derecha, el objetivo:** grande, en verde si apuesta a que sube y en rojo si apuesta a que baja (PO, 2026-11-05), con su flecha (↑ por encima, ↓ por debajo), por ejemplo "↑ $240". Debajo, en gris, cuánto se mueve desde el precio de entrada: "+33 % desde $180". La flecha va con su texto: el color nunca es la única señal.
-- [ ] **TK-06** **Debajo, dos datos con su rótulo:** CONVICCIÓN, con las 4 barras azules y el nombre del nivel ("Alta"), y PLAZO, con la fecha ("4 nov 2027") y cuánto falta ("en 12 meses").
+- [ ] **TK-04** **Tres celdas con la misma forma** (PO, 2026-11-06: "los 3 conceptos son importantes"): un rótulo chico arriba (ACTIVO, CONVICCIÓN, OBJETIVO), el valor y una línea gris debajo. Desde `sm`, una al lado de la otra con una línea fina entre ellas (sin los "›", que parecían botones); en el teléfono, el activo y el objetivo arriba y la convicción debajo. **Activo:** su logo de 24 px y el símbolo (`$NVDA`), que llevan a su página; debajo, el nombre. Sin logo, las iniciales en su tono de identidad.
+- [ ] **TK-05** **Objetivo:** el valor más grande del ticket (24 px; el activo y la convicción, 18 px: a 24 px se veían demasiado grandes, PO 2026-11-06), en verde si apuesta a que sube y en rojo si apuesta a que baja, con su flecha (↑ por encima, ↓ por debajo). Su rótulo lleva el toro o el oso (`specs/thesis-agree` AG-19). Debajo, cuánto se mueve desde el precio de entrada: "+33 % desde $180". La flecha va con su texto: el color nunca es la única señal.
+- [ ] **TK-06** **Convicción:** las 4 barras azules y el nombre del nivel ("Alta"); debajo, su lugar en la escala ("3 de 4"). Debajo de las tres celdas, después del troquel, el PLAZO con la fecha ("4 nov 2027") y cuánto falta ("en 12 meses").
 - [ ] **TK-07** **Cerrada:** el plazo da lugar al resultado. Acertada o Errada con ✓ / ✗ y el precio de cierre; Vencida, Disputada y Cancelada con su texto, como hoy en `ThesisState`.
 - [ ] **TK-08** **Sin activo** (una tesis cualitativa vieja): el ticket muestra solo la convicción y el plazo.
 

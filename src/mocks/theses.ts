@@ -9,6 +9,8 @@ import { assetBySymbol } from './fixtures/assets'
 import { communityById, communityBySlug, communitySummary } from './fixtures/communities'
 import { MOCK_NOW, mockId } from './fixtures/ids'
 import { THESES } from './fixtures/theses'
+import { withAgreement } from './thesis-agreement'
+import { withIdentity } from './thesis-identity'
 import { takeThesisDraft } from './thesis-drafts'
 import { PROFILES, summary } from './fixtures/users'
 import { commentsOf } from './posting'
@@ -132,13 +134,20 @@ function argumentsOf(thesis: RawThesis): RawThesis['argumentCounts'] {
   }
 }
 
-/** A thesis as the caller sees it: `canCancel` is theirs (specs/thesis-detail TD-12). */
+/**
+ * A thesis as the caller sees it: `canCancel` is theirs (specs/thesis-detail TD-12), and so is its
+ * "Will it happen?" (P-043, specs/thesis-agree). With today's price and its author's count (P-044,
+ * P-045, specs/thesis-identity).
+ */
 export function asSeenBy(thesis: RawThesis, accessToken: string | null | undefined): RawThesis {
-  return {
-    ...thesis,
-    canCancel: cancellable(thesis, mockCaller(accessToken)),
-    argumentCounts: argumentsOf(thesis),
-  }
+  return withAgreement(
+    withIdentity({
+      ...thesis,
+      canCancel: cancellable(thesis, mockCaller(accessToken)),
+      argumentCounts: argumentsOf(thesis),
+    }),
+    accessToken,
+  )
 }
 
 /** Updates by thesis, newest last as written: GET sorts them (specs/thesis-arguments § 8). */

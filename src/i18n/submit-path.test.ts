@@ -25,4 +25,10 @@ describe('submitPath (specs/submit-page SU-01)', () => {
     )
     expect(submitPath('en', { community: 'defi', related: [] })).toBe('/submit?community=defi')
   })
+
+  it('carries the thesis a new one answers (specs/thesis-agree AG-11)', () => {
+    expect(submitPath('es', { community: 'NVDA', type: 'thesis', counter: 'abc' })).toBe(
+      '/publicar?community=NVDA&type=thesis&counter=abc',
+    )
+  })
 })

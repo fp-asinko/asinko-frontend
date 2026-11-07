@@ -2,19 +2,21 @@ import { ForwardIcon, MessagesSquareIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import type { ReactNode } from 'react'
 import { ShareButton } from '@/components/molecules/share-button'
-import { ThesisClaim, ThesisTicket } from '@/components/organisms/thesis-ticket'
+import { ThesisState } from '@/components/organisms/thesis-summary'
+import { ThesisBadge, ThesisClaim, ThesisTicket } from '@/components/organisms/thesis-ticket'
 import { Link } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 import type { ThesisItem } from '../feed.types'
 import { CARD_ACTION } from './card-action'
 import { CardLink } from '@/components/molecules/card-link'
 import { FeedReasonLine } from './feed-reason-line'
-import { ThesisByline } from './thesis-byline'
+import { CardByline } from './card-byline'
+import { ThesisAgree } from './thesis-agree'
 import { VoteControl } from './vote-control'
 
 /**
- * A thesis in a feed as a betting ticket (specs/thesis-ticket), a Server Component: a small line
- * with THESIS, its state and its author; the ticket with the asset, the target, the conviction and
+ * A thesis in a feed as a betting ticket (specs/thesis-ticket), a Server Component: the header of
+ * every post, with THESIS on the right; the ticket with the asset, the target, the conviction and its state, and
  * the deadline; then the claim, second; and votes, arguments and share. The whole card opens its
  * page.
  *
@@ -26,6 +28,7 @@ export function ThesisCard({
   variant = 'card',
   feedCommunity,
   leading,
+  chart,
   menu,
   children,
 }: {
@@ -35,6 +38,11 @@ export function ThesisCard({
   feedCommunity?: string
   /** Before the header: the page's back button (specs/post-detail-refresh PD-01). */
   leading?: ReactNode
+  /**
+   * Its page's price chart, between the header and the ticket (specs/thesis-chart Q3, PO
+   * 2026-11-06: the back button and the author stay on top of everything).
+   */
+  chart?: ReactNode
   /** "⋯" to cancel it, when its author can (TD-12): over the card's link. */
   menu?: ReactNode
   /** What the page adds between the summary and the actions: the reasoning (TD-06). */
@@ -69,23 +77,38 @@ export function ThesisCard({
       aria-labelledby={titleId}
     >
       {!detail && thesis.reason && <FeedReasonLine reason={thesis.reason} />}
-      {/* THESIS, its state, its author (TK-01, TK-02): small, the ticket leads. */}
+      {/* The header every post has: its group or author first, THESIS and its state on the right,
+          as POLL (TK-01, PO 2026-11-05). Not the asset's own community: the ticket shows it (TK-02). */}
       <div className={cn('flex items-center gap-2.5', detail && 'mb-1')}>
         {leading}
         <div className="min-w-0 flex-1">
-          <ThesisByline
-            thesis={thesis}
+          <CardByline
+            author={thesis.author}
+            community={ownGroup(thesis)}
+            publishedAt={thesis.publishedAt}
             titleId={titleId}
             canJoin={thesis.community?.slug !== feedCommunity}
-            compact={detail}
+            // Beside the page's back button in a phone: the icon alone (TD-01). Its state goes
+            // down, in the ticket (PO, 2026-11-05).
+            badge={<ThesisBadge iconOnly={detail} />}
+            // Who bets and how often they are right (specs/thesis-identity TI-08).
+            accuracy="words"
           />
         </div>
         {menu && <div className="relative -my-2">{menu}</div>}
       </div>
 
+      {/* Empty when there is no history (CH-06): no gap, the page as before. */}
+      {chart && <div className="mt-3 empty:hidden">{chart}</div>}
+
       {/* The bet first: asset, target, conviction and deadline (TK-03 to TK-08). On its page, also
           the entry price's date and the deadline to the minute (Q4). */}
-      <ThesisTicket thesis={thesis} variant={detail ? 'detail' : 'card'} />
+      <ThesisTicket
+        thesis={thesis}
+        variant={detail ? 'detail' : 'card'}
+        stateChip={<ThesisState state={thesis.state} onSurface />}
+        author={thesis.author?.username}
+      />
 
       {/* The claim, second (TK-09): its page's h1, or the card's title and link. */}
       <ThesisClaim
@@ -94,6 +117,19 @@ export function ThesisCard({
         heading={detail ? 'h1' : 'h2'}
         href={detail ? undefined : thesis.path}
       />
+
+      {/* "Will it happen?" right after what has to happen: the claim (specs/thesis-agree AG-01, PO
+          2026-11-06). Closed, only its result, if anyone answered (AG-02); without the backend's
+          field, nothing (AG-18). */}
+      {thesis.agreement &&
+        (thesis.state === 'open' || thesis.agreement.yes + thesis.agreement.no > 0) && (
+          <ThesisAgree
+            thesisId={thesis.id}
+            assetSymbol={thesis.asset?.symbol ?? null}
+            agreement={thesis.agreement}
+            className="mt-3"
+          />
+        )}
 
       {children}
 
@@ -129,4 +165,9 @@ export function ThesisCard({
       </div>
     </Card>
   )
+}
+
+/** Its group, unless it is the asset's own community: the ticket already says the asset (TK-02). */
+function ownGroup({ community, asset }: ThesisItem) {
+  return community?.kind === 'asset' && community.slug === asset?.symbol ? null : community
 }

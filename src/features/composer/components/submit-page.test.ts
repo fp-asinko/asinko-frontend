@@ -28,6 +28,10 @@ describe('the page to create a post: its URL (specs/submit-page SU-01)', () => {
     })
     // The thesis's tab too (specs/thesis-create TC-01).
     expect(parseSubmitQuery({ type: 'thesis' }).type).toBe('thesis')
+    // The thesis it answers, only as an id (specs/thesis-agree AG-11).
+    const id = '00000000-0000-4000-8000-000000000001'
+    expect(parseSubmitQuery({ type: 'thesis', counter: id }).counter).toBe(id)
+    expect(parseSubmitQuery({ type: 'thesis', counter: '../x' }).counter).toBeUndefined()
     expect(parseSubmitQuery({ community: ['BTC', 'ETH'], type: 'video' })).toEqual({
       community: 'BTC',
       type: undefined,

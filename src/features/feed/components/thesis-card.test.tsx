@@ -9,14 +9,17 @@ vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 vi.mock('../actions/vote-post.action', () => ({ votePost: vi.fn() }))
 vi.mock('../actions/vote-comment.action', () => ({ voteComment: vi.fn() }))
 vi.mock('../actions/vote-thesis.action', () => ({ voteThesis: vi.fn() }))
+vi.mock('../actions/answer-thesis.action', () => ({ answerThesis: vi.fn() }))
 
 describe('ThesisCard in a feed (specs/thesis-detail TD-02 to TD-05, specs/thesis-ticket)', () => {
-  it('opens with a small line: THESIS, its state, its group and author (specs/thesis-ticket TK-01, TK-02)', () => {
+  it('opens with the header of every post: group and author first, then THESIS (TK-01)', () => {
     renderWithIntl(<ThesisCard thesis={thesisItem()} />)
     const card = screen.getByRole('article', {
       name: 'BTC will close above $150K before December 2026',
     })
-    expect(card).toHaveTextContent(/^Thesis\s*Open/)
+    // After the group's initials (its avatar): the group, the author, then the badge; its state
+    // down in the ticket, beside the deadline (PO, 2026-11-05).
+    expect(card).toHaveTextContent(/^MAmacro.*maria.*Thesis.*\$BTC.*Deadline\s*Open/)
     // Seen, in gray (PO, 2026-11-05): only on its page, in a phone, it keeps just the icon.
     expect(screen.getByText('Thesis')).not.toHaveClass('sr-only')
   })
@@ -68,7 +71,8 @@ describe('ThesisCard in a feed (specs/thesis-detail TD-02 to TD-05, specs/thesis
         })}
       />,
     )
-    expect(screen.getByText('Correct', { selector: '[data-state]' })).toBeInTheDocument()
+    // Closed: no state chip, its result says it (PO, 2026-11-05).
+    expect(document.querySelector('[data-state]')).toBeNull()
     expect(screen.getByText(/^Correct on Dec 3, 2026 at \$162,000/)).toBeInTheDocument()
     expect(screen.queryByText('Deadline')).not.toBeInTheDocument()
   })
@@ -112,5 +116,45 @@ describe('ThesisCard in a feed (specs/thesis-detail TD-02 to TD-05, specs/thesis
   it('does not offer to join the community the feed is filtered by (CP-07)', () => {
     renderWithIntl(<ThesisCard thesis={thesisItem()} feedCommunity="macro" />)
     expect(screen.queryByRole('button', { name: /join/i })).not.toBeInTheDocument()
+  })
+})
+
+describe('ThesisCard and "Will it happen?" (specs/thesis-agree)', () => {
+  it('asks right after the claim, on an open one (AG-01, PO 2026-11-06, AG-03)', () => {
+    renderWithIntl(<ThesisCard thesis={thesisItem()} />)
+    const group = screen.getByRole('group', { name: 'Will it happen?' })
+    expect(group.compareDocumentPosition(screen.getByRole('heading', { level: 2 }))).toBe(
+      Node.DOCUMENT_POSITION_PRECEDING,
+    )
+    // The votes stay, in the actions (Q1).
+    expect(screen.getByRole('button', { name: /upvote/i })).toBeInTheDocument()
+  })
+
+  it('shows a closed one’s result only if anyone answered, and nothing without the field', () => {
+    const closed = { state: 'correct' as const }
+    const { unmount } = renderWithIntl(
+      <ThesisCard
+        thesis={thesisItem({
+          ...closed,
+          agreement: { yes: 3, no: 1, viewerVote: null, canVote: false },
+        })}
+      />,
+    )
+    expect(screen.getByText('75% yes · 25% no · 4 votes')).toBeInTheDocument()
+    unmount()
+
+    const { unmount: again } = renderWithIntl(
+      <ThesisCard
+        thesis={thesisItem({
+          ...closed,
+          agreement: { yes: 0, no: 0, viewerVote: null, canVote: false },
+        })}
+      />,
+    )
+    expect(screen.queryByText('Will it happen?')).toBeNull()
+    again()
+
+    renderWithIntl(<ThesisCard thesis={thesisItem({ agreement: null })} />)
+    expect(screen.queryByText('Will it happen?')).toBeNull()
   })
 })

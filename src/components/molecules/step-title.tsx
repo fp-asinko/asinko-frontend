@@ -25,13 +25,16 @@ export function StepTitle({
       <span
         aria-hidden
         className={cn(
-          'inline-flex size-5 shrink-0 items-center justify-center rounded-full type-caption font-bold tabular-nums transition-colors duration-150',
+          'relative inline-flex size-5 shrink-0 items-center justify-center rounded-full type-caption font-bold tabular-nums transition-colors duration-150',
           done
             ? 'bg-primary text-primary-foreground'
             : 'border border-border-strong text-muted-foreground',
         )}
       >
-        {done ? <CheckIcon className="size-3" strokeWidth={3} /> : n}
+        {/* The number stays, hidden under the ✓: its text gives the circle the same baseline
+            done or not, so the title's row does not move as the step fills (PO 2026-11-06). */}
+        <span className={cn(done && 'invisible')}>{n}</span>
+        {done && <CheckIcon className="absolute size-3" strokeWidth={3} />}
       </span>
       <span className="sr-only">{t(done ? 'stepDone' : 'step', { n, total })}</span> {children}
     </span>

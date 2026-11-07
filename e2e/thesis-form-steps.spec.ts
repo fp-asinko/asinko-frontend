@@ -6,6 +6,30 @@ import { main } from './fixtures/theses'
 // the viewer’s assets beside it (their interests, then the popular), and the numbered steps.
 
 test.describe('The thesis form in steps', () => {
+  test('a step turning done does not move its field (FS-09, PO 2026-11-06)', async ({ page }) => {
+    await page.goto('/en/submit?community=BTC&type=thesis')
+    const claim = main(page).getByRole('textbox', { name: /Claim/ })
+    await claim.focus()
+    // Once the entrances end: the page settles to the pixel first.
+    await page.evaluate(() =>
+      Promise.all(
+        document
+          .getAnimations()
+          .filter((each) => each.effect?.getComputedTiming().iterations !== Infinity)
+          .map((each) => each.finished),
+      ),
+    )
+    const top = () => claim.evaluate((el) => el.getBoundingClientRect().top + window.scrollY)
+    const before = await top()
+    // The first letter turns its number into ✓: the title's row keeps its height.
+    await page.keyboard.type('A')
+    await expect(
+      main(page).getByRole('textbox', { name: 'Step 5 of 6, done: Claim' }),
+    ).toBeVisible()
+    // The bug moved it a whole pixel.
+    expect(Math.abs((await top()) - before)).toBeLessThan(0.5)
+  })
+
   test('searches an asset and chooses it, and × brings the search back (FS-01 to FS-03, FS-09)', async ({
     page,
   }) => {

@@ -86,11 +86,9 @@ export function AssetSearch({
         id={id}
         role="group"
         aria-labelledby={labelledBy}
-        // A value, not a field to type in: unfilled, on white, where the day's green reads (TC-29).
-        className={cn(
-          FIELD_BOX,
-          'flex min-h-12 items-center gap-2 bg-transparent py-1.5 pr-2 dark:bg-transparent',
-        )}
+        // Filled, as the other fields (PO 2026-11-06); the day's change goes on its own white pill,
+        // where its green reads (TC-29).
+        className={cn(FIELD_BOX, 'flex min-h-12 items-center gap-2 py-1.5 pr-2')}
         aria-describedby={describedBy}
       >
         {renderValue(value)}
@@ -151,6 +149,12 @@ export function AssetSearch({
         className={cn(
           FIELD_BOX,
           'h-12 w-full px-3 [&_input]:text-base',
+          // Focused, the line of every field, without the input group's ring.
+          'has-[[data-slot=input-group-control]:focus-visible]:border-foreground/60 has-[[data-slot=input-group-control]:focus-visible]:ring-0',
+          // With the results open, the field goes on below: its bottom corners square, no line, and
+          // the floating cards' shadow, over the form (PO 2026-11-06). `!` over the focus line and the
+          // list's shadcn shadow, written after it, as the hover cards do.
+          'has-[[aria-expanded=true]]:rounded-b-none has-[[aria-expanded=true]]:border-transparent! has-[[aria-expanded=true]]:shadow-float',
           invalid && 'border-destructive',
         )}
       >
@@ -163,7 +167,12 @@ export function AssetSearch({
       {text.trim() && (
         <ComboboxContent
           align="start"
-          className="min-w-0 rounded-xl border p-1 shadow-none ring-0 duration-150 ease-out data-open:slide-in-from-top-1"
+          // Against the field, its width, its fill and its shadow: the field unfolds down into the
+          // results (PO 2026-11-06), a hairline between them. clip-path, not height (design-system.md).
+          sideOffset={0}
+          // The whole field, not its <input>: the list as wide as the box it continues.
+          anchor={() => field.current?.closest<HTMLElement>('[data-slot=input-group]') ?? null}
+          className="min-w-0 rounded-t-none rounded-b-2xl bg-surface p-1 shadow-float! ring-0 before:pointer-events-none before:absolute before:inset-x-3 before:top-0 before:border-t before:border-border data-open:animate-unfold-in data-closed:animate-unfold-out"
         >
           {/* Inside the list: while it is open, the rest of the page is hidden from a screen
                 reader. It says each change: searching, how many, none (WCAG 4.1.3, FS-01). */}

@@ -15,6 +15,7 @@ import type { ThesisItem } from '../feed.types'
 import { getThesis } from '../lib/thesis-api'
 import { PostMarkdown } from './post-markdown'
 import { ThesisCard } from './thesis-card'
+import { ThesisChartSection, ThesisChartSkeleton } from './thesis-chart-section'
 import { ThesisMenu } from './thesis-menu'
 import { ThesisArguments } from './thesis-arguments'
 import { ThesisUpdates } from './thesis-updates'
@@ -94,6 +95,13 @@ export async function ThesisDetail({
       <ThesisCard
         thesis={thesis}
         variant="detail"
+        // Under its header, above the ticket (specs/thesis-chart Q3): a secondary section that
+        // streams in at its own height, and never holds the thesis back (CH-06).
+        chart={
+          <Suspense fallback={<ThesisChartSkeleton />}>
+            <ThesisChartSection thesis={thesis} />
+          </Suspense>
+        }
         leading={<BackButton variant="plain" />}
         menu={thesis.canCancel ? <ThesisMenu id={thesis.id} claim={thesis.claim} /> : undefined}
       >

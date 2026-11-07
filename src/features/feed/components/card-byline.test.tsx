@@ -37,6 +37,21 @@ describe('CardByline (specs/community-first)', () => {
     expect(asset.querySelector('span span')).toHaveClass('text-muted-foreground')
   })
 
+  it('says a thesis author’s accuracy in words (specs/thesis-identity TI-08)', () => {
+    renderWithIntl(
+      <CardByline
+        author={MARIA}
+        community={null}
+        publishedAt={hourAgo()}
+        titleId="t"
+        accuracy="words"
+      />,
+    )
+    expect(screen.getByText('74% accuracy rate')).toBeInTheDocument()
+    // The tier still for screen readers (FC-03).
+    expect(screen.getByText('74% accuracy, high')).toBeInTheDocument()
+  })
+
   it('puts the group first and the author second, without a photo (CF-01, CF-02)', () => {
     renderWithIntl(
       <CardByline author={MARIA} community={defi()} publishedAt={hourAgo()} titleId="t" />,

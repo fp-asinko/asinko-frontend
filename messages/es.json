@@ -168,7 +168,8 @@
       "linkDomain": "({domain})",
       "related": "Relacionadas",
       "thought": "Thought",
-      "thoughtBy": "Thought de {author}"
+      "thoughtBy": "Thought de {author}",
+      "accuracyWords": "{value} de aciertos"
     },
     "poll": {
       "badge": "Encuesta",
@@ -300,6 +301,17 @@
           "generic": "No se pudo publicar la actualización. Probá de nuevo."
         },
         "posted": "Actualización publicada"
+      },
+      "agree": {
+        "question": "¿Se cumple?",
+        "yes": "Sí",
+        "no": "No",
+        "error": "No pudimos guardar tu respuesta. Probá de nuevo.",
+        "invite": {
+          "title": "¿Pensás distinto? Publicá tu tesis",
+          "action": "Crear tesis",
+          "close": "Cerrar"
+        }
       }
     },
     "type": {
@@ -1157,7 +1169,7 @@
         "above": "Por encima de",
         "below": "Por debajo de",
         "price": "Precio objetivo",
-        "direction": "{direction, select, ABOVE {Por encima del precio actual} other {Por debajo del precio actual}} · {change}",
+        "direction": "{direction, select, ABOVE {Por encima del precio actual} other {Por debajo del precio actual}} · <pill>{change}</pill>",
         "needsAsset": "Elige un activo primero"
       },
       "deadline": {
@@ -1202,8 +1214,6 @@
       },
       "confirm": {
         "title": "Publicar tesis",
-        "target": "{direction, select, ABOVE {Por encima de} other {Por debajo de}} {price} al {date}",
-        "conviction": "Convicción: {level}",
         "final": "Una tesis publicada no se puede editar ni borrar. Se resuelve sola en la fecha límite, contra el precio de mercado.",
         "disclaimer": "Entiendo que esto no es asesoramiento financiero",
         "back": "Volver",
@@ -1303,6 +1313,11 @@
       "resolution": "Se resuelve sola en la fecha límite, contra el precio de mercado.",
       "final": "Una vez publicada queda en tu historial: no se puede editar ni borrar.",
       "reference": "El precio de referencia del activo se toma al publicar."
+    },
+    "counter": {
+      "title": "Respondés a {author}",
+      "bet": "{direction, select, above {Por encima de} below {Por debajo de} other {En}} {price} al {date}",
+      "hint": "{direction, select, above {Si creés que no llega a {price}, poné tu objetivo por debajo.} below {Si creés que no baja a {price}, poné tu objetivo por encima.} other {Si creés que no va a estar en {price}, poné tu objetivo donde creés que va.}}"
     }
   },
   "ads": {
@@ -1412,6 +1427,29 @@
       "cancelled": "Cancelada el {date}{hasReason, select, yes {: {reason}} other {}}",
       "cancelledNoDate": "Cancelada"
     },
-    "badge": "Tesis"
+    "badge": "Tesis",
+    "progress": {
+      "entry": "Entrada {price}",
+      "target": "Objetivo {price}",
+      "line": "<strong>{closed, select, yes {Cerró en {price}} other {Hoy {price}}}</strong> · {kind, select, toward {{direction, select, below {tiene que bajar un {remaining} más} other {tiene que subir un {remaining} más}}} short {quedó a un {remaining} del objetivo} reached {objetivo alcanzado} other {{direction, select, below {{change} por encima de la entrada} other {{change} por debajo de la entrada}}}}{stale, select, yes { · precio del {date}} other {}}"
+    },
+    "number": "Tesis número {number}{hasAuthor, select, yes { de {author}} other {}}",
+    "asset": "Activo",
+    "target": "Objetivo",
+    "convictionScale": "{level} de 4"
+  },
+  "thesisChart": {
+    "label": "Precio de {symbol} desde el {start}: de {entry} a {price} {closed, select, yes {al cierre} other {hoy}}{hasTarget, select, yes {; objetivo {target} al {deadline}} other {}}",
+    "today": "Hoy",
+    "closed": "Cierre",
+    "scrub": "Precio de {symbol} por {hourly, select, yes {hora} other {día}}",
+    "point": "{date} · {price} · {change} desde la entrada",
+    "sinceEntry": "{change} desde la entrada",
+    "entryLevel": "Entrada",
+    "targetLevel": "Objetivo"
+  },
+  "agreeBar": {
+    "result": "{yes} sí · {no} no · {count, plural, one {# voto} other {# votos}}",
+    "empty": "Todavía sin votos"
   }
 }

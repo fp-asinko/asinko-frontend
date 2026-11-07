@@ -14,7 +14,9 @@ const thesis = (overrides: Partial<ThesisItem> = {}): ThesisItem => ({
   state: 'open',
   target: { direction: 'above', price: 150000 },
   deadline: '2026-12-31T12:00:00.000Z',
+  number: null,
   conviction: 3,
+  current: null,
   reference: { price: 100000, at: '2026-09-29T12:00:00.000Z' },
   resolution: null,
   cancellation: null,
@@ -30,12 +32,13 @@ describe('ThesisCard (specs/profile-track-record PT-07, PT-08)', () => {
     ).toHaveAttribute('href', '/thesis/t1')
   })
 
-  it('leads with THESIS and the ticket, the claim second as its title (specs/thesis-ticket Q5)', () => {
+  it('leads with when and THESIS on the right, the ticket, the claim second (specs/thesis-ticket Q5)', () => {
     renderWithIntl(<ThesisCard thesis={thesis()} />)
     const card = screen.getByRole('article', {
       name: 'BTC will close above $150K before December 2026',
     })
-    expect(card).toHaveTextContent(/^Thesis/)
+    // When on the left, THESIS on the right, as every post's header (TK-01, PO 2026-11-05).
+    expect(card).toHaveTextContent(/^.+ agoThesis/)
     expect(screen.getByRole('link', { name: /\$BTC/ })).toHaveAttribute('href', '/asset/BTC')
     expect(screen.getByText('+50% from $100,000')).toBeInTheDocument()
     // The claim after the ticket, second: gray, two lines.
@@ -44,6 +47,11 @@ describe('ThesisCard (specs/profile-track-record PT-07, PT-08)', () => {
     expect(screen.getByText('Bitcoin').compareDocumentPosition(claim)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     )
+  })
+
+  it('leaves its author’s accuracy out: the profile says it above (specs/thesis-identity TI-11)', () => {
+    renderWithIntl(<ThesisCard thesis={thesis()} />)
+    expect(screen.queryByText(/accuracy/i)).toBeNull()
   })
 
   it('shows how a correct thesis ended, without votes', () => {

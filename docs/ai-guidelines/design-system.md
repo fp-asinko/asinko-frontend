@@ -60,7 +60,7 @@ El sistema visual sale del prototipo (`docs/references/prototype.html`), medido 
 - **Píldora gris** (como Reddit): todo lo que se toca dentro de una tarjeta (votos, comentarios, compartir, chips, "Join", botones secundarios) va `rounded-full bg-muted hover:bg-muted-hover`, relleno y **sin borde**. Las opciones de encuesta son cajas `bg-surface`. El borde queda para separar capas, no para dibujar botones.
 - **Texto secundario**: `--muted-foreground` (`#5C5D60`). **`--faint` (`#8A8B8E`) no es para texto chico** (3,4:1): solo íconos, separadores y texto de 18 px o más.
 - **Verde en texto** (`--success`/`--bullish`) sobre fondos blancos, no sobre `--surface`. El color nunca es la única señal: siempre con flecha, ícono o texto.
-- **Sin sombras**: las capas se separan con borde. Dos excepciones, aprobadas por el PO: las tarjetas que flotan al pasar el mouse (`shadow-float`, `specs/mention-preview`), con borde además, y la columna izquierda abierta, una sombra corta hacia el contenido como Reddit (`shadow-rail`, `specs/sidebar-toggle`, 2026-10-23). Radios de 4 / 8 / 12 / 16 px y `rounded-full` para píldoras.
+- **Sin sombras**: las capas se separan con borde. Tres excepciones, aprobadas por el PO: las tarjetas que flotan al pasar el mouse (`shadow-float`, `specs/mention-preview`), con borde además; el buscador de activos abierto, campo y resultados como una pieza que flota sobre el formulario, sin borde (`specs/thesis-form-steps`, PO 2026-11-06); y la columna izquierda abierta, una sombra corta hacia el contenido como Reddit (`shadow-rail`, `specs/sidebar-toggle`, 2026-10-23). Radios de 4 / 8 / 12 / 16 px y `rounded-full` para píldoras.
 - **Bordes de campos activos** con `--input` (3:1); el borde suave del prototipo solo en elementos deshabilitados o decorativos. **Excepción, los formularios de crear post y tesis** (PO, 2026-11-05: más limpio): campos **rellenos**, `bg-surface` sin línea (`FIELD_BOX` y la caja del cuerpo). El borde aparece al escribir (`foreground/60`) o en rojo con un error. Cada campo conserva su rótulo visible, que es lo que lo identifica (WCAG 1.4.11 pide 3:1 para lo que hace falta para reconocer el control; acá lo dice el rótulo, no el borde).
 - `src/test/tokens-contrast.test.ts` mide cada par en los dos temas: un token que baja del mínimo rompe el build.
 
@@ -98,7 +98,7 @@ Definido en `specs/home-motion`. Los valores salen del prototipo y el criterio, 
 - **Escalas al hover** con `motion-safe:`: la red de seguridad acorta duraciones pero no quita la escala, que saltaría al instante.
 - **Reglas**:
   - Transiciones para cambios de estado (se pueden interrumpir); `@keyframes` solo para entradas de una vez.
-  - Todo ≤ 300 ms con salidas `ease-out`; nunca `ease-in`. Excepción: barras de encuesta (600 ms, del prototipo).
+  - Todo ≤ 300 ms con salidas `ease-out`; nunca `ease-in`. Excepciones: barras de encuesta (600 ms, del prototipo) y el gráfico de una tesis, que se dibuja una vez al entrar (1,6 s lineales con `clip-path`, no con una máscara de SVG, que se re-rasteriza en cada cuadro; `animate-chart-draw`, `-area`, `-dot`, `-fade` y `-pulse`; PO 2026-11-05 y 2026-11-06, `specs/thesis-chart` Q1).
   - Solo `transform` y `opacity`; la altura se anima únicamente en los desplegables. Nada desde `scale(0)`.
   - Abrir es más lento que cerrar (200 / 150 ms): lo que la persona pidió ver se muestra con calma; la respuesta del sistema es inmediata.
   - Lo que solo se mueve con hover usa la variante `hover:` (Tailwind 4 la limita a dispositivos con hover).

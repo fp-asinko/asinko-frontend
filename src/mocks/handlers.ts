@@ -23,6 +23,8 @@ import {
   postSchema,
   profileSchema,
   searchResultSchema,
+  thesisAgreementSchema,
+  priceHistorySchema,
   thesisSchema,
   thesisUpdateListSchema,
   thesisUpdateSchema,
@@ -57,6 +59,9 @@ import { withTopPost } from './top-post'
 import { followersOf, followingOf, listItem } from './fixtures/follows'
 import { membersOf } from './fixtures/members'
 import { feedTheses, THESES, thesesBy, thesisById } from './fixtures/theses'
+import { answerMockThesis, extendWithAgreement, unanswerMockThesis } from './thesis-agreement'
+import { extendWithIdentity, withIdentity } from './thesis-identity'
+import { mockAssetPrices } from './asset-prices'
 
 /** An open thesis and its author's session: what the cancel example needs (specs/thesis-detail). */
 const OPEN_THESIS = THESES.find((each) => each.state === 'OPEN')!
@@ -595,7 +600,9 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     example: { ...noRequest, params: { userId: PROFILES[1]!.id } },
     handler: ({ params, query }) => {
       if (!PROFILES.some((each) => each.id === params.userId)) return notFound
-      return { status: 200, body: paginate(thesesBy(params.userId ?? ''), query.cursor) }
+      // With today's price and the author's count (P-044, P-045, specs/thesis-identity).
+      const theses = thesesBy(params.userId ?? '').map(withIdentity)
+      return { status: 200, body: paginate(theses, query.cursor) }
     },
   },
 
@@ -737,6 +744,48 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     schema: noContentSchema,
     example: { ...noRequest, params: { id: THESES[0]!.id }, query: { userId: DEMO_USER.id } },
     handler: removeMockThesisVote,
+  },
+  // P-046 (proposal): an asset's price history, for a thesis's chart (specs/thesis-chart).
+  {
+    method: 'GET',
+    path: '/api/v1/assets/:symbol/prices',
+    kind: 'proposal',
+    implemented: false,
+    schema: priceHistorySchema,
+    example: {
+      ...noRequest,
+      params: { symbol: 'BTC' },
+      query: { from: '2026-10-01T00:00:00.000Z', to: '2026-11-01T00:00:00.000Z' },
+    },
+    handler: mockAssetPrices,
+  },
+
+  // P-043 (proposal): "Will it happen?" on a thesis, yes or no (specs/thesis-agree). No liveExample.
+  {
+    method: 'PUT',
+    path: '/api/v1/theses/:id/agreement',
+    kind: 'proposal',
+    implemented: false,
+    schema: thesisAgreementSchema,
+    example: {
+      ...noRequest,
+      params: { id: OTHER_OPEN_THESIS.id },
+      body: { userId: DEMO_USER.id, value: 'NO' },
+    },
+    handler: answerMockThesis,
+  },
+  {
+    method: 'DELETE',
+    path: '/api/v1/theses/:id/agreement',
+    kind: 'proposal',
+    implemented: false,
+    schema: thesisAgreementSchema,
+    example: {
+      ...noRequest,
+      params: { id: OTHER_OPEN_THESIS.id },
+      query: { userId: DEMO_USER.id },
+    },
+    handler: unanswerMockThesis,
   },
 
   // E02
@@ -1253,17 +1302,35 @@ export const MOCK_EXTENSIONS: readonly MockExtension[] = [
   {
     method: 'GET',
     path: '/api/v1/feed/explore',
-    extend: (response, { query }) => extendFeed(response, !query.community),
+    extend: (response, context) =>
+      extendWithIdentity(
+        extendWithAgreement(extendFeed(response, !context.query.community), context),
+      ),
   },
   {
     method: 'GET',
     path: '/api/v1/feed/following',
-    extend: (response) => extendFeed(response, true),
+    extend: (response, context) =>
+      extendWithIdentity(extendWithAgreement(extendFeed(response, true), context)),
   },
   {
     method: 'GET',
     path: '/api/v1/users/:userId/content',
-    extend: (response) => extendFeed(response, false),
+    extend: (response, context) =>
+      extendWithIdentity(extendWithAgreement(extendFeed(response, false), context)),
+  },
+  {
+    // P-043: a thesis's page with its "Will it happen?" (specs/thesis-agree), and P-044 / P-045
+    // (specs/thesis-identity).
+    method: 'GET',
+    path: '/api/v1/theses/:id',
+    extend: (response, context) => extendWithIdentity(extendWithAgreement(response, context)),
+  },
+  {
+    // P-044 / P-045 on a person's theses (specs/thesis-identity).
+    method: 'GET',
+    path: '/api/v1/users/:userId/theses',
+    extend: extendWithIdentity,
   },
   {
     // A post's whole tree carries its ads (P-031, specs/ads AD-04); a search (?q) or a card's

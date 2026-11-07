@@ -34,6 +34,18 @@ export const assetPageSchema = assetSchema.extend({
 
 export type RawAsset = z.infer<typeof assetSchema>
 
+/** P-046 (proposal, specs/thesis-chart): one price of an asset's history. */
+export const pricePointSchema = z.object({ at: z.iso.datetime(), price: z.number().positive() })
+
+/** GET /api/v1/assets/{symbol}/prices?from=&to=: oldest first. The items, each checked apart. */
+export const priceHistorySchema = z.object({
+  symbol: z.string(),
+  interval: z.enum(['DAY', 'HOUR']),
+  items: z.array(z.unknown()),
+})
+
+export type RawPricePoint = z.infer<typeof pricePointSchema>
+
 /**
  * GET /api/v1/assets?q= (E14, catalog and autocomplete). The backend returns at most a short
  * list, without a cursor: `nextCursor` is optional.

@@ -52,8 +52,10 @@ export function thesisItem(overrides: Partial<ThesisItem> = {}): ThesisItem {
     asset: { symbol: 'BTC', name: 'Bitcoin', path: '/asset/BTC', logoUrl: null },
     state: 'open',
     target: { direction: 'above', price: 150000 },
+    current: null,
     reference: { price: 83584.01, at: '2026-10-13T15:17:55.886Z' },
     deadline: new Date(Date.now() + 23 * 24 * 3600_000).toISOString(),
+    number: null,
     conviction: 3,
     resolution: null,
     cancellation: null,
@@ -72,6 +74,7 @@ export function thesisItem(overrides: Partial<ThesisItem> = {}): ThesisItem {
     viewerVote: null,
     argumentCount: { pro: 3, contra: 1 },
     canCancel: false,
+    agreement: { yes: 24, no: 8, viewerVote: null, canVote: true },
     publishedAt: new Date(Date.now() - 2 * 3600_000).toISOString(),
     ...overrides,
   }

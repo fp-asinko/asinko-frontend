@@ -83,3 +83,17 @@ export type TopAsset = { option: CommunityOption; thesisCount: number }
  * interests, filled with the most-thesised ones, or only those when they have none.
  */
 export type SuggestedAssets = { basis: 'interests' | 'popular'; assets: CommunityOption[] }
+
+/**
+ * The thesis a new one answers (specs/thesis-agree AG-11): what the form shows above it, as a
+ * reference. Only an open one with an asset and a target.
+ */
+export type CounterThesis = {
+  id: string
+  /** Its author's username; null for a system thesis. */
+  author: string | null
+  symbol: string
+  direction: 'above' | 'below' | 'equals'
+  targetPrice: number
+  deadline: string
+}

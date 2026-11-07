@@ -22,7 +22,9 @@ import { draftKey, thesisDraftKey } from '../lib/draft-key'
 import { RELATED_MAX } from '../schemas/create-post.schema'
 import { getSubmitCommunity } from '../lib/submit-community'
 import { getSuggestedAssets } from '../lib/suggested-assets'
+import { getCounterThesis } from '../lib/counter-thesis'
 import type { PreviewAction } from './body-tabs'
+import { CounterThesisNote } from './counter-thesis-note'
 import { SubmitEditorLoader } from './submit-editor-loader'
 import { ThesisTipsList } from './thesis-tips'
 
@@ -32,6 +34,8 @@ type SearchParams = Record<string, string | string[] | undefined>
 const querySchema = z.object({
   community: z.string().min(1).max(64).optional().catch(undefined),
   type: z.enum(['text', 'link', 'image', 'thought', 'thesis']).optional().catch(undefined),
+  // The thesis a new one answers (specs/thesis-agree AG-11): its id, or nothing.
+  counter: z.uuid().optional().catch(undefined),
 })
 
 /** A related one's slug (specs/related-aside RA-04): a group's or an asset's. */
@@ -43,6 +47,7 @@ export function parseSubmitQuery(searchParams: SearchParams) {
   const query = querySchema.parse({
     community: one(searchParams.community),
     type: one(searchParams.type),
+    counter: one(searchParams.counter),
   })
   // Up to three, valid, without repeats or the main community; anything else is left out.
   const related = [...new Set((one(searchParams.related) ?? '').split(','))]
@@ -135,9 +140,11 @@ export async function SubmitPage({
             : 'TEXT'
   // The related ones of the URL that exist and can be tagged: groups and assets (RA-04). Beside
   // them, the assets for the thesis: the viewer's interests, then the popular (FS-04).
-  const [relatedFound, suggested] = await Promise.all([
+  const [relatedFound, suggested, counter] = await Promise.all([
     Promise.all(query.related.map((slug) => getSubmitCommunity(slug, viewer.username))),
     getSuggestedAssets(),
+    // Only for a thesis: a post answers nothing (AG-11).
+    query.type === 'thesis' ? getCounterThesis(query.counter) : null,
   ])
   const related = relatedFound
     .flatMap((each) => (each.ok && each.data.kind !== 'user' ? [each.data.option.handle] : []))
@@ -194,6 +201,12 @@ export async function SubmitPage({
         </Collapsible>
       )}
       <div className="px-4 py-4 md:px-0">
+        {/* The thesis this one answers, as a reference (specs/thesis-agree AG-11). */}
+        {counter && (
+          <div className="mb-4">
+            <CounterThesisNote thesis={counter} />
+          </div>
+        )}
         <SubmitEditorLoader
           type={type}
           community={community?.option ?? null}
@@ -205,6 +218,8 @@ export async function SubmitPage({
           related={related}
           suggested={suggested}
           preview={preview}
+          // Who publishes, at the head of the thesis's confirmation (TC-11, PO 2026-11-06).
+          author={{ username: viewer.username, avatarUrl: viewer.avatarUrl ?? null }}
         />
       </div>
     </PageColumns>

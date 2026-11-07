@@ -233,6 +233,11 @@ describe('mock handlers behave like the contract', () => {
         '/api/v1/drafts',
         '/api/v1/drafts/:draftId',
         '/api/v1/drafts/:draftId',
+        // P-043 (specs/thesis-agree): "Will it happen?" on a thesis.
+        '/api/v1/theses/:id/agreement',
+        '/api/v1/theses/:id/agreement',
+        // P-046 (specs/thesis-chart): an asset's price history.
+        '/api/v1/assets/:symbol/prices',
       ].toSorted(),
     )
   })

@@ -166,8 +166,19 @@ export type ThesisItem = ThesisTicketData & {
   viewerVote: 1 | -1 | null
   argumentCount: { pro: number; contra: number }
   canCancel: boolean
+  /** "Will it happen?" (specs/thesis-agree); null while the backend does not send it (AG-18). */
+  agreement: ThesisAgreement | null
   publishedAt: string
   reason?: FeedReason | null
+}
+
+/** Who thinks a thesis will happen (specs/thesis-agree § 3). */
+export type ThesisAgreement = {
+  yes: number
+  no: number
+  viewerVote: 'yes' | 'no' | null
+  /** false for its author and once closed: the result without buttons (AG-02, AG-07). */
+  canVote: boolean
 }
 
 export type FeedItem = PostItem | PollItem | ThesisItem | AdItem | GlossaryItem

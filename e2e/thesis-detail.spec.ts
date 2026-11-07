@@ -50,7 +50,7 @@ test.describe('A thesis in the feed and on its page', () => {
       const card = main(page).getByRole('article', { name: MARIA_OPEN })
       // THESIS; the asset › the conviction › the target; the deadline with its state; the claim.
       await expect(card).toContainText(
-        /Thesis.*\$BTC.*Conviction.*Above \$150,000.*Deadline\s*Open.*BTC will close/,
+        /Thesis.*Asset.*\$BTC.*Conviction.*Target.*Above \$150,000.*Deadline\s*Open.*BTC will close/,
       )
       const overflow = await page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -75,6 +75,89 @@ test.describe('A thesis in the feed and on its page', () => {
     // On the same line.
     expect(Math.abs(conviction.y - asset.y)).toBeLessThan(asset.height)
   })
+
+  test('says how it is doing, on a perforated ticket, and stamps a closed one (specs/thesis-identity)', async ({
+    page,
+  }) => {
+    // Maria's open one, a little against its bet in the mocks (src/mocks/thesis-identity.ts).
+    await page.goto(MARIA_PAGE)
+    const bet = main(page).getByRole('region', { name: 'The bet' })
+    await expect(bet.getByText(/^Today \$[\d,.]+ · [\d.]+% below the entry$/)).toBeVisible()
+    await expect(bet.getByText(/^Entry \$/)).toBeVisible()
+    await expect(bet.getByText('Target $150,000')).toBeVisible()
+    // The bull beside its target (specs/thesis-agree AG-19).
+    await expect(bet.locator('[data-mark="bull"]')).toBeVisible()
+
+    // A resolved one wears its stamp: its card in the list, with the ticket, not the featured one.
+    await page.goto('/en/user/maria?tab=theses')
+    const resolved = main(page)
+      .getByRole('article')
+      .filter({ hasText: 'SOL holds above $150 through the October unlocks' })
+      .filter({ has: page.locator('.ticket-stub-top') })
+      .first()
+    const stamp = resolved.locator('[data-stamp="correct"]')
+    await expect(stamp).toHaveText('Correct')
+    // Its number among maria's, stamped beside it (specs/thesis-number TN-01, TN-03).
+    await expect(resolved.getByText(/^Thesis number \d+$/)).toBeAttached()
+    // It covers no number: its result's text ends before it, or sits above it in a phone (TI-15).
+    const result = (await resolved.getByText(/^Correct on /).boundingBox())!
+    const box = (await stamp.boundingBox())!
+    const apart = result.x + result.width <= box.x || result.y + result.height <= box.y
+    expect(apart).toBe(true)
+    await expectNoA11yViolations(page)
+  })
+
+  test('draws its price chart above its card, walkable with the keyboard (specs/thesis-chart)', async ({
+    page,
+  }) => {
+    await page.goto(MARIA_PAGE)
+    const chart = main(page).getByRole('img', {
+      name: /^Price of BTC since .+ today; target \$150,000 by /,
+    })
+    await expect(chart).toBeVisible()
+    // Under the header, the back button on top of everything, and above the ticket (Q3).
+    const back = main(page).getByRole('button', { name: 'Back' })
+    const bet = main(page).getByRole('region', { name: 'The bet' })
+    const top = (await chart.boundingBox())!.y
+    expect((await back.boundingBox())!.y).toBeLessThan(top)
+    expect(top).toBeLessThan((await bet.boundingBox())!.y)
+
+    // Walked day by day (CH-17): the day's date, price and change, read as the slider's value.
+    const walk = main(page).getByRole('slider', { name: /^BTC price by (day|hour)$/ })
+    await walk.focus()
+    const today = await walk.getAttribute('aria-valuenow')
+    await page.keyboard.press('ArrowLeft')
+    await expect(walk).not.toHaveAttribute('aria-valuenow', today!)
+    await expect(walk).toHaveAttribute(
+      'aria-valuetext',
+      // With hourly points the date carries its time: "Nov 6, 3:00 PM".
+      /^\w{3} \d{1,2}(,.*)? · \$[\d,.]+ · .+ from entry$/,
+    )
+    await page.keyboard.press('Home')
+    await expect(walk).toHaveAttribute('aria-valuenow', '0')
+    // Walked, with its reading open: still accessible.
+    await expectNoA11yViolations(page)
+  })
+
+  for (const theme of ['light', 'dark'] as const) {
+    test(`walks its chart at 360px without scrolling sideways, in ${theme} (specs/thesis-chart CH-12)`, async ({
+      page,
+    }) => {
+      await page.addInitScript((value) => localStorage.setItem('theme', value), theme)
+      await page.setViewportSize({ width: 360, height: 800 })
+      await page.goto(MARIA_PAGE)
+      const walk = main(page).getByRole('slider', { name: /^BTC price by (day|hour)$/ })
+      await walk.focus()
+      for (const key of ['Home', 'ArrowRight', 'ArrowRight', 'End']) {
+        await page.keyboard.press(key)
+        const overflow = await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        )
+        expect(overflow).toBeLessThanOrEqual(0)
+      }
+      await expectNoA11yViolations(page)
+    })
+  }
 
   test('says how a resolved one ended and why a cancelled one was (TD-08)', async ({ page }) => {
     await page.goto('/en/user/maria?tab=theses')

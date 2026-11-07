@@ -26,9 +26,14 @@ export function TopAssetsRail({
   const label = t(suggested.basis)
 
   return (
-    // At the bottom of its cell: its pills level with the search, the label above them.
-    <section aria-label={label} className="flex min-w-0 flex-col gap-1.5 self-end">
-      <p aria-hidden className="type-meta text-muted-foreground">
+    // Its pills level with the search. Beside it (sm), the label goes up to the step's title row,
+    // out of the flow, so the row is as tall as the search and the title as close as in the other
+    // steps (PO 2026-11-06). Under it, in phones, the label stays above the pills.
+    <section aria-label={label} className="relative flex min-w-0 flex-col gap-1.5 self-end">
+      <p
+        aria-hidden
+        className="type-meta text-muted-foreground sm:absolute sm:bottom-full sm:left-0 sm:mb-2"
+      >
         {label}
       </p>
       <div className="grid h-12 grid-cols-3 items-center gap-2">

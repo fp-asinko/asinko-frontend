@@ -52,9 +52,12 @@ import { TopAssetsRail } from './top-assets-rail'
 import { ProfileReach } from './profile-reach'
 import { ACTIONS_BAR, BARE, FIELD_BOX, PILL } from './editor-styles'
 import { FormatTabs, type CreateFormat } from './format-tabs'
-import type { ThesisSummary } from './thesis-confirm'
+import type { ThesisAuthor, ThesisSummary } from './thesis-confirm'
 
 // The confirmation, at the first Publish (specs/thesis-create TC-19).
+/** A conviction as the ticket's bars. */
+const CONVICTION_BARS = { LOW: 1, MEDIUM: 2, HIGH: 3, EXTREME: 4 } as const
+
 const ThesisConfirm = dynamic(() => import('./thesis-confirm').then((mod) => mod.ThesisConfirm), {
   ssr: false,
 })
@@ -114,6 +117,7 @@ export function ThesisEditor({
   storageKey,
   draftsReady = true,
   suggested,
+  author,
   draftRef,
   onCancel,
   onFormat,
@@ -132,6 +136,8 @@ export function ThesisEditor({
   draftsReady?: boolean
   /** The assets beside the search: the viewer's interests, then the popular (FS-04). */
   suggested?: SuggestedAssets
+  /** Who publishes: the confirmation's header (TC-11). */
+  author?: ThesisAuthor
   /** Filled with a check of whether something is written, read when leaving. */
   draftRef: RefObject<(() => boolean) | null>
   onCancel: () => void
@@ -468,8 +474,37 @@ export function ThesisEditor({
   const derived = change === null ? undefined : change > 0 ? 'ABOVE' : change < 0 ? 'BELOW' : null
   const choosing = Boolean(asset) && quote === null
 
+  // The ticket as it will be published (TC-11, PO 2026-11-06): today's price as its entry.
+  const confirmingAt = confirming ? deadlineAt(confirming.deadline) : null
   const summary: ThesisSummary | null =
-    confirming && asset ? { ...confirming, asset: asset.handle } : null
+    confirming && asset && confirmingAt
+      ? {
+          claim: confirming.claim,
+          reasoning: confirming.reasoning,
+          author: author ?? null,
+          ticket: {
+            id: 'preview',
+            asset: {
+              symbol: asset.handle.replace(/^\$/, ''),
+              name: quote?.name ?? asset.name,
+              path: `/asset/${asset.slug}`,
+              logoUrl: asset.avatarUrl ?? null,
+            },
+            target: {
+              direction: confirming.direction === 'ABOVE' ? 'above' : 'below',
+              price: confirming.targetPrice,
+            },
+            current: null,
+            reference: reference === null ? null : { price: reference, at: null },
+            deadline: confirmingAt,
+            number: null,
+            conviction: CONVICTION_BARS[confirming.conviction],
+            state: 'open',
+            resolution: null,
+            cancellation: null,
+          },
+        }
+      : null
 
   const reasoningField = register('reasoning')
   const reasoningRef = useRef<HTMLTextAreaElement | null>(null)
@@ -589,7 +624,12 @@ export function ThesisEditor({
                           {/* The day's change in green or red, also when out of date: then it
                             says so beside it (TC-29). */}
                           <span className="flex items-center justify-end gap-1 type-meta">
-                            {quote?.changePct != null && <Delta value={quote.changePct} />}
+                            {quote?.changePct != null && (
+                              <Delta
+                                value={quote.changePct}
+                                className="rounded-full bg-background px-1.5"
+                              />
+                            )}
                             {quote?.stale && (
                               <span className="text-muted-foreground">
                                 {quote.changePct != null && '· '}
@@ -725,9 +765,8 @@ export function ThesisEditor({
                 // Said as it changes with the price typed.
                 aria-live="polite"
                 // Hidden while empty: it would add its gap below the price.
-                // Its arrow green up or red down, the words in the text's color: from sm it sits
-                // in the filled field, where small green text would not reach 4.5:1 (PO
-                // 2026-11-05). Never the color alone: the arrow and the words say it.
+                // Its arrow and its change green up or red down, the words in the text's color (PO,
+                // 2026-11-06: only painted, no pill). Never the color alone: the arrow and the words say it.
                 className="hidden items-center gap-1 px-1 type-meta font-semibold text-foreground not-empty:flex sm:pointer-events-none sm:absolute sm:inset-y-0 sm:right-3"
               >
                 {derived && change !== null && (
@@ -741,14 +780,26 @@ export function ThesisEditor({
                     ) : (
                       <ArrowUpIcon aria-hidden className="size-3 text-bullish" strokeWidth={2.5} />
                     )}
-                    {t('thesis.target.direction', {
-                      direction: derived,
-                      change: format.number(change, {
-                        style: 'percent',
-                        maximumFractionDigits: 1,
-                        signDisplay: 'exceptZero',
-                      }),
-                    })}
+                    <span>
+                      {t.rich('thesis.target.direction', {
+                        direction: derived,
+                        change: format.number(change, {
+                          style: 'percent',
+                          maximumFractionDigits: 1,
+                          signDisplay: 'exceptZero',
+                        }),
+                        pill: (chunks) => (
+                          <span
+                            className={cn(
+                              'tabular-nums',
+                              derived === 'BELOW' ? 'text-bearish' : 'text-bullish',
+                            )}
+                          >
+                            {chunks}
+                          </span>
+                        ),
+                      })}
+                    </span>
                   </>
                 )}
               </p>
@@ -884,6 +935,9 @@ export function ThesisEditor({
                   : t('thesis.claim.placeholder')
               }
               {...register('claim')}
+              // A new sentence each time: the browser's autofill would bring an old one, and its
+              // blue fill (PO 2026-11-06).
+              autoComplete="off"
               aria-invalid={invalid('claim') || undefined}
               aria-required
               aria-describedby={`${ids}-claim-hint ${ids}-claim-count ${ids}-claim-error`}

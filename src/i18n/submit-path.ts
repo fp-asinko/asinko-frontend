@@ -16,8 +16,8 @@ export type SubmitType = 'text' | 'link' | 'image' | 'thought' | 'thesis'
 
 /**
  * Where "Create" goes: the page of the locale, with the community (its slug), the related ones
- * (their slugs, specs/related-aside RA-04) and the format. A path without the locale: the
- * localized Link adds it.
+ * (their slugs, specs/related-aside RA-04), the format and the thesis it answers (`?counter=`,
+ * specs/thesis-agree AG-11). A path without the locale: the localized Link adds it.
  */
 export function submitPath(
   locale: Locale,
@@ -25,12 +25,20 @@ export function submitPath(
     community,
     type,
     related = [],
-  }: { community?: string | null; type?: SubmitType; related?: readonly string[] } = {},
+    counter,
+  }: {
+    community?: string | null
+    type?: SubmitType
+    related?: readonly string[]
+    /** The thesis a new one answers: its id. */
+    counter?: string
+  } = {},
 ): string {
   const query = new URLSearchParams()
   if (community) query.set('community', community)
   if (related.length) query.set('related', related.join(','))
   if (type && type !== 'text') query.set('type', type)
+  if (counter) query.set('counter', counter)
   const search = query.toString()
   return `/${SUBMIT_SEGMENT[locale]}${search ? `?${search}` : ''}`
 }

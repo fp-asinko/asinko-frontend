@@ -18,7 +18,17 @@ const STATE_CLASSES: Record<ThesisStateName, string> = {
  * Shared by the profile's card, a featured one (specs/profile-showcase PS-05) and the feed's
  * (specs/thesis-detail TD-03).
  */
-export function ThesisState({ state }: { state: ThesisStateName }) {
+export function ThesisState({
+  state,
+  onSurface = false,
+}: {
+  state: ThesisStateName
+  /**
+   * On a `bg-surface` panel (the ticket): the gray pill would melt into it, so the gray ones go
+   * white with a hairline, as a layer over the panel.
+   */
+  onSurface?: boolean
+}) {
   const t = useTranslations('thesisSummary')
   return (
     <span
@@ -26,6 +36,9 @@ export function ThesisState({ state }: { state: ThesisStateName }) {
       className={cn(
         'inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 type-meta font-bold',
         STATE_CLASSES[state],
+        onSurface &&
+          STATE_CLASSES[state].startsWith('bg-muted') &&
+          'bg-background ring-1 ring-border ring-inset',
       )}
     >
       {state === 'correct' && <CheckIcon aria-hidden className="size-3.5" />}

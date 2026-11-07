@@ -28,7 +28,13 @@ export function CardByline({
   canJoin = true,
   badge,
   linked = true,
+  accuracy: accuracyDisplay = 'chip',
 }: {
+  /**
+   * The accuracy in words, "68 % accuracy rate", not "68%": a thesis's, whose author's record is
+   * part of the bet (specs/thesis-identity TI-08).
+   */
+  accuracy?: 'chip' | 'words'
   /** false in a preview (specs/submit-tools ST-01): the same names, as text; nothing leads away. */
   linked?: boolean
   author: Author | null
@@ -60,11 +66,19 @@ export function CardByline({
     <span
       data-tier={accuracy.tier}
       className={cn(
-        'shrink-0 rounded-sm px-1 text-[0.625rem] font-bold tabular-nums',
+        'shrink-0 font-bold tabular-nums',
+        // In words, a whole phrase: 11px, not the chip's 10px.
+        accuracyDisplay === 'words'
+          ? 'rounded-full px-1.5 type-caption'
+          : 'rounded-sm px-1 text-[0.625rem]',
         ACCURACY_CLASSES[accuracy.tier],
       )}
     >
-      <span aria-hidden>{accuracy.value}</span>
+      <span aria-hidden>
+        {accuracyDisplay === 'words'
+          ? t('accuracyWords', { value: accuracy.value })
+          : accuracy.value}
+      </span>
       <span className="sr-only">{t('accuracy', accuracy)}</span>
     </span>
   )

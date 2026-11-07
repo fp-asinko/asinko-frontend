@@ -322,6 +322,111 @@ Medido contra `dev` el 2026-10-30.
 1. ¿Hay algo más del backend que dependa del claim o del razonamiento (moderación, el resumen de una notificación, el índice de búsqueda)?
 2. Una tesis sin claim y sin razonamiento, ¿necesita alguna otra señal para no parecer spam (por ejemplo, un límite de tesis por día)? El rate limit de hoy (`429`) ¿alcanza?
 
+### P-043: "¿Se cumple?" Sí / No en una tesis
+
+**Estado:** propuesta (2026-11-05, `specs/thesis-agree`). Mockeada con `API_MOCKS=true` y `missing` (con `missing`, un `MockExtension` agrega `agreement` a las tesis reales del feed y de `GET /theses/{id}`); con `false`, la fila no se muestra.
+
+**Motivo:** debajo del ticket de una tesis abierta, "¿Se cumple?" con Sí y No (pedido del PO, 2026-11-05). Es otra cosa que los votos ▲▼, que siguen: ▲▼ dice si la tesis es buena; Sí / No, si la persona cree que se va a cumplir. Los porcentajes se ven después de responder; el autor no responde su propia tesis. Al responder No, el front invita a publicar una tesis en contra.
+
+**Cambio:**
+
+1. **`PUT /api/v1/theses/{id}/agreement`**, body `{ "userId": "uuid", "value": "YES" | "NO" }`: responde o cambia la respuesta (una por persona y tesis).
+2. **`DELETE /api/v1/theses/{id}/agreement?userId=uuid`**: la quita.
+
+   Los dos responden `200` con los conteos nuevos:
+
+   ```jsonc
+   { "yes": 62, "no": 38, "viewerVote": "NO", "canVote": true }
+   ```
+
+   Errores: `401`; `403 USER_MISMATCH`; `403 OWN_THESIS` (su autor); `404 NOT_FOUND`; `409 THESIS_CLOSED` (cualquier estado que no sea `OPEN`); `422 VALIDATION_ERROR` (otro `value`).
+
+3. **El recurso `Thesis`** (feed, `GET /theses/{id}`, `GET /users/{id}/theses`): un campo más,
+
+   ```jsonc
+   { "agreement": { "yes": 62, "no": 38, "viewerVote": "YES" | "NO" | null, "canVote": true } }
+   ```
+
+   - `viewerVote`: la respuesta de quien pide; `null` sin sesión o sin responder.
+   - `canVote`: si quien pide puede responder. `false` para su autor y cuando la tesis ya no está abierta; `true` sin sesión (el front pide la cuenta al tocar), como `canCancel` lo decide el backend.
+
+**Preguntas:**
+
+1. Al cerrarse la tesis, ¿se congelan los conteos? El front los muestra en solo lectura.
+2. ¿Hace falta rate limit propio, o alcanza el de los votos?
+
+### P-044: El precio de hoy del activo en una tesis
+
+**Estado:** propuesta (2026-11-05, `specs/thesis-identity`). Mockeada con `API_MOCKS=true` y `missing` (con `missing`, un `MockExtension` agrega el precio a las tesis reales del feed y de `GET /theses/{id}`); con `false` y sin el campo, el ticket queda como hoy.
+
+**Motivo:** el ticket de una tesis muestra una barra de **entrada → hoy → objetivo**, para ver de un vistazo si va ganando o perdiendo (pedido del PO, 2026-11-05). El feed no puede pedir cada activo aparte (`GET /assets/{symbol}`): serían 20 requests por página.
+
+**Cambio:** en el recurso `Thesis` (feed, `GET /theses/{id}`, `GET /users/{id}/theses`), el `asset` suma los mismos campos de precio que `GET /assets/{symbol}`:
+
+```jsonc
+{
+  "asset": {
+    "id": "uuid",
+    "symbol": "NVDA",
+    "name": "NVIDIA Corp.",
+    "price": 236.4, // null sin datos de mercado
+    "priceUpdatedAt": "2026-11-05T14:00:00Z",
+    "priceStale": false,
+  },
+}
+```
+
+**Pregunta:** si es más simple para el backend, nos sirve también `GET /assets?symbols=NVDA,BTC` con los precios de varios activos en un request.
+
+### P-045: Cuántas tesis resueltas tiene el autor
+
+**Estado:** propuesta (2026-11-05, `specs/thesis-identity` TI-09). Mockeada; sin el campo, el front muestra el acierto como hoy.
+
+**Motivo:** en una tesis, junto al autor, "68 % de aciertos". Con 1 o 2 tesis resueltas el porcentaje dice poco (1 de 1 es 100 %): el front lo muestra desde 3 resueltas (PO, 2026-11-05).
+
+**Cambio:** en el `creator` del recurso `Thesis`, junto a `accuracyRate`:
+
+```jsonc
+{ "creator": { "id": "uuid", "username": "maria", "avatarUrl": null, "accuracyRate": 0.68, "resolvedCount": 12 } }
+```
+
+`resolvedCount`: acertadas + erradas (las que cuentan para `accuracyRate`).
+
+### P-046: El historial de precios de un activo
+
+**Estado:** propuesta (2026-11-05, `specs/thesis-chart`). Mockeada con `API_MOCKS=true` y `missing`; con `false` y sin el endpoint, la página de la tesis no muestra el gráfico.
+
+**Motivo:** en la página de una tesis, un gráfico del precio desde que se publicó hasta hoy, con la entrada y el objetivo (pedido del PO, 2026-11-05). El contrato no tiene historial (E14): solo el precio de hoy.
+
+**Cambio:** `GET /api/v1/assets/{symbol}/prices?from=<iso>&to=<iso>`, público.
+
+```jsonc
+{
+  "symbol": "BTC",
+  "interval": "HOUR", // "DAY" cuando 200 puntos por hora no alcanzan para el rango
+  "items": [{ "at": "2026-10-13T00:00:00Z", "price": 83584.01 }],
+}
+```
+
+- Ordenado del más viejo al más nuevo; como mucho unos 200 puntos, cada hora mientras entren (el backend elige el intervalo). El gráfico se ve como el de un broker, con su recorrido real, no un punto por día.
+- Errores: `404 NOT_FOUND` si el activo no existe; `422 VALIDATION_ERROR` si las fechas son inválidas o `from` es posterior a `to`.
+
+**Pregunta:** ¿Twelve Data da el historial con el plan actual, o hay que guardarlo nosotros día a día?
+
+### P-047: El número de una tesis entre las de su autor
+
+**Estado:** propuesta (2026-11-06, `specs/thesis-number`). Mockeada; sin el campo, el front no lo muestra.
+
+**Motivo:** cada tesis lleva su número entre las de su autor, como la serie de un boleto: "#12" dice si es su primera apuesta o la duodécima (pedido del PO, 2026-11-06). El front no puede calcularlo: ve una página de tesis por vez.
+
+**Cambio:** en el recurso `Thesis` (feed, `GET /theses/{id}`, `GET /users/{id}/theses`):
+
+```jsonc
+{ "authorSequence": 12 }
+```
+
+Su orden entre las tesis publicadas del autor, desde 1, canceladas incluidas: no cambia nunca. Sin él en las tesis del sistema.
+
 ## Fase 3 del backend: solo visual en el front
 
 Decisión del 2026-10-21: estas propuestas se implementan en el backend en una fase 3. Hasta entonces, el front las muestra con mocks (desarrollo y CI, `API_MOCKS=missing` o `true`): la forma de abajo es la que ya usa, y es lo que proponemos.

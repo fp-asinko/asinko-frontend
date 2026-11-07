@@ -6,7 +6,7 @@ import { MOCK_ROUTES } from '@/mocks/handlers'
 import type { MockRoute } from '@/mocks/types'
 import { COMMENTS_BY_CONTENT } from '@/mocks/fixtures/comments'
 import { THESES } from '@/mocks/fixtures/theses'
-import { voteCommentAs, votePollAs, votePostAs, voteThesisAs } from './votes-api'
+import { answerThesisAs, voteCommentAs, votePollAs, votePostAs, voteThesisAs } from './votes-api'
 
 // The real client against the mock routes, which follow the contract (E03, E05).
 const state = vi.hoisted(() => ({ routes: [] as readonly MockRoute[] }))
@@ -115,6 +115,31 @@ describe('voteCommentAs (specs/post-create-detail PC-16)', () => {
     expect(await voteCommentAs(DEMO_USER.id, { commentId: comment.id, value: null })).toEqual({
       ok: true,
       data: { score: null, viewerVote: null },
+    })
+  })
+})
+
+describe('answerThesisAs (P-043, specs/thesis-agree)', () => {
+  beforeEach(() => {
+    state.routes = MOCK_ROUTES
+  })
+  // Someone else's open thesis: the demo user can answer it.
+  const thesis = THESES.find((each) => each.state === 'OPEN' && each.creator?.id !== DEMO_USER.id)!
+
+  it('answers, changes and takes back, with the counts in lowercase', async () => {
+    const yes = await answerThesisAs(DEMO_USER.id, { thesisId: thesis.id, value: 'yes' })
+    expect(yes).toMatchObject({ ok: true, data: { viewerVote: 'yes', canVote: true } })
+    const no = await answerThesisAs(DEMO_USER.id, { thesisId: thesis.id, value: 'no' })
+    expect(no).toMatchObject({ ok: true, data: { viewerVote: 'no' } })
+    const removed = await answerThesisAs(DEMO_USER.id, { thesisId: thesis.id, value: null })
+    expect(removed).toMatchObject({ ok: true, data: { viewerVote: null } })
+  })
+
+  it('passes a closed thesis through as THESIS_CLOSED', async () => {
+    const closed = THESES.find((each) => each.state === 'CORRECT')!
+    expect(await answerThesisAs(DEMO_USER.id, { thesisId: closed.id, value: 'no' })).toMatchObject({
+      ok: false,
+      code: 'THESIS_CLOSED',
     })
   })
 })

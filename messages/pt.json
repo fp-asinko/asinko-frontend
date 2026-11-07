@@ -168,7 +168,8 @@
       "linkDomain": "({domain})",
       "related": "Relacionadas",
       "thought": "Thought",
-      "thoughtBy": "Thought de {author}"
+      "thoughtBy": "Thought de {author}",
+      "accuracyWords": "{value} de acertos"
     },
     "poll": {
       "badge": "Enquete",
@@ -300,6 +301,17 @@
           "generic": "Não foi possível publicar a atualização. Tente de novo."
         },
         "posted": "Atualização publicada"
+      },
+      "agree": {
+        "question": "Vai acontecer?",
+        "yes": "Sim",
+        "no": "Não",
+        "error": "Não foi possível salvar sua resposta. Tente de novo.",
+        "invite": {
+          "title": "Pensa diferente? Publique sua tese",
+          "action": "Criar tese",
+          "close": "Fechar"
+        }
       }
     },
     "type": {
@@ -1157,7 +1169,7 @@
         "above": "Acima de",
         "below": "Abaixo de",
         "price": "Preço-alvo",
-        "direction": "{direction, select, ABOVE {Acima do preço atual} other {Abaixo do preço atual}} · {change}",
+        "direction": "{direction, select, ABOVE {Acima do preço atual} other {Abaixo do preço atual}} · <pill>{change}</pill>",
         "needsAsset": "Escolha um ativo primeiro"
       },
       "deadline": {
@@ -1202,8 +1214,6 @@
       },
       "confirm": {
         "title": "Publicar tese",
-        "target": "{direction, select, ABOVE {Acima de} other {Abaixo de}} {price} até {date}",
-        "conviction": "Convicção: {level}",
         "final": "Uma tese publicada não pode ser editada nem apagada. Ela se resolve sozinha no prazo, contra o preço de mercado.",
         "disclaimer": "Entendo que isto não é aconselhamento financeiro",
         "back": "Voltar",
@@ -1303,6 +1313,11 @@
       "resolution": "Ela se resolve sozinha no prazo, contra o preço de mercado.",
       "final": "Depois de publicada, fica no seu histórico: não pode ser editada nem apagada.",
       "reference": "O preço de referência do ativo é registrado ao publicar."
+    },
+    "counter": {
+      "title": "Respondendo a {author}",
+      "bet": "{direction, select, above {Acima de} below {Abaixo de} other {Em}} {price} até {date}",
+      "hint": "{direction, select, above {Se você acha que não chega a {price}, coloque seu alvo abaixo.} below {Se você acha que não cai até {price}, coloque seu alvo acima.} other {Se você acha que não vai estar em {price}, coloque seu alvo onde acha que vai.}}"
     }
   },
   "ads": {
@@ -1412,6 +1427,29 @@
       "cancelled": "Cancelada em {date}{hasReason, select, yes {: {reason}} other {}}",
       "cancelledNoDate": "Cancelada"
     },
-    "badge": "Tese"
+    "badge": "Tese",
+    "progress": {
+      "entry": "Entrada {price}",
+      "target": "Alvo {price}",
+      "line": "<strong>{closed, select, yes {Fechou em {price}} other {Hoje {price}}}</strong> · {kind, select, toward {{direction, select, below {precisa cair mais {remaining}} other {precisa subir mais {remaining}}}} short {ficou a {remaining} do alvo} reached {alvo atingido} other {{direction, select, below {{change} acima da entrada} other {{change} abaixo da entrada}}}}{stale, select, yes { · preço de {date}} other {}}"
+    },
+    "number": "Tese número {number}{hasAuthor, select, yes { de {author}} other {}}",
+    "asset": "Ativo",
+    "target": "Alvo",
+    "convictionScale": "{level} de 4"
+  },
+  "thesisChart": {
+    "label": "Preço de {symbol} desde {start}: de {entry} a {price} {closed, select, yes {no fechamento} other {hoje}}{hasTarget, select, yes {; alvo {target} até {deadline}} other {}}",
+    "today": "Hoje",
+    "closed": "Fechamento",
+    "scrub": "Preço de {symbol} por {hourly, select, yes {hora} other {dia}}",
+    "point": "{date} · {price} · {change} desde a entrada",
+    "sinceEntry": "{change} desde a entrada",
+    "entryLevel": "Entrada",
+    "targetLevel": "Alvo"
+  },
+  "agreeBar": {
+    "result": "{yes} sim · {no} não · {count, plural, one {# voto} other {# votos}}",
+    "empty": "Ainda sem votos"
   }
 }

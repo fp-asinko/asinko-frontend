@@ -13,6 +13,7 @@ import type {
   RawPoll,
   RawPost,
   RawThesis,
+  RawThesisAgreement,
   RawUserSummary,
 } from '@/lib/api/contract'
 import type {
@@ -27,6 +28,7 @@ import type {
   PollResults,
   PostItem,
   PostMedia,
+  ThesisAgreement,
   ThesisItem,
 } from '../feed.types'
 import { toThesisTicket } from '@/lib/theses/ticket'
@@ -242,14 +244,39 @@ export function toThesisItem(thesis: RawThesis, signedIn = false): ThesisItem {
     path: thesisPath(thesis.id),
     claim: thesis.claim,
     reasoning: thesis.reasoning,
-    author: thesis.creatorType === 'SYSTEM' ? null : toAuthor(thesis.creator),
+    author: thesis.creatorType === 'SYSTEM' ? null : toThesisAuthor(thesis.creator),
     community: toCardCommunity(thesis.community, signedIn),
     score: thesis.score,
     viewerVote: thesis.viewerVote,
     argumentCount: thesis.argumentCounts,
     // The backend says it: only its author, while it is open and not in the last 10 % (E11).
     canCancel: thesis.canCancel,
+    agreement: thesis.agreement ? toThesisAgreement(thesis.agreement) : null,
     publishedAt: thesis.publishedAt,
+  }
+}
+
+/** Resolved theses an accuracy needs to mean something (specs/thesis-identity TI-09, Q2). */
+export const MIN_RESOLVED_FOR_ACCURACY = 3
+
+/**
+ * A thesis's author: their accuracy only from 3 resolved theses (TI-09), so a 1 of 1 does not say
+ * 100 %. Without the count (P-045 not yet in the backend), as any card's.
+ */
+function toThesisAuthor(creator: RawThesis['creator']): Author | null {
+  const author = toAuthor(creator)
+  const resolved = creator?.resolvedCount
+  if (!author || resolved === undefined || resolved >= MIN_RESOLVED_FOR_ACCURACY) return author
+  return { ...author, accuracyRate: null }
+}
+
+/** "Will it happen?" as the UI reads it (specs/thesis-agree § 3): the answers in lowercase. */
+export function toThesisAgreement(raw: RawThesisAgreement): ThesisAgreement {
+  return {
+    yes: raw.yes,
+    no: raw.no,
+    viewerVote: raw.viewerVote === 'YES' ? 'yes' : raw.viewerVote === 'NO' ? 'no' : null,
+    canVote: raw.canVote,
   }
 }
 

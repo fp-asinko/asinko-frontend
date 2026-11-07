@@ -28,11 +28,22 @@ export function toThesisTicket(thesis: RawThesis): ThesisTicketData {
             price: thesis.targetPrice,
           }
         : null,
+    // P-044: today's price, only when the backend sends it (specs/thesis-identity TI-06).
+    current:
+      typeof thesis.asset?.price === 'number'
+        ? {
+            price: thesis.asset.price,
+            at: thesis.asset.priceUpdatedAt ?? null,
+            stale: thesis.asset.priceStale ?? false,
+          }
+        : null,
     reference:
       thesis.referencePrice !== null
         ? { price: thesis.referencePrice, at: thesis.referencePriceAt }
         : null,
     deadline: thesis.deadline,
+    // P-047: only an author's thesis has one (TN-05).
+    number: thesis.creatorType === 'USER' ? (thesis.authorSequence ?? null) : null,
     conviction: CONVICTION[thesis.conviction],
     state: thesis.state.toLowerCase() as ThesisTicketState,
     resolution:

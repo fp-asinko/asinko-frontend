@@ -30,3 +30,11 @@ export const voteThesisSchema = z.object({
 })
 
 export type VoteThesisInput = z.infer<typeof voteThesisSchema>
+
+/** Input of answerThesis (specs/thesis-agree AG-04, AG-05): yes, no, or null to take it back. */
+export const answerThesisSchema = z.object({
+  thesisId: z.uuid(),
+  value: z.enum(['yes', 'no']).nullable(),
+})
+
+export type AnswerThesisInput = z.infer<typeof answerThesisSchema>

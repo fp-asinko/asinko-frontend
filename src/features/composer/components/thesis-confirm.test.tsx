@@ -1,16 +1,26 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { ThesisConfirm, type ThesisSummary } from './thesis-confirm'
 
 const SUMMARY: ThesisSummary = {
-  asset: '$NVDA',
   claim: 'NVDA closes above 200',
-  direction: 'BELOW',
-  targetPrice: 1234.5,
-  deadline: '2026-12-31',
-  conviction: 'EXTREME',
+  reasoning: '**Data centers** keep _buying_.',
+  author: { username: 'demo', avatarUrl: null },
+  ticket: {
+    id: 'preview',
+    asset: { symbol: 'NVDA', name: 'NVIDIA', path: '/asset/NVDA', logoUrl: null },
+    target: { direction: 'below', price: 150 },
+    current: null,
+    reference: { price: 180, at: null },
+    deadline: '2026-12-31T23:59:59.000Z',
+    number: null,
+    conviction: 4,
+    state: 'open',
+    resolution: null,
+    cancellation: null,
+  },
 }
 
 function renderConfirm(props: Partial<Parameters<typeof ThesisConfirm>[0]> = {}) {
@@ -31,13 +41,18 @@ function renderConfirm(props: Partial<Parameters<typeof ThesisConfirm>[0]> = {})
 }
 
 describe('ThesisConfirm (specs/thesis-create TC-11, TC-12)', () => {
-  it('sums up the thesis and says it is final, in the page’s language', async () => {
+  it('shows the thesis as its ticket and says it is final, in the page’s language', async () => {
     renderConfirm()
     const dialog = await screen.findByRole('dialog', { name: 'Publicar tesis' })
-    expect(dialog).toHaveTextContent('$NVDA')
     expect(dialog).toHaveTextContent('NVDA closes above 200')
-    expect(dialog).toHaveTextContent('Por debajo de 1234,5 al 31 dic 2026')
-    expect(dialog).toHaveTextContent('Convicción: Extrema')
+    // The ticket as it will be published (PO 2026-11-06), its asset not a link out of the form.
+    expect(dialog).toHaveTextContent(/Activo.*\$NVDA.*Convicción.*Extrema.*Objetivo/)
+    expect(dialog).toHaveTextContent('-16,7 %')
+    expect(within(dialog).queryByRole('link')).toBeNull()
+    // As its card: who publishes and THESIS first, the claim, and the reasoning as text.
+    expect(dialog).toHaveTextContent(
+      /demo.*Tesis.*Activo.*NVDA closes above 200.*Data centers keep buying\./,
+    )
     expect(dialog).toHaveAccessibleDescription(/no se puede editar ni borrar/)
   })
 

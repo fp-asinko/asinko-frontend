@@ -1,14 +1,15 @@
 import 'server-only'
 import { apiRequest, noContentSchema, type ApiResult } from '@/lib/api'
-import { pollSchema, voteResultSchema } from '@/lib/api/contract'
-import type { PollResults } from '../feed.types'
+import { pollSchema, thesisAgreementSchema, voteResultSchema } from '@/lib/api/contract'
+import type { PollResults, ThesisAgreement } from '../feed.types'
 import type {
+  AnswerThesisInput,
   VoteCommentInput,
   VotePollInput,
   VotePostInput,
   VoteThesisInput,
 } from '../schemas/vote.schema'
-import { toPollResults } from './mappers'
+import { toPollResults, toThesisAgreement } from './mappers'
 
 type PostVote = { score: number | null; viewerVote: 1 | -1 | null }
 
@@ -100,4 +101,31 @@ export async function voteCommentAs(
     body: { userId, value },
     schema: voteResultSchema,
   })
+}
+
+/**
+ * Answers "Will it happen?" on a thesis (P-043, specs/thesis-agree), changes the answer or, with
+ * null, takes it back. Both answer the new counts.
+ */
+export async function answerThesisAs(
+  userId: string,
+  { thesisId, value }: AnswerThesisInput,
+): Promise<ApiResult<ThesisAgreement>> {
+  const result =
+    value === null
+      ? await apiRequest({
+          method: 'DELETE',
+          path: '/api/v1/theses/:id/agreement',
+          params: { id: thesisId },
+          query: { userId },
+          schema: thesisAgreementSchema,
+        })
+      : await apiRequest({
+          method: 'PUT',
+          path: '/api/v1/theses/:id/agreement',
+          params: { id: thesisId },
+          body: { userId, value: value === 'yes' ? 'YES' : 'NO' },
+          schema: thesisAgreementSchema,
+        })
+  return result.ok ? { ok: true, data: toThesisAgreement(result.data) } : result
 }

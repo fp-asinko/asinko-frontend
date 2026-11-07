@@ -147,17 +147,20 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     await screen.findByText('NVIDIA')
     expect(screen.queryByRole('radiogroup', { name: 'Target' })).toBeNull()
     await userEvent.type(price(), '198')
-    // Green with its arrow up; red with its arrow down.
-    // The arrow in green, the words in the text's color: on the filled field (PO, 2026-11-05).
-    expect(screen.getByText('Above the current price · +10%').querySelector('svg')).toHaveClass(
-      'text-bullish',
-    )
-    expect(screen.getByText('Above the current price · +10%').querySelector('svg')).not.toBeNull()
+    // The arrow and the change in green up, red down; the change on its white pill, as it sits on
+    // the filled field (PO, 2026-11-05 and 2026-11-06).
+    const said = (text: string) =>
+      screen.getByText(
+        (_, node) => node?.id.endsWith('-direction-said') === true && node.textContent === text,
+      )
+    expect(said('Above the current price · +10%').querySelector('svg')).toHaveClass('text-bullish')
+    expect(screen.getByText('+10%')).toHaveClass('text-bullish')
     await userEvent.clear(price())
     await userEvent.type(price(), '150')
-    expect(screen.getByText('Below the current price · -16.7%').querySelector('svg')).toHaveClass(
+    expect(said('Below the current price · -16.7%').querySelector('svg')).toHaveClass(
       'text-bearish',
     )
+    expect(screen.getByText('-16.7%')).toHaveClass('text-bearish')
     await userEvent.clear(price())
     await userEvent.type(price(), '180')
     expect(
@@ -293,7 +296,8 @@ describe('ThesisEditor (specs/thesis-create)', () => {
     expect(dialog).toHaveTextContent('$NVDA')
     expect(dialog).toHaveTextContent('NVDA closes above 200')
     expect(dialog).toHaveTextContent('can’t be edited or deleted'.replace('’', "'"))
-    expect(dialog).toHaveTextContent('Conviction: High')
+    // The ticket as it will be published (TC-11, PO 2026-11-06).
+    expect(dialog).toHaveTextContent(/Asset.*\$NVDA.*Conviction.*High.*Target/)
     const send = within(dialog).getByRole('button', { name: 'Publish thesis' })
     expect(send).toHaveAttribute('aria-disabled', 'true')
     await userEvent.click(send)

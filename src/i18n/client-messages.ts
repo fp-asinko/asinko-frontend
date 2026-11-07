@@ -6,6 +6,7 @@ import type { AbstractIntlMessages } from 'next-intl'
  * uses a namespace missing here.
  */
 export const CLIENT_NAMESPACES = [
+  'agreeBar',
   'auth',
   'authGate',
   'common',
@@ -26,6 +27,7 @@ export const CLIENT_NAMESPACES = [
   'feed.loadMore',
   'feed.poll',
   'feed.replies.more',
+  'feed.thesis.agree',
   'feed.thesis.cancel',
   'feed.thesis.updates',
   'feed.type',
@@ -37,6 +39,9 @@ export const CLIENT_NAMESPACES = [
   'preview',
   'rightColumn.recent',
   'share',
+  // The ticket in the thesis's confirmation (specs/thesis-create TC-11).
+  'thesisSummary',
+  'thesisTicket',
 ] as const
 
 /** The subset of `messages` under CLIENT_NAMESPACES, keeping their nesting. */

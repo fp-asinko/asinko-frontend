@@ -13,6 +13,7 @@ import { DiscardDialog } from './discard-dialog'
 import type { PreviewAction } from './body-tabs'
 import type { CreateFormat } from './format-tabs'
 import { PostEditor } from './post-editor'
+import type { ThesisAuthor } from './thesis-confirm'
 import { EditorSkeleton } from './submit-editor-skeleton'
 
 // The thesis editor, at the first time its tab is chosen (specs/thesis-create TC-19).
@@ -44,7 +45,10 @@ export function SubmitEditor({
   related = [],
   suggested,
   preview,
+  author,
 }: {
+  /** Who publishes: the thesis's confirmation shows it as its card's header (TC-11). */
+  author?: ThesisAuthor
   /** The preview's Server Action (specs/submit-tools ST-01). */
   preview?: PreviewAction
   type: CreateFormat
@@ -168,6 +172,7 @@ export function SubmitEditor({
             storageKey={thesisStorageKey}
             draftsReady={thesisDrafts}
             suggested={suggested}
+            author={author}
             draftRef={thesisWritten}
             onCancel={cancel}
             onFormat={showPost}

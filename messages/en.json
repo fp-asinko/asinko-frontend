@@ -168,7 +168,8 @@
       "linkDomain": "({domain})",
       "related": "Related",
       "thought": "Thought",
-      "thoughtBy": "Thought by {author}"
+      "thoughtBy": "Thought by {author}",
+      "accuracyWords": "{value} accuracy rate"
     },
     "poll": {
       "badge": "Poll",
@@ -300,6 +301,17 @@
           "generic": "Could not post the update. Try again."
         },
         "posted": "Update posted"
+      },
+      "agree": {
+        "question": "Will it happen?",
+        "yes": "Yes",
+        "no": "No",
+        "error": "Could not save your answer. Try again.",
+        "invite": {
+          "title": "Think otherwise? Post your thesis",
+          "action": "Create thesis",
+          "close": "Close"
+        }
       }
     },
     "type": {
@@ -1157,7 +1169,7 @@
         "above": "Above",
         "below": "Below",
         "price": "Target price",
-        "direction": "{direction, select, ABOVE {Above the current price} other {Below the current price}} · {change}",
+        "direction": "{direction, select, ABOVE {Above the current price} other {Below the current price}} · <pill>{change}</pill>",
         "needsAsset": "Choose an asset first"
       },
       "deadline": {
@@ -1202,8 +1214,6 @@
       },
       "confirm": {
         "title": "Publish thesis",
-        "target": "{direction, select, ABOVE {Above} other {Below}} {price} by {date}",
-        "conviction": "Conviction: {level}",
         "final": "A published thesis can't be edited or deleted. It resolves by itself at the deadline, against the market price.",
         "disclaimer": "I understand this is not financial advice",
         "back": "Back",
@@ -1303,6 +1313,11 @@
       "resolution": "It resolves by itself at the deadline, against the market price.",
       "final": "Once published it stays on your track record: it can’t be edited or deleted.",
       "reference": "The asset’s reference price is taken when you publish."
+    },
+    "counter": {
+      "title": "Answering {author}",
+      "bet": "{direction, select, above {Above} below {Below} other {At}} {price} by {date}",
+      "hint": "{direction, select, above {If you think it won't reach {price}, set your target below it.} below {If you think it won't fall to {price}, set your target above it.} other {If you think it will miss {price}, set your target where you think it goes.}}"
     }
   },
   "ads": {
@@ -1412,6 +1427,29 @@
       "cancelled": "Cancelled on {date}{hasReason, select, yes {: {reason}} other {}}",
       "cancelledNoDate": "Cancelled"
     },
-    "badge": "Thesis"
+    "badge": "Thesis",
+    "progress": {
+      "entry": "Entry {price}",
+      "target": "Target {price}",
+      "line": "<strong>{closed, select, yes {Closed at {price}} other {Today {price}}}</strong> · {kind, select, toward {{direction, select, below {needs to fall {remaining} more} other {needs to rise {remaining} more}}} short {ended {remaining} short of the target} reached {target reached} other {{direction, select, below {{change} above the entry} other {{change} below the entry}}}}{stale, select, yes { · price from {date}} other {}}"
+    },
+    "number": "Thesis number {number}{hasAuthor, select, yes { by {author}} other {}}",
+    "asset": "Asset",
+    "target": "Target",
+    "convictionScale": "{level} of 4"
+  },
+  "thesisChart": {
+    "label": "Price of {symbol} since {start}: from {entry} to {price} {closed, select, yes {at its close} other {today}}{hasTarget, select, yes {; target {target} by {deadline}} other {}}",
+    "today": "Today",
+    "closed": "Close",
+    "scrub": "{symbol} price by {hourly, select, yes {hour} other {day}}",
+    "point": "{date} · {price} · {change} from entry",
+    "sinceEntry": "{change} since entry",
+    "entryLevel": "Entry",
+    "targetLevel": "Target"
+  },
+  "agreeBar": {
+    "result": "{yes} yes · {no} no · {count, plural, one {# vote} other {# votes}}",
+    "empty": "No votes yet"
   }
 }

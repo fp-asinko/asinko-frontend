@@ -5,7 +5,7 @@
 | Pieza                             | Dónde                                             | Qué hace                                                                                                                                        |
 | --------------------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ThesisTicket` (Server Component) | `components/organisms/thesis-ticket/`             | El panel: activo, objetivo, convicción y plazo o resultado. No conoce el negocio: recibe un `ThesisTicketData` por props, como `ThesisSummary`. |
-| `ThesisCard` del feed             | `features/feed/components/thesis-card.tsx`        | Línea de arriba (TK-01, TK-02), el ticket, el claim (TK-09) y las acciones.                                                                     |
+| `ThesisCard` del feed             | `features/feed/components/thesis-card.tsx`        | `CardByline` con THESIS y el estado como badge (TK-01, TK-02), el ticket, el claim (TK-09) y las acciones.                                      |
 | `ThesisCard` del perfil (Q5)      | `features/communities/components/thesis-card.tsx` | La misma composición, sin votos.                                                                                                                |
 | Página de la tesis (Q4)           | `thesis-route-page.tsx`                           | El ticket con la variante `detail`, que suma lo que hoy dice `ThesisBet` (fecha de entrada, plazo con hora). `ThesisBet` se borra.              |
 

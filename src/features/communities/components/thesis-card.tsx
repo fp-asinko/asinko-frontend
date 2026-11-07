@@ -26,14 +26,16 @@ export function ThesisCard({ thesis, menu = false }: { thesis: ThesisItem; menu?
       aria-labelledby={titleId}
       className="px-4 py-4.5 wrap-anywhere transition-colors duration-150 ease-out hover:bg-surface sm:rounded-2xl md:my-1 md:px-3"
     >
-      {/* THESIS and when (TK-01): the profile is its author's. Its state, in the ticket. */}
-      <div className="flex items-center justify-between gap-3">
-        <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 type-meta text-muted-foreground">
-          <ThesisBadge />
-          <time dateTime={thesis.publishedAt}>
-            {format.relativeTime(new Date(thesis.publishedAt), now)}
-          </time>
-        </p>
+      {/* When on the left and THESIS on the right, as every post's header (TK-01, PO 2026-11-05):
+          the profile is its author's, so no byline. Its state, in the ticket. */}
+      <div className="flex items-center gap-3">
+        <time
+          dateTime={thesis.publishedAt}
+          className="min-w-0 flex-1 type-meta text-muted-foreground"
+        >
+          {format.relativeTime(new Date(thesis.publishedAt), now)}
+        </time>
+        <ThesisBadge />
         {menu && (
           <div className="-my-2">
             <FeatureMenu
@@ -45,7 +47,7 @@ export function ThesisCard({ thesis, menu = false }: { thesis: ThesisItem; menu?
         )}
       </div>
 
-      <ThesisTicket thesis={thesis} stateChip={<ThesisState state={thesis.state} />} />
+      <ThesisTicket thesis={thesis} stateChip={<ThesisState state={thesis.state} onSurface />} />
       {/* Its claim, second, opens its page (TK-09, specs/thesis-detail TD-17). */}
       <ThesisClaim
         claim={thesis.claim}

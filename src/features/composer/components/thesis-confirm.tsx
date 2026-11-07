@@ -1,7 +1,10 @@
 'use client'
 
-import { useFormatter, useTranslations } from 'next-intl'
+import { useFormatter, useNow, useTranslations } from 'next-intl'
 import { useId, useState } from 'react'
+import { UserAvatar } from '@/components/molecules/user-avatar'
+import { ThesisBadge } from '@/components/organisms/thesis-ticket/thesis-badge'
+import { ThesisTicket } from '@/components/organisms/thesis-ticket/thesis-ticket'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
@@ -11,15 +14,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import type { ThesisTicketData } from '@/lib/theses/ticket.types'
 import { cn } from '@/lib/utils'
-import type { ThesisFormValues } from '../schemas/create-thesis.schema'
+import { markdownText } from '../lib/markdown-text'
 import { PILL } from './editor-styles'
 
-/** What the confirmation sums up (TC-11): the form's values and the asset's handle. */
-export type ThesisSummary = Pick<
-  ThesisFormValues,
-  'claim' | 'direction' | 'targetPrice' | 'deadline' | 'conviction'
-> & { asset: string }
+/**
+ * What the confirmation shows (TC-11): the claim, and the ticket as it will be published (PO
+ * 2026-11-06), built from the form's values.
+ */
+export type ThesisSummary = {
+  claim: string
+  reasoning: string
+  /** Its header, as every card's; none when the page did not say. */
+  author: ThesisAuthor | null
+  ticket: ThesisTicketData
+}
+
+/** Who publishes, from the session. */
+export type ThesisAuthor = { username: string; avatarUrl: string | null }
 
 /**
  * The last step before publishing a thesis (specs/thesis-create TC-11, TC-12): what is being
@@ -43,8 +56,9 @@ export function ThesisConfirm({
   onConfirm: () => void
 }) {
   const t = useTranslations('composer.thesis')
-  const format = useFormatter()
   const ids = useId()
+  const format = useFormatter()
+  const now = useNow()
   const [accepted, setAccepted] = useState(false)
   // Publish pressed without the checkbox: it says why (WCAG 3.3.1), as the form does.
   const [missing, setMissing] = useState(false)
@@ -65,7 +79,8 @@ export function ThesisConfirm({
         // The checkbox is where the person goes: the focus starts there.
         initialFocus={() => document.getElementById(`${ids}-disclaimer`)}
         className={cn(
-          'gap-5 p-5 sm:max-w-md',
+          // Wide enough from sm for the ticket's three cells side by side.
+          'gap-5 p-5 sm:max-w-xl',
           // A panel from the bottom in phones, edge to edge (TC-16): max-sm: reads best here, against
           // the shadcn window it overrides. The same in cancelling a thesis (specs/thesis-detail).
           'max-sm:top-auto max-sm:bottom-0 max-sm:max-w-full max-sm:translate-y-0 max-sm:rounded-b-none max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))]',
@@ -79,22 +94,40 @@ export function ThesisConfirm({
               </DialogTitle>
               <DialogDescription>{t('confirm.final')}</DialogDescription>
             </DialogHeader>
-            {/* What is published, as one block (TC-11). */}
-            <div className="flex flex-col gap-1.5 rounded-xl bg-surface p-4">
-              <p className="type-action font-bold">{summary.asset}</p>
-              <p className="type-post-body wrap-anywhere">{summary.claim}</p>
-              <p className="type-small text-muted-foreground">
-                {t('confirm.target', {
-                  direction: summary.direction,
-                  price: format.number(summary.targetPrice, { maximumFractionDigits: 8 }),
-                  date: format.dateTime(new Date(`${summary.deadline}T12:00:00`), {
-                    dateStyle: 'medium',
-                  }),
-                })}
-              </p>
-              <p className="type-small text-muted-foreground">
-                {t('confirm.conviction', { level: t(`conviction.${summary.conviction}`) })}
-              </p>
+            {/* What is published, as its card will look (TC-11, PO 2026-11-06): who publishes and
+                THESIS, the ticket, the claim and the start of the reasoning. */}
+            <div className="min-w-0 wrap-anywhere">
+              <div className="flex items-center gap-2">
+                {summary.author && (
+                  <>
+                    <UserAvatar
+                      name={summary.author.username}
+                      colorKey={summary.author.username}
+                      imageUrl={summary.author.avatarUrl}
+                      size="md"
+                      className="size-8 text-[0.6875rem]"
+                    />
+                    <p className="flex min-w-0 flex-1 items-center gap-x-1.25 type-meta text-muted-foreground">
+                      <span className="truncate type-ui font-bold text-foreground">
+                        {summary.author.username}
+                      </span>
+                      <span aria-hidden>·</span>
+                      <span className="shrink-0">{format.relativeTime(now, now)}</span>
+                    </p>
+                  </>
+                )}
+                <span className="ml-auto">
+                  <ThesisBadge />
+                </span>
+              </div>
+              <ThesisTicket thesis={summary.ticket} variant="preview" />
+              <p className="mt-3 type-post-title">{summary.claim}</p>
+              {summary.reasoning.trim() && (
+                // Its first lines, as text: the real render is the server's (markdown-text.ts).
+                <p className="mt-1.5 line-clamp-3 type-post-body whitespace-pre-line text-muted-foreground">
+                  {markdownText(summary.reasoning)}
+                </p>
+              )}
             </div>
             <div className="flex items-start gap-3">
               <Checkbox

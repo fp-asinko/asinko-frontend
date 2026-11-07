@@ -167,6 +167,20 @@ export const thesisStateSchema = z.enum([
 ])
 
 /**
+ * "Will it happen?" on a thesis (P-043, specs/thesis-agree): how many said yes and no, the viewer's
+ * answer, and whether the viewer can answer (not its author, only while open), as `canCancel`.
+ * Also what PUT and DELETE /theses/{id}/agreement answer.
+ */
+export const thesisAgreementSchema = z.object({
+  yes: z.number().int().nonnegative(),
+  no: z.number().int().nonnegative(),
+  viewerVote: z.enum(['YES', 'NO']).nullable(),
+  canVote: z.boolean(),
+})
+
+export type RawThesisAgreement = z.infer<typeof thesisAgreementSchema>
+
+/**
  * A thesis (E11), as GET /users/{userId}/theses lists it (E12). A qualitative thesis has no asset,
  * and then no target: `targetPrice` and `targetDirection` come null (the backend's serializer,
  * `asinko-app` lib/api/theses.ts, although E11 types them as required).
@@ -182,6 +196,13 @@ export const thesisSchema = z.object({
       name: z.string(),
       /** P-041 (proposal): the asset's logo. Optional until the backend sends it. */
       logoUrl: z.string().nullable().optional(),
+      /**
+       * P-044 (proposal, specs/thesis-identity): today's price, as GET /assets/{symbol}. Optional
+       * until the backend sends it: without it, the ticket has no progress bar.
+       */
+      price: z.number().nullable().optional(),
+      priceUpdatedAt: z.iso.datetime().nullable().optional(),
+      priceStale: z.boolean().optional(),
     })
     .nullable(),
   claim: z.string(),
@@ -199,12 +220,24 @@ export const thesisSchema = z.object({
   cancelledAt: z.iso.datetime().nullable(),
   cancellationReason: z.string().nullable(),
   disclaimerAcceptedAt: z.iso.datetime(),
-  creator: userSummarySchema.nullable(),
+  creator: userSummarySchema
+    .extend({
+      /** P-045 (proposal, specs/thesis-identity TI-09): their resolved theses, correct + incorrect. */
+      resolvedCount: z.number().int().nonnegative().optional(),
+    })
+    .nullable(),
   creatorType: z.enum(['USER', 'SYSTEM']),
+  /** P-047 (proposal, specs/thesis-number): its order among its author's theses, from 1. */
+  authorSequence: z.number().int().positive().optional(),
   score: z.number().int(),
   viewerVote: z.union([z.literal(1), z.literal(-1)]).nullable(),
   argumentCounts: z.object({ pro: z.number().int(), contra: z.number().int() }),
   canCancel: z.boolean(),
+  /**
+   * P-043 (proposal, specs/thesis-agree): who thinks it will happen. Optional until the backend
+   * sends it; a malformed one leaves the thesis without the row, not out of the feed.
+   */
+  agreement: thesisAgreementSchema.nullable().optional().catch(null),
   publishedAt: z.iso.datetime(),
   createdAt: z.iso.datetime(),
 })

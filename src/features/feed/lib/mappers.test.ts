@@ -316,6 +316,42 @@ describe('toThesisItem (specs/thesis-detail § 2)', () => {
     })
   })
 
+  it('carries today’s price when the backend sends it, stale or not (specs/thesis-identity TI-06)', () => {
+    const raw = byState('OPEN')
+    expect(toThesisItem(raw).current).toBeNull()
+    const priced = {
+      ...raw,
+      asset: {
+        ...raw.asset!,
+        price: 91000,
+        priceUpdatedAt: '2026-11-05T12:00:00.000Z',
+        priceStale: true,
+      },
+    }
+    expect(toThesisItem(priced).current).toEqual({
+      price: 91000,
+      at: '2026-11-05T12:00:00.000Z',
+      stale: true,
+    })
+  })
+
+  it('shows its author’s accuracy only from three resolved theses (specs/thesis-identity TI-09)', () => {
+    const raw = byState('OPEN')
+    const withCount = (resolvedCount?: number) =>
+      toThesisItem({ ...raw, creator: { ...raw.creator!, accuracyRate: 1, resolvedCount } }).author
+    expect(withCount(1)?.accuracyRate).toBeNull()
+    expect(withCount(3)?.accuracyRate).toBe(1)
+    // Without the count (P-045 not in the backend yet), as any card's.
+    expect(withCount(undefined)?.accuracyRate).toBe(1)
+  })
+
+  it('carries its number among its author’s, never a system one’s (specs/thesis-number TN-05)', () => {
+    const raw = byState('OPEN')
+    expect(toThesisItem(raw).number).toBeNull()
+    expect(toThesisItem({ ...raw, authorSequence: 12 }).number).toBe(12)
+    expect(toThesisItem({ ...raw, authorSequence: 12, creatorType: 'SYSTEM' }).number).toBeNull()
+  })
+
   it('takes a feed item of kind THESIS, with its reason in Explore', () => {
     const item = toFeedItem(
       { kind: 'THESIS', content: byState('OPEN'), reason: null },

@@ -51,4 +51,13 @@ describe('ThesisState (specs/profile-track-record PT-07)', () => {
     rerender(<ThesisState state="expired" />)
     expect(screen.getByText('Expired').querySelector('svg')).toBeNull()
   })
+
+  it('goes white with a hairline on the ticket’s gray, where a gray pill would melt in', () => {
+    const { rerender } = renderWithIntl(<ThesisState state="open" onSurface />)
+    expect(screen.getByText('Open')).toHaveClass('bg-background', 'ring-1')
+    expect(screen.getByText('Open')).not.toHaveClass('bg-muted')
+    // The resolved ones keep their tint: it already stands out.
+    rerender(<ThesisState state="correct" onSurface />)
+    expect(screen.getByText('Correct')).not.toHaveClass('bg-background')
+  })
 })
