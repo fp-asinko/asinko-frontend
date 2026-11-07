@@ -1,3 +1,4 @@
+import { ArrowUpRightIcon, ListIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { IdentityBanner } from '@/components/molecules/identity-banner'
 import { UserAvatar } from '@/components/molecules/user-avatar'
@@ -12,12 +13,15 @@ export const NO_NAME = '##'
 /**
  * How the group being created will look (specs/community-create CG-08): its banner (or the color
  * its handle gives it), its square photo, the handle as the title, the name and the description in
- * three lines, and the "Joined" its creator will see. Only render: what the form has comes in.
+ * three lines, and the "Joined" its creator will see. Under them, as its page's details, the rules
+ * in four lines and the website's domain. Only render: what the form has comes in.
  */
 export function GroupPreview({
   handle,
   name,
   description,
+  rules = '',
+  website = null,
   avatarUrl,
   bannerUrl,
   className,
@@ -25,6 +29,9 @@ export function GroupPreview({
   handle: string
   name: string
   description: string
+  rules?: string
+  /** The website's domain, only when it is a valid link. */
+  website?: string | null
   avatarUrl: string | null
   bannerUrl: string | null
   className?: string
@@ -74,6 +81,33 @@ export function GroupPreview({
           <p className="mt-2 line-clamp-3 type-small wrap-anywhere whitespace-pre-line text-muted-foreground">
             {description}
           </p>
+        )}
+        {(rules || website) && (
+          <div className="mt-3 border-t pt-3">
+            {rules && (
+              <>
+                <p className="flex items-center gap-1.5 type-action">
+                  <ListIcon aria-hidden className="size-3.5 text-muted-foreground" />
+                  {t('rules')}
+                </p>
+                <p className="mt-1 line-clamp-4 type-small wrap-anywhere whitespace-pre-line text-muted-foreground">
+                  {rules}
+                </p>
+              </>
+            )}
+            {website && (
+              // Not a link: a preview of the pill, as the group's page will have it.
+              <span
+                className={cn(
+                  'flex w-fit max-w-full items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 type-action text-muted-foreground',
+                  rules && 'mt-3',
+                )}
+              >
+                <span className="truncate">{website}</span>
+                <ArrowUpRightIcon aria-hidden className="size-3.5 shrink-0" />
+              </span>
+            )}
+          </div>
         )}
       </div>
     </section>

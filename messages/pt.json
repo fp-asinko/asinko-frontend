@@ -1531,7 +1531,8 @@
     "preview": {
       "label": "Prévia",
       "placeholder": "seu-grupo",
-      "joined": "Participando"
+      "joined": "Participando",
+      "rules": "Regras do grupo"
     },
     "images": {
       "cropPhoto": "Recorte a foto",

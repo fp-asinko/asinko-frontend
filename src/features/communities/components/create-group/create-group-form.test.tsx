@@ -209,4 +209,18 @@ describe('CreateGroupForm (specs/community-create)', () => {
     renderWithIntl(<CreateGroupForm />)
     expect(create().closest('[data-sticky-actions]')).not.toBeNull()
   })
+
+  it('shows the rules and the website in the preview, the website only when valid (CG-08)', async () => {
+    renderWithIntl(<CreateGroupForm />)
+    const preview = screen.getByRole('region', { name: 'Preview' })
+    await userEvent.type(screen.getByRole('textbox', { name: /Rules/ }), 'No spam.')
+    expect(preview).toHaveTextContent('No spam.')
+    const website = screen.getByRole('textbox', { name: /Website/ })
+    await userEvent.type(website, 'not a link')
+    await userEvent.tab()
+    expect(preview).not.toHaveTextContent('not a link')
+    await userEvent.clear(website)
+    await userEvent.type(website, 'https://www.example.com/about')
+    expect(preview).toHaveTextContent('example.com')
+  })
 })

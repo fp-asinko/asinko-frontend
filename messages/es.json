@@ -1531,7 +1531,8 @@
     "preview": {
       "label": "Vista previa",
       "placeholder": "tu-grupo",
-      "joined": "Unido"
+      "joined": "Unido",
+      "rules": "Reglas del grupo"
     },
     "images": {
       "cropPhoto": "Recortá la foto",

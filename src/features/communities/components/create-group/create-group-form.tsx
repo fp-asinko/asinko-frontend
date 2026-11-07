@@ -12,6 +12,7 @@ import { Field, FieldError, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Link } from '@/i18n/navigation'
+import { toProfileLink } from '@/lib/profile-links'
 import { cn } from '@/lib/utils'
 import { useCreateGroup } from '../../hooks/use-create-group'
 import { useSimilarGroups } from '../../hooks/use-similar-groups'
@@ -155,6 +156,8 @@ export function CreateGroupForm() {
       handle={slugOk ? slug : ''}
       name={name.trim()}
       description={description.trim()}
+      rules={rules.trim()}
+      website={invalid('mainUrl') ? null : (toProfileLink(mainUrl)?.host ?? null)}
       avatarUrl={images.avatar?.url ?? null}
       bannerUrl={images.banner?.url ?? null}
       className={className}

@@ -40,4 +40,19 @@ describe('GroupPreview (specs/community-create CG-08)', () => {
       'blob:banner',
     )
   })
+
+  it('shows the rules in four lines and the website, as the group page details', () => {
+    renderWithIntl(<GroupPreview {...group} rules={'No spam.\nBe kind.'} website="example.com" />)
+    const preview = screen.getByRole('region', { name: 'Preview' })
+    expect(preview).toHaveTextContent('Group rules')
+    expect(screen.getByText(/No spam./)).toHaveClass('line-clamp-4')
+    expect(preview).toHaveTextContent('example.com')
+    // A preview: the website is not a link yet.
+    expect(screen.queryByRole('link')).toBeNull()
+  })
+
+  it('leaves the details out without rules nor website', () => {
+    renderWithIntl(<GroupPreview {...group} />)
+    expect(screen.getByRole('region', { name: 'Preview' })).not.toHaveTextContent('Group rules')
+  })
 })

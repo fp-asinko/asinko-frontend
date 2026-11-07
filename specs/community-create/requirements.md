@@ -56,6 +56,7 @@ Que cualquier persona con cuenta pueda abrir su propio grupo, con nombre, handle
   - el banner, o el degradé del tono que le toca al handle (`IdentityBanner`);
   - el avatar, o su inicial con el tono;
   - `#handle`, el nombre y la descripción.
+  - debajo, como en los detalles de la página del grupo, las reglas (hasta cuatro líneas) y el dominio del sitio web, este solo cuando es un link válido (PO, 2026-11-07).
 
   Se actualiza al escribir. En mobile y tablet va debajo del formulario, antes del botón (Q3).
 

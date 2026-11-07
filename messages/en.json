@@ -1531,7 +1531,8 @@
     "preview": {
       "label": "Preview",
       "placeholder": "your-group",
-      "joined": "Joined"
+      "joined": "Joined",
+      "rules": "Group rules"
     },
     "images": {
       "cropPhoto": "Crop the photo",
