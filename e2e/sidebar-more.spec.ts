@@ -76,7 +76,9 @@ test('in the phone panel, with no height to fit, shows everything and no "more" 
   expect(await assets.locator('ul > li').filter({ visible: true }).count()).toBe(
     await assets.locator('ul > li').count(),
   )
-  await expect(panel.getByRole('button', { name: /^more: / })).toHaveCount(0)
+  // In the sections with a fixed count: the demo's groups grow when another test creates one
+  // (specs/community-create), and past their maximum their "more" is right.
+  await expect(assets.getByRole('button', { name: /^more: / })).toHaveCount(0)
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
   )

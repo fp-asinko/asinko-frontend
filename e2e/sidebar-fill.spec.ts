@@ -107,9 +107,17 @@ test.describe('The left column fills its height', () => {
     await phone.getByRole('button', { name: 'Open menu' }).click()
     const panel = phone.getByRole('dialog').getByRole('region', { name: 'Your interests' })
     await expect(panel).toBeVisible()
-    const hidden = await panel.evaluate(
-      (el) => [...el.querySelectorAll('li')].filter((li) => li.hidden || !li.offsetParent).length,
-    )
+    // People and assets, not the groups: the demo's grow when another test creates one
+    // (specs/community-create), and past their maximum the rest wait under "more", as they should.
+    let hidden = 0
+    for (const name of ['People', 'Assets']) {
+      hidden += await panel
+        .getByRole('region', { name })
+        .evaluate(
+          (el) =>
+            [...el.querySelectorAll('li')].filter((li) => li.hidden || !li.offsetParent).length,
+        )
+    }
     expect(hidden).toBe(0)
     await phone.close()
   })
