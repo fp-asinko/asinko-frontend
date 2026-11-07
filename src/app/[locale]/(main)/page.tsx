@@ -20,7 +20,11 @@ export default async function HomePage({ searchParams }: PageProps<'/[locale]'>)
     <PageColumns>
       {/* The prototype has no visible page title; the single H1 is for screen readers and SEO. */}
       <h1 className="sr-only">{t('title')}</h1>
-      <HomeFeed searchParams={searchParams} />
+      {/* Where loading.tsx drew its skeleton: the composer, the tabs and the feed fade in together
+          (specs/content-reveal CR-05). */}
+      <div className="arrive">
+        <HomeFeed searchParams={searchParams} />
+      </div>
     </PageColumns>
   )
 }

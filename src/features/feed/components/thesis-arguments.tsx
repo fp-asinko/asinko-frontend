@@ -43,7 +43,9 @@ export async function ThesisArguments({
       {/* The side's ad above its arguments, under the thesis, as a post's above its comments
           (specs/ads AD-04, PO 2026-11-05). Nothing if it fails. */}
       <Suspense key={`${query.side}:${query.sort}`} fallback={null}>
-        <ArgumentsAd target={target} sort={query.sort} />
+        <div className="arrive">
+          <ArgumentsAd target={target} sort={query.sort} />
+        </div>
       </Suspense>
       <section
         id="arguments"
@@ -87,7 +89,9 @@ export async function ThesisArguments({
             />
           </div>
           <Suspense key={`${query.side}:${query.sort}`} fallback={<ArgumentsSkeleton />}>
-            <LoadedArguments target={target} side={query.side} sort={query.sort} />
+            <div className="arrive">
+              <LoadedArguments target={target} side={query.side} sort={query.sort} />
+            </div>
           </Suspense>
         </CommentThread>
       </section>

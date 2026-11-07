@@ -99,7 +99,9 @@ export async function ThesisDetail({
         // streams in at its own height, and never holds the thesis back (CH-06).
         chart={
           <Suspense fallback={<ThesisChartSkeleton />}>
-            <ThesisChartSection thesis={thesis} />
+            <div className="arrive">
+              <ThesisChartSection thesis={thesis} />
+            </div>
           </Suspense>
         }
         leading={<BackButton variant="plain" />}
@@ -111,16 +113,18 @@ export async function ThesisDetail({
       </ThesisCard>
       {/* A secondary section: it streams in, and never holds the arguments back. */}
       <Suspense fallback={<UpdatesSkeleton />}>
-        <ThesisUpdates
-          thesisId={thesis.id}
-          // Its author, while it is open (TA-10). Not canCancel: that one ends in the last 10 %.
-          canPublish={
-            thesis.state === 'open' &&
-            viewer !== null &&
-            thesis.author !== null &&
-            viewer.username === thesis.author.username
-          }
-        />
+        <div className="arrive">
+          <ThesisUpdates
+            thesisId={thesis.id}
+            // Its author, while it is open (TA-10). Not canCancel: that one ends in the last 10 %.
+            canPublish={
+              thesis.state === 'open' &&
+              viewer !== null &&
+              thesis.author !== null &&
+              viewer.username === thesis.author.username
+            }
+          />
+        </div>
       </Suspense>
       <ThesisArguments thesis={thesis} query={thesisArgumentsQuerySchema.parse(searchParams)} />
     </>

@@ -45,7 +45,9 @@ export async function PostComments({
           it (specs/ads AD-04, PO 2026-10-26). A search has none (AD-05). */}
       {!query.q && (
         <Suspense key={query.sort} fallback={null}>
-          <PostAd postId={postId} sort={query.sort} />
+          <div className="arrive">
+            <PostAd postId={postId} sort={query.sort} />
+          </div>
         </Suspense>
       )}
       <section
@@ -63,11 +65,13 @@ export async function PostComments({
         </div>
         <p id={ANNOUNCER} role="status" className="sr-only" />
         <Suspense key={`${query.sort}:${query.q ?? ''}`} fallback={<CommentsSkeleton />}>
-          {query.q ? (
-            <SearchedComments postId={postId} q={query.q} allHref={path} />
-          ) : (
-            <LoadedComments postId={postId} sort={query.sort} closed={closed} />
-          )}
+          <div className="arrive">
+            {query.q ? (
+              <SearchedComments postId={postId} q={query.q} allHref={path} />
+            ) : (
+              <LoadedComments postId={postId} sort={query.sort} closed={closed} />
+            )}
+          </div>
         </Suspense>
       </section>
     </>

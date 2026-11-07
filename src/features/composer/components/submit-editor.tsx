@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { arriving } from '@/components/molecules/arriving'
 import { useLocale } from 'next-intl'
 import { useRef, useState, type RefObject } from 'react'
 import type { Locale } from '@/i18n/routing'
@@ -17,10 +18,13 @@ import type { ThesisAuthor } from './thesis-confirm'
 import { EditorSkeleton } from './submit-editor-skeleton'
 
 // The thesis editor, at the first time its tab is chosen (specs/thesis-create TC-19).
-const ThesisEditor = dynamic(() => import('./thesis-editor').then((mod) => mod.ThesisEditor), {
-  ssr: false,
-  loading: EditorSkeleton,
-})
+const ThesisEditor = dynamic(
+  () => import('./thesis-editor').then((mod) => arriving(mod.ThesisEditor)),
+  {
+    ssr: false,
+    loading: EditorSkeleton,
+  },
+)
 
 /** A handle's slug: $BTC is BTC and #macro is macro. */
 const slugOf = (handle: string) => handle.slice(1)

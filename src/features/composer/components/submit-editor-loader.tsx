@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { arriving } from '@/components/molecules/arriving'
 import { EditorSkeleton } from './submit-editor-skeleton'
 
 /**
@@ -10,7 +11,7 @@ import { EditorSkeleton } from './submit-editor-skeleton'
  * the server; the form's place keeps its shape meanwhile, so nothing jumps (CLS).
  */
 export const SubmitEditorLoader = dynamic(
-  () => import('./submit-editor').then((mod) => mod.SubmitEditor),
+  () => import('./submit-editor').then((mod) => arriving(mod.SubmitEditor)),
   { ssr: false, loading: EditorSkeleton },
 )
 

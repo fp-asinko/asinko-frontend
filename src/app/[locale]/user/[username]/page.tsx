@@ -72,16 +72,20 @@ export default async function UserPage({
       <ProfileTabs pagePath={path} current={tab} />
       {tab === 'replies' ? (
         <Suspense fallback={<ReplyListSkeleton />}>
-          <UserReplies userId={profile.id} handle={page.handle} isSelf={profile.isSelf} />
+          <div className="arrive">
+            <UserReplies userId={profile.id} handle={page.handle} isSelf={profile.isSelf} />
+          </div>
         </Suspense>
       ) : tab === 'theses' ? (
         <Suspense fallback={<ThesesListSkeleton />}>
-          <ThesesList
-            userId={profile.id}
-            handle={page.handle}
-            isSelf={profile.isSelf}
-            record={profile}
-          />
+          <div className="arrive">
+            <ThesesList
+              userId={profile.id}
+              handle={page.handle}
+              isSelf={profile.isSelf}
+              record={profile}
+            />
+          </div>
         </Suspense>
       ) : (
         <CommunityFeed

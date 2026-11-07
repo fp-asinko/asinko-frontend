@@ -1,6 +1,7 @@
 'use client'
 
 import { CameraIcon } from 'lucide-react'
+import { arriving } from '@/components/molecules/arriving'
 import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState } from 'react'
@@ -10,7 +11,7 @@ import { getSuggestedPhoto } from '../actions/suggested-photo.action'
 
 /** The cropper (and its library) comes when a photo is picked (seo.md). */
 const PhotoCropper = dynamic(
-  () => import('./photo-cropper').then((module) => module.PhotoCropper),
+  () => import('./photo-cropper').then((module) => arriving(module.PhotoCropper)),
   {
     // Its place while it comes, the cropper's height: the modal does not jump.
     loading: () => <Skeleton className="h-82 rounded-lg sm:h-98" />,

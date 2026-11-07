@@ -10,7 +10,9 @@ export default async function SubmitRight({ searchParams }: PageProps<'/[locale]
   const { community, related, type } = parseSubmitQuery(await searchParams)
   return (
     <Suspense fallback={<Skeleton className="m-3.5 h-48 rounded-lg" />}>
-      <SubmitAside community={community} related={related} thesis={type === 'thesis'} />
+      <div className="arrive">
+        <SubmitAside community={community} related={related} thesis={type === 'thesis'} />
+      </div>
     </Suspense>
   )
 }

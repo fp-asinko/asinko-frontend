@@ -123,7 +123,9 @@ export default async function LocaleLayout({ children, right, params }: LayoutPr
                       // Streamed: the shell and the page never wait for the column's data
                       // (specs/feed-navigation FN-08), as a language switch re-renders the layout.
                       <Suspense fallback={<InterestsSkeleton />}>
-                        <InterestsSidebar />
+                        <div className="arrive">
+                          <InterestsSidebar />
+                        </div>
                       </Suspense>
                     }
                     // Each page's right column (the @right slot): the widgets, or its own (specs/submit-page).

@@ -52,7 +52,9 @@ export async function CommunityFeed({
         <div className="pt-1.5" />
       )}
       <Suspense key={`${filter}|${params.type}`} fallback={<FeedListSkeleton />}>
-        <CommunityFeedList params={params} handle={handle} pagePath={pagePath} />
+        <div className="arrive">
+          <CommunityFeedList params={params} handle={handle} pagePath={pagePath} />
+        </div>
       </Suspense>
     </>
   )

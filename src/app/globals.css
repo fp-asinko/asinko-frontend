@@ -504,6 +504,18 @@
 }
 
 /*
+ * What arrives after the page fades in, instead of appearing at once (specs/content-reveal): the
+ * content of a Suspense or a deferred component, where its skeleton was. Without a box of its own
+ * (the layout does not change); its children fade, only opacity. Again when a new key remounts it.
+ */
+@utility arrive {
+  display: contents;
+  & > * {
+    animation: var(--animate-fade-in);
+  }
+}
+
+/*
  * A thesis's ticket, perforated between its two stubs (specs/thesis-identity TI-12, TI-13): a mask
  * bites a half circle out of each side at the join, so what is behind shows through (white, or the
  * card's gray on hover), and a ring 1px wider draws the bite's edge in the border's color.

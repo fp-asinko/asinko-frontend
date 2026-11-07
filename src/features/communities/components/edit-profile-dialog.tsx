@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { arriving } from '@/components/molecules/arriving'
 import { XIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from 'react'
@@ -39,7 +40,7 @@ import { OpenToField } from './edit-profile-open-to'
 
 /** The cropper (and its library) comes when an image is picked (seo.md). */
 const ImageCropper = dynamic(
-  () => import('./image-cropper').then((module) => module.ImageCropper),
+  () => import('./image-cropper').then((module) => arriving(module.ImageCropper)),
   {
     // Its place while it comes, the cropper's height: the window does not jump.
     loading: () => <Skeleton className="h-72 rounded-lg sm:h-88" />,

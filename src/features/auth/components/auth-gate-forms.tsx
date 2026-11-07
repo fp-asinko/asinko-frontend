@@ -1,24 +1,28 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { arriving } from '@/components/molecules/arriving'
 import { useState } from 'react'
 import { useGateDialog } from '@/components/organisms/auth-gate'
 import { useRouter } from '@/i18n/navigation'
 import { FormSkeleton } from './form-skeleton'
 
 // Loaded when the modal shows them: they bring zod to the browser (seo.md § Zod, AU-19).
-const LogInForm = dynamic(() => import('./log-in-form').then((mod) => mod.LogInForm), {
+const LogInForm = dynamic(() => import('./log-in-form').then((mod) => arriving(mod.LogInForm)), {
   ssr: false,
   loading: () => <FormSkeleton fields={2} />,
 })
-const SignUpForm = dynamic(() => import('./sign-up-form').then((mod) => mod.SignUpForm), {
+const SignUpForm = dynamic(() => import('./sign-up-form').then((mod) => arriving(mod.SignUpForm)), {
   ssr: false,
   loading: () => <FormSkeleton fields={2} />,
 })
-const ProfileForm = dynamic(() => import('./profile-form').then((mod) => mod.ProfileForm), {
-  ssr: false,
-  loading: () => <FormSkeleton fields={2} />,
-})
+const ProfileForm = dynamic(
+  () => import('./profile-form').then((mod) => arriving(mod.ProfileForm)),
+  {
+    ssr: false,
+    loading: () => <FormSkeleton fields={2} />,
+  },
+)
 
 /**
  * The forms of the account modal (specs/auth AU-01, AU-02, AU-07, AU-11): the layout gives them

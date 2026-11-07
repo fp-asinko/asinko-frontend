@@ -1,22 +1,26 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { arriving } from '@/components/molecules/arriving'
 import { useRouter } from '@/i18n/navigation'
 import { FormSkeleton } from './form-skeleton'
 
 // After the page, with a skeleton in their place: they bring zod (seo.md § Zod, AU-19).
-const LogInForm = dynamic(() => import('./log-in-form').then((mod) => mod.LogInForm), {
+const LogInForm = dynamic(() => import('./log-in-form').then((mod) => arriving(mod.LogInForm)), {
   ssr: false,
   loading: () => <FormSkeleton fields={2} />,
 })
-const SignUpForm = dynamic(() => import('./sign-up-form').then((mod) => mod.SignUpForm), {
+const SignUpForm = dynamic(() => import('./sign-up-form').then((mod) => arriving(mod.SignUpForm)), {
   ssr: false,
   loading: () => <FormSkeleton fields={2} />,
 })
-const ProfileForm = dynamic(() => import('./profile-form').then((mod) => mod.ProfileForm), {
-  ssr: false,
-  loading: () => <FormSkeleton fields={2} />,
-})
+const ProfileForm = dynamic(
+  () => import('./profile-form').then((mod) => arriving(mod.ProfileForm)),
+  {
+    ssr: false,
+    loading: () => <FormSkeleton fields={2} />,
+  },
+)
 
 /**
  * `next` is a path of this site, with its locale (safeNext on the server): a full navigation, so

@@ -29,13 +29,17 @@ export async function HomeFeed({ searchParams }: { searchParams: Promise<unknown
         chip={
           filtered && (
             <Suspense key={key} fallback={<CommunityChipSkeleton />}>
-              <FilteredCommunity params={params} />
+              <div className="arrive">
+                <FilteredCommunity params={params} />
+              </div>
             </Suspense>
           )
         }
       />
       <Suspense key={key} fallback={<FeedListSkeleton />}>
-        <FeedList params={params} viewer={viewer} filtered={filtered} />
+        <div className="arrive">
+          <FeedList params={params} viewer={viewer} filtered={filtered} />
+        </div>
       </Suspense>
     </>
   )
