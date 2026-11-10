@@ -136,6 +136,29 @@ test.describe('Home feed', () => {
     await expect(page.getByRole('button', { name: 'Load more' })).toBeHidden()
   })
 
+  test('keeps the reader where they were while the next page arrives (H-16)', async ({ page }) => {
+    // Bug (2026-11-10): the new page suspended outside its transition, the feed fell back to its
+    // skeleton for an instant and the page jumped to the top. Watch every scroll for that drop.
+    await page.addInitScript(() => {
+      const w = window as Window & { lowest?: number }
+      w.lowest = Infinity
+      addEventListener('scroll', () => {
+        if (scrollY > 0) w.lowest = Math.min(w.lowest ?? Infinity, scrollY)
+      })
+    })
+    await page.goto('/en')
+    await expect(articles(page)).toHaveCount(22)
+    await page.getByRole('button', { name: 'Load more' }).scrollIntoViewIfNeeded()
+    const before = await page.evaluate(() => {
+      ;(window as Window & { lowest?: number }).lowest = Infinity
+      return scrollY
+    })
+    await expect(articles(page)).toHaveCount(38)
+    expect(before).toBeGreaterThan(1000)
+    const lowest = await page.evaluate(() => (window as Window & { lowest?: number }).lowest ?? 0)
+    expect(lowest).toBeGreaterThanOrEqual(before - 200)
+  })
+
   test('features of later phases say "Coming soon" (H-26)', async ({ page }) => {
     await page.goto('/en')
     // The composer box's Duel (Thesis, Link and Image go to the page to create a post).

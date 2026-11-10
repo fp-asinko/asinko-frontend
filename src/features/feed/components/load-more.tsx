@@ -38,9 +38,13 @@ export function LoadMore({ params, cursor }: { params: FeedParams; cursor: strin
         return
       }
       const { items, requestId } = result.data
-      setPages((loaded) => [...loaded, { items, requestId }])
-      setNext(result.data.nextCursor)
-      setAnnouncement(t('loaded', { count: result.data.count }))
+      // Updates after an await leave the transition: unwrapped, the new cards suspend while their
+      // code loads and the feed falls back to its skeleton, which sends the reader to the top.
+      startTransition(() => {
+        setPages((loaded) => [...loaded, { items, requestId }])
+        setNext(result.data.nextCursor)
+        setAnnouncement(t('loaded', { count: result.data.count }))
+      })
     })
   }
 

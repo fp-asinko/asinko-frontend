@@ -32,9 +32,13 @@ export function ThesesLoadMore({ userId, cursor }: { userId: string; cursor: str
         return
       }
       focusNewPage.current = true
-      setPages((loaded) => [...loaded, result.data.items])
-      setNext(result.data.nextCursor)
-      setAnnouncement(t('loaded', { count: result.data.count }))
+      // After an await, outside the transition: the new items would suspend and show the
+      // fallback, losing the reader's place (as the feed's LoadMore).
+      startTransition(() => {
+        setPages((loaded) => [...loaded, result.data.items])
+        setNext(result.data.nextCursor)
+        setAnnouncement(t('loaded', { count: result.data.count }))
+      })
     })
   }
 

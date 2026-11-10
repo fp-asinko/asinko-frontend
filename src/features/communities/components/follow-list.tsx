@@ -68,17 +68,21 @@ export function FollowList({
         setAnnouncement(cursor ? t('loadError') : t('error'))
         return
       }
-      setFailedMore(false)
-      setState((current) => ({
-        status: 'ready',
-        pages:
-          current.status === 'ready' && cursor
-            ? [...current.pages, result.data.items]
-            : [result.data.items],
-        count: (current.status === 'ready' && cursor ? current.count : 0) + result.data.count,
-        next: result.data.nextCursor,
-      }))
-      setAnnouncement(cursor ? t('loaded', { count: result.data.count }) : '')
+      // After an await, outside the transition: the new people would suspend and show the
+      // fallback, losing the reader's place (as the feed's LoadMore).
+      startTransition(() => {
+        setFailedMore(false)
+        setState((current) => ({
+          status: 'ready',
+          pages:
+            current.status === 'ready' && cursor
+              ? [...current.pages, result.data.items]
+              : [result.data.items],
+          count: (current.status === 'ready' && cursor ? current.count : 0) + result.data.count,
+          next: result.data.nextCursor,
+        }))
+        setAnnouncement(cursor ? t('loaded', { count: result.data.count }) : '')
+      })
     })
   }
 
