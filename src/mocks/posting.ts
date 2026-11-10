@@ -24,6 +24,8 @@ const error = (status: number, code: string): MockResponse => ({
 /** Posts created in this process (newest first). */
 export const CREATED_POSTS: RawPost[] = []
 let created = 0
+/** The ids of created posts, apart from every fixture's (src/mocks/fixtures/ids.ts). */
+export const CREATED_POST_NAMESPACE = 11
 
 export function findPost(id: string): RawPost | undefined {
   return CREATED_POSTS.find((each) => each.id === id) ?? postById(id)
@@ -87,7 +89,9 @@ export function createPost(body: unknown): MockResponse {
   created += 1
   const now = new Date().toISOString()
   const post: RawPost = {
-    id: mockId(9, created),
+    // Its own namespace: 9 is the fixtures' theses, and a post sharing a thesis's id showed its
+    // arguments as comments (the flaky ES-02).
+    id: mockId(CREATED_POST_NAMESPACE, created),
     communityId: community.id,
     community: communitySummary(community.slug),
     type,

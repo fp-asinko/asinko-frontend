@@ -174,9 +174,86 @@ const FEDERICO: Seed[] = [
   },
 ]
 
-// None of @demo's: e2e/profile-track-record.spec.ts expects its tab empty. One to cancel is
-// written in the test itself (specs/thesis-detail).
-export const THESES: RawThesis[] = [...MARIA, ...FEDERICO].map((seed, index) =>
+/**
+ * @demo's, all resolved (PO, 2026-11-09: to see correct and incorrect theses with one's own user):
+ * crypto with a group of its own in the mocks, above and below their targets. Published over two months
+ * ago, so the feeds do not carry them (feedTheses): on the profile's tab and their pages. Its
+ * profile's counters match them (fixtures/users.ts). One to cancel is written in its test
+ * (specs/thesis-detail).
+ */
+const DEMO: Seed[] = [
+  {
+    author: 'demo',
+    asset: 'AVAX',
+    claim: 'AVAX closes above $30 as subnets go live',
+    state: 'CORRECT',
+    target: 30,
+    conviction: 'HIGH',
+    deadlineIn: -5,
+    publishedDaysAgo: 70,
+    resolutionPrice: 34.21,
+  },
+  {
+    author: 'demo',
+    asset: 'BTC',
+    claim: 'BTC holds above $95K through the halving anniversary',
+    state: 'CORRECT',
+    target: 95000,
+    conviction: 'EXTREME',
+    deadlineIn: -12,
+    publishedDaysAgo: 90,
+    resolutionPrice: 97430.12,
+  },
+  {
+    author: 'demo',
+    asset: 'ETH',
+    claim: 'ETH drops below $3,000 before the next upgrade',
+    state: 'INCORRECT',
+    direction: 'BELOW',
+    target: 3000,
+    conviction: 'MEDIUM',
+    deadlineIn: -20,
+    publishedDaysAgo: 100,
+    resolutionPrice: 3420.55,
+  },
+  {
+    author: 'demo',
+    asset: 'LINK',
+    claim: 'LINK reclaims $15 on the back of oracle demand',
+    state: 'CORRECT',
+    target: 15,
+    conviction: 'LOW',
+    deadlineIn: -26,
+    publishedDaysAgo: 110,
+    resolutionPrice: 18.93,
+  },
+  {
+    author: 'demo',
+    asset: 'XRP',
+    claim: 'XRP reaches $3 this cycle',
+    state: 'INCORRECT',
+    target: 3,
+    conviction: 'HIGH',
+    deadlineIn: -35,
+    publishedDaysAgo: 130,
+    resolutionPrice: 2.4113,
+  },
+  {
+    author: 'demo',
+    asset: 'SOL',
+    claim: 'SOL stays below $200 until the next unlock',
+    state: 'CORRECT',
+    direction: 'BELOW',
+    target: 200,
+    conviction: 'MEDIUM',
+    deadlineIn: -45,
+    publishedDaysAgo: 150,
+    resolutionPrice: 182.47,
+  },
+]
+
+// @demo's go last: the others keep their ids (e2e links to /thesis/…9001).
+export const THESES: RawThesis[] = [...MARIA, ...FEDERICO, ...DEMO].map((seed, index) =>
   thesis(index + 1, seed),
 )
 

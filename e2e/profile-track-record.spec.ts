@@ -26,8 +26,8 @@ test.describe('Profile track record', () => {
   })
 
   test('says there is no resolved thesis yet instead of zeros (PT-03)', async ({ page }) => {
-    // The demo viewer's own profile: no thesis at all.
-    await page.goto('/en/user/demo?tab=theses')
+    // Someone without a resolved thesis (@demo has some since 2026-11-09).
+    await page.goto('/en/user/satoshi_nights?tab=theses')
     await expect(theses(page).getByText('No resolved theses yet')).toBeVisible()
   })
 
@@ -74,13 +74,25 @@ test.describe('Profile track record', () => {
     )
   })
 
+  test('the demo user has its own correct and incorrect theses (PO, 2026-11-09)', async ({
+    page,
+  }) => {
+    await page.goto('/en/user/demo?tab=theses')
+    await expect(theses(page).getByText(/4\s*correct/)).toBeVisible()
+    await expect(theses(page).getByText(/2\s*incorrect/)).toBeVisible()
+    const card = (claim: string) => theses(page).getByRole('article', { name: claim })
+    await expect(card('AVAX closes above $30 as subnets go live')).toContainText(
+      /Result\s*Correct on /,
+    )
+    await expect(card('XRP reaches $3 this cycle')).toContainText(/Result\s*Incorrect on /)
+  })
+
   test('someone without theses gets the empty state (PT-06)', async ({ page }) => {
     await page.goto('/en/user/jeppe?tab=theses')
     await expect(theses(page).getByText('@jeppe has not published a thesis yet.')).toBeVisible()
-    // On your own profile it speaks to you (creating theses comes later: no button).
-    await page.goto('/en/user/demo?tab=theses')
-    await expect(theses(page).getByText('You have not published a thesis yet.')).toBeVisible()
     await expect(theses(page).getByRole('button')).toHaveCount(0)
+    // Its own profile's wording ("You have not published…") is not checked here: @demo, the only
+    // signed-in user with mocks, has theses (PO, 2026-11-09).
   })
 
   for (const theme of ['light', 'dark'] as const) {

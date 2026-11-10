@@ -59,7 +59,11 @@ export const PROFILES: RawProfile[] = [
     ...profile(0, {
       username: DEMO_USER.username,
       bio: 'Demo account until login exists.',
-      accuracyRate: null,
+      // Its resolved theses (fixtures/theses.ts): 4 correct, 2 incorrect, the last two right.
+      accuracyRate: 0.67,
+      correctCount: 4,
+      incorrectCount: 2,
+      currentStreak: 2,
       points: 0,
       badgeStatus: 'NONE',
     }),
