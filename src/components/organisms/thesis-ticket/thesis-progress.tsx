@@ -1,4 +1,5 @@
 import { ChevronLeftIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { thesisPrice } from '@/lib/theses/price'
 import { thesisProgress } from '@/lib/theses/progress'
@@ -10,6 +11,18 @@ const TONES = {
   above: { fill: 'bg-bullish', dot: 'bg-bullish' },
   below: { fill: 'bg-bearish', dot: 'bg-bearish' },
 } as const
+
+/**
+ * Which part of the label sits on the dot, from 0 (its left edge) to 1 (its right edge): the middle,
+ * except in the first and last fifth of the bar, where it slides toward the end so it does not
+ * overflow. Without measuring the label: a Server Component.
+ */
+export function anchor(share: number): number {
+  const edge = 0.2
+  if (share < edge) return (Math.max(share, 0) / edge) * 0.5
+  if (share > 1 - edge) return 1 - (Math.max(1 - share, 0) / edge) * 0.5
+  return 0.5
+}
 
 /**
  * How a thesis is doing (specs/thesis-identity TI-01 to TI-07): a bar from its entry to its target,
@@ -31,6 +44,9 @@ export function ThesisProgress({ thesis }: { thesis: ThesisTicketData }) {
   const kind = progress.kind === 'toward' && progress.closed ? 'short' : progress.kind
 
   const date = (iso: string) => format.dateTime(new Date(iso), { dateStyle: 'medium' })
+  const strong = (chunks: ReactNode) => (
+    <strong className="font-semibold text-foreground">{chunks}</strong>
+  )
 
   return (
     <div
@@ -39,11 +55,12 @@ export function ThesisProgress({ thesis }: { thesis: ThesisTicketData }) {
       className="mt-4 flex flex-col gap-2"
     >
       {/* Where it is and which way it has to go, in words (PO, 2026-11-05: "12.6% to go" did not
-          say it): "Today $89.21 · needs to fall 12.6% more". */}
-      <p className="type-meta text-muted-foreground tabular-nums">
+          say it): "Today $89.21 · needs to fall 12.6% more". Only for screen readers: on screen,
+          today's price goes over its dot (PO, 2026-11-09). */}
+      <p className="sr-only">
         {/* One message: each language orders it and separates it its own way. */}
         {t.rich('line', {
-          strong: (chunks) => <strong className="font-semibold text-foreground">{chunks}</strong>,
+          strong,
           closed: progress.closed ? 'yes' : 'no',
           price: thesisPrice(format, progress.price),
           kind,
@@ -54,6 +71,26 @@ export function ThesisProgress({ thesis }: { thesis: ThesisTicketData }) {
           date: progress.staleAt ? date(progress.staleAt) : '',
         })}
       </p>
+      {/* Today's price, centered over its dot; near an end it slides inward so it never leaves
+          the ticket. Against, the bar starts after the arrow, and so does this. */}
+      <div
+        aria-hidden
+        data-marker
+        className={cn('relative h-4', progress.kind === 'against' && 'ml-3.5')}
+      >
+        <span
+          className="absolute bottom-0 type-meta whitespace-nowrap text-muted-foreground tabular-nums"
+          style={{ left: `${share * 100}%`, transform: `translateX(-${anchor(share) * 100}%)` }}
+        >
+          {t.rich('marker', {
+            strong,
+            closed: progress.closed ? 'yes' : 'no',
+            price: thesisPrice(format, progress.price),
+            stale: progress.staleAt ? 'yes' : 'no',
+            date: progress.staleAt ? date(progress.staleAt) : '',
+          })}
+        </span>
+      </div>
       <div aria-hidden className="flex items-center gap-1">
         {/* Against: the dot at the edge, and an arrow out of it (TI-04). */}
         {progress.kind === 'against' && (

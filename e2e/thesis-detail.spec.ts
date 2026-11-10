@@ -28,7 +28,8 @@ test.describe('A thesis in the feed and on its page', () => {
     // when that was; the deadline with how long it has left.
     const bet = main(page).getByRole('region', { name: 'The bet' })
     await expect(bet.getByText(/^Above \$150,000$/)).toBeVisible()
-    await expect(bet.getByText(/^[+-][\d.]+% from \$[\d,.]+ on /)).toBeVisible()
+    await expect(bet.getByText(/^[+-][\d.]+%$/)).toBeVisible()
+    await expect(bet.getByText(/^from \$[\d,.]+ on /)).toBeVisible()
     await expect(bet.getByText(/ · in /)).toBeVisible()
     // Its arguments, For and Against (specs/thesis-arguments TA-01).
     const args = main(page).getByRole('region', { name: 'Arguments' })
@@ -82,7 +83,9 @@ test.describe('A thesis in the feed and on its page', () => {
     // Maria's open one, a little against its bet in the mocks (src/mocks/thesis-identity.ts).
     await page.goto(MARIA_PAGE)
     const bet = main(page).getByRole('region', { name: 'The bet' })
-    await expect(bet.getByText(/^Today \$[\d,.]+ · [\d.]+% below the entry$/)).toBeVisible()
+    // On screen, only today's price over its dot; the sentence, for screen readers (PO, 2026-11-09).
+    await expect(bet.locator('[data-marker]').getByText(/^Today \$[\d,.]+$/)).toBeVisible()
+    await expect(bet.getByText(/^Today \$[\d,.]+ · [\d.]+% below the entry$/)).toBeAttached()
     await expect(bet.getByText(/^Entry \$/)).toBeVisible()
     await expect(bet.getByText('Target $150,000')).toBeVisible()
     // The bull beside its target (specs/thesis-agree AG-19).

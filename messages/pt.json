@@ -1450,7 +1450,7 @@
       "below": "Abaixo de",
       "equals": "Igual a"
     },
-    "fromReference": "{change} desde {price}{hasDate, select, yes { em {date}} other {}}",
+    "fromReference": "desde {price}{hasDate, select, yes { em {date}} other {}}",
     "noReference": "Sem preço de referência",
     "result": "Resultado",
     "left": "{date}{hasLeft, select, yes { · {left}} other {}}",
@@ -1468,6 +1468,7 @@
     "progress": {
       "entry": "Entrada {price}",
       "target": "Alvo {price}",
+      "marker": "<strong>{closed, select, yes {Fechou em {price}} other {Hoje {price}}}</strong>{stale, select, yes { · preço de {date}} other {}}",
       "line": "<strong>{closed, select, yes {Fechou em {price}} other {Hoje {price}}}</strong> · {kind, select, toward {{direction, select, below {precisa cair mais {remaining}} other {precisa subir mais {remaining}}}} short {ficou a {remaining} do alvo} reached {alvo atingido} other {{direction, select, below {{change} acima da entrada} other {{change} abaixo da entrada}}}}{stale, select, yes { · preço de {date}} other {}}"
     },
     "number": "Tese número {number}{hasAuthor, select, yes { de {author}} other {}}",

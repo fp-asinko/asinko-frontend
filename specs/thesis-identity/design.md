@@ -64,7 +64,7 @@ Para las dos direcciones vale la misma cuenta: `share = (precio − entrada) / (
 ## 3. La barra (TI-01 a TI-07, TI-16, TI-17)
 
 ```
-  Today $236 · needs to rise 14.4% more
+              Today $236
   ●━━━━━━━━━━━━━━━━━━●─────────────────────────────○
   Entry $224.72                                        Target $270
 ```
@@ -73,6 +73,7 @@ Para las dos direcciones vale la misma cuenta: `share = (precio − entrada) / (
 - **Va en contra:** sin relleno. La marca queda en el borde izquierdo, con un `ChevronLeft` hacia afuera, y la cifra es "−4 % desde la entrada".
 - **Ya lo pasó:** la barra entera y "Objetivo alcanzado".
 - **Texto** (PO, 2026-11-05: "$236 today · 14% to go" no se entendía): arriba de la barra, dónde está y hacia dónde tiene que ir, "**Hoy $236** · tiene que subir un 14,4 % más" (o "bajar", según la apuesta), y si el precio es viejo, "· precio del 3 nov". Debajo, qué es cada extremo: "Entrada $224,72" y "Objetivo $270". Todo `type-meta text-muted-foreground`, el precio de hoy en negrita. El texto no lleva verde ni rojo (va sobre `bg-surface`, y ahí el verde no llega a 4,5:1); el color va en la pista y en la marca, que con 3:1 alcanzan.
+- **Precio sobre la marca** (PO, 2026-11-09): en pantalla, arriba de la barra solo va "**Hoy $236**" (o "Cerró en $251", y "· precio del 3 nov" si es viejo), centrado sobre el punto. En el primer y el último quinto de la barra se corre hacia el extremo para no salirse del ticket (`anchor(share)`, sin medir: es de servidor). La frase completa ("· tiene que subir un 14,4 % más") queda solo para lectores de pantalla (`sr-only`).
 - **`data-tone`** (`above` / `below`) dice el color de la barra, para los tests: la pista es `aria-hidden`.
 - **Accesible:** la pista es `aria-hidden` y el texto visible la explica, que es la opción "mejor" de TI-16.
 - **Cerrada:** "Cerró en $251" en lugar de "hoy".

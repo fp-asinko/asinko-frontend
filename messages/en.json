@@ -1450,7 +1450,7 @@
       "below": "Below",
       "equals": "At"
     },
-    "fromReference": "{change} from {price}{hasDate, select, yes { on {date}} other {}}",
+    "fromReference": "from {price}{hasDate, select, yes { on {date}} other {}}",
     "noReference": "No reference price",
     "result": "Result",
     "left": "{date}{hasLeft, select, yes { · {left}} other {}}",
@@ -1468,6 +1468,7 @@
     "progress": {
       "entry": "Entry {price}",
       "target": "Target {price}",
+      "marker": "<strong>{closed, select, yes {Closed at {price}} other {Today {price}}}</strong>{stale, select, yes { · price from {date}} other {}}",
       "line": "<strong>{closed, select, yes {Closed at {price}} other {Today {price}}}</strong> · {kind, select, toward {{direction, select, below {needs to fall {remaining} more} other {needs to rise {remaining} more}}} short {ended {remaining} short of the target} reached {target reached} other {{direction, select, below {{change} above the entry} other {{change} below the entry}}}}{stale, select, yes { · price from {date}} other {}}"
     },
     "number": "Thesis number {number}{hasAuthor, select, yes { by {author}} other {}}",

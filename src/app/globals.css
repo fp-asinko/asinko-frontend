@@ -54,6 +54,9 @@
   --success: #17853b;
   --bullish: var(--success);
   --bearish: var(--destructive);
+  /* Small green text on --surface, which --success does not reach at 4.5:1: a thesis's percent
+     beside its target (specs/thesis-ticket, PO 2026-11-09). */
+  --bullish-text: #168239;
   --interesting: #8b5cf6;
   --brand-dot: #155de9; /* only the logo dot */
   --mention: #155de9; /* mentions while writing (specs/mention-autocomplete MA-12) */
@@ -154,6 +157,7 @@
   --accent-foreground: #f4f4f2;
   --destructive: #ff6b6b;
   --success: #3dbe6a;
+  --bullish-text: #3dbe6a;
   --interesting: #a78bfa;
   --brand-dot: #4c8dff;
   --mention: #6fa3ff;
@@ -235,6 +239,7 @@
   --color-success: var(--success);
   --color-bullish: var(--bullish);
   --color-bearish: var(--bearish);
+  --color-bullish-text: var(--bullish-text);
   --color-interesting: var(--interesting);
   --color-brand-dot: var(--brand-dot);
   --color-mention: var(--mention);

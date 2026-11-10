@@ -40,7 +40,7 @@ describe('ThesisCard (specs/profile-track-record PT-07, PT-08)', () => {
     // When on the left, THESIS on the right, as every post's header (TK-01, PO 2026-11-05).
     expect(card).toHaveTextContent(/^.+ agoThesis/)
     expect(screen.getByRole('link', { name: /\$BTC/ })).toHaveAttribute('href', '/asset/BTC')
-    expect(screen.getByText('+50% from $100,000')).toBeInTheDocument()
+    expect(screen.getByText('from $100,000')).toBeInTheDocument()
     // The claim after the ticket, second: gray, two lines.
     const claim = screen.getByRole('heading', { level: 3 })
     expect(claim).toHaveClass('text-muted-foreground', 'line-clamp-2')

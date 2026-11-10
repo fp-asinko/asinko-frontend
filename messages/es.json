@@ -1450,7 +1450,7 @@
       "below": "Por debajo de",
       "equals": "Igual a"
     },
-    "fromReference": "{change} desde {price}{hasDate, select, yes { el {date}} other {}}",
+    "fromReference": "desde {price}{hasDate, select, yes { el {date}} other {}}",
     "noReference": "Sin precio de referencia",
     "result": "Resultado",
     "left": "{date}{hasLeft, select, yes { · {left}} other {}}",
@@ -1468,6 +1468,7 @@
     "progress": {
       "entry": "Entrada {price}",
       "target": "Objetivo {price}",
+      "marker": "<strong>{closed, select, yes {Cerró en {price}} other {Hoy {price}}}</strong>{stale, select, yes { · precio del {date}} other {}}",
       "line": "<strong>{closed, select, yes {Cerró en {price}} other {Hoy {price}}}</strong> · {kind, select, toward {{direction, select, below {tiene que bajar un {remaining} más} other {tiene que subir un {remaining} más}}} short {quedó a un {remaining} del objetivo} reached {objetivo alcanzado} other {{direction, select, below {{change} por encima de la entrada} other {{change} por debajo de la entrada}}}}{stale, select, yes { · precio del {date}} other {}}"
     },
     "number": "Tesis número {number}{hasAuthor, select, yes { de {author}} other {}}",

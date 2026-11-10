@@ -15,8 +15,8 @@
 
 ```
 ┌─ bg-surface · border · rounded-xl · p-4 ──────────────────┐
-│ (logo 44)  $NVDA                         ↑ $240           │  ← objetivo: 24px/800, verde o rojo
-│            NVIDIA                        +33 % desde $180 │  ← type-meta, muted
+│ (logo 44)  $NVDA                   ↑ $240 +33,3 %         │  ← objetivo: 24px/800, verde o rojo; el % a 12px/700
+│            NVIDIA                        desde $180       │  ← type-meta, muted
 │ ───────────────────────────────────────────────────────── │  ← border-t
 │ CONVICCIÓN  ▮▮▮▯ Alta        PLAZO  4 nov 2027 · en 12 m  │  ← type-section + type-small
 └───────────────────────────────────────────────────────────┘
@@ -25,6 +25,7 @@
 - **Grilla:** `grid grid-cols-[auto_1fr_auto]`. Por debajo de `sm`, si el objetivo no entra, pasa a la segunda fila alineado a la izquierda (`flex-wrap`).
 - **Logo:** `UserAvatar` de 44 px (`size-11`, `size-10` en el teléfono), `rounded-full`, con `colorKey` el símbolo. La imagen sale de `asset.logoUrl` (P-041) o del avatar de la comunidad si es la del activo.
 - **Objetivo:** `text-bullish` si sube, `text-bearish` si baja, `text-foreground` si es a un precio (PO, 2026-11-05: sin azul). Es texto grande (24 px, 800): pide 3:1 sobre `--surface`, y el verde da 4,4:1 en claro. Los dos pares van en `tokens-contrast.test.ts`. La flecha es un ícono `aria-hidden`; el texto accesible es "Por encima de $240". El color nunca va solo: flecha y palabra.
+- **Distancia a la entrada** (PO, 2026-11-09): el porcentaje va al lado del objetivo, del mismo color y más chico (12 px en negrita, `data-change`), sobre la misma línea de base que el precio (no centrado), y en el teléfono, si no entra, pasa debajo del precio; debajo queda "desde $180". Es texto chico de color sobre `--surface`, que pide 4,5:1: `--success` da 4,43:1 en claro, así que el verde usa `--bullish-text` (`#168239`, 4,6:1; en oscuro, el mismo `--success`), un paso más oscuro que el del objetivo (PO, 2026-11-09). El rojo da 4,9:1 y queda igual. Los dos pares van en `tokens-contrast.test.ts`.
 - **Convicción:** `LevelBars` en solo lectura (las barras del feed de hoy, ya en azules desde 2026-11-04) más el nombre del nivel.
 - **Cerrada (TK-07):** la columna de PLAZO pasa a RESULTADO, con el texto de `ThesisState` y el precio de cierre.
 - **Badge THESIS (TK-01):** `text-muted-foreground` (PO, 2026-11-05: no en azul) con el ícono `TargetIcon`, en mayúsculas como hoy.
@@ -41,7 +42,7 @@
 
 ## 5. Textos
 
-`thesisTicket.*`: `conviction`, `deadline`, `result`, `fromReference` ("{change} desde {price}"), `target.above` / `target.below` (accesibles). El badge, el estado y los niveles reusan los que ya existen.
+`thesisTicket.*`: `conviction`, `deadline`, `result`, `fromReference` ("desde {price}"; el porcentaje va aparte, al lado del objetivo), `target.above` / `target.below` (accesibles). El badge, el estado y los niveles reusan los que ya existen.
 
 ## 6. Tests
 

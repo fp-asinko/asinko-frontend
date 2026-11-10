@@ -30,6 +30,16 @@ const TARGET_COLORS = {
   equals: 'text-foreground',
 } as const
 
+/**
+ * The percent beside it, small: 4.5:1 on the panel's gray. Green a step darker than the target's
+ * (--bullish-text, PO 2026-11-09); the red already reaches it.
+ */
+const CHANGE_COLORS = {
+  above: 'text-bullish-text',
+  below: 'text-bearish',
+  equals: 'text-foreground',
+} as const
+
 /** The bars, written whole (Tailwind only builds what it finds): the chosen level's blue. */
 const LEVEL_FILLS = ['bg-level-1', 'bg-level-2', 'bg-level-3', 'bg-level-4'] as const
 const BAR_HEIGHTS = ['h-2', 'h-2.5', 'h-3', 'h-3.5'] as const
@@ -180,17 +190,32 @@ export function ThesisTicket({
             >
               <Value large className={cn('gap-1', TARGET_COLORS[target.direction])}>
                 <Arrow aria-hidden className="size-5 shrink-0" strokeWidth={3} />
-                <span className="sr-only">{t(`direction.${target.direction}`)} </span>
-                {price(target.price)}
+                {/* On the price's baseline, not centered on it (PO, 2026-11-09). Wraps: in a
+                    phone's half width, the percent goes under the price. */}
+                <span className="inline-flex min-w-0 flex-wrap items-baseline gap-x-1">
+                  <span>
+                    <span className="sr-only">{t(`direction.${target.direction}`)} </span>
+                    {price(target.price)}
+                  </span>
+                  {/* How far from the entry, beside the target in its color and smaller (PO,
+                      2026-11-09); the entry price below. */}
+                  {reference && change !== null && (
+                    <span
+                      data-change
+                      className={cn('text-xs font-bold', CHANGE_COLORS[target.direction])}
+                    >
+                      {format.number(change, {
+                        style: 'percent',
+                        maximumFractionDigits: 1,
+                        signDisplay: 'exceptZero',
+                      })}
+                    </span>
+                  )}
+                </span>
               </Value>
               <Sub>
                 {reference && change !== null
                   ? t('fromReference', {
-                      change: format.number(change, {
-                        style: 'percent',
-                        maximumFractionDigits: 1,
-                        signDisplay: 'exceptZero',
-                      }),
                       price: price(reference.price),
                       hasDate: detail && reference.at ? 'yes' : 'no',
                       date: reference.at ? day(reference.at) : '',

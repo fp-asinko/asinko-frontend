@@ -54,7 +54,7 @@ describe('ThesisCard in a feed (specs/thesis-detail TD-02 to TD-05, specs/thesis
   it('leads with the ticket, and puts the claim second, in gray (TK-03, TK-09)', () => {
     renderWithIntl(<ThesisCard thesis={thesisItem()} />)
     expect(screen.getByRole('link', { name: /\$BTC/ })).toHaveAttribute('href', '/asset/BTC')
-    expect(screen.getByText(/^\+79\.5% from \$83,584/)).toBeInTheDocument()
+    expect(screen.getByText(/^from \$83,584/)).toBeInTheDocument()
     const claim = screen.getByRole('heading', { level: 2 })
     expect(claim).toHaveClass('type-post-body', 'text-muted-foreground', 'line-clamp-2')
     expect(screen.getByText('Bitcoin').compareDocumentPosition(claim)).toBe(

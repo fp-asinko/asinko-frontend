@@ -32,8 +32,9 @@ describe('ThesisTicket (specs/thesis-ticket TK-03 to TK-08)', () => {
     // The arrow is drawn; its word is read.
     expect(datum('Target')).toHaveTextContent(/^Above \$240/)
     // Green up, red down (PO, 2026-11-05).
-    expect(datum('Target').querySelector('.text-bullish')).toHaveTextContent('Above $240')
-    expect(screen.getByText('+33.3% from $180')).toBeInTheDocument()
+    expect(datum('Target').querySelector('.text-bullish')).toHaveTextContent('Above $240+33.3%')
+    expect(datum('Target').querySelector('[data-change]')).toHaveTextContent('+33.3%')
+    expect(screen.getByText('from $180')).toBeInTheDocument()
     expect(datum('Asset')).toHaveTextContent(/\$NVDA/)
   })
 
@@ -41,7 +42,7 @@ describe('ThesisTicket (specs/thesis-ticket TK-03 to TK-08)', () => {
     renderWithIntl(<ThesisTicket thesis={ticket()} />)
     expect(datum('Asset')).toHaveTextContent('NVIDIA')
     expect(datum('Conviction')).toHaveTextContent('High3 of 4')
-    expect(datum('Target')).toHaveTextContent('+33.3% from $180')
+    expect(datum('Target')).toHaveTextContent('+33.3%from $180')
   })
 
   it.each([
@@ -111,7 +112,7 @@ describe('ThesisTicket (specs/thesis-ticket TK-03 to TK-08)', () => {
       />,
     )
     const section = screen.getByRole('region', { name: 'The bet' })
-    expect(within(section).getByText('+33.3% from $180 on Nov 4, 2026')).toBeInTheDocument()
+    expect(within(section).getByText('from $180 on Nov 4, 2026')).toBeInTheDocument()
     // Closed: the deadline stays beside the result.
     expect(datum('Deadline')).toHaveTextContent(/Nov 4, 2027, \d{1,2}:\d{2}/)
     expect(datum('Result')).toHaveTextContent('Waiting for resolution')

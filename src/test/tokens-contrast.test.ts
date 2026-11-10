@@ -83,6 +83,9 @@ const TEXT_PAIRS: Array<[string, string]> = [
   // Green text goes on white surfaces (cards, tiles), not on --surface.
   ['success', 'card'],
   ['bearish', 'card'],
+  // A thesis's percent beside its target, small on the ticket's gray (specs/thesis-ticket).
+  ['bullish-text', 'surface'],
+  ['bearish', 'surface'],
   ['sidebar-foreground', 'sidebar'],
   // Mentions in blue while writing (MA-12): in the box (card) and in the window (popover).
   ['mention', 'background'],

@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import type { ThesisTicketData } from '@/lib/theses/ticket.types'
 import { renderWithIntl } from '@/test/render-with-intl'
-import { ThesisProgress } from './thesis-progress'
+import { anchor, ThesisProgress } from './thesis-progress'
 
 const ticket = (overrides: Partial<ThesisTicketData> = {}): ThesisTicketData => ({
   id: 't1',
@@ -79,6 +79,24 @@ describe('ThesisProgress (specs/thesis-identity)', () => {
       { locale: 'es' },
     )
     expect(line(container)).toHaveTextContent(/^Hoy .+ · tiene que bajar un 4,8 % más$/)
+  })
+
+  it('shows only today’s price on screen, over its dot (PO, 2026-11-09)', () => {
+    const { container } = renderWithIntl(<ThesisProgress thesis={ticket()} />)
+    const marker = container.querySelector('[data-marker]')
+    expect(marker).toHaveTextContent(/^Today \$236$/)
+    expect(marker).toHaveAttribute('aria-hidden')
+    // The full sentence stays for screen readers.
+    expect(line(container)).toHaveClass('sr-only')
+  })
+
+  it('centers the label on the dot, sliding it inward near the ends', () => {
+    expect(anchor(0.5)).toBe(0.5)
+    expect(anchor(0.2)).toBe(0.5)
+    expect(anchor(0)).toBe(0)
+    expect(anchor(0.1)).toBeCloseTo(0.25)
+    expect(anchor(1)).toBe(1)
+    expect(anchor(0.9)).toBeCloseTo(0.75)
   })
 
   it('draws nothing without a price or for a target at a price (TI-06, TI-07)', () => {
