@@ -493,7 +493,9 @@
       "about": {
         "created": "Creada el {date}",
         "members": "{count, plural, one {# miembro} other {# miembros}}",
-        "public": "Pública"
+        "public": "Pública",
+        "rules": "Reglas",
+        "newTab": "(se abre en una pestaña nueva)"
       },
       "images": {
         "position": "{index, number} de {total, number}",

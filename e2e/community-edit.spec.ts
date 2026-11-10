@@ -17,19 +17,29 @@ async function createGroup(page: Page, project: string): Promise<string> {
 }
 
 test.describe('Edit a group', () => {
-  test('its moderator edits the description and rules, and sees them on the page (CE-01 to CE-03)', async ({
+  test('its moderator edits the description, rules and website, and sees them on the page (CE-01 to CE-03)', async ({
     page,
+    isMobile,
   }, testInfo) => {
     await createGroup(page, testInfo.project.name)
     await page.getByRole('button', { name: 'Edit group' }).click()
     const dialog = page.getByRole('dialog', { name: 'Edit group' })
     await dialog.getByRole('textbox', { name: 'Description' }).fill('Edited by the e2e run.')
     await dialog.getByRole('textbox', { name: 'Rules' }).fill('Be kind.')
+    await dialog.getByRole('textbox', { name: 'Website' }).fill('https://example.com/club')
     await dialog.getByRole('button', { name: 'Save' }).click()
 
     await expect(dialog).toBeHidden()
     await expect(page.getByText('Changes saved')).toBeVisible()
     await expect(main(page).getByText('Edited by the e2e run.').first()).toBeVisible()
+    // The rules and the website in the group's details (PO, 2026-11-09): the right column from lg,
+    // under the header's fold on a phone.
+    const details = isMobile ? main(page) : page.getByRole('complementary', { name: 'Related' })
+    if (isMobile) await main(page).getByRole('button', { name: 'About the community' }).click()
+    await expect(details.getByRole('region', { name: 'Rules' })).toContainText('Be kind.')
+    await expect(
+      details.getByRole('link', { name: 'example.com (opens in a new tab)' }),
+    ).toBeVisible()
   })
 
   test('the new group shows its first steps; one opens the window on its field, and it hides (CE-07, CE-08)', async ({

@@ -303,7 +303,8 @@ export function CreateGroupForm() {
                     setSlugTouched(true)
                     setValue('slug', each, { shouldDirty: true, shouldValidate: true })
                   }}
-                  className="inline-flex h-8 tap items-center rounded-full bg-muted px-3 type-action outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
+                  // Its own color: the invalid Field paints what it holds red (a choice, not an error).
+                  className="inline-flex h-8 tap items-center rounded-full bg-muted px-3 type-action text-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
                 >
                   #{each}
                 </button>

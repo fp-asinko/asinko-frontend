@@ -447,6 +447,20 @@ El slug más corto que hoy acepta el backend (1 a 50) seguiría valiendo para lo
 
 **Pregunta:** ¿`POST /uploads/community-image` acepta subir **sin `communityId`**, antes de crear el grupo, como la foto del perfil? Mientras no lo sepamos, el front crea el grupo sin imágenes, las sube ya como moderador y las guarda con `PATCH /communities/{slug}`.
 
+### P-049: `POST /communities` guarda la descripción
+
+**Estado:** bug (2026-11-09), encontrado al probar `specs/community-create` contra `dev`. Como P-037, pero en grupos.
+
+**Motivo:** E02 dice que `POST /communities` acepta `description?`. Un grupo creado desde el front con descripción, reglas y sitio web (`#test-group`, 2026-11-09) quedó con `rules` y `mainUrl` guardados y `description: null`. El `201` dice que salió bien. El front manda los tres campos en el mismo body, ya recortados (lo cubre `create-group.action.test.ts`).
+
+**Efecto:** el grupo nuevo aparece sin descripción, y su checklist (`specs/community-edit` CE-07) le pide "Say what the group is about" aunque ya la escribió.
+
+**Cambio:** que `POST /communities` guarde `description` como lo hace `PATCH`. Si no se va a aceptar al crear, corregir E02 y responder `422` en lugar de ignorarla.
+
+**Solo al crear:** con `PATCH /communities/{slug}` ("Edit group") la descripción sí se guarda (probado en `dev` el mismo día). El bug está en el alta, no en el campo.
+
+**Mientras tanto, en el front:** nada (`api-integration.md`: no se compensa en el front). La descripción se puede cargar después con "Edit group".
+
 ## Fase 3 del backend: solo visual en el front
 
 Decisión del 2026-10-21: estas propuestas se implementan en el backend en una fase 3. Hasta entonces, el front las muestra con mocks (desarrollo y CI, `API_MOCKS=missing` o `true`): la forma de abajo es la que ya usa, y es lo que proponemos.

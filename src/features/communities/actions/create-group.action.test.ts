@@ -49,6 +49,22 @@ describe('createGroup (specs/community-create CG-09, CG-10)', () => {
     expect(deps.revalidatePath).toHaveBeenCalledWith('/', 'layout')
   })
 
+  it('sends what was written in every field, the description too', async () => {
+    await createGroup({
+      ...input,
+      description: '  Dividend stocks from Latin America.  ',
+      rules: 'Be kind.',
+      mainUrl: 'https://example.com',
+    })
+    expect(deps.createGroupAs).toHaveBeenCalledWith(ME, {
+      name: 'Options Flow',
+      slug: 'options-flow',
+      description: 'Dividend stocks from Latin America.',
+      rules: 'Be kind.',
+      mainUrl: 'https://example.com',
+    })
+  })
+
   it('asks for a session before anything', async () => {
     deps.viewer = null
     expect(await createGroup(input)).toEqual({ ok: false, error: 'api.errors.UNAUTHENTICATED' })

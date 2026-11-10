@@ -30,6 +30,7 @@ Que la página de un grupo se sienta como su sitio: un banner que la abre de lad
 ### Los widgets (Q2, Q3)
 
 - [x] **CW-05** Arriba de todo, siempre, **Detalles de la comunidad**: nombre, descripción, cuándo se creó, miembros y si es pública. No se mueve ni se borra.
+  - **Sus reglas y su sitio web** (PO, 2026-11-09: "no se ven las rules cuando creo un grupo"), debajo de la descripción: el texto de reglas con su título "Reglas" y el sitio como píldora con el dominio, que abre en otra pestaña. Son los campos que piden crear y editar un grupo (`specs/community-create`, `specs/community-edit`); antes de los widgets estaban en el desplegable de la cabecera (`CommunityDetails`), que en los grupos se reemplazó. Un widget de reglas sigue siendo aparte, para reglas con título y descripción.
 - [x] **CW-06** Después, los widgets del grupo, en el orden que eligió el moderador (hasta 20):
   - **Texto:** un título y un cuerpo con Markdown simple (negrita, itálica, listas, links), como el cuerpo de un post.
   - **Reglas:** un título y hasta 15 reglas numeradas. Cada regla tiene su título y, si tiene descripción, se despliega.
