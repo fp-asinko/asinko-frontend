@@ -461,6 +461,30 @@ El slug más corto que hoy acepta el backend (1 a 50) seguiría valiendo para lo
 
 **Mientras tanto, en el front:** nada (`api-integration.md`: no se compensa en el front). La descripción se puede cargar después con "Edit group".
 
+### P-050: Configurar Supabase para recuperar la contraseña
+
+**Estado:** propuesta (2026-11-09), `specs/password-recovery` (MVP-217). No es un endpoint de `asinko-app`: es configuración de Supabase Auth, a cargo de quien lo administra. Sin mock propio: el Supabase simulado (`src/mocks/auth.ts`) ya cubre el flujo.
+
+**Motivo:** el front suma "Forgot your password?" con la API de Supabase Auth (`/recover`, `/verify`, `PUT /user`), desde el servidor como el login. Para que el mail llegue y el link funcione hace falta configurar tres cosas del proyecto.
+
+**Cambio:**
+
+1. **SMTP propio** (_Authentication → Emails → SMTP Settings_). El de Supabase manda muy pocos mails por hora y no sirve para producción. En `dev` se puede probar sin esto.
+2. **Plantilla "Reset password"** (_Authentication → Emails → Templates_), en inglés (PO, 2026-11-09). El link tiene que llevar el token hash a nuestra ruta, no el link por defecto de Supabase:
+
+   ```html
+   <h2>Reset your password</h2>
+   <p>Someone asked to reset the password of your Asinko account. If it was you, choose a new one:</p>
+   <p><a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery">Choose a new password</a></p>
+   <p>The link works for 1 hour. If you didn't ask for it, ignore this email: your password stays the same.</p>
+   ```
+
+   `{{ .RedirectTo }}` es `{origen}/auth/reset?next=…`, que manda el front. Por qué no el link por defecto: los filtros de mail abren los links antes que la persona, y el link por defecto gastaría el token (`specs/password-recovery/design.md § 1`).
+
+3. **Redirect URLs** (_Authentication → URL Configuration_): `{dominio del front}/auth/reset` y lo mismo para las previews (`https://*-asinko.vercel.app/auth/reset` o el patrón que ya usan).
+
+**Se deja como está:** la duración del link (1 hora, el default; PO, 2026-11-09).
+
 ## Fase 3 del backend: solo visual en el front
 
 Decisión del 2026-10-21: estas propuestas se implementan en el backend en una fase 3. Hasta entonces, el front las muestra con mocks (desarrollo y CI, `API_MOCKS=missing` o `true`): la forma de abajo es la que ya usa, y es lo que proponemos.

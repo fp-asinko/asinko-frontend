@@ -28,10 +28,15 @@ export type AuthFailure =
   | 'invalidEmail'
   | 'rateLimited'
   | 'unavailable'
-  /** A refresh token or a code Supabase refused: the session is over. */
+  /** A refresh token, a code or a recovery link Supabase refused: the session is over. */
   | 'expired'
+  /** The new password is the one the account already had (specs/password-recovery PR-09). */
+  | 'samePassword'
 
 export type AuthResult = { ok: true; tokens: AuthTokens } | { ok: false; reason: AuthFailure }
+
+/** An answer without tokens: asking for the recovery email, or saving a new password. */
+export type AuthDone = { ok: true } | { ok: false; reason: AuthFailure }
 
 const tokensSchema = z.object({
   access_token: z.string().min(1),
@@ -94,10 +99,11 @@ export function createSupabaseAuth({
     path: string,
     body: unknown,
     accessToken?: string,
+    method: 'POST' | 'PUT' = 'POST',
   ): Promise<{ status: number; json: unknown } | null> {
     try {
       const response = await fetchImpl(new URL(`/auth/v1/${path}`, url), {
-        method: 'POST',
+        method,
         headers: {
           apikey: anonKey,
           'Content-Type': 'application/json',
@@ -112,6 +118,32 @@ export function createSupabaseAuth({
     } catch {
       return null
     }
+  }
+
+  /** Supabase's refusal as a reason; `refused` for a 4xx without a code we know. */
+  function failure(status: number, json: unknown, refused: AuthFailure): AuthFailure {
+    if (status === 429) return 'rateLimited'
+    if (status >= 500) return 'unavailable'
+    const code = errorSchema.safeParse(json).data?.error_code
+    if (code && EMAIL_TAKEN.has(code)) return 'emailTaken'
+    if (code === 'weak_password') return 'weakPassword'
+    if (code === 'same_password') return 'samePassword'
+    if (code === 'email_address_invalid') return 'invalidEmail'
+    if (status === 400 || status === 401 || status === 403 || status === 422) return refused
+    return 'unavailable'
+  }
+
+  async function done(
+    path: string,
+    body: unknown,
+    refused: AuthFailure,
+    accessToken?: string,
+    method?: 'POST' | 'PUT',
+  ): Promise<AuthDone> {
+    const answer = await call(path, body, accessToken, method)
+    if (!answer) return { ok: false, reason: 'unavailable' }
+    if (answer.status >= 200 && answer.status < 300) return { ok: true }
+    return { ok: false, reason: failure(answer.status, answer.json, refused) }
   }
 
   async function tokens(path: string, body: unknown, refused: AuthFailure): Promise<AuthResult> {
@@ -135,16 +167,7 @@ export function createSupabaseAuth({
         },
       }
     }
-    if (status === 429) return { ok: false, reason: 'rateLimited' }
-    if (status >= 500) return { ok: false, reason: 'unavailable' }
-    const code = errorSchema.safeParse(json).data?.error_code
-    if (code && EMAIL_TAKEN.has(code)) return { ok: false, reason: 'emailTaken' }
-    if (code === 'weak_password') return { ok: false, reason: 'weakPassword' }
-    if (code === 'email_address_invalid') return { ok: false, reason: 'invalidEmail' }
-    if (status === 400 || status === 401 || status === 403 || status === 422) {
-      return { ok: false, reason: refused }
-    }
-    return { ok: false, reason: 'unavailable' }
+    return { ok: false, reason: failure(status, json, refused) }
   }
 
   return {
@@ -166,6 +189,33 @@ export function createSupabaseAuth({
     signOut: async (accessToken: string): Promise<void> => {
       await call('logout', {}, accessToken)
     },
+
+    /**
+     * Sends the email to choose a new password (specs/password-recovery design.md § 2). Supabase
+     * answers the same with or without an account (PR-12): only a 429 or an outage fail.
+     */
+    recover: async (email: string, redirectTo: string): Promise<AuthDone> => {
+      const result = await done(
+        `recover?redirect_to=${encodeURIComponent(redirectTo)}`,
+        { email },
+        'credentials',
+      )
+      // A refusal for the email itself would tell whether it has an account: never said.
+      return result.ok || result.reason === 'rateLimited' || result.reason === 'unavailable'
+        ? result
+        : { ok: true }
+    },
+
+    /** The recovery link's token for a session (design.md § 1): spent once used. */
+    verifyRecovery: (tokenHash: string) =>
+      tokens('verify', { type: 'recovery', token_hash: tokenHash }, 'expired'),
+
+    /** The new password of the account the access token belongs to (PR-09). */
+    updatePassword: (accessToken: string, password: string) =>
+      done('user', { password }, 'expired', accessToken, 'PUT'),
+
+    /** Closes every other session of the account (PR-18). Best effort, as signOut. */
+    signOutOthers: (accessToken: string) => done('logout?scope=others', {}, 'expired', accessToken),
 
     /** Where to send the person to sign in with Google. */
     googleUrl: (redirectTo: string, codeChallenge: string): string => {

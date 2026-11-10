@@ -369,7 +369,8 @@
       "login": "Entre no Asinko",
       "signup": "Junte-se ao Asinko",
       "comment": "Entre no Asinko para comentar",
-      "profile": "Escolha seu nome de usuário"
+      "profile": "Escolha seu nome de usuário",
+      "recover": "Recupere sua senha"
     },
     "value": "No Asinko, cada previsão ganha um histórico público e verificável.",
     "signup": "Criar conta",
@@ -398,7 +399,9 @@
     "menu": {
       "logOut": "Sair"
     },
-    "profileValue": "É como as pessoas encontram e mencionam você no Asinko. Adicione uma foto se quiser."
+    "profileValue": "É como as pessoas encontram e mencionam você no Asinko. Adicione uma foto se quiser.",
+    "recoverValue": "Digite o e-mail da sua conta e enviaremos um link para você escolher uma nova senha.",
+    "backToLogin": "Voltar para entrar"
   },
   "join": {
     "label": "Participar",
@@ -1374,11 +1377,29 @@
   "auth": {
     "login": {
       "submit": "Entrar",
-      "pending": "Entrando…"
+      "pending": "Entrando…",
+      "forgot": "Esqueceu sua senha?"
     },
     "signup": {
       "submit": "Criar conta",
       "pending": "Criando sua conta…"
+    },
+    "recover": {
+      "submit": "Enviar link",
+      "pending": "Enviando…",
+      "sent": "Se houver uma conta com {email}, enviamos um link para escolher uma nova senha. Confira também a pasta de spam.",
+      "resend": "Enviar de novo",
+      "resendIn": "Enviar de novo em {seconds} s"
+    },
+    "reset": {
+      "title": "Escolha uma nova senha",
+      "intro": "Você continua conectado aqui, e encerramos a sessão nos seus outros dispositivos.",
+      "label": "Nova senha",
+      "submit": "Salvar senha",
+      "pending": "Salvando…",
+      "expired": "Este link expirou ou já foi usado. Peça um novo.",
+      "requestNew": "Pedir um novo link",
+      "done": "Sua senha foi alterada"
     },
     "welcome": {
       "title": "Escolha seu nome de usuário",
@@ -1431,7 +1452,8 @@
       "photoType": "Use uma imagem JPEG, PNG ou WebP",
       "photoTooLarge": "Essa imagem é grande demais",
       "photoUpload": "Seu perfil está pronto, mas a foto não subiu. Tente de novo ou remova-a para continuar",
-      "nameSave": "Seu perfil está pronto, mas o nome não foi salvo. Tente de novo ou apague-o para continuar"
+      "nameSave": "Seu perfil está pronto, mas o nome não foi salvo. Tente de novo ou apague-o para continuar",
+      "samePassword": "Escolha uma senha diferente da atual"
     },
     "photo": {
       "label": "Foto de perfil (opcional)",

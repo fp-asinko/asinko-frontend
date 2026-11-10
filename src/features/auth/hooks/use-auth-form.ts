@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useState, useTransition } from 'react'
+import { useRef, useState, useTransition, type BaseSyntheticEvent } from 'react'
 import type { FieldValues, Path, UseFormReturn } from 'react-hook-form'
 import type { ActionResult } from '@/lib/result'
 
@@ -21,24 +21,41 @@ export function useAuthForm<Values extends FieldValues, Data>(
     translate(key.replace(/^auth\./, '') as Parameters<typeof translate>[0])
   const [pending, startTransition] = useTransition()
   const [alert, setAlert] = useState<string | null>(null)
+  // A second Enter or tap while it runs sends nothing (security.md § 7, password-recovery PR-05):
+  // `pending` arrives a render late, the ref does not. Only the handler reads it.
+  const running = useRef(false)
 
-  const submit = form.handleSubmit((values) => {
+  function send(values: Values): Promise<void> {
     setAlert(null)
-    startTransition(async () => {
-      const result = await action(values)
-      if (result.ok) {
-        onDone(result.data)
-        return
-      }
-      const fields = Object.entries(result.fieldErrors ?? {})
-      for (const [name, [key] = []] of fields) {
-        if (key) form.setError(name as Path<Values>, { message: key })
-      }
-      const [first] = fields
-      if (first) form.setFocus(first[0] as Path<Values>)
-      else setAlert(t(result.error))
-    })
-  })
+    return new Promise((resolve) =>
+      startTransition(async () => {
+        const result = await action(values)
+        resolve()
+        if (result.ok) {
+          onDone(result.data)
+          return
+        }
+        const fields = Object.entries(result.fieldErrors ?? {})
+        for (const [name, [key] = []] of fields) {
+          if (key) form.setError(name as Path<Values>, { message: key })
+        }
+        const [first] = fields
+        if (first) form.setFocus(first[0] as Path<Values>)
+        else setAlert(t(result.error))
+      }),
+    )
+  }
+
+  async function submit(event?: BaseSyntheticEvent) {
+    event?.preventDefault()
+    if (running.current) return
+    running.current = true
+    try {
+      await form.handleSubmit(send)()
+    } finally {
+      running.current = false
+    }
+  }
 
   /** A field's error, translated. */
   const error = (name: Path<Values>): string | undefined => {

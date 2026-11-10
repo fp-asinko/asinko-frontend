@@ -46,6 +46,8 @@ export function AuthGateDialog({
   const title = view === 'invite' ? t(`title.${request.action}`) : t(`title.${view}`)
   // The second step has its own line, and no way to switch or to another provider (AU-11).
   const second = view === 'profile'
+  // Recovering a password is about the account it has: no other provider (password-recovery PR-01).
+  const recover = view === 'recover'
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
@@ -83,7 +85,7 @@ export function AuthGateDialog({
           <DialogTitle className="text-[1.375rem] leading-tight font-bold">{title}</DialogTitle>
           {/* The reason to have an account, under every title: the forms too. */}
           <DialogDescription className="leading-normal">
-            {second ? t('profileValue') : t('value')}
+            {second ? t('profileValue') : recover ? t('recoverValue') : t('value')}
           </DialogDescription>
         </div>
 
@@ -116,7 +118,17 @@ export function AuthGateDialog({
           </p>
         )}
 
-        {!second && (
+        {recover && (
+          <button
+            type="button"
+            className="mx-auto min-h-6 type-ui font-semibold text-foreground underline underline-offset-2"
+            onClick={() => onViewChange('login')}
+          >
+            {t('backToLogin')}
+          </button>
+        )}
+
+        {!second && !recover && (
           <>
             <div className="flex items-center gap-3 type-meta text-muted-foreground">
               <span aria-hidden className="h-px flex-1 bg-border" />

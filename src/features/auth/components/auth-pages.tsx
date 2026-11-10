@@ -2,7 +2,7 @@ import { getTranslations } from 'next-intl/server'
 import type { ReactNode } from 'react'
 import { SocialLogins } from '@/components/organisms/auth-gate'
 import { Link } from '@/i18n/navigation'
-import { LoginPageForm, WelcomePageForm } from './page-forms'
+import { LoginPageForm, ResetPasswordPageForm, WelcomePageForm } from './page-forms'
 import { LogOutButton } from './log-out-button'
 
 function AuthCard({
@@ -27,19 +27,34 @@ function AuthCard({
 
 /**
  * The login page (specs/auth AU-03): the modal's forms as a page, for direct links and when
- * there is no JavaScript to open the modal. `mode` switches between logging in and signing up.
+ * there is no JavaScript to open the modal. `mode` switches between logging in, signing up and
+ * asking for the email to choose a new password (specs/password-recovery PR-01).
  */
 export async function LoginView({
   mode,
   next,
   googleFailed,
 }: {
-  mode: 'login' | 'signup'
+  mode: 'login' | 'signup' | 'recover'
   next: string
   googleFailed: boolean
 }) {
   const t = await getTranslations('authGate')
   const other = mode === 'login' ? 'signup' : 'login'
+
+  if (mode === 'recover') {
+    return (
+      <AuthCard title={t('title.recover')} intro={t('recoverValue')}>
+        <LoginPageForm mode="recover" next={next} />
+        <Link
+          href={{ pathname: '/login', query: { next } }}
+          className="mx-auto inline-flex min-h-6 items-center type-ui font-semibold text-foreground underline underline-offset-2"
+        >
+          {t('backToLogin')}
+        </Link>
+      </AuthCard>
+    )
+  }
 
   return (
     <AuthCard title={t(`title.${mode}`)}>
@@ -87,6 +102,19 @@ export async function WelcomeView({
     <AuthCard title={t('title')} intro={t('intro')}>
       <WelcomePageForm next={next} suggestion={suggestion} suggestedName={suggestedName} />
       <LogOutButton />
+    </AuthCard>
+  )
+}
+
+/**
+ * Choosing a new password from the email's link (specs/password-recovery PR-06, PR-08).
+ * `hasLink`: /auth/reset left the link's cookie; without it, the page says it expired.
+ */
+export async function ResetPasswordView({ next, hasLink }: { next: string; hasLink: boolean }) {
+  const t = await getTranslations('auth.reset')
+  return (
+    <AuthCard title={t('title')} intro={hasLink ? t('intro') : undefined}>
+      <ResetPasswordPageForm next={next} hasLink={hasLink} />
     </AuthCard>
   )
 }

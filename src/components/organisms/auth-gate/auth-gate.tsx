@@ -19,10 +19,11 @@ export type GatedAction =
 export type GateRequest = { action: GatedAction; next: string }
 
 /**
- * What the modal shows: the invitation, one of the forms (specs/auth AU-01), or the second step of
- * an account without a username (AU-11): its username, photo and terms.
+ * What the modal shows: the invitation, one of the forms (specs/auth AU-01), the second step of
+ * an account without a username (AU-11): its username, photo and terms, or asking for the email
+ * to choose a new password (specs/password-recovery PR-01).
  */
-export type GateView = 'invite' | 'login' | 'signup' | 'profile'
+export type GateView = 'invite' | 'login' | 'signup' | 'profile' | 'recover'
 
 /** Back from Google without a username, the page opens the second step (design.md § 12). */
 export const WELCOME_PARAM = 'welcome'

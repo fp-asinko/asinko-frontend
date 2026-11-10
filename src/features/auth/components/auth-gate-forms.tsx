@@ -16,6 +16,10 @@ const SignUpForm = dynamic(() => import('./sign-up-form').then((mod) => arriving
   ssr: false,
   loading: () => <FormSkeleton fields={2} />,
 })
+const RecoverForm = dynamic(
+  () => import('./recover-form').then((mod) => arriving(mod.RecoverForm)),
+  { ssr: false, loading: () => <FormSkeleton fields={1} /> },
+)
 const ProfileForm = dynamic(
   () => import('./profile-form').then((mod) => arriving(mod.ProfileForm)),
   {
@@ -43,6 +47,13 @@ export function AuthGateForms({
   const router = useRouter()
   // From the step just done; the layout's (from the session) when back from Google.
   const [suggested, setSuggested] = useState<string | null>(null)
+  // What the log in form had in its email, for the recovery form (password-recovery PR-02).
+  const [email, setEmail] = useState('')
+  // Once the modal moved off the view it opened with, each form replaces another one: its first
+  // field takes the focus (back to log in, too).
+  const [opened] = useState(dialog?.view)
+  const [switched, setSwitched] = useState(false)
+  if (!switched && dialog && dialog.view !== opened) setSwitched(true)
   if (!dialog) return null
 
   function done(result: { needsProfile: boolean; suggestion?: string | null }) {
@@ -68,5 +79,18 @@ export function AuthGateForms({
       />
     )
   }
-  return dialog.view === 'signup' ? <SignUpForm onDone={done} /> : <LogInForm onDone={done} />
+  if (dialog.view === 'recover') {
+    return <RecoverForm defaultEmail={email} next={dialog.next} focusFirst={switched} />
+  }
+  if (dialog.view === 'signup') return <SignUpForm onDone={done} focusFirst={switched} />
+  return (
+    <LogInForm
+      onDone={done}
+      focusFirst={switched}
+      onForgot={(written) => {
+        setEmail(written)
+        dialog.setView('recover')
+      }}
+    />
+  )
 }

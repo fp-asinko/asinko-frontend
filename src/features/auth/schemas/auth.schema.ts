@@ -39,6 +39,12 @@ export const signUpSchema = z.object({
     .max(PASSWORD_MAX, { message: 'auth.fields.password.long' }),
 })
 
+/** Asking for the recovery email (specs/password-recovery PR-02): where it was asked from, too. */
+export const recoverSchema = z.object({ email, next: z.string().max(2048).optional() })
+
+/** The new password, with the rules of a new account (PR-06, AU-06). */
+export const newPasswordSchema = signUpSchema.pick({ password: true })
+
 /** Optional: empty, the profile is titled with the username alone (P-011, design.md § 16). */
 const displayName = z
   .string()
@@ -51,3 +57,5 @@ export const profileSchema = z.object({ username, displayName, accepted })
 export type LogInInput = z.infer<typeof logInSchema>
 export type SignUpInput = z.infer<typeof signUpSchema>
 export type ProfileInput = z.infer<typeof profileSchema>
+export type RecoverInput = z.infer<typeof recoverSchema>
+export type NewPasswordInput = z.infer<typeof newPasswordSchema>

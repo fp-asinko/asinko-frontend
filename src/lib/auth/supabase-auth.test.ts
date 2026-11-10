@@ -3,6 +3,8 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   MOCK_DEMO_EMAIL,
   MOCK_DEMO_PASSWORD,
+  MOCK_LIMITED_EMAIL,
+  MOCK_RECOVERY_TOKEN,
   MOCK_SUPABASE_URL,
   MOCK_TAKEN_EMAIL,
   mockSupabaseFetch,
@@ -149,6 +151,80 @@ describe('createSupabaseAuth (specs/auth design.md § 2)', () => {
     })
   })
 
+  describe('password recovery (specs/password-recovery design.md § 2)', () => {
+    it('asks for the email with where its link goes back to', async () => {
+      const fetchImpl = answer(200, {})
+      const result = await withFetch(fetchImpl).recover(
+        'ana@asinko.dev',
+        'https://asinko.app/auth/reset?next=/es',
+      )
+      expect(result).toEqual({ ok: true })
+      const [target, init] = vi.mocked(fetchImpl).mock.calls[0]!
+      const url = new URL(target as URL)
+      expect(url.pathname).toBe('/auth/v1/recover')
+      expect(url.searchParams.get('redirect_to')).toBe('https://asinko.app/auth/reset?next=/es')
+      expect(JSON.parse(init!.body as string)).toEqual({ email: 'ana@asinko.dev' })
+    })
+
+    it('never tells an email apart: only too many requests or an outage fail (PR-04, PR-12)', async () => {
+      const recover = (status: number, body: unknown) =>
+        withFetch(answer(status, body)).recover('x@asinko.dev', 'https://asinko.app/auth/reset')
+      expect(await recover(400, { error_code: 'email_address_invalid' })).toEqual({ ok: true })
+      expect(await recover(422, { error_code: 'user_not_found' })).toEqual({ ok: true })
+      expect(await recover(429, { error_code: 'over_email_send_rate_limit' })).toEqual({
+        ok: false,
+        reason: 'rateLimited',
+      })
+      expect(await recover(503, {})).toEqual({ ok: false, reason: 'unavailable' })
+    })
+
+    it('exchanges the token hash, and says expired when it is spent or too old (PR-08)', async () => {
+      const fetchImpl = answer(200, TOKENS)
+      const result = await withFetch(fetchImpl).verifyRecovery('hash')
+      expect(result.ok && result.tokens.accessToken).toBe('access')
+      expect(JSON.parse(vi.mocked(fetchImpl).mock.calls[0]![1]!.body as string)).toEqual({
+        type: 'recovery',
+        token_hash: 'hash',
+      })
+      expect(
+        await withFetch(answer(403, { error_code: 'otp_expired' })).verifyRecovery('hash'),
+      ).toEqual({ ok: false, reason: 'expired' })
+    })
+
+    it('saves the new password with PUT and the Bearer, and names each refusal (PR-09)', async () => {
+      const fetchImpl = answer(200, { id: USER_ID })
+      expect(await withFetch(fetchImpl).updatePassword('access', 'new-password')).toEqual({
+        ok: true,
+      })
+      const [target, init] = vi.mocked(fetchImpl).mock.calls[0]!
+      expect(new URL(target as URL).pathname).toBe('/auth/v1/user')
+      expect(init?.method).toBe('PUT')
+      expect(init?.headers).toMatchObject({ Authorization: 'Bearer access' })
+
+      const update = (status: number, body: unknown) =>
+        withFetch(answer(status, body)).updatePassword('access', 'x')
+      expect(await update(422, { error_code: 'weak_password' })).toEqual({
+        ok: false,
+        reason: 'weakPassword',
+      })
+      expect(await update(422, { error_code: 'same_password' })).toEqual({
+        ok: false,
+        reason: 'samePassword',
+      })
+      expect(await update(401, { error_code: 'bad_jwt' })).toEqual({ ok: false, reason: 'expired' })
+    })
+
+    it('closes the other sessions with the Bearer (PR-18)', async () => {
+      const fetchImpl = vi.fn(
+        async () => new Response(null, { status: 204 }),
+      ) as unknown as typeof fetch
+      expect(await withFetch(fetchImpl).signOutOthers('access')).toEqual({ ok: true })
+      const [target, init] = vi.mocked(fetchImpl).mock.calls[0]!
+      expect(new URL(target as URL).search).toBe('?scope=others')
+      expect(init?.headers).toMatchObject({ Authorization: 'Bearer access' })
+    })
+  })
+
   it("builds Google's authorize URL with the challenge (S256)", () => {
     const url = new URL(
       withFetch(answer(200, {})).googleUrl('https://asinko.app/auth/callback', 'challenge'),
@@ -191,6 +267,35 @@ describe('the simulated Supabase (API_MOCKS=true, design.md § 9)', () => {
       ok: false,
       reason: 'emailTaken',
     })
+  })
+
+  it('recovers a password: the same answer for any email, and the old one still logs in', async () => {
+    expect(await auth.recover('nobody@asinko.dev', 'https://site/auth/reset')).toEqual({ ok: true })
+    expect(await auth.recover(MOCK_LIMITED_EMAIL, 'https://site/auth/reset')).toEqual({
+      ok: false,
+      reason: 'rateLimited',
+    })
+    expect(await auth.verifyRecovery('forged')).toEqual({ ok: false, reason: 'expired' })
+
+    const verified = await auth.verifyRecovery(MOCK_RECOVERY_TOKEN.demo)
+    if (!verified.ok) throw new Error('no session')
+    expect(verified.tokens.userId).toBe(DEMO_USER.id)
+    const token = verified.tokens.accessToken
+    expect(await auth.updatePassword(token, MOCK_DEMO_PASSWORD)).toEqual({
+      ok: false,
+      reason: 'samePassword',
+    })
+    const fresh = `fresh-${crypto.randomUUID()}`
+    expect(await auth.updatePassword(token, fresh)).toEqual({ ok: true })
+    expect((await auth.signInWithPassword(MOCK_DEMO_EMAIL, fresh)).ok).toBe(true)
+    expect((await auth.signInWithPassword(MOCK_DEMO_EMAIL, MOCK_DEMO_PASSWORD)).ok).toBe(true)
+    expect(await auth.signOutOthers(token)).toEqual({ ok: true })
+  })
+
+  it('gives an account without a profile for the other recovery link (PR-10)', async () => {
+    const verified = await auth.verifyRecovery(MOCK_RECOVERY_TOKEN.new)
+    expect(verified.ok && verified.tokens.userId).not.toBe(DEMO_USER.id)
+    expect(verified.ok && verified.tokens.email).toBe('forgetful@asinko.dev')
   })
 
   it('refreshes a session it gave, and refuses anything else', async () => {
