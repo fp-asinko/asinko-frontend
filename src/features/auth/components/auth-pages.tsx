@@ -48,7 +48,7 @@ export async function LoginView({
         <LoginPageForm mode="recover" next={next} />
         <Link
           href={{ pathname: '/login', query: { next } }}
-          className="mx-auto type-ui font-semibold text-foreground underline underline-offset-2"
+          className="mx-auto inline-flex min-h-6 items-center type-ui font-semibold text-foreground underline underline-offset-2"
         >
           {t('backToLogin')}
         </Link>

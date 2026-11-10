@@ -2,9 +2,10 @@
 
 import dynamic from 'next/dynamic'
 import { arriving } from '@/components/molecules/arriving'
+import { useState } from 'react'
 import { useRouter } from '@/i18n/navigation'
 import { FormSkeleton } from './form-skeleton'
-import { rememberedEmail, rememberEmail } from './recover-email'
+import { rememberedEmail, rememberEmail } from '../lib/recover-email'
 
 // After the page, with a skeleton in their place: they bring zod (seo.md § Zod, AU-19).
 const LogInForm = dynamic(() => import('./log-in-form').then((mod) => arriving(mod.LogInForm)), {
@@ -51,15 +52,23 @@ export function LoginPageForm({
   next: string
 }) {
   const router = useRouter()
+  // Once off the mode the page loaded with, each form replaces another one (focus on its first
+  // field), back to log in too.
+  const [loaded] = useState(mode)
+  const [switched, setSwitched] = useState(false)
+  if (!switched && mode !== loaded) setSwitched(true)
   function done({ needsProfile }: { needsProfile: boolean }) {
     if (needsProfile) router.replace({ pathname: '/welcome', query: { next } })
     else goTo(next)
   }
-  if (mode === 'recover') return <RecoverForm defaultEmail={rememberedEmail()} next={next} />
-  if (mode === 'signup') return <SignUpForm onDone={done} />
+  if (mode === 'recover') {
+    return <RecoverForm defaultEmail={rememberedEmail()} next={next} focusFirst={switched} />
+  }
+  if (mode === 'signup') return <SignUpForm onDone={done} focusFirst={switched} />
   return (
     <LogInForm
       onDone={done}
+      focusFirst={switched}
       onForgot={(email) => {
         rememberEmail(email)
         router.replace({ pathname: '/login', query: { mode: 'recover', next } })

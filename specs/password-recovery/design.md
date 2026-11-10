@@ -81,7 +81,9 @@ Con `react-hook-form`, `zodResolver` y `AuthField`, como el login, y cargados di
 
 - **`RecoverForm`** (email): al enviar bien, se reemplaza por la confirmación (PR-03), con `role="status"`, el botón "Reenviar" con la cuenta regresiva de 60 s (PR-05) y "Volver a log in".
 - **`ResetPasswordForm`** (contraseña nueva, `autocomplete="new-password"`, `reveal`). `auth.reset.expired` lo reemplaza por el estado de PR-08: el texto y el botón "Pedir un link nuevo", que lleva a `/login?mode=recover` con el mismo `next`.
-- **`LogInForm`** suma el link "Forgot your password?" (un `<button type="button">`, PR-01, Q3) y una prop `onForgot(email)`, que recibe lo escrito en el campo email (PR-02).
+- **`LogInForm`** suma el link "Forgot your password?" (un `<button type="button">`, PR-01, Q3) y una prop `onForgot(email)`, que recibe lo escrito en el campo email (PR-02). En `/login`, el email pasa por memoria del módulo (`features/auth/lib/recover-email.ts`), nunca por la URL (`security.md § 7`).
+- **Foco (PR-16, revisión de `ui-reviewer`, 2026-11-09):** cuando un formulario reemplaza a otro (ir a recuperar, volver a log in, y también log in ↔ crear cuenta, que tenía el mismo problema), su primer campo toma el foco (`useFocusFirst`, prop `focusFirst`). No al cargar la página: abriría el teclado del celular. La confirmación de PR-03 y el aviso de link vencido toman el foco al aparecer; "Send it again" tiene un nombre fijo y la cuenta regresiva solo se ve, para que no se lea cada segundo.
+- **Envío doble (PR-05):** `useAuthForm` no manda un segundo pedido mientras corre el primero (un ref, no `pending`, que llega un render tarde). Vale para todos los formularios de cuenta.
 
 ## 7. UI
 

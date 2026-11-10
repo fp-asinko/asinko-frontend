@@ -96,9 +96,10 @@ describe('the forms in the modal (specs/auth AU-01, AU-02, AU-11)', () => {
 
     const dialog = await screen.findByRole('dialog', { name: 'Reset your password' })
     expect(dialog).toHaveAttribute('data-view', 'recover')
-    expect(await screen.findByLabelText('Email', {}, { timeout: 5000 })).toHaveValue(
-      'ana@example.com',
-    )
+    const recoverEmail = await screen.findByLabelText('Email', {}, { timeout: 5000 })
+    expect(recoverEmail).toHaveValue('ana@example.com')
+    // The button that switched it left with the log in form: the email takes the focus (PR-16).
+    await vi.waitFor(() => expect(recoverEmail).toHaveFocus())
     // About the account it has: no other provider, and no switch to sign up.
     expect(screen.queryByRole('link', { name: /Google/ })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Create an account' })).toBeNull()
@@ -108,6 +109,8 @@ describe('the forms in the modal (specs/auth AU-01, AU-02, AU-11)', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Back to log in' }))
     expect(await screen.findByRole('dialog', { name: 'Log in to Asinko' })).toBeInTheDocument()
+    const loginEmail = await screen.findByLabelText('Email', {}, { timeout: 5000 })
+    await vi.waitFor(() => expect(loginEmail).toHaveFocus())
   })
 
   it('is nothing outside the modal', () => {
@@ -145,7 +148,7 @@ describe('the login page form (AU-03)', () => {
   })
 
   it('shows the recovery form in its mode, with the email remembered', async () => {
-    const { rememberEmail } = await import('./recover-email')
+    const { rememberEmail } = await import('../lib/recover-email')
     rememberEmail('ana@example.com')
     renderWithIntl(<LoginPageForm mode="recover" next="/en" />)
     expect(await screen.findByLabelText('Email', {}, { timeout: 5000 })).toHaveValue(

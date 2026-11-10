@@ -64,6 +64,37 @@ describe('AuthGate', () => {
     expect(screen.getByText('form:login')).toBeInTheDocument()
   })
 
+  it('shows the recovery view without other providers, and goes back to log in (password-recovery PR-01)', async () => {
+    function RecoverForms() {
+      const dialog = useGateDialog()
+      return dialog?.view === 'login' ? (
+        <button type="button" onClick={() => dialog.setView('recover')}>
+          Forgot
+        </button>
+      ) : (
+        <p>{`form:${dialog?.view}`}</p>
+      )
+    }
+    renderWithIntl(
+      <AuthGateProvider signedIn={false} forms={<RecoverForms />}>
+        <Upvote onVote={vi.fn()} action="login" />
+      </AuthGateProvider>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Forgot' }))
+
+    const dialog = screen.getByRole('dialog', { name: 'Reset your password' })
+    expect(dialog).toHaveAttribute('data-view', 'recover')
+    expect(dialog).toHaveAccessibleDescription(
+      'Enter your account’s email and we’ll send you a link to choose a new password.',
+    )
+    expect(within(dialog).queryByRole('link', { name: /Google/ })).toBeNull()
+    expect(within(dialog).queryByRole('button', { name: 'Create an account' })).toBeNull()
+
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Back to log in' }))
+    expect(screen.getByRole('dialog', { name: 'Log in to Asinko' })).toBeInTheDocument()
+  })
+
   it('opens straight on the form for Log in and Sign up', async () => {
     renderGate(false, 'signup')
     await userEvent.click(screen.getByRole('button', { name: 'Upvote' }))

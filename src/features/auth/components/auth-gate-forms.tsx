@@ -49,6 +49,11 @@ export function AuthGateForms({
   const [suggested, setSuggested] = useState<string | null>(null)
   // What the log in form had in its email, for the recovery form (password-recovery PR-02).
   const [email, setEmail] = useState('')
+  // Once the modal moved off the view it opened with, each form replaces another one: its first
+  // field takes the focus (back to log in, too).
+  const [opened] = useState(dialog?.view)
+  const [switched, setSwitched] = useState(false)
+  if (!switched && dialog && dialog.view !== opened) setSwitched(true)
   if (!dialog) return null
 
   function done(result: { needsProfile: boolean; suggestion?: string | null }) {
@@ -74,11 +79,14 @@ export function AuthGateForms({
       />
     )
   }
-  if (dialog.view === 'recover') return <RecoverForm defaultEmail={email} next={dialog.next} />
-  if (dialog.view === 'signup') return <SignUpForm onDone={done} />
+  if (dialog.view === 'recover') {
+    return <RecoverForm defaultEmail={email} next={dialog.next} focusFirst={switched} />
+  }
+  if (dialog.view === 'signup') return <SignUpForm onDone={done} focusFirst={switched} />
   return (
     <LogInForm
       onDone={done}
+      focusFirst={switched}
       onForgot={(written) => {
         setEmail(written)
         dialog.setView('recover')

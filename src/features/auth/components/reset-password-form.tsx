@@ -69,7 +69,7 @@ export function ResetPasswordForm({ next, hasLink }: { next: string; hasLink: bo
         type="submit"
         size="lg"
         aria-disabled={pending || undefined}
-        className="mt-1 h-11 rounded-full text-[0.875rem] font-semibold disabled:opacity-35"
+        className="mt-1 h-11 rounded-full font-semibold aria-disabled:opacity-35"
       >
         {pending ? t('reset.pending') : t('reset.submit')}
       </Button>
@@ -87,7 +87,9 @@ function ExpiredLink({ next, takeFocus }: { next: string; takeFocus: boolean }) 
 
   return (
     <div className="flex flex-col gap-3.5">
-      <p ref={message} tabIndex={-1} role="alert" className="type-ui outline-none">
+      {/* Focused when it replaces the form, so it is read once: no alert role on top. No
+          outline: only the code focuses it. */}
+      <p ref={message} tabIndex={-1} className="type-ui outline-none">
         {t('expired')}
       </p>
       <Link

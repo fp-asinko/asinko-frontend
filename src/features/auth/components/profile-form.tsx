@@ -87,7 +87,7 @@ export function ProfileForm({
           size="lg"
           disabled={!accepted}
           aria-disabled={pending || undefined}
-          className="mt-1 h-11 rounded-full text-[0.875rem] font-semibold disabled:opacity-35"
+          className="mt-1 h-11 rounded-full font-semibold aria-disabled:opacity-35"
         >
           {pending ? t('welcome.pending') : t('welcome.submit')}
         </Button>

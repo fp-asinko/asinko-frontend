@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import { Button } from '@/components/ui/button'
 import { logIn } from '../actions/log-in.action'
 import { useAuthForm } from '../hooks/use-auth-form'
+import { useFocusFirst } from '../hooks/use-focus-first'
 import { logInSchema, type LogInInput } from '../schemas/auth.schema'
 import { AuthField, FormAlert } from './auth-field'
 
@@ -17,9 +18,12 @@ import { AuthField, FormAlert } from './auth-field'
  */
 export function LogInForm({
   onDone,
+  focusFirst = false,
   onForgot,
 }: {
   onDone: (result: { needsProfile: boolean; suggestion?: string | null }) => void
+  /** It takes another form's place: the focus goes to its first field. */
+  focusFirst?: boolean
   onForgot?: (email: string) => void
 }) {
   const t = useTranslations('auth')
@@ -29,6 +33,7 @@ export function LogInForm({
     defaultValues: { email: '', password: '' },
   })
   const { submit, pending, alert, error } = useAuthForm(form, logIn, onDone)
+  useFocusFirst(form, 'email', focusFirst)
 
   return (
     <form noValidate onSubmit={submit} className="flex flex-col gap-3.5">
@@ -66,7 +71,7 @@ export function LogInForm({
         type="submit"
         size="lg"
         aria-disabled={pending || undefined}
-        className="mt-1 h-11 rounded-full text-[0.875rem] font-semibold disabled:opacity-35"
+        className="mt-1 h-11 rounded-full font-semibold aria-disabled:opacity-35"
       >
         {pending ? t('login.pending') : t('login.submit')}
       </Button>
