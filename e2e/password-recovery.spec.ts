@@ -43,10 +43,10 @@ test.describe('Recover the password (specs/password-recovery)', () => {
     await expect(dialog.getByRole('status')).toContainText(
       `If there’s an account with ${DEMO_EMAIL}, we sent it a link`,
     )
-    await expect(dialog.getByRole('button', { name: /Send it again in \d+ s/ })).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    )
+    // A fixed name for screen readers; the countdown is only seen (PR-05, PR-16).
+    const again = dialog.getByRole('button', { name: 'Send it again' })
+    await expect(again).toHaveText(/Send it again in \d+ s/)
+    await expect(again).toHaveAttribute('aria-disabled', 'true')
     await expect(page).toHaveURL(/\/en\/hub\/defi$/)
 
     // An email without an account: the very same answer.
