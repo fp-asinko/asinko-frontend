@@ -63,5 +63,5 @@ En `docs/references/api/proposals.md`:
 ## 7. Columna izquierda en streaming (FN-08)
 
 - Cambiar de idioma cambia el segmento `[locale]` y re-renderiza el layout. El layout esperaba a `InterestsSidebar` (`GET /communities` y los intereses, ~2,7 s), y como `loading.tsx` vive dentro del layout, no había ninguna señal.
-- `InterestsSidebar` va en un `Suspense` con `InterestsSkeleton` (filas del tamaño de las sugerencias). Sirve también para el panel ☰, que recibe el mismo nodo, y para la primera carga de cualquier página.
+- `InterestsSidebar` va en un `Suspense` con `InterestsSkeleton`, que tiene la forma de la columna con sesión: grupos y "Create group", personas, los activos como mosaicos de 3 columnas y las sugerencias abajo de todo (PO, 2026-11-10; antes eran seis filas iguales). Sirve también para el panel ☰, que recibe el mismo nodo, y para la primera carga de cualquier página.
 - La demora simulada (`mockDelay`) también frena la columna, y el e2e lo cubre.
