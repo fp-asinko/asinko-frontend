@@ -9,6 +9,9 @@ import { DEMO_USER } from './demo-user'
  * - taken@asinko.dev: already registered.
  * - Google comes back with `mock-google-demo` (the demo user) or `mock-google-new` (a new account
  *   without a profile, new.trader@gmail.com).
+ * - The recovery email (specs/password-recovery design.md § 9) is never sent: its links are
+ *   `mock-recovery-demo` (the demo user) and `mock-recovery-new` (an account without a profile);
+ *   any other token is expired. limited@asinko.dev asked too often (429).
  */
 export const MOCK_SUPABASE_URL = 'https://supabase.mock'
 export const MOCK_DEMO_EMAIL = 'demo@asinko.dev'
@@ -16,13 +19,27 @@ export const MOCK_DEMO_PASSWORD = 'demo-password'
 export const MOCK_TAKEN_EMAIL = 'taken@asinko.dev'
 /** Codes Google "returns" with the mocks. */
 export const MOCK_GOOGLE_CODE = { demo: 'mock-google-demo', new: 'mock-google-new' } as const
+/** Tokens of the recovery link with the mocks (specs/password-recovery PR-15). */
+export const MOCK_RECOVERY_TOKEN = { demo: 'mock-recovery-demo', new: 'mock-recovery-new' } as const
+/** The account behind MOCK_RECOVERY_TOKEN.new: it has no profile (PR-10). */
+export const MOCK_RECOVERY_NEW_EMAIL = 'forgetful@asinko.dev'
+/** An email that asked for the recovery email too often. */
+export const MOCK_LIMITED_EMAIL = 'limited@asinko.dev'
 /** The email of a new Google account: the welcome screen suggests `new_trader`. */
 export const MOCK_GOOGLE_NEW_EMAIL = 'new.trader@gmail.com'
 /** The new Google account's photo (specs/auth design.md § 15): mockGooglePhotoFetch answers it. */
 export const MOCK_GOOGLE_NAME = 'New Trader'
 export const MOCK_GOOGLE_PHOTO = 'https://lh3.googleusercontent.com/a/mock-new-trader=s96-c'
 
-type Account = { id: string; password: string }
+type Account = {
+  id: string
+  password: string
+  /**
+   * Passwords it had before a recovery: they still log in, so an e2e that changes the demo user's
+   * password does not lock out the tests running beside it (specs/password-recovery § 9).
+   */
+  previous?: string[]
+}
 
 const accounts = new Map<string, Account>([
   [MOCK_DEMO_EMAIL, { id: DEMO_USER.id, password: MOCK_DEMO_PASSWORD }],
@@ -67,6 +84,11 @@ function session(
   }
 }
 
+function accountOf(userId: string): Account | null {
+  for (const account of accounts.values()) if (account.id === userId) return account
+  return null
+}
+
 function emailOf(userId: string): string | null {
   for (const [email, account] of accounts) if (account.id === userId) return email
   return null
@@ -97,7 +119,8 @@ export async function mockSupabaseFetch(
 
   if (route === '/auth/v1/token?grant_type=password') {
     const account = accounts.get(body.email?.toLowerCase() ?? '')
-    return account && account.password === body.password
+    const known = account && [account.password, ...(account.previous ?? [])]
+    return account && known?.includes(body.password ?? '')
       ? json(200, session(account.id))
       : refused(400, 'invalid_credentials')
   }
@@ -121,7 +144,38 @@ export async function mockSupabaseFetch(
     }
     return refused(400, 'flow_state_not_found')
   }
-  if (route === '/auth/v1/logout') return json(204, null)
+  if (route.startsWith('/auth/v1/recover?')) {
+    // Supabase does not say whether the account exists: the same answer for any email.
+    return body.email?.toLowerCase() === MOCK_LIMITED_EMAIL
+      ? refused(429, 'over_email_send_rate_limit')
+      : json(200, {})
+  }
+  if (route === '/auth/v1/verify' && body.type === 'recovery') {
+    if (body.token_hash === MOCK_RECOVERY_TOKEN.demo) return json(200, session(DEMO_USER.id))
+    if (body.token_hash === MOCK_RECOVERY_TOKEN.new) {
+      const account = accounts.get(MOCK_RECOVERY_NEW_EMAIL) ?? {
+        id: crypto.randomUUID(),
+        password: 'forgotten-password',
+      }
+      accounts.set(MOCK_RECOVERY_NEW_EMAIL, account)
+      return json(200, session(account.id))
+    }
+    return refused(403, 'otp_expired')
+  }
+  if (route === '/auth/v1/user' && init?.method === 'PUT') {
+    const bearer = new Headers(init.headers).get('Authorization')?.replace(/^Bearer /, '')
+    const account = accountOf(mockTokenUser(bearer) ?? '')
+    if (!account) return refused(401, 'bad_jwt')
+    const password = body.password ?? ''
+    if (password.length < 6) return refused(422, 'weak_password')
+    if (password === account.password) return refused(422, 'same_password')
+    account.previous = [...(account.previous ?? []), account.password]
+    account.password = password
+    return json(200, { id: account.id })
+  }
+  if (route === '/auth/v1/logout' || route === '/auth/v1/logout?scope=others') {
+    return json(204, null)
+  }
   return json(404, { error_code: 'not_found' })
 }
 
