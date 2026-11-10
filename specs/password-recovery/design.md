@@ -1,6 +1,6 @@
 # Recuperar la contraseña — Design
 
-> **Estado:** borrador (2026-11-09), pendiente del Tech Lead. Requirements aprobados por el PO el 2026-11-09. Tarea **MVP-217**.
+> **Estado:** aprobado por el Tech Lead el 2026-11-09. Requirements aprobados por el PO el 2026-11-09. Tarea **MVP-217**.
 >
 > Se apoya en `specs/auth/design.md`: el cliente REST de Supabase (§ 1, § 2), la sesión en cookie (§ 3), los Route Handlers fuera del locale (§ 5) y el modal de cuenta (§ 8, § 12).
 

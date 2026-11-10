@@ -58,6 +58,9 @@ test.describe('JavaScript budget', () => {
     ['/en/login', GUEST],
     ['/en/login?mode=signup', GUEST],
     ['/en/welcome', NO_USERNAME],
+    // specs/password-recovery PR-17
+    ['/en/login?mode=recover', GUEST],
+    ['/en/reset-password', GUEST],
   ].map((entry) => (typeof entry === 'string' ? [entry] : entry))) {
     const [path, cookie] = entry as [string, string?]
     test(`${path} stays under ${BUDGET_KB} KB gzip`, async ({ request }) => {

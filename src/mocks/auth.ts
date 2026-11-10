@@ -168,7 +168,10 @@ export async function mockSupabaseFetch(
     if (!account) return refused(401, 'bad_jwt')
     const password = body.password ?? ''
     if (password.length < 6) return refused(422, 'weak_password')
-    if (password === account.password) return refused(422, 'same_password')
+    // Any password it had, not only the current one: tests running beside each other change it.
+    if ([account.password, ...(account.previous ?? [])].includes(password)) {
+      return refused(422, 'same_password')
+    }
     account.previous = [...(account.previous ?? []), account.password]
     account.password = password
     return json(200, { id: account.id })
