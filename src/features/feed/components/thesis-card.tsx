@@ -118,7 +118,7 @@ export function ThesisCard({
         href={detail ? undefined : thesis.path}
       />
 
-      {/* "Will it happen?" right after what has to happen: the claim (specs/thesis-agree AG-01, PO
+      {/* "Do you agree?" right after what has to happen: the claim (specs/thesis-agree AG-01, PO
           2026-11-06). Closed, only its result, if anyone answered (AG-02); without the backend's
           field, nothing (AG-18). */}
       {thesis.agreement &&
@@ -126,6 +126,16 @@ export function ThesisCard({
           <ThesisAgree
             thesisId={thesis.id}
             assetSymbol={thesis.asset?.symbol ?? null}
+            bet={
+              thesis.author && thesis.target
+                ? {
+                    handle: thesis.author.handle,
+                    direction: thesis.target.direction,
+                    price: thesis.target.price,
+                    deadline: thesis.deadline,
+                  }
+                : null
+            }
             agreement={thesis.agreement}
             className="mt-3"
           />

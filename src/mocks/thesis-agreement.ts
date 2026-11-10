@@ -3,7 +3,7 @@ import { mockCaller } from './auth'
 import { THESES } from './fixtures/theses'
 import type { MockContext, MockResponse } from './types'
 
-// P-043 (proposal, specs/thesis-agree): "Will it happen?" on a thesis. The answers live in this
+// P-043 (proposal, specs/thesis-agree): "Do you agree?" on a thesis. The answers live in this
 // process's memory, on top of a stable base per thesis so the feed shows results without anyone
 // voting.
 

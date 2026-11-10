@@ -20,7 +20,7 @@
 
 ### La pregunta (Q1)
 
-- [ ] **AG-01** Debajo del claim (PO, 2026-11-06: primero qué tiene que pasar, después la pregunta; antes iba entre el ticket y el claim), una fila: **"¿Se cumple?"** y dos botones, **Sí** y **No**. En el feed y en la página de la tesis, donde va antes del razonamiento.
+- [ ] **AG-01** Debajo del claim (PO, 2026-11-06: primero qué tiene que pasar, después la pregunta; antes iba entre el ticket y el claim), una fila: **"¿Estás de acuerdo?"** ("Do you agree?"; PO, 2026-11-09: antes "¿Se cumple?") y dos botones, **Sí** y **No**. En el feed y en la página de la tesis, donde va antes del razonamiento.
 - [ ] **AG-02** Solo mientras la tesis está **abierta**. Cerrada (acertada, errada, vencida, disputada, cancelada), la fila muestra el resultado final en solo lectura, si hubo votos; sin votos, no se muestra.
 - [ ] **AG-03** Los votos ▲▼ no cambian: siguen en la fila de acciones (Q1).
 
@@ -35,7 +35,7 @@
 
 ### La invitación del No (Q2)
 
-- [ ] **AG-10** Al votar **No**, debajo de la barra aparece una invitación: **"¿Pensás distinto? Publicá tu tesis"**, con un botón que lleva a crear tesis. Se puede cerrar (✕) y no vuelve para esa tesis en esa visita.
+- [ ] **AG-10** Con el voto en **No**, debajo de la barra aparece una invitación que **nombra la apuesta**: **"@maria apuesta a que $BTC supera $150.000 al 1 dic 2026."**, con "Tomá la posición contraria: si acertás, suma a tu precisión." debajo, un ícono de espadas (el choque) y el botón **"Apostá en contra"**, que lleva a crear tesis, pegado al texto. Sin objetivo o sin autor, el título es "¿Creés que se equivoca?". Se ve **mientras el voto siga en No, también en otra visita**; sin ✕: se va al cambiar el voto (PO, 2026-11-09; antes "¿Pensás distinto? Publicá tu tesis" y "Crear tesis", con ✕ y solo en la visita en que se votó).
 - [ ] **AG-11** El botón abre `/submit?type=thesis` con **el mismo activo** elegido y la tesis original como referencia: "Respondés a @autor: ↑ $240 al 4 nov 2027". El objetivo sigue decidiendo la dirección (TC-24); el formulario sugiere la contraria ("Si creés que no llega a $240, tu objetivo va por debajo").
 - [ ] **AG-12** Al votar Sí no aparece ninguna invitación.
 - [ ] **AG-13** Sin activo (una tesis cualitativa vieja), la invitación abre crear tesis vacío.

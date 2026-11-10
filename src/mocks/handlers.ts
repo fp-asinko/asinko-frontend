@@ -761,7 +761,7 @@ export const MOCK_ROUTES: readonly MockRoute[] = [
     handler: mockAssetPrices,
   },
 
-  // P-043 (proposal): "Will it happen?" on a thesis, yes or no (specs/thesis-agree). No liveExample.
+  // P-043 (proposal): "Do you agree?" on a thesis, yes or no (specs/thesis-agree). No liveExample.
   {
     method: 'PUT',
     path: '/api/v1/theses/:id/agreement',
@@ -1348,7 +1348,7 @@ export const MOCK_EXTENSIONS: readonly MockExtension[] = [
       extendWithIdentity(extendWithAgreement(extendFeed(response, false), context)),
   },
   {
-    // P-043: a thesis's page with its "Will it happen?" (specs/thesis-agree), and P-044 / P-045
+    // P-043: a thesis's page with its "Do you agree?" (specs/thesis-agree), and P-044 / P-045
     // (specs/thesis-identity).
     method: 'GET',
     path: '/api/v1/theses/:id',

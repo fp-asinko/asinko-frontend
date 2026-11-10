@@ -1,19 +1,29 @@
 'use client'
 
-import { ThumbsDownIcon, ThumbsUpIcon, XIcon } from 'lucide-react'
+import { SwordsIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react'
 import { useFormatter, useLocale, useTranslations } from 'next-intl'
-import { useId, useOptimistic, useRef, useState, useTransition } from 'react'
+import { useId, useOptimistic, useState, useTransition } from 'react'
 import { AgreeBar } from '@/components/molecules/agree-bar'
 import { useAuthGate } from '@/components/organisms/auth-gate'
 import { buttonVariants } from '@/components/ui/button'
 import { Link } from '@/i18n/navigation'
 import type { Locale } from '@/i18n/routing'
 import { submitPath } from '@/i18n/submit-path'
+import { thesisPrice } from '@/lib/theses/price'
 import { cn } from '@/lib/utils'
 import { answerThesis } from '../actions/answer-thesis.action'
 import type { ThesisAgreement } from '../feed.types'
 
 type Answer = 'yes' | 'no'
+
+/** The bet a No answers, as the invitation says it (AG-10): whose, which way, how much and when. */
+export type AgreeBet = {
+  /** How the author is mentioned: @maria. */
+  handle: string
+  direction: 'above' | 'below' | 'equals'
+  price: number
+  deadline: string
+}
 
 /**
  * Each answer's look (PO, 2026-11-05: big, as the prototype's Bull and Bear). Written whole: Tailwind
@@ -47,10 +57,11 @@ function counted(agreement: ThesisAgreement, next: Answer | null): ThesisAgreeme
 }
 
 /**
- * "Will it happen?" on an open thesis (specs/thesis-agree AG-01 to AG-14), a client leaf: Yes and
+ * "Do you agree?" on an open thesis (specs/thesis-agree AG-01 to AG-14), a client leaf: Yes and
  * No, then the bar. The shares show only once answered (Q3), always to its author and to a guest.
  * Pressing the same answer takes it back, the other changes it (Q4). A No invites to bet the other
- * way (Q2): create a thesis on the same asset, answering this one.
+ * way (Q2): create a thesis on the same asset, answering this one. It shows while the No stands,
+ * also on a later visit (AG-10).
  *
  * Closed, or to its author, the result alone (AG-02, AG-07). The card leaves out a closed one
  * without votes.
@@ -58,12 +69,15 @@ function counted(agreement: ThesisAgreement, next: Answer | null): ThesisAgreeme
 export function ThesisAgree({
   thesisId,
   assetSymbol,
+  bet,
   agreement,
   className,
 }: {
   thesisId: string
   /** The asset the counter-thesis opens on (AG-11); null for a qualitative one (AG-13). */
   assetSymbol: string | null
+  /** What the invitation names (AG-10); null without a target or an author. */
+  bet: AgreeBet | null
   agreement: ThesisAgreement
   className?: string
 }) {
@@ -76,9 +90,6 @@ export function ThesisAgree({
   const [shown, setShown] = useOptimistic(confirmed)
   const [pending, startTransition] = useTransition()
   const [error, setError] = useState(false)
-  // A No's invitation, until closed: for this visit (AG-10).
-  const [invited, setInvited] = useState(false)
-  const noRef = useRef<HTMLButtonElement>(null)
 
   const { canVote } = confirmed
   const revealed = !canVote || !signedIn || shown.viewerVote !== null
@@ -90,16 +101,12 @@ export function ThesisAgree({
     if (pending || !requireAccount('vote-poll')) return
     const next = shown.viewerVote === value ? null : value
     setError(false)
-    setInvited(next === 'no')
     startTransition(async () => {
       setShown(counted(shown, next))
       const result = await answerThesis({ thesisId, value: next })
       if (result.ok) setConfirmed(result.data)
       else if (result.error === 'api.errors.UNAUTHENTICATED') openGate('vote-poll')
-      else {
-        setInvited(false)
-        setError(true)
-      }
+      else setError(true)
     })
   }
 
@@ -112,13 +119,12 @@ export function ThesisAgree({
         </span>
         {canVote && (
           <span className="grid grid-cols-2 gap-2">
-            {(['yes', 'no'] as const).map((value) => {
+            {(['no', 'yes'] as const).map((value) => {
               const mine = shown.viewerVote === value
               const { Icon, ...look } = ANSWERS[value]
               return (
                 <button
                   key={value}
-                  ref={value === 'no' ? noRef : undefined}
                   type="button"
                   aria-pressed={mine}
                   aria-disabled={pending || undefined}
@@ -172,10 +178,34 @@ export function ThesisAgree({
           />
         )}
 
-        {invited && shown.viewerVote === 'no' && (
+        {canVote && shown.viewerVote === 'no' && (
           // White with a hairline: the card turns `bg-surface` on hover, and a gray box would melt.
-          <div className="flex animate-fade-up flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border bg-background py-2 pr-2 pl-3">
-            <p className="min-w-0 flex-1 type-small font-semibold">{t('invite.title')}</p>
+          // The question and its button side by side, centered: one thought (PO, 2026-11-09).
+          <div className="flex animate-fade-up flex-wrap items-center justify-center gap-x-4 gap-y-2 rounded-lg border bg-background p-2 pl-3">
+            <span className="flex min-w-0 items-center gap-2.5">
+              {/* Taking the other side: the clash, in the No's red (an icon: 3:1 is enough). */}
+              <span
+                aria-hidden
+                className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-bearish/15 text-bearish"
+              >
+                <SwordsIcon className="size-4" />
+              </span>
+              <span className="flex min-w-0 flex-col">
+                {/* Its bet, named: disagreeing with someone, not with a card (PO, 2026-11-09). */}
+                <span className="type-small font-semibold">
+                  {bet && assetSymbol
+                    ? t('invite.bet', {
+                        author: bet.handle,
+                        symbol: `$${assetSymbol}`,
+                        direction: bet.direction,
+                        price: thesisPrice(format, bet.price),
+                        date: format.dateTime(new Date(bet.deadline), { dateStyle: 'medium' }),
+                      })
+                    : t('invite.title')}
+                </span>
+                <span className="type-meta text-muted-foreground">{t('invite.hint')}</span>
+              </span>
+            </span>
             <Link
               href={submitPath(locale, {
                 community: assetSymbol,
@@ -183,22 +213,10 @@ export function ThesisAgree({
                 counter: assetSymbol ? thesisId : undefined,
               })}
               // 32px, as Yes and No (AG-14).
-              className={cn(buttonVariants(), 'tap rounded-full px-3')}
+              className={cn(buttonVariants(), 'shrink-0 tap rounded-full px-3')}
             >
               {t('invite.action')}
             </Link>
-            <button
-              type="button"
-              aria-label={t('invite.close')}
-              onClick={() => {
-                setInvited(false)
-                // The focus goes back to the No it came from, not to the page (WCAG 2.4.3).
-                noRef.current?.focus()
-              }}
-              className="inline-flex size-8 tap items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted-hover focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              <XIcon aria-hidden className="size-4" />
-            </button>
           </div>
         )}
       </div>

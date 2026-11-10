@@ -104,7 +104,7 @@ export async function voteCommentAs(
 }
 
 /**
- * Answers "Will it happen?" on a thesis (P-043, specs/thesis-agree), changes the answer or, with
+ * Answers "Do you agree?" on a thesis (P-043, specs/thesis-agree), changes the answer or, with
  * null, takes it back. Both answer the new counts.
  */
 export async function answerThesisAs(

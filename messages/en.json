@@ -303,14 +303,15 @@
         "posted": "Update posted"
       },
       "agree": {
-        "question": "Will it happen?",
+        "question": "Do you agree?",
         "yes": "Yes",
         "no": "No",
         "error": "Could not save your answer. Try again.",
         "invite": {
-          "title": "Think otherwise? Post your thesis",
-          "action": "Create thesis",
-          "close": "Close"
+          "title": "Think they're wrong?",
+          "bet": "{author} bets {symbol} {direction, select, above {goes above} below {falls below} other {lands at}} {price} by {date}.",
+          "hint": "Take the other side: if you're right, it counts toward your accuracy.",
+          "action": "Bet against it"
         }
       }
     },

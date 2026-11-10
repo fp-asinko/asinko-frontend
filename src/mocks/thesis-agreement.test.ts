@@ -24,7 +24,7 @@ const context = (id: string, rest: Partial<MockContext> = {}): MockContext => ({
 const answer = (id: string, value: unknown, userId: unknown = DEMO_USER.id) =>
   answerMockThesis(context(id, { body: { userId, value } }))
 
-describe('"Will it happen?" mock (P-043, specs/thesis-agree)', () => {
+describe('"Do you agree?" mock (P-043, specs/thesis-agree)', () => {
   it('answers, changes and takes back the answer, with the counts', () => {
     const before = agreementOf(open.id, DEMO_USER.id, open)
     expect(before).toMatchObject({ viewerVote: null, canVote: true })

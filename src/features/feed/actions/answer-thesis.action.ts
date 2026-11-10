@@ -7,7 +7,7 @@ import { answerThesisAs } from '../lib/votes-api'
 import { answerThesisSchema } from '../schemas/vote.schema'
 
 /**
- * Answers "Will it happen?" on a thesis (specs/thesis-agree AG-04, AG-05): yes, no, or null to take
+ * Answers "Do you agree?" on a thesis (specs/thesis-agree AG-04, AG-05): yes, no, or null to take
  * it back. A public endpoint: it validates the input and checks the session itself; the userId is
  * the session's.
  */

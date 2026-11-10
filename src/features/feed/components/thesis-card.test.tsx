@@ -119,10 +119,10 @@ describe('ThesisCard in a feed (specs/thesis-detail TD-02 to TD-05, specs/thesis
   })
 })
 
-describe('ThesisCard and "Will it happen?" (specs/thesis-agree)', () => {
+describe('ThesisCard and "Do you agree?" (specs/thesis-agree)', () => {
   it('asks right after the claim, on an open one (AG-01, PO 2026-11-06, AG-03)', () => {
     renderWithIntl(<ThesisCard thesis={thesisItem()} />)
-    const group = screen.getByRole('group', { name: 'Will it happen?' })
+    const group = screen.getByRole('group', { name: 'Do you agree?' })
     expect(group.compareDocumentPosition(screen.getByRole('heading', { level: 2 }))).toBe(
       Node.DOCUMENT_POSITION_PRECEDING,
     )
@@ -151,10 +151,10 @@ describe('ThesisCard and "Will it happen?" (specs/thesis-agree)', () => {
         })}
       />,
     )
-    expect(screen.queryByText('Will it happen?')).toBeNull()
+    expect(screen.queryByText('Do you agree?')).toBeNull()
     again()
 
     renderWithIntl(<ThesisCard thesis={thesisItem({ agreement: null })} />)
-    expect(screen.queryByText('Will it happen?')).toBeNull()
+    expect(screen.queryByText('Do you agree?')).toBeNull()
   })
 })

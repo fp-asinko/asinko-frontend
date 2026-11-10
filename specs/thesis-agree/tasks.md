@@ -6,7 +6,7 @@ Rama: `feature/thesis-agree-yes-no`. Aprobado por el PO el 2026-11-05. Depende d
 - [x] **T-02 (M)** Mocks: rutas `PUT` / `DELETE` con errores (`401`, `403 OWN_THESIS`, `409 THESIS_CLOSED`), `MockExtension` para `missing`, fixtures; `fixtures.test.ts` en verde. → AG-18
 - [x] **T-03 (S)** `votes-api` + `answerThesis` con su test: input inválido, sin sesión, `userId` de la sesión, cambiar y quitar. → AG-04, AG-05, AG-08
 - [x] **T-04 (M)** `AgreeBar` (molécula) con su test: %, total, sin votos, solo lectura. → AG-06, AG-02
-- [x] **T-05 (L)** `ThesisAgree` con su test: sin votar, votar Sí / No, cambiar, quitar, autor, sin sesión, cerrada, error que revierte, doble toque, invitación y su ✕. → AG-01 a AG-10, AG-12, AG-14
+- [x] **T-05 (L)** `ThesisAgree` con su test: sin votar, votar Sí / No, cambiar, quitar, autor, sin sesión, cerrada, error que revierte, doble toque, invitación (con la apuesta nombrada, también en otra visita; sin ✕, PO 2026-11-09). → AG-01 a AG-10, AG-12, AG-14
 - [x] **T-06 (S)** En `ThesisCard` (feed y detalle); actualizar su test. → AG-01, AG-03, AG-15
 - [x] **T-07 (M)** Contra-tesis en crear tesis: `?counter=`, `counter-thesis.ts` con su test, la tarjeta de referencia y la sugerencia. → AG-11, AG-13
 - [x] **T-08 (S)** Textos en en, es y pt. → AG-16

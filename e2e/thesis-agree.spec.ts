@@ -10,14 +10,14 @@ const MARIA_OPEN = 'BTC will close above $150K before December 2026'
 const MARIA_PAGE = '/en/thesis/00000000-0000-4000-8000-000000009001'
 const RESULT = /^\d+% yes · \d+% no · \d+ votes?$/
 
-test.describe('"Will it happen?" on a thesis', () => {
+test.describe('"Do you agree?" on a thesis', () => {
   test('answers No, sees the result and bets the other way (AG-01, AG-04, AG-10, AG-11)', async ({
     page,
     baseURL,
   }) => {
     await signUp(page, baseURL!)
     await page.goto(MARIA_PAGE)
-    const question = main(page).getByRole('group', { name: 'Will it happen?' })
+    const question = main(page).getByRole('group', { name: 'Do you agree?' })
     await expect(question).toBeVisible()
     // Before answering, no shares (Q3).
     await expect(main(page).getByText(RESULT)).toHaveCount(0)
@@ -27,7 +27,9 @@ test.describe('"Will it happen?" on a thesis', () => {
     await expect(main(page).getByText(RESULT)).toBeVisible()
     await expectNoA11yViolations(page)
 
-    await main(page).getByRole('link', { name: 'Create thesis' }).click()
+    // Its bet, named (AG-10).
+    await expect(main(page).getByText(/^@maria bets \$BTC goes above \$150,000 by /)).toBeVisible()
+    await main(page).getByRole('link', { name: 'Bet against it' }).click()
     await expect(page).toHaveURL(
       /\/en\/submit\?community=BTC&type=thesis&counter=00000000-0000-4000-8000-000000009001$/,
     )
@@ -39,7 +41,7 @@ test.describe('"Will it happen?" on a thesis', () => {
   test('takes the answer back with the same button (AG-05)', async ({ page, baseURL }) => {
     await signUp(page, baseURL!)
     await page.goto(MARIA_PAGE)
-    const question = main(page).getByRole('group', { name: 'Will it happen?' })
+    const question = main(page).getByRole('group', { name: 'Do you agree?' })
     await question.getByRole('button', { name: 'Yes' }).click()
     await expect(question.getByRole('button', { name: 'Yes', pressed: true })).toBeVisible()
     await question.getByRole('button', { name: 'Yes' }).click()
@@ -48,7 +50,7 @@ test.describe('"Will it happen?" on a thesis', () => {
     await page.reload()
     await expect(
       main(page)
-        .getByRole('group', { name: 'Will it happen?' })
+        .getByRole('group', { name: 'Do you agree?' })
         .getByRole('button', { name: 'Yes', pressed: false }),
     ).toBeVisible()
   })

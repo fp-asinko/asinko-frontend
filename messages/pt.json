@@ -303,14 +303,15 @@
         "posted": "Atualização publicada"
       },
       "agree": {
-        "question": "Vai acontecer?",
+        "question": "Você concorda?",
         "yes": "Sim",
         "no": "Não",
         "error": "Não foi possível salvar sua resposta. Tente de novo.",
         "invite": {
-          "title": "Pensa diferente? Publique sua tese",
-          "action": "Criar tese",
-          "close": "Fechar"
+          "title": "Acha que está errado?",
+          "bet": "{author} aposta que {symbol} {direction, select, above {passa de} below {cai abaixo de} other {chega a}} {price} até {date}.",
+          "hint": "Assuma o lado oposto: se acertar, conta para a sua precisão.",
+          "action": "Aposte contra"
         }
       }
     },

@@ -166,7 +166,7 @@ export type ThesisItem = ThesisTicketData & {
   viewerVote: 1 | -1 | null
   argumentCount: { pro: number; contra: number }
   canCancel: boolean
-  /** "Will it happen?" (specs/thesis-agree); null while the backend does not send it (AG-18). */
+  /** "Do you agree?" (specs/thesis-agree); null while the backend does not send it (AG-18). */
   agreement: ThesisAgreement | null
   publishedAt: string
   reason?: FeedReason | null

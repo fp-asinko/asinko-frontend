@@ -15,21 +15,21 @@
 
 ```
 Abierta, sin votar:
-  ¿Se cumple?                                  ( Sí )  ( No )
+  ¿Se cumple?                                  ( No )  ( Sí )
 
 Votó No (o es el autor, o no tiene sesión, sin la invitación):
-  ¿Se cumple?                                  ( Sí )  (✓ No )
+  ¿Se cumple?                                  (✓ No )  ( Sí )
   ███████████████░░░░░░░░░░░░░  62 % Sí · 38 % No · 128 votos
   ┌──────────────────────────────────────────────────────── ✕ ┐
   │ ¿Pensás distinto? Publicá tu tesis          [ Crear tesis ] │
   └─────────────────────────────────────────────────────────────┘
 ```
 
-- **Botones** (PO, 2026-11-05: grandes, como el Bull / Bear del prototipo): grilla de dos columnas, `h-11 rounded-lg border bg-background`, `type-ui` en negrita y negro, 👍 verde / 👎 rojo. Votado: borde de 2 px de su color (`ring-1 ring-inset`) y el ícono relleno. Con resultado, cada botón se rellena desde la izquierda con su parte (`bg-bullish/15` o `bg-bearish/15`, `scaleX`) y muestra su %; debajo, `AgreeBar` solo con las palabras (`words`). El texto no va en verde: sobre el relleno no llega a 4,5:1. `aria-pressed`.
+- **Botones** (PO, 2026-11-05: grandes, como el Bull / Bear del prototipo; PO, 2026-11-09: **No a la izquierda y Sí a la derecha**): grilla de dos columnas, `h-11 rounded-lg border bg-background`, `type-ui` en negrita y negro, 👍 verde / 👎 rojo. Votado: borde de 2 px de su color (`ring-1 ring-inset`) y el ícono relleno. Con resultado, cada botón se rellena desde la izquierda con su parte (`bg-bullish/15` o `bg-bearish/15`, `scaleX`) y muestra su %; debajo, `AgreeBar` solo con las palabras (`words`). El texto no va en verde: sobre el relleno no llega a 4,5:1. `aria-pressed`.
 - **Barra:** 6 px, `rounded-full`: el rojo de No (`bg-bearish`) entero, y el verde de Sí (`bg-bullish`) encima, con `scaleX` desde la izquierda. Sin separación: así cambiar la respuesta solo mueve `transform`. Debajo, `type-meta text-muted-foreground` con los dos % y el total. El verde y el rojo van sobre `bg-background` o `bg-surface` como relleno (3:1, ya medido en `tokens-contrast.test.ts`), nunca como texto chico (AG-06).
 - **Animación:** el relleno de los botones es una transición de `transform: scaleX` de 600 ms con `--ease-bars`, como las barras de las encuestas: crece de 0 al votar y se corre al cambiar. Nada con `prefers-reduced-motion`. Sin botones (el autor, cerrada), `AgreeBar` dibuja su barra quieta.
 - **Toro y oso (AG-19):** `BullMark` y `BearMark` en `components/ui/stance-marks.tsx`, átomos de marca en la grilla de 24 px de lucide (trazo 2, `currentColor`). En el ticket, sobre el precio: `type-section text-muted-foreground` con el animal en `text-bullish` / `text-bearish` (un gráfico: 3:1 alcanza).
-- **Invitación:** caja `bg-background border rounded-lg` (la tarjeta pasa a `bg-surface` con el hover), botón de 32 px, dentro de la región `aria-live`; al cerrarla, el foco vuelve a No, `animate-fade-up`, con el botón primario (`Button` de shadcn, `size="sm"`) y ✕ (`aria-label` traducido). El ✕ la esconde con estado local: "en esa visita" (AG-10).
+- **Invitación:** caja `bg-background border rounded-lg` (la tarjeta pasa a `bg-surface` con el hover), dentro de la región `aria-live`, `animate-fade-up`. Centrada: `SwordsIcon` de lucide en un círculo `bg-bearish/15 text-bearish` (un ícono: 3:1 alcanza), la apuesta (`invite.bet`: `@autor`, `$SÍMBOLO`, dirección, `thesisPrice` y la fecha `medium`; sin objetivo o sin autor, `invite.title`) y la bajada en dos líneas, y el botón primario de 32 px pegado al texto, no contra el borde; a 360 px el botón baja a su propia fila (`flex-wrap`). La tarjeta le pasa `bet` (handle, dirección, precio y deadline): solo esos campos. Se dibuja con `canVote && viewerVote === 'no'`, sin estado propio: aparece también al volver a una tesis votada No y se va al cambiar a Sí o quitar el voto (PO, 2026-11-09; sin ✕) (AG-10).
 - **Dentro de la tarjeta del feed:** la fila va sobre el `CardLink`, como la fila de acciones (`relative z-10`), para que tocar un botón no abra la tesis.
 
 ## 3. Datos

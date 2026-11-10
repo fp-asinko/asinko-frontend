@@ -34,7 +34,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
   it('keeps only those namespaces, with their nesting', () => {
     const picked = pickClientMessages(en)
     expect(Object.keys(picked).sort()).toEqual([
-      // The bar of "Will it happen?" (specs/thesis-agree AG-04).
+      // The bar of "Do you agree?" (specs/thesis-agree AG-04).
       'agreeBar',
       'auth',
       'authGate',
@@ -74,7 +74,7 @@ describe('client messages (i18n.md § Server y Client Components)', () => {
       'more',
     ])
     expect(Object.keys((picked.feed as Record<string, Record<string, unknown>>).thesis!)).toEqual([
-      // "Will it happen?" on a thesis (specs/thesis-agree).
+      // "Do you agree?" on a thesis (specs/thesis-agree).
       'agree',
       'cancel',
       'updates',

@@ -20,18 +20,37 @@ function deferred<T>() {
   return { promise, resolve }
 }
 
-const render = (agreement: ThesisAgreement = OPEN, assetSymbol: string | null = 'NVDA') =>
-  renderWithIntl(<ThesisAgree thesisId={ID} assetSymbol={assetSymbol} agreement={agreement} />)
+const BET = {
+  handle: '@maria',
+  direction: 'above',
+  price: 240,
+  deadline: '2027-11-04T12:00:00.000Z',
+} as const
+
+const render = (
+  agreement: ThesisAgreement = OPEN,
+  assetSymbol: string | null = 'NVDA',
+  bet: typeof BET | null = BET,
+) =>
+  renderWithIntl(
+    <ThesisAgree thesisId={ID} assetSymbol={assetSymbol} bet={bet} agreement={agreement} />,
+  )
 
 describe('ThesisAgree (specs/thesis-agree)', () => {
   beforeEach(() => action.answerThesis.mockReset())
 
   it('asks with Yes and No, without the shares before answering (AG-01, Q3)', () => {
     render()
-    const group = screen.getByRole('group', { name: 'Will it happen?' })
+    const group = screen.getByRole('group', { name: 'Do you agree?' })
     expect(group).toContainElement(screen.getByRole('button', { name: 'Yes', pressed: false }))
     expect(group).toContainElement(screen.getByRole('button', { name: 'No', pressed: false }))
     expect(screen.queryByText(/votes/)).toBeNull()
+  })
+
+  it('puts No first and Yes second (PO, 2026-11-09)', () => {
+    render()
+    const buttons = screen.getAllByRole('button', { name: /^(Yes|No)$/ })
+    expect(buttons.map((button) => button.textContent)).toEqual(['No', 'Yes'])
   })
 
   it('shows the answer and the shares at once, then the server’s counts (AG-04)', async () => {
@@ -50,7 +69,7 @@ describe('ThesisAgree (specs/thesis-agree)', () => {
     saved.resolve({ ok: true, data: { yes: 8, no: 2, viewerVote: 'yes', canVote: true } })
     expect(await screen.findByText('80% yes · 20% no · 10 votes')).toBeInTheDocument()
     // Answering Yes invites nothing (AG-12).
-    expect(screen.queryByRole('link', { name: 'Create thesis' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Bet against it' })).toBeNull()
   })
 
   it('changes with the other answer, moving the count (AG-05, Q4)', async () => {
@@ -74,7 +93,7 @@ describe('ThesisAgree (specs/thesis-agree)', () => {
     expect(action.answerThesis).toHaveBeenCalledWith({ thesisId: ID, value: null })
   })
 
-  it('invites to bet the other way after a No, on the same asset, until closed (AG-10, AG-11)', async () => {
+  it('invites to bet the other way after a No, on the same asset, with no way to close it (AG-10, AG-11)', async () => {
     action.answerThesis.mockResolvedValue({
       ok: true,
       data: { yes: 6, no: 4, viewerVote: 'no', canVote: true },
@@ -82,15 +101,24 @@ describe('ThesisAgree (specs/thesis-agree)', () => {
     render()
     await userEvent.click(screen.getByRole('button', { name: 'No' }))
 
-    expect(screen.getByText('Think otherwise? Post your thesis')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Create thesis' })).toHaveAttribute(
+    // Its bet, named (PO, 2026-11-09), and what is in it for the reader.
+    expect(
+      screen.getByText('@maria bets $NVDA goes above $240 by Nov 4, 2027.'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText("Take the other side: if you're right, it counts toward your accuracy."),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Bet against it' })).toHaveAttribute(
       'href',
       `/submit?community=NVDA&type=thesis&counter=${ID}`,
     )
-    await userEvent.click(screen.getByRole('button', { name: 'Close' }))
-    // Back to the No it came from, not to the page (WCAG 2.4.3).
-    expect(screen.getByRole('button', { name: 'No' })).toHaveFocus()
-    expect(screen.queryByRole('link', { name: 'Create thesis' })).toBeNull()
+    // No ✕ (PO, 2026-11-09): answering Yes is what takes it away (AG-12).
+    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull()
+  })
+
+  it('invites again on a later visit while the No stands (AG-10)', () => {
+    render({ yes: 6, no: 4, viewerVote: 'no', canVote: true })
+    expect(screen.getByRole('link', { name: 'Bet against it' })).toBeInTheDocument()
   })
 
   it('invites to an empty thesis when this one has no asset (AG-13)', async () => {
@@ -98,9 +126,11 @@ describe('ThesisAgree (specs/thesis-agree)', () => {
       ok: true,
       data: { yes: 6, no: 4, viewerVote: 'no', canVote: true },
     })
-    render(OPEN, null)
+    render(OPEN, null, null)
     await userEvent.click(screen.getByRole('button', { name: 'No' }))
-    expect(screen.getByRole('link', { name: 'Create thesis' })).toHaveAttribute(
+    // Nothing to name: the question alone.
+    expect(screen.getByText("Think they're wrong?")).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Bet against it' })).toHaveAttribute(
       'href',
       '/submit?type=thesis',
     )
@@ -115,7 +145,7 @@ describe('ThesisAgree (specs/thesis-agree)', () => {
   it('shows a guest the result, and opens the account modal instead of answering (AG-08)', async () => {
     renderWithIntl(
       <AuthGateProvider signedIn={false}>
-        <ThesisAgree thesisId={ID} assetSymbol="NVDA" agreement={OPEN} />
+        <ThesisAgree thesisId={ID} assetSymbol="NVDA" bet={BET} agreement={OPEN} />
       </AuthGateProvider>,
     )
     expect(screen.getByText('67% yes · 33% no · 9 votes')).toBeInTheDocument()
@@ -132,7 +162,7 @@ describe('ThesisAgree (specs/thesis-agree)', () => {
       'Could not save your answer. Try again.',
     )
     expect(screen.getByRole('button', { name: 'No', pressed: false })).toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Create thesis' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'Bet against it' })).toBeNull()
   })
 
   it('ignores a second press while saving (AG-09)', async () => {

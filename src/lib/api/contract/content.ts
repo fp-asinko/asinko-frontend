@@ -167,7 +167,7 @@ export const thesisStateSchema = z.enum([
 ])
 
 /**
- * "Will it happen?" on a thesis (P-043, specs/thesis-agree): how many said yes and no, the viewer's
+ * "Do you agree?" on a thesis (P-043, specs/thesis-agree): how many said yes and no, the viewer's
  * answer, and whether the viewer can answer (not its author, only while open), as `canCancel`.
  * Also what PUT and DELETE /theses/{id}/agreement answer.
  */

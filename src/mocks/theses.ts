@@ -136,7 +136,7 @@ function argumentsOf(thesis: RawThesis): RawThesis['argumentCounts'] {
 
 /**
  * A thesis as the caller sees it: `canCancel` is theirs (specs/thesis-detail TD-12), and so is its
- * "Will it happen?" (P-043, specs/thesis-agree). With today's price and its author's count (P-044,
+ * "Do you agree?" (P-043, specs/thesis-agree). With today's price and its author's count (P-044,
  * P-045, specs/thesis-identity).
  */
 export function asSeenBy(thesis: RawThesis, accessToken: string | null | undefined): RawThesis {

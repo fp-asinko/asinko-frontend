@@ -270,7 +270,7 @@ function toThesisAuthor(creator: RawThesis['creator']): Author | null {
   return { ...author, accuracyRate: null }
 }
 
-/** "Will it happen?" as the UI reads it (specs/thesis-agree § 3): the answers in lowercase. */
+/** "Do you agree?" as the UI reads it (specs/thesis-agree § 3): the answers in lowercase. */
 export function toThesisAgreement(raw: RawThesisAgreement): ThesisAgreement {
   return {
     yes: raw.yes,
