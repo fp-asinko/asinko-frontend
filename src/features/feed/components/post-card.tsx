@@ -30,6 +30,9 @@ import { VoteControl } from './vote-control'
 /** Bodies longer than this get "See more" (6 lines at 15px in the 748px column, roughly). */
 const LONG_BODY = 420
 
+/** The card's image width per layout: shared by the image and its blurred fill (one download). */
+const IMAGE_SIZES = '(min-width: 1024px) 732px, (min-width: 768px) calc(100vw - 300px), 100vw'
+
 function isLong(body: string) {
   return body.length > LONG_BODY || body.split('\n').length > 6
 }
@@ -251,13 +254,25 @@ export function PostCard({
             detail ? 'mt-4' : 'mt-3',
           )}
         >
+          {/* The same image, enlarged and blurred, fills what the whole one leaves empty, as
+              Reddit (specs/image-fit IF-02). Same src and sizes: one download (IF-04). */}
+          <PostImage
+            src={post.media.url}
+            alt=""
+            aria-hidden
+            fill
+            sizes={IMAGE_SIZES}
+            className="scale-110 object-cover blur-2xl brightness-90"
+            unoptimized={post.media.url.endsWith('.svg')}
+          />
           <PostImage
             src={post.media.url}
             // Its description (imageAlt), else the post's title (specs/backend-answer-1013 BA-04).
             alt={post.media.alt ?? post.title}
             fill
-            sizes="(min-width: 1024px) 732px, (min-width: 768px) calc(100vw - 300px), 100vw"
-            className="object-cover"
+            sizes={IMAGE_SIZES}
+            // Whole, never cropped (specs/image-fit IF-01).
+            className="object-contain"
             // The detail's image is its largest paint (seo.md § Performance).
             priority={detail}
             // Local SVG mocks skip the optimizer; backend images get remotePatterns when they exist.

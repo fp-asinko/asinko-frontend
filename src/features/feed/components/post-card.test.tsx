@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { FeaturedMenuContext } from '@/components/organisms/featured'
@@ -93,6 +93,52 @@ describe('PostCard (H-12)', () => {
       'src',
       '/mocks/chart.svg',
     )
+  })
+
+  it('shows the image whole, over a blurred copy of itself (specs/image-fit IF-01, IF-02, IF-03, IF-05)', () => {
+    const { container } = renderWithIntl(
+      <PostCard
+        post={postItem({ media: { type: 'image', url: '/mocks/chart.svg', alt: 'BTC chart' } })}
+      />,
+    )
+    // One image for a screen reader, never cropped.
+    const image = screen.getByRole('img', { name: 'BTC chart' })
+    expect(screen.getAllByRole('img')).toHaveLength(1)
+    expect(image).toHaveClass('object-contain')
+    // The fill is decorative and is the same file: one download.
+    const fill = container.querySelector('img[aria-hidden="true"]')
+    expect(fill).toHaveAttribute('alt', '')
+    expect(fill).toHaveAttribute('src', image.getAttribute('src'))
+  })
+
+  it('gives the optimized image and its fill the same srcset: one download (IF-04)', () => {
+    const { container } = renderWithIntl(
+      <PostCard
+        post={postItem({ media: { type: 'image', url: '/mocks/photo.png', alt: 'A photo' } })}
+      />,
+    )
+    const image = screen.getByRole('img', { name: 'A photo' })
+    const fill = container.querySelector('img[aria-hidden="true"]')
+    expect(image.getAttribute('srcset')).toBeTruthy()
+    expect(fill).toHaveAttribute('srcset', image.getAttribute('srcset'))
+    expect(fill).toHaveAttribute('sizes', image.getAttribute('sizes'))
+  })
+
+  it('fades the image and its fill in, each once loaded (IF-06)', async () => {
+    const { container } = renderWithIntl(
+      <PostCard
+        fadeImage
+        post={postItem({ media: { type: 'image', url: '/mocks/chart.svg', alt: 'BTC chart' } })}
+      />,
+    )
+    const layers = [...container.querySelectorAll('img')]
+    expect(layers).toHaveLength(2)
+    for (const layer of layers) expect(layer).not.toHaveAttribute('data-loaded')
+    for (const layer of layers) fireEvent.load(layer)
+    // next/image calls onLoad after an async decode().
+    await waitFor(() => {
+      for (const layer of layers) expect(layer).toHaveAttribute('data-loaded', 'true')
+    })
   })
 
   it('shows a link post with its real domain, opened safely', () => {
