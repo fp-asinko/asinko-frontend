@@ -1,4 +1,5 @@
 import { routing } from '@/i18n/routing'
+import { safeNext } from '@/lib/auth/next'
 
 // Where Google's way back lands (specs/auth AU-10, AU-11), in the language of the page the person
 // was on: the Route Handlers live outside the locale.
@@ -22,4 +23,13 @@ export function welcomePath(next: string): string {
 /** The login page saying Google did not work, coming back to `next` after it. */
 export function googleErrorPath(next: string): string {
   return `/${localeOf(next)}/login?error=google&next=${encodeURIComponent(next)}`
+}
+
+/**
+ * The page to choose a new password (specs/password-recovery design.md § 3), in the language of
+ * the page where the email was asked for, coming back to it.
+ */
+export function resetPasswordPath(next: unknown): string {
+  const safe = safeNext(next)
+  return `/${localeOf(safe)}/reset-password?next=${encodeURIComponent(safe)}`
 }
