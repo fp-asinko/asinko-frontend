@@ -105,7 +105,8 @@ export function toSuggestions(
     .map((c) => ({
       handle: communityHandle(c),
       slug: c.slug,
-      path: communityPath(kindOf(c.type), c.slug),
+      // An asset's page goes by its symbol, never its slug (/asset/XAU%2FUSD, not /asset/xauusd).
+      path: mentionOf(c).path,
       name: c.name,
       memberCount: c.memberCount,
       description: text(c.description),

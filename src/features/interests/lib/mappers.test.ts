@@ -54,6 +54,20 @@ describe('interests mappers', () => {
     expect(toSuggestions(list).map((s) => s.handle)).toEqual(['$ETH', '#macro'])
   })
 
+  it("links a suggested asset to its symbol's page, not its slug's", () => {
+    const list = [
+      community({
+        slug: 'xauusd',
+        name: '$XAU/USD',
+        type: 'SYSTEM_ASSET',
+        viewerMembership: null,
+        memberCount: 2,
+      }),
+      community({ slug: 'macro', type: 'USER_PUBLIC', viewerMembership: null, memberCount: 1 }),
+    ]
+    expect(toSuggestions(list).map((s) => s.path)).toEqual(['/asset/XAU%2FUSD', '/hub/macro'])
+  })
+
   it('suggests up to 8, with or without a session (specs/sidebar-fill SF-02)', () => {
     const list = Array.from({ length: 12 }, (_, index) =>
       community({
