@@ -21,7 +21,7 @@ Que la columna se vea completa en cualquier pantalla y zoom: sin un hueco blanco
 
 ### Llenar el alto
 
-- [x] **SF-02** **Sugeridos** ocupa el alto que queda y muestra todas las sugerencias que entran **enteras** (hasta 8). Nunca una a medias. Con sesión sigue siendo la última sección.
+- [x] **SF-02** **Sugeridos** ocupa el alto que queda y muestra todas las sugerencias que entran **enteras** (hasta 8). Nunca una a medias. Con sesión sigue siendo la última sección. Va pegada al fondo de la columna: el espacio que sobra queda arriba de ella (PO, 2026-11-10).
 - [x] **SF-03** Con poco alto, **Grupos**, **Personas** y **Activos** muestran menos ítems, en este orden de prioridad, y dejan "more" para el resto. Mínimos: 2 grupos, 1 persona, una fila de 3 activos y 1 sugerencia.
 - [x] **SF-04** Si con esos mínimos tampoco entra, la columna hace scroll (como hoy). Ninguna sección desaparece entera.
 - [x] **SF-05** Funciona igual con zoom del navegador y al cambiar el alto de la ventana, sin recargar. Los escalones los resuelve CSS; Sugeridos usa una molécula cliente mínima para esconder del teclado lo que no entra (cambio al implementar, ver design § 2), medida contra el presupuesto (`seo.md`).

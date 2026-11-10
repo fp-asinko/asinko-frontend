@@ -11,6 +11,7 @@
 - La lista usa el truco de `flex-wrap`: `flex flex-col flex-wrap content-start overflow-hidden` con el alto que le queda y cada ítem al 100 % del ancho. Un ítem que no entra entero pasa a una segunda columna, fuera de la vista: nunca se ve a medias.
 - _Cambio al implementar (2026-10-21):_ lo recortado por el `flex-wrap` seguiría en el teclado, invisible (SF-06), y un escalón por alto no sabe cuánto ocupan las secciones de arriba (depende de cada cuenta). Lo resuelve una molécula cliente mínima, `FitList` (`components/molecules`): con un `ResizeObserver` sobre la lista, pone `hidden` a los ítems que pasaron a la segunda columna, y los vuelve a mostrar cuando entran. Sin JavaScript, el recorte de CSS igual evita los ítems a medias. Es el único JavaScript nuevo, en todas las rutas: se mide con `performance.spec.ts`.
 - La sección que llena tiene un mínimo de su título y un ítem entero (`min-h-24`): por debajo, la columna hace scroll (SF-04).
+- _Cambio del PO (2026-11-10):_ Sugeridos va **abajo de todo** en la columna. La línea y la sección van en un contenedor `flex-1 justify-end` (mínimo 121 px: línea, título y un ítem), así el espacio que sobra queda arriba. La sección ya no crece: tiene su alto mientras la lista entra y se achica hasta el alto que queda cuando no, y ahí `FitList` deja solo los ítems enteros. Lo verifica `e2e/sidebar-fill.spec.ts` con 1280 × 1800.
 
 ## 3. Menos ítems con poco alto (SF-03, SF-04, SF-05)
 

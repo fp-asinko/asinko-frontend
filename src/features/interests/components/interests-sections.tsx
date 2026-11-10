@@ -91,12 +91,16 @@ export function InterestsSections({ interests }: { interests: Interests }) {
       >
         {(tiles, listId) => <AssetTiles id={listId} tiles={tiles} />}
       </SidebarSection>
-      {/* At the bottom of the column, after a short, soft line (as without a session). */}
-      <hr className="mx-1 mb-6 shrink-0 border-border/60" />
-      {/* It takes the height left, whole items only (SF-02). */}
-      <SidebarSection title={t('suggested')} result={interests.suggested} fill className="mb-0">
-        {(suggestions) => <SuggestedCommunities suggestions={suggestions} />}
-      </SidebarSection>
+      {/* At the bottom of the column (PO, 2026-11-10), after a short, soft line (as without a
+          session): the space left goes above it. At least the line, its title and one whole
+          item: below that, the column scrolls (SF-04). */}
+      <div className="flex flex-col md:min-h-30.25 md:flex-1 md:justify-end">
+        <hr className="mx-1 mb-6 shrink-0 border-border/60" />
+        {/* At most the height left, whole items only (SF-02). */}
+        <SidebarSection title={t('suggested')} result={interests.suggested} fill className="mb-0">
+          {(suggestions) => <SuggestedCommunities suggestions={suggestions} />}
+        </SidebarSection>
+      </div>
     </section>
   )
 }

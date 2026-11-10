@@ -40,6 +40,30 @@ test.describe('The left column fills its height', () => {
     ])
   })
 
+  test('suggested sits at the bottom of the column, the space left above it (PO, 2026-11-10)', async ({
+    page,
+  }, testInfo) => {
+    // Taller than everything: room to spare.
+    await page.setViewportSize({ width: 1280, height: 1800 })
+    await page.goto('/en')
+    const suggested = page
+      .getByRole('region', { name: 'Your interests' })
+      .getByRole('region', { name: 'Suggested' })
+    await expect(suggested.getByRole('listitem').first()).toBeVisible()
+    const gap = await column(page).evaluate((el) => {
+      const lists = el.querySelectorAll('ul')
+      const items = [...(lists[lists.length - 1]?.children ?? [])].filter(
+        (li) => !(li as HTMLElement).hidden,
+      )
+      const last = items[items.length - 1]!.getBoundingClientRect()
+      const box = el.getBoundingClientRect()
+      return box.bottom - last.bottom
+    })
+    await page.screenshot({ path: testInfo.outputPath('bottom.png') })
+    // Only the column's own padding under it.
+    expect(gap).toBeLessThan(48)
+  })
+
   test('tall: no scroll, every item whole; low: fewer, still no scroll; lower: it scrolls (SF-02 to SF-05)', async ({
     page,
   }) => {

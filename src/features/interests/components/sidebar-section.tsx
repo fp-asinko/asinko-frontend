@@ -32,7 +32,10 @@ export function SidebarSection<T>({
   emptyIcon?: ReactNode
   /** "more" under its list, while some item is out of sight (specs/sidebar-more). */
   more?: boolean
-  /** Takes the column's height left (specs/sidebar-fill SF-02): its list fills it. */
+  /**
+   * At most the column's height left (specs/sidebar-fill SF-02): its own height while its list fits,
+   * else it shrinks and its list shows only the items that fit whole. Its parent puts it at the bottom.
+   */
   fill?: boolean
   className?: string
   /** The list, with the id "more" controls. */
@@ -48,14 +51,14 @@ export function SidebarSection<T>({
       className={cn(
         // `group/section`: its list shows everything while "more" is open (specs/sidebar-more).
         'group/section mb-4', // At least its title and one whole item: below it, the column scrolls (SF-04).
-        fill && 'md:flex md:min-h-24 md:flex-1 md:flex-col',
+        fill && 'md:flex md:min-h-24 md:flex-col',
         className,
       )}
     >
       <h2 id={headingId} className="sr-only">
         {title}
       </h2>
-      <Collapsible defaultOpen className={cn(fill && 'md:flex md:min-h-0 md:flex-1 md:flex-col')}>
+      <Collapsible defaultOpen className={cn(fill && 'md:flex md:min-h-0 md:flex-col')}>
         <CollapsibleTrigger className="group flex min-h-6 w-full cursor-pointer items-center justify-between rounded-sm px-1 py-1 text-muted-foreground transition-colors duration-150 ease-out outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50">
           <span className="text-[0.625rem] leading-[1.4] font-bold tracking-[0.08em] uppercase">
             {title}
@@ -70,9 +73,9 @@ export function SidebarSection<T>({
         <CollapsibleContent
           className={cn(
             'overflow-hidden transition-[height] duration-200 ease-out data-ending-style:h-0 data-ending-style:duration-150 data-starting-style:h-0',
-            // Filling, its height is the column's left (no measured height to animate to).
+            // Filling, at most the column's height left (no measured height to animate to).
             'h-(--collapsible-panel-height)',
-            fill && 'md:h-auto md:min-h-0 md:flex-1',
+            fill && 'md:h-auto md:min-h-0',
           )}
         >
           <div className={cn('py-1', fill && 'md:h-full')}>
