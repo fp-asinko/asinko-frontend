@@ -31,6 +31,8 @@ export function authFailure(reason: AuthFailure): ActionResult<never> {
       return field('email', 'auth.fields.email.invalid')
     case 'weakPassword':
       return field('password', 'auth.errors.weakPassword')
+    case 'samePassword':
+      return field('password', 'auth.errors.samePassword')
     case 'credentials':
       return { ok: false, error: 'auth.errors.credentials' }
     case 'rateLimited':

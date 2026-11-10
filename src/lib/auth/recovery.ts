@@ -22,10 +22,19 @@ export function recoveryToken(params: URLSearchParams): string | null {
   return parsed.success ? parsed.data : null
 }
 
-/** A token kept in the cookie, checked again: the cookie also comes from the browser. */
-export function keptRecoveryToken(value: string | undefined): string | null {
+/**
+ * The cookie's value once the token was spent but the password was refused (too weak, the same):
+ * the session it gave can try another one without a new email, and only then (design.md § 5).
+ */
+export const RECOVERY_VERIFIED = 'verified'
+
+export type KeptRecovery = { token: string } | { verified: true }
+
+/** What the cookie keeps, checked again: the cookie also comes from the browser. */
+export function keptRecovery(value: string | undefined): KeptRecovery | null {
+  if (value === RECOVERY_VERIFIED) return { verified: true }
   const parsed = tokenHashSchema.safeParse(value)
-  return parsed.success ? parsed.data : null
+  return parsed.success ? { token: parsed.data } : null
 }
 
 /** Where the email's link goes back to (design.md § 4): Supabase adds the token after `next`. */

@@ -368,7 +368,8 @@
       "login": "Inicia sesión en Asinko",
       "signup": "Únete a Asinko",
       "comment": "Únete a Asinko para comentar",
-      "profile": "Elige tu nombre de usuario"
+      "profile": "Elige tu nombre de usuario",
+      "recover": "Recupera tu contraseña"
     },
     "value": "En Asinko, cada predicción tiene un historial público y verificable.",
     "signup": "Crear cuenta",
@@ -1371,11 +1372,31 @@
   "auth": {
     "login": {
       "submit": "Iniciar sesión",
-      "pending": "Iniciando sesión…"
+      "pending": "Iniciando sesión…",
+      "forgot": "¿Olvidaste tu contraseña?"
     },
     "signup": {
       "submit": "Crear cuenta",
       "pending": "Creando tu cuenta…"
+    },
+    "recover": {
+      "intro": "Escribe el correo de tu cuenta y te enviaremos un link para elegir una contraseña nueva.",
+      "submit": "Enviar link",
+      "pending": "Enviando…",
+      "sent": "Si hay una cuenta con {email}, le enviamos un link para elegir una contraseña nueva. Revisa también la carpeta de spam.",
+      "resend": "Enviarlo de nuevo",
+      "resendIn": "Enviarlo de nuevo en {seconds} s",
+      "back": "Volver a iniciar sesión"
+    },
+    "reset": {
+      "title": "Elige una contraseña nueva",
+      "intro": "Seguirás con tu sesión aquí, y la cerraremos en tus otros dispositivos.",
+      "label": "Contraseña nueva",
+      "submit": "Guardar contraseña",
+      "pending": "Guardando…",
+      "expired": "Este link venció o ya se usó. Pide uno nuevo.",
+      "requestNew": "Pedir un link nuevo",
+      "done": "Cambiamos tu contraseña"
     },
     "welcome": {
       "title": "Elige tu nombre de usuario",
@@ -1428,7 +1449,8 @@
       "photoType": "Usa una imagen JPEG, PNG o WebP",
       "photoTooLarge": "Esa imagen es demasiado grande",
       "photoUpload": "Tu perfil está listo, pero la foto no se subió. Prueba de nuevo, o quítala para continuar",
-      "nameSave": "Tu perfil está listo, pero el nombre no se guardó. Prueba de nuevo, o bórralo para continuar"
+      "nameSave": "Tu perfil está listo, pero el nombre no se guardó. Prueba de nuevo, o bórralo para continuar",
+      "samePassword": "Elige una contraseña distinta de la actual"
     },
     "photo": {
       "label": "Foto de perfil (opcional)",

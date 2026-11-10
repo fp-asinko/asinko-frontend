@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
-import { keptRecoveryToken, recoveryRedirect, recoveryToken } from './recovery'
+import { keptRecovery, recoveryRedirect, recoveryToken } from './recovery'
 
 describe('the recovery link (specs/password-recovery design.md § 3)', () => {
   it('takes the token of a recovery link only', () => {
@@ -15,9 +15,10 @@ describe('the recovery link (specs/password-recovery design.md § 3)', () => {
   })
 
   it('checks again the token kept in the cookie, which also comes from the browser', () => {
-    expect(keptRecoveryToken('abc123def456')).toBe('abc123def456')
-    expect(keptRecoveryToken('abc<script>def')).toBeNull()
-    expect(keptRecoveryToken(undefined)).toBeNull()
+    expect(keptRecovery('abc123def456')).toEqual({ token: 'abc123def456' })
+    expect(keptRecovery('verified')).toEqual({ verified: true })
+    expect(keptRecovery('abc<script>def')).toBeNull()
+    expect(keptRecovery(undefined)).toBeNull()
   })
 
   it('goes back to our route with an internal next only (PR-14)', () => {

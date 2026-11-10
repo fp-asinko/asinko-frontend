@@ -368,7 +368,8 @@
       "login": "Log in to Asinko",
       "signup": "Join Asinko",
       "comment": "Join Asinko to comment",
-      "profile": "Choose your username"
+      "profile": "Choose your username",
+      "recover": "Reset your password"
     },
     "value": "Asinko is where calls get a public, verifiable track record.",
     "signup": "Create account",
@@ -1371,11 +1372,31 @@
   "auth": {
     "login": {
       "submit": "Log in",
-      "pending": "Logging in…"
+      "pending": "Logging in…",
+      "forgot": "Forgot your password?"
     },
     "signup": {
       "submit": "Create account",
       "pending": "Creating your account…"
+    },
+    "recover": {
+      "intro": "Enter your account’s email and we’ll send you a link to choose a new password.",
+      "submit": "Send link",
+      "pending": "Sending…",
+      "sent": "If there’s an account with {email}, we sent it a link to choose a new password. Check your spam folder too.",
+      "resend": "Send it again",
+      "resendIn": "Send it again in {seconds} s",
+      "back": "Back to log in"
+    },
+    "reset": {
+      "title": "Choose a new password",
+      "intro": "You’ll stay logged in here, and we’ll log you out on your other devices.",
+      "label": "New password",
+      "submit": "Save password",
+      "pending": "Saving…",
+      "expired": "This link expired or was already used. Ask for a new one.",
+      "requestNew": "Get a new link",
+      "done": "Your password was changed"
     },
     "welcome": {
       "title": "Choose your username",
@@ -1428,7 +1449,8 @@
       "photoType": "Use a JPEG, PNG or WebP image",
       "photoTooLarge": "That image is too large",
       "photoUpload": "Your profile is ready, but the photo didn’t upload. Try again, or remove it to continue",
-      "nameSave": "Your profile is ready, but the name didn’t save. Try again, or clear it to continue"
+      "nameSave": "Your profile is ready, but the name didn’t save. Try again, or clear it to continue",
+      "samePassword": "Choose a password different from your current one"
     },
     "photo": {
       "label": "Profile photo (optional)",
