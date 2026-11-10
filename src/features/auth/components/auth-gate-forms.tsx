@@ -16,6 +16,10 @@ const SignUpForm = dynamic(() => import('./sign-up-form').then((mod) => arriving
   ssr: false,
   loading: () => <FormSkeleton fields={2} />,
 })
+const RecoverForm = dynamic(
+  () => import('./recover-form').then((mod) => arriving(mod.RecoverForm)),
+  { ssr: false, loading: () => <FormSkeleton fields={1} /> },
+)
 const ProfileForm = dynamic(
   () => import('./profile-form').then((mod) => arriving(mod.ProfileForm)),
   {
@@ -43,6 +47,8 @@ export function AuthGateForms({
   const router = useRouter()
   // From the step just done; the layout's (from the session) when back from Google.
   const [suggested, setSuggested] = useState<string | null>(null)
+  // What the log in form had in its email, for the recovery form (password-recovery PR-02).
+  const [email, setEmail] = useState('')
   if (!dialog) return null
 
   function done(result: { needsProfile: boolean; suggestion?: string | null }) {
@@ -68,5 +74,15 @@ export function AuthGateForms({
       />
     )
   }
-  return dialog.view === 'signup' ? <SignUpForm onDone={done} /> : <LogInForm onDone={done} />
+  if (dialog.view === 'recover') return <RecoverForm defaultEmail={email} next={dialog.next} />
+  if (dialog.view === 'signup') return <SignUpForm onDone={done} />
+  return (
+    <LogInForm
+      onDone={done}
+      onForgot={(written) => {
+        setEmail(written)
+        dialog.setView('recover')
+      }}
+    />
+  )
 }

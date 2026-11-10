@@ -38,7 +38,7 @@ En `src/lib/auth/supabase-auth.ts`, con el mismo `call` (que pasa a aceptar el m
 | `/auth/reset` (Route Handler) | Llega desde el mail con `token_hash`, `type=recovery` y `next`. Valida el formato del token (zod) y `next` (`safeNext`), guarda el token en la cookie `asinko-recovery` y redirige a `/{locale}/reset-password?next=…`. Sin token válido, igual redirige: la página muestra el estado de link vencido. |
 | `/[locale]/reset-password`    | La página del formulario (PR-06). Fuera de `(main)` y sin `loading.tsx`, como `/login`. `noindex`. Sin la cookie, muestra directamente el estado de PR-08. No redirige con sesión: alguien con sesión también puede venir del mail.                                                                    |
 
-- **La cookie `asinko-recovery`:** `HttpOnly`, `SameSite=Lax` (llega con la redirección), `Secure` con https, `path=/`, `maxAge` de 1 hora (Q4). Se borra al guardar bien o cuando Supabase dice que el token no sirve.
+- **La cookie `asinko-recovery`:** `HttpOnly`, `SameSite=Lax` (llega con la redirección), `Secure` con https, `path=/`, `maxAge` de 1 hora (Q4). Guarda el token o, una vez gastado, la marca `verified` (§ 5). Se borra al guardar bien o cuando Supabase dice que el token no sirve.
 - **El idioma:** `next` trae el locale de la página donde se pidió el mail (`localeOf`, `src/app/auth/paths.ts`); sin `next`, el idioma por defecto.
 - El proxy no corre en `/auth/` (ya excluido): la página `/reset-password` sí pasa por él, con la CSP y el locale de siempre.
 - `/reset-password` no se traduce (como `/login` y `/welcome`).
@@ -61,17 +61,19 @@ La plantilla "Reset password" de Supabase arma el link con el token hash en vez 
 2. `supabaseAuth.recover(email, redirectTo)`.
 3. Devuelve `{ ok: true }` también cuando Supabase no tiene la cuenta (PR-03, PR-12). Errores: `rateLimited` y `unavailable` (PR-04).
 
-### `resetPassword({ password, next })`
+### `resetPassword({ password })`
 
-1. Valida con `newPasswordSchema` (8 o más, AU-06).
+1. Valida con `newPasswordSchema` (8 o más, AU-06). Una contraseña corta no gasta el link.
 2. Lee `asinko-recovery`. Sin cookie → `{ ok: false, error: 'auth.reset.expired' }`.
-3. `verifyRecovery(tokenHash)`. `expired` → borra la cookie y devuelve `auth.reset.expired` (PR-08).
-4. `updatePassword(accessToken, password)`. `weakPassword` y `samePassword` van al campo (PR-09). El token ya se gastó: la sesión de recuperación se guarda igual (`startSession`) para que reintentar no necesite otro mail; la cookie `asinko-recovery` se borra. Un reintento sin la cookie, pero con sesión, llama directo a `updatePassword` con el access token de la sesión.
-5. `signOutOthers(accessToken)` (PR-18, Q1). Mejor esfuerzo: si falla, se reporta a Sentry (sin el email ni el token) y se sigue.
-6. `startSession(tokens)` (si no se guardó en el paso 4), borra la cookie y `revalidatePath('/', 'layout')`.
-7. Devuelve `{ needsProfile, suggestion }`, como `logIn`: sin perfil va a la bienvenida (PR-10).
+3. Con el token: `verifyRecovery(tokenHash)`. `expired` → borra la cookie y devuelve `auth.reset.expired` (PR-08). Bien: `startSession(tokens)`, y la cookie pasa a valer `verified` (el token ya se gastó).
+4. Con `verified`: usa la sesión actual. Sin sesión → `auth.reset.expired`.
+5. `updatePassword(accessToken, password)`. `weakPassword` y `samePassword` van al campo (PR-09), y la cookie queda en `verified`: el próximo intento usa la sesión, sin otro mail. `expired` → borra la cookie y `auth.reset.expired`.
+6. `signOutOthers(accessToken)` (PR-18, Q1). Mejor esfuerzo: si falla, se reporta a Sentry (sin el email ni el token) y se sigue.
+7. Borra la cookie, `revalidatePath('/', 'layout')` y devuelve `{ needsProfile, suggestion }`, como `logIn`: sin perfil va a la bienvenida (PR-10).
 
-**Por qué el reintento del paso 4 usa la sesión:** sin eso, una contraseña rechazada por débil gastaría el link. Que una sesión pueda cambiar su contraseña con `PUT /user` es lo que Supabase permite de por sí; no abre nada nuevo (la persona ya podía hacerlo con la sesión).
+**Por qué la marca `verified` (2026-11-09, al implementar):** sin un segundo intento, una contraseña rechazada por débil gastaría el link. Pero si el segundo intento aceptara cualquier sesión, cualquiera con sesión podría cambiar su contraseña por este camino sin saber la actual. La marca, que solo deja el paso 3, limita el reintento a la sesión que dio el link. También hace que, si se recarga la página después de un rechazo, siga mostrando el formulario.
+
+`readRecovery`, `markRecoveryVerified`, `clearRecovery` y `requestOrigin` viven en `src/lib/auth/recovery-cookie.ts` (server-only); el formato del token y de la cookie, en `src/lib/auth/recovery.ts`.
 
 ## 6. Formularios
 

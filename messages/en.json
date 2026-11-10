@@ -398,7 +398,9 @@
     "menu": {
       "logOut": "Log out"
     },
-    "profileValue": "It’s how people find you and mention you on Asinko. Add a photo if you like."
+    "profileValue": "It’s how people find you and mention you on Asinko. Add a photo if you like.",
+    "recoverValue": "Enter your account’s email and we’ll send you a link to choose a new password.",
+    "backToLogin": "Back to log in"
   },
   "join": {
     "label": "Join",
@@ -1380,13 +1382,11 @@
       "pending": "Creating your account…"
     },
     "recover": {
-      "intro": "Enter your account’s email and we’ll send you a link to choose a new password.",
       "submit": "Send link",
       "pending": "Sending…",
       "sent": "If there’s an account with {email}, we sent it a link to choose a new password. Check your spam folder too.",
       "resend": "Send it again",
-      "resendIn": "Send it again in {seconds} s",
-      "back": "Back to log in"
+      "resendIn": "Send it again in {seconds} s"
     },
     "reset": {
       "title": "Choose a new password",

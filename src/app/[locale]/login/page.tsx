@@ -26,7 +26,7 @@ export default async function LoginRoute({ params, searchParams }: PageProps<'/[
 
   return (
     <LoginView
-      mode={query.mode === 'signup' ? 'signup' : 'login'}
+      mode={query.mode === 'signup' || query.mode === 'recover' ? query.mode : 'login'}
       next={next}
       googleFailed={query.error === 'google'}
     />

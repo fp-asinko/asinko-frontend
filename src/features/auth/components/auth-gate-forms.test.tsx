@@ -19,6 +19,11 @@ vi.mock('../actions/create-profile.action', () => ({ createProfile: profile.crea
 vi.mock('../actions/set-avatar.action', () => ({ setAvatar: vi.fn() }))
 vi.mock('../actions/suggested-photo.action', () => ({ getSuggestedPhoto: async () => null }))
 vi.mock('../actions/check-username.action', () => ({ checkUsername: async () => 'unknown' }))
+const recovery = vi.hoisted(() => ({ requestRecovery: vi.fn() }))
+vi.mock('../actions/request-recovery.action', () => ({
+  requestRecovery: recovery.requestRecovery,
+}))
+vi.mock('../actions/reset-password.action', () => ({ resetPassword: vi.fn() }))
 
 function OpenLogIn() {
   const { openGate } = useAuthGate()
@@ -75,6 +80,36 @@ describe('the forms in the modal (specs/auth AU-01, AU-02, AU-11)', () => {
     expect(router.refresh).toHaveBeenCalledOnce()
   })
 
+  it('asks for the recovery email in the same modal, with the email written (password-recovery PR-01, PR-02)', async () => {
+    recovery.requestRecovery.mockResolvedValue({ ok: true, data: null })
+    renderWithIntl(
+      <AuthGateProvider signedIn={false} forms={<AuthGateForms />}>
+        <OpenLogIn />
+      </AuthGateProvider>,
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Open' }))
+    await userEvent.type(
+      await screen.findByLabelText('Email', {}, { timeout: 5000 }),
+      'ana@example.com',
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Forgot your password?' }))
+
+    const dialog = await screen.findByRole('dialog', { name: 'Reset your password' })
+    expect(dialog).toHaveAttribute('data-view', 'recover')
+    expect(await screen.findByLabelText('Email', {}, { timeout: 5000 })).toHaveValue(
+      'ana@example.com',
+    )
+    // About the account it has: no other provider, and no switch to sign up.
+    expect(screen.queryByRole('link', { name: /Google/ })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Create an account' })).toBeNull()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Send link' }))
+    expect(recovery.requestRecovery).toHaveBeenCalledWith({ email: 'ana@example.com', next: '/' })
+
+    await userEvent.click(screen.getByRole('button', { name: 'Back to log in' }))
+    expect(await screen.findByRole('dialog', { name: 'Log in to Asinko' })).toBeInTheDocument()
+  })
+
   it('is nothing outside the modal', () => {
     const { container } = renderWithIntl(<AuthGateForms />)
     expect(container).toBeEmptyDOMElement()
@@ -94,6 +129,29 @@ describe('the login page form (AU-03)', () => {
         query: { next: '/es/hub/macro' },
       }),
     )
+  })
+
+  it('switches to the recovery mode with the email written, never in the URL (PR-02)', async () => {
+    renderWithIntl(<LoginPageForm mode="login" next="/es" />)
+    await userEvent.type(
+      await screen.findByLabelText('Email', {}, { timeout: 5000 }),
+      'ana@example.com',
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Forgot your password?' }))
+    expect(router.replace).toHaveBeenCalledWith({
+      pathname: '/login',
+      query: { mode: 'recover', next: '/es' },
+    })
+  })
+
+  it('shows the recovery form in its mode, with the email remembered', async () => {
+    const { rememberEmail } = await import('./recover-email')
+    rememberEmail('ana@example.com')
+    renderWithIntl(<LoginPageForm mode="recover" next="/en" />)
+    expect(await screen.findByLabelText('Email', {}, { timeout: 5000 })).toHaveValue(
+      'ana@example.com',
+    )
+    expect(screen.getByRole('button', { name: 'Send link' })).toBeInTheDocument()
   })
 
   it('shows the sign up form in its mode', async () => {

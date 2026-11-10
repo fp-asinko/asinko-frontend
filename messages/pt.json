@@ -398,7 +398,9 @@
     "menu": {
       "logOut": "Sair"
     },
-    "profileValue": "É como as pessoas encontram e mencionam você no Asinko. Adicione uma foto se quiser."
+    "profileValue": "É como as pessoas encontram e mencionam você no Asinko. Adicione uma foto se quiser.",
+    "recoverValue": "Digite o e-mail da sua conta e enviaremos um link para você escolher uma nova senha.",
+    "backToLogin": "Voltar para entrar"
   },
   "join": {
     "label": "Participar",
@@ -1380,13 +1382,11 @@
       "pending": "Criando sua conta…"
     },
     "recover": {
-      "intro": "Digite o e-mail da sua conta e enviaremos um link para você escolher uma nova senha.",
       "submit": "Enviar link",
       "pending": "Enviando…",
       "sent": "Se houver uma conta com {email}, enviamos um link para escolher uma nova senha. Confira também a pasta de spam.",
       "resend": "Enviar de novo",
-      "resendIn": "Enviar de novo em {seconds} s",
-      "back": "Voltar para entrar"
+      "resendIn": "Enviar de novo em {seconds} s"
     },
     "reset": {
       "title": "Escolha uma nova senha",

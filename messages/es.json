@@ -398,7 +398,9 @@
     "menu": {
       "logOut": "Cerrar sesión"
     },
-    "profileValue": "Es como te encuentran y te mencionan en Asinko. Agrega una foto si quieres."
+    "profileValue": "Es como te encuentran y te mencionan en Asinko. Agrega una foto si quieres.",
+    "recoverValue": "Escribe el correo de tu cuenta y te enviaremos un link para elegir una contraseña nueva.",
+    "backToLogin": "Volver a iniciar sesión"
   },
   "join": {
     "label": "Unirse",
@@ -1380,13 +1382,11 @@
       "pending": "Creando tu cuenta…"
     },
     "recover": {
-      "intro": "Escribe el correo de tu cuenta y te enviaremos un link para elegir una contraseña nueva.",
       "submit": "Enviar link",
       "pending": "Enviando…",
       "sent": "Si hay una cuenta con {email}, le enviamos un link para elegir una contraseña nueva. Revisa también la carpeta de spam.",
       "resend": "Enviarlo de nuevo",
-      "resendIn": "Enviarlo de nuevo en {seconds} s",
-      "back": "Volver a iniciar sesión"
+      "resendIn": "Enviarlo de nuevo en {seconds} s"
     },
     "reset": {
       "title": "Elige una contraseña nueva",

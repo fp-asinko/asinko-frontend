@@ -12,12 +12,15 @@ import { AuthField, FormAlert } from './auth-field'
 
 /**
  * Log in with email and password (specs/auth AU-02, AU-04). Loaded on first use: it brings zod to
- * the browser (seo.md § Zod). `onDone` says whether the account still needs a username.
+ * the browser (seo.md § Zod). `onDone` says whether the account still needs a username. `onForgot`
+ * opens the recovery form with the email already written (specs/password-recovery PR-01, PR-02).
  */
 export function LogInForm({
   onDone,
+  onForgot,
 }: {
   onDone: (result: { needsProfile: boolean; suggestion?: string | null }) => void
+  onForgot?: (email: string) => void
 }) {
   const t = useTranslations('auth')
   const ids = useId()
@@ -49,6 +52,16 @@ export function LogInForm({
         field={form.register('password')}
         error={error('password')}
       />
+      {onForgot && (
+        // Always there, under the password (Q3). A button: it switches the form, it goes nowhere.
+        <button
+          type="button"
+          onClick={() => onForgot(form.getValues('email').trim())}
+          className="-mt-1.5 min-h-6 self-end type-meta font-semibold text-foreground underline underline-offset-2"
+        >
+          {t('login.forgot')}
+        </button>
+      )}
       <Button
         type="submit"
         size="lg"
