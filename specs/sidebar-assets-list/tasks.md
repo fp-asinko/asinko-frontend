@@ -32,6 +32,7 @@
   - Tests: los mismos e2e, en `mobile` y `desktop`.
   - Cubre: SA-10, SA-11, SA-12, SA-13, SA-14.
   - Depende de: T3, T4, T5.
+  - _Feedback del PO (2026-11-12), aplicado sobre T3: grilla de columnas fijas y reloj dentro de la celda del precio con globo "Price as of {date}" (`interests.priceAsOf`, `AssetRow.priceUpdatedAt`); tests en `asset-list.test.tsx` y `mappers.test.ts`._
   - _Estado (2026-11-12): los e2e se reajustaron pero **no se corrieron** (no se hace `build` con el `next dev` del PO en marcha); queda para el CI. Los KB de `performance.spec.ts` no se midieron: sin build no hay medición, `seo.md` no cambia. Los activos del demo no incluyen uno sin precio: ese caso lo cubre `asset-list.test.tsx`._
 - [x] **T7 — Documentación (S).**
   - `docs/references/api/E14-primitivas-financieras.md` suma `logoUrl` al objeto `Asset` (tras `pnpm api:smoke`).

@@ -22,6 +22,7 @@ export function toAssetRow(asset: RawAsset, communitySlug: string, favorite = fa
     changePct: asset.priceChangePct,
     price: asset.price,
     stale: asset.priceStale,
+    priceUpdatedAt: asset.priceUpdatedAt,
     logoUrl: allowedImageUrl(asset.logoUrl ?? null),
     assetClass: asset.assetClass,
     communitySlug,

@@ -11,6 +11,8 @@ export type AssetRow = {
   changePct: number | null
   price: number | null
   stale: boolean
+  /** ISO date of the last price (null if none): the stale hint says since when. */
+  priceUpdatedAt: string | null
   /** The asset's logo (an allowed image URL), or null: the row shows its initials (SA-03). */
   logoUrl: string | null
   /** Decides the price's currency and decimals (specs/sidebar-assets-list Q1). */

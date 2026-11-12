@@ -17,6 +17,7 @@ const btc: AssetRow = {
   changePct: 2.14,
   price: 83584.01,
   stale: false,
+  priceUpdatedAt: '2026-10-13T12:00:00.000Z',
   logoUrl: null,
   assetClass: 'CRYPTO',
   communitySlug: 'BTC',
@@ -31,6 +32,7 @@ const wti: AssetRow = {
   name: 'WTI Crude Oil',
   changePct: null,
   price: null,
+  priceUpdatedAt: null,
   assetClass: 'COMMODITY',
   communitySlug: 'wti',
   path: '/asset/WTI',
@@ -139,11 +141,54 @@ describe('AssetList (specs/sidebar-assets-list)', () => {
     expect(screen.queryByText(/%/)).not.toBeInTheDocument()
   })
 
-  it('marks a stale price with a clock and its text, also in the link name (SA-08)', () => {
-    renderWithIntl(<AssetList assets={[{ ...btc, stale: true }]} />)
-    expect(screen.getByRole('link')).toHaveAccessibleName(
-      'Bitcoin BTC Outdated price $83.6K up 2.14% 24h',
-    )
+  describe('stale price (SA-08, PO feedback 2026-11-12)', () => {
+    const stale = { ...btc, stale: true }
+
+    it('says since when in the link name', () => {
+      renderWithIntl(<AssetList assets={[stale]} />)
+      expect(screen.getByRole('link')).toHaveAccessibleName(
+        'Bitcoin BTC Price as of Oct 13 $83.6K up 2.14% 24h',
+      )
+    })
+
+    it('falls back to the plain warning without a date', () => {
+      renderWithIntl(<AssetList assets={[{ ...stale, priceUpdatedAt: null }]} />)
+      expect(screen.getByRole('link')).toHaveAccessibleName(/Outdated price \$83\.6K/)
+    })
+
+    it('puts the clock inside the price cell, with the price muted', () => {
+      renderWithIntl(<AssetList assets={[stale, { ...btc, symbol: 'ETH', name: 'Ethereum' }]} />)
+      const [stalePrice, freshPrice] = screen.getAllByText('$83.6K')
+      expect(stalePrice!.parentElement!.querySelector('svg')).not.toBeNull()
+      expect(stalePrice).toHaveClass('text-muted-foreground')
+      expect(freshPrice!.parentElement!.querySelector('svg')).toBeNull()
+      expect(freshPrice).not.toHaveClass('text-muted-foreground')
+    })
+
+    it('explains the clock in a bubble, hidden from screen readers', () => {
+      renderWithIntl(<AssetList assets={[stale]} />)
+      const bubble = screen.getByRole('link').querySelector('[data-hint]')
+      expect(bubble).toHaveTextContent('Price as of Oct 13')
+      expect(bubble).toHaveAttribute('aria-hidden', 'true')
+    })
+
+    it('has no bubble nor clock on a fresh price', () => {
+      renderWithIntl(<AssetList assets={[btc]} />)
+      expect(screen.getByRole('link').querySelector('[data-hint]')).toBeNull()
+      expect(screen.getByRole('link').querySelector('svg:not([class*=lucide-arrow])')).toBeNull()
+    })
+  })
+
+  it('lays every row on the same fixed columns: logo, symbol, price, change (PO feedback)', () => {
+    renderWithIntl(<AssetList assets={[btc, { ...wti, stale: true }]} />)
+    const [first, second] = screen.getAllByRole('link')
+    for (const link of [first!, second!]) {
+      expect(link).toHaveClass('grid', 'grid-cols-[1.5rem_minmax(0,1fr)_auto_3.25rem]', 'gap-1.5')
+    }
+    expect(first!.className).toBe(second!.className)
+    // The dash sits in the same price column and carries no clock.
+    expect(screen.getByText('—').parentElement).toHaveClass('text-right')
+    expect(screen.getByText('—').parentElement!.querySelector('svg')).toBeNull()
   })
 
   it('keeps the favorite star beside the row, filled on a favorite (SA-09)', () => {

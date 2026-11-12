@@ -105,6 +105,7 @@
     "mod": "MOD",
     "stale": "Preço desatualizado",
     "noPrice": "No price yet",
+    "priceAsOf": "Price as of {date}",
     "accuracy": "{value} de acertos",
     "members": "{count, plural, one {# membro} other {# membros}}",
     "error": "Não foi possível carregar esta seção.",

@@ -105,6 +105,7 @@
     "mod": "MOD",
     "stale": "Outdated price",
     "noPrice": "No price yet",
+    "priceAsOf": "Price as of {date}",
     "accuracy": "{value} accuracy",
     "members": "{count, plural, one {# member} other {# members}}",
     "error": "Could not load this section.",

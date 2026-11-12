@@ -40,6 +40,12 @@ describe('interests mappers', () => {
       expect(toAssetRow(asset({ logoUrl }), 'btc').logoUrl).toBeNull()
     })
 
+    it('carries when the price was last updated, for the stale hint', () => {
+      const priceUpdatedAt = '2026-10-13T12:00:00.000Z'
+      expect(toAssetRow(asset({ priceUpdatedAt }), 'btc').priceUpdatedAt).toBe(priceUpdatedAt)
+      expect(toAssetRow(asset({ priceUpdatedAt: null }), 'btc').priceUpdatedAt).toBeNull()
+    })
+
     it('carries the asset class for the price format', () => {
       expect(toAssetRow(asset({ assetClass: 'FOREX' }), 'eurusd').assetClass).toBe('FOREX')
     })

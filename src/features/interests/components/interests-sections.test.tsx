@@ -22,6 +22,7 @@ const interests: Interests = {
         changePct: 2.4,
         price: 64000,
         stale: false,
+        priceUpdatedAt: null,
         logoUrl: null,
         assetClass: 'CRYPTO',
         communitySlug: 'BTC',
@@ -35,6 +36,7 @@ const interests: Interests = {
         changePct: -1.2,
         price: 30,
         stale: true,
+        priceUpdatedAt: null,
         logoUrl: null,
         assetClass: 'CRYPTO',
         communitySlug: 'avax',
@@ -133,7 +135,8 @@ describe('InterestsSections', () => {
   it('announces the change direction, stale prices and accuracy', () => {
     renderWithIntl(<InterestsSections interests={interests} />)
 
-    expect(screen.getByText('Outdated price')).toBeInTheDocument()
+    // Once for screen readers, once in the sighted hint bubble.
+    expect(screen.getAllByText('Outdated price')).toHaveLength(2)
     expect(screen.getByText('74% accuracy')).toBeInTheDocument()
     expect(screen.getByText('MOD')).toBeInTheDocument()
     expect(screen.getByText('1,200 members')).toBeInTheDocument()

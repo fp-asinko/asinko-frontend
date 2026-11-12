@@ -42,15 +42,15 @@ Verificado en el código (2026-11-12):
   <FavoriteOrder itemClassName="group/row flex items-center gap-0.5" rows=… >
     <li>
       <CommunityLink href={path}
-        class="group flex min-h-8 min-w-0 flex-1 tap items-center gap-2 rounded-md px-1 py-1 outline-none
+        class="group/hint group grid min-h-8 min-w-0 flex-1 grid-cols-[1.5rem_minmax(0,1fr)_auto_3.25rem] tap items-center gap-1.5 rounded-md px-1 py-1 outline-none
                transition-colors duration-150 ease-out hover:bg-surface aria-[current=page]:bg-muted
                focus-visible:ring-3 focus-visible:ring-ring/50
                hover:[&_.text-bullish]:text-foreground hover:[&_.text-bearish]:text-foreground
                aria-[current=page]:[&_.text-bullish]:text-foreground aria-[current=page]:[&_.text-bearish]:text-foreground">
         <UserAvatar … />
         <span class="sr-only">{name}</span>{' '}
-        <span class="min-w-0 flex-1 truncate type-small font-bold">{symbol}</span>{' '}
-        precio · cambio (§ 3)
+        <span class="min-w-0 truncate type-small font-bold">{symbol}</span>{' '}
+        celda del precio (con el reloj si está viejo) · celda del cambio (§ 3)
       </CommunityLink>
       <FavoriteStar slug={communitySlug} handle="$BTC" initial={favorite} />
     </li>
@@ -63,18 +63,18 @@ Verificado en el código (2026-11-12):
 
 ## 3. Precio, cambio y estados de la fila
 
-Columnas a la derecha del símbolo: precio (`type-meta`, `text-muted-foreground`, `tabular-nums`, `text-right`) y cambio (`Delta` con `type-meta`, ancho mínimo fijo `min-w-14`, alineado a la derecha). Los anchos fijos hacen que las columnas queden parejas entre filas; el símbolo (`flex-1 truncate`) cede el espacio.
+**Columnas fijas (feedback del PO, 2026-11-12):** cada fila es una grilla `grid-cols-[1.5rem_minmax(0,1fr)_auto_3.25rem]` con `gap-1.5`: logo 24 px, símbolo (toma lo que sobra, se trunca solo si no hay otra), precio (ancho de su contenido, alineado a la derecha) y cambio (52 px fijos, alineado a la derecha). El presupuesto en una columna de ~194 px útiles es logo 24 + 3 espacios de 6 + cambio 52 = 94, quedan ~100 px para símbolo y precio: `EURUSD` (~50) y un precio de 6 caracteres (~40) entran. Con un precio desactualizado y muy largo, un símbolo largo (`XAU/USD`) puede truncarse; es el último recurso y nunca hay scroll horizontal. _No se pudo medir en un build (sin `next build` con el `next dev` del PO en marcha)._ El reloj no tiene columna propia: va **dentro de la celda del precio** (ver tabla). Columnas a la derecha del símbolo: precio (`type-meta`, `text-muted-foreground`, `tabular-nums`, `text-right`) y cambio (`Delta` con `type-meta`, ancho mínimo fijo `min-w-14`, alineado a la derecha). Los anchos fijos hacen que las columnas queden parejas entre filas; el símbolo (`flex-1 truncate`) cede el espacio.
 
-| Caso                         | Precio                                | Cambio  | Reloj                         | Nombre accesible del link (ejemplo)              |
-| ---------------------------- | ------------------------------------- | ------- | ----------------------------- | ------------------------------------------------ |
-| Normal                       | formateado (Q1)                       | `Delta` | no                            | `Bitcoin BTC $83.6K up 2.14% 24h`                |
-| Desactualizado (Q4)          | formateado                            | `Delta` | sí, a la izquierda del precio | `Bitcoin BTC Outdated price $83.6K up 2.14% 24h` |
-| Sin precio (Q3)              | "—" (`aria-hidden`) + texto `sr-only` | no      | solo si `stale`               | `WTI Crude Oil WTI No price yet`                 |
-| Cambio nulo, precio presente | formateado                            | no      | según `stale`                 | `… $356.04`                                      |
+| Caso                         | Precio                                | Cambio  | Reloj                                                                               | Nombre accesible del link (ejemplo)                  |
+| ---------------------------- | ------------------------------------- | ------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| Normal                       | formateado (Q1)                       | `Delta` | no                                                                                  | `Bitcoin BTC $83.6K up 2.14% 24h`                    |
+| Desactualizado (Q4)          | formateado, en gris                   | `Delta` | sí, dentro de la celda del precio, pegado a los dígitos; globo "Price as of Oct 13" | `Bitcoin BTC Price as of Oct 13 $83.6K up 2.14% 24h` |
+| Sin precio (Q3)              | "—" (`aria-hidden`) + texto `sr-only` | no      | solo si `stale`                                                                     | `WTI Crude Oil WTI No price yet`                     |
+| Cambio nulo, precio presente | formateado                            | no      | según `stale`                                                                       | `… $356.04`                                          |
 
 - **Cambio 0:** `Delta` ya lo muestra como `−` y "unchanged"; no se toca.
 - **Período (Q8):** el `24h` (`interests.period`, clave existente) va en un `<span class="sr-only">` después del `Delta`, solo si hay cambio.
-- **Reloj:** `ClockAlertIcon` `size-3` en `text-muted-foreground`, con `sr-only` `interests.stale` ("Outdated price"), como hoy.
+- **Reloj:** `ClockAlertIcon` `size-3` en `text-muted-foreground`, dentro de la celda del precio. Su texto (`sr-only`) y el globo (`HintBubble`, `align="end"`, el link es `group/hint`) dicen `interests.priceAsOf` ("Price as of {date}", fecha de `priceUpdatedAt` con `format.dateTime({ month: 'short', day: 'numeric' })`); si no hay fecha, `interests.stale`. `AssetRow` suma `priceUpdatedAt`. `es` y `pt` llevan el texto en inglés con `TODO(i18n)` (como `noPrice`). El precio normal va en `text-foreground`; el desactualizado, en gris.
 - **Formato de precio, con `useFormatter().number` (nunca `toLocaleString`)** — Q1 recomendada:
 
   | Clase del activo               | Estilo                                                                                              |
@@ -133,11 +133,12 @@ group-has-data-[more=open]/section:[&>li]:flex!   // "more" abierto: todas
 
 Claves de `interests` (`messages/{en,es,pt}.json`):
 
-| Clave                 | en                        | es / pt                                                                                        |
-| --------------------- | ------------------------- | ---------------------------------------------------------------------------------------------- |
-| `period`              | `24h` (existe)            | Existe (`24 h` / `24h`). Pasa de rótulo visible a texto `sr-only`.                             |
-| `stale`               | `Outdated price` (existe) | Existe en es y pt.                                                                             |
-| `noPrice` **(nueva)** | `No price yet`            | Sin copy aprobado: en es y pt se usa el texto en inglés con `TODO(i18n)` (`i18n.md`, regla 2). |
+| Clave                   | en                        | es / pt                                                                                        |
+| ----------------------- | ------------------------- | ---------------------------------------------------------------------------------------------- |
+| `period`                | `24h` (existe)            | Existe (`24 h` / `24h`). Pasa de rótulo visible a texto `sr-only`.                             |
+| `stale`                 | `Outdated price` (existe) | Existe en es y pt. Queda como texto cuando no hay fecha.                                       |
+| `priceAsOf` **(nueva)** | `Price as of {date}`      | Sin copy aprobado: texto en inglés en es y pt, con `TODO(i18n)`.                               |
+| `noPrice` **(nueva)**   | `No price yet`            | Sin copy aprobado: en es y pt se usa el texto en inglés con `TODO(i18n)` (`i18n.md`, regla 2). |
 
 - El "—" visible no es texto traducible (símbolo tipográfico, `aria-hidden`).
 - Los números salen de `useFormatter`; el porcentaje, de `Delta` (ya lo hace).
