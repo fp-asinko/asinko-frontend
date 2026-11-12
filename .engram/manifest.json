@@ -8,6 +8,22 @@
       "sessions": 1,
       "memories": 5,
       "prompts": 0
+    },
+    {
+      "id": "ce0cfb53",
+      "created_by": "Windows 10",
+      "created_at": "2026-11-12T16:58:53.9006466Z",
+      "sessions": 1,
+      "memories": 4,
+      "prompts": 0
+    },
+    {
+      "id": "a6883f78",
+      "created_by": "Windows 10",
+      "created_at": "2026-11-12T16:59:02.5227527Z",
+      "sessions": 1,
+      "memories": 1,
+      "prompts": 0
     }
   ]
 }
