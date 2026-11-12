@@ -14,17 +14,17 @@
   - Tests: `format-asset-price.test.ts` con acción, cripto compacta, bajo 1, índice, par de monedas, y `es` y `pt` (separadores).
   - Cubre: SA-06.
   - Depende de: T1 (el tipo de `assetClass`).
-- [ ] **T3 — `AssetList` (M).** `components/asset-list.tsx` reemplaza a `asset-tiles.tsx` (design § 2, 3, 4, 6).
+- [x] **T3 — `AssetList` (M).** `components/asset-list.tsx` reemplaza a `asset-tiles.tsx` (design § 2, 3, 4, 6).
   - Fila con `UserAvatar`, símbolo, precio, `Delta`, reloj, "—" sin precio, `FavoriteStar` al lado, escalones 3 / 5 / 8 y "more".
   - Se borra `asset-tiles.tsx` y su test; `interests-sections.tsx` importa `AssetList`.
   - Tests: `asset-list.test.tsx` (SA-01, 02, 04, 05, 07, 08, 09, 10: el nombre accesible, `aria-current`, flecha y texto, fila abierta sin verde ni rojo, favoritos primero, las clases de los escalones, el sin-precio).
   - Cubre: SA-01, SA-02, SA-04, SA-05, SA-07, SA-08, SA-09, SA-10 (clases).
   - Depende de: T1, T2.
-- [ ] **T4 — Textos (S).** `interests.noPrice` en `en`, `es` y `pt` (`es` y `pt` con el texto en inglés y `TODO(i18n)`, a menos que el PO apruebe copy); `period` pasa a uso solo `sr-only`.
+- [x] **T4 — Textos (S).** `interests.noPrice` en `en`, `es` y `pt` (`es` y `pt` con el texto en inglés y `TODO(i18n)`, a menos que el PO apruebe copy); `period` pasa a uso solo `sr-only`.
   - Tests: el test de claves entre idiomas; el de `asset-list` verifica el texto.
   - Cubre: SA-07, SA-13.
   - Depende de: —.
-- [ ] **T5 — Esqueleto (S).** El bloque de activos pasa a 5 filas de `min-h-8` (design § 5); se quita el rótulo y la grilla.
+- [x] **T5 — Esqueleto (S).** El bloque de activos pasa a 5 filas de `min-h-8` (design § 5); se quita el rótulo y la grilla.
   - Tests: `interests-skeleton.test.tsx` (5 filas, sin grilla, `aria-hidden`).
   - Cubre: SA-11.
   - Depende de: —.

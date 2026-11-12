@@ -3,7 +3,7 @@ import { PlusCircleIcon } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import type { Interests } from '../interests.types'
-import { AssetTiles } from './asset-tiles'
+import { AssetList } from './asset-list'
 import { GroupList } from './group-list'
 import { PeopleList } from './people-list'
 import { SidebarSection } from './sidebar-section'
@@ -89,7 +89,7 @@ export function InterestsSections({ interests }: { interests: Interests }) {
         emptyIcon={<CoinsIcon />}
         more
       >
-        {(tiles, listId) => <AssetTiles id={listId} tiles={tiles} />}
+        {(assets, listId) => <AssetList id={listId} assets={assets} />}
       </SidebarSection>
       {/* At the bottom of the column (PO, 2026-11-10), after a short, soft line (as without a
           session): the space left goes above it. At least the line, its title and one whole

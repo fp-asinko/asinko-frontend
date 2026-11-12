@@ -16,9 +16,14 @@ describe('InterestsSkeleton (FN-08)', () => {
     expect(sections).toEqual(['groups', 'people', 'assets', 'suggested'])
   })
 
-  it('draws the assets as a grid of six tiles, as the real ones', () => {
+  it('draws the assets as five rows of the real height, with no grid (SA-11)', () => {
     render(<InterestsSkeleton />)
     const assets = screen.getByTestId('interests-skeleton').querySelector('[data-section=assets]')
-    expect(assets?.querySelector('.grid')?.children).toHaveLength(6)
+    expect(assets?.querySelector('.grid')).toBeNull()
+    const rows = assets?.querySelectorAll('.min-h-8') ?? []
+    expect(rows).toHaveLength(5)
+    // A round logo, the symbol, the price and the change, as the real row.
+    expect(rows[0]?.children).toHaveLength(4)
+    expect(rows[0]?.firstElementChild).toHaveClass('size-6', 'rounded-full')
   })
 })

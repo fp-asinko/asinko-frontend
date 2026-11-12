@@ -26,7 +26,7 @@ function CommunityRow({ name = 'w-24', line = 'w-32' }: { name?: string; line?: 
 
 /**
  * The left column while its data loads (specs/feed-navigation FN-08), with the shape of the
- * signed-in column (specs/sidebar-fill): groups and "Create group", people, assets as tiles, and
+ * signed-in column (specs/sidebar-fill): groups and "Create group", people, assets as rows, and
  * suggested at the bottom. The page, the bar and a language switch never wait for the column.
  * Decorative: the feed's own status announces the loading.
  */
@@ -59,13 +59,16 @@ export function InterestsSkeleton() {
 
       <div data-section="assets" className="mb-4">
         <Head />
-        <div className="py-1">
-          <Skeleton className="mb-1.5 ml-auto h-2 w-5" />
-          <div className="grid grid-cols-3 gap-1.25">
-            {[0, 1, 2, 3, 4, 5].map((tile) => (
-              <Skeleton key={tile} className="h-19.5 rounded-md" />
-            ))}
-          </div>
+        {/* The real row's geometry (32px, gap-0.5), so the data lands with no layout shift. */}
+        <div className="flex flex-col gap-0.5 py-1">
+          {[0, 1, 2, 3, 4].map((row) => (
+            <div key={row} className="flex min-h-8 items-center gap-2 px-1 py-1">
+              <Skeleton className="size-6 shrink-0 rounded-full" />
+              <Skeleton className="h-3.5 w-12" />
+              <Skeleton className="ml-auto h-3 w-12" />
+              <Skeleton className="h-3 w-10" />
+            </div>
+          ))}
         </div>
       </div>
 

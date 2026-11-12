@@ -104,6 +104,7 @@
     "less": "ver menos",
     "mod": "MOD",
     "stale": "Precio desactualizado",
+    "noPrice": "No price yet",
     "accuracy": "{value} de aciertos",
     "members": "{count, plural, one {# miembro} other {# miembros}}",
     "error": "No se pudo cargar esta sección.",
