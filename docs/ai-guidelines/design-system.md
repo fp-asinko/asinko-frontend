@@ -102,7 +102,7 @@ Definido en `specs/home-motion`. Los valores salen del prototipo y el criterio, 
   - Solo `transform` y `opacity`; la altura se anima únicamente en los desplegables. Nada desde `scale(0)`.
   - Abrir es más lento que cerrar (200 / 150 ms): lo que la persona pidió ver se muestra con calma; la respuesta del sistema es inmediata.
   - Lo que solo se mueve con hover usa la variante `hover:` (Tailwind 4 la limita a dispositivos con hover).
-  - Un estado con fondo nuevo (hover, activo) respeta el contraste: el verde de las variaciones va sobre blanco (por eso un mosaico de activo no cambia de fondo).
+  - Un estado con fondo nuevo (hover, activo) respeta el contraste: el verde de las variaciones va sobre blanco (por eso, en la fila de un activo, la variación toma el color del texto al pasar el mouse o estando abierta, `specs/sidebar-assets-list`).
 - **Reducir movimiento**: una regla global en `globals.css` termina al instante toda animación y transición con `prefers-reduced-motion: reduce`, incluidas las de terceros.
 - **Desplegables**: `Collapsible` de shadcn (alto animado en todos los navegadores; el `<details>` nativo solo se anima en Chrome y Edge).
 

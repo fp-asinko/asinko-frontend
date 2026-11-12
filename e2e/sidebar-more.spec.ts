@@ -30,7 +30,7 @@ test.describe('"more" in the left column', () => {
     await expect(less).toHaveAttribute('aria-expanded', 'true')
     await expect(less).toBeFocused()
     await expect.poll(() => visibleItems(page, 'Assets')).toBeGreaterThan(fitting)
-    // What shows can be reached: the last tile takes the focus by Tab.
+    // What shows can be reached: the last row takes the focus by Tab.
     const last = assets.locator('ul > li').last().getByRole('link')
     await expect(last).toBeVisible()
     await expectNoA11yViolations(page)

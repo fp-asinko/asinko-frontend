@@ -34,7 +34,7 @@ Que el Home responda a lo que hace la persona: cada acción tiene un feedback in
 ### Columna "Tus intereses"
 
 - [x] **S-01** **Secciones**: plegar y desplegar anima la altura (además del chevron que ya rota). En navegadores que no lo soportan, se pliega sin animación (mejora progresiva).
-- [x] **S-02** **Mosaicos de activos**: al pasar el mouse o enfocar, el mosaico se eleva levemente y su borde inferior gana intensidad; al presionar, se hunde.
+- [x] **S-02** **Mosaicos de activos**: al pasar el mouse o enfocar, el mosaico se eleva levemente y su borde inferior gana intensidad; al presionar, se hunde. _Nota (`specs/sidebar-assets-list`, 2026-11-12): los mosaicos desaparecen; la fila de activo usa `tap` y su logo crece un poco al pasar el mouse, como Personas._
 - [x] **S-03** **Personas, grupos y sugeridas**: filas con hover de fondo y feedback al presionar; el avatar crece levemente al hacer hover.
 - [x] **S-04** **Comunidad activa**: cuando el feed está filtrado por una comunidad (`?community=`), su mosaico o su grupo en la columna se marca como seleccionado (`aria-current`) y el cambio se anima.
 - [x] **S-05** **Botones de la columna** ("more", "Create group", "+ Join"): hover y feedback al presionar.

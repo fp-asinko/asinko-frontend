@@ -28,11 +28,12 @@
   - Tests: `interests-skeleton.test.tsx` (5 filas, sin grilla, `aria-hidden`).
   - Cubre: SA-11.
   - Depende de: —.
-- [ ] **T6 — E2E y alturas (M).** Se reajustan `e2e/sidebar-fill.spec.ts` (alturas de 620 y 420 con el mínimo nuevo, activos en filas, axe en claro y oscuro con los tres casos) y `e2e/sidebar-more.spec.ts` (palabra "tile", última fila con Tab); `e2e/favorites.spec.ts` (lugar de la estrella). Un caso mobile a 360 px sin scroll horizontal. Medición de `e2e/performance.spec.ts` antes y después.
+- [x] **T6 — E2E y alturas (M).** Se reajustan `e2e/sidebar-fill.spec.ts` (alturas de 620 y 420 con el mínimo nuevo, activos en filas, axe en claro y oscuro con los tres casos) y `e2e/sidebar-more.spec.ts` (palabra "tile", última fila con Tab); `e2e/favorites.spec.ts` (lugar de la estrella). Un caso mobile a 360 px sin scroll horizontal. Medición de `e2e/performance.spec.ts` antes y después.
   - Tests: los mismos e2e, en `mobile` y `desktop`.
   - Cubre: SA-10, SA-11, SA-12, SA-13, SA-14.
   - Depende de: T3, T4, T5.
-- [ ] **T7 — Documentación (S).**
+  - _Estado (2026-11-12): los e2e se reajustaron pero **no se corrieron** (no se hace `build` con el `next dev` del PO en marcha); queda para el CI. Los KB de `performance.spec.ts` no se midieron: sin build no hay medición, `seo.md` no cambia. Los activos del demo no incluyen uno sin precio: ese caso lo cubre `asset-list.test.tsx`._
+- [x] **T7 — Documentación (S).**
   - `docs/references/api/E14-primitivas-financieras.md` suma `logoUrl` al objeto `Asset` (tras `pnpm api:smoke`).
   - Notas en `specs/sidebar-fill` (SF-03), `specs/favorites` (FV-02) y `specs/home-motion` (S-02); `design-system.md` ajusta la frase del "mosaico de activo" en Movimiento; `seo.md` anota los KB si cambiaron.
   - Tests: ninguno (documentación); `pnpm format:check`.

@@ -86,6 +86,27 @@ test.describe('The left column fills its height', () => {
     ).toHaveCount(4)
   })
 
+  test('assets are one row of 32px each, 3 / 5 / 8 by the column height (SA-01, SA-10)', async ({
+    page,
+  }) => {
+    const rows = page.locator('#left-column').getByRole('region', { name: 'Assets' }).locator('li')
+
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await page.goto('/en')
+    await expect(rows.first()).toBeVisible()
+    await expect.poll(() => rows.filter({ visible: true }).count()).toBe(3)
+
+    await page.setViewportSize({ width: 1280, height: 1100 })
+    await expect.poll(() => rows.filter({ visible: true }).count()).toBe(5)
+
+    // Whole rows, 32px at least (WCAG 2.5.8), and no scroll.
+    const heights = await rows
+      .filter({ visible: true })
+      .evaluateAll((items) => items.map((li) => li.getBoundingClientRect().height))
+    for (const height of heights) expect(height).toBeGreaterThanOrEqual(32)
+    expect(await layout(page)).toMatchObject({ scrolls: false, cut: false })
+  })
+
   test('what is shown fits whole in its list; the rest is out of the keyboard (SF-06)', async ({
     page,
   }) => {
@@ -143,6 +164,17 @@ test.describe('The left column fills its height', () => {
         )
     }
     expect(hidden).toBe(0)
+    // Assets: a row of 32px at least, and nothing wider than the 360px screen (SA-12).
+    const heights = await panel
+      .getByRole('region', { name: 'Assets' })
+      .locator('li')
+      .evaluateAll((items) => items.map((li) => li.getBoundingClientRect().height))
+    for (const height of heights) expect(height).toBeGreaterThanOrEqual(32)
+    expect(
+      await phone.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      ),
+    ).toBeLessThanOrEqual(0)
     await phone.close()
   })
 

@@ -13,6 +13,7 @@
   "exchange": "string | null", // MIC (ISO 10383, ej. "XNAS", "XNYS"), null para crypto
   "name": "string",
   "assetClass": "EQUITY | CRYPTO | ETF | FOREX | INDEX | COMMODITY | OTHER",
+  "logoUrl": "string | null",       // URL pública de Storage: cripto con su logo real, el resto un monograma con sus iniciales (backend 2026-10-13)
   "price": "number | null",         // último precio conocido
   "priceChangePct": "number | null", // variación del día
   "priceUpdatedAt": "ISO 8601 | null",
