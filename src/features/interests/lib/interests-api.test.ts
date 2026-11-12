@@ -36,7 +36,7 @@ describe('getInterests', () => {
 
     expect(interests.signedIn).toBe(true)
     expect(interests.assets).toMatchObject({ ok: true })
-    expect(interests.assets.ok && interests.assets.data.map((tile) => tile.symbol)).toEqual(
+    expect(interests.assets.ok && interests.assets.data.map((row) => row.symbol)).toEqual(
       expect.arrayContaining(['BTC', 'ETH', 'SOL']),
     )
     expect(interests.people.ok && interests.people.data.map((p) => p.username)).toEqual(
@@ -47,6 +47,17 @@ describe('getInterests', () => {
       isModerator: true,
     })
     expect(interests.suggested.ok && interests.suggested.data.length).toBeLessThanOrEqual(3)
+  })
+
+  it('carries the logo and class of each asset, and keeps one without a price (SA-03, SA-07)', async () => {
+    const interests = await getInterests(viewer)
+    const rows = interests.assets.ok ? interests.assets.data : []
+
+    expect(rows.find((row) => row.symbol === 'BTC')).toMatchObject({
+      logoUrl: null,
+      assetClass: 'CRYPTO',
+    })
+    expect(rows.length).toBeGreaterThan(0)
   })
 
   it('fails only the people section when following is down (H-19)', async () => {
@@ -202,7 +213,7 @@ describe('getInterests', () => {
     it('shows the sample assets when the account follows none', async () => {
       withoutAssetMemberships()
       const interests = await getInterests(viewer, { sampleAssets: ['BTC', 'ETH'] })
-      expect(interests.assets.ok && interests.assets.data.map((tile) => tile.symbol)).toEqual([
+      expect(interests.assets.ok && interests.assets.data.map((row) => row.symbol)).toEqual([
         'BTC',
         'ETH',
       ])
@@ -215,7 +226,7 @@ describe('getInterests', () => {
 
     it('never replaces the assets the account does follow', async () => {
       const interests = await getInterests(viewer, { sampleAssets: ['XRP'] })
-      expect(interests.assets.ok && interests.assets.data.map((tile) => tile.symbol)).toEqual(
+      expect(interests.assets.ok && interests.assets.data.map((row) => row.symbol)).toEqual(
         expect.arrayContaining(['BTC', 'ETH', 'SOL']),
       )
     })

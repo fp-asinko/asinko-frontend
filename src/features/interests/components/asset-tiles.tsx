@@ -2,7 +2,7 @@ import { ClockAlertIcon } from 'lucide-react'
 import { useFormatter, useTranslations } from 'next-intl'
 import { Delta } from '@/components/molecules/delta'
 import { cn } from '@/lib/utils'
-import type { AssetTile } from '../interests.types'
+import type { AssetRow } from '../interests.types'
 import { CommunityLink } from './community-link'
 import { FavoriteOrder } from './favorite-order'
 import { FavoriteStar } from './favorite-star'
@@ -15,7 +15,7 @@ import { plainHandle } from '@/lib/plain-handle'
  * Motion (S-02): lifts on hover and focus, presses on tap; the community the feed shows is
  * marked as current (S-04).
  */
-export function AssetTiles({ tiles, id }: { tiles: AssetTile[]; id?: string }) {
+export function AssetTiles({ tiles, id }: { tiles: AssetRow[]; id?: string }) {
   const t = useTranslations('interests')
   const format = useFormatter()
 

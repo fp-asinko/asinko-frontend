@@ -1,5 +1,5 @@
 import type { RawAsset, RawCommunity, RawUserSummary } from '@/lib/api/contract'
-import type { AssetTile, Group, Person, Suggestion } from '../interests.types'
+import type { AssetRow, Group, Person, Suggestion } from '../interests.types'
 import { communityPath, kindOf, mentionOf } from '@/lib/communities/paths'
 import { allowedImageUrl } from '@/lib/images'
 
@@ -9,12 +9,12 @@ export const SUGGESTION_COUNT = { signedIn: 8, guest: 8 } as const
 /** A community's mention: an asset's symbol from its name (specs/backend-answer-1020 BA-10). */
 const communityHandle = (community: RawCommunity) => mentionOf(community).handle
 
-/** Asset communities the viewer belongs to (one tile each). */
+/** Asset communities the viewer belongs to (one row each). */
 export function memberAssetCommunities(communities: readonly RawCommunity[]) {
   return communities.filter((c) => c.type === 'SYSTEM_ASSET' && c.viewerMembership && c.assetId)
 }
 
-export function toAssetTile(asset: RawAsset, communitySlug: string, favorite = false): AssetTile {
+export function toAssetRow(asset: RawAsset, communitySlug: string, favorite = false): AssetRow {
   return {
     handle: `$${asset.symbol}`,
     symbol: asset.symbol,
@@ -22,6 +22,8 @@ export function toAssetTile(asset: RawAsset, communitySlug: string, favorite = f
     changePct: asset.priceChangePct,
     price: asset.price,
     stale: asset.priceStale,
+    logoUrl: allowedImageUrl(asset.logoUrl ?? null),
+    assetClass: asset.assetClass,
     communitySlug,
     path: communityPath('asset', asset.symbol),
     favorite,

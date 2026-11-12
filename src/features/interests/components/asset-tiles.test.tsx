@@ -15,6 +15,8 @@ const tile = {
   changePct: 2.4,
   price: 64000,
   stale: false,
+  logoUrl: null,
+  assetClass: 'CRYPTO' as const,
   communitySlug: 'BTC',
   favorite: false,
   path: '/asset/BTC',

@@ -14,7 +14,7 @@ import {
   favoritesFirst,
   followedChannels,
   memberAssetCommunities,
-  toAssetTile,
+  toAssetRow,
   toGroups,
   toPerson,
   toSuggestions,
@@ -92,13 +92,13 @@ export async function getInterests(
     ),
   )
 
-  // A missing asset drops only its tile; the section fails only if every asset failed.
-  const tiles = favoritesFirst(
+  // A missing asset drops only its row; the section fails only if every asset failed.
+  const rows = favoritesFirst(
     assetPages.flatMap((page, index) =>
-      page.ok ? [toAssetTile(page.data, assetSlugs[index]!, chosen[index]!.favorite)] : [],
+      page.ok ? [toAssetRow(page.data, assetSlugs[index]!, chosen[index]!.favorite)] : [],
     ),
   )
-  const assets = tiles.length === 0 && assetPages.length > 0 ? failed : section(tiles)
+  const assets = rows.length === 0 && assetPages.length > 0 ? failed : section(rows)
 
   return { signedIn, assets, people, groups: section(toGroups(mine.data.items)), suggested }
 }

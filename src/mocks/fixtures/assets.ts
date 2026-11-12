@@ -19,6 +19,9 @@ function crypto(n: number, seed: Seed): RawAsset {
     // A stale price keeps the last known value: the UI should say so.
     priceUpdatedAt: minutesAgo(seed.stale ? 95 : 1),
     priceStale: seed.stale ?? false,
+    // The backend sends the logo's Storage URL; like the communities' avatarUrl, the mocks send
+    // none, so the initials show and CI needs no network (specs/sidebar-assets-list SA-15).
+    logoUrl: null,
     sentiment: {
       bullishPct: seed.bullishPct,
       bearishPct: Math.round((100 - seed.bullishPct) * 10) / 10,

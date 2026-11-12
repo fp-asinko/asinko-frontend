@@ -1,7 +1,9 @@
 // Domain types of the "Your interests" column (specs/home/design.md §4). The UI only knows these,
 // never the raw contract shapes.
 
-export type AssetTile = {
+import type { RawAsset } from '@/lib/api/contract'
+
+export type AssetRow = {
   /** How it is mentioned: $BTC */
   handle: string
   symbol: string
@@ -9,7 +11,11 @@ export type AssetTile = {
   changePct: number | null
   price: number | null
   stale: boolean
-  /** Slug of the asset community: the tile links to the Home filtered by it. */
+  /** The asset's logo (an allowed image URL), or null: the row shows its initials (SA-03). */
+  logoUrl: string | null
+  /** Decides the price's currency and decimals (specs/sidebar-assets-list Q1). */
+  assetClass: RawAsset['assetClass']
+  /** Slug of the asset community: the row links to the Home filtered by it. */
   communitySlug: string
   /** The asset's page: /asset/{SYMBOL} (specs/community-pages CP-14). */
   path: string
@@ -70,7 +76,7 @@ export type SectionResult<T> = { ok: true; data: T } | { ok: false }
 export type Interests = {
   /** Without a session the column shows only communities (H-07, decided 2026-10-03). */
   signedIn: boolean
-  assets: SectionResult<AssetTile[]>
+  assets: SectionResult<AssetRow[]>
   people: SectionResult<Person[]>
   groups: SectionResult<Group[]>
   suggested: SectionResult<Suggestion[]>

@@ -4,7 +4,7 @@
 
 ## Tareas
 
-- [ ] **T1 — Datos: logo y clase del activo (S).**
+- [x] **T1 — Datos: logo y clase del activo (S).**
   - `AssetTile` pasa a `AssetRow` con `logoUrl: string | null` y `assetClass` (Q1); `toAssetTile` pasa a `toAssetRow` con `allowedImageUrl(asset.logoUrl ?? null)`. Se actualizan `interests-api.ts` e `interests-sections.tsx`.
   - `src/mocks/fixtures/assets.ts` devuelve `logoUrl` (design § 1).
   - Tests: `mappers.test.ts` (host permitido, otro host, URL inválida, `undefined`, `assetClass`); `interests-api.test.ts` (el activo llega con su logo; sin precio sigue en la lista); `fixtures.test.ts` (los mocks validan).

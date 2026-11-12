@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { RawCommunity } from '@/lib/api/contract'
+import type { RawAsset, RawCommunity } from '@/lib/api/contract'
+import { ASSETS } from '@/mocks/fixtures/assets'
 import { COMMUNITIES } from '@/mocks/fixtures/communities'
 import {
   favoritesFirst,
@@ -7,6 +8,7 @@ import {
   memberAssetCommunities,
   SUGGESTION_COUNT,
   toGroups,
+  toAssetRow,
   toPerson,
   toSuggestions,
 } from './mappers'
@@ -15,7 +17,34 @@ function community(overrides: Partial<RawCommunity>): RawCommunity {
   return { ...COMMUNITIES[0]!, ...overrides }
 }
 
+const STORAGE = 'https://hqarefesoovfmibncivu.supabase.co/storage/v1/object/public/asset-logos'
+
+function asset(overrides: Partial<RawAsset>): RawAsset {
+  return { ...ASSETS[0]!, ...overrides }
+}
+
 describe('interests mappers', () => {
+  describe('toAssetRow (SA-03)', () => {
+    it('keeps the logo when it comes from an allowed host', () => {
+      const logoUrl = `${STORAGE}/monogram/EURUSD.png`
+      expect(toAssetRow(asset({ logoUrl }), 'btc').logoUrl).toBe(logoUrl)
+    })
+
+    it.each([
+      ['another host', 'https://evil.example.com/storage/v1/object/public/x.png'],
+      ['an invalid URL', 'not a url'],
+      ['an http URL', 'http://hqarefesoovfmibncivu.supabase.co/storage/v1/object/public/x.png'],
+      ['undefined', undefined],
+      ['null', null],
+    ])('drops the logo from %s', (_, logoUrl) => {
+      expect(toAssetRow(asset({ logoUrl }), 'btc').logoUrl).toBeNull()
+    })
+
+    it('carries the asset class for the price format', () => {
+      expect(toAssetRow(asset({ assetClass: 'FOREX' }), 'eurusd').assetClass).toBe('FOREX')
+    })
+  })
+
   it('keeps only the asset communities the viewer belongs to', () => {
     const list = [
       community({ slug: 'BTC', type: 'SYSTEM_ASSET', viewerMembership: 'MEMBER' }),

@@ -65,6 +65,13 @@ describe('mock data is internally consistent', () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 
+  it('gives every asset the backend shape of logoUrl, without a network dependency (SA-15)', () => {
+    for (const asset of ASSETS) {
+      // Like the communities' avatarUrl: null, so CI never loads a remote logo.
+      expect(asset).toHaveProperty('logoUrl', null)
+    }
+  })
+
   it('resolves every mention to the exact text it covers', () => {
     for (const post of POSTS) {
       for (const entity of post.entities ?? []) {
