@@ -1,6 +1,6 @@
 # Activos de la columna izquierda como lista con logo — Tasks
 
-> **Estado:** Pendiente de aprobación. **Ninguna tarea empieza hasta que el PO responda Q1 a Q8** de `requirements.md` y el spec quede aprobado. Basado en `requirements.md` y `design.md` (2026-11-12). Rama `feature/sidebar-assets-list-<descripcion>`, desde `develop`. Cada tarea lleva sus tests; se escribe primero el test que falla (Strict TDD).
+> **Estado:** Aprobada (PO, 2026-11-12): Q1 a Q8 resueltas con la opción recomendada. Basado en `requirements.md` y `design.md` (2026-11-12). Rama `feature/sidebar-assets-list-<descripcion>`, desde `develop`. Cada tarea lleva sus tests; se escribe primero el test que falla (Strict TDD).
 
 ## Tareas
 

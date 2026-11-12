@@ -1,6 +1,6 @@
 # Activos de la columna izquierda como lista con logo — Design
 
-> **Estado:** Pendiente de aprobación. Basado en `requirements.md`. Las decisiones que dependen de Q1 a Q8 llevan su opción **recomendada**; si el PO responde otra, se ajusta este documento antes de las tareas.
+> **Estado:** Aprobada (PO, 2026-11-12). Basado en `requirements.md`. Q1 a Q8 resueltas con la opción recomendada: lo que dice este documento es lo decidido.
 > Rama de implementación: `feature/sidebar-assets-list-<descripcion>`, desde `develop`.
 
 ## 1. Datos: el logo ya viene, falta llevarlo a la UI
