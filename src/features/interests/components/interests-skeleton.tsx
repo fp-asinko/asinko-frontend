@@ -1,12 +1,19 @@
 import { Skeleton } from '@/components/ui/skeleton'
 import { cn } from '@/lib/utils'
+import { STAR_WIDTH } from './star-box'
 
 /** A section's title and its chevron, the size of SidebarSection's trigger. */
 function Head() {
   return (
-    <div className="flex min-h-6 items-center justify-between px-1 py-1">
+    <div className="flex min-h-6 items-center justify-between py-1 pl-1">
       <Skeleton className="h-2.5 w-14" />
-      <Skeleton className="size-3 rounded-sm" />
+      {/* The real header's box: the star's width, so the chevron lands on the stars' axis. */}
+      <span
+        data-chevron-box
+        className={cn('-my-1 flex h-6 shrink-0 items-center justify-center', STAR_WIDTH)}
+      >
+        <Skeleton className="size-3 rounded-sm" />
+      </span>
     </div>
   )
 }

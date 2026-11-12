@@ -195,7 +195,7 @@ describe('AssetList (specs/sidebar-assets-list)', () => {
     renderWithIntl(<AssetList assets={[{ ...btc, favorite: true }]} />)
     const star = screen.getByRole('button', { name: 'Remove $BTC from favorites' })
     expect(star).toHaveAttribute('aria-pressed', 'true')
-    expect(star).toHaveClass('size-7')
+    expect(star).toHaveClass('w-7', 'h-7')
     expect(screen.getByRole('link')).not.toContainElement(star)
   })
 

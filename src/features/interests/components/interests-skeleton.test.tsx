@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { InterestsSkeleton } from './interests-skeleton'
+import { STAR_WIDTH } from './star-box'
 
 describe('InterestsSkeleton (FN-08)', () => {
   it('holds the column while it loads, hidden from screen readers', () => {
@@ -38,5 +39,12 @@ describe('InterestsSkeleton (FN-08)', () => {
     render(<InterestsSkeleton />)
     const groups = screen.getByTestId('interests-skeleton').querySelector('[data-section=groups]')
     expect(groups?.nextElementSibling?.getAttribute('data-section')).toBe('people')
+  })
+
+  it("puts each header's chevron placeholder in the star-width box, as the real header", () => {
+    render(<InterestsSkeleton />)
+    const boxes = screen.getByTestId('interests-skeleton').querySelectorAll('[data-chevron-box]')
+    expect(boxes).toHaveLength(4)
+    for (const box of boxes) expect(box).toHaveClass(STAR_WIDTH, 'justify-center')
   })
 })

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import { FavoriteStar } from './favorite-star'
+import { STAR_WIDTH } from './star-box'
 
 vi.mock('@/i18n/navigation', () => import('@/test/navigation-mock'))
 const action = vi.hoisted(() => ({ setFavorite: vi.fn() }))
@@ -41,5 +42,11 @@ describe('FavoriteStar (specs/favorites)', () => {
       'aria-pressed',
       'false',
     )
+  })
+
+  it('uses the shared star width, the box the section chevrons center on (PO, 2026-11-12)', () => {
+    renderWithIntl(<FavoriteStar slug="macro" handle="#macro" initial />)
+    expect(STAR_WIDTH).toBe('w-7')
+    expect(screen.getByRole('button')).toHaveClass(STAR_WIDTH, 'h-7')
   })
 })

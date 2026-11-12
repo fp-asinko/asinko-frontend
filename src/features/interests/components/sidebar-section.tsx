@@ -4,6 +4,7 @@ import { MoreToggle } from '@/components/molecules/more-toggle'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { useId, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
+import { STAR_WIDTH } from './star-box'
 import type { SectionResult } from '../interests.types'
 import { CloudOffIcon } from 'lucide-react'
 import { EmptyState } from '@/components/organisms/empty-state'
@@ -66,7 +67,7 @@ export function SidebarSection<T>({
         {title}
       </h2>
       <Collapsible defaultOpen className={cn(fill && 'md:flex md:min-h-0 md:flex-col')}>
-        <div className="group/head relative flex min-h-6 items-center gap-1 rounded-sm px-1 py-1 text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground">
+        <div className="group/head relative flex min-h-6 items-center gap-1 rounded-sm py-1 pl-1 text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground">
           {/* One real button stretched over the whole header: it keeps click, keyboard and focus,
               and its name is the title. The visible title and chevron are decoration over it. */}
           <CollapsibleTrigger className="absolute inset-0 cursor-pointer rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
@@ -80,11 +81,21 @@ export function SidebarSection<T>({
           </span>
           {/* Above the stretched trigger, so a click on it does not toggle. */}
           {action && <div className="relative z-10 -my-1">{action}</div>}
-          <ChevronDownIcon
-            aria-hidden
-            className="pointer-events-none relative ml-auto size-3 -rotate-90 transition-transform duration-200 ease-out group-has-[[data-panel-open]]/head:rotate-0"
-            strokeWidth={2.5}
-          />
+          {/* The star's width, flush right: its center is the stars' (14px from the edge). The
+              negative margin keeps the header's height. */}
+          <span
+            data-chevron-box
+            className={cn(
+              'pointer-events-none relative -my-1 ml-auto flex h-6 shrink-0 items-center justify-center',
+              STAR_WIDTH,
+            )}
+          >
+            <ChevronDownIcon
+              aria-hidden
+              className="size-3 -rotate-90 transition-transform duration-200 ease-out group-has-[[data-panel-open]]/head:rotate-0"
+              strokeWidth={2.5}
+            />
+          </span>
         </div>
         {/* Height from Base UI's --collapsible-panel-height: animates in every browser (S-01). */}
         <CollapsibleContent

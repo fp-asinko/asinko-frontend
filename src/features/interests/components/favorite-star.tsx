@@ -7,13 +7,14 @@ import { useRouter } from '@/i18n/navigation'
 import { setFavorite } from '@/lib/communities/set-favorite.action'
 import { cn } from '@/lib/utils'
 import { useFavoriteOrder } from './favorite-order'
+import { STAR_WIDTH } from './star-box'
 
 /**
  * Where it sits: beside a row's link (a round button), or in an asset tile's corner, small and with
  * no background so it covers nothing (PO, 2026-10-28). Both at least 24px to tap (WCAG 2.5.8).
  */
 const PLACEMENT = {
-  row: 'size-7 rounded-full hover:bg-muted [&_svg]:size-3.5',
+  row: `${STAR_WIDTH} h-7 rounded-full hover:bg-muted [&_svg]:size-3.5`,
   // The icon in the very corner, away from the symbol; the 24px to tap around it (PO, 2026-10-28).
   corner: 'absolute top-0 right-0 size-6 items-start! justify-end! rounded-md p-1 [&_svg]:size-2.5',
 } as const

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
 import type { SectionResult } from '../interests.types'
 import { SidebarSection } from './sidebar-section'
+import { STAR_WIDTH } from './star-box'
 
 function renderSection(result: SectionResult<string[]>, more = false, hidden: string[] = []) {
   return renderWithIntl(
@@ -150,5 +151,21 @@ describe('SidebarSection', () => {
     renderSection({ ok: true, data: ['BTC', 'ETH'] }, true, ['ETH'])
     const more = await screen.findByRole('button', { name: 'more: Assets' })
     expect(more).toHaveAttribute('aria-controls', screen.getByRole('list').id)
+  })
+
+  it('centers its chevron in the star width, flush with the right edge (PO, 2026-11-12)', () => {
+    renderWithIntl(
+      <SidebarSection title="Assets" result={{ ok: true, data: ['BTC'] }}>
+        {(items) => <p>{items.join(', ')}</p>}
+      </SidebarSection>,
+    )
+    const box = document.querySelector('[data-chevron-box]')!
+    // The same box as the favorite stars below, so both centers share one vertical axis.
+    expect(box).toHaveClass(STAR_WIDTH, 'ml-auto', 'justify-center')
+    expect(box.querySelector('svg')).toBeInTheDocument()
+    // The header keeps its left padding but none on the right, where the box starts.
+    const head = box.parentElement!
+    expect(head).toHaveClass('pl-1')
+    expect(head).not.toHaveClass('px-1', 'pr-1')
   })
 })
