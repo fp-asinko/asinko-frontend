@@ -6,7 +6,7 @@
 
 - **Pendiente ahora:** una pregunta sobre los slugs de los activos, y lo que espera una decisión de producto (P-026, P-023 y la fórmula de `best`, P-014).
 - **Fase 3 del backend:** los logros (P-030) y los widgets de los grupos (P-028, P-029). En el front ya se ven, contra mocks; el backend los implementa más adelante.
-- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033), Explore con sesión (P-034), saber si un username está libre mientras se escribe (P-035), borrar una cuenta sin dejar el perfil huérfano (P-036) que `POST /users` guarde lo que dice el contrato (P-037) y borradores de tesis (P-038).
+- **Sprint 2 (MVP-3):** lo nuevo que piden las tareas del sprint, empezando por las reglas de la cuenta (P-033), Explore con sesión (P-034), saber si un username está libre mientras se escribe (P-035), borrar una cuenta sin dejar el perfil huérfano (P-036) que `POST /users` guarde lo que dice el contrato (P-037) y borradores de tesis (P-038). Después, la columna "Tus intereses": una página por sección, sugeridos por tamaño y el precio de varios activos juntos (P-051 a P-053).
 
 **Verificado contra el deploy de `dev` el 2026-10-21** (`pnpm api:smoke` contra `https://asinko-app-web.vercel.app`): 10 de 10 en verde, solo lecturas, cada respuesta con el mismo esquema que usa el mock. Además de lo de antes:
 
@@ -484,6 +484,68 @@ El slug más corto que hoy acepta el backend (1 a 50) seguiría valiendo para lo
 3. **Redirect URLs** (_Authentication → URL Configuration_): `{dominio del front}/auth/reset` y lo mismo para las previews (`https://*-asinko.vercel.app/auth/reset` o el patrón que ya usan).
 
 **Se deja como está:** la duración del link (1 hora, el default; PO, 2026-11-09).
+
+### P-051: "Tus intereses" con una página por sección
+
+**Estado:** propuesta (2026-11-11). Sin mock. **Mientras tanto, el front recorre las páginas** de `mine=true` con `nextCursor`, hasta 5 (100 membresías), y separa las secciones él: nada se pierde, pero una cuenta que sigue a mucha gente hace varios pedidos.
+
+**Endpoint:** `GET /api/v1/communities?mine=true` y `GET /api/v1/users/{userId}/following`.
+
+**Motivo:** la columna izquierda con sesión ("Tus intereses") muestra tres secciones: Grupos, Personas y Activos. Cuántos ítems se ven lo decide el alto de la pantalla (de 2 a 6 grupos, de 1 a 5 personas y de 3 a 9 activos). "more" muestra el resto, **todo lo que llegó del backend** (`specs/sidebar-fill`, `specs/sidebar-more`). Hoy los datos salen de dos pedidos, y el front lee solo su primera página:
+
+| Sección  | De dónde sale                                  | Tope |
+| -------- | ---------------------------------------------- | ---- |
+| Grupos   | `mine=true`, sin `SYSTEM_ASSET` ni canales     | 20 entre los tres |
+| Activos  | `mine=true`, los `SYSTEM_ASSET`                | ↑    |
+| Personas | `following`                                    | 20   |
+
+**El problema:** la página de 20 de `mine=true` mezcla todas las membresías: grupos, activos, el canal propio y **el canal personal de cada persona que se sigue**. Con 10 personas seguidas, 11 de los 20 lugares son canales, y quedan 9 para grupos y activos juntos. Lo que pasa del 20 (lo menos activo y no favorito, por el orden de `pageOfMine`) no aparecía ni con "more", sin aviso: le pasó a una cuenta de prueba de `dev` que sigue a 10 personas, hasta que el front empezó a recorrer las páginas.
+
+Además, la estrella de favorito de una persona sale de esa misma página (su canal en `mine=true`, `viewerIsFavorite`). Si su canal quedó fuera de los 20, la estrella se ve apagada aunque sea favorita.
+
+**Cambio:**
+
+1. **`type` acepta varios tipos**, separados por coma, como `assetClass` en `GET /assets`: `type=SYSTEM_GEO,SYSTEM_CATEGORY,USER_PUBLIC`. Un tipo desconocido se ignora, como hoy. Con eso el front pide cada sección por separado, con su propia página de 20 y el mismo orden (favoritos primero, después por actividad):
+   - Grupos: `mine=true&type=SYSTEM_GEO,SYSTEM_CATEGORY,USER_PUBLIC`
+   - Activos: `mine=true&type=SYSTEM_ASSET`
+2. **`isFavorite` en cada fila de `following`**, cuando `{userId}` es el viewer: si marcó como favorito el canal de esa persona. En cualquier otro caso, `null` (como `isFollowedByViewer`, P-017). Así Personas no depende de `mine=true`.
+
+   ```jsonc
+   { "id": "uuid", "username": "michael_burry", "isFavorite": true /* … */ }
+   ```
+
+3. **El orden de `following`, como el de `mine=true`:** favoritos primero, después por actividad. Hoy la columna los reordena, pero solo dentro de la página que le llegó. Un favorito en la segunda página no sube.
+
+**Pregunta:** más de 20 por sección, ¿se espera en el MVP? Si sí, "more" pasaría a cargar la página siguiente con `nextCursor`. Por ahora, con 20 por sección alcanza.
+
+### P-052: Sugeridos: las comunidades con más miembros, sin las mías
+
+**Estado:** propuesta (2026-11-11). Sin mock.
+
+**Endpoint:** `GET /api/v1/communities`.
+
+**Motivo:** "Sugeridos", al pie de la columna izquierda, muestra las comunidades más grandes a las que la persona no pertenece (hasta 8; decisión del 2026-10-03). `GET /communities` sin `mine` devuelve las 20 **más recientes**. El front saca las propias y ordena por miembros **esas 20**: no son las más grandes del sitio, sino las más grandes entre las últimas creadas. A alguien que ya está en casi todas las nuevas le quedan una o dos, por ejemplo un grupo de prueba con 1 miembro (`#test-group`, 2026-11-10), y nunca le aparecen las grandes y viejas.
+
+**Cambio:** dos parámetros nuevos:
+
+| Parámetro      | Qué hace                                                                                                  |
+| -------------- | --------------------------------------------------------------------------------------------------------- |
+| `sort=members` | De más miembros a menos (desempate por `id`). Sin `sort`, como hoy: las más recientes.                   |
+| `notMine=true` | Sin las comunidades donde el viewer es miembro. Sin sesión se ignora. Junto con `mine=true`, `422`.      |
+
+El front pediría `GET /communities?sort=members&notMine=true&type=SYSTEM_ASSET,SYSTEM_GEO,SYSTEM_CATEGORY,USER_PUBLIC` (los canales personales no se sugieren; `type` con varios valores es P-051). Sin sesión, lo mismo sin `notMine`.
+
+### P-053: El precio de varios activos en un pedido
+
+**Estado:** propuesta (2026-11-11). Sin mock.
+
+**Endpoint:** `GET /api/v1/assets`.
+
+**Motivo:** cada mosaico de Activos en la columna izquierda muestra el precio y la variación del día. `mine=true` trae la comunidad del activo, pero no su precio. Por eso el front pide `GET /assets/{symbol}` **una vez por activo**, en cada página que se carga: con 20 activos, 20 pedidos (y cada uno trae también sus tesis abiertas, que la columna no usa).
+
+**Cambio:** `symbols` en el catálogo, separados por coma (hasta 50): `GET /assets?symbols=BTC,XAU/USD,BRK.B`. Devuelve `{ items: Asset[], nextCursor: null }` con esos activos, en el orden pedido. Un símbolo que no existe no viene (sin `404`). Con `q`, `422`.
+
+**Alternativa:** que cada comunidad `SYSTEM_ASSET` de `mine=true` traiga su `asset` (`symbol`, `price`, `priceChangePct`, `priceStale`). Ahorra el segundo pedido, pero suma una consulta a una lista que también se usa en otros lugares. Preferimos `symbols`, que además sirve para otras listas de activos.
 
 ## Fase 3 del backend: solo visual en el front
 
