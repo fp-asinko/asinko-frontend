@@ -24,7 +24,7 @@ Que cualquier persona con cuenta pueda abrir su propio grupo, con nombre, handle
 
 ### Entrada
 
-- [ ] **CG-01** "Create group" de la columna izquierda deja de ser "Próximamente" y lleva a la página **`/{locale}/create-group`** (Q1). Sin sesión, la página muestra lo mismo que crear post sin sesión: el aviso para entrar con su botón, que vuelve a esta página al entrar (`specs/auth`).
+- [ ] **CG-01** "Create group" de la columna izquierda deja de ser "Próximamente" y lleva a la página **`/{locale}/create-group`** (Q1). Sin sesión, la página muestra lo mismo que crear post sin sesión: el aviso para entrar con su botón, que vuelve a esta página al entrar (`specs/auth`). Es un botón de ícono "+" en la cabecera de la sección Groups, junto al chevron de plegado, con "Create group" como nombre accesible y globo de ayuda (nota 2026-11-12, decisión del PO: se movió de debajo de la lista a la cabecera para recuperar altura en la columna; ya no hay un link con borde punteado debajo de los grupos).
 - [ ] **CG-02** La página tiene su título ("Create a group"), su metadata traducida y `noindex`: es un formulario, no contenido.
 
 ### El formulario

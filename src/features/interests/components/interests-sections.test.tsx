@@ -162,6 +162,26 @@ describe('InterestsSections', () => {
     )
   })
 
+  it('puts Create group once, in the Groups header and not below its list (PO, 2026-11-12)', () => {
+    renderWithIntl(<InterestsSections interests={interests} />)
+
+    expect(screen.getAllByRole('link', { name: 'Create group' })).toHaveLength(1)
+    const groups = screen.getByRole('region', { name: 'Groups' })
+    const link = within(groups).getByRole('link', { name: 'Create group' })
+    // Beside the header's toggle, not in the list and not a sibling of the section.
+    expect(groups.querySelector('ul')).not.toContainElement(link)
+    expect(within(groups).getByRole('button', { name: /^Groups/ })).not.toContainElement(link)
+    // No dashed link under the list any more.
+    expect(link.className).not.toContain('border-dashed')
+    expect(groups.nextElementSibling).not.toContainElement(link)
+    // The other sections have no action.
+    for (const name of ['People', 'Assets']) {
+      expect(
+        within(screen.getByRole('region', { name })).queryByRole('link', { name: 'Create group' }),
+      ).toBeNull()
+    }
+  })
+
   it('shows an error per failed section without hiding the others (H-19)', () => {
     renderWithIntl(<InterestsSections interests={{ ...interests, people: { ok: false } }} />)
 

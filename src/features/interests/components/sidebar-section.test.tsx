@@ -25,6 +25,23 @@ function renderSection(result: SectionResult<string[]>, more = false, hidden: st
 }
 
 describe('SidebarSection', () => {
+  it('renders an optional action in the header, outside the toggle and kept when collapsed', async () => {
+    renderWithIntl(
+      <SidebarSection
+        title="Assets"
+        result={{ ok: true, data: ['BTC'] }}
+        action={<button type="button">Do it</button>}
+      >
+        {(items) => <p>{items.join(', ')}</p>}
+      </SidebarSection>,
+    )
+    const toggle = screen.getByRole('button', { name: /Assets/ })
+    const action = screen.getByRole('button', { name: 'Do it' })
+    expect(toggle).not.toContainElement(action)
+    await userEvent.click(toggle)
+    expect(screen.getByRole('button', { name: 'Do it' })).toBeInTheDocument()
+  })
+
   it('is a named region with a heading outside the toggle', () => {
     renderSection({ ok: true, data: ['BTC'] })
     const region = screen.getByRole('region', { name: 'Assets' })

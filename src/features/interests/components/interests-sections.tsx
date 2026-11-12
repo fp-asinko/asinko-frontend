@@ -1,5 +1,5 @@
 import { JoinCard } from '@/components/organisms/auth-gate'
-import { PlusCircleIcon } from 'lucide-react'
+import { HoverHint } from '@/components/molecules/hover-hint'
 import { useTranslations } from 'next-intl'
 import { Link } from '@/i18n/navigation'
 import type { Interests } from '../interests.types'
@@ -8,7 +8,7 @@ import { GroupList } from './group-list'
 import { PeopleList } from './people-list'
 import { SidebarSection } from './sidebar-section'
 import { SuggestedCommunities } from './suggested-communities'
-import { CoinsIcon, HashIcon, UsersIcon } from 'lucide-react'
+import { CoinsIcon, HashIcon, PlusIcon, UsersIcon } from 'lucide-react'
 
 const COLUMN_TITLE =
   'px-1 pt-1 pb-2 text-[0.6875rem] leading-[1.4] font-extrabold tracking-[0.08em] text-muted-foreground uppercase'
@@ -59,20 +59,22 @@ export function InterestsSections({ interests }: { interests: Interests }) {
         empty={t('empty.groups')}
         emptyIcon={<HashIcon />}
         more
+        // In the header, beside the chevron, to save the column's height (PO, 2026-11-12;
+        // specs/community-create CG-01). Shown even without groups.
+        action={
+          <HoverHint label={t('createGroup')} align="end">
+            <Link
+              href="/create-group"
+              aria-label={t('createGroup')}
+              className="flex size-6 tap items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              <PlusIcon aria-hidden className="size-3.5" strokeWidth={2.5} />
+            </Link>
+          </HoverHint>
+        }
       >
         {(groups, listId) => <GroupList id={listId} groups={groups} />}
       </SidebarSection>
-      {/* After the groups' "more", as in the prototype; shown even without groups. Its page
-          (specs/community-create CG-01). */}
-      <div className="mt-1 mb-6 flex flex-col">
-        <Link
-          href="/create-group"
-          className="flex h-7.5 w-full tap items-center gap-1.75 rounded-md border border-dashed px-1.5 type-meta font-semibold text-muted-foreground outline-none hover:bg-surface hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
-        >
-          <PlusCircleIcon aria-hidden className="size-3" />
-          {t('createGroup')}
-        </Link>
-      </div>
       <SidebarSection
         title={t('people')}
         result={interests.people}
