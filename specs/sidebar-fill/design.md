@@ -30,12 +30,34 @@
 - Se aplica en cada lista escondiendo los `li` desde el número que corresponde (`nth-child`), con las variantes `column-short`, `column-mid` y `column-tall` de `globals.css`. El "more" ya está en cada sección.
 - Por debajo del mínimo, la columna conserva `overflow-y-auto`: aparece el scroll (SF-04).
 
+### Mínimos nuevos: 3 grupos, 3 personas, 3 activos (PO, 2026-11-12)
+
+El PO pide ver **al menos 3 grupos, 3 personas y 3 activos**. Alturas medidas (arriba): fijos ~406 px (títulos, "more" y líneas), grupo 52, persona 42, fila de activos 34 (32 de la fila + 2 de separación; 3 filas ~102) y una sugerencia 50. Los fijos se midieron antes de mover "Crear grupo" al encabezado (`specs/community-create`), que seguramente los baja un poco; no se volvió a medir, así que el mínimo es una cota conservadora.
+
+- **Mínimo nuevo:** 406 + 3 × 52 (grupos) + 3 × 42 (personas) + 102 (activos) + 50 (1 sugerencia) = **~840 px** de columna.
+- **Mínimo anterior:** 406 + 2 × 52 + 42 + 102 + 50 = ~704 px. Sube **~136 px**.
+- **Consecuencia (decisión del PO):** la columna es la ventana menos la barra superior, así que con una ventana de ~800 px de alto (laptops comunes) mide menos de 840 y hace scroll (SF-04). Hace falta una ventana de unos 900 px o más para verla sin scroll. Ninguna sección desaparece y lo escondido sigue en `display: none` (SF-06).
+
+Escalones nuevos (cada uno suma lo que cuestan los ítems que agrega al mínimo de 840; Sugeridos se queda con lo que sobra):
+
+| Alto de la columna | Grupos | Personas | Activos | Sugeridas                |
+| ------------------ | ------ | -------- | ------- | ------------------------ |
+| menos de 936 px    | 3      | 3        | 3 filas | las que entran (FitList) |
+| 936 a 1002         | 4      | 4        | 3 filas | las que entran           |
+| 1002 a 1250        | 4      | 4        | 5 filas | las que entran           |
+| más de 1250        | 6      | 5        | 8 filas | las que entran           |
+
+(936 = 840 + 52 + 42 + 2; 1002 = 840 + 52 + 42 + 2 × 34; 1250 = 1002 + 2 × 52 + 42 + 3 × 34.)
+
+- Variantes de `globals.css`: `column-short` < 58.5rem (936 px), `column-mid` < 62.625rem (1002 px), `column-tall` < 78.125rem (1250 px). Grupos y personas esconden desde el cuarto (`short`) o el quinto (`tall`); activos desde la cuarta fila (`mid`) o la sexta (`tall`). Los topes de 6 / 5 / 8 no cambian.
+- **Esqueleto** (`interests-skeleton.tsx`): 3 grupos, 3 personas y 5 filas de activos, para que al llegar los datos no haya salto de layout.
+
 ## 4. Tests
 
 - **Unitarios:** el orden de las secciones en `interests-sections.test.tsx`; 8 sugerencias con sesión en `interests-api.test.ts`.
 - **E2E** (`e2e/sidebar-fill.spec.ts`, desktop):
   - con 1280 × 1100, sin scroll en la columna y Sugeridos llega hasta abajo;
-  - con 1280 × 620, menos ítems por sección, sin scroll en la columna, y ningún ítem cortado a medias (la caja de cada uno entra entera);
+  - con 1280 × 620, menos ítems por sección, sin scroll en la columna, y ningún ítem cortado a medias (la caja de cada uno entra entera). _PO, 2026-11-12:_ con los mínimos nuevos esto pasa a 1280 × 1000 (columna de ~930 px: 3 / 3 / 3 sin scroll) y 1280 × 800 hace scroll;
   - con 1280 × 420, scroll en la columna y las cuatro secciones presentes;
   - axe en claro y oscuro;
   - el presupuesto de JS sin cambios (`performance.spec.ts`).
