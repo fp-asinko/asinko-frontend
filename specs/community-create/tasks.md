@@ -38,7 +38,7 @@
   - Depende de: T2 a T7.
 - [x] **T9 — Ruta, columna y entrada (M).**
   - `create-group/page.tsx` con metadata y `noindex`, `@right/create-group/page.tsx`, la vista sin sesión y el formulario diferido.
-  - El link "Create group" en la columna izquierda (desde 2026-11-12, decisión del PO, como botón "+" en la cabecera de Groups, junto al chevron).
+  - El link "Create group" en la columna izquierda (desde 2026-11-12, decisión del PO, como botón "+" en la cabecera de Groups; PO feedback 2026-11-12: el + va después del título de GROUPS, no junto al chevron).
   - Los textos `createGroup` en en, es y pt, y `CLIENT_NAMESPACES`.
   - Tests: los de `interests-sections` actualizados, más el de `client-messages`.
   - Depende de: T8.

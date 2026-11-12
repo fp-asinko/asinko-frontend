@@ -42,6 +42,58 @@ describe('SidebarSection', () => {
     expect(screen.getByRole('button', { name: 'Do it' })).toBeInTheDocument()
   })
 
+  it('puts the action right after the title and before the chevron, in tab order', async () => {
+    renderWithIntl(
+      <SidebarSection
+        title="Assets"
+        result={{ ok: true, data: ['BTC'] }}
+        action={<button type="button">Do it</button>}
+      >
+        {(items) => <p>{items.join(', ')}</p>}
+      </SidebarSection>,
+    )
+    const toggle = screen.getByRole('button', { name: 'Assets' })
+    const action = screen.getByRole('button', { name: 'Do it' })
+    expect(toggle).not.toContainElement(action)
+    const title = screen.getByText('Assets', { selector: 'span[aria-hidden]' })
+    const chevron = toggle.closest('div')!.querySelector('svg')!
+    const after = Node.DOCUMENT_POSITION_FOLLOWING
+    expect(title.compareDocumentPosition(action) & after).toBeTruthy()
+    expect(action.compareDocumentPosition(chevron) & after).toBeTruthy()
+
+    // Trigger first, then the action.
+    await userEvent.tab()
+    expect(toggle).toHaveFocus()
+    await userEvent.tab()
+    expect(action).toHaveFocus()
+  })
+
+  it('clicking the action does not toggle the section; the toggle still does with the keyboard', async () => {
+    renderWithIntl(
+      <SidebarSection
+        title="Assets"
+        result={{ ok: true, data: ['BTC'] }}
+        action={<button type="button">Do it</button>}
+      >
+        {(items) => <p>{items.join(', ')}</p>}
+      </SidebarSection>,
+    )
+    const toggle = screen.getByRole('button', { name: 'Assets' })
+    await userEvent.click(screen.getByRole('button', { name: 'Do it' }))
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    toggle.focus()
+    await userEvent.keyboard('{Enter}')
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    await userEvent.keyboard(' ')
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('without an action renders a single button named by the title', () => {
+    renderSection({ ok: true, data: ['BTC'] })
+    expect(screen.getAllByRole('button')).toHaveLength(1)
+    expect(screen.getByRole('button', { name: 'Assets' })).toBeInTheDocument()
+  })
+
   it('is a named region with a heading outside the toggle', () => {
     renderSection({ ok: true, data: ['BTC'] })
     const region = screen.getByRole('region', { name: 'Assets' })

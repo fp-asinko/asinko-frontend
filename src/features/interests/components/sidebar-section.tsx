@@ -39,8 +39,9 @@ export function SidebarSection<T>({
    */
   fill?: boolean
   /**
-   * A control in the header, beside the chevron (e.g. "Create group"). It is a sibling of the
-   * toggle, not inside it: a link cannot live inside a button. Stays visible while collapsed.
+   * A control in the header, right after the title (e.g. "Create group"), so the chevrons of all
+   * sections stay aligned. It is a sibling of the toggle, not inside it: a link cannot live inside
+   * a button. Stays visible while collapsed.
    */
   action?: ReactNode
   className?: string
@@ -65,24 +66,25 @@ export function SidebarSection<T>({
         {title}
       </h2>
       <Collapsible defaultOpen className={cn(fill && 'md:flex md:min-h-0 md:flex-col')}>
-        <div className="relative">
-          <CollapsibleTrigger
-            className={cn(
-              'group flex min-h-6 w-full cursor-pointer items-center justify-between rounded-sm px-1 py-1 text-muted-foreground transition-colors duration-150 ease-out outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50',
-              // Room for the action, which sits over the toggle's right side, before the chevron.
-              action && 'pr-8',
-            )}
-          >
-            <span className="text-[0.625rem] leading-[1.4] font-bold tracking-[0.08em] uppercase">
-              {title}
-            </span>
-            <ChevronDownIcon
-              aria-hidden
-              className="size-3 -rotate-90 transition-transform duration-200 ease-out group-data-panel-open:rotate-0"
-              strokeWidth={2.5}
-            />
+        <div className="group/head relative flex min-h-6 items-center gap-1 rounded-sm px-1 py-1 text-muted-foreground transition-colors duration-150 ease-out hover:text-foreground">
+          {/* One real button stretched over the whole header: it keeps click, keyboard and focus,
+              and its name is the title. The visible title and chevron are decoration over it. */}
+          <CollapsibleTrigger className="absolute inset-0 cursor-pointer rounded-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+            <span className="sr-only">{title}</span>
           </CollapsibleTrigger>
-          {action && <div className="absolute top-1/2 right-6 -translate-y-1/2">{action}</div>}
+          <span
+            aria-hidden
+            className="pointer-events-none relative text-[0.625rem] leading-[1.4] font-bold tracking-[0.08em] uppercase"
+          >
+            {title}
+          </span>
+          {/* Above the stretched trigger, so a click on it does not toggle. */}
+          {action && <div className="relative z-10 -my-1">{action}</div>}
+          <ChevronDownIcon
+            aria-hidden
+            className="pointer-events-none relative ml-auto size-3 -rotate-90 transition-transform duration-200 ease-out group-has-[[data-panel-open]]/head:rotate-0"
+            strokeWidth={2.5}
+          />
         </div>
         {/* Height from Base UI's --collapsible-panel-height: animates in every browser (S-01). */}
         <CollapsibleContent

@@ -100,7 +100,7 @@ Las reglas son más estrictas que las del backend (`^[a-z0-9-]{1,50}$`): todo lo
 
 ## 7. Entrada (CG-01)
 
-`InterestsSections` cambia el `ComingSoon` de "Create group" por un `Link` a `/create-group`. Nota 2026-11-12 (decisión del PO, para recuperar altura en la columna): el `Link` ya no es una fila con borde punteado debajo de la lista de grupos, sino un botón de ícono "+" (`PlusIcon`, 24 px, `aria-label` = `interests.createGroup`, con `HoverHint`) en la cabecera de la sección Groups, junto al chevron. `SidebarSection` recibe un slot opcional `action`, hermano del trigger (un link no puede ir dentro de un botón) y visible aunque la sección esté plegada; People y Assets no lo usan.
+`InterestsSections` cambia el `ComingSoon` de "Create group" por un `Link` a `/create-group`. Nota 2026-11-12 (decisión del PO, para recuperar altura en la columna): el `Link` ya no es una fila con borde punteado debajo de la lista de grupos, sino un botón de ícono "+" (`PlusIcon`, 24 px, `aria-label` = `interests.createGroup`, con `HoverHint`) en la cabecera de la sección Groups, justo después del título (PO feedback 2026-11-12: el + va después del título de GROUPS, no junto al chevron, así los chevrons de Groups, People y Assets quedan alineados entre sí y con las estrellas de favorito). El trigger de plegado se estira sobre toda la cabecera (un solo botón, nombre = título) y el `action` va encima (`z-10`), después del título y antes del chevron. `SidebarSection` recibe un slot opcional `action`, hermano del trigger (un link no puede ir dentro de un botón) y visible aunque la sección esté plegada; People y Assets no lo usan.
 
 ## 8. Mocks y contrato (CG-15)
 

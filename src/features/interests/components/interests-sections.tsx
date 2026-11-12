@@ -59,16 +59,17 @@ export function InterestsSections({ interests }: { interests: Interests }) {
         empty={t('empty.groups')}
         emptyIcon={<HashIcon />}
         more
-        // In the header, beside the chevron, to save the column's height (PO, 2026-11-12;
-        // specs/community-create CG-01). Shown even without groups.
+        // In the header, right after the title (chevrons stay aligned), to save the column's
+        // height (PO, 2026-11-12; specs/community-create CG-01). Shown even without groups.
+        // The bubble is centered: the control sits near the column's left, so "end" would clip.
         action={
-          <HoverHint label={t('createGroup')} align="end">
+          <HoverHint label={t('createGroup')}>
             <Link
               href="/create-group"
               aria-label={t('createGroup')}
               className="flex size-6 tap items-center justify-center rounded-full text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
             >
-              <PlusIcon aria-hidden className="size-3.5" strokeWidth={2.5} />
+              <PlusIcon aria-hidden className="size-3.5" strokeWidth={2} />
             </Link>
           </HoverHint>
         }

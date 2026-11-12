@@ -168,9 +168,15 @@ describe('InterestsSections', () => {
     expect(screen.getAllByRole('link', { name: 'Create group' })).toHaveLength(1)
     const groups = screen.getByRole('region', { name: 'Groups' })
     const link = within(groups).getByRole('link', { name: 'Create group' })
-    // Beside the header's toggle, not in the list and not a sibling of the section.
+    // Right after the title, not in the list and not a sibling of the section.
     expect(groups.querySelector('ul')).not.toContainElement(link)
-    expect(within(groups).getByRole('button', { name: /^Groups/ })).not.toContainElement(link)
+    const toggle = within(groups).getByRole('button', { name: 'Groups' })
+    expect(toggle).not.toContainElement(link)
+    const title = within(groups).getByText('Groups', { selector: 'span[aria-hidden]' })
+    expect(title.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(
+      link.compareDocumentPosition([...toggle.parentElement!.querySelectorAll('svg')].at(-1)!),
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
     // No dashed link under the list any more.
     expect(link.className).not.toContain('border-dashed')
     expect(groups.nextElementSibling).not.toContainElement(link)
