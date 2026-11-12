@@ -46,14 +46,7 @@ export async function getInterests(
 ): Promise<Interests> {
   const communitiesPage = paginatedSchema(communitySchema)
   const [mine, all, following] = await Promise.all([
-    viewer
-      ? apiRequest({
-          method: 'GET',
-          path: '/api/v1/communities',
-          query: { mine: 'true' },
-          schema: communitiesPage,
-        })
-      : Promise.resolve(emptyPage),
+    viewer ? allMyCommunities() : Promise.resolve(emptyPage),
     apiRequest({ method: 'GET', path: '/api/v1/communities', schema: communitiesPage }),
     viewer
       ? apiRequest({
@@ -108,6 +101,40 @@ export async function getInterests(
   const assets = tiles.length === 0 && assetPages.length > 0 ? failed : section(tiles)
 
   return { signedIn, assets, people, groups: section(toGroups(mine.data.items)), suggested }
+}
+
+/** Pages of mine=true read at most: 100 memberships, so an unusual account never loops on. */
+const MINE_MAX_PAGES = 5
+
+/**
+ * Every community of the viewer, following nextCursor. Its pages of 20 mix groups, assets and the
+ * channels of whom it follows (10 people followed take half the first page): reading only the
+ * first one left groups and assets out, even behind "more" (bug, 2026-11-11). P-051 asks for a page
+ * per section. Only the first page failing fails the sections; a later one keeps what arrived (the
+ * client already reported it).
+ */
+async function allMyCommunities() {
+  const first = await apiRequest({
+    method: 'GET',
+    path: '/api/v1/communities',
+    query: { mine: 'true' },
+    schema: paginatedSchema(communitySchema),
+  })
+  if (!first.ok) return first
+  const items = [...first.data.items]
+  let cursor = first.data.nextCursor
+  for (let page = 1; cursor && page < MINE_MAX_PAGES; page++) {
+    const next = await apiRequest({
+      method: 'GET',
+      path: '/api/v1/communities',
+      query: { mine: 'true', cursor },
+      schema: paginatedSchema(communitySchema),
+    })
+    if (!next.ok) break
+    items.push(...next.data.items)
+    cursor = next.data.nextCursor
+  }
+  return { ok: true as const, data: { items, nextCursor: null } }
 }
 
 /** Each sample symbol with its community's slug, when the backend has one. */

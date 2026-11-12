@@ -104,6 +104,80 @@ describe('getInterests', () => {
     expect(interests.suggested.ok).toBe(true)
   })
 
+  describe("the viewer's communities in more than one page", () => {
+    // mine=true mixes groups, assets and the channels of whom the viewer follows in pages of 20:
+    // past the first page there can still be groups (bug, 2026-11-11, P-051).
+    const extraGroup = {
+      id: '00000000-0000-4000-8000-00000000f001',
+      slug: 'late-group',
+      slugChangedAt: null,
+      name: 'Late group',
+      description: null,
+      avatarUrl: null,
+      bannerUrl: null,
+      type: 'USER_PUBLIC',
+      assetId: null,
+      mainUrl: null,
+      rules: null,
+      memberCount: 3,
+      createdByProfileId: null,
+      createdAt: '2026-11-01T00:00:00.000Z',
+      viewerMembership: 'MEMBER',
+      viewerIsFavorite: false,
+    }
+    const requests: (string | undefined)[] = []
+
+    /** mine=true answers its usual page, then `pages` more: the extra group in the last one. */
+    function mineIn(pages: number, { failAt }: { failAt?: number } = {}) {
+      requests.length = 0
+      state.routes = MOCK_ROUTES.map((route) =>
+        route.path === '/api/v1/communities'
+          ? {
+              ...route,
+              handler: async (context) => {
+                if (context.query.mine !== 'true') return route.handler(context)
+                const cursor = context.query.cursor
+                requests.push(cursor)
+                const page = cursor ? Number(cursor) : 0
+                if (page === failAt) return { status: 500, body: { error: { code: 'HTTP' } } }
+                const nextCursor = page < pages ? String(page + 1) : null
+                if (page === 0) {
+                  const first = await route.handler({ ...context, query: { mine: 'true' } })
+                  return { ...first, body: { ...(first.body as object), nextCursor } }
+                }
+                return {
+                  status: 200,
+                  body: { items: page === pages ? [extraGroup] : [], nextCursor },
+                }
+              },
+            }
+          : route,
+      )
+    }
+
+    it('follows nextCursor, so a group past the first page still shows', async () => {
+      mineIn(1)
+      const interests = await getInterests(viewer)
+      expect(requests).toEqual([undefined, '1'])
+      expect(interests.groups.ok && interests.groups.data.map((group) => group.slug)).toContain(
+        'late-group',
+      )
+    })
+
+    it('stops at 5 pages, however many there are', async () => {
+      mineIn(50)
+      await getInterests(viewer)
+      expect(requests).toHaveLength(5)
+    })
+
+    it('keeps what arrived when a later page fails', async () => {
+      mineIn(3, { failAt: 2 })
+      const interests = await getInterests(viewer)
+      expect(interests.groups.ok && interests.groups.data[0]?.slug).toBe('trading-on-chain')
+      expect(interests.assets.ok).toBe(true)
+    })
+  })
+
   describe('sample assets (development only)', () => {
     // A fresh test account: member of no asset community.
     function withoutAssetMemberships() {
