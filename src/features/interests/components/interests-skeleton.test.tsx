@@ -21,4 +21,10 @@ describe('InterestsSkeleton (FN-08)', () => {
     const assets = screen.getByTestId('interests-skeleton').querySelector('[data-section=assets]')
     expect(assets?.querySelector('.grid')?.children).toHaveLength(6)
   })
+
+  it('has no standalone "Create group" placeholder below the groups (it lives in the header)', () => {
+    render(<InterestsSkeleton />)
+    const groups = screen.getByTestId('interests-skeleton').querySelector('[data-section=groups]')
+    expect(groups?.nextElementSibling?.getAttribute('data-section')).toBe('people')
+  })
 })

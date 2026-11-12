@@ -26,7 +26,7 @@ function CommunityRow({ name = 'w-24', line = 'w-32' }: { name?: string; line?: 
 
 /**
  * The left column while its data loads (specs/feed-navigation FN-08), with the shape of the
- * signed-in column (specs/sidebar-fill): groups and "Create group", people, assets as tiles, and
+ * signed-in column (specs/sidebar-fill): groups, people, assets as tiles, and
  * suggested at the bottom. The page, the bar and a language switch never wait for the column.
  * Decorative: the feed's own status announces the loading.
  */
@@ -43,7 +43,6 @@ export function InterestsSkeleton() {
           <CommunityRow name="w-20" line="w-28" />
         </div>
       </div>
-      <Skeleton className="mt-1 mb-6 h-7.5 w-full rounded-md" />
 
       <div data-section="people" className="mb-4">
         <Head />
