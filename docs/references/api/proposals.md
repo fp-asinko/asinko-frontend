@@ -445,7 +445,7 @@ Su orden entre las tesis publicadas del autor, desde 1, canceladas incluidas: no
 
 El slug más corto que hoy acepta el backend (1 a 50) seguiría valiendo para los grupos que ya existen.
 
-**Pregunta:** ¿`POST /uploads/community-image` acepta subir **sin `communityId`**, antes de crear el grupo, como la foto del perfil? Mientras no lo sepamos, el front crea el grupo sin imágenes, las sube ya como moderador y las guarda con `PATCH /communities/{slug}`.
+**~~Pregunta~~ (respondida en el código, 2026-11-12):** sí. En `dev` (`4a07959`, 22/10, desplegado), `POST /uploads/community-image` pide solo `{ userId, contentType, size }`, sin el grupo, y `POST /communities` acepta `avatarUrl` y `bannerUrl` subidos así (los limpia de metadatos y los achica, como la foto del perfil). El front todavía crea el grupo sin imágenes y las guarda después con `PATCH /communities/{slug}`. Puede pasar a mandarlas en el alta, con un spec chico. Queda pendiente la parte de los límites.
 
 ### P-049: `POST /communities` guarda la descripción
 
@@ -458,6 +458,8 @@ El slug más corto que hoy acepta el backend (1 a 50) seguiría valiendo para lo
 **Cambio:** que `POST /communities` guarde `description` como lo hace `PATCH`. Si no se va a aceptar al crear, corregir E02 y responder `422` en lugar de ignorarla.
 
 **Solo al crear:** con `PATCH /communities/{slug}` ("Edit group") la descripción sí se guarda (probado en `dev` el mismo día). El bug está en el alta, no en el campo.
+
+**Revisado el 2026-11-12, sin causa encontrada:** el código de `dev` guarda `description` en el alta desde `c4f6bdf` (17/09), igual que `rules` y `mainUrl`. El front la manda en el mismo body (`createGroupAs`: `{ userId, ...input }`). El `PATCH` de las imágenes, que corre justo después, manda solo la imagen, y el backend solo toca `description` si llega como string. No vemos por qué quedó en `null`. **Pregunta:** ¿lo pueden reproducir en `dev`, o ver qué body llegó al crear `#test-group` el 2026-11-09? Si hace falta, lo reproducimos con un grupo de prueba, aunque quedaría en la base porque no hay forma de borrar un grupo.
 
 **Mientras tanto, en el front:** nada (`api-integration.md`: no se compensa en el front). La descripción se puede cargar después con "Edit group".
 
@@ -534,6 +536,14 @@ Además, la estrella de favorito de una persona sale de esa misma página (su ca
 | `notMine=true` | Sin las comunidades donde el viewer es miembro. Sin sesión se ignora. Junto con `mine=true`, `422`.      |
 
 El front pediría `GET /communities?sort=members&notMine=true&type=SYSTEM_ASSET,SYSTEM_GEO,SYSTEM_CATEGORY,USER_PUBLIC` (los canales personales no se sugieren; `type` con varios valores es P-051). Sin sesión, lo mismo sin `notMine`.
+
+**Con sesión, ya existe algo que sirve (2026-11-12):** `GET /api/v1/onboarding/suggestions` (MVP-152, `64acff1`, 22/10, desplegado en `dev`; todavía no está en nuestro snapshot de E01). Sin `interests` devuelve las comunidades donde la persona no está, sin canales personales, de más miembros a menos: lo que Sugeridos necesita. `?communities=8` (de 1 a 30). También devuelve `users`: sin un `users=0`, la columna pediría al menos una persona que no usa.
+
+- **Propuesta reducida:** con sesión, el front usa `onboarding/suggestions` y no hace falta `notMine`. Pedimos solo dos cosas:
+  - que `users` acepte `0`, para no calcular personas que no se muestran;
+  - que cada comunidad traiga `topPost`, como en `GET /communities` (P-016), porque la fila muestra su post principal.
+- **Sin sesión** (la columna de un invitado, `specs/guest-sidebar`) sigue haciendo falta `sort=members` en `GET /communities`: `onboarding/suggestions` responde `401`.
+- **Antes de adoptarlo:** sumar el endpoint al snapshot de E01, con su esquema y un mock, y probarlo con `pnpm api:smoke` (necesita sesión).
 
 ### P-053: El precio de varios activos en un pedido
 
