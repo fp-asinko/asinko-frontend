@@ -10,7 +10,7 @@
   - Tests: `mappers.test.ts` (host permitido, otro host, URL inválida, `undefined`, `assetClass`); `interests-api.test.ts` (el activo llega con su logo; sin precio sigue en la lista); `fixtures.test.ts` (los mocks validan).
   - Cubre: SA-03, SA-15.
   - Depende de: —.
-- [ ] **T2 — Formato del precio (S).** `lib/format-asset-price.ts`, función pura con la regla de Q1 (design § 3).
+- [x] **T2 — Formato del precio (S).** `lib/format-asset-price.ts`, función pura con la regla de Q1 (design § 3).
   - Tests: `format-asset-price.test.ts` con acción, cripto compacta, bajo 1, índice, par de monedas, y `es` y `pt` (separadores).
   - Cubre: SA-06.
   - Depende de: T1 (el tipo de `assetClass`).
