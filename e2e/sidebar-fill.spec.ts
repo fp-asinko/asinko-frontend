@@ -73,10 +73,15 @@ test.describe('The left column fills its height', () => {
     const tall = await layout(page)
     expect(tall).toMatchObject({ scrolls: false, cut: false })
 
-    // Lower, as with zoom, without reloading (SF-05): fewer items, still no scroll.
-    await page.setViewportSize({ width: 1280, height: 800 })
+    // Lower, as with zoom, without reloading (SF-05): fewer items, still no scroll. The minimum
+    // column is ~840px (3 groups, 3 people, 3 rows, 1 suggestion; PO, 2026-11-12).
+    await page.setViewportSize({ width: 1280, height: 1000 })
     await expect.poll(async () => (await layout(page)).shown).toBeLessThan(tall.shown)
     expect(await layout(page)).toMatchObject({ scrolls: false, cut: false })
+
+    // A common laptop window (800px) is below the new minimum: the column scrolls (SF-04).
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await expect.poll(async () => (await layout(page)).scrolls).toBe(true)
 
     // Below the minimums: the column scrolls and no section goes away (SF-04).
     await page.setViewportSize({ width: 1280, height: 560 })
@@ -86,12 +91,29 @@ test.describe('The left column fills its height', () => {
     ).toHaveCount(4)
   })
 
+  test('at least 3 groups, 3 people and 3 assets at the minimum column (SF-03, PO 2026-11-12)', async ({
+    page,
+  }) => {
+    // A column just over the minimum: no scroll and nothing beyond the minimums yet.
+    await page.setViewportSize({ width: 1280, height: 1000 })
+    await page.goto('/en')
+    await expect(page.getByRole('region', { name: 'Your interests' })).toBeVisible()
+    for (const name of ['Groups', 'People', 'Assets']) {
+      const items = column(page).getByRole('region', { name }).locator('ul > li')
+      const total = await items.count()
+      await expect
+        .poll(() => items.filter({ visible: true }).count())
+        .toBeGreaterThanOrEqual(Math.min(total, 3))
+    }
+    expect(await layout(page)).toMatchObject({ scrolls: false, cut: false })
+  })
+
   test('assets are one row of 32px each, 3 / 5 / 8 by the column height (SA-01, SA-10)', async ({
     page,
   }) => {
     const rows = page.locator('#left-column').getByRole('region', { name: 'Assets' }).locator('li')
 
-    await page.setViewportSize({ width: 1280, height: 800 })
+    await page.setViewportSize({ width: 1280, height: 1000 })
     await page.goto('/en')
     await expect(rows.first()).toBeVisible()
     await expect.poll(() => rows.filter({ visible: true }).count()).toBe(3)

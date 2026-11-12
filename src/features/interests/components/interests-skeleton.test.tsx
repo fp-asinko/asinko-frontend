@@ -27,6 +27,13 @@ describe('InterestsSkeleton (FN-08)', () => {
     expect(rows[0]?.firstElementChild).toHaveClass('size-6', 'rounded-full')
   })
 
+  it('holds the minimums: 3 groups and 3 people (SF-03, PO 2026-11-12)', () => {
+    render(<InterestsSkeleton />)
+    const root = screen.getByTestId('interests-skeleton')
+    expect(root.querySelectorAll('[data-section=groups] .size-8')).toHaveLength(3)
+    expect(root.querySelectorAll('[data-section=people] .size-8')).toHaveLength(3)
+  })
+
   it('has no standalone "Create group" placeholder below the groups (it lives in the header)', () => {
     render(<InterestsSkeleton />)
     const groups = screen.getByTestId('interests-skeleton').querySelector('[data-section=groups]')

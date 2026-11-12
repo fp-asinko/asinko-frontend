@@ -66,4 +66,14 @@ describe('PeopleList, the accuracy in its tier (specs/interests-refresh IR-04)',
     expect(tierOf('60%')).toBe('mid')
     expect(tierOf('30%')).toBe('low')
   })
+
+  it('shows 3, 4 or 5 people by the column height, all of them with "more" open (SF-03, PO 2026-11-12)', () => {
+    renderWithIntl(<PeopleList people={[]} id="people-list" />)
+    expect(screen.getByRole('list')).toHaveClass(
+      '[&>li:nth-child(n+6)]:hidden',
+      'column-tall:[&>li:nth-child(n+5)]:hidden',
+      'column-short:[&>li:nth-child(n+4)]:hidden',
+      'group-has-data-[more=open]/section:[&>li]:flex!',
+    )
+  })
 })

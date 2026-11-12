@@ -47,7 +47,7 @@ export function InterestsSkeleton() {
       <div data-section="people" className="mb-4">
         <Head />
         <div className="flex flex-col gap-0.5 py-1">
-          {['w-24', 'w-20'].map((width) => (
+          {['w-24', 'w-20', 'w-16'].map((width) => (
             <div key={width} className="flex min-h-10 items-center gap-2 px-1 py-1">
               <Skeleton className="size-8 shrink-0 rounded-full" />
               <Skeleton className={cn('h-3.5', width)} />

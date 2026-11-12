@@ -57,4 +57,14 @@ describe('GroupList (H-07)', () => {
       String(identityIndex('onchain')),
     )
   })
+
+  it('shows 3, 4 or 6 groups by the column height, all of them with "more" open (SF-03, PO 2026-11-12)', () => {
+    renderWithIntl(<GroupList groups={[group]} id="groups-list" />)
+    expect(screen.getByRole('list')).toHaveClass(
+      '[&>li:nth-child(n+7)]:hidden',
+      'column-tall:[&>li:nth-child(n+5)]:hidden',
+      'column-short:[&>li:nth-child(n+4)]:hidden',
+      'group-has-data-[more=open]/section:[&>li]:flex!',
+    )
+  })
 })
