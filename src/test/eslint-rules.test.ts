@@ -16,6 +16,8 @@ function rulesFor(relativeFile: string) {
 }
 
 describe('project lint rules', () => {
+  // Type-aware linting of the fixtures takes seconds alone and over a minute with the whole suite and
+  // other tools competing for the CPU (it hit the previous 60 s). Only a hang should fail here.
   beforeAll(async () => {
     const eslint = new ESLint({ ignore: false })
     const results = await eslint.lintFiles([FIXTURES])
@@ -25,7 +27,7 @@ describe('project lint rules', () => {
         ruleId: message.ruleId,
       })),
     )
-  }, 60_000)
+  }, 180_000)
 
   it('forbids a feature importing another feature', () => {
     expect(rulesFor('features/profile/uses-home.ts')).toContain('boundaries/dependencies')
