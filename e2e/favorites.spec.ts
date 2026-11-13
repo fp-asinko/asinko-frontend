@@ -33,10 +33,6 @@ test.describe('Favorites', () => {
       'aria-pressed',
       'true',
     )
-    await page.screenshot({
-      path: 'C:/Users/WINDOW~1/AppData/Local/Temp/claude/d--programacion-asinko-web/b01afc19-1a9c-4422-b005-e39e7a2ec9b6/scratchpad/fav-column.png',
-      clip: { x: 0, y: 60, width: 280, height: 900 },
-    })
   })
 
   test('each star stays on its row with "more" open (FV-02)', async ({ page }) => {
