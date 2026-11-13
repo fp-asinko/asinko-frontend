@@ -1,4 +1,4 @@
-import { act, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { router } from '@/test/navigation-mock'
@@ -82,27 +82,35 @@ describe('password recovery forms (specs/password-recovery)', () => {
     })
 
     it('lets it be sent again only after a minute (PR-05)', async () => {
-      vi.useFakeTimers({ shouldAdvanceTime: true })
-      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+      // Fully fake clock: with `shouldAdvanceTime` the real time of a loaded machine also ran the
+      // countdown, so the button could already be live (or read 59 s) when the test looked at it.
+      vi.useFakeTimers()
+      // fireEvent, not userEvent: Testing Library's async wrapper waits on a real setTimeout(0)
+      // after each userEvent call, which a fully fake clock never fires (the test would hang).
+      // Lets the promises of the form and of the action settle, without moving the countdown.
+      const settle = () => act(async () => void (await vi.advanceTimersByTimeAsync(0)))
       actions.requestRecovery.mockResolvedValue({ ok: true, data: null })
       renderWithIntl(<RecoverForm defaultEmail="ana@example.com" next="/en" />)
-      await user.click(screen.getByRole('button', { name: 'Send link' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Send link' }))
+      await settle()
       // A fixed name: the countdown is only seen, never read every second.
-      const again = await screen.findByRole('button', { name: 'Send it again' })
+      const again = screen.getByRole('button', { name: 'Send it again' })
       expect(again).toHaveTextContent(`Send it again in ${RESEND_SECONDS} s`)
       expect(again).toHaveAttribute('aria-disabled', 'true')
-      await user.click(again)
+      fireEvent.click(again)
+      await settle()
       expect(actions.requestRecovery).toHaveBeenCalledTimes(1)
 
       for (let second = 0; second < RESEND_SECONDS; second++) {
-        await act(async () => vi.advanceTimersByTime(1000))
+        await act(async () => vi.advanceTimersByTimeAsync(1000))
       }
       expect(again).toHaveTextContent(/^Send it again$/)
       expect(again).not.toHaveAttribute('aria-disabled')
-      await user.click(again)
-      await vi.waitFor(() => expect(actions.requestRecovery).toHaveBeenCalledTimes(2))
+      fireEvent.click(again)
+      await settle()
+      expect(actions.requestRecovery).toHaveBeenCalledTimes(2)
       // Sent again: the confirmation takes the focus back, to be read again (PR-16).
-      await vi.waitFor(() => expect(screen.getByRole('status')).toHaveFocus())
+      expect(screen.getByRole('status')).toHaveFocus()
     })
 
     it('sends once while it runs, however many times Enter is pressed (PR-05)', async () => {

@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -51,13 +51,34 @@ describe('AssetSearch (specs/thesis-form-steps FS-01 to FS-03)', () => {
     await userEvent.click(field())
     expect(screen.queryByRole('option')).toBeNull()
 
-    await userEvent.type(field(), 'bit')
+    // Pasted, one input event: typed key by key, a pause longer than the debounce between two keys
+    // (a loaded machine) searches for a half-written word. The debounce is checked below.
+    await userEvent.paste('bit')
     expect(await screen.findByRole('option', { name: /\$BTC/ })).toBeVisible()
     // Said, not only seen (WCAG 4.1.3).
     await vi.waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('2 assets'))
     // Only assets, and once typing rests (FS-01).
     expect(action.searchCommunities).toHaveBeenCalledTimes(1)
     expect(action.searchCommunities).toHaveBeenCalledWith('bit', 'assets')
+  })
+
+  it('waits for typing to rest before searching, whatever the pace of the keys (FS-01)', () => {
+    vi.useFakeTimers()
+    try {
+      action.searchCommunities.mockResolvedValue({ ok: true, data: [BTC] })
+      renderWithIntl(<Search />)
+      // A fake clock, so the pace between keys is exact and not the machine's.
+      for (const text of ['b', 'bi', 'bit']) {
+        fireEvent.change(field(), { target: { value: text } })
+        act(() => void vi.advanceTimersByTime(150))
+      }
+      expect(action.searchCommunities).not.toHaveBeenCalled()
+      act(() => void vi.advanceTimersByTime(60))
+      expect(action.searchCommunities).toHaveBeenCalledTimes(1)
+      expect(action.searchCommunities).toHaveBeenCalledWith('bit', 'assets')
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('chooses one, shows it as its card, and × brings the search back focused (FS-02)', async () => {
