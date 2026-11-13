@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithIntl } from '@/test/render-with-intl'
@@ -77,8 +77,10 @@ describe('CardComments (specs/card-comment)', () => {
     renderPanel({ empty: true })
     expect(screen.getByText('No comments yet.')).toBeInTheDocument()
     await comment('First!')
+    // The comment shows first as pending, then as sent (another element, the one that drops the
+    // empty preview): wait for the preview to go, not for the first match of the text.
+    await waitFor(() => expect(screen.queryByText('No comments yet.')).toBeNull())
     expect(await screen.findByText('First!')).toBeInTheDocument()
-    expect(screen.queryByText('No comments yet.')).toBeNull()
   })
 
   it('gives the text back with the reason when it fails (CC-04)', async () => {
