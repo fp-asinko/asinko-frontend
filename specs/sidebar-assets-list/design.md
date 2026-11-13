@@ -101,7 +101,7 @@ group-has-data-[more=open]/section:[&>li]:flex!   // "more" abierto: todas
 
 - `hidden` es `display: none`: lo escondido sale del orden de Tab y del lector (SF-06). Las reglas solo suman `hidden`, así que las que coinciden se combinan (gana la más estricta), como en `PeopleList`.
 - El panel lateral del teléfono no tiene contenedor `column`: muestra hasta 8 y "more" (como hoy muestra hasta 9).
-- Los mínimos de `sidebar-fill § 3` cambian: la fila de 3 mosaicos (85 px) pasa a 3 filas (~102 px); el mínimo de la columna sube ~17 px (a ~704 px). `e2e/sidebar-fill.spec.ts` se reajusta (viewport de 620 y de 420) y la nota se agrega a `specs/sidebar-fill` (SF-03). Con la alternativa 2 / 4 / 6 de Q5, la altura queda igual.
+- Los mínimos de `sidebar-fill § 3` cambian: la fila de 3 mosaicos (85 px) pasa a 3 filas (~102 px); el mínimo de la columna sube ~17 px (estimado: ~704 px). _Medido el 2026-11-13 (`specs/sidebar-fill` § 3): el mínimo real es de 612 px con el demo y ~668 px con datos completos; los fijos eran menores que los ~406 px estimados._ `e2e/sidebar-fill.spec.ts` se reajusta (viewport de 620 y de 420) y la nota se agrega a `specs/sidebar-fill` (SF-03). Con la alternativa 2 / 4 / 6 de Q5, la altura queda igual.
 - Si la persona tiene menos de 3 activos, no hay "more" (`MoreToggle` con `empty:hidden`, hoy).
 
 ## 5. Esqueleto, error y vacío (SA-11)
@@ -175,6 +175,6 @@ Los tests unitarios de `asset-tiles.test.tsx` migran a `asset-list.test.tsx`; ni
 
 ## 10. Riesgos
 
-- **Alto de la columna:** pasar de 85 a ~102 px en el mínimo mueve el punto donde aparece el scroll (§ 4). Se mide en el build, no a ojo.
+- **Alto de la columna:** pasar de 85 a ~102 px en el mínimo mueve el punto donde aparece el scroll (§ 4). Se mide en el build, no a ojo. _Medido el 2026-11-13: ver `specs/sidebar-fill` § 3; una ventana de 800 px no hace scroll._
 - **Logos en CI:** con `API_MOCKS=true` el CI no tiene red al Storage garantizada. Los mocks que usen URLs reales de Storage pueden fallar la carga de imagen en e2e; la regla de § 1 (seguir lo que hacen los mocks de avatares) evita introducir una dependencia nueva de red.
 - **Carga de imagen fallida:** si un logo permitido devuelve 404, `next/image` muestra la imagen rota. Igual que hoy con los avatares; queda fuera de alcance (ver `requirements.md`).

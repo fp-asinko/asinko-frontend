@@ -13,6 +13,6 @@ Orden: T-01 → T-03 → T-04.
 | ------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | SF-01        | `interests-sections.test.tsx`                                                                                             |
 | SF-02, SF-03 | `group-list.test.tsx`, `people-list.test.tsx`, `asset-list.test.tsx`, `e2e/sidebar-fill.spec.ts`, `interests-api.test.ts` |
-| SF-04        | `e2e/sidebar-fill.spec.ts` (420 px)                                                                                       |
+| SF-04        | `e2e/sidebar-fill.spec.ts` (560 px)                                                                                       |
 | SF-05        | `e2e/sidebar-fill.spec.ts` (cambia el alto sin recargar)                                                                  |
 | SF-06        | e2e (axe; lo escondido fuera del orden del teclado)                                                                       |

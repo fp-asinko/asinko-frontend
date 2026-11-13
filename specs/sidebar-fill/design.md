@@ -32,13 +32,29 @@
 
 ### Mínimos nuevos: 3 grupos, 3 personas, 3 activos (PO, 2026-11-12)
 
-El PO pide ver **al menos 3 grupos, 3 personas y 3 activos**. Alturas medidas (arriba): fijos ~406 px (títulos, "more" y líneas), grupo 52, persona 42, fila de activos 34 (32 de la fila + 2 de separación; 3 filas ~102) y una sugerencia 50. Los fijos se midieron antes de mover "Crear grupo" al encabezado (`specs/community-create`), que seguramente los baja un poco; no se volvió a medir, así que el mínimo es una cota conservadora.
+El PO pide ver **al menos 3 grupos, 3 personas y 3 activos**.
 
-- **Mínimo nuevo:** 406 + 3 × 52 (grupos) + 3 × 42 (personas) + 102 (activos) + 50 (1 sugerencia) = **~840 px** de columna.
-- **Mínimo anterior:** 406 + 2 × 52 + 42 + 102 + 50 = ~704 px. Sube **~136 px**.
-- **Consecuencia (decisión del PO):** la columna es la ventana menos la barra superior, así que con una ventana de ~800 px de alto (laptops comunes) mide menos de 840 y hace scroll (SF-04). Hace falta una ventana de unos 900 px o más para verla sin scroll. Ninguna sección desaparece y lo escondido sigue en `display: none` (SF-06).
+**Estimación inicial (descartada).** Se calculó con los ~406 px fijos de 2026-10-21 (anteriores a mover "Crear grupo" al encabezado y a pasar los activos a filas): 406 + 3 × 52 + 3 × 42 + 102 + 50 = ~840 px, y de ahí se dedujo que una ventana de 800 px haría scroll. Era una cota sin medir y resultó **alta por unos 170 px**: `e2e/sidebar-fill.spec.ts` lo mostró en CI (el scroll esperado a 800 px no aparecía).
 
-Escalones nuevos (cada uno suma lo que cuestan los ítems que agrega al mínimo de 840; Sugeridos se queda con lo que sobra):
+**Medido en el build de producción (2026-11-13, `API_MOCKS=true`, 1280 px de ancho; la columna es el alto de la ventana menos 61 px de la barra superior):**
+
+| Parte                                           | Alto (px)                |
+| ----------------------------------------------- | ------------------------ |
+| Grupos (3 filas de 50 + título y separaciones)  | 186                      |
+| Personas (3 filas de 40 + título)               | 156                      |
+| Activos (3 filas de 32 + título + "more")       | 160                      |
+| Sugeridos (título + 1 sugerencia de 50)         | 96                       |
+| **Contenido total, datos del demo**             | **612** (ventana de 673) |
+| Fila de "more" (botón de 24 + 4 de margen)      | 28                       |
+| **Contenido total, con "more" en las 3 listas** | **668** (ventana de 729) |
+
+El demo tiene exactamente 3 grupos, 3 personas y 6 activos, así que solo Activos muestra "more". Los 668 px **no se midieron con datos reales de más**: se simularon en el navegador clonando un cuarto ítem y una fila de "more" en Grupos y Personas (la fila de "more" se midió en Activos). Una segunda sugerencia entra desde una columna de unos 780 px (medido con ventanas de 800 y 840 px: 1 y 2 sugerencias); no cambia el mínimo, porque Sugeridos es la última prioridad.
+
+- **Mínimo real:** **612 px** de columna con el demo y **668 px** con 4 o más grupos y personas (3 / 3 / 3 visibles y 1 sugerencia). Antes se estimaban ~840.
+- **Consecuencia para una ventana de laptop:** con 800 px de alto la columna mide 739 px, **por encima del mínimo (668): no hace scroll** y muestra los 3 / 3 / 3. El scroll (SF-04) aparece con ventanas de menos de ~673 px (demo) o ~729 px (datos completos). Medido: 560 px y 640 px hacen scroll; 700 px y más, no (con el demo).
+- Ninguna sección desaparece y lo escondido sigue en `display: none` (SF-06).
+
+Escalones (siguen siendo los de la estimación de 840 px, ver la nota de abajo; Sugeridos se queda con lo que sobra):
 
 | Alto de la columna | Grupos | Personas | Activos | Sugeridas                |
 | ------------------ | ------ | -------- | ------- | ------------------------ |
@@ -49,6 +65,8 @@ Escalones nuevos (cada uno suma lo que cuestan los ítems que agrega al mínimo 
 
 (936 = 840 + 52 + 42 + 2; 1002 = 840 + 52 + 42 + 2 × 34; 1250 = 1002 + 2 × 52 + 42 + 3 × 34.)
 
+_Nota (2026-11-13):_ con el mínimo medido de 668 px, cada escalón podría empezar antes (por ejemplo, 4 grupos y 4 personas necesitan 668 + 52 + 42 = ~762 px, y con una segunda sugerencia ~797 px, no 936). No se cambiaron: los umbrales actuales son más altos que lo necesario, así que **nunca** provocan scroll ni rompen los mínimos del PO; solo dejan más aire sobre Sugeridos entre ~670 y 936 px de columna. Moverlos es una decisión de diseño para el PO, no un error.
+
 - Variantes de `globals.css`: `column-short` < 58.5rem (936 px), `column-mid` < 62.625rem (1002 px), `column-tall` < 78.125rem (1250 px). Grupos y personas esconden desde el cuarto (`short`) o el quinto (`tall`); activos desde la cuarta fila (`mid`) o la sexta (`tall`). Los topes de 6 / 5 / 8 no cambian.
 - **Esqueleto** (`interests-skeleton.tsx`): 3 grupos, 3 personas y 5 filas de activos, para que al llegar los datos no haya salto de layout.
 
@@ -57,7 +75,7 @@ Escalones nuevos (cada uno suma lo que cuestan los ítems que agrega al mínimo 
 - **Unitarios:** el orden de las secciones en `interests-sections.test.tsx`; 8 sugerencias con sesión en `interests-api.test.ts`.
 - **E2E** (`e2e/sidebar-fill.spec.ts`, desktop):
   - con 1280 × 1100, sin scroll en la columna y Sugeridos llega hasta abajo;
-  - con 1280 × 620, menos ítems por sección, sin scroll en la columna, y ningún ítem cortado a medias (la caja de cada uno entra entera). _PO, 2026-11-12:_ con los mínimos nuevos esto pasa a 1280 × 1000 (columna de ~930 px: 3 / 3 / 3 sin scroll) y 1280 × 800 hace scroll;
-  - con 1280 × 420, scroll en la columna y las cuatro secciones presentes;
+  - con 1280 × 620, menos ítems por sección, sin scroll en la columna, y ningún ítem cortado a medias (la caja de cada uno entra entera). _PO, 2026-11-12, corregido con lo medido el 2026-11-13:_ con los mínimos nuevos esto pasa a 1280 × 1000 (menos ítems que a 1100, sin scroll) y 1280 × 800 (columna de 739 px: 3 / 3 / 3 sin scroll; **no** hace scroll, a diferencia de lo estimado);
+  - con 1280 × 560 (columna de ~500 px, por debajo del mínimo medido), scroll en la columna y las cuatro secciones presentes;
   - axe en claro y oscuro;
   - el presupuesto de JS sin cambios (`performance.spec.ts`).
