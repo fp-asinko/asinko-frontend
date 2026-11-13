@@ -67,23 +67,28 @@ test.describe('The left column fills its height', () => {
   test('tall: no scroll, every item whole; low: fewer, still no scroll; lower: it scrolls (SF-02 to SF-05)', async ({
     page,
   }) => {
+    // The column is the window minus the top bar (61px). Measured on the production build
+    // (specs/sidebar-fill design § 3): its content needs 612px with the demo's data (3 groups,
+    // 3 people, 3 assets, 1 suggestion) and 668px with the "more" row under each list that has
+    // more than 3. So the expectations below hold for any amount of mock data.
     await page.setViewportSize({ width: 1280, height: 1100 })
     await page.goto('/en')
     await expect(page.getByRole('region', { name: 'Your interests' })).toBeVisible()
     const tall = await layout(page)
     expect(tall).toMatchObject({ scrolls: false, cut: false })
 
-    // Lower, as with zoom, without reloading (SF-05): fewer items, still no scroll. The minimum
-    // column is ~840px (3 groups, 3 people, 3 rows, 1 suggestion; PO, 2026-11-12).
+    // Lower, as with zoom, without reloading (SF-05): fewer items, still no scroll.
     await page.setViewportSize({ width: 1280, height: 1000 })
     await expect.poll(async () => (await layout(page)).shown).toBeLessThan(tall.shown)
     expect(await layout(page)).toMatchObject({ scrolls: false, cut: false })
 
-    // A common laptop window (800px) is below the new minimum: the column scrolls (SF-04).
+    // A common laptop window (800px, a 739px column) is above the measured minimum (668px at most):
+    // the minimums fit and the column does not scroll (SF-03).
     await page.setViewportSize({ width: 1280, height: 800 })
-    await expect.poll(async () => (await layout(page)).scrolls).toBe(true)
+    await expect.poll(async () => (await layout(page)).scrolls).toBe(false)
+    expect(await layout(page)).toMatchObject({ scrolls: false, cut: false })
 
-    // Below the minimums: the column scrolls and no section goes away (SF-04).
+    // Below the minimum (560px: a 499px column): the column scrolls and no section goes away (SF-04).
     await page.setViewportSize({ width: 1280, height: 560 })
     await expect.poll(async () => (await layout(page)).scrolls).toBe(true)
     await expect(
@@ -91,11 +96,11 @@ test.describe('The left column fills its height', () => {
     ).toHaveCount(4)
   })
 
-  test('at least 3 groups, 3 people and 3 assets at the minimum column (SF-03, PO 2026-11-12)', async ({
+  test('at least 3 groups, 3 people and 3 assets at a common laptop window (SF-03, PO 2026-11-12)', async ({
     page,
   }) => {
-    // A column just over the minimum: no scroll and nothing beyond the minimums yet.
-    await page.setViewportSize({ width: 1280, height: 1000 })
+    // 800px: close to the minimum column, so only the minimums fit; no scroll.
+    await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/en')
     await expect(page.getByRole('region', { name: 'Your interests' })).toBeVisible()
     for (const name of ['Groups', 'People', 'Assets']) {
