@@ -94,7 +94,8 @@ describe('VoteControl (H-15)', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Downvote' }))
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not save your vote')
-    expect(screen.getByText('10 points')).toBeInTheDocument()
+    // The score goes back when the transition ends, a step after the alert shows: wait for it.
+    expect(await screen.findByText('10 points')).toBeInTheDocument()
   })
 
   it('opens the account modal without a session, marking and sending nothing (G-04)', async () => {

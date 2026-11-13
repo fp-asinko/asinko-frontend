@@ -17,6 +17,13 @@ export default defineConfig({
     // the whole suite in parallel on a loaded machine (the pre-push hook, a dev server running).
     // A longer limit, not slower checks: a test that hangs still fails.
     testTimeout: 15_000,
+    // Hooks (beforeAll with a slow setup) get the same margin under load; a hook that needs more
+    // (the lint-rules fixtures) declares its own.
+    hookTimeout: 30_000,
+    // Half the logical CPUs. By default Vitest starts about one worker per core, and each one boots
+    // its own jsdom (412 files, ~1700 s of CPU in total): with typecheck, ESLint or a dev server
+    // alongside, the machine saturates and timing-based checks drift. Isolation stays on.
+    maxWorkers: '50%',
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     // next-intl imports 'next/navigation' without extension; let Vite resolve it.
