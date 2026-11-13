@@ -40,7 +40,8 @@ for (const theme of ['light', 'dark'] as const) {
     }) => {
       await context.addCookies([{ name: 'asinko-mock-guest', value: '1', url: baseURL! }])
       await page.goto('/en?feed=following')
-      await expect(page.getByText('Your feed, your way')).toBeVisible()
+      // Inside <main>: while the page streams, Next also holds a hidden copy of the content outside it.
+      await expect(page.getByRole('main').getByText('Your feed, your way')).toBeVisible()
       await expect(
         page.getByRole('main').getByRole('button', { name: 'Create account' }),
       ).toBeVisible()
